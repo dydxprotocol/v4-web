@@ -6,10 +6,6 @@ import styled from 'styled-components';
 import { Link } from './Link';
 import { Output, OutputType } from './Output';
 
-export type ValidatorNameProps = {
-  validator?: Validator;
-};
-
 export const ValidatorFaviconIcon = ({
   className,
   url,
@@ -40,10 +36,7 @@ export const ValidatorFaviconIcon = ({
   return null;
 };
 
-export const ValidatorName = ({ validator }: ValidatorNameProps) => {
-  if (!validator) {
-    return null;
-  }
+export const ValidatorName = ({ validator }: { validator?: Validator }) => {
   const output = (
     <$Output
       type={OutputType.Text}
@@ -57,15 +50,22 @@ export const ValidatorName = ({ validator }: ValidatorNameProps) => {
     />
   );
 
-  if (validator?.description?.website) {
-    return (
-      <Link href={validator?.description?.website} withIcon>
-        {output}
-      </Link>
-    );
-  }
-  return output;
+  return validator?.description?.website ? (
+    <Link href={validator?.description?.website} withIcon>
+      {output}
+    </Link>
+  ) : (
+    output
+  );
 };
+
+const $Img = styled.img`
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.25em;
+`;
 
 const $IconContainer = styled.div`
   display: flex;
@@ -77,14 +77,6 @@ const $IconContainer = styled.div`
   border-radius: 50%;
   font-weight: bold;
   color: var(--color-text-1);
-  margin-right: 0.25em;
-`;
-
-const $Img = styled.img`
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  object-fit: cover;
   margin-right: 0.25em;
 `;
 

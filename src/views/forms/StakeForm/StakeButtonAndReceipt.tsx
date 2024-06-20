@@ -1,17 +1,22 @@
+import { Dispatch, SetStateAction } from 'react';
+
+import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { DiffOutput } from '@/components/DiffOutput';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorName } from '@/components/ValidatorName';
+import { ValidatorDropdown } from '@/components/ValidatorDropdown';
 import { WithTooltip } from '@/components/WithTooltip';
 import { StakeButtonAlert, StakeRewardButtonAndReceipt } from '@/views/StakeRewardButtonAndReceipt';
 
@@ -22,13 +27,22 @@ type ElementProps = {
   fee?: BigNumberish;
   amount?: number;
   isLoading: boolean;
+  selectedValidator: Validator | undefined;
+  setSelectedValidator: Dispatch<SetStateAction<Validator | undefined>>;
 };
 
-export const StakeButtonAndReceipt = ({ error, fee, amount, isLoading }: ElementProps) => {
+export const StakeButtonAndReceipt = ({
+  error,
+  fee,
+  amount,
+  isLoading,
+  selectedValidator,
+  setSelectedValidator,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
+  const { mintscanValidatorsLearnMore } = useURLConfigs();
   const { nativeStakingBalance } = useAccountBalance();
-  const { selectedValidator } = useStakingValidator() ?? {};
 
   const newStakedBalance = amount ? MustBigNumber(nativeStakingBalance).plus(amount) : undefined;
 
@@ -36,11 +50,29 @@ export const StakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Element
     {
       key: 'validator',
       label: (
-        <WithTooltip tooltip="validator-selection">
-          {stringGetter({ key: STRING_KEYS.SELECTED_VALIDATOR })}
+        <WithTooltip
+          tooltipString={stringGetter({
+            key: STRING_KEYS.VALIDATORS_INFO_LINK,
+            params: {
+              MINTSCAN_LINK: (
+                <$Link href={mintscanValidatorsLearnMore}>
+                  {stringGetter({ key: STRING_KEYS.MINTSCAN })}
+                </$Link>
+              ),
+            },
+          })}
+        >
+          {stringGetter({
+            key: STRING_KEYS.VALIDATOR,
+          })}
         </WithTooltip>
       ),
-      value: <ValidatorName validator={selectedValidator} />,
+      value: (
+        <ValidatorDropdown
+          selectedValidator={selectedValidator}
+          setSelectedValidator={setSelectedValidator}
+        />
+      ),
     },
     {
       key: 'fees',
@@ -86,3 +118,8 @@ export const StakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Element
     />
   );
 };
+
+const $Link = styled(Link)`
+  display: inline;
+  text-decoration: underline;
+`;

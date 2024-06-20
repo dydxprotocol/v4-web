@@ -138,10 +138,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     key: STRING_KEYS.CURRENTLY_STAKING,
     params: {
       AMOUNT: (
-        <>
+        <$StakedAmount>
           {nativeStakingBalance}
           <Tag>{chainTokenLabel}</Tag>
-        </>
+        </$StakedAmount>
       ),
     },
   });
@@ -203,6 +203,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
           ]}
         >
           <FormInput
+            id="unstakeAmount"
             label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_UNSTAKE })}
             type={InputType.Number}
             onChange={({ floatValue }: NumberFormatValues) =>
@@ -223,7 +224,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                 }
               />
             }
-            disabled={isLoading}
           />
         </$WithDetailsReceipt>
       )}
@@ -266,7 +266,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                       }
                     />
                   }
-                  disabled={isLoading}
                 />
               </React.Fragment>
             );
@@ -312,4 +311,9 @@ const $Footer = styled.footer`
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
+`;
+
+const $StakedAmount = styled.span`
+  ${layoutMixins.inlineRow}
+  color: var(--color-text-1);
 `;

@@ -167,6 +167,8 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
   --withReceipt-backgroundColor: var(--color-layer-2);
+
+  color: var(--color-text-form);
   width: 100%;
 
   ${({ isForm }) =>

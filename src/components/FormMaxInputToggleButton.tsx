@@ -18,7 +18,7 @@ type ElementProps = {
 };
 
 export const FormMaxInputToggleButton = ({
-  size = ButtonSize.XSmall,
+  size = ButtonSize.Small,
   isInputEmpty,
   isLoading,
   onPressedChange,
@@ -42,4 +42,6 @@ const $FormMaxInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 
   --button-padding: 0 0.5rem;
+  --button-backgroundColor: var(--color-accent);
+  --button-textColor: var(--color-text-2);
 `;

@@ -47,7 +47,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   const { delegate, getDelegateFee } = useSubaccount();
   const { nativeTokenBalance: balance } = useAccountBalance();
-  const { selectedValidator } = useStakingValidator() ?? {};
+  const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
@@ -61,6 +61,11 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   const maxAmountBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
+
+  useEffect(() => {
+    // Initalize to default validator once on mount
+    setSelectedValidator(defaultValidator);
+  }, []);
 
   useEffect(() => {
     if (amountBN && !isAmountValid) {
@@ -141,13 +146,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     },
   ];
 
-  const openKeplrDialog = () =>
-    dispatch(
-      forceOpenDialog({
-        type: DialogTypes.ExternalNavKeplr,
-      })
-    );
-
   const openStrideDialog = () =>
     dispatch(
       forceOpenDialog({
@@ -170,6 +168,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
       </$Description>
       <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
         <FormInput
+          id="stakeAmount"
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) =>
@@ -185,7 +184,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
               }
             />
           }
-          disabled={isLoading}
         />
       </$WithDetailsReceipt>
 
@@ -195,16 +193,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           fee={fee}
           isLoading={isLoading}
           amount={amountBN?.toNumber()}
+          selectedValidator={selectedValidator}
+          setSelectedValidator={setSelectedValidator}
         />
         <$LegalDisclaimer>
           {stringGetter({
-            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER,
+            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
             params: {
-              KEPLR_DASHBOARD_LINK: (
-                <$Link withIcon onClick={openKeplrDialog}>
-                  {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
-                </$Link>
-              ),
               STRIDE_LINK: (
                 <$Link withIcon onClick={openStrideDialog}>
                   Stride
@@ -220,6 +215,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
 const $Form = styled.form`
   ${formMixins.transfersForm}
+  --color-text-form: var(--color-text-0);
 `;
 
 const $Description = styled.div`
@@ -234,14 +230,16 @@ const $Footer = styled.footer`
   flex-direction: column;
   gap: 1rem;
 `;
+
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
+  color: var(--color-text-form);
 `;
 
 const $LegalDisclaimer = styled.div`
   text-align: center;
   color: var(--color-text-0);
-  font: var(--font-small-book);
+  font: var(--font-mini-book);
 `;
 
 const $Link = styled(Link)`
