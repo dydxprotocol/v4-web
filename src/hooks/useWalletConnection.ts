@@ -306,6 +306,7 @@ export const useWalletConnection = () => {
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,
+    isConnectedGraz,
     signerGraz,
   };
 };
