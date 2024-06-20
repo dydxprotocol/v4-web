@@ -61,6 +61,17 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label>{stringGetter({ key: labelKey })}</label>
               <Tag>{stringGetter({ key: tagKey })}</Tag>
+
+              {link && linkLabelKey ? (
+                <$BillboardLink
+                  href={link}
+                  size={ButtonSize.Small}
+                  type={ButtonType.Link}
+                  action={ButtonAction.Navigation}
+                >
+                  {stringGetter({ key: linkLabelKey })}
+                </$BillboardLink>
+              ) : null}
             </$BillboardTitle>
             <$Output
               useGrouping
@@ -69,16 +80,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
               type={type}
               value={value}
             />
-            {link && linkLabelKey ? (
-              <$BillboardLink
-                href={link}
-                size={ButtonSize.Small}
-                type={ButtonType.Link}
-                action={ButtonAction.Navigation}
-              >
-                {stringGetter({ key: linkLabelKey })}
-              </$BillboardLink>
-            ) : null}
           </$BillboardStat>
         </$BillboardContainer>
       ))}
@@ -96,7 +97,7 @@ const $BillboardContainer = styled.div`
   justify-content: space-between;
 
   background-color: var(--color-layer-3);
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 0.625rem;
 `;
 const $BillboardLink = styled(Button)`
@@ -104,6 +105,7 @@ const $BillboardLink = styled(Button)`
   --button-height: unset;
   --button-padding: 0;
   justify-content: flex-start;
+  margin-left: auto;
 `;
 const $BillboardTitle = styled.div`
   ${layoutMixins.row}
@@ -114,6 +116,7 @@ const $BillboardStat = styled.div`
   ${layoutMixins.column}
 
   gap: 0.5rem;
+  flex: 1;
 
   label {
     color: var(--color-text-0);
