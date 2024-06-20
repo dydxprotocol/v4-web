@@ -10,8 +10,8 @@ import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/order
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
 import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
+import { useOrderbookMiddleRowScrollListener } from '@/hooks/Orderbook/useOrderbookMiddleRowScrollListener';
 import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues';
-import { useSpreadRowScrollListener } from '@/hooks/Orderbook/useSpreadRowScrollListener';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
@@ -26,7 +26,7 @@ import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSe
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { OrderbookRow, SpreadRow } from './OrderbookRow';
+import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
   maxRowsPerSide?: number;
@@ -44,10 +44,9 @@ export const CanvasOrderbook = forwardRef(
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent } =
-      useCalculateOrderbookData({
-        maxRowsPerSide,
-      });
+    const { asks, bids, hasOrderbook, histogramRange } = useCalculateOrderbookData({
+      maxRowsPerSide,
+    });
 
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
@@ -84,13 +83,13 @@ export const CanvasOrderbook = forwardRef(
     useCenterOrderbook({ orderbookRef, marketId: currentMarket });
 
     /**
-     * Display top or bottom spreadRow when center spreadRow is off screen
+     * Display top or bottom middleRow when center middleRow is off screen
      */
-    const spreadRowRef = useRef<HTMLDivElement>(null);
+    const orderbookMiddleRowRef = useRef<HTMLDivElement>(null);
 
-    const displaySide = useSpreadRowScrollListener({
+    const displaySide = useOrderbookMiddleRowScrollListener({
       orderbookRef,
-      spreadRowRef,
+      orderbookMiddleRowRef,
     });
 
     /**
@@ -140,12 +139,7 @@ export const CanvasOrderbook = forwardRef(
           </$Header>
 
           {displaySide === 'top' && (
-            <$SpreadRow
-              side="top"
-              spread={spread}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <$OrderbookMiddleRow side="top" tickSizeDecimals={tickSizeDecimals} />
           )}
 
           <$OrderbookWrapper ref={orderbookRef}>
@@ -170,12 +164,7 @@ export const CanvasOrderbook = forwardRef(
               <$OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
             </$OrderbookSideContainer>
 
-            <SpreadRow
-              ref={spreadRowRef}
-              spread={spread?.toNumber()}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <OrderbookMiddleRow ref={orderbookMiddleRowRef} tickSizeDecimals={tickSizeDecimals} />
 
             <$OrderbookSideContainer $side="bids">
               <$HoverRows>
@@ -203,12 +192,7 @@ export const CanvasOrderbook = forwardRef(
             </$OrderbookSideContainer>
           </$OrderbookWrapper>
           {displaySide === 'bottom' && (
-            <$SpreadRow
-              side="bottom"
-              spread={spread}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
           )}
         </$OrderbookContent>
         {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
@@ -285,6 +269,6 @@ const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-const $SpreadRow = styled(SpreadRow)`
+const $OrderbookMiddleRow = styled(OrderbookMiddleRow)`
   position: absolute;
 `;
