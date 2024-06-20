@@ -37,6 +37,7 @@ export interface LinksConfigs {
   fetAgixMarketWindDownProposal?: string;
   contractLossMechanismLearnMore?: string;
   mintscanValidatorsLearnMore?: string;
+  protocolStaking: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -75,5 +76,6 @@ export const useURLConfigs = (): LinksConfigs => {
     fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
     mintscanValidatorsLearnMore: linksConfigs.mintscanValidatorsLearnMore,
+    protocolStaking: linksConfigs.protocolStaking,
   };
 };

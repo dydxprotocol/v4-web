@@ -10,6 +10,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -17,6 +18,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Tag, TagSign } from '@/components/Tag';
@@ -36,11 +38,25 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const { complianceState } = useComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
   const { chainTokenLabel } = useTokenConfigs();
+  const { protocolStaking } = useURLConfigs();
 
   const unstakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
   const stakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
 
   const showStakingActions = canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
+
+  const estimatedAprTooltipString = stringGetter({
+    key: STRING_KEYS.ESTIMATED_APR_DATA_BASED_ON,
+    params: {
+      PROTOCOL_STAKING_LINK: (
+        <$Link href={protocolStaking} withIcon>
+          {stringGetter({
+            key: STRING_KEYS.PROTOCOL_STAKING,
+          })}
+        </$Link>
+      ),
+    },
+  });
 
   return (
     <Panel
@@ -74,7 +90,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
         <$BalanceRow>
           <div>
             <$Label>
-              <WithTooltip tooltipString="haha fill out">
+              <WithTooltip tooltipString={estimatedAprTooltipString}>
                 {stringGetter({
                   key: STRING_KEYS.UNSTAKED,
                 })}
@@ -99,7 +115,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
         <$BalanceRow>
           <div>
             <$Label>
-              <WithTooltip tooltipString="haha fill out">
+              <WithTooltip tooltipString={estimatedAprTooltipString}>
                 {stringGetter({
                   key: STRING_KEYS.STAKED,
                 })}
@@ -201,4 +217,10 @@ const $Label = styled.div`
 const $BalanceOutput = styled(Output)`
   font-size: var(--fontSize-large);
   color: var(--color-text-0);
+`;
+
+const $Link = styled(Link)`
+  text-decoration: underline;
+
+  ${layoutMixins.inlineRow}
 `;
