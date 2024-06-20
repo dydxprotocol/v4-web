@@ -28,7 +28,6 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import otherChains from '../../../../public/configs/otherChains.json';
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
@@ -53,15 +52,26 @@ export const SourceSelectMenu = ({
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
-  const isNotKeplrDeposit = type === TransferType.withdrawal || walletType !== WalletType.Keplr;
+  const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
-  const chains =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
-    EMPTY_ARR;
+  const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
+  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
+  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
-  const exchanges =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
-    EMPTY_ARR;
+  const { cosmosChains, otherChains } = chains.reduce(
+    (acc, chain) => {
+      if (chain.string === 'Noble') {
+        acc.cosmosChains.push(chain);
+      } else {
+        acc.otherChains.push(chain);
+      }
+      return acc;
+    },
+    { cosmosChains: [], otherChains: [] } as {
+      cosmosChains: exchange.dydx.abacus.output.input.SelectionOption[];
+      otherChains: exchange.dydx.abacus.output.input.SelectionOption[];
+    }
+  );
 
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -97,7 +107,7 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
-      if (!isNotKeplrDeposit) return true;
+      if (!isNotKeplrWallet) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -122,14 +132,14 @@ export const SourceSelectMenu = ({
     [feesDecoratorProp]: <LowestFeesDecoratorText />,
   }));
 
-  const selectedChainOption = supportedChains.find((item) => item.type === selectedChain);
+  const selectedChainOption = chains.find((item) => item.type === selectedChain);
 
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
 
   return (
     <SearchSelectMenu
       items={[
-        isNotKeplrDeposit &&
+        isNotKeplrWallet &&
           exchangeItems.length > 0 && {
             group: 'exchanges',
             groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
@@ -148,7 +158,14 @@ export const SourceSelectMenu = ({
       <$ChainRow>
         {selectedChainOption ? (
           <>
-            <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
+            <$Img
+              src={
+                selectedChainOption.string === 'Noble'
+                  ? NOBLE_ICON_URL
+                  : selectedChainOption.iconUrl ?? undefined
+              }
+              alt=""
+            />{' '}
             {selectedChainOption.stringKey}
           </>
         ) : selectedExchangeOption ? (
