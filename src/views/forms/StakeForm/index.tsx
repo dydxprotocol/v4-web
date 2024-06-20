@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
-import { type NumberFormatValues } from 'react-number-format';
+import { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
@@ -168,6 +168,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
       </$Description>
       <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
         <FormInput
+          id="stakeAmount"
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) =>
@@ -183,7 +184,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
               }
             />
           }
-          disabled={isLoading}
         />
       </$WithDetailsReceipt>
 

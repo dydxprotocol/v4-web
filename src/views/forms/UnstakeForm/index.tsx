@@ -203,6 +203,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
           ]}
         >
           <FormInput
+            id="unstakeAmount"
             label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_UNSTAKE })}
             type={InputType.Number}
             onChange={({ floatValue }: NumberFormatValues) =>
@@ -223,7 +224,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                 }
               />
             }
-            disabled={isLoading}
           />
         </$WithDetailsReceipt>
       )}
@@ -266,7 +266,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                       }
                     />
                   }
-                  disabled={isLoading}
                 />
               </React.Fragment>
             );
