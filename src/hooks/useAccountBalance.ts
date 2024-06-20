@@ -1,7 +1,4 @@
-import { useCallback } from 'react';
-
-import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from '@tanstack/react-query';
+import { useBalance as useBalanceGraz } from 'graz';
 import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
@@ -11,8 +8,8 @@ import { EvmAddress } from '@/constants/wallets';
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { getNobleChainId } from '@/lib/squid';
 
 import { useAccounts } from './useAccounts';
 import { useEnvConfig } from './useEnvConfig';
@@ -21,12 +18,9 @@ import { useTokenConfigs } from './useTokenConfigs';
 type UseAccountBalanceProps = {
   // Token Items
   addressOrDenom?: string;
-  decimals?: number;
 
   // Chain Items
   chainId?: string | number;
-  bech32AddrPrefix?: string;
-  rpc?: string;
 
   isCosmosChain?: boolean;
 };
@@ -39,16 +33,13 @@ export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeee
 
 export const useAccountBalance = ({
   addressOrDenom,
-  bech32AddrPrefix,
   chainId,
-  decimals = 0,
-  rpc,
   isCosmosChain,
 }: UseAccountBalanceProps = {}) => {
-  const { evmAddress, dydxAddress } = useAccounts();
+  const { evmAddress, nobleAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
-  const { chainTokenDenom, usdcDenom } = useTokenConfigs();
+  const { chainTokenDenom, usdcDenom, usdcGasDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
@@ -126,7 +117,6 @@ export const useAccountBalance = ({
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
-
   const usdcCoinBalance = balances?.[usdcDenom];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).toNumber();
 
