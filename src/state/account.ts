@@ -242,7 +242,7 @@ export const accountSlice = createSlice({
         hasUnseenOrderUpdates: hasNewOrderUpdates,
         localPlaceOrders: canceledOrderIdsInPayload.length
           ? state.localPlaceOrders.map((order) =>
-              order.submissionStatus < PlaceOrderStatuses.Canceled &&
+              order.submissionStatus !== PlaceOrderStatuses.Canceled &&
               order.orderId &&
               canceledOrderIdsInPayload.includes(order.orderId)
                 ? {
