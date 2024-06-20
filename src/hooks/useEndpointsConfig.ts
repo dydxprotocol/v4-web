@@ -12,6 +12,7 @@ interface EndpointsConfig {
   '0xsquid': string;
   nobleValidator: string;
   faucet?: string;
+  stakingAPR?: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -24,5 +25,6 @@ export const useEndpointsConfig = () => {
     '0xsquid': endpointsConfig['0xsquid'],
     nobleValidator: endpointsConfig.nobleValidator,
     faucet: endpointsConfig.faucet,
+    stakingAPR: endpointsConfig.stakingAPR,
   };
 };
