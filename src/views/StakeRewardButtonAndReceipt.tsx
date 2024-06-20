@@ -5,7 +5,7 @@ import { shallowEqual, useDispatch } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -124,6 +124,8 @@ export const StakeRewardButtonAndReceipt = ({
     [errorToDisplay]
   );
 
+  const buttonSize = ButtonSize.Base;
+
   return (
     <>
       {errorToDisplay && (
@@ -134,12 +136,13 @@ export const StakeRewardButtonAndReceipt = ({
           tooltipString={shouldDisplayErrorAsWarning() ? errorToDisplay?.message : undefined}
         >
           {!canAccountTrade ? (
-            <$OnboardingTriggerButton />
+            <$OnboardingTriggerButton size={buttonSize} />
           ) : (
             errorToDisplay?.slotButton ?? (
               <$Button
                 action={ButtonAction.Primary}
                 type={isForm ? ButtonType.Submit : ButtonType.Button}
+                size={buttonSize}
                 onClick={onClick}
                 slotLeft={
                   shouldDisplayErrorAsWarning() ? (

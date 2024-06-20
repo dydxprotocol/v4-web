@@ -21,6 +21,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Tag, TagSign } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -38,6 +39,8 @@ export const StakingPanel = ({ className }: { className?: string }) => {
 
   const unstakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
   const stakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
+
+  const showStakingActions = canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
 
   return (
     <Panel
@@ -70,17 +73,19 @@ export const StakingPanel = ({ className }: { className?: string }) => {
       <$Content>
         <$BalanceRow>
           <div>
-            <$label>
-              {stringGetter({
-                key: STRING_KEYS.UNSTAKED,
-              })}
+            <$Label>
+              <WithTooltip tooltipString="haha fill out">
+                {stringGetter({
+                  key: STRING_KEYS.UNSTAKED,
+                })}
+              </WithTooltip>
               <Tag sign={TagSign.Positive}>
                 {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: unstakedApr } })}
               </Tag>
-            </$label>
+            </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
           </div>
-          {canAccountTrade && (
+          {showStakingActions && (
             <div>
               <Button
                 action={ButtonAction.Primary}
@@ -93,17 +98,19 @@ export const StakingPanel = ({ className }: { className?: string }) => {
         </$BalanceRow>
         <$BalanceRow>
           <div>
-            <$label>
-              {stringGetter({
-                key: STRING_KEYS.STAKED,
-              })}
+            <$Label>
+              <WithTooltip tooltipString="haha fill out">
+                {stringGetter({
+                  key: STRING_KEYS.STAKED,
+                })}
+              </WithTooltip>
               <Tag>
                 {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakedApr } })}
               </Tag>
-            </$label>
+            </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
           </div>
-          {canAccountTrade && nativeStakingBalance > 0 && (
+          {showStakingActions && nativeStakingBalance > 0 && (
             <div>
               <Button
                 action={ButtonAction.Base}
@@ -118,12 +125,16 @@ export const StakingPanel = ({ className }: { className?: string }) => {
           items={[
             {
               key: 'totalBalance',
-              label: 'Total balance',
+              label: (
+                <$Label>
+                  {stringGetter({ key: STRING_KEYS.TOTAL_BALANCE })}
+                  <Tag>{chainTokenLabel}</Tag>
+                </$Label>
+              ),
               value: (
                 <Output
                   type={OutputType.Asset}
                   value={nativeTokenBalance.plus(nativeStakingBalance)}
-                  tag={chainTokenLabel}
                 />
               ),
             },
@@ -181,10 +192,10 @@ const $BalanceRow = styled.div`
   padding: 1rem;
 `;
 
-const $label = styled.div`
+const $Label = styled.div`
   ${layoutMixins.row}
 
-  gap: 0.25rem;
+  gap: 0.5rem;
 `;
 
 const $BalanceOutput = styled(Output)`

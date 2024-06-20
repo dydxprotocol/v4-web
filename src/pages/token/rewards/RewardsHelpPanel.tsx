@@ -46,9 +46,9 @@ export const RewardsHelpPanel = () => {
               key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
               params: {
                 HERE_LINK: (
-                  <$Link href={tradingRewardsLearnMore}>
+                  <$AccentLink href={tradingRewardsLearnMore}>
                     {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
+                  </$AccentLink>
                 ),
               },
             }),
@@ -63,9 +63,9 @@ export const RewardsHelpPanel = () => {
               key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
               params: {
                 HERE_LINK: (
-                  <$Link href="https://protocolstaking.info/">
+                  <$AccentLink href="https://protocolstaking.info/">
                     {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
+                  </$AccentLink>
                 ),
               },
             }),
@@ -86,9 +86,9 @@ export const RewardsHelpPanel = () => {
               key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_ANSWER,
               params: {
                 DOCUMENT_LINK: (
-                  <$Link href={mintscanValidatorsLearnMore}>
+                  <$AccentLink href={mintscanValidatorsLearnMore}>
                     {stringGetter({ key: STRING_KEYS.DOCUMENT })}
-                  </$Link>
+                  </$AccentLink>
                 ),
               },
             }),
@@ -116,7 +116,7 @@ const $Header = styled.div`
   padding: 1rem 1rem;
   border-bottom: var(--border-width) solid var(--border-color);
 
-  font: var(--font-small-book);
+  font: var(--font-base-book);
 
   @media ${breakpoints.notTablet} {
     padding: 1.5rem;
@@ -128,7 +128,7 @@ const $Header = styled.div`
   }
 `;
 
-const $Link = styled(Link)`
+const $AccentLink = styled(Link)`
   --link-color: var(--color-accent);
   display: inline-block;
 `;

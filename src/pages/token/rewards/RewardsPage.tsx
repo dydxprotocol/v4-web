@@ -10,8 +10,10 @@ import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
+import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -21,6 +23,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Link } from '@/components/Link';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
@@ -65,7 +68,17 @@ const RewardsPage = () => {
     return total;
   }, 0);
 
-  const showMigratePanel = import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet;
+  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const chainId = Number(ethereumChainId);
+  // v3 token is only on mainnet
+  const { balance: tokenBalance } = useAccountBalance({
+    addressOrDenom: chainId === 1 ? import.meta.env.VITE_V3_TOKEN_ADDRESS : undefined,
+    chainId: 1,
+    isCosmosChain: false,
+  });
+
+  const showMigratePanel =
+    import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
   const showGeoblockedPanel = stakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
   const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && stakingEnabled;
 
@@ -76,7 +89,12 @@ const RewardsPage = () => {
   );
   const legalDisclaimer = (
     <$LegalDisclaimer>
-      {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
+      {stringGetter({
+        key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
+        params: {
+          TERMS_OF_USE_LINK: <$Link>{stringGetter({ key: STRING_KEYS.TERMS_OF_USE })} </$Link>,
+        },
+      })}
     </$LegalDisclaimer>
   );
 
@@ -165,4 +183,9 @@ const $RightColumn = styled.div`
 const $LegalDisclaimer = styled.div`
   font: var(--font-mini-book);
   color: var(--color-text-0);
+`;
+
+const $Link = styled(Link)`
+  display: inline-block;
+  text-decoration: underline;
 `;

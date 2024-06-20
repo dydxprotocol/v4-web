@@ -146,6 +146,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     },
   ];
 
+  const openKeplrDialog = () =>
+    dispatch(
+      forceOpenDialog({
+        type: DialogTypes.ExternalNavKeplr,
+      })
+    );
+
   const openStrideDialog = () =>
     dispatch(
       forceOpenDialog({
@@ -172,7 +179,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) =>
-            onChangeAmount(floatValue ? MustBigNumber(floatValue) : undefined)
+            onChangeAmount(floatValue !== undefined ? MustBigNumber(floatValue) : undefined)
           }
           value={amountBN ? amountBN.toNumber() : undefined}
           slotRight={
@@ -192,7 +199,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           error={error}
           fee={fee}
           isLoading={isLoading}
-          amount={amountBN?.toNumber()}
+          amount={amountBN}
           selectedValidator={selectedValidator}
           setSelectedValidator={setSelectedValidator}
         />
@@ -200,6 +207,11 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           {stringGetter({
             key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
             params: {
+              KEPLR_DASHBOARD_LINK: (
+                <$Link withIcon onClick={openKeplrDialog}>
+                  {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
+                </$Link>
+              ),
               STRIDE_LINK: (
                 <$Link withIcon onClick={openStrideDialog}>
                   Stride
@@ -243,6 +255,6 @@ const $LegalDisclaimer = styled.div`
 `;
 
 const $Link = styled(Link)`
-  --link-color: var(--color-text-2);
+  --link-color: var(--color-text-1);
   display: inline-flex;
 `;
