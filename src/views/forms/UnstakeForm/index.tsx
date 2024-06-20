@@ -251,7 +251,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
             {stringGetter({
               key: STRING_KEYS.VALIDATOR,
             })}
-          </div>g
+          </div>
           <$SpacedRow>
             {stringGetter({
               key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
