@@ -1,3 +1,4 @@
+import { type exchange } from '@dydxprotocol/v4-abacus';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -20,7 +21,6 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 
 import cctpTokens from '../../../../public/configs/cctp.json';
-import otherChains from '../../../../public/configs/otherChains.json';
 
 type ElementProps = {
   label?: string;
@@ -29,19 +29,25 @@ type ElementProps = {
   onSelect: (name: string, type: 'chain' | 'exchange') => void;
 };
 
+const NOBLE_ICON_URL =
+  'https://raw.githubusercontent.com/cosmos/chain-registry/master/noble/images/stake.svg';
+
 export type TokenInfo = {
   chainId: string;
   tokenAddress: string;
   name: string;
 };
 
-const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.chainId]) {
-    acc[token.chainId] = [];
-  }
-  acc[token.chainId].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByChainId = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const SourceSelectMenu = ({
   label,
@@ -57,30 +63,43 @@ export const SourceSelectMenu = ({
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
-  const isNotKeplrDeposit = type === TransferType.withdrawal || walletType !== WalletType.Keplr;
+  const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
-  const chains =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
-    EMPTY_ARR;
+  const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
+  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
+  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
-  const exchanges =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
-    EMPTY_ARR;
+  const { cosmosChains, otherChains } = chains.reduce(
+    (acc, chain) => {
+      if (chain.string === 'Noble') {
+        acc.cosmosChains.push(chain);
+      } else {
+        acc.otherChains.push(chain);
+      }
+      return acc;
+    },
+    { cosmosChains: [], otherChains: [] } as {
+      cosmosChains: exchange.dydx.abacus.output.input.SelectionOption[];
+      otherChains: exchange.dydx.abacus.output.input.SelectionOption[];
+    }
+  );
+
+  const chainOptions = isNotKeplrWallet ? otherChains : cosmosChains;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
   const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
-  const supportedChains = isNotKeplrDeposit ? chains : otherChains;
-
-  const chainItems = Object.values(supportedChains)
+  const chainItems = Object.values(chainOptions)
     .map((chain) => ({
       value: chain.type,
       label: chain.stringKey,
       onSelect: () => {
         onSelect(chain.type, 'chain');
       },
-      slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
+      slotBefore: (
+        <$Img src={chain.string === 'Noble' ? NOBLE_ICON_URL : chain.iconUrl ?? undefined} alt="" />
+      ),
       [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
         <$Text>
           {stringGetter({
@@ -97,7 +116,7 @@ export const SourceSelectMenu = ({
       ),
     }))
     .filter((chain) => {
-      if (!isNotKeplrDeposit) return true;
+      if (!isNotKeplrWallet) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -119,14 +138,14 @@ export const SourceSelectMenu = ({
     slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
   }));
 
-  const selectedChainOption = supportedChains.find((item) => item.type === selectedChain);
+  const selectedChainOption = chains.find((item) => item.type === selectedChain);
 
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
 
   return (
     <SearchSelectMenu
       items={[
-        isNotKeplrDeposit &&
+        isNotKeplrWallet &&
           exchangeItems.length > 0 && {
             group: 'exchanges',
             groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
@@ -145,7 +164,14 @@ export const SourceSelectMenu = ({
       <$ChainRow>
         {selectedChainOption ? (
           <>
-            <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
+            <$Img
+              src={
+                selectedChainOption.string === 'Noble'
+                  ? NOBLE_ICON_URL
+                  : selectedChainOption.iconUrl ?? undefined
+              }
+              alt=""
+            />{' '}
             {selectedChainOption.stringKey}
           </>
         ) : selectedExchangeOption ? (

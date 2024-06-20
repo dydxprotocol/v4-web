@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
@@ -12,6 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -46,12 +47,13 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { closeDialog, openDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
+import { NATIVE_TOKEN_ADDRESS, getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -67,6 +69,7 @@ type DepositFormProps = {
 
 export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
@@ -75,6 +78,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { dydxAddress, evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
+
+  const { usdcDecimals } = useTokenConfigs();
+
+  const { walletType } = useAccounts();
+
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   const {
     requestPayload,
@@ -89,7 +98,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   // todo are these guaranteed to be base 10?
   // eslint-disable-next-line radix
-  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
+  const chainId = chainIdStr && !isKeplrWallet ? parseInt(chainIdStr) : chainIdStr ?? undefined;
 
   // User inputs
   const sourceToken = useMemo(
@@ -99,11 +108,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const sourceChain = useMemo(
     () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
-    [chainId, resources]
+    [chainIdStr, resources]
   );
 
   const [fromAmount, setFromAmount] = useState('');
-  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
+  const [slippage, setSlippage] = useState(isCctp || isKeplrWallet ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   const { usdcLabel } = useTokenConfigs();
@@ -112,15 +121,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
-    decimals: sourceToken?.decimals || undefined,
-    isCosmosChain: false,
+    isCosmosChain: isKeplrWallet,
   });
-
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
 
-  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
+  useEffect(() => {
+    setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);
+  }, [isCctp, isKeplrWallet]);
 
   useEffect(() => {
     const hasInvalidInput =
@@ -153,8 +162,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) onError?.();
   }, [error]);
 
-  const { walletType } = useAccounts();
-
   useEffect(() => {
     if (walletType === WalletType.Privy) {
       abacusStateManager.setTransferValue({
@@ -162,7 +169,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         value: 'coinbase',
       });
     }
-  }, [walletType]);
+    if (walletType === WalletType.Keplr) {
+      if (nobleAddress) {
+        abacusStateManager.setTransfersSourceAddress(nobleAddress);
+      }
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: getNobleChainId(),
+      });
+    }
+  }, [nobleAddress, walletType]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
@@ -260,6 +276,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       try {
         e.preventDefault();
 
+        if (walletType === WalletType.Keplr) {
+          dispatch(closeDialog());
+          dispatch(
+            openDialog({
+              type: DialogTypes.NobleDepositDialog,
+            })
+          );
+          return;
+        }
+
         if (!signerWagmi) {
           throw new Error('Missing signer');
         }
@@ -317,7 +343,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setIsLoading(false);
       }
     },
-    [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain]
   );
 
   const amountInputReceipt = [
