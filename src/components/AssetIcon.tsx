@@ -23,6 +23,7 @@ const assetIcons = {
   BCH: '/currencies/bch.png',
   BLUR: '/currencies/blur.png',
   BNB: '/currencies/bnb.png',
+  BODEN: '/currencies/boden.png',
   BOME: '/currencies/bome.png',
   BONK: '/currencies/bonk.png',
   BTC: '/currencies/btc.png',
@@ -65,6 +66,7 @@ const assetIcons = {
   MEME: '/currencies/meme.png',
   MINA: '/currencies/mina.png',
   MKR: '/currencies/mkr.png',
+  MOG: '/currencies/mog.png',
   MOTHER: '/currencies/mother.png',
   NEAR: '/currencies/near.png',
   OCEAN: '/currencies/ocean.png',
@@ -86,6 +88,8 @@ const assetIcons = {
   SUSHI: '/currencies/sushi.png',
   TIA: '/currencies/tia.png',
   TON: '/currencies/ton.png',
+  TREMP: '/currencies/tremp.png',
+  TRUMP: '/currencies/trump.png',
   TRX: '/currencies/trx.png',
   UMA: '/currencies/uma.png',
   UNI: '/currencies/uni.png',
@@ -104,7 +108,9 @@ const assetIcons = {
   YFI: '/currencies/yfi.png',
   ZEC: '/currencies/zec.png',
   ZETA: '/currencies/zeta.png',
+  ZK: '/currencies/zk.png',
   ZRX: '/currencies/zrx.png',
+  ZRO: '/currencies/zro.png',
 } as const;
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>

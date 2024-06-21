@@ -371,17 +371,6 @@ export const WithdrawForm = () => {
       };
     }
 
-    if (routeErrors) {
-      return {
-        errorMessage: routeErrorMessage
-          ? stringGetter({
-              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-              params: { ERROR_MESSAGE: routeErrorMessage },
-            })
-          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
-      };
-    }
-
     if (!toAddress) {
       return {
         alertType: AlertType.Warning,
@@ -395,6 +384,17 @@ export const WithdrawForm = () => {
           key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
         }),
       };
+
+    if (routeErrors) {
+      return {
+        errorMessage: routeErrorMessage
+          ? stringGetter({
+              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+              params: { ERROR_MESSAGE: routeErrorMessage },
+            })
+          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
+      };
+    }
 
     if (debouncedAmountBN) {
       if (!chainIdStr && !exchange) {

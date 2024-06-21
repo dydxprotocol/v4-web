@@ -214,7 +214,11 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  const isBestEffortCanceled = status === AbacusOrderStatus.Canceling;
+  // we update short term orders to pending status when they are best effort canceled in Abacus
+  const isBestEffortCanceled =
+    (status === AbacusOrderStatus.Pending && cancelReason != null) ||
+    status === AbacusOrderStatus.Canceling;
+
   const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
 
   return (

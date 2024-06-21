@@ -152,14 +152,15 @@ export const CLEARED_SIZE_INPUTS = {
 };
 
 export enum PlaceOrderStatuses {
-  Submitted,
-  Placed,
-  Filled,
+  Submitted = 0,
+  Placed = 1,
+  Filled = 2,
+  Canceled = 3,
 }
 
 export enum CancelOrderStatuses {
-  Submitted,
-  Canceled,
+  Submitted = 0,
+  Canceled = 1,
 }
 
 export type LocalPlaceOrderData = {

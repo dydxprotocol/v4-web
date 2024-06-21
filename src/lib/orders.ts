@@ -29,18 +29,19 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
       };
     }
     case AbacusOrderStatus.PartiallyFilled.rawValue:
+    case AbacusOrderStatus.PartiallyCanceled.rawValue: {
       return {
         statusIcon: IconName.OrderPartiallyFilled,
         statusIconColor: `var(--color-warning)`,
       };
+    }
     case AbacusOrderStatus.Filled.rawValue: {
       return {
         statusIcon: IconName.OrderFilled,
         statusIconColor: `var(--color-success)`,
       };
     }
-    case AbacusOrderStatus.Canceled.rawValue:
-    case AbacusOrderStatus.PartiallyCanceled.rawValue: {
+    case AbacusOrderStatus.Canceled.rawValue: {
       return {
         statusIcon: IconName.OrderCanceled,
         statusIconColor: `var(--color-error)`,
@@ -69,7 +70,10 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
 };
 
 export const isOrderStatusClearable = (status: OrderStatus) =>
-  [AbacusOrderStatus.Filled, AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
+  status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
+
+export const isOrderStatusCanceled = (status: OrderStatus) =>
+  [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
     (orderStatus) => status === orderStatus
   );
 

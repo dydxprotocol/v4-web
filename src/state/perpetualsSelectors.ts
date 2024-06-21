@@ -146,6 +146,11 @@ export const getCurrentMarketMidMarketPrice = (state: RootState) => {
   return currentMarketOrderbook?.midPrice;
 };
 
+export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSelector(
+  [getCurrentMarketMidMarketPrice, getCurrentMarketOraclePrice],
+  (midMarketPrice, oraclePrice) => midMarketPrice ?? oraclePrice
+);
+
 /**
  *
  * @param marketId

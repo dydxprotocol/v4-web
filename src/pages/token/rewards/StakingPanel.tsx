@@ -8,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -35,13 +36,12 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const stakingApr = useStakingAPR();
+
   const { complianceState } = useComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
   const { chainTokenLabel } = useTokenConfigs();
   const { protocolStaking } = useURLConfigs();
-
-  const unstakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
-  const stakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
 
   const showStakingActions = canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
 
@@ -96,7 +96,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                 })}
               </WithTooltip>
               <Tag sign={TagSign.Positive}>
-                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: unstakedApr } })}
+                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
               </Tag>
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
@@ -121,7 +121,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                 })}
               </WithTooltip>
               <Tag>
-                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakedApr } })}
+                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
               </Tag>
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
