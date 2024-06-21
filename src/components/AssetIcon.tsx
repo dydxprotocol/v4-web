@@ -5,7 +5,6 @@ import { Nullable } from '@/constants/abacus';
 export type AssetSymbol = keyof typeof assetIcons;
 
 const assetIcons = {
-  $MICHI: '/currencies/$michi.png',
   '1CAT': '/currencies/1cat.png',
   '1INCH': '/currencies/1inch.png',
   AAVE: '/currencies/aave.png',
@@ -343,6 +342,7 @@ const assetIcons = {
   MERL: '/currencies/merl.png',
   METIS: '/currencies/metis.png',
   MEW: '/currencies/mew.png',
+  MICHI: '/currencies/michi.png',
   MINA: '/currencies/mina.png',
   MKR: '/currencies/mkr.png',
   MLK: '/currencies/mlk.png',
