@@ -3226,15 +3226,6 @@
         "whitepaperLink": null,
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/adventure-gold/"
     },
-    "ZK-USD": {
-        "name": "Polyhedra Network",
-        "tags": [
-            "Real World Assets"
-        ],
-        "websiteLink": "https://polyhedra.network/",
-        "whitepaperLink": "https://dl.acm.org/doi/10.1145/3548606.3560652",
-        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polyhedra-network/"
-    },
     "DORA-USD": {
         "name": "Dora Factory",
         "tags": [
@@ -6387,7 +6378,7 @@
         "tags": [
             "Meme"
         ],
-        "websiteLink": "https://bodenonsol.xyz/",
+        "websiteLink": "https://www.boden4pres.com/",
         "whitepaperLink": null,
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jeo-boden/"
     },
@@ -7169,5 +7160,379 @@
         "websiteLink": "https://arawtoken.vip",
         "whitepaperLink": null,
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/araw/"
+    },
+    "ZRO-USD": {
+        "name": "LayerZero",
+        "tags": [],
+        "websiteLink": "https://layerzero.network/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/layerzero/",
+        "whitepaperLink": "https://layerzero.network/pdf/LayerZero_Whitepaper_Release.pdf"
+    },
+    "ZK-USD": {
+      "name": "zkSync",
+      "tags": [],
+      "websiteLink": "https://zksync.io/",
+      "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zksync/",
+      "whitepaperLink": "https://zksync.mirror.xyz/"
+    },
+    "IO-USD": {
+        "name": "io.net",
+        "tags": [],
+        "websiteLink": "https://io.net/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/io-net/",
+        "whitepaperLink": "https://docs.io.net"
+    },
+    "GME-USD": {
+        "name": "GameStop",
+        "tags": [
+            "Gaming",
+            "Meme"
+        ],
+        "websiteLink": "https://wallstsucks.lol/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gme/"
+    },
+    "MICHI-USD": {
+        "name": "michi",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://michisolana.org/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/michi/"
+    },
+    "BRETT-USD": {
+        "name": "Brett (Based)",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://www.basedbrett.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/based-brett/"
+    },
+    "SAFE-USD": {
+        "name": "Safe",
+        "tags": [],
+        "websiteLink": "https://safe.global/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/safe1/",
+        "whitepaperLink": "https://docs.gnosis-safe.io/"
+    },
+    "ATH-USD": {
+        "name": "Aethir",
+        "tags": [],
+        "websiteLink": "https://www.aethir.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aethir/",
+        "whitepaperLink": "https://aethir.gitbook.io/aethir/ljvx8d8ee4ElPliP31K1"
+    },
+    "DESO-USD": {
+        "name": "Decentralized Social",
+        "tags": [],
+        "websiteLink": "https://deso.com",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/deso/",
+        "whitepaperLink": "https://docs.deso.org/about-deso-chain/readme"
+    },
+    "ZENT-USD": {
+        "name": "Zentry",
+        "tags": [
+            "Gaming"
+        ],
+        "websiteLink": "https://zentry.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zentry/",
+        "whitepaperLink": "https://whitepaper.guildfi.com/"
+    },
+    "TAIKO-USD": {
+        "name": "Taiko",
+        "tags": [
+            "Layer 2"
+        ],
+        "websiteLink": "https://taiko.xyz/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/taiko/",
+        "whitepaperLink": "https://docs.taiko.xyz/"
+    },
+    "MERL-USD": {
+        "name": "Merlin Chain",
+        "tags": [
+            "Layer 2"
+        ],
+        "websiteLink": "https://merlinchain.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/merlin-chain/",
+        "whitepaperLink": "https://docs.merlinchain.io/merlin-docs"
+    },
+    "KARRAT-USD": {
+        "name": "KARRAT",
+        "tags": [
+            "Gaming"
+        ],
+        "websiteLink": "https://www.karratcoin.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/karrat/"
+    },
+    "TLOS-USD": {
+        "name": "Telos",
+        "tags": [
+            "NFT",
+            "Defi"
+        ],
+        "websiteLink": "https://telos.net/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/telos/",
+        "whitepaperLink": "https://telos.net/whitepaper"
+    },
+    "ZKJ-USD": {
+        "name": "Polyhedra Network",
+        "tags": [
+            "RWA"
+        ],
+        "websiteLink": "https://polyhedra.network/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polyhedra-network/",
+        "whitepaperLink": "https://dl.acm.org/doi/10.1145/3548606.3560652"
+    },
+    "MANEKI-USD": {
+        "name": "MANEKI",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://manekineko.world",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/maneki-coin/"
+    },
+    "PIRATE-USD": {
+        "name": "Pirate Nation",
+        "tags": [
+            "Gaming"
+        ],
+        "websiteLink": "https://piratenation.game/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pirate-nation/",
+        "whitepaperLink": "https://www.piratenation.foundation/PN%20Foundation%20Litepaper_v1.1.02_June2024.pdf"
+    },
+    "MAPO-USD": {
+        "name": "MAP Protocol",
+        "tags": [],
+        "websiteLink": "https://www.mapprotocol.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/map-protocol/",
+        "whitepaperLink": "https://www.mapprotocol.io/article?id=whitepaper"
+    },
+    "ULTI-USD": {
+        "name": "Ultiverse",
+        "tags": [
+            "Gaming"
+        ],
+        "websiteLink": "https://ultiverse.io",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ultiverse/",
+        "whitepaperLink": "https://docs.ultiverse.io"
+    },
+    "BEER-USD": {
+        "name": "BEERCOIN",
+        "tags": [],
+        "websiteLink": "https://beercoin.wtf/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/beercoin/"
+    },
+    "DUKO-USD": {
+        "name": "DUKO",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://dukocoin.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/duko/"
+    },
+    "MON-USD": {
+        "name": "MON Protocol",
+        "tags": [],
+        "websiteLink": "https://monprotocol.ai/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mon/",
+        "whitepaperLink": "https://www.monprotocol.ai/tokenomics"
+    },
+    "BENDOG-USD": {
+        "name": "Ben the Dog",
+        "tags": [
+            "Gaming",
+            "Meme"
+        ],
+        "websiteLink": "https://benthedog.io",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ben-the-dog/"
+    },
+    "CHAT-USD": {
+        "name": "Solchat",
+        "tags": [],
+        "websiteLink": "https://www.solchat.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/solchat/",
+        "whitepaperLink": "http://docs.solchat.io/"
+    },
+    "NYAN-USD": {
+        "name": "Nyan Heroes",
+        "tags": [],
+        "websiteLink": "https://nyanheroes.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/nyan-heroes/",
+        "whitepaperLink": "https://nyan-heroes.gitbook.io/nyan-heroes/"
+    },
+    "ZERO-USD": {
+        "name": "ZeroLend",
+        "tags": [
+            "Defi"
+        ],
+        "websiteLink": "https://zerolend.xyz/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zerolend/",
+        "whitepaperLink": "https://docs.zerolend.xyz/"
+    },
+    "WSM-USD": {
+        "name": "Wall Street Memes",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://wallstmemes.com/en/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wall-street-memes/"
+    },
+    "BLOCK-USD": {
+        "name": "BlockGames",
+        "tags": [
+            "Gaming"
+        ],
+        "websiteLink": "https://www.blockgames.com",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blockgames/",
+        "whitepaperLink": "https://block-games.gitbook.io/whitepaper"
+    },
+    "UNB-USD": {
+        "name": "Unbound",
+        "tags": [
+            "Defi"
+        ],
+        "websiteLink": "https://app.unbound.finance/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/unbound/",
+        "whitepaperLink": "https://docs.unbound.finance/documentation/whitepaper"
+    },
+    "DEFI-USD": {
+        "name": "DeFi",
+        "tags": [
+            "Defi"
+        ],
+        "websiteLink": "https://de.fi/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/de-fi/",
+        "whitepaperLink": "https://docs.de.fi/welcome/readme"
+    },
+    "MSN-USD": {
+        "name": "Meson Network",
+        "tags": [],
+        "websiteLink": "https://www.meson.network/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/meson-network/",
+        "whitepaperLink": "https://docs.meson.network/Meson-Network-Whitepaper-v1.6.pdf"
+    },
+    "RNT-USD": {
+        "name": "Real Nigger Tate",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://www.university.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/real-nigger-tate/"
+    },
+    "COOKIE-USD": {
+        "name": "Cookie",
+        "tags": [],
+        "websiteLink": "https://www.cookie3.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/cookie/",
+        "whitepaperLink": "https://assets.cdn.cookie3.co/assets/Cookie3_Litepaper.pdf"
+    },
+    "MASA-USD": {
+        "name": "Masa",
+        "tags": [],
+        "websiteLink": "https://www.masa.finance",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/masa-network/",
+        "whitepaperLink": "https://github.com/masa-finance/whitepaper/blob/main/masa-whitepaper.pdf"
+    },
+    "WUF-USD": {
+        "name": "WUFFI",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://www.wuffi.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wuffi/",
+        "whitepaperLink": "https://www.wuffi.io/terms/"
+    },
+    "FURY-USD": {
+        "name": "Engines of Fury",
+        "tags": [],
+        "websiteLink": "https://www.eof.gg",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/engines-of-fury/",
+        "whitepaperLink": "https://eof.gg/whitepaper"
+    },
+    "GUMMY-USD": {
+        "name": "GUMMY",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://gummyonsol.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gummy/"
+    },
+    "PENG-USD": {
+        "name": "Peng",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://pengsol.xyz/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/peng-sol/"
+    },
+    "SAROS-USD": {
+        "name": "Saros",
+        "tags": [
+            "Defi"
+        ],
+        "websiteLink": "https://www.saros.xyz/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/saros/"
+    },
+    "NUB-USD": {
+        "name": "nubcat",
+        "tags": [],
+        "websiteLink": "https://nubcat.xyz",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/nubcat/"
+    },
+    "ZACK-USD": {
+        "name": "Zack Morris",
+        "tags": [],
+        "websiteLink": "https://zackmorris.lol/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zack-morris/"
+    },
+    "GOL-USD": {
+        "name": "Golazo",
+        "tags": [],
+        "websiteLink": "https://golazo.world",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/golazo/"
+    },
+    "MUMU-USD": {
+        "name": "Mumu the Bull",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://www.mumu.ing",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mumu-ing/"
+    },
+    "HEGE-USD": {
+        "name": "Hege",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://www.hegecoin.com/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/hege/",
+        "whitepaperLink": "https://www.hegecoin.com/#roadmap"
+    },
+    "WAFFLES-USD": {
+        "name": "Waffles Davincij15's Cat",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "wafflesj15.com",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/waffles-davincij15s-cat/"
+    },
+    "FALX-USD": {
+        "name": "FalconX",
+        "tags": [],
+        "websiteLink": "https://falxdex.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/falxdex-io/",
+        "whitepaperLink": "https://falconx.gitbook.io/falconx"
+    },
+    "CANDY-USD": {
+        "name": "Candy Pocket",
+        "tags": [],
+        "websiteLink": "https://www.candypocket.com",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/candy-pocket/",
+        "whitepaperLink": "https://d2g38dx0j6xqav.cloudfront.net/online/file/candypoket-1.7EN.pdf"
+    },
+    "WSTETH-USD": {
+        "name": "Lido wstETH",
+        "tags": [],
+        "websiteLink": "https://www.lido.fi",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/lido-finance-wsteth/"
     }
 }
