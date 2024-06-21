@@ -95,9 +95,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.UNSTAKED,
                 })}
               </WithTooltip>
-              <Tag sign={TagSign.Positive}>
-                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-              </Tag>
+              {stakingApr && (
+                <Tag sign={TagSign.Positive}>
+                  {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
+                </Tag>
+              )}
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
           </div>
@@ -120,9 +122,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.STAKED,
                 })}
               </WithTooltip>
-              <Tag>
-                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-              </Tag>
+              {stakingApr && (
+                <Tag>
+                  {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
+                </Tag>
+              )}
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
           </div>
