@@ -68,7 +68,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   useEffect(() => {
     // Initalize to default validator once on mount
     setSelectedValidator(defaultValidator);
-    track(AnalyticsEvent.StakeDialog);
   }, []);
 
   useEffect(() => {
