@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
@@ -14,23 +13,11 @@ import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
-
 export const RewardsHelpPanel = () => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const { isStakingEnabled } = useEnvFeatures();
-  const { tradingRewardsLearnMore, mintscanValidatorsLearnMore, validatorSelectionDocument } =
-    useURLConfigs();
-
-  const openKeplrDialog = () =>
-    dispatch(
-      openDialog({
-        type: DialogTypes.ExternalNavKeplr,
-      })
-    );
+  const { tradingRewardsLearnMore, mintscanValidatorsLearnMore } = useURLConfigs();
 
   return (
     <$HelpCard
@@ -104,26 +91,6 @@ export const RewardsHelpPanel = () => {
                     params: {
                       DOCUMENT_LINK: (
                         <$AccentLink href={mintscanValidatorsLearnMore}>
-                          {stringGetter({ key: STRING_KEYS.DOCUMENT })}
-                        </$AccentLink>
-                      ),
-                    },
-                  }),
-                },
-                {
-                  header: stringGetter({
-                    key: STRING_KEYS.FAQ_WHICH_VALIDATORS_ARE_AVAILABLE_QUESTION,
-                  }),
-                  content: stringGetter({
-                    key: STRING_KEYS.FAQ_WHICH_VALIDATORS_ARE_AVAILABLE_ANSWER,
-                    params: {
-                      KEPLR_LINK: (
-                        <$AccentLink onClick={openKeplrDialog}>
-                          {stringGetter({ key: STRING_KEYS.KEPLR })}
-                        </$AccentLink>
-                      ),
-                      DOCUMENT_LINK: (
-                        <$AccentLink href={validatorSelectionDocument}>
                           {stringGetter({ key: STRING_KEYS.DOCUMENT })}
                         </$AccentLink>
                       ),
