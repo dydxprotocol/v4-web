@@ -41,6 +41,7 @@ import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotifi
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { StakingLiveNotification } from '@/views/notifications/StakingLiveNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -61,6 +62,7 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
+import { useEnvFeatures } from './useEnvFeatures';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -281,11 +283,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const { isStakingEnabled } = useEnvFeatures();
 
       const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
       const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
       const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
+      const stakingLiveExpirationDate = new Date('2024-08-24T23:59:59');
+
       const { isolatedMarginLearnMore } = useURLConfigs();
 
       const currentDate = new Date();
@@ -382,6 +387,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
+
+        if (isStakingEnabled && currentDate <= stakingLiveExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.InAppStakingLive,
+            {
+              title: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.TITLE' }),
+              body: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.BODY' }),
+              renderCustomBody({ isToast, notification }) {
+                return <StakingLiveNotification isToast={isToast} notification={notification} />;
+              },
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.InAppStakingLive,
+            },
+            []
+          );
+        }
       }, [stringGetter]);
 
       const { dydxAddress } = useAccounts();
@@ -431,13 +452,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
+      const { isStakingEnabled } = useEnvFeatures();
+
       const navigate = useNavigate();
 
       return (notificationId: string) => {
         if (notificationId === INCENTIVES_SEASON_NOTIFICATION_ID) {
-          navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+          if (isStakingEnabled) {
+            navigate(`${chainTokenLabel}`);
+          } else {
+            navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+          }
         } else if (notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID) {
-          navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
+          if (isStakingEnabled) {
+            navigate(`${chainTokenLabel}`);
+          } else {
+            navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
+          }
         }
       };
     },

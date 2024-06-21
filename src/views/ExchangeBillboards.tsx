@@ -4,6 +4,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -21,6 +22,7 @@ type ExchangeBillboardsProps = {
 
 export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
   const stringGetter = useStringGetter();
+  const { isStakingEnabled } = useEnvFeatures();
   const { chainTokenLabel } = useTokenConfigs();
 
   const {
@@ -52,7 +54,9 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           value: feesEarned,
           type: OutputType.Fiat,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
-          link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
+          link: isStakingEnabled
+            ? `${chainTokenLabel}`
+            : `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
         },
       ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
         <$BillboardContainer key={key}>
