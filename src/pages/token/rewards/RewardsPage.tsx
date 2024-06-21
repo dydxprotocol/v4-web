@@ -14,6 +14,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -31,7 +32,6 @@ import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
@@ -57,7 +57,7 @@ const RewardsPage = () => {
 
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
-  const stakingEnabled = testFlags.enableStaking;
+  const { isStakingEnabled } = useEnvFeatures();
 
   const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
@@ -79,8 +79,8 @@ const RewardsPage = () => {
 
   const showMigratePanel =
     import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
-  const showGeoblockedPanel = stakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && stakingEnabled;
+  const showGeoblockedPanel = isStakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
+  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && isStakingEnabled;
 
   const stakingRewardPanel = (
     <StakingRewardPanel
@@ -116,16 +116,16 @@ const RewardsPage = () => {
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel />}
         {showStakingRewardPanel && stakingRewardPanel}
-        {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-        {stakingEnabled && <UnbondingPanels />}
-        {stakingEnabled && <TradingRewardsChartPanel />}
+        {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+        {isStakingEnabled && <UnbondingPanels />}
+        {isStakingEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
-        {!stakingEnabled && <TradingRewardsSummaryPanel />}
-        {stakingEnabled && <NewMarketsPanel />}
-        {stakingEnabled && <GovernancePanel />}
+        {!isStakingEnabled && <TradingRewardsSummaryPanel />}
+        {isStakingEnabled && <NewMarketsPanel />}
+        {isStakingEnabled && <GovernancePanel />}
         <RewardHistoryPanel />
         <RewardsHelpPanel />
-        {stakingEnabled && legalDisclaimer}
+        {isStakingEnabled && legalDisclaimer}
       </$DetachedSection>
     </div>
   ) : (
@@ -133,20 +133,20 @@ const RewardsPage = () => {
       {showMigratePanel && <MigratePanel />}
       <$DoubleColumnView>
         <$LeftColumn>
-          {stakingEnabled && <TradingRewardsChartPanel />}
+          {isStakingEnabled && <TradingRewardsChartPanel />}
           <LaunchIncentivesPanel />
-          {!stakingEnabled && <TradingRewardsSummaryPanel />}
+          {!isStakingEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel />}
           {showStakingRewardPanel && stakingRewardPanel}
-          {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-          {stakingEnabled && <UnbondingPanels />}
-          {stakingEnabled && <NewMarketsPanel />}
-          {stakingEnabled && <GovernancePanel />}
+          {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+          {isStakingEnabled && <UnbondingPanels />}
+          {isStakingEnabled && <NewMarketsPanel />}
+          {isStakingEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
-          {stakingEnabled && legalDisclaimer}
+          {isStakingEnabled && legalDisclaimer}
         </$RightColumn>
       </$DoubleColumnView>
     </$DetachedSection>
