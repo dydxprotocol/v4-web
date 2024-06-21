@@ -172,7 +172,7 @@ const useDydxClientContext = () => {
         fills = [],
         totalResults,
         pageSize,
-      } = await indexerClient.account.getSubaccountFills(
+      } = await indexerClient.account.getParentSubaccountNumberFills(
         address,
         subaccountNumber,
         undefined,
@@ -195,7 +195,7 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient.account.getSubaccountFills(
+          indexerClient.account.getParentSubaccountNumberFills(
             address,
             subaccountNumber,
             undefined,
@@ -226,7 +226,7 @@ const useDydxClientContext = () => {
         transfers = [],
         totalResults,
         pageSize,
-      } = await indexerClient.account.getSubaccountTransfers(
+      } = await indexerClient.account.getParentSubaccountNumberTransfers(
         address,
         subaccountNumber,
         100,
@@ -247,11 +247,9 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient.account.getSubaccountFills(
+          indexerClient.account.getParentSubaccountNumberTransfers(
             address,
             subaccountNumber,
-            undefined,
-            undefined,
             100,
             undefined,
             undefined,
