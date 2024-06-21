@@ -32204,12 +32204,12 @@
             "cmcId": -1
         }
     },
-    "Bazinga": {
-        "title": "Add Bazinga-USD perpetual market",
+    "BAZINGA": {
+        "title": "Add BAZINGA-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a Bazinga-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
             "id": 664,
-            "ticker": "Bazinga-USD",
+            "ticker": "BAZINGA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
             "minPriceChange": 800,
@@ -32217,7 +32217,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "SOL-Bazinga-GHVSjfv2kEpiMSTXsxP1S9KZKNzqa4rG8u3qVGVvNiEU-9-GKpbD62S56ZFtTBR5C1tJE4ZgaPesu5jhuLhkY3BXXKb-6-DbK9zkkFDh9aHfV3TVbbDjrXtFtdecSbsGwfofW4KzvC-BhQgvhYpYVccRt5wJnxi13waXNaC3dJVcX6TjTNY9kee",
+                    "ticker": "SOL-BAZINGA-GHVSjfv2kEpiMSTXsxP1S9KZKNzqa4rG8u3qVGVvNiEU-9-GKpbD62S56ZFtTBR5C1tJE4ZgaPesu5jhuLhkY3BXXKb-6-DbK9zkkFDh9aHfV3TVbbDjrXtFtdecSbsGwfofW4KzvC-BhQgvhYpYVccRt5wJnxi13waXNaC3dJVcX6TjTNY9kee",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
