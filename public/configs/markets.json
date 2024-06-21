@@ -1078,10 +1078,9 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pancakeswap/", 
         "name": "PancakeSwap", 
         "tags": [
-            "NFT", 
             "Defi", 
-            "Defi", 
-            "Governance"
+            "Governance",
+            "NFT"
         ], 
         "websiteLink": "https://pancakeswap.finance/", 
         "whitepaperLink": "https://docs.pancakeswap.finance/developers"
@@ -1130,8 +1129,8 @@
         "name": "CEEK VR", 
         "tags": [
             "AR/VR", 
-            "NFT", 
-            "Entertainment"
+            "Entertainment",
+            "NFT"
         ], 
         "websiteLink": "https://www.ceek.io/", 
         "whitepaperLink": null
