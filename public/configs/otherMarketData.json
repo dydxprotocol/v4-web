@@ -10575,8 +10575,7 @@
                 {
                     "exchangeName": "Raydium",
                     "ticker": "TRUMP-SOL-GwUn3JYQ5PC6P9cB9HsatJN7y7aw3BXrNqHPpoHtWyKF-8-5DNPt6WYgj3x7EmU4Fyqe3jDYPk2HMAB21H5N4Ggbev9-9-FAWLdBB8kmWZQ74KpYAYN3YaEW31Si8qrwuQPauFSoma-7Lco4QdQLaW6M4sxVhWe8BHjrykyzjcjGTo4a6qYGABK",
-                    "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "adjustByMarket": "SOL-USD"
                 }
             ],
             "liquidityTier": 2,
