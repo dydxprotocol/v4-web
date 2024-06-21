@@ -24823,48 +24823,6 @@
             "cmcId": 30661
         }
     },
-    "KP3R": {
-        "title": "Add KP3R-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KP3R-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 489,
-            "ticker": "KP3R-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -8,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Binance",
-                    "ticker": "KP3RUSDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "KP3R-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -7,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Keep3rV1",
-            "referencePrice": 61.84142249233301,
-            "cmcId": 7535
-        }
-    },
     "VLX": {
         "title": "Add VLX-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a VLX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
