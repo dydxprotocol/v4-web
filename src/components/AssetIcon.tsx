@@ -89,6 +89,7 @@ const assetIcons = {
   TIA: '/currencies/tia.png',
   TON: '/currencies/ton.png',
   TREMP: '/currencies/tremp.png',
+  TRUMP: '/currencies/trump.png',
   TRX: '/currencies/trx.png',
   UMA: '/currencies/uma.png',
   UNI: '/currencies/uni.png',
