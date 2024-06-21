@@ -35,7 +35,7 @@ export const StakingLiveNotification = ({ isToast, notification }: NotificationP
               {stringGetter({ key: STRING_KEYS.STAKE_NOW })}
             </$Button>
           </$LeftColumn>
-          <$Img src="/public/staking.png" alt={stringGetter({ key: STRING_KEYS.STAKING })} />
+          <$Img src="/staking.png" alt={stringGetter({ key: STRING_KEYS.STAKING })} />
         </$Container>
       }
     />
