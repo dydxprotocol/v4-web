@@ -116,16 +116,16 @@ const RewardsPage = () => {
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel />}
         {showStakingRewardPanel && stakingRewardPanel}
-        {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-        {stakingEnabled && <UnbondingPanels />}
-        {stakingEnabled && <TradingRewardsChartPanel />}
+        {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+        {isStakingEnabled && <UnbondingPanels />}
+        {isStakingEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
-        {!stakingEnabled && <TradingRewardsSummaryPanel />}
-        {stakingEnabled && <NewMarketsPanel />}
-        {stakingEnabled && <GovernancePanel />}
+        {!isStakingEnabled && <TradingRewardsSummaryPanel />}
+        {isStakingEnabled && <NewMarketsPanel />}
+        {isStakingEnabled && <GovernancePanel />}
         <RewardHistoryPanel />
         <RewardsHelpPanel />
-        {stakingEnabled && legalDisclaimer}
+        {isStakingEnabled && legalDisclaimer}
       </$DetachedSection>
     </div>
   ) : (
@@ -133,20 +133,20 @@ const RewardsPage = () => {
       {showMigratePanel && <MigratePanel />}
       <$DoubleColumnView>
         <$LeftColumn>
-          {stakingEnabled && <TradingRewardsChartPanel />}
+          {isStakingEnabled && <TradingRewardsChartPanel />}
           <LaunchIncentivesPanel />
-          {!stakingEnabled && <TradingRewardsSummaryPanel />}
+          {!isStakingEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel />}
           {showStakingRewardPanel && stakingRewardPanel}
-          {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-          {stakingEnabled && <UnbondingPanels />}
-          {stakingEnabled && <NewMarketsPanel />}
-          {stakingEnabled && <GovernancePanel />}
+          {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+          {isStakingEnabled && <UnbondingPanels />}
+          {isStakingEnabled && <NewMarketsPanel />}
+          {isStakingEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
-          {stakingEnabled && legalDisclaimer}
+          {isStakingEnabled && legalDisclaimer}
         </$RightColumn>
       </$DoubleColumnView>
     </$DetachedSection>
