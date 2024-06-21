@@ -22,9 +22,16 @@ type ElementProps = {
   fee?: BigNumberish;
   amount?: number;
   isLoading: boolean;
+  allAmountsEmpty: boolean;
 };
 
-export const UnstakeButtonAndReceipt = ({ error, fee, amount, isLoading }: ElementProps) => {
+export const UnstakeButtonAndReceipt = ({
+  error,
+  fee,
+  amount,
+  isLoading,
+  allAmountsEmpty,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
   const { nativeTokenBalance } = useAccountBalance();
@@ -75,7 +82,11 @@ export const UnstakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Eleme
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
       alert={error}
-      buttonText={stringGetter({ key: STRING_KEYS.UNSTAKE })}
+      buttonText={
+        allAmountsEmpty
+          ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE })
+          : stringGetter({ key: STRING_KEYS.UNSTAKE })
+      }
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
       isLoading={isLoading}

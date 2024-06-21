@@ -7,6 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -16,15 +17,15 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { WithSidebar } from '@/components/WithSidebar';
 
-import { testFlags } from '@/lib/testFlags';
-
 const RewardsPage = lazy(() => import('./rewards/RewardsPage'));
 const StakingPage = lazy(() => import('./staking/StakingPage'));
 const GovernancePage = lazy(() => import('./Governance'));
 
 const Token = () => {
-  const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
+
+  const { isTablet } = useBreakpoints();
+  const { isStakingEnabled } = useEnvFeatures();
 
   const routesComponent = (
     <Suspense fallback={<LoadingSpace id="token-page" />}>
@@ -40,7 +41,7 @@ const Token = () => {
   return (
     <WithSidebar
       sidebar={
-        isTablet || testFlags.enableStaking ? null : (
+        isTablet || isStakingEnabled ? null : (
           <$SideBar>
             <$NavigationMenu
               items={[

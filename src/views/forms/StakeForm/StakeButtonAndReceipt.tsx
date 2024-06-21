@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
+import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -25,7 +26,7 @@ import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 type ElementProps = {
   error?: StakeButtonAlert;
   fee?: BigNumberish;
-  amount?: number;
+  amount?: BigNumber;
   isLoading: boolean;
   selectedValidator: Validator | undefined;
   setSelectedValidator: Dispatch<SetStateAction<Validator | undefined>>;
@@ -110,7 +111,9 @@ export const StakeButtonAndReceipt = ({
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
       alert={error}
-      buttonText={stringGetter({ key: STRING_KEYS.STAKE })}
+      buttonText={stringGetter({
+        key: amount !== undefined ? STRING_KEYS.STAKE : STRING_KEYS.ENTER_AMOUNT_TO_STAKE,
+      })}
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
       isLoading={isLoading}

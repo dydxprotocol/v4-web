@@ -16,12 +16,12 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ValidatorFaviconIcon } from '@/components/ValidatorName';
 
-import { getUnbondingDelegations } from '@/state/accountSelectors';
+import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 export const UnbondingPanels = () => {
   const stringGetter = useStringGetter();
-  const unbondingDelegations = useAppSelector(getUnbondingDelegations, shallowEqual);
+  const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
   const { unbondingValidators } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
@@ -37,6 +37,40 @@ export const UnbondingPanels = () => {
         const timeDifference = completionDate - currentDate;
 
         const dayDifference = Math.floor(timeDifference / timeUnits.day);
+        const hourDifference = Math.floor(timeDifference / timeUnits.hour);
+        const minuteDifference = Math.floor(timeDifference / timeUnits.minute);
+
+        const availableInText =
+          dayDifference > 1
+            ? stringGetter({
+                key: STRING_KEYS.AVAILABLE_IN_DAYS,
+                params: {
+                  DAYS: dayDifference,
+                },
+              })
+            : hourDifference >= 1
+              ? stringGetter({
+                  key: STRING_KEYS.AVAILABLE_IN,
+                  params: {
+                    DURATION: stringGetter({
+                      key: STRING_KEYS.X_HOURS_LOWERCASED,
+                      params: {
+                        X: hourDifference,
+                      },
+                    }),
+                  },
+                })
+              : stringGetter({
+                  key: STRING_KEYS.AVAILABLE_IN,
+                  params: {
+                    DURATION: stringGetter({
+                      key: STRING_KEYS.X_MINUTES_LOWERCASED,
+                      params: {
+                        X: minuteDifference,
+                      },
+                    }),
+                  },
+                });
 
         const unbondingValidator = unbondingValidators?.[delegation.validator]?.[0];
 
@@ -66,14 +100,7 @@ export const UnbondingPanels = () => {
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
                 slotRight={<$AssetIcon symbol={chainTokenLabel} />}
               />
-              <$Footer>
-                {stringGetter({
-                  key: STRING_KEYS.AVAILABLE_IN_DAYS,
-                  params: {
-                    DAYS: dayDifference,
-                  },
-                })}
-              </$Footer>
+              <$Footer>{availableInText}</$Footer>
             </$Content>
           </Panel>
         );

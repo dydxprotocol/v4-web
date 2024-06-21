@@ -13,6 +13,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -85,9 +87,9 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       {
         key: 'equity',
         label: (
-          <>
+          <$RowItem>
             {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
-          </>
+          </$RowItem>
         ),
         value: (
           <DiffOutput
@@ -102,9 +104,9 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       {
         key: 'gas-fees',
         label: (
-          <>
+          <$RowItem>
             {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{usdcLabel}</Tag>
-          </>
+          </$RowItem>
         ),
         value: <Output type={OutputType.Fiat} value={fee} />,
       },
@@ -179,6 +181,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
 
 const $Dialog = styled(Dialog)`
   --dialog-header-paddingBottom: 0rem;
+  --dialog-width: 25rem;
 `;
 
 const $Container = styled.div<{ backgroundImagePath: string }>`
@@ -201,6 +204,10 @@ const $Container = styled.div<{ backgroundImagePath: string }>`
     `}
     mask-image: linear-gradient(to bottom, var(--color-layer-3) 20%, transparent);
   }
+`;
+
+const $RowItem = styled.div`
+  ${layoutMixins.inlineRow};
 `;
 
 const $AssetContainer = styled.div`

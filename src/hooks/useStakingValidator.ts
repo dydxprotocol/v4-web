@@ -10,17 +10,19 @@ import { shallowEqual } from 'react-redux';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
-import { getStakingDelegations, getUnbondingDelegations } from '@/state/accountSelectors';
+import { useDydxClient } from '@/hooks/useDydxClient';
+
+import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
+import { getStakingDelegations } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { MustBigNumber } from '../lib/numbers';
-import { useDydxClient } from './useDydxClient';
+import { MustBigNumber } from '@/lib/numbers';
 
 export const useStakingValidator = () => {
   const { getValidators, isCompositeClientConnected } = useDydxClient();
   const selectedNetwork = useAppSelector(getSelectedNetwork);
-  const unbondingDelegations = useAppSelector(getUnbondingDelegations, shallowEqual);
+  const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
   const currentDelegations = useAppSelector(getStakingDelegations, shallowEqual)?.map(
     (delegation) => {
       return {
