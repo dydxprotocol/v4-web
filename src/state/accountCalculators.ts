@@ -7,12 +7,13 @@ import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
+  getUnbondingDelegations,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
+import { createAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { createAppSelector } from './appTypes';
 import {
   getCurrentInput,
   getInputClosePositionData,
@@ -114,6 +115,23 @@ export const calculateShouldRenderActionsInPositionsTable = () =>
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );
+
+/**
+ * @description calculate sorted unbonding delegations (from soonest to complete unbonding -> latest)
+ */
+export const calculateSortedUnbondingDelegations = createAppSelector(
+  [getUnbondingDelegations],
+  (unbondingDelegations) => {
+    if (unbondingDelegations?.length) {
+      const sortedUnbondingDelegations = [...unbondingDelegations];
+      sortedUnbondingDelegations.sort(
+        (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
+      );
+      return sortedUnbondingDelegations;
+    }
+    return unbondingDelegations;
+  }
+);
 
 export const calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero = createAppSelector(
   [
