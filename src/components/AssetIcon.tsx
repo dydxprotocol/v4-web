@@ -66,6 +66,7 @@ const assetIcons = {
   MEME: '/currencies/meme.png',
   MINA: '/currencies/mina.png',
   MKR: '/currencies/mkr.png',
+  MOG: '/currencies/mog.png',
   MOTHER: '/currencies/mother.png',
   NEAR: '/currencies/near.png',
   OCEAN: '/currencies/ocean.png',
