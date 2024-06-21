@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -16,15 +17,13 @@ import { Panel } from '@/components/Panel';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const RewardsHelpPanel = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+
+  const { isStakingEnabled } = useEnvFeatures();
   const { tradingRewardsLearnMore, mintscanValidatorsLearnMore, validatorSelectionDocument } =
     useURLConfigs();
-
-  const stakingEnabled = testFlags.enableStaking;
 
   const openKeplrDialog = () =>
     dispatch(
@@ -69,7 +68,7 @@ export const RewardsHelpPanel = () => {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
           },
-          ...(stakingEnabled
+          ...(isStakingEnabled
             ? [
                 {
                   header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
