@@ -752,10 +752,70 @@ async function retry<T>(
   }
 }
 
+// getMarketsToValidate finds markets that are either added or modified.
+function getMarketsToValidate(otherMarketsContent: string): Set<string> {
+  const diffFile = process.env.DIFF;
+  if (!diffFile) {
+    throw new Error('Diff file does not exist');
+  }
+
+  // Get added/modified line numbers.
+  const diffContent = readFileSync(diffFile, 'utf8');
+  const diffLines = diffContent.split('\n');
+  const changedLines: number[] = [];
+  let currentLine = 0;
+  diffLines.forEach(line => {
+    if (line.startsWith('@@')) {
+      const match = line.match(/@@ \-(\d+),\d+ \+(\d+),\d+ @@/);
+      if (match) {
+        currentLine = parseInt(match[2], 10) - 1;
+      }
+    } else if (line.startsWith('+') && !line.startsWith('+++')) {
+      currentLine += 1; 
+      changedLines.push(currentLine);
+    } else if (!line.startsWith('-')) {
+      currentLine += 1;
+    }
+  });
+
+  // Get all added/modified markets.
+  const marketsToValidate = new Set<string>();
+  const lines = otherMarketsContent.split('\n');
+  const findMarket = (lineNumber: number, lines: string[]) => {
+    for (let i = lineNumber - 1; i >= 0; i--) {
+      const line = lines[i].trim();
+      const match = line.match(/"([A-Z]+)": \{/);
+      if (match) {
+        return match[1];
+      }
+    }
+    return null;
+  };
+  changedLines.forEach(line => {
+    const market = findMarket(line, lines);
+    if (market) {
+      marketsToValidate.add(market);
+    }
+  });
+  if (marketsToValidate.size === 0) {
+    console.log('No markets to validate');
+  }
+
+  return marketsToValidate;
+}
+
 async function main(): Promise<void> {
-  // Read proposals from json file.
+  // Get markets to validate.
   const fileContent = readFileSync(PATH_TO_PROPOSALS, 'utf8');
-  const proposals: Proposal[] = Object.values(JSON.parse(fileContent));
+  const marketsToValidate = getMarketsToValidate(fileContent);
+  console.log("\nValidating markets: ", marketsToValidate);
+  if (marketsToValidate.size === 0) {
+    return;
+  }
+
+  // Extract proposals.
+  const allMarkets = JSON.parse(fileContent)
+  const proposals: Proposal[] = Array.from(marketsToValidate).map(market => allMarkets[market]);
 
   // Validate JSON schema.
   console.log('Validating JSON schema of params...\n');
@@ -773,6 +833,8 @@ async function main(): Promise<void> {
   // Validate proposals against localnet.
   console.log('\nTesting proposals against localnet...\n');
   await validateAgainstLocalnet(proposals);
+
+  console.log(`\nValidated ${proposals.length} markets. See log for specific names.`);
 }
 
 main()
