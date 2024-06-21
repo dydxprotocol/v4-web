@@ -48,6 +48,13 @@ jobs:
           make build
           echo "Starting localnet..."
           DOCKER_BUILDKIT=1 make localnet-startd
+
+      - name: Get diff of otherMarketData.json
+        run: |
+          git fetch origin
+          git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
       
       - name: Validate other market data
+        env:
+          DIFF: otherMarketDiff.txt
         run: pnpx tsx scripts/validate-other-market-data.ts
