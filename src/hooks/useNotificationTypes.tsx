@@ -220,25 +220,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const title = stringGetter({
-            key: {
-              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[transferType],
-          });
+          if (isCosmosTransfer) {
+            const icon = <$AssetIcon symbol="USDC" />;
+            const isFinished =
+              cosmosTransferStatus?.status === 'success' &&
+              cosmosTransferStatus?.step === 'depositToSubaccount';
+            const title = isFinished
+              ? stringGetter({
+                  key: STRING_KEYS.DEPOSIT,
+                })
+              : // TODO: Need to add Localization
+                'Confirm Pending Deposit';
 
-          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
-          // TODO: remove typeguards once skip implements estimatedrouteduration
-          // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
-          const estimatedDuration =
-            typeof toChainEta === 'string' ? toChainEta : formatSeconds(Math.max(toChainEta, 0));
-          const body = stringGetter({
-            key: STRING_KEYS.DEPOSIT_STATUS,
-            params: {
-              AMOUNT_USD: `${toAmount} ${DydxChainAsset.USDC.toUpperCase()}`,
-              ESTIMATED_DURATION: estimatedDuration,
-            },
-          });
+            trigger(
+              txHash,
+              {
+                icon,
+                title,
+                toastSensitivity: 'foreground',
+                renderCustomBody: ({ isToast, notification }) => (
+                  <TransferStatusNotification
+                    isToast={isToast}
+                    slotIcon={icon}
+                    slotTitle={title}
+                    transfer={transfer}
+                    type={transferType}
+                    triggeredAt={transfer.triggeredAt}
+                    notification={notification}
+                  />
+                ),
+                groupKey: NotificationType.SquidTransfer,
+              },
+              []
+            );
+          } else {
+            const isFinished =
+              (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+            const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           trigger(
             id ?? txHash,
@@ -675,4 +693,8 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
+`;
+
+const $AssetIcon = styled(AssetIcon)`
+  font-size: 1.5rem;
 `;

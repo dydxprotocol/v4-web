@@ -6,6 +6,7 @@ import { SkipStatusResponse } from './skip';
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
+  PendingDeposit = 'PendingDeposit',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
@@ -26,6 +27,7 @@ export const NotificationTypeCategory: {
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
   [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.PendingDeposit]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,

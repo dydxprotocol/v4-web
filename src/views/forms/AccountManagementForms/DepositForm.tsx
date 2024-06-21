@@ -97,8 +97,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
 
-  const { usdcDecimals } = useTokenConfigs();
-
   const { walletType } = useAccounts();
 
   const isKeplrWallet = walletType === WalletType.Keplr;
@@ -302,6 +300,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           dispatch(
             openDialog({
               type: DialogTypes.NobleDepositDialog,
+              dialogProps: {
+                toChainId: selectedDydxChainId,
+                fromChainId: chainIdStr ?? undefined,
+                toAmount: summary?.usdcSize ?? undefined,
+              },
             })
           );
           return;
