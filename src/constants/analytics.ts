@@ -119,138 +119,112 @@ export enum AnalyticsEvent {
 
   // Notification
   NotificationAction = 'NotificationAction',
+
+  // Staking
+  StakeTransaction = 'StakeTransaction',
+  UnstakeTransaction = 'UnstakeTransaction',
+  ClaimTransaction = 'ClaimTransaction',
 }
 
-export type AnalyticsEventData<T extends AnalyticsEvent> =
-  // App
-  T extends AnalyticsEvent.AppStart
-    ? {}
-    : T extends AnalyticsEvent.NetworkStatus
-      ? {
-          status: (typeof AbacusApiStatus)['name'];
-          /** Last time indexer node was queried successfully */
-          lastSuccessfulIndexerRpcQuery?: number;
-          /** Time elapsed since indexer node was queried successfully */
-          elapsedTime?: number;
-          blockHeight?: number;
-          indexerBlockHeight?: number;
-          trailingBlocks?: number;
-        }
-      : // Navigation
-        T extends AnalyticsEvent.NavigatePage
-        ? {
-            path: string;
-          }
-        : T extends AnalyticsEvent.NavigateDialog
-          ? {
-              type: DialogTypes;
-            }
-          : T extends AnalyticsEvent.NavigateDialogClose
-            ? {
-                type: DialogTypes;
-              }
-            : T extends AnalyticsEvent.NavigateExternal
-              ? {
-                  link: string;
-                }
-              : // Wallet
-                T extends AnalyticsEvent.ConnectWallet
-                ? {
-                    walletType: WalletType;
-                    walletConnectionType: WalletConnectionType;
-                  }
-                : T extends AnalyticsEvent.DisconnectWallet
-                  ? {}
-                  : // Onboarding
-                    T extends AnalyticsEvent.OnboardingStepChanged
-                    ? {
-                        state: OnboardingState;
-                        step?: OnboardingSteps;
-                      }
-                    : T extends AnalyticsEvent.OnboardingAccountDerived
-                      ? {
-                          hasPreviousTransactions: boolean;
-                        }
-                      : // Transfers
-                        T extends AnalyticsEvent.TransferFaucet
-                        ? {}
-                        : T extends AnalyticsEvent.TransferFaucetConfirmed
-                          ? {
-                              /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-                              roundtripMs: number;
-                              /** URL/IP of node the order was sent to */
-                              validatorUrl: string;
-                            }
-                          : T extends AnalyticsEvent.TransferDeposit
-                            ? {
-                                chainId?: string;
-                                tokenAddress?: string;
-                                tokenSymbol?: string;
-                                slippage?: number;
-                                gasFee?: number;
-                                bridgeFee?: number;
-                                exchangeRate?: number;
-                                estimatedRouteDuration?: number;
-                                toAmount?: number;
-                                toAmountMin?: number;
-                              }
-                            : T extends AnalyticsEvent.TransferWithdraw
-                              ? {
-                                  chainId?: string;
-                                  tokenAddress?: string;
-                                  tokenSymbol?: string;
-                                  slippage?: number;
-                                  gasFee?: number;
-                                  bridgeFee?: number;
-                                  exchangeRate?: number;
-                                  estimatedRouteDuration?: number;
-                                  toAmount?: number;
-                                  toAmountMin?: number;
-                                }
-                              : // Trading
-                                T extends AnalyticsEvent.TradeOrderTypeSelected
-                                ? {
-                                    type: TradeTypes;
-                                  }
-                                : T extends AnalyticsEvent.TradePlaceOrder
-                                  ? HumanReadablePlaceOrderPayload & {
-                                      isClosePosition: boolean;
-                                    }
-                                  : T extends AnalyticsEvent.TradePlaceOrderConfirmed
-                                    ? {
-                                        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-                                        roundtripMs: number;
-                                        /** URL/IP of node the order was sent to */
-                                        validatorUrl: string;
-                                      }
-                                    : T extends AnalyticsEvent.TradeCancelOrder
-                                      ? {}
-                                      : T extends AnalyticsEvent.TradeCancelOrderConfirmed
-                                        ? {
-                                            /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
-                                            roundtripMs: number;
-                                            /** URL/IP of node the order was sent to */
-                                            validatorUrl: string;
-                                          }
-                                        : // Notifcation
-                                          T extends AnalyticsEvent.NotificationAction
-                                          ? {
-                                              type: string;
-                                              id: string;
-                                            }
-                                          : T extends AnalyticsEvent.TransferNotification
-                                            ? {
-                                                type: TransferNotificationTypes | undefined;
-                                                toAmount: number | undefined;
-                                                timeSpent:
-                                                  | Record<string, number>
-                                                  | number
-                                                  | undefined;
-                                                txHash: string;
-                                                status: 'new' | 'success' | 'error';
-                                                triggeredAt: number | undefined;
-                                              }
-                                            : never;
+type AnalyticsEventDataMap = {
+  [AnalyticsEvent.AppStart]: {};
+  [AnalyticsEvent.NetworkStatus]: {
+    status: (typeof AbacusApiStatus)['name'];
+    lastSuccessfulIndexerRpcQuery?: number;
+    elapsedTime?: number;
+    blockHeight?: number;
+    indexerBlockHeight?: number;
+    trailingBlocks?: number;
+  };
+  [AnalyticsEvent.NavigatePage]: { path: string };
+  [AnalyticsEvent.NavigateDialog]: { type: DialogTypes };
+  [AnalyticsEvent.NavigateDialogClose]: { type: DialogTypes };
+  [AnalyticsEvent.NavigateExternal]: { link: string };
+  [AnalyticsEvent.ConnectWallet]: {
+    walletType: WalletType;
+    walletConnectionType: WalletConnectionType;
+  };
+  [AnalyticsEvent.DisconnectWallet]: {};
+  [AnalyticsEvent.OnboardingStepChanged]: {
+    state: OnboardingState;
+    step?: OnboardingSteps;
+  };
+  [AnalyticsEvent.OnboardingAccountDerived]: {
+    hasPreviousTransactions: boolean;
+  };
+  [AnalyticsEvent.TransferFaucet]: {};
+  [AnalyticsEvent.TransferFaucetConfirmed]: {
+    roundtripMs: number;
+    validatorUrl: string;
+  };
+  [AnalyticsEvent.TransferDeposit]: {
+    chainId?: string;
+    tokenAddress?: string;
+    tokenSymbol?: string;
+    slippage?: number;
+    gasFee?: number;
+    bridgeFee?: number;
+    exchangeRate?: number;
+    estimatedRouteDuration?: number;
+    toAmount?: number;
+    toAmountMin?: number;
+  };
+  [AnalyticsEvent.TransferWithdraw]: {
+    chainId?: string;
+    tokenAddress?: string;
+    tokenSymbol?: string;
+    slippage?: number;
+    gasFee?: number;
+    bridgeFee?: number;
+    exchangeRate?: number;
+    estimatedRouteDuration?: number;
+    toAmount?: number;
+    toAmountMin?: number;
+  };
+  [AnalyticsEvent.TradeOrderTypeSelected]: { type: TradeTypes };
+  [AnalyticsEvent.TradePlaceOrder]: HumanReadablePlaceOrderPayload & {
+    isClosePosition: boolean;
+  };
+  [AnalyticsEvent.TradePlaceOrderConfirmed]: {
+    roundtripMs: number;
+    validatorUrl: string;
+  };
+  [AnalyticsEvent.TradeCancelOrder]: {};
+  [AnalyticsEvent.TradeCancelOrderConfirmed]: {
+    roundtripMs: number;
+    validatorUrl: string;
+  };
+  [AnalyticsEvent.NotificationAction]: {
+    type: string;
+    id: string;
+  };
+  [AnalyticsEvent.TransferNotification]: {
+    type: TransferNotificationTypes | undefined;
+    toAmount: number | undefined;
+    timeSpent: Record<string, number> | number | undefined;
+    txHash: string;
+    status: 'new' | 'success' | 'error';
+    triggeredAt: number | undefined;
+  };
+  [AnalyticsEvent.StakeTransaction]: {
+    txHash?: string;
+    amount?: number;
+    validatorAddress?: string;
+  };
+  [AnalyticsEvent.UnstakeTransaction]: {
+    txHash?: string;
+    amount?: number;
+    validatorAddresses?: string[];
+  };
+  [AnalyticsEvent.ClaimTransaction]: {
+    txHash?: string;
+    amount?: string;
+  };
+};
+
+export type AnalyticsEventData<T extends AnalyticsEvent> = T extends keyof AnalyticsEventDataMap
+  ? AnalyticsEventDataMap[T]
+  : never;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};

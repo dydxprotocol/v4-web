@@ -7,6 +7,7 @@ import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -33,8 +34,10 @@ import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndRec
 import { useAppDispatch } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type StakeFormProps = {
   onDone?: () => void;
@@ -65,6 +68,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   useEffect(() => {
     // Initalize to default validator once on mount
     setSelectedValidator(defaultValidator);
+    track(AnalyticsEvent.StakeDialog);
   }, []);
 
   useEffect(() => {
@@ -115,7 +119,14 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const tx = await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const txHash = hashFromTx(tx.hash);
+
+      track(AnalyticsEvent.StakeTransaction, {
+        txHash,
+        amount: amountBN.toNumber(),
+        validatorAddress: selectedValidator.operatorAddress,
+      });
       onDone?.();
     } catch (err) {
       log('StakeForm/onStake', err);

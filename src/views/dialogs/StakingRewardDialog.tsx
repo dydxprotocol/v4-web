@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
@@ -29,8 +30,10 @@ import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type ElementProps = {
   validators: string[];
@@ -117,7 +120,13 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     try {
       setIsLoading(true);
       setError(undefined);
-      await withdrawReward(validators);
+      const tx = await withdrawReward(validators);
+      const txHash = hashFromTx(tx.hash);
+
+      track(AnalyticsEvent.ClaimTransaction, {
+        txHash,
+        amount: usdcRewards.toString(),
+      });
       setIsOpen(false);
     } catch (err) {
       log('StakeRewardDialog/withdrawReward', err);
@@ -129,7 +138,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     } finally {
       setIsLoading(false);
     }
-  }, [validators, withdrawReward, setIsOpen]);
+  }, [validators, withdrawReward, setIsOpen, usdcRewards]);
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
