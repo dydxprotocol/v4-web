@@ -123,6 +123,8 @@ export enum AnalyticsEvent {
   // Staking
   StakeTransaction = 'StakeTransaction',
   UnstakeTransaction = 'UnstakeTransaction',
+  StakeInput = 'StakeInput',
+  UnstakeInput = 'UnstakeInput',
   ClaimTransaction = 'ClaimTransaction',
 }
 
@@ -219,6 +221,14 @@ type AnalyticsEventDataMap = {
   [AnalyticsEvent.ClaimTransaction]: {
     txHash?: string;
     amount?: string;
+  };
+  [AnalyticsEvent.StakeInput]: {
+    amount?: number;
+    validatorAddress?: string;
+  };
+  [AnalyticsEvent.UnstakeInput]: {
+    amount?: number;
+    validatorAddress?: string;
   };
 };
 

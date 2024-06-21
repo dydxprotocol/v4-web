@@ -147,6 +147,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
 
   const onChangeAmount = useCallback((validator: string, value: number | undefined) => {
     setAmounts((a) => ({ ...a, [validator]: value }));
+    track(AnalyticsEvent.UnstakeInput, {
+      amount: value,
+      validatorAddress: validator,
+    });
   }, []);
 
   const setAllUnstakeAmountsToMax = useCallback(() => {

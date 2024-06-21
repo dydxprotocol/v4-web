@@ -110,6 +110,10 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   const onChangeAmount = (value?: BigNumber) => {
     setAmountBN(value);
+    track(AnalyticsEvent.StakeInput, {
+      amount: value?.toNumber(),
+      validatorAddress: selectedValidator?.operatorAddress,
+    });
   };
 
   const onStake = useCallback(async () => {
