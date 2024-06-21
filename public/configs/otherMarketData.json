@@ -32384,42 +32384,6 @@
             "cmcId": -1
         }
     },
-    "Q": {
-        "title": "Add Q-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a Q-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 669,
-            "ticker": "Q-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Raydium",
-                    "ticker": "Q-SOL-GwjFP2SE691aitDr4JsymgaM3mF8xWLgeYZUCJRkLKs4-6-4mhZSMPAQ9hdmsKpzHJHsjZfSqdMK7noxbCJpFGjS5iv-9-4cGQG1p35BEnu2s5puRPNgdgwPndtZkXWUvLDi79SNWC-4qpJCwZzyofPEqf1E9x8VkAjzUzPCdcBu2MAKn42Bxzc",
-                    "adjustByMarket": "SOL-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Qanouns",
-            "referencePrice": 0.4941327578084841,
-            "cmcId": -1
-        }
-    },
     "RETARDIO": {
         "title": "Add RETARDIO-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RETARDIO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
