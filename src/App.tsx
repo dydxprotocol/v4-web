@@ -8,7 +8,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
-import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -107,7 +107,7 @@ const Content = () => {
 
               <Route
                 path={`/${chainTokenLabel}/*`}
-                element={showChainTokenPage ? <TokenPage /> : <Navigate to={DEFAULT_TRADE_ROUTE} />}
+                element={showChainTokenPage ? <TokenPage /> : <Navigate to={AppRoute.Markets} />}
               />
 
               {isTablet && (
@@ -126,7 +126,7 @@ const Content = () => {
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
                 path="*"
-                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
+                element={<Navigate to={pathFromHash || AppRoute.Markets} replace />}
               />
             </Routes>
           </Suspense>
