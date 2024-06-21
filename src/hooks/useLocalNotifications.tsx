@@ -112,6 +112,8 @@ const useLocalNotificationsContext = () => {
               isExchange,
               requestId,
               tracked,
+              isCosmosTransfer,
+              cosmosTransferStatus,
             } = transferNotification;
 
             const hasErrors =
@@ -119,6 +121,22 @@ const useLocalNotificationsContext = () => {
               // also error can some time come back as an empty object so we need to ignore for that
               !!currentStatus?.errors ||
               (currentStatus?.error && Object.keys(currentStatus.error).length !== 0);
+
+            if (
+              isCosmosTransfer &&
+              cosmosTransferStatus?.step === 'depositToSubaccount' &&
+              cosmosTransferStatus.status === 'success'
+            ) {
+              track(AnalyticsEvent.TransferNotification, {
+                triggeredAt,
+                timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                toAmount: transferNotification.toAmount,
+                status: 'success',
+                type: transferNotification.type,
+                txHash,
+              });
+              return transferNotification;
+            }
 
             if (
               !isExchange &&
@@ -201,5 +219,6 @@ const useLocalNotificationsContext = () => {
     // Transfer notifications
     transferNotifications,
     addTransferNotification,
+    setTransferNotifications,
   };
 };

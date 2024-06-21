@@ -19,7 +19,6 @@ export enum LocalStorageKey {
   NotificationPreferences = 'dydx.NotificationPreferences',
 
   // UI State
-  LastNobleDepositStep = 'dydx.LastNobleDepositStep',
   LastViewedMarket = 'dydx.LastViewedMarket',
   SelectedLocale = 'dydx.SelectedLocale',
   SelectedNetwork = 'dydx.SelectedNetwork',
