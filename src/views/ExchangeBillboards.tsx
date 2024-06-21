@@ -53,25 +53,15 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           type: OutputType.Fiat,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
-          slotLeft: '~',
         },
-      ].map(
-        ({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey, slotLeft }) => (
-          <$BillboardContainer key={key}>
-            <$BillboardStat>
-              <$BillboardTitle>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label>{stringGetter({ key: labelKey })}</label>
-                <Tag>{stringGetter({ key: tagKey })}</Tag>
-              </$BillboardTitle>
-              <$Output
-                useGrouping
-                withBaseFont
-                fractionDigits={fractionDigits}
-                type={type}
-                value={value}
-                slotLeft={slotLeft}
-              />
+      ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
+        <$BillboardContainer key={key}>
+          <$BillboardStat>
+            <$BillboardTitle>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label>{stringGetter({ key: labelKey })}</label>
+              <Tag>{stringGetter({ key: tagKey })}</Tag>
+
               {link && linkLabelKey ? (
                 <$BillboardLink
                   href={link}
@@ -82,10 +72,17 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                   {stringGetter({ key: linkLabelKey })}
                 </$BillboardLink>
               ) : null}
-            </$BillboardStat>
-          </$BillboardContainer>
-        )
-      )}
+            </$BillboardTitle>
+            <$Output
+              useGrouping
+              withBaseFont
+              fractionDigits={fractionDigits}
+              type={type}
+              value={value}
+            />
+          </$BillboardStat>
+        </$BillboardContainer>
+      ))}
     </$MarketBillboardsWrapper>
   );
 };
@@ -100,7 +97,7 @@ const $BillboardContainer = styled.div`
   justify-content: space-between;
 
   background-color: var(--color-layer-3);
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 0.625rem;
 `;
 const $BillboardLink = styled(Button)`
@@ -108,6 +105,7 @@ const $BillboardLink = styled(Button)`
   --button-height: unset;
   --button-padding: 0;
   justify-content: flex-start;
+  margin-left: auto;
 `;
 const $BillboardTitle = styled.div`
   ${layoutMixins.row}
@@ -118,6 +116,7 @@ const $BillboardStat = styled.div`
   ${layoutMixins.column}
 
   gap: 0.5rem;
+  flex: 1;
 
   label {
     color: var(--color-text-0);

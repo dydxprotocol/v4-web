@@ -160,7 +160,7 @@ export const MarketsCompactTable = ({
   return (
     <$Table
       withInnerBorders
-      data={sortedMarkets.slice(0, 5)}
+      data={sortedMarkets.slice(0, 3)}
       getRowKey={(row) => row.market ?? ''}
       label="Markets"
       onRowAction={(market: Key) =>
