@@ -56,7 +56,7 @@ export const FooterMobile = () => {
                         <Icon iconName={IconName.Play} />
                       </$StartIcon>
                     ),
-                    onClick: () => dispatch(openDialog({ type: DialogTypes.Onboarding })),
+                    onClick: () => dispatch(openDialog(DialogTypes.Onboarding())),
                   },
               {
                 value: 'portfolio',

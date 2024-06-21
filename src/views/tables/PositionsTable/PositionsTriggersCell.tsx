@@ -80,16 +80,15 @@ export const PositionsTriggersCell = ({
       return;
     }
     dispatch(
-      openDialog({
-        type: DialogTypes.Triggers,
-        dialogProps: {
+      openDialog(
+        DialogTypes.Triggers({
           marketId,
           assetId,
           stopLossOrders,
           takeProfitOrders,
           navigateToMarketOrders: onViewOrders,
-        },
-      })
+        })
+      )
     );
   };
 

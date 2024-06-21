@@ -2,15 +2,16 @@ import { createContext, useCallback, useContext, useEffect } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import type { TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { track } from '@/lib/analytics';
-import { fetchSquidStatus, STATUS_ERROR_GRACE_PERIOD } from '@/lib/squid';
+import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/lib/squid';
 
+import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
 
 const LocalNotificationsContext = createContext<
@@ -29,6 +30,7 @@ const TRANSFER_STATUS_FETCH_INTERVAL = 10_000;
 const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
+  const { skip } = useEndpointsConfig();
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
     version: string;
@@ -77,14 +79,16 @@ const useLocalNotificationsContext = () => {
       const { txHash, triggeredAt, toAmount, type } = notification;
       setTransferNotifications([...transferNotifications, notification]);
       // track initialized new transfer notification
-      track(AnalyticsEvent.TransferNotification, {
-        triggeredAt,
-        timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
-        txHash,
-        toAmount,
-        type,
-        status: 'new',
-      });
+      track(
+        AnalyticsEvents.TransferNotification({
+          triggeredAt,
+          timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+          txHash,
+          toAmount,
+          type,
+          status: 'new',
+        })
+      );
     },
     [transferNotifications]
   );
@@ -107,6 +111,7 @@ const useLocalNotificationsContext = () => {
               status: currentStatus,
               isExchange,
               requestId,
+              tracked,
             } = transferNotification;
 
             const hasErrors =
@@ -122,41 +127,57 @@ const useLocalNotificationsContext = () => {
                 currentStatus?.squidTransactionStatus === 'ongoing')
             ) {
               try {
-                const status = await fetchSquidStatus(
-                  {
-                    transactionId: txHash,
-                    toChainId,
-                    fromChainId,
-                  },
+                const skipParams = {
+                  transactionHash: txHash,
+                  chainId: fromChainId,
+                  baseUrl: skip,
+                };
+                // TODO: replace with statsig call
+                const useSkip = false;
+                if (!tracked && useSkip) {
+                  const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
+                  // if no tx hash was returned, transfer has not yet been tracked
+                  if (!trackedTxHash) return transferNotification;
+                  transferNotification.tracked = true;
+                }
+                const status = await fetchTransferStatus({
+                  transactionId: txHash,
+                  toChainId,
+                  fromChainId,
                   isCctp,
-                  undefined,
-                  requestId
-                );
+                  requestId,
+                  baseUrl: skip,
+                  useSkip,
+                });
                 if (status) {
                   transferNotification.status = status;
                   if (status.squidTransactionStatus === 'success') {
-                    track(AnalyticsEvent.TransferNotification, {
-                      triggeredAt,
-                      timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
-                      toAmount: transferNotification.toAmount,
-                      status: 'success',
-                      type: transferNotification.type,
-                      txHash,
-                    });
+                    track(
+                      AnalyticsEvents.TransferNotification({
+                        triggeredAt,
+                        timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                        toAmount: transferNotification.toAmount,
+                        status: 'success',
+                        type: transferNotification.type,
+                        txHash,
+                      })
+                    );
                   }
                 }
               } catch (error) {
                 if (!triggeredAt || Date.now() - triggeredAt > STATUS_ERROR_GRACE_PERIOD) {
                   if (errorCount && errorCount > ERROR_COUNT_THRESHOLD) {
                     transferNotification.status = error;
-                    track(AnalyticsEvent.TransferNotification, {
-                      triggeredAt,
-                      timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
-                      toAmount: transferNotification.toAmount,
-                      status: 'error',
-                      type: transferNotification.type,
-                      txHash,
-                    });
+                    track(
+                      AnalyticsEvents.TransferNotification({
+                        triggeredAt,
+                        timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                        toAmount: transferNotification.toAmount,
+                        status: 'error',
+                        type: transferNotification.type,
+                        txHash,
+                      })
+                    );
                   } else {
                     transferNotification.errorCount = errorCount ? errorCount + 1 : 1;
                   }

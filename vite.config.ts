@@ -82,6 +82,7 @@ export default defineConfig(({ mode }) => ({
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/e2e/**',
     ],
+    environment: 'jsdom',
   },
   build: {
     rollupOptions: {

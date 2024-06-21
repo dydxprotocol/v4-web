@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import type { Compliance } from '@/constants/abacus';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
+import { ComplianceConfigDialogProps, DialogProps } from '@/constants/dialogs';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { MenuGroup } from '@/constants/menus';
 
@@ -84,11 +85,7 @@ const usePreferenceMenu = () => {
   return [otherSection, notificationSection];
 };
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
-export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
+export const ComplianceConfigDialog = ({ setIsOpen }: DialogProps<ComplianceConfigDialogProps>) => {
   const preferenceItems = usePreferenceMenu();
   const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
 

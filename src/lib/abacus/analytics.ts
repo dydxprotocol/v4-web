@@ -8,7 +8,7 @@ class AbacusAnalytics implements AbacusTrackingProtocol {
   log(event: string, data: Nullable<string>) {
     try {
       const parsedData = data ? JSON.parse(data) : {};
-      track(event as AnalyticsEvent, parsedData);
+      track({ type: event, payload: parsedData } as AnalyticsEvent);
     } catch (error) {
       telemetryLog('AbacusAnalytics/log', error);
     }

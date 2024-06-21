@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { ComplianceAction, Nullable, ParsingError } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
+import { DialogProps, GeoComplianceDialogProps } from '@/constants/dialogs';
 import { COUNTRIES_MAP } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -21,10 +22,6 @@ import { WithReceipt } from '@/components/WithReceipt';
 import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
-
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
 
 const CountrySelector = ({
   label,
@@ -62,7 +59,7 @@ const CountrySelector = ({
   );
 };
 
-export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
+export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDialogProps>) => {
   const stringGetter = useStringGetter();
 
   const [residence, setResidence] = useState('');

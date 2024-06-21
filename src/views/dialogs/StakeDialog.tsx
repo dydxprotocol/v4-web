@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, StakeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStakingAPR } from '@/hooks/useStakingAPR';
@@ -10,14 +11,11 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
+import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { StakeForm } from '@/views/forms/StakeForm';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const StakeDialog = ({ setIsOpen }: ElementProps) => {
+export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
   const stringGetter = useStringGetter();
 
   const { chainTokenLabel } = useTokenConfigs();
@@ -32,9 +30,12 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
         <$Title>
           {stringGetter({ key: STRING_KEYS.STAKE })}
           {stakingApr && (
-            <Tag sign={TagSign.Positive}>
-              {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-            </Tag>
+            <$Tag sign={TagSign.Positive}>
+              {stringGetter({
+                key: STRING_KEYS.EST_APR,
+                params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+              })}
+            </$Tag>
           )}
         </$Title>
       }
@@ -43,10 +44,19 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
     </$Dialog>
   );
 };
+
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
 `;
 
 const $Title = styled.span`
   ${layoutMixins.inlineRow}
+`;
+
+const $Tag = styled(Tag)`
+  display: inline-block;
+`;
+
+const $Output = styled(Output)`
+  display: inline-block;
 `;

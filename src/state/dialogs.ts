@@ -1,16 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
-
-type DialogInfo<TDialog extends DialogTypes | TradeBoxDialogTypes> = {
-  type: TDialog;
-  dialogProps?: any;
-};
+import type { DialogType, TradeBoxDialogType } from '@/constants/dialogs';
 
 export interface DialogsState {
-  activeDialog?: DialogInfo<DialogTypes>;
-  activeTradeBoxDialog?: DialogInfo<TradeBoxDialogTypes>;
-  dialogQueue: DialogInfo<DialogTypes>[];
+  activeDialog?: DialogType;
+  activeTradeBoxDialog?: TradeBoxDialogType;
+  dialogQueue: DialogType[];
 }
 
 const initialState: DialogsState = {
@@ -23,7 +18,7 @@ export const dialogsSlice = createSlice({
   name: 'Dialogs',
   initialState,
   reducers: {
-    openDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
+    openDialog: (state, action: PayloadAction<DialogType>) => {
       if (state.activeDialog?.type === action.payload.type) return;
 
       if (state.activeDialog) {
@@ -32,22 +27,19 @@ export const dialogsSlice = createSlice({
         state.activeDialog = action.payload;
       }
     },
-    closeDialog: (state: DialogsState) => {
+    closeDialog: (state) => {
       state.activeDialog = state.dialogQueue.shift();
     },
-    forceOpenDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
+    forceOpenDialog: (state, action: PayloadAction<DialogType>) => {
       if (state.activeDialog) {
         state.dialogQueue.unshift(state.activeDialog);
       }
       state.activeDialog = action.payload;
     },
-    closeDialogInTradeBox: (state: DialogsState) => {
+    closeDialogInTradeBox: (state) => {
       state.activeTradeBoxDialog = undefined;
     },
-    openDialogInTradeBox: (
-      state: DialogsState,
-      action: PayloadAction<DialogInfo<TradeBoxDialogTypes>>
-    ) => {
+    openDialogInTradeBox: (state, action: PayloadAction<TradeBoxDialogType>) => {
       state.activeTradeBoxDialog = action.payload;
     },
   },

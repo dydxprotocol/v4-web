@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useDispatch } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -16,7 +16,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
@@ -70,7 +70,7 @@ export const StakeRewardButtonAndReceipt = ({
   onClick,
   className,
 }: ElementProps & StyleProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
@@ -79,7 +79,7 @@ export const StakeRewardButtonAndReceipt = ({
   const [errorToDisplay, setErrorToDisplay] = useState(alert);
 
   const depositFunds = useCallback(
-    () => dispatch(forceOpenDialog({ type: DialogTypes.Deposit })),
+    () => dispatch(forceOpenDialog(DialogTypes.Deposit())),
     [dispatch]
   );
 

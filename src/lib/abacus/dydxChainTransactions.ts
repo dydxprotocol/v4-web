@@ -86,6 +86,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     this.localWallet = localWallet;
   }
 
+  clearAccounts() {
+    this.localWallet = undefined;
+    this.nobleWallet = undefined;
+    this.hdkey = undefined;
+  }
+
   setNobleWallet(nobleWallet: LocalWallet) {
     try {
       this.nobleWallet = nobleWallet;

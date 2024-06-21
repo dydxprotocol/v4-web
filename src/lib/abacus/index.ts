@@ -11,6 +11,7 @@ import type {
   HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   Nullable,
+  OrderbookGroupings,
   ParsingError,
   TradeInputFields,
   TransferInputFields,
@@ -126,6 +127,7 @@ class AbacusStateManager {
   // ------ Breakdown ------ //
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;
+    this.chainTransactions.clearAccounts();
   };
 
   attemptDisconnectAccount = () => {
@@ -386,6 +388,10 @@ class AbacusStateManager {
   getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
     this.stateManager.historicalTradingRewardPeriod;
 
+  modifyOrderbookLevel = (grouping: OrderbookGroupings) => {
+    this.stateManager.orderbookGrouping = grouping;
+  };
+
   handleCandlesSubscription = ({
     channelId,
     subscribe,
@@ -398,6 +404,10 @@ class AbacusStateManager {
 
   sendSocketRequest = (requestText: string) => {
     this.websocket.send(requestText);
+  };
+
+  getChainById = (chainId: string) => {
+    return this.stateManager.getChainById(chainId);
   };
 }
 

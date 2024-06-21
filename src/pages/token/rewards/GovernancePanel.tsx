@@ -20,7 +20,7 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
   const { governanceLearnMore } = useURLConfigs();
 
   const openKeplrDialog = useCallback(
-    () => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr })),
+    () => dispatch(openDialog(DialogTypes.ExternalNavKeplr())),
     [dispatch]
   );
 

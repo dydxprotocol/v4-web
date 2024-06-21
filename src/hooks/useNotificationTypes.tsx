@@ -190,19 +190,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
         const [abacusNotificationType, id = ''] = notificationId.split(':');
 
         if (ordersById[id]) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.OrderDetails,
-              dialogProps: { orderId: id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: id })));
         } else if (fillsById[id]) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.FillDetails,
-              dialogProps: { fillId: id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.FillDetails({ fillId: id })));
         } else if (marketIds.includes(id)) {
           navigate(`${AppRoute.Trade}/${id}`, {
             replace: true,
@@ -240,7 +230,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
-          const estimatedDuration = formatSeconds(Math.max(toChainEta, 0));
+          // TODO: remove typeguards once skip implements estimatedrouteduration
+          // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
+          const estimatedDuration =
+            typeof toChainEta === 'string' ? toChainEta : formatSeconds(Math.max(toChainEta, 0));
           const body = stringGetter({
             key: STRING_KEYS.DEPOSIT_STATUS,
             params: {
@@ -618,11 +611,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       return () => {
         if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.GeoCompliance,
-            })
-          );
+          dispatch(openDialog(DialogTypes.GeoCompliance()));
         }
       };
     },
@@ -701,12 +690,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return (orderClientId: string) => {
         const order = orders.find((o) => o.clientId?.toString() === orderClientId);
         if (order) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.OrderDetails,
-              dialogProps: { orderId: order.id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
       };
     },

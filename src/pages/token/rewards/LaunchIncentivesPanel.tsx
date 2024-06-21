@@ -155,10 +155,9 @@ const LaunchIncentivesContent = () => {
           action={ButtonAction.Base}
           onClick={() => {
             dispatch(
-              openDialog({
-                type: DialogTypes.ExternalLink,
-                dialogProps: { link: 'https://dydx.exchange/blog/v4-full-trading' },
-              })
+              openDialog(
+                DialogTypes.ExternalLink({ link: 'https://dydx.exchange/blog/v4-full-trading' })
+              )
             );
           }}
           slotRight={<Icon iconName={IconName.LinkOut} />}
@@ -169,10 +168,11 @@ const LaunchIncentivesContent = () => {
           action={ButtonAction.Primary}
           onClick={() => {
             dispatch(
-              openDialog({
-                type: DialogTypes.ExternalLink,
-                dialogProps: { link: 'https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard' },
-              })
+              openDialog(
+                DialogTypes.ExternalLink({
+                  link: 'https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard',
+                })
+              )
             );
           }}
           slotRight={<Icon iconName={IconName.LinkOut} />}

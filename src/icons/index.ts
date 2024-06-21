@@ -29,6 +29,7 @@ export { default as FileIcon } from './file.svg';
 export { default as FundingChartIcon } from './funding-chart.svg';
 export { default as GearIcon } from './gear.svg';
 export { default as GiftboxIcon } from './giftbox.svg';
+export { default as GooglePlayIcon } from './google-play.svg';
 export { default as GovernanceIcon } from './governance.svg';
 export { default as HelpCircleIcon } from './help-circle.svg';
 export { default as HideIcon } from './hide.svg';

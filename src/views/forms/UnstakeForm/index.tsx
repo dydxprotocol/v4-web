@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -30,8 +32,10 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type UnstakeFormProps = {
   onDone?: () => void;
@@ -121,7 +125,16 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await undelegate(amounts);
+      const tx = await undelegate(amounts);
+      const txHash = hashFromTx(tx.hash);
+
+      track(
+        AnalyticsEvents.UnstakeTransaction({
+          txHash,
+          amount: totalAmount,
+          validatorAddresses: Object.keys(amounts),
+        })
+      );
       onDone?.();
     } catch (err) {
       log('UnstakeForm/onUnstake', err);
@@ -133,10 +146,24 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [isAmountValid, amounts, undelegate, onDone]);
+  }, [isAmountValid, amounts, undelegate, onDone, totalAmount]);
+
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount: number | undefined, validator: string) => {
+        track(
+          AnalyticsEvents.UnstakeInput({
+            amount,
+            validatorAddress: validator,
+          })
+        );
+      }, 1000),
+    []
+  );
 
   const onChangeAmount = useCallback((validator: string, value: number | undefined) => {
     setAmounts((a) => ({ ...a, [validator]: value }));
+    debouncedChangeTrack(value, validator);
   }, []);
 
   const setAllUnstakeAmountsToMax = useCallback(() => {

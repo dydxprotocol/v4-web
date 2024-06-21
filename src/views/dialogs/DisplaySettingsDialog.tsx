@@ -1,6 +1,7 @@
 import { Indicator, Item, Root } from '@radix-ui/react-radio-group';
 import styled, { css } from 'styled-components';
 
+import { DialogProps, DisplaySettingsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -23,11 +24,7 @@ import {
 } from '@/state/configs';
 import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
-export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
+export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettingsDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 

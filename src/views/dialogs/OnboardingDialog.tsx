@@ -3,7 +3,8 @@ import { useEffect, useState, type ElementType } from 'react';
 import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
+import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { WalletType, wallets } from '@/constants/wallets';
@@ -31,11 +32,7 @@ import { AcknowledgeTerms } from './OnboardingDialog/AcknowledgeTerms';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
+export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProps>) => {
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
   const stringGetter = useStringGetter();
@@ -113,13 +110,13 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
                 {isMainnet ? (
                   <DepositForm
                     onDeposit={(event) => {
-                      track(AnalyticsEvent.TransferDeposit, event);
+                      track(AnalyticsEvents.TransferDeposit(event ?? {}));
                     }}
                   />
                 ) : (
                   <TestnetDepositForm
                     onDeposit={() => {
-                      track(AnalyticsEvent.TransferFaucet);
+                      track(AnalyticsEvents.TransferFaucet());
                     }}
                   />
                 )}

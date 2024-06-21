@@ -87,43 +87,11 @@ type FormatTimestampParams = {
   };
 } & FormatParams;
 
-<<<<<<< HEAD
-type FormatParams = {
-  type: OutputType;
-  value?: BigNumberish | null;
-  locale?: string;
-};
-
-type FormatNumberParams = {
-  fractionDigits?: number | null;
-  showSign?: ShowSign;
-  slotLeft?: React.ReactNode;
-  slotRight?: React.ReactNode;
-  useGrouping?: boolean;
-  roundingMode?: BigNumber.RoundingMode;
-  localeDecimalSeparator?: string;
-  localeGroupSeparator?: string;
-} & FormatParams;
-
-type FormatTimestampParams = {
-  withSubscript?: boolean;
-  relativeTimeFormatOptions?: {
-    format: 'long' | 'short' | 'narrow' | 'singleCharacter';
-    resolution?: number;
-    stripRelativeWords?: boolean;
-  };
-  timeOptions?: {
-    useUTC?: boolean;
-  };
-} & FormatParams;
-
-=======
 type FormattingOptions = {
   prefix?: string;
   suffix?: string;
 };
 
->>>>>>> bf47bc9 (feat(staking): claim rewards transaction (+ simulation) (#648))
 type ElementProps = {
   type: OutputType;
   value?: BigNumberish | null;
@@ -483,19 +451,6 @@ export const Output = (props: OutputProps) => {
         group: LOCALE_GROUP_SEPARATOR,
       });
 
-      const getFormattedVal = (
-        val: BigNumber,
-        fallbackDecimals: number,
-        formattingOptions?: FormattingOptions
-      ) => {
-        const numDigits = fractionDigits ?? fallbackDecimals;
-        const precisionVal = minimumFractionDigits
-          ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
-          : val;
-        const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
-        return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
-      };
-
       const numberRenderers = {
         [OutputType.CompactNumber]: () => {
           if (!isNumber(value)) {
@@ -508,10 +463,6 @@ export const Output = (props: OutputProps) => {
           <NumberValue value={formattedString} withSubscript={withSubscript} />
         ),
         [OutputType.Fiat]: () => (
-          <NumberValue
-            value={getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' })}
-            withSubscript={withSubscript}
-          />
           <NumberValue value={formattedString} withSubscript={withSubscript} />
         ),
         [OutputType.SmallFiat]: () => (
@@ -528,17 +479,9 @@ export const Output = (props: OutputProps) => {
           <NumberValue value={formattedString} withSubscript={withSubscript} />
         ),
         [OutputType.Percent]: () => (
-          <NumberValue
-            value={getFormattedVal(valueBN.times(100), PERCENT_DECIMALS, { suffix: '%' })}
-            withSubscript={withSubscript}
-          />
           <NumberValue value={formattedString} withSubscript={withSubscript} />
         ),
         [OutputType.SmallPercent]: () => (
-          <NumberValue
-            value={getFormattedVal(valueBN.times(100), SMALL_PERCENT_DECIMALS, { suffix: '%' })}
-            withSubscript={withSubscript}
-          />
           <NumberValue value={formattedString} withSubscript={withSubscript} />
         ),
         [OutputType.Multiple]: () => (

@@ -27,23 +27,26 @@ export const TradeBox = () => {
 
   const activeDialogConfig =
     activeDialog &&
-    {
-      [TradeBoxDialogTypes.ClosePosition]: {
-        title: stringGetter({ key: STRING_KEYS.CLOSE_POSITION }),
-        content: (
-          <ClosePositionForm onClosePositionSuccess={() => dispatch(closeDialogInTradeBox())} />
-        ),
-        onClose: () => {
-          abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
-        },
-      },
-      [TradeBoxDialogTypes.SelectMarginMode]: {
-        title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-        content: (
-          <SelectMarginModeForm onChangeMarginMode={() => dispatch(closeDialogInTradeBox())} />
-        ),
-      },
-    }[activeDialog.type];
+    TradeBoxDialogTypes.match<{ title: string; content: JSX.Element; onClose?(): void }>(
+      activeDialog,
+      {
+        SelectMarginMode: () => ({
+          title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+          content: (
+            <SelectMarginModeForm onChangeMarginMode={() => dispatch(closeDialogInTradeBox())} />
+          ),
+        }),
+        ClosePosition: () => ({
+          title: stringGetter({ key: STRING_KEYS.CLOSE_POSITION }),
+          content: (
+            <ClosePositionForm onClosePositionSuccess={() => dispatch(closeDialogInTradeBox())} />
+          ),
+          onClose: () => {
+            abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+          },
+        }),
+      }
+    );
 
   return (
     <$TradeBox>
@@ -60,7 +63,6 @@ export const TradeBox = () => {
           if (!isOpen) activeDialogConfig?.onClose?.();
         }}
         placement={DialogPlacement.Inline}
-        {...activeDialog?.dialogProps}
       >
         {activeDialogConfig?.content}
       </$Dialog>
