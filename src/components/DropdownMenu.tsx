@@ -8,6 +8,7 @@ import {
   Separator,
   Trigger,
   type DropdownMenuProps as RadixDropdownMenuProps,
+  type DropdownMenuTriggerProps as RadixDropdownMenuTriggerProps,
 } from '@radix-ui/react-dropdown-menu';
 import styled from 'styled-components';
 
@@ -39,7 +40,11 @@ type ElementProps<T> = {
   slotTopContent?: React.ReactNode;
 };
 
-export type DropdownMenuProps<T> = StyleProps & ElementProps<T> & RadixDropdownMenuProps;
+export type DropdownMenuProps<T> = StyleProps &
+  ElementProps<T> &
+  RadixDropdownMenuProps & {
+    triggerOptions?: RadixDropdownMenuTriggerProps;
+  };
 
 export const DropdownMenu = forwardRefFn(
   <T extends string>(
@@ -51,13 +56,14 @@ export const DropdownMenu = forwardRefFn(
       slotTopContent,
       side = 'bottom',
       sideOffset = 8,
+      triggerOptions,
       ...rest
     }: DropdownMenuProps<T>,
     ref: Ref<HTMLButtonElement>
   ) => {
     return (
       <Root {...rest}>
-        <$Trigger ref={ref} className={className}>
+        <$Trigger ref={ref} className={className} {...triggerOptions}>
           {children}
           <$DropdownIcon aria-hidden="true">
             <Icon iconName={IconName.Triangle} aria-hidden="true" />

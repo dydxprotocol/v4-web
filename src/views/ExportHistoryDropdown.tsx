@@ -20,7 +20,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { OutputType, formatNumber } from '@/components/Output';
 
-import { getSubaccountId } from '@/state/accountSelectors';
+import { getIsAccountConnected, getSubaccountId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -37,6 +37,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const stringGetter = useStringGetter();
   const subaccountNumber = useAppSelector(getSubaccountId);
   const { dydxAddress } = useAccounts();
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
   const { requestAllAccountFills, requestAllAccountTransfers } = useDydxClient();
   const [checkedTrades, setCheckedTrades] = useState(true);
   const [checkedTransfers, setCheckedTransfers] = useState(true);
@@ -294,6 +295,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           onSelect: exportData,
         },
       ]}
+      triggerOptions={{
+        disabled: !isAccountConnected,
+      }}
       {...props}
     >
       <Icon iconName={IconName.Download} />
