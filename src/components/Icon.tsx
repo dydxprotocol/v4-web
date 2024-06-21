@@ -170,7 +170,6 @@ export enum IconName {
   Website = 'Website',
   Whitepaper = 'Whitepaper',
   Withdraw = 'Withdraw',
-  Download = 'Download',
   SocialX = 'SocialX',
 }
 
@@ -256,7 +255,6 @@ const icons = {
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
-  [IconName.Download]: DownloadIcon,
   [IconName.SocialX]: SocialXIcon,
 } as Record<IconName, ElementType>;
 
