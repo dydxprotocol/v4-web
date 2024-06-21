@@ -83,6 +83,7 @@ export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
 export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketHistoricalFunding;
+export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualMarketType;
 
 // ------ Configs ------ //
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
@@ -102,6 +103,8 @@ export type ClosePositionInputs = Abacus.exchange.dydx.abacus.output.input.Close
 export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeInputSummary;
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
 export type TriggerOrdersInputs = Abacus.exchange.dydx.abacus.output.input.TriggerOrdersInput;
+export type AdjustIsolatedMarginInputs =
+  Abacus.exchange.dydx.abacus.output.input.AdjustIsolatedMarginInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
@@ -122,6 +125,8 @@ export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPe
 
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
+export type SubaccountPendingPosition =
+  Abacus.exchange.dydx.abacus.output.SubaccountPendingPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
 export type OrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 export const AbacusOrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
@@ -147,6 +152,13 @@ const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
 export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferType;
+
+export const AdjustIsolatedMarginInputField =
+  Abacus.exchange.dydx.abacus.state.model.AdjustIsolatedMarginInputField;
+const adjustIsolatedMarginInputFields = [...AdjustIsolatedMarginInputField.values()] as const;
+export type AdjustIsolatedMarginInputFields = (typeof adjustIsolatedMarginInputFields)[number];
+export const IsolatedMarginAdjustmentType =
+  Abacus.exchange.dydx.abacus.output.input.IsolatedMarginAdjustmentType;
 
 // ------ Trade Items ------ //
 export const TradeInputField = Abacus.exchange.dydx.abacus.state.model.TradeInputField;
@@ -194,6 +206,8 @@ export type HumanReadableWithdrawPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
 export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
+export type HumanReadableSubaccountTransferPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
 
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;
@@ -228,10 +242,10 @@ type ReadonlyKeysOf<T> = {
 export type KotlinIrEnumValues<T> = Exclude<ReadonlyKeysOf<T>, 'Companion' | '$serializer'>;
 
 export const ORDER_SIDES: Record<KotlinIrEnumValues<typeof AbacusOrderSide>, OrderSide> = {
-  [AbacusOrderSide.buy.name]: OrderSide.BUY,
-  [AbacusOrderSide.sell.name]: OrderSide.SELL,
-  [AbacusOrderSide.buy.rawValue]: OrderSide.BUY,
-  [AbacusOrderSide.sell.rawValue]: OrderSide.SELL,
+  [AbacusOrderSide.Buy.name]: OrderSide.BUY,
+  [AbacusOrderSide.Sell.name]: OrderSide.SELL,
+  [AbacusOrderSide.Buy.rawValue]: OrderSide.BUY,
+  [AbacusOrderSide.Sell.rawValue]: OrderSide.SELL,
 };
 
 export const HISTORICAL_PNL_PERIODS: Record<
@@ -254,74 +268,77 @@ export const HISTORICAL_TRADING_REWARDS_PERIODS: Record<
 };
 
 export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderStatus>, string> = {
-  [AbacusOrderStatus.open.name]: STRING_KEYS.OPEN_STATUS,
-  [AbacusOrderStatus.open.rawValue]: STRING_KEYS.OPEN_STATUS,
+  [AbacusOrderStatus.Open.name]: STRING_KEYS.OPEN_STATUS,
+  [AbacusOrderStatus.Open.rawValue]: STRING_KEYS.OPEN_STATUS,
 
-  [AbacusOrderStatus.partiallyFilled.name]: STRING_KEYS.PARTIALLY_FILLED,
-  [AbacusOrderStatus.partiallyFilled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
+  [AbacusOrderStatus.PartiallyFilled.name]: STRING_KEYS.PARTIALLY_FILLED,
+  [AbacusOrderStatus.PartiallyFilled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
 
-  [AbacusOrderStatus.filled.name]: STRING_KEYS.ORDER_FILLED,
-  [AbacusOrderStatus.filled.rawValue]: STRING_KEYS.ORDER_FILLED,
+  [AbacusOrderStatus.PartiallyCanceled.name]: STRING_KEYS.PARTIALLY_FILLED,
+  [AbacusOrderStatus.PartiallyCanceled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
 
-  [AbacusOrderStatus.cancelled.name]: STRING_KEYS.CANCELED,
-  [AbacusOrderStatus.cancelled.rawValue]: STRING_KEYS.CANCELED,
+  [AbacusOrderStatus.Filled.name]: STRING_KEYS.ORDER_FILLED,
+  [AbacusOrderStatus.Filled.rawValue]: STRING_KEYS.ORDER_FILLED,
 
-  [AbacusOrderStatus.canceling.name]: STRING_KEYS.CANCELING,
-  [AbacusOrderStatus.canceling.rawValue]: STRING_KEYS.CANCELING,
+  [AbacusOrderStatus.Canceled.name]: STRING_KEYS.CANCELED,
+  [AbacusOrderStatus.Canceled.rawValue]: STRING_KEYS.CANCELED,
 
-  [AbacusOrderStatus.pending.name]: STRING_KEYS.PENDING,
-  [AbacusOrderStatus.pending.rawValue]: STRING_KEYS.PENDING,
+  [AbacusOrderStatus.Canceling.name]: STRING_KEYS.CANCELING,
+  [AbacusOrderStatus.Canceling.rawValue]: STRING_KEYS.CANCELING,
 
-  [AbacusOrderStatus.untriggered.name]: STRING_KEYS.CREATED,
-  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.CREATED,
+  [AbacusOrderStatus.Pending.name]: STRING_KEYS.PENDING,
+  [AbacusOrderStatus.Pending.rawValue]: STRING_KEYS.PENDING,
+
+  [AbacusOrderStatus.Untriggered.name]: STRING_KEYS.CREATED,
+  [AbacusOrderStatus.Untriggered.rawValue]: STRING_KEYS.CREATED,
 };
 
 export const TRADE_TYPES: Record<
   KotlinIrEnumValues<typeof AbacusOrderType>,
   Nullable<TradeTypes>
 > = {
-  [AbacusOrderType.limit.name]: TradeTypes.LIMIT,
-  [AbacusOrderType.limit.rawValue]: TradeTypes.LIMIT,
+  [AbacusOrderType.Limit.name]: TradeTypes.LIMIT,
+  [AbacusOrderType.Limit.rawValue]: TradeTypes.LIMIT,
 
-  [AbacusOrderType.market.name]: TradeTypes.MARKET,
-  [AbacusOrderType.market.rawValue]: TradeTypes.MARKET,
+  [AbacusOrderType.Market.name]: TradeTypes.MARKET,
+  [AbacusOrderType.Market.rawValue]: TradeTypes.MARKET,
 
-  [AbacusOrderType.stopLimit.name]: TradeTypes.STOP_LIMIT,
-  [AbacusOrderType.stopLimit.rawValue]: TradeTypes.STOP_LIMIT,
+  [AbacusOrderType.StopLimit.name]: TradeTypes.STOP_LIMIT,
+  [AbacusOrderType.StopLimit.rawValue]: TradeTypes.STOP_LIMIT,
 
-  [AbacusOrderType.stopMarket.name]: TradeTypes.STOP_MARKET,
-  [AbacusOrderType.stopMarket.rawValue]: TradeTypes.STOP_MARKET,
+  [AbacusOrderType.StopMarket.name]: TradeTypes.STOP_MARKET,
+  [AbacusOrderType.StopMarket.rawValue]: TradeTypes.STOP_MARKET,
 
-  [AbacusOrderType.takeProfitLimit.name]: TradeTypes.TAKE_PROFIT,
-  [AbacusOrderType.takeProfitLimit.rawValue]: TradeTypes.TAKE_PROFIT,
+  [AbacusOrderType.TakeProfitLimit.name]: TradeTypes.TAKE_PROFIT,
+  [AbacusOrderType.TakeProfitLimit.rawValue]: TradeTypes.TAKE_PROFIT,
 
-  [AbacusOrderType.takeProfitMarket.name]: TradeTypes.TAKE_PROFIT_MARKET,
-  [AbacusOrderType.takeProfitMarket.rawValue]: TradeTypes.TAKE_PROFIT_MARKET,
+  [AbacusOrderType.TakeProfitMarket.name]: TradeTypes.TAKE_PROFIT_MARKET,
+  [AbacusOrderType.TakeProfitMarket.rawValue]: TradeTypes.TAKE_PROFIT_MARKET,
 
-  [AbacusOrderType.liquidated.name]: null,
-  [AbacusOrderType.liquidated.rawValue]: null,
+  [AbacusOrderType.Liquidated.name]: null,
+  [AbacusOrderType.Liquidated.rawValue]: null,
 
-  [AbacusOrderType.liquidation.name]: null,
-  [AbacusOrderType.liquidation.rawValue]: null,
+  [AbacusOrderType.Liquidation.name]: null,
+  [AbacusOrderType.Liquidation.rawValue]: null,
 
-  [AbacusOrderType.trailingStop.name]: null,
-  [AbacusOrderType.trailingStop.rawValue]: null,
+  [AbacusOrderType.TrailingStop.name]: null,
+  [AbacusOrderType.TrailingStop.rawValue]: null,
 
-  [AbacusOrderType.offsetting.name]: null,
-  [AbacusOrderType.offsetting.rawValue]: null,
+  [AbacusOrderType.Offsetting.name]: null,
+  [AbacusOrderType.Offsetting.rawValue]: null,
 
-  [AbacusOrderType.deleveraged.name]: null,
-  [AbacusOrderType.deleveraged.rawValue]: null,
+  [AbacusOrderType.Deleveraged.name]: null,
+  [AbacusOrderType.Deleveraged.rawValue]: null,
 
-  [AbacusOrderType.finalSettlement.name]: null,
-  [AbacusOrderType.finalSettlement.rawValue]: null,
+  [AbacusOrderType.FinalSettlement.name]: null,
+  [AbacusOrderType.FinalSettlement.rawValue]: null,
 };
 
 export const MARGIN_MODE_STRINGS: Record<string, string> = {
-  [AbacusMarginMode.cross.name]: STRING_KEYS.CROSS,
-  [AbacusMarginMode.cross.rawValue]: STRING_KEYS.CROSS,
-  [AbacusMarginMode.isolated.name]: STRING_KEYS.ISOLATED,
-  [AbacusMarginMode.isolated.rawValue]: STRING_KEYS.ISOLATED,
+  [AbacusMarginMode.Cross.name]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.Cross.rawValue]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.Isolated.name]: STRING_KEYS.ISOLATED,
+  [AbacusMarginMode.Isolated.rawValue]: STRING_KEYS.ISOLATED,
 };
 
 // Custom types involving Abacus

@@ -156,7 +156,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
-    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint as string]
+    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint]
   );
 
   const collator = useCollator();
@@ -566,8 +566,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
             aria-hidden="true"
             sortDirection={
               state.sortDescriptor?.column === column.key
-                ? state.sortDescriptor?.direction
-                : undefined
+                ? state.sortDescriptor?.direction ?? 'none'
+                : 'none'
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
@@ -857,7 +857,7 @@ const $Td = styled.td`
   }
 `;
 
-const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
+const $SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' | 'none' }>`
   float: right;
   margin-left: auto;
 
@@ -868,13 +868,18 @@ const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
 
   font-size: 0.375em;
 
-  ${$Th}[aria-sort="none"] & {
-    visibility: hidden;
-  }
-
-  ${$Th}[aria-sort="ascending"] & {
-    transform: scaleY(-1);
-  }
+  ${({ sortDirection }) =>
+    ({
+      ascending: css`
+        transform: scaleY(-1);
+      `,
+      descending: css`
+        transform: scaleY(1);
+      `,
+      none: css`
+        visibility: hidden;
+      `,
+    })[sortDirection]}
 `;
 
 const $Thead = styled.thead<TableStyleProps>`

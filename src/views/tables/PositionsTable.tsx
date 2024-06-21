@@ -32,6 +32,7 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import {
   calculateIsAccountViewOnly,
@@ -44,7 +45,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
-import { testFlags } from '@/lib/testFlags';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
@@ -75,6 +76,7 @@ type PositionTableRow = {
   fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
+  stepSizeDecimals: number;
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -191,7 +193,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
+        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals, stepSizeDecimals }) => (
           <TableCell stacked>
             <$OutputSigned
               type={OutputType.Asset}
@@ -199,6 +201,7 @@ const getPositionsTableColumnDef = ({
               tag={assetId}
               showSign={ShowSign.Negative}
               sign={getNumberSign(size?.current)}
+              fractionDigits={stepSizeDecimals}
             />
             <Output
               type={OutputType.Fiat}
@@ -210,13 +213,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.leverage?.current,
+        getCellValue: (row) => getPositionMargin({ position: row }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
-          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
-        ),
+        renderCell: (row) => <PositionsMarginCell position={row} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
@@ -347,7 +348,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'actions',
         label: stringGetter({
           key:
-            shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
+            showClosePositionAction && shouldRenderTriggers
               ? STRING_KEYS.ACTIONS
               : showClosePositionAction
                 ? STRING_KEYS.CLOSE
@@ -356,10 +357,30 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({
+          id,
+          assetId,
+          stopLossOrders,
+          leverage,
+          side,
+          oraclePrice,
+          entryPrice,
+          takeProfitOrders,
+          unrealizedPnlPercent,
+          resources,
+        }) => (
           <PositionsActionsCell
             marketId={id}
             assetId={assetId}
+            side={side.current}
+            leverage={leverage.current}
+            oraclePrice={oraclePrice}
+            entryPrice={entryPrice.current}
+            unrealizedPnlPercent={unrealizedPnlPercent?.current}
+            sideLabel={
+              resources.sideStringKey?.current &&
+              stringGetter({ key: resources.sideStringKey?.current })
+            }
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
             stopLossOrders={stopLossOrders}
@@ -377,6 +398,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   showClosePositionAction: boolean;
   initialPageSize?: PageSize;
   onNavigate?: () => void;
@@ -393,6 +415,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  marketTypeFilter,
   showClosePositionAction,
   initialPageSize,
   onNavigate,
@@ -411,9 +434,14 @@ export const PositionsTable = ({
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
-    const marketPosition = openPositions.find((position) => position.id === currentMarket);
-    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
-  }, [currentMarket, openPositions]);
+    return openPositions.filter((position) => {
+      const matchesMarket = currentMarket == null || position.id === currentMarket;
+      const subaccountNumber = position.childSubaccountNumber;
+      const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
+      const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+      return matchesMarket && matchesType;
+    });
+  }, [currentMarket, marketTypeFilter, openPositions]);
 
   const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
@@ -443,6 +471,8 @@ export const PositionsTable = ({
             takeProfitOrders: allTakeProfitOrders.filter(
               (order: SubaccountOrder) => order.marketId === position.id
             ),
+            stepSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
           },
           position
         );

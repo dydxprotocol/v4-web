@@ -1,26 +1,26 @@
 import { useEffect, useState, type RefObject } from 'react';
 
-export const useSpreadRowScrollListener = ({
+export const useOrderbookMiddleRowScrollListener = ({
   orderbookRef,
-  spreadRowRef,
+  orderbookMiddleRowRef,
 }: {
   orderbookRef: RefObject<HTMLDivElement>;
-  spreadRowRef: RefObject<HTMLDivElement>;
+  orderbookMiddleRowRef: RefObject<HTMLDivElement>;
 }) => {
   const [displaySide, setDisplaySide] = useState<string>();
 
   useEffect(() => {
     const onScroll = () => {
-      if (spreadRowRef.current && orderbookRef.current) {
+      if (orderbookMiddleRowRef.current && orderbookRef.current) {
         const { clientHeight } = orderbookRef.current;
         const parent = orderbookRef.current.getBoundingClientRect();
-        const spread = spreadRowRef.current.getBoundingClientRect();
-        const spreadTop = spread.top - parent.top;
-        const spreadBottom = spread.bottom - parent.top;
+        const middleRow = orderbookMiddleRowRef.current.getBoundingClientRect();
+        const middleRowTop = middleRow.top - parent.top;
+        const middleRowBottom = middleRow.bottom - parent.top;
 
-        if (spreadBottom > clientHeight) {
+        if (middleRowBottom > clientHeight) {
           setDisplaySide('bottom');
-        } else if (spreadTop < 0) {
+        } else if (middleRowTop < 0) {
           setDisplaySide('top');
         } else {
           setDisplaySide(undefined);
@@ -33,7 +33,7 @@ export const useSpreadRowScrollListener = ({
     return () => {
       orderbookRef.current?.removeEventListener('scroll', onScroll, false);
     };
-  }, [orderbookRef.current, spreadRowRef.current]);
+  }, [orderbookRef.current, orderbookMiddleRowRef.current]);
 
   return displaySide;
 };

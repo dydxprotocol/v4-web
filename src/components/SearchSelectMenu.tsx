@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -12,12 +12,13 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { type DetailsItem } from '@/components/Details';
-import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+
+import { DropdownIcon } from './DropdownIcon';
 
 type ElementProps = {
   asChild?: boolean;
@@ -58,7 +59,7 @@ export const SearchSelectMenu = ({
   ) : (
     <$MenuTrigger>
       {label ? <$WithLabel label={label}>{children}</$WithLabel> : children}
-      <$TriggerIcon iconName={IconName.Triangle} open={open} />
+      <DropdownIcon isOpen={open} />
     </$MenuTrigger>
   );
 
@@ -153,15 +154,3 @@ const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
   max-height: 30vh;
   overflow: auto;
 ` as typeof ComboboxMenuStyleType;
-
-const $TriggerIcon = styled(Icon)<{ open?: boolean }>`
-  width: 0.625rem;
-  height: 0.375rem;
-  color: var(--color-text-0);
-
-  ${({ open }) =>
-    open &&
-    css`
-      transform: rotate(180deg);
-    `}
-`;

@@ -21,7 +21,6 @@ export type DetailsItem = {
   // eslint-disable-next-line react/no-unused-prop-types
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
-  allowUserSelection?: boolean;
 };
 
 const DETAIL_LAYOUTS = {
@@ -66,7 +65,6 @@ const DetailItem = ({
   justifyItems,
   layout = 'column',
   withOverflow,
-  allowUserSelection,
 }: DetailsItem & StyleProps) => (
   <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
@@ -79,7 +77,7 @@ const DetailItem = ({
         {label}
       </WithTooltip>
     </dt>
-    <$DetailsItemValue allowUserSelection={allowUserSelection}>{value ?? ''}</$DetailsItemValue>
+    <dd>{value ?? ''}</dd>
   </$Item>
 );
 
@@ -96,42 +94,30 @@ export const Details = ({
   <LoadingContext.Provider value={isLoading}>
     <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
-        {items.map(
-          ({
-            key,
-            tooltip,
-            tooltipParams,
-            label,
-            subitems,
-            value,
-            withTooltipIcon,
-            allowUserSelection,
-          }) => (
-            <Fragment key={key}>
-              <DetailItem
-                {...{
-                  key,
-                  tooltip,
-                  tooltipParams,
-                  label,
-                  value,
-                  withTooltipIcon,
-                  justifyItems,
-                  layout,
-                  withOverflow,
-                  allowUserSelection,
-                }}
+        {items.map(({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon }) => (
+          <Fragment key={key}>
+            <DetailItem
+              {...{
+                key,
+                tooltip,
+                tooltipParams,
+                label,
+                value,
+                withTooltipIcon,
+                justifyItems,
+                layout,
+                withOverflow,
+              }}
+            />
+            {subitems && showSubitems && layout === 'column' && (
+              <$SubDetails
+                items={subitems}
+                layout={DETAIL_LAYOUTS[layout]}
+                withSeparators={withSeparators}
               />
-              {subitems && showSubitems && layout === 'column' && (
-                <$SubDetails
-                  items={subitems}
-                  layout={DETAIL_LAYOUTS[layout]}
-                  withSeparators={withSeparators}
-                />
-              )}
-            </Fragment>
-          )
-        )}
+            )}
+          </Fragment>
+        ))}
       </WithSeparators>
     </$Details>
   </LoadingContext.Provider>
@@ -167,8 +153,6 @@ const detailsLayoutVariants = {
 
 const itemLayoutVariants = {
   column: css`
-    isolation: isolate;
-
     ${layoutMixins.scrollArea}
 
     ${layoutMixins.stickyArea0}
@@ -318,14 +302,4 @@ const $SubDetails = styled(Details)`
     width: var(--details-subitem-borderWidth);
     border-radius: 0.25rem;
   }
-`;
-
-const $DetailsItemValue = styled.dd<{
-  allowUserSelection?: boolean;
-}>`
-  ${({ allowUserSelection }) =>
-    allowUserSelection &&
-    css`
-      user-select: all;
-    `}
 `;

@@ -40,7 +40,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
   // CT831: if order is stateful and is initially best effort canceled, it's a stuck order that
   // traders should be able to submit another cancel
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isBestEffortCanceled = status === AbacusOrderStatus.Canceling;
   const isCancelDisabled =
     isCanceling || !!isDisabled || (isShortTermOrder && isBestEffortCanceled);
 

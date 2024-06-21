@@ -1,7 +1,10 @@
+import { Nullable } from '@/constants/abacus';
 import { Candle, TradingViewBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { mapCandle } from '@/lib/tradingView/utils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
@@ -41,6 +44,22 @@ export const getMarketData = (state: RootState, marketId: string) =>
  */
 export const getMarketIds = (state: RootState) =>
   Object.keys(getPerpetualMarkets(state) ?? EMPTY_OBJ);
+
+/**
+ * @returns clobPairIds of all markets, mapped by marketId.
+ */
+export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
+  return Object.entries(markets ?? {}).reduce(
+    (acc, [marketId, market]) => {
+      const clobPairId: Nullable<string> = market?.configs?.clobPairId;
+      if (clobPairId !== undefined) {
+        acc[marketId] = Number(clobPairId);
+      }
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+});
 
 /**
  * @returns PerpetualMarket data of the market the user is currently viewing
@@ -127,6 +146,11 @@ export const getCurrentMarketMidMarketPrice = (state: RootState) => {
   return currentMarketOrderbook?.midPrice;
 };
 
+export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSelector(
+  [getCurrentMarketMidMarketPrice, getCurrentMarketOraclePrice],
+  (midMarketPrice, oraclePrice) => midMarketPrice ?? oraclePrice
+);
+
 /**
  *
  * @param marketId
@@ -168,4 +192,24 @@ export const getSelectedResolutionForMarket = (state: RootState, marketId: strin
 export const getCurrentMarketNextFundingRate = createAppSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
+);
+
+/**
+ * @returns Specified market's max leverage
+ */
+export const getMarketMaxLeverage = createAppSelector(
+  [(state: RootState, marketId: string) => getMarketConfig(state, marketId)],
+  (marketConfig) => {
+    const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
+
+    if (effectiveInitialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
+    }
+
+    if (initialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
+    }
+
+    return 10; // safe default
+  }
 );

@@ -2,6 +2,7 @@ export enum DialogTypes {
   AdjustIsolatedMargin = 'AdjustIsolatedMargin',
   AdjustTargetLeverage = 'AdjustTargetLeverage',
   ClosePosition = 'ClosePosition',
+  CancelPendingOrders = 'CancelPendingOrders',
   ComplianceConfig = 'ComplianceConfig',
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',
@@ -34,6 +35,7 @@ export enum DialogTypes {
   Unstake = 'Unstake',
   Withdraw = 'Withdraw',
   WithdrawalGated = 'WithdrawalGated',
+  SharePNLAnalytics = 'SharePNLAnalytics',
 }
 
 export enum TradeBoxDialogTypes {

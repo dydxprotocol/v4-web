@@ -25,6 +25,7 @@ type StyleProps = {
   className?: string;
   fullWidth?: boolean;
   noBlur?: boolean;
+  align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   triggerType?: TriggerType;
   withPortal?: boolean;
@@ -38,6 +39,7 @@ export const Popover = ({
   onOpenChange,
   slotTrigger,
   slotAnchor,
+  align = 'center',
   sideOffset,
   fullWidth,
   noBlur,
@@ -59,6 +61,7 @@ export const Popover = ({
       $noBlur={noBlur}
       className={className}
       sideOffset={sideOffset}
+      align={align}
     >
       {children}
     </$Content>

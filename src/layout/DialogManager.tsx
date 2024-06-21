@@ -2,6 +2,7 @@ import { DialogTypes } from '@/constants/dialogs';
 
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
+import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
@@ -27,6 +28,7 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
+import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
@@ -62,6 +64,7 @@ export const DialogManager = () => {
     [DialogTypes.AdjustIsolatedMargin]: <AdjustIsolatedMarginDialog {...modalProps} />,
     [DialogTypes.AdjustTargetLeverage]: <AdjustTargetLeverageDialog {...modalProps} />,
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
+    [DialogTypes.CancelPendingOrders]: <CancelAllOrdersDialog {...modalProps} />,
     [DialogTypes.ComplianceConfig]: <ComplianceConfigDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
     [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
@@ -91,6 +94,7 @@ export const DialogManager = () => {
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
+    [DialogTypes.SharePNLAnalytics]: <SharePNLAnalyticsDialog {...modalProps} />,
     [DialogTypes.Unstake]: <UnstakeDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,

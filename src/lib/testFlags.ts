@@ -36,12 +36,8 @@ class TestFlags {
     return !!this.queryParams.isolatedmargin;
   }
 
-  get withNewMarketType() {
-    return !!this.queryParams.withnewmarkettype;
-  }
-
-  get enableStaking() {
-    return !!this.queryParams.staking;
+  get enableComplianceApi() {
+    return !!this.queryParams.complianceapi;
   }
 
   get referrer() {

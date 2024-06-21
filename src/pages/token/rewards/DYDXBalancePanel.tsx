@@ -103,7 +103,7 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
           items={[
             {
               key: 'totalBalance',
-              label: 'Total balance',
+              label: stringGetter({ key: STRING_KEYS.TOTAL_BALANCE }),
               value: (
                 <Output
                   type={OutputType.Asset}

@@ -1,15 +1,20 @@
+import { useEffect } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
-import { AccountBalance } from '@/constants/abacus';
+import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
+import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -19,12 +24,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Link } from '@/components/Link';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
@@ -46,23 +53,34 @@ const RewardsPage = () => {
 
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
-  const stakingEnabled = testFlags.enableStaking;
+  const { isStakingEnabled } = useEnvFeatures();
 
-  const stakingRewards: AccountBalance[] =
-    useAppSelector(getStakingRewards, shallowEqual)?.totalRewards?.toArray() ?? [];
+  const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
-  const totalUsdcRewards = stakingRewards?.reduce((total: number, reward) => {
+  const totalUsdcRewards = (totalRewards?.toArray() ?? [])?.reduce((total: number, reward) => {
     if (reward?.denom === usdcDenom && reward.amount) {
       return total + parseFloat(reward.amount);
     }
     return total;
   }, 0);
 
-  const showMigratePanel = import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet;
-  const showGeoblockedPanel = stakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && stakingEnabled;
+  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const chainId = Number(ethereumChainId);
+  // v3 token is only on mainnet
+  const { balance: tokenBalance } = useAccountBalance({
+    addressOrDenom: chainId === 1 ? import.meta.env.VITE_V3_TOKEN_ADDRESS : undefined,
+    chainId: 1,
+    isCosmosChain: false,
+  });
+
+  const showMigratePanel =
+    import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
+  const showGeoblockedPanel = isStakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
+  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && isStakingEnabled;
 
   const stakingRewardPanel = (
     <StakingRewardPanel
@@ -71,9 +89,23 @@ const RewardsPage = () => {
   );
   const legalDisclaimer = (
     <$LegalDisclaimer>
-      {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
+      {stringGetter({
+        key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
+        params: {
+          TERMS_OF_USE_LINK: (
+            <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
+              {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+            </$Link>
+          ),
+        },
+      })}
     </$LegalDisclaimer>
   );
+
+  useEffect(() => {
+    // Initialize daily data for rewards table + chart
+    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
+  }, [canViewAccount]);
 
   return isTablet ? (
     <div>
@@ -84,16 +116,16 @@ const RewardsPage = () => {
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel />}
         {showStakingRewardPanel && stakingRewardPanel}
-        {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-        {stakingEnabled && <UnbondingPanels />}
-        {stakingEnabled && <TradingRewardsChartPanel />}
+        {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+        {isStakingEnabled && <UnbondingPanels />}
+        {isStakingEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
-        {!stakingEnabled && <TradingRewardsSummaryPanel />}
-        {stakingEnabled && <NewMarketsPanel />}
-        {stakingEnabled && <GovernancePanel />}
+        {!isStakingEnabled && <TradingRewardsSummaryPanel />}
+        {isStakingEnabled && <NewMarketsPanel />}
+        {isStakingEnabled && <GovernancePanel />}
         <RewardHistoryPanel />
         <RewardsHelpPanel />
-        {stakingEnabled && legalDisclaimer}
+        {isStakingEnabled && legalDisclaimer}
       </$DetachedSection>
     </div>
   ) : (
@@ -101,20 +133,20 @@ const RewardsPage = () => {
       {showMigratePanel && <MigratePanel />}
       <$DoubleColumnView>
         <$LeftColumn>
-          {stakingEnabled && <TradingRewardsChartPanel />}
+          {isStakingEnabled && <TradingRewardsChartPanel />}
           <LaunchIncentivesPanel />
-          {!stakingEnabled && <TradingRewardsSummaryPanel />}
+          {!isStakingEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel />}
           {showStakingRewardPanel && stakingRewardPanel}
-          {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-          {stakingEnabled && <UnbondingPanels />}
-          {stakingEnabled && <NewMarketsPanel />}
-          {stakingEnabled && <GovernancePanel />}
+          {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+          {isStakingEnabled && <UnbondingPanels />}
+          {isStakingEnabled && <NewMarketsPanel />}
+          {isStakingEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
-          {stakingEnabled && legalDisclaimer}
+          {isStakingEnabled && legalDisclaimer}
         </$RightColumn>
       </$DoubleColumnView>
     </$DetachedSection>
@@ -155,4 +187,9 @@ const $RightColumn = styled.div`
 const $LegalDisclaimer = styled.div`
   font: var(--font-mini-book);
   color: var(--color-text-0);
+`;
+
+const $Link = styled(Link)`
+  display: inline-block;
+  text-decoration: underline;
 `;

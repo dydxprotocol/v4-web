@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -25,19 +27,28 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(positionId), shallowEqual);
 
+  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+
   return (
-    <Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
     >
       <$Content>
-        <AdjustIsolatedMarginForm marketId={positionId} />
+        <AdjustIsolatedMarginForm
+          marketId={positionId}
+          onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
+        />
       </$Content>
-    </Dialog>
+    </$Dialog>
   );
 };
+
+const $Dialog = styled(Dialog)`
+  --dialog-width: 25rem;
+`;
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
