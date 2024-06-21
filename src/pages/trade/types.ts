@@ -4,11 +4,11 @@ export enum MarketTypeFilter {
   Isolated = 'Isolated',
 }
 
-export function marketTypeMatchesFilter(type: 'isolated' | 'cross', filter?: MarketTypeFilter) {
+export function marketTypeMatchesFilter(type: 'Isolated' | 'Cross', filter?: MarketTypeFilter) {
   return (
     filter == null ||
     filter === MarketTypeFilter.AllMarkets ||
-    (type === 'cross' && filter === MarketTypeFilter.Cross) ||
-    (type === 'isolated' && filter === MarketTypeFilter.Isolated)
+    (type === 'Isolated' && filter === MarketTypeFilter.Cross) ||
+    (type === 'Cross' && filter === MarketTypeFilter.Isolated)
   );
 }

@@ -1,23 +1,23 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type {
-  AccountBalance,
-  Compliance,
-  HistoricalPnlPeriods,
-  Nullable,
-  StakingDelegation,
-  StakingRewards,
-  Subaccount,
-  SubaccountFill,
-  SubaccountFills,
-  SubaccountFundingPayments,
-  SubAccountHistoricalPNLs,
-  SubaccountOrder,
-  SubaccountTransfers,
-  TradingRewards,
-  UnbondingDelegation,
-  UsageRestriction,
-  Wallet,
+import {
+  type AccountBalance,
+  type Compliance,
+  type HistoricalPnlPeriods,
+  type Nullable,
+  type StakingDelegation,
+  type StakingRewards,
+  type SubAccountHistoricalPNLs,
+  type Subaccount,
+  type SubaccountFill,
+  type SubaccountFills,
+  type SubaccountFundingPayments,
+  type SubaccountOrder,
+  type SubaccountTransfers,
+  type TradingRewards,
+  type UnbondingDelegation,
+  type UsageRestriction,
+  type Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -32,6 +32,7 @@ import {
 import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { isOrderStatusCanceled } from '@/lib/orders';
 
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
@@ -226,17 +227,38 @@ export const accountSlice = createSlice({
         : [];
 
       // Updates are only considered new after state.subaccount.orders has been set
+      const payloadOrders = action.payload?.orders?.toArray() ?? [];
       const hasNewOrderUpdates =
         state.subaccount?.orders != null &&
-        (action.payload?.orders?.toArray() ?? []).some(
-          (order: SubaccountOrder) => !existingOrderIds.includes(order.id)
-        );
+        payloadOrders.some((order: SubaccountOrder) => !existingOrderIds.includes(order.id));
 
-      if (!state.hasUnseenOrderUpdates) {
-        state.hasUnseenOrderUpdates = hasNewOrderUpdates;
-      }
+      const canceledOrderIdsInPayload = payloadOrders
+        .filter((order) => isOrderStatusCanceled(order.status))
+        .map((order) => order.id);
 
-      state.subaccount = action.payload;
+      // ignore locally canceled orders since it's intentional and already handled
+      // by local cancel tracking and notification
+      const isOrderCanceledByBackend = (orderId: string) =>
+        canceledOrderIdsInPayload.includes(orderId) &&
+        !state.localCancelOrders.map((order) => order.orderId).includes(orderId);
+
+      return {
+        ...state,
+        subaccount: action.payload,
+        hasUnseenOrderUpdates: hasNewOrderUpdates,
+        localPlaceOrders: canceledOrderIdsInPayload.length
+          ? state.localPlaceOrders.map((order) =>
+              order.submissionStatus !== PlaceOrderStatuses.Canceled &&
+              order.orderId &&
+              isOrderCanceledByBackend(order.orderId)
+                ? {
+                    ...order,
+                    submissionStatus: PlaceOrderStatuses.Canceled,
+                  }
+                : order
+            )
+          : state.localPlaceOrders,
+      };
     },
     setChildSubaccount: (
       state,

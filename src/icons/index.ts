@@ -59,6 +59,7 @@ export { default as SearchIcon } from './search.svg';
 export { default as SendIcon } from './send.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as ShowIcon } from './show.svg';
+export { default as SocialXIcon } from './social-x.svg';
 export { default as StarIcon } from './star.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as TerminalIcon } from './terminal.svg';

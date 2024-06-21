@@ -16,7 +16,7 @@ export const getIsClosingIsolatedMarginPosition = createAppSelector(
     return (
       currentInput === 'closePosition' &&
       MustBigNumber(size?.size).abs().gt(0) &&
-      marginMode === AbacusMarginMode.isolated
+      marginMode === AbacusMarginMode.Isolated
     );
   }
 );

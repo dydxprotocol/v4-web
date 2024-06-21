@@ -10,8 +10,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
   getCurrentMarketConfig,
   getCurrentMarketId,
-  getCurrentMarketMidMarketPrice,
-  getCurrentMarketOraclePrice,
+  getCurrentMarketMidMarketPriceWithOraclePriceFallback,
 } from '@/state/perpetualsSelectors';
 
 import { useBreakpoints } from './useBreakpoints';
@@ -20,16 +19,15 @@ export const usePageTitlePriceUpdates = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { isNotTablet } = useBreakpoints();
   const id = useAppSelector(getCurrentMarketId);
-  const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const orderbookMidMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
-
-  const price = orderbookMidMarketPrice ?? oraclePrice;
+  const orderbookMidMarketPrice = useAppSelector(
+    getCurrentMarketMidMarketPriceWithOraclePriceFallback
+  );
 
   useEffect(() => {
-    if (id && price && isNotTablet) {
-      const priceString = price.toLocaleString(selectedLocale, {
+    if (id && orderbookMidMarketPrice && isNotTablet) {
+      const priceString = orderbookMidMarketPrice.toLocaleString(selectedLocale, {
         minimumFractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
         maximumFractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
       });
@@ -41,5 +39,5 @@ export const usePageTitlePriceUpdates = () => {
     return () => {
       document.title = DEFAULT_DOCUMENT_TITLE;
     };
-  }, [price]);
+  }, [orderbookMidMarketPrice, tickSizeDecimals]);
 };

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import QRCodeStyling from 'qr-code-styling';
+import QRCodeStyling, { Options } from 'qr-code-styling';
 import styled from 'styled-components';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -15,12 +15,19 @@ type StyleProps = {
   className?: string;
   hasLogo?: boolean;
   size?: number;
+  options?: Partial<Options>;
 };
 
 const DARK_LOGO_MARK_URL = '/logos/logo-mark-dark.svg';
 const LIGHT_LOGO_MARK_URL = '/logos/logo-mark-light.svg';
 
-export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps & StyleProps) => {
+export const QrCode = ({
+  className,
+  value,
+  hasLogo,
+  size = 300,
+  options,
+}: ElementProps & StyleProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const appTheme: AppTheme = useAppSelector(getAppTheme);
 
@@ -57,6 +64,7 @@ export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps &
       qrOptions: {
         errorCorrectionLevel: 'M',
       },
+      ...options,
     })
   );
 

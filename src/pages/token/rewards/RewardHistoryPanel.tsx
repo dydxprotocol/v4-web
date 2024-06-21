@@ -46,6 +46,7 @@ const $RewardHistoryContainer = styled.div`
 const $Title = styled.div`
   font: var(--font-large-book);
   color: var(--color-text-2);
+  padding: 0 0.5rem;
 `;
 
 const $TradingRewardHistoryTable = styled(TradingRewardHistoryTable)`

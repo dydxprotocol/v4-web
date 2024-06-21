@@ -20,6 +20,7 @@ import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { isDev } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -126,7 +127,7 @@ const useDydxClientContext = () => {
 
   const setSelectedGasDenom = useCallback(
     (selectedGasDenom: SelectedGasDenom) => {
-      if (compositeClient) {
+      if (isDev && compositeClient) {
         compositeClient.validatorClient.setSelectedGasDenom(selectedGasDenom);
         abacusStateManager.setSelectedGasDenom(selectedGasDenom);
         setGasDenom(selectedGasDenom);
@@ -136,7 +137,7 @@ const useDydxClientContext = () => {
   );
 
   useEffect(() => {
-    if (compositeClient) {
+    if (isDev && compositeClient) {
       setSelectedGasDenom(gasDenom);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,9 +184,7 @@ const useDydxClientContext = () => {
         1
       );
 
-      /**
-       * We get all the pages but we should exclude the first one, we already have this data
-       */
+      // We get all the pages but we should exclude the first one, we already have this data
       const pages = Array.from(
         {
           length: Math.ceil(totalResults / pageSize) - 1,
@@ -235,9 +234,7 @@ const useDydxClientContext = () => {
         1
       );
 
-      /**
-       * We get all the pages but we should exclude the first one, we already have this data
-       */
+      // We get all the pages but we should exclude the first one, we already have this data
       const pages = Array.from(
         {
           length: Math.ceil(totalResults / pageSize) - 1,

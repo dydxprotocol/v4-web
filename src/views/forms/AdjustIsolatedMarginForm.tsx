@@ -64,7 +64,7 @@ export const AdjustIsolatedMarginForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber, marginUsage } = subaccountPosition ?? {};
+  const { childSubaccountNumber, marginUsage, freeCollateral } = subaccountPosition ?? {};
   const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
   const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
@@ -177,6 +177,13 @@ export const AdjustIsolatedMarginForm = ({
 
   const alertMessage = useMemo(() => {
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+      if (MustBigNumber(amount).gte(MustBigNumber(crossFreeCollateral))) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
+          type: AlertType.Error,
+        };
+      }
+
       if (crossMarginUsageUpdated && MustBigNumber(crossMarginUsageUpdated).gte(1)) {
         return {
           message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
@@ -184,6 +191,13 @@ export const AdjustIsolatedMarginForm = ({
         };
       }
     } else if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
+      if (MustBigNumber(amount).gte(MustBigNumber(freeCollateral?.current))) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
+          type: AlertType.Error,
+        };
+      }
+
       if (marginUsage?.postOrder && MustBigNumber(marginUsage?.postOrder).gte(1)) {
         return {
           message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
@@ -201,7 +215,10 @@ export const AdjustIsolatedMarginForm = ({
 
     return null;
   }, [
+    amount,
+    crossFreeCollateral,
     crossMarginUsageUpdated,
+    freeCollateral,
     isolatedMarginAdjustmentType,
     marginUsage,
     marketMaxLeverage,
