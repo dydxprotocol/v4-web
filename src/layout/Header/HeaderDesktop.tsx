@@ -2,7 +2,7 @@ import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
+import { ButtonShape, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -122,6 +122,36 @@ export const HeaderDesktop = () => {
     },
   ];
 
+  const renderMobileDownloadButtons = () => {
+    const androidUrl = document
+      .querySelector('meta[name="smartbanner:button-url-google"]')
+      ?.getAttribute('content');
+    const iosUrl = document
+      .querySelector('meta[name="smartbanner:button-url-apple"]')
+      ?.getAttribute('content');
+
+    return (
+      <>
+        {androidUrl && (
+          <$IconButton
+            type={ButtonType.Link}
+            href={androidUrl}
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.HelpCircle}
+          />
+        )}
+        {iosUrl && (
+          <$IconButton
+            type={ButtonType.Link}
+            href={iosUrl}
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.HelpCircle}
+          />
+        )}
+      </>
+    );
+  };
+
   return (
     <$Header>
       <$LogoLink to="/">
@@ -143,6 +173,8 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
+        {renderMobileDownloadButtons()}
+
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
