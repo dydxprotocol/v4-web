@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
-  WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
-  useSuggestChainAndConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
   useOfflineSigners as useOfflineSignersGraz,
+  useSuggestChainAndConnect as useConnectGraz,
+  WalletType as CosmosWalletType,
 } from 'graz';
 import {
   useAccount as useAccountWagmi,
@@ -22,11 +22,12 @@ import { STRING_KEYS } from '@/constants/localization';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
   DYDX_CHAIN_INFO,
-  WalletConnectionType,
-  WalletType,
-  wallets,
   type DydxAddress,
   type EvmAddress,
+  SolAddress,
+  WalletConnectionType,
+  wallets,
+  WalletType,
 } from '@/constants/wallets';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -53,6 +54,12 @@ export const useWalletConnection = () => {
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
+
+  // SOL wallet connection
+  const [solAddress, saveSolAddress] = useLocalStorage<SolAddress | undefined>({
+    key: LocalStorageKey.SolAddress,
+    defaultValue: undefined,
+  });
 
   useEffect(() => {
     // Cache last connected address
@@ -145,7 +152,9 @@ export const useWalletConnection = () => {
     }) => {
       if (!wType) return { walletType: wType, walletConnectionType };
 
+      console.log({ wType, forceConnect, isAccountConnected });
       const walletConnection = getWalletConnection({ walletType: wType });
+      console.log('walletConnection', walletConnection);
 
       try {
         if (!walletConnection) {
@@ -171,6 +180,8 @@ export const useWalletConnection = () => {
           }
         } else if (walletConnection.type === WalletConnectionType.TestWallet) {
           saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
+        } else if (walletConnection.type === WalletConnectionType.Phantom) {
+          (window as any).phantom.solana.connect();
         } else {
           // if account connected (via remember me), do not show wagmi popup until forceConnect
           if (!isConnectedWagmi && (!!forceConnect || !isAccountConnected)) {
