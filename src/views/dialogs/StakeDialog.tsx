@@ -10,6 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
+import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { StakeForm } from '@/views/forms/StakeForm';
 
@@ -32,9 +33,12 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
         <$Title>
           {stringGetter({ key: STRING_KEYS.STAKE })}
           {stakingApr && (
-            <Tag sign={TagSign.Positive}>
-              {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-            </Tag>
+            <$Tag sign={TagSign.Positive}>
+              {stringGetter({
+                key: STRING_KEYS.EST_APR,
+                params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+              })}
+            </$Tag>
           )}
         </$Title>
       }
@@ -43,10 +47,19 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
     </$Dialog>
   );
 };
+
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
 `;
 
 const $Title = styled.span`
   ${layoutMixins.inlineRow}
+`;
+
+const $Tag = styled(Tag)`
+  display: inline-block;
+`;
+
+const $Output = styled(Output)`
+  display: inline-block;
 `;

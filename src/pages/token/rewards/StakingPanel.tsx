@@ -58,6 +58,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
     },
   });
 
+  const aprText = stringGetter({
+    key: STRING_KEYS.EST_APR,
+    params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+  });
+
   return (
     <Panel
       className={className}
@@ -95,11 +100,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.UNSTAKED,
                 })}
               </WithTooltip>
-              {stakingApr && (
-                <Tag sign={TagSign.Positive}>
-                  {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-                </Tag>
-              )}
+              {stakingApr && <$Tag sign={TagSign.Positive}>{aprText}</$Tag>}
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
           </div>
@@ -122,11 +123,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.STAKED,
                 })}
               </WithTooltip>
-              {stakingApr && (
-                <Tag>
-                  {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-                </Tag>
-              )}
+              {stakingApr && <$Tag>{aprText}</$Tag>}
             </$Label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
           </div>
@@ -191,6 +188,14 @@ const $ActionButtons = styled(Toolbar)`
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
+`;
+
+const $Tag = styled(Tag)`
+  display: inline-block;
+`;
+
+const $Output = styled(Output)`
+  display: inline-block;
 `;
 
 const $TotalBalance = styled(Details)`
