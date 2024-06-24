@@ -189,6 +189,7 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
   IsolatedMarginLive = 'isolated-margin-live', // Added 06/12/2024
+  InAppStakingLive = 'staking-live', // Added 06/24/2024
 }
 
 // Incentives Season

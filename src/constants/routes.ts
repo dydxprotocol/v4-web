@@ -1,5 +1,3 @@
-import { DEFAULT_MARKETID } from './markets';
-
 export enum AppRoute {
   Markets = '/markets',
   Portfolio = '/portfolio',
@@ -30,6 +28,7 @@ export enum HistoryRoute {
   Payments = 'payments',
 }
 
+// OTE-459: Deprecate this route
 export enum TokenRoute {
   TradingRewards = 'trading-rewards',
   StakingRewards = 'staking-rewards',
@@ -44,5 +43,4 @@ export enum MobileSettingsRoute {
 
 export const BASE_ROUTE = import.meta.env.VITE_ROUTER_TYPE === 'hash' ? '/#' : '';
 export const TRADE_ROUTE = `${AppRoute.Trade}/:market`;
-export const DEFAULT_TRADE_ROUTE = `${AppRoute.Trade}/${DEFAULT_MARKETID}`;
 export const DEFAULT_DOCUMENT_TITLE = 'dYdX';

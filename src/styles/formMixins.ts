@@ -58,8 +58,14 @@ export const formMixins = {
 
     --button-toggle-off-backgroundColor: var(--color-layer-5);
     --button-toggle-off-textColor: var(--color-text-1);
+    --button-toggle-off-border: var(--border-width) solid var(--color-layer-6);
     --button-toggle-on-backgroundColor: var(--color-layer-5);
     --button-toggle-on-textColor: var(--color-text-1);
+    --button-toggle-on-border: var(--border-width) solid var(--color-layer-6);
+
+    svg {
+      color: var(--color-text-0);
+    }
   `,
 
   // TODO: replace with select menu design system

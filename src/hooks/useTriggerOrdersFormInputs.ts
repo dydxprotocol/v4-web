@@ -67,7 +67,7 @@ export const useTriggerOrdersFormInputs = ({
     } else {
       abacusStateManager.setTriggerOrdersValue({
         field: TriggerOrdersInputField.stopLossOrderType,
-        value: AbacusOrderType.stopMarket.rawValue,
+        value: AbacusOrderType.StopMarket.rawValue,
       });
     }
 
@@ -99,7 +99,7 @@ export const useTriggerOrdersFormInputs = ({
     } else {
       abacusStateManager.setTriggerOrdersValue({
         field: TriggerOrdersInputField.takeProfitOrderType,
-        value: AbacusOrderType.takeProfitMarket.rawValue,
+        value: AbacusOrderType.TakeProfitMarket.rawValue,
       });
     }
 

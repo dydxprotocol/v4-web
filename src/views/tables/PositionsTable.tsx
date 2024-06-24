@@ -76,6 +76,7 @@ type PositionTableRow = {
   fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
+  stepSizeDecimals: number;
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -192,7 +193,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
+        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals, stepSizeDecimals }) => (
           <TableCell stacked>
             <$OutputSigned
               type={OutputType.Asset}
@@ -200,6 +201,7 @@ const getPositionsTableColumnDef = ({
               tag={assetId}
               showSign={ShowSign.Negative}
               sign={getNumberSign(size?.current)}
+              fractionDigits={stepSizeDecimals}
             />
             <Output
               type={OutputType.Fiat}
@@ -355,10 +357,30 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({
+          id,
+          assetId,
+          stopLossOrders,
+          leverage,
+          side,
+          oraclePrice,
+          entryPrice,
+          takeProfitOrders,
+          unrealizedPnlPercent,
+          resources,
+        }) => (
           <PositionsActionsCell
             marketId={id}
             assetId={assetId}
+            side={side.current}
+            leverage={leverage.current}
+            oraclePrice={oraclePrice}
+            entryPrice={entryPrice.current}
+            unrealizedPnlPercent={unrealizedPnlPercent?.current}
+            sideLabel={
+              resources.sideStringKey?.current &&
+              stringGetter({ key: resources.sideStringKey?.current })
+            }
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
             stopLossOrders={stopLossOrders}
@@ -449,6 +471,8 @@ export const PositionsTable = ({
             takeProfitOrders: allTakeProfitOrders.filter(
               (order: SubaccountOrder) => order.marketId === position.id
             ),
+            stepSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
           },
           position
         );

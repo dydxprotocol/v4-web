@@ -11,7 +11,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Icon, IconName } from '@/components/Icon';
+import { DropdownIcon } from '@/components/DropdownIcon';
+import { IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
 
 import { getNonZeroPendingPositions } from '@/state/accountSelectors';
@@ -35,9 +36,9 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
 
   return (
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
-      <$Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
+      <$Button onClick={() => setIsOpen(!isOpen)}>
         {stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
-        <Icon iconName={IconName.Caret} />
+        <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
       </$Button>
 
       {isOpen && (
@@ -105,7 +106,7 @@ const $UnopenedIsolatedPositionsDrawerContainer = styled.div<{ isOpen?: boolean 
   border-top: var(--border);
   ${({ isOpen }) => isOpen && 'height: 100%;'}
 `;
-const $Button = styled(Button)<{ isOpen?: boolean }>`
+const $Button = styled(Button)`
   position: sticky;
   top: 0;
   gap: 1rem;
@@ -113,14 +114,6 @@ const $Button = styled(Button)<{ isOpen?: boolean }>`
   background-color: transparent;
   border: none;
   margin: 0 1rem;
-
-  ${({ isOpen }) =>
-    isOpen &&
-    `
-      svg {
-        transform: rotate(180deg);
-      }
-    `}
 `;
 const $Cards = styled.div`
   ${layoutMixins.flexWrap}

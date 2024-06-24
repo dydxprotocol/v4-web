@@ -5,13 +5,13 @@ import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
 import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
+import { useOrderbookMiddleRowScrollListener } from '@/hooks/Orderbook/useOrderbookMiddleRowScrollListener';
 import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues';
-import { useSpreadRowScrollListener } from '@/hooks/Orderbook/useSpreadRowScrollListener';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
@@ -30,7 +30,7 @@ import {
 import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderbookControls } from './OrderbookControls';
-import { OrderbookRow, SpreadRow } from './OrderbookRow';
+import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
   maxRowsPerSide?: number;
@@ -52,10 +52,11 @@ export const CanvasOrderbook = forwardRef(
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent, currentGrouping } =
-      useCalculateOrderbookData({
+    const { asks, bids, hasOrderbook, histogramRange, currentGrouping } = useCalculateOrderbookData(
+      {
         maxRowsPerSide,
-      });
+      }
+    );
 
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
@@ -101,13 +102,13 @@ export const CanvasOrderbook = forwardRef(
     });
 
     /**
-     * Display top or bottom spreadRow when center spreadRow is off screen
+     * Display top or bottom middleRow when center middleRow is off screen
      */
-    const spreadRowRef = useRef<HTMLDivElement>(null);
+    const orderbookMiddleRowRef = useRef<HTMLDivElement>(null);
 
-    const displaySide = useSpreadRowScrollListener({
+    const displaySide = useOrderbookMiddleRowScrollListener({
       orderbookRef,
-      spreadRowRef,
+      orderbookMiddleRowRef,
     });
 
     /**
@@ -121,12 +122,12 @@ export const CanvasOrderbook = forwardRef(
           // avoid scientific notation for when converting small number to string
           dispatch(
             setTradeFormInputs({
-              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
             })
           );
         }
       },
-      [currentInput]
+      [currentInput, tickSizeDecimals]
     );
 
     const [displayUnit, setDisplayUnit] = useState<'fiat' | 'asset'>('asset');
@@ -225,10 +226,8 @@ export const CanvasOrderbook = forwardRef(
           )}
 
           {(displaySide === 'top' || layout === 'horizontal') && (
-            <$SpreadRow
+            <$OrderbookMiddleRow
               side="top"
-              spread={spread}
-              spreadPercent={spreadPercent}
               tickSizeDecimals={tickSizeDecimals}
               isHeader={layout === 'horizontal'}
             />
@@ -237,21 +236,11 @@ export const CanvasOrderbook = forwardRef(
             <>
               <$OrderbookWrapper ref={orderbookRef}>
                 {asksOrderbook}
-                <SpreadRow
-                  ref={spreadRowRef}
-                  spread={spread}
-                  spreadPercent={spreadPercent}
-                  tickSizeDecimals={tickSizeDecimals}
-                />
+                <OrderbookMiddleRow tickSizeDecimals={tickSizeDecimals} />
                 {bidsOrderbook}
               </$OrderbookWrapper>
               {displaySide === 'bottom' && (
-                <$SpreadRow
-                  side="bottom"
-                  spread={spread}
-                  spreadPercent={spreadPercent}
-                  tickSizeDecimals={tickSizeDecimals}
-                />
+                <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
               )}
             </>
           ) : (
@@ -344,6 +333,6 @@ const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-const $SpreadRow = styled(SpreadRow)`
+const $OrderbookMiddleRow = styled(OrderbookMiddleRow)`
   position: absolute;
 `;

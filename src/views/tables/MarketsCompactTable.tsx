@@ -21,6 +21,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { AssetTableCell } from '@/components/Table/AssetTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { Tag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -89,24 +90,17 @@ export const MarketsCompactTable = ({
             </TableCell>
           ),
         },
-        filters === MarketFilters.NEW
+        sorting === MarketSorting.HIGHEST_CLOB_PAIR_ID
           ? {
               columnKey: 'listing',
               allowsSorting: false,
-              renderCell: ({ listingDate }) => (
+              renderCell: ({ isNew }) => (
                 <$DetailsCell>
-                  <$RecentlyListed>
-                    <span>Listed</span>
-                    {listingDate && (
-                      <$RelativeTimeOutput
-                        type={OutputType.RelativeTime}
-                        relativeTimeFormatOptions={{
-                          format: 'singleCharacter',
-                        }}
-                        value={listingDate.getTime()}
-                      />
-                    )}
-                  </$RecentlyListed>
+                  {isNew && (
+                    <$RecentlyListed>
+                      <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+                    </$RecentlyListed>
+                  )}
                   <Icon iconName={IconName.ChevronRight} />
                 </$DetailsCell>
               ),
@@ -134,37 +128,39 @@ export const MarketsCompactTable = ({
   );
 
   const sortedMarkets = useMemo(() => {
-    const sortingFunction = (marketA: MarketData, marketB: MarketData) => {
-      if (marketA.priceChange24HPercent == null && marketB.priceChange24HPercent == null) {
-        return 0;
-      }
-
-      if (marketA.priceChange24HPercent == null) {
-        return 1;
-      }
-
-      if (marketB.priceChange24HPercent == null) {
-        return -1;
-      }
-
-      return sorting === MarketSorting.GAINERS
-        ? marketB.priceChange24HPercent - marketA.priceChange24HPercent
-        : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
-    };
-
-    if (sorting === MarketSorting.LOSERS) {
-      return filteredMarkets
-        .filter((market) => !!market.priceChange24HPercent && market.priceChange24HPercent < 0)
-        .sort(sortingFunction);
+    if (sorting === MarketSorting.HIGHEST_CLOB_PAIR_ID) {
+      return filteredMarkets.sort((a, b) => b.clobPairId - a.clobPairId);
     }
 
-    return filteredMarkets.sort(sortingFunction);
+    if (sorting === MarketSorting.GAINERS || sorting === MarketSorting.LOSERS) {
+      const sortingFunction = (marketA: MarketData, marketB: MarketData) => {
+        if (marketA.priceChange24HPercent == null && marketB.priceChange24HPercent == null) {
+          return 0;
+        }
+
+        if (marketA.priceChange24HPercent == null) {
+          return 1;
+        }
+
+        if (marketB.priceChange24HPercent == null) {
+          return -1;
+        }
+
+        return sorting === MarketSorting.GAINERS
+          ? marketB.priceChange24HPercent - marketA.priceChange24HPercent
+          : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
+      };
+
+      return filteredMarkets.sort(sortingFunction);
+    }
+
+    return filteredMarkets;
   }, [sorting, filteredMarkets]);
 
   return (
     <$Table
       withInnerBorders
-      data={sortedMarkets.slice(0, 5)}
+      data={sortedMarkets.slice(0, 3)}
       getRowKey={(row) => row.market ?? ''}
       label="Markets"
       onRowAction={(market: Key) =>
@@ -303,17 +299,6 @@ const $RecentlyListed = styled.div`
     text-align: right;
     justify-content: flex-end;
   }
-
-  & > span:first-child {
-    color: var(--color-text-0);
-    font: var(--font-mini-medium);
-  }
-
-  & > span:last-child,
-  & > output:first-child {
-    color: var(--color-text-1);
-    font: var(--font-small-medium);
-  }
 `;
 
 const $InterestOutput = styled(Output)`
@@ -321,7 +306,8 @@ const $InterestOutput = styled(Output)`
   font: var(--font-mini-medium);
 `;
 
-const $RelativeTimeOutput = styled(Output)`
-  color: var(--color-text-1);
-  font: var(--font-small-medium);
+const $NewTag = styled(Tag)`
+  background-color: var(--color-accent-faded);
+  color: var(--color-accent);
+  text-transform: uppercase;
 `;

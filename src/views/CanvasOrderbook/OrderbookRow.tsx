@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
 
-import { BigNumber } from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
@@ -11,7 +10,9 @@ import { ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Output, OutputType } from '@/components/Output';
-import { WithTooltip } from '@/components/WithTooltip';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketMidMarketPriceWithOraclePriceFallback } from '@/state/perpetualsSelectors';
 
 type StyleProps = {
   side?: 'top' | 'bottom';
@@ -19,8 +20,6 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  spread?: Nullable<BigNumber | number>;
-  spreadPercent?: Nullable<number>;
   tickSizeDecimals?: Nullable<number>;
 };
 
@@ -51,37 +50,33 @@ export const OrderbookRow = styled.div<{ isHeader?: boolean }>`
       : ``}
 `;
 
-export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
-  ({ side, spread, isHeader, spreadPercent, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
+export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
+  ({ side, isHeader, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
     const stringGetter = useStringGetter();
+    const orderbookMidMarketPrice = useAppSelector(
+      getCurrentMarketMidMarketPriceWithOraclePriceFallback
+    );
 
     return (
-      <$SpreadRow ref={ref} side={side} isHeader={isHeader}>
-        <span>
-          <WithTooltip tooltip="spread">
-            <Output
-              type={OutputType.Text}
-              value={stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
-            />
-          </WithTooltip>
-        </span>
-        <span>
-          <Output type={OutputType.Fiat} value={spread} fractionDigits={tickSizeDecimals} />
-        </span>
-        <span>
-          <Output type={OutputType.Percent} value={spreadPercent} />
-        </span>
-      </$SpreadRow>
+      <$OrderbookMiddleRow ref={ref} side={side} isHeader={isHeader}>
+        <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
+        <$PriceOutputSpan>
+          <$Output
+            type={OutputType.Number}
+            value={orderbookMidMarketPrice}
+            fractionDigits={tickSizeDecimals}
+            useGrouping={false}
+          />
+        </$PriceOutputSpan>
+        <span /> {/* Empty cell */}
+      </$OrderbookMiddleRow>
     );
   }
 );
-const $SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
+const $OrderbookMiddleRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
   height: 2rem;
   border-top: var(--border);
   border-bottom: var(--border);
-  span {
-    margin-bottom: 2px;
-  }
 
   ${({ side }) =>
     side &&
@@ -92,5 +87,15 @@ const $SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
       bottom: css`
         border-bottom: none;
       `,
-    }[side]}
+    }[side]};
+`;
+
+// matching the output height and styling with price span
+const $PriceOutputSpan = styled.span`
+  display: flex;
+  flex-direction: column;
+`;
+
+const $Output = styled(Output)`
+  justify-content: right;
 `;

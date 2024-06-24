@@ -16,12 +16,12 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ValidatorFaviconIcon } from '@/components/ValidatorName';
 
-import { getUnbondingDelegations } from '@/state/accountSelectors';
+import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 export const UnbondingPanels = () => {
   const stringGetter = useStringGetter();
-  const unbondingDelegations = useAppSelector(getUnbondingDelegations, shallowEqual);
+  const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
   const { unbondingValidators } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
@@ -37,14 +37,48 @@ export const UnbondingPanels = () => {
         const timeDifference = completionDate - currentDate;
 
         const dayDifference = Math.floor(timeDifference / timeUnits.day);
+        const hourDifference = Math.floor(timeDifference / timeUnits.hour);
+        const minuteDifference = Math.floor(timeDifference / timeUnits.minute);
+
+        const availableInText =
+          dayDifference > 1
+            ? stringGetter({
+                key: STRING_KEYS.AVAILABLE_IN_DAYS,
+                params: {
+                  DAYS: dayDifference,
+                },
+              })
+            : hourDifference >= 1
+              ? stringGetter({
+                  key: STRING_KEYS.AVAILABLE_IN,
+                  params: {
+                    DURATION: stringGetter({
+                      key: STRING_KEYS.X_HOURS_LOWERCASED,
+                      params: {
+                        X: hourDifference,
+                      },
+                    }),
+                  },
+                })
+              : stringGetter({
+                  key: STRING_KEYS.AVAILABLE_IN,
+                  params: {
+                    DURATION: stringGetter({
+                      key: STRING_KEYS.X_MINUTES_LOWERCASED,
+                      params: {
+                        X: minuteDifference,
+                      },
+                    }),
+                  },
+                });
 
         const unbondingValidator = unbondingValidators?.[delegation.validator]?.[0];
 
         return (
           <Panel
-            key={delegation.validator}
-            slotHeaderContent={
-              <>
+            key={`${delegation.validator}-${delegation.completionTime}`}
+            slotHeader={
+              <$Header>
                 <$Title>
                   {stringGetter({
                     key: STRING_KEYS.UNSTAKING_FROM,
@@ -53,11 +87,11 @@ export const UnbondingPanels = () => {
                     },
                   })}
                 </$Title>
-                <$ValidatorFaviconIcon
+                <ValidatorFaviconIcon
                   url={unbondingValidator?.description?.website}
                   fallbackText={unbondingValidator?.description?.moniker}
                 />
-              </>
+              </$Header>
             }
           >
             <$Content>
@@ -66,14 +100,7 @@ export const UnbondingPanels = () => {
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
                 slotRight={<$AssetIcon symbol={chainTokenLabel} />}
               />
-              <$Footer>
-                {stringGetter({
-                  key: STRING_KEYS.AVAILABLE_IN_DAYS,
-                  params: {
-                    DAYS: dayDifference,
-                  },
-                })}
-              </$Footer>
+              <$Footer>{availableInText}</$Footer>
             </$Content>
           </Panel>
         );
@@ -85,12 +112,16 @@ export const UnbondingPanels = () => {
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
-  flex: 1;
+`;
+
+const $Header = styled.div`
+  ${layoutMixins.spacedRow}
+  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
-  margin-bottom: -1.5rem;
+  ${layoutMixins.textTruncate}
 
   font: var(--font-medium-book);
   color: var(--color-text-1);
@@ -101,13 +132,9 @@ const $Content = styled.div`
   gap: 1rem;
 `;
 
-const $ValidatorFaviconIcon = styled(ValidatorFaviconIcon)`
-  margin-bottom: -1.5rem;
-`;
-
 const $Balance = styled(Output)`
   font: var(--font-large-book);
-  color: var(--color-text-3);
+  color: var(--color-text-2);
 `;
 
 const $AssetIcon = styled(AssetIcon)`

@@ -16,7 +16,12 @@ import {
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
-import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
+import {
+  getHydratedTradingData,
+  isOrderStatusClearable,
+  isStopLossOrder,
+  isTakeProfitOrder,
+} from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
 
 import { type RootState } from './_store';
@@ -199,32 +204,39 @@ export const getCurrentMarketOrders = createAppSelector(
  * @returns list of orders that have not been filled or cancelled
  */
 export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter(
-    (order) =>
-      order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
-  )
+  orders?.filter((order) => isOpenOrderStatus(order.status))
+);
+
+export const getOpenIsolatedOrders = createAppSelector(
+  [getSubaccountOrders, getPerpetualMarkets],
+  (allOrders, allMarkets) =>
+    (allOrders ?? [])
+      .filter(
+        (o) =>
+          (o.status === AbacusOrderStatus.Open ||
+            o.status === AbacusOrderStatus.Pending ||
+            o.status === AbacusOrderStatus.PartiallyFilled ||
+            o.status === AbacusOrderStatus.Untriggered) &&
+          o.marginMode === AbacusMarginMode.Isolated
+      )
+      // eslint-disable-next-line prefer-object-spread
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }))
 );
 
 export const getPendingIsolatedOrders = createAppSelector(
-  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
-  (allOrders, allOpenPositions, allMarkets) => {
-    const allValidOrders = (allOrders ?? [])
-      .filter(
-        (o) =>
-          (o.status === AbacusOrderStatus.open ||
-            o.status === AbacusOrderStatus.pending ||
-            o.status === AbacusOrderStatus.partiallyFilled ||
-            o.status === AbacusOrderStatus.untriggered) &&
-          o.marginMode === AbacusMarginMode.isolated
-      )
-      // eslint-disable-next-line prefer-object-spread
-      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+  [getOpenIsolatedOrders, getExistingOpenPositions],
+  (isolatedOrders, allOpenPositions) => {
     const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
     return groupBy(
-      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      isolatedOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
       (o) => o.marketId
     );
   }
+);
+
+export const getCurrentMarketHasOpenIsolatedOrders = createAppSelector(
+  [getOpenIsolatedOrders, getCurrentMarketId],
+  (openOrders, marketId) => openOrders.some((o) => o.marketId === marketId)
 );
 
 /**
@@ -295,8 +307,8 @@ export const getSubaccountConditionalOrders = () =>
       positions?.forEach((position) => {
         const orderSideForConditionalOrder =
           position?.side?.current === AbacusPositionSide.LONG
-            ? AbacusOrderSide.sell
-            : AbacusOrderSide.buy;
+            ? AbacusOrderSide.Sell
+            : AbacusOrderSide.Buy;
 
         const conditionalOrders = openOrdersByMarketId[position.id];
 
@@ -328,7 +340,7 @@ export const getSubaccountOpenOrdersForCurrentMarket = createAppSelector(
   (orders, marketId) =>
     orders?.filter(
       (order) =>
-        order.status === AbacusOrderStatus.open && marketId != null && order.marketId === marketId
+        order.status === AbacusOrderStatus.Open && marketId != null && order.marketId === marketId
     )
 );
 
@@ -504,9 +516,7 @@ export const getCurrentMarketFundingPayments = createAppSelector(
  * @param state
  * @returns boolean on whether an order status is considered open
  */
-const isOpenOrderStatus = (status: AbacusOrderStatuses) => {
-  return status !== AbacusOrderStatus.filled && status !== AbacusOrderStatus.cancelled;
-};
+const isOpenOrderStatus = (status: AbacusOrderStatuses) => !isOrderStatusClearable(status);
 
 /**
  * @param state
