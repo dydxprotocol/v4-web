@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
@@ -145,12 +146,20 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     }
   }, [isAmountValid, amounts, undelegate, onDone, totalAmount]);
 
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount: number | undefined, validator: string) => {
+        track(AnalyticsEvent.UnstakeInput, {
+          amount,
+          validatorAddress: validator,
+        });
+      }, 1000),
+    []
+  );
+
   const onChangeAmount = useCallback((validator: string, value: number | undefined) => {
     setAmounts((a) => ({ ...a, [validator]: value }));
-    track(AnalyticsEvent.UnstakeInput, {
-      amount: value,
-      validatorAddress: validator,
-    });
+    debouncedChangeTrack(value, validator);
   }, []);
 
   const setAllUnstakeAmountsToMax = useCallback(() => {

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
@@ -108,12 +109,20 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
   }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
 
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount?: number, validator?: string) => {
+        track(AnalyticsEvent.StakeInput, {
+          amount,
+          validatorAddress: validator,
+        });
+      }, 1000),
+    []
+  );
+
   const onChangeAmount = (value?: BigNumber) => {
     setAmountBN(value);
-    track(AnalyticsEvent.StakeInput, {
-      amount: value?.toNumber(),
-      validatorAddress: selectedValidator?.operatorAddress,
-    });
+    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
   };
 
   const onStake = useCallback(async () => {
