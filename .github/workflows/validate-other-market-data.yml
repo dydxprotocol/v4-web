@@ -36,19 +36,25 @@ jobs:
       - name: Checkout v4-chain repo
         uses: actions/checkout@v3
         with:
-          repository: 'dydxprotocol/v4-chain'
-          ref: 'd4e0f0d1ac28f128c787e40c5a0cdc7c481e6c42'
+          repository: 'skip-mev/v4-chain'
+          ref: '86b361becee776c36dd9c8ee4b96ada17b913109'
           path: 'v4-chain'
 
       - name: Start v4 localnet
         run: |
           cd v4-chain/protocol
           sed -i '/\.consensus\.timeout_commit.*-v '\''5s'\''/s/5s/1s/' testing/testnet-local/local.sh
-          sed -i '/  datadog-agent:/,/    ports:/d; /^      - "8125:8215"/d; /^      - "8126:8126"/d' docker-compose.yml
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
           DOCKER_BUILDKIT=1 make localnet-startd
+
+      - name: Get diff of otherMarketData.json
+        run: |
+          git fetch origin
+          git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
       
       - name: Validate other market data
+        env:
+          DIFF: otherMarketDiff.txt
         run: pnpx tsx scripts/validate-other-market-data.ts

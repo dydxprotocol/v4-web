@@ -34,7 +34,10 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import {
+  calculateIsAccountViewOnly,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
@@ -73,6 +76,7 @@ type PositionTableRow = {
   fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
+  stepSizeDecimals: number;
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -81,6 +85,7 @@ const getPositionsTableColumnDef = ({
   width,
   isAccountViewOnly,
   showClosePositionAction,
+  shouldRenderTriggers,
   navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
@@ -88,6 +93,7 @@ const getPositionsTableColumnDef = ({
   width?: ColumnSize;
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
+  shouldRenderTriggers: boolean;
   navigateToOrders: (market: string) => void;
 }) => ({
   width,
@@ -187,7 +193,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
+        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals, stepSizeDecimals }) => (
           <TableCell stacked>
             <$OutputSigned
               type={OutputType.Asset}
@@ -195,6 +201,7 @@ const getPositionsTableColumnDef = ({
               tag={assetId}
               showSign={ShowSign.Negative}
               sign={getNumberSign(size?.current)}
+              fractionDigits={stepSizeDecimals}
             />
             <Output
               type={OutputType.Fiat}
@@ -340,16 +347,45 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
         label: stringGetter({
-          key: showClosePositionAction ? STRING_KEYS.CLOSE : STRING_KEYS.ACTION,
+          key:
+            showClosePositionAction && shouldRenderTriggers
+              ? STRING_KEYS.ACTIONS
+              : showClosePositionAction
+                ? STRING_KEYS.CLOSE
+                : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id }) => (
+        renderCell: ({
+          id,
+          assetId,
+          stopLossOrders,
+          leverage,
+          side,
+          oraclePrice,
+          entryPrice,
+          takeProfitOrders,
+          unrealizedPnlPercent,
+          resources,
+        }) => (
           <PositionsActionsCell
             marketId={id}
+            assetId={assetId}
+            side={side.current}
+            leverage={leverage.current}
+            oraclePrice={oraclePrice}
+            entryPrice={entryPrice.current}
+            unrealizedPnlPercent={unrealizedPnlPercent?.current}
+            sideLabel={
+              resources.sideStringKey?.current &&
+              stringGetter({ key: resources.sideStringKey?.current })
+            }
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+            navigateToMarketOrders={navigateToOrders}
           />
         ),
       },
@@ -394,6 +430,7 @@ export const PositionsTable = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
@@ -434,6 +471,8 @@ export const PositionsTable = ({
             takeProfitOrders: allTakeProfitOrders.filter(
               (order: SubaccountOrder) => order.marketId === position.id
             ),
+            stepSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
           },
           position
         );
@@ -457,6 +496,7 @@ export const PositionsTable = ({
           width: columnWidths?.[key],
           isAccountViewOnly,
           showClosePositionAction,
+          shouldRenderTriggers,
           navigateToOrders,
         })
       )}

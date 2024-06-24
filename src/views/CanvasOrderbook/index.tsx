@@ -5,25 +5,28 @@ import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
 import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
+import { useOrderbookMiddleRowScrollListener } from '@/hooks/Orderbook/useOrderbookMiddleRowScrollListener';
 import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues';
-import { useSpreadRowScrollListener } from '@/hooks/Orderbook/useSpreadRowScrollListener';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
-import { useAppSelector, useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
-import { OrderbookRow, SpreadRow } from './OrderbookRow';
+import { MustBigNumber } from '@/lib/numbers';
+
+import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
   maxRowsPerSide?: number;
@@ -41,17 +44,16 @@ export const CanvasOrderbook = forwardRef(
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent } =
-      useCalculateOrderbookData({
-        maxRowsPerSide,
-      });
+    const { asks, bids, hasOrderbook, histogramRange } = useCalculateOrderbookData({
+      maxRowsPerSide,
+    });
 
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
     const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
-    const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
+    const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
     /**
      * Slice asks and bids to maxRowsPerSide using empty rows
@@ -81,13 +83,13 @@ export const CanvasOrderbook = forwardRef(
     useCenterOrderbook({ orderbookRef, marketId: currentMarket });
 
     /**
-     * Display top or bottom spreadRow when center spreadRow is off screen
+     * Display top or bottom middleRow when center middleRow is off screen
      */
-    const spreadRowRef = useRef<HTMLDivElement>(null);
+    const orderbookMiddleRowRef = useRef<HTMLDivElement>(null);
 
-    const displaySide = useSpreadRowScrollListener({
+    const displaySide = useOrderbookMiddleRowScrollListener({
       orderbookRef,
-      spreadRowRef,
+      orderbookMiddleRowRef,
     });
 
     /**
@@ -98,10 +100,15 @@ export const CanvasOrderbook = forwardRef(
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {
-          dispatch(setTradeFormInputs({ limitPriceInput: price?.toString() }));
+          // avoid scientific notation for when converting small number to string
+          dispatch(
+            setTradeFormInputs({
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+            })
+          );
         }
       },
-      [currentInput]
+      [currentInput, tickSizeDecimals]
     );
 
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
@@ -132,12 +139,7 @@ export const CanvasOrderbook = forwardRef(
           </$Header>
 
           {displaySide === 'top' && (
-            <$SpreadRow
-              side="top"
-              spread={spread}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <$OrderbookMiddleRow side="top" tickSizeDecimals={tickSizeDecimals} />
           )}
 
           <$OrderbookWrapper ref={orderbookRef}>
@@ -162,12 +164,7 @@ export const CanvasOrderbook = forwardRef(
               <$OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
             </$OrderbookSideContainer>
 
-            <SpreadRow
-              ref={spreadRowRef}
-              spread={spread?.toNumber()}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <OrderbookMiddleRow ref={orderbookMiddleRowRef} tickSizeDecimals={tickSizeDecimals} />
 
             <$OrderbookSideContainer $side="bids">
               <$HoverRows>
@@ -195,12 +192,7 @@ export const CanvasOrderbook = forwardRef(
             </$OrderbookSideContainer>
           </$OrderbookWrapper>
           {displaySide === 'bottom' && (
-            <$SpreadRow
-              side="bottom"
-              spread={spread}
-              spreadPercent={spreadPercent}
-              tickSizeDecimals={tickSizeDecimals}
-            />
+            <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
           )}
         </$OrderbookContent>
         {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
@@ -277,6 +269,6 @@ const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-const $SpreadRow = styled(SpreadRow)`
+const $OrderbookMiddleRow = styled(OrderbookMiddleRow)`
   position: absolute;
 `;

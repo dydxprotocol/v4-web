@@ -16,6 +16,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 import {
+  DEFAULT_GAS_LIMIT,
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
   MIN_CCTP_TRANSFER_AMOUNT,
@@ -213,7 +214,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
     if (!sourceToken?.address || !sourceToken.decimals)
       throw new Error('Missing source token address');
-    if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
     if (!requestPayload?.value) throw new Error('Missing transaction value');
     if (sourceToken?.address === NATIVE_TOKEN_ADDRESS) return;
@@ -259,13 +259,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (!signerWagmi) {
           throw new Error('Missing signer');
         }
-        if (
-          !requestPayload?.targetAddress ||
-          !requestPayload.data ||
-          !requestPayload.value ||
-          !requestPayload.gasLimit ||
-          !requestPayload.routeType
-        ) {
+        if (!requestPayload?.targetAddress || !requestPayload.data || !requestPayload.value) {
           throw new Error('Missing request payload');
         }
 
@@ -280,7 +274,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         const tx = {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
-          gasLimit: BigInt(requestPayload.gasLimit),
+          gasLimit: BigInt(requestPayload.gasLimit || DEFAULT_GAS_LIMIT),
           value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
         const txHash = await signerWagmi.sendTransaction(tx);

@@ -38,7 +38,6 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -91,11 +90,6 @@ export const TradingRewardsChart = ({
     getHistoricalTradingRewardsForPeriod,
     SELECTED_PERIOD.name
   );
-
-  useEffect(() => {
-    // Initialize daily data for rewards chart
-    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
-  }, [canViewAccount]);
 
   const rewardsData = useMemo(
     () =>

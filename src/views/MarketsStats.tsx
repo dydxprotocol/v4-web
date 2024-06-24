@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, MarketSorting } from '@/constants/markets';
+import { MarketSorting } from '@/constants/markets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -35,7 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
           </$RecentlyListed>
         </$SectionHeader>
-        <MarketsCompactTable filters={MarketFilters.NEW} />
+        <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
       </$Section>
       <$Section>
         <$SectionHeader>
@@ -110,9 +110,9 @@ const $SectionHeader = styled.div`
   ${layoutMixins.row}
 
   justify-content: space-between;
-  padding: 1.125rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   gap: 0.375rem;
-  height: 4rem;
+  height: 2.5rem;
 
   & h4 {
     font: var(--font-base-medium);

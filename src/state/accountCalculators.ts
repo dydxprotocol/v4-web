@@ -1,15 +1,24 @@
+import { AbacusMarginMode } from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ENVIRONMENT_CONFIG_MAP, type DydxNetwork } from '@/constants/networks';
 
 import {
+  getCurrentMarketHasOpenIsolatedOrders,
+  getCurrentMarketPositionData,
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
+  getUnbondingDelegations,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { createAppSelector } from '@/state/appTypes';
 
-import { createAppSelector } from './appTypes';
+import { MustBigNumber } from '@/lib/numbers';
+
+import {
+  getCurrentInput,
+  getInputClosePositionData,
+  getInputTradeMarginMode,
+} from './inputsSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -91,9 +100,8 @@ export const calculateIsAccountLoading = createAppSelector(
  * @description calculate whether positions table should render triggers column
  */
 export const calculateShouldRenderTriggersInPositionsTable = createAppSelector(
-  [calculateIsAccountViewOnly, getSelectedNetwork],
-  (isAccountViewOnly: boolean, selectedNetwork: DydxNetwork) =>
-    !isAccountViewOnly && ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags.isSlTpEnabled
+  [calculateIsAccountViewOnly],
+  (isAccountViewOnly: boolean) => !isAccountViewOnly
 );
 
 /**
@@ -107,3 +115,52 @@ export const calculateShouldRenderActionsInPositionsTable = () =>
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );
+
+/**
+ * @description calculate sorted unbonding delegations (from soonest to complete unbonding -> latest)
+ */
+export const calculateSortedUnbondingDelegations = createAppSelector(
+  [getUnbondingDelegations],
+  (unbondingDelegations) => {
+    if (unbondingDelegations?.length) {
+      const sortedUnbondingDelegations = [...unbondingDelegations];
+      sortedUnbondingDelegations.sort(
+        (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
+      );
+      return sortedUnbondingDelegations;
+    }
+    return unbondingDelegations;
+  }
+);
+
+export const calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero = createAppSelector(
+  [
+    getCurrentInput,
+    getInputTradeMarginMode,
+    getCurrentMarketHasOpenIsolatedOrders,
+    getInputClosePositionData,
+    getCurrentMarketPositionData,
+  ],
+  (
+    currentInput,
+    marginMode,
+    hasOpenIsolatedOrders,
+    closePositionInputData,
+    currentMarketPosition
+  ) => {
+    const { size: sizeInputData } = closePositionInputData ?? {};
+    const { size } = sizeInputData ?? {};
+    const { size: currentPositionSize } = currentMarketPosition ?? {};
+    const { current: currentSize } = currentPositionSize ?? {};
+    const isFullClose = MustBigNumber(currentSize)
+      .abs()
+      .eq(size ?? 0);
+
+    return (
+      currentInput === 'closePosition' &&
+      marginMode === AbacusMarginMode.Isolated &&
+      !hasOpenIsolatedOrders &&
+      isFullClose
+    );
+  }
+);

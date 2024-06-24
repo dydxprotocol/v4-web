@@ -22,42 +22,44 @@ import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
-    case AbacusOrderStatus.open.rawValue: {
+    case AbacusOrderStatus.Open.rawValue: {
       return {
         statusIcon: IconName.OrderOpen,
         statusIconColor: `var(--color-text-2)`,
       };
     }
-    case AbacusOrderStatus.partiallyFilled.rawValue:
+    case AbacusOrderStatus.PartiallyFilled.rawValue:
+    case AbacusOrderStatus.PartiallyCanceled.rawValue: {
       return {
         statusIcon: IconName.OrderPartiallyFilled,
         statusIconColor: `var(--color-warning)`,
       };
-    case AbacusOrderStatus.filled.rawValue: {
+    }
+    case AbacusOrderStatus.Filled.rawValue: {
       return {
         statusIcon: IconName.OrderFilled,
         statusIconColor: `var(--color-success)`,
       };
     }
-    case AbacusOrderStatus.cancelled.rawValue: {
+    case AbacusOrderStatus.Canceled.rawValue: {
       return {
         statusIcon: IconName.OrderCanceled,
         statusIconColor: `var(--color-error)`,
       };
     }
-    case AbacusOrderStatus.canceling.rawValue: {
+    case AbacusOrderStatus.Canceling.rawValue: {
       return {
         statusIcon: IconName.OrderPending,
         statusIconColor: `var(--color-error)`,
       };
     }
-    case AbacusOrderStatus.untriggered.rawValue: {
+    case AbacusOrderStatus.Untriggered.rawValue: {
       return {
         statusIcon: IconName.OrderUntriggered,
         statusIconColor: `var(--color-text-2)`,
       };
     }
-    case AbacusOrderStatus.pending.rawValue:
+    case AbacusOrderStatus.Pending.rawValue:
     default: {
       return {
         statusIcon: IconName.OrderPending,
@@ -68,36 +70,39 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
 };
 
 export const isOrderStatusClearable = (status: OrderStatus) =>
-  [AbacusOrderStatus.filled, AbacusOrderStatus.cancelled].some(
+  status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
+
+export const isOrderStatusCanceled = (status: OrderStatus) =>
+  [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
     (orderStatus) => status === orderStatus
   );
 
 export const isMarketOrderType = (type?: AbacusOrderTypes) =>
   type &&
   [
-    AbacusOrderType.market,
-    AbacusOrderType.stopMarket,
-    AbacusOrderType.takeProfitMarket,
-    AbacusOrderType.trailingStop,
+    AbacusOrderType.Market,
+    AbacusOrderType.StopMarket,
+    AbacusOrderType.TakeProfitMarket,
+    AbacusOrderType.TrailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
 
 export const isLimitOrderType = (type?: AbacusOrderTypes) =>
   type &&
-  [AbacusOrderType.limit, AbacusOrderType.stopLimit, AbacusOrderType.takeProfitLimit].some(
+  [AbacusOrderType.Limit, AbacusOrderType.StopLimit, AbacusOrderType.TakeProfitLimit].some(
     ({ ordinal }) => ordinal === type.ordinal
   );
 
 export const isStopLossOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
   const validOrderTypes = isSlTpLimitOrdersEnabled
-    ? [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket]
-    : [AbacusOrderType.stopMarket];
+    ? [AbacusOrderType.StopLimit, AbacusOrderType.StopMarket]
+    : [AbacusOrderType.StopMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
 
 export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
   const validOrderTypes = isSlTpLimitOrdersEnabled
-    ? [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket]
-    : [AbacusOrderType.takeProfitMarket];
+    ? [AbacusOrderType.TakeProfitLimit, AbacusOrderType.TakeProfitMarket]
+    : [AbacusOrderType.TakeProfitMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
 

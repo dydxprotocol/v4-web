@@ -6,7 +6,7 @@ export type MarketData = {
   tickSizeDecimals: Nullable<number>;
   oneDaySparkline?: number[];
   isNew?: boolean;
-  listingDate?: Date;
+  clobPairId: number;
 } & PerpetualMarket &
   PerpetualMarket['perpetual'] &
   PerpetualMarket['configs'];
@@ -14,6 +14,7 @@ export type MarketData = {
 export enum MarketSorting {
   GAINERS = 'gainers',
   LOSERS = 'losers',
+  HIGHEST_CLOB_PAIR_ID = 'highest_clob_pair_id',
 }
 
 export enum MarketFilters {

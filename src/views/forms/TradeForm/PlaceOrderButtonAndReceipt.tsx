@@ -22,7 +22,10 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import {
+  calculateCanAccountTrade,
+  calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero,
+} from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
@@ -96,8 +99,12 @@ export const PlaceOrderButtonAndReceipt = ({
   // check if required fields are filled and summary has been calculated
   const areInputsFilled = fee != null || reward != null;
 
+  const isIsolatedMarketPostOrderPositionMarginZero = useAppSelector(
+    calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero
+  );
+
   const renderMarginValue = () => {
-    if (marginMode === AbacusMarginMode.cross) {
+    if (marginMode === AbacusMarginMode.Cross) {
       const currentCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
@@ -128,8 +135,12 @@ export const PlaceOrderButtonAndReceipt = ({
         useGrouping
         type={OutputType.Fiat}
         value={equity?.current}
-        newValue={equity?.postOrder}
-        withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(equity)}
+        newValue={isIsolatedMarketPostOrderPositionMarginZero ? null : equity?.postOrder}
+        withDiff={
+          isIsolatedMarketPostOrderPositionMarginZero
+            ? nullIfZero(equity?.current) != null
+            : areInputsFilled && getTradeStateWithDoubleValuesHasDiff(equity)
+        }
       />
     );
   };
@@ -158,6 +169,7 @@ export const PlaceOrderButtonAndReceipt = ({
         <DiffOutput
           useGrouping
           type={OutputType.Fiat}
+          fractionDigits={tickSizeDecimals}
           value={liquidationPrice?.current}
           newValue={liquidationPrice?.postOrder}
           withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
