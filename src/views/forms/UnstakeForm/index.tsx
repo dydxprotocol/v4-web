@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { AnalyticsEvent } from '@/constants/analytics';
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -18,20 +20,22 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
+import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
-import { Icon, IconName } from '@/components/Icon';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ToggleButton } from '@/components/ToggleButton';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type UnstakeFormProps = {
   onDone?: () => void;
@@ -46,14 +50,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [amounts, setAmounts] = useState<Record<string, number | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
-
-  const onChangeAmount = (validator: string, value: number | undefined) => {
-    setAmounts({ ...amounts, [validator]: value });
-  };
 
   const isEachAmountValid = useMemo(() => {
     return (
@@ -75,11 +75,31 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   }, [amounts]);
 
   const isTotalAmountValid = totalAmount && totalAmount > 0;
-
   const isAmountValid = isEachAmountValid && isTotalAmountValid;
+  const allAmountsEmpty =
+    !amounts || Object.values(amounts).filter((amount) => amount !== undefined).length === 0;
+  const showClearButton =
+    amounts && Object.values(amounts).filter((amount) => amount !== undefined).length > 0;
+
+  useEffect(() => {
+    if (!isAmountValid && !allAmountsEmpty) {
+      setError({
+        key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
+        type: AlertType.Error,
+        message: stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT }),
+      });
+    } else {
+      setError({
+        key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
+        type: AlertType.Info,
+        message: stringGetter({ key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION }),
+      });
+    }
+  }, [stringGetter, isAmountValid, allAmountsEmpty]);
 
   useEffect(() => {
     if (isAmountValid) {
+      setIsLoading(true);
       getUndelegateFee(amounts)
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
@@ -90,6 +110,9 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         .catch((err) => {
           log('UnstakeForm/getDelegateFee', err);
           setFee(undefined);
+        })
+        .then(() => {
+          setIsLoading(false);
         });
     } else {
       setFee(undefined);
@@ -102,46 +125,63 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await undelegate(amounts);
+      const tx = await undelegate(amounts);
+      const txHash = hashFromTx(tx.hash);
+
+      track(AnalyticsEvent.UnstakeTransaction, {
+        txHash,
+        amount: totalAmount,
+        validatorAddresses: Object.keys(amounts),
+      });
       onDone?.();
     } catch (err) {
       log('UnstakeForm/onUnstake', err);
-      setError(err.message);
+      setError({
+        key: err.message,
+        type: AlertType.Error,
+        message: err.message,
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [isAmountValid, amounts, undelegate, onDone]);
+  }, [isAmountValid, amounts, undelegate, onDone, totalAmount]);
 
-  const renderFormInputButton = ({
-    label,
-    isInputEmpty,
-    onClear,
-    onClick,
-  }: {
-    label: string;
-    isInputEmpty: boolean;
-    onClear: () => void;
-    onClick: () => void;
-  }) => (
-    <$FormInputToggleButton
-      size={ButtonSize.XSmall}
-      isPressed={!isInputEmpty}
-      onPressedChange={(isPressed: boolean) => (isPressed ? onClick : onClear)()}
-      disabled={isLoading}
-      shape={isInputEmpty ? ButtonShape.Rectangle : ButtonShape.Circle}
-    >
-      {isInputEmpty ? label : <Icon iconName={IconName.Close} />}
-    </$FormInputToggleButton>
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount: number | undefined, validator: string) => {
+        track(AnalyticsEvent.UnstakeInput, {
+          amount,
+          validatorAddress: validator,
+        });
+      }, 1000),
+    []
   );
+
+  const onChangeAmount = useCallback((validator: string, value: number | undefined) => {
+    setAmounts((a) => ({ ...a, [validator]: value }));
+    debouncedChangeTrack(value, validator);
+  }, []);
+
+  const setAllUnstakeAmountsToMax = useCallback(() => {
+    currentDelegations?.forEach((delegation) => {
+      onChangeAmount(delegation.validator, MustBigNumber(delegation.amount).toNumber());
+    });
+  }, [currentDelegations, onChangeAmount]);
+
+  const clearAllUnstakeAmounts = useCallback(() => {
+    currentDelegations?.forEach((delegation) => {
+      onChangeAmount(delegation.validator, undefined);
+    });
+  }, [currentDelegations, onChangeAmount]);
 
   let description = stringGetter({
     key: STRING_KEYS.CURRENTLY_STAKING,
     params: {
       AMOUNT: (
-        <>
+        <$StakedAmount>
           {nativeStakingBalance}
           <Tag>{chainTokenLabel}</Tag>
-        </>
+        </$StakedAmount>
       ),
     },
   });
@@ -203,23 +243,27 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
           ]}
         >
           <FormInput
+            id="unstakeAmount"
             label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_UNSTAKE })}
             type={InputType.Number}
             onChange={({ floatValue }: NumberFormatValues) =>
               onChangeAmount(currentDelegations[0].validator, floatValue)
             }
             value={amounts[currentDelegations[0].validator] ?? undefined}
-            slotRight={renderFormInputButton({
-              label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: !amounts[currentDelegations[0].validator],
-              onClear: () => onChangeAmount(currentDelegations[0].validator, undefined),
-              onClick: () =>
-                onChangeAmount(
-                  currentDelegations[0].validator,
-                  parseFloat(currentDelegations[0].amount)
-                ),
-            })}
-            disabled={isLoading}
+            slotRight={
+              <FormMaxInputToggleButton
+                isInputEmpty={!amounts[currentDelegations[0].validator]}
+                isLoading={isLoading}
+                onPressedChange={(isPressed: boolean) =>
+                  isPressed
+                    ? onChangeAmount(
+                        currentDelegations[0].validator,
+                        parseFloat(currentDelegations[0].amount)
+                      )
+                    : onChangeAmount(currentDelegations[0].validator, undefined)
+                }
+              />
+            }
           />
         </$WithDetailsReceipt>
       )}
@@ -231,15 +275,21 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
               key: STRING_KEYS.VALIDATOR,
             })}
           </div>
-          <div>
+          <$SpacedRow>
             {stringGetter({
               key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
             })}
-          </div>
+            {showClearButton ? (
+              <$Button onClick={clearAllUnstakeAmounts} action={ButtonAction.Reset}>
+                {stringGetter({ key: STRING_KEYS.CLEAR })}
+              </$Button>
+            ) : (
+              <$AllButton onClick={setAllUnstakeAmountsToMax}>
+                {stringGetter({ key: STRING_KEYS.ALL })}
+              </$AllButton>
+            )}
+          </$SpacedRow>
           {currentDelegations?.map((delegation) => {
-            if (!delegation) {
-              return null;
-            }
             const balance = MustBigNumber(delegation.amount).toNumber();
             return (
               <React.Fragment key={delegation.validator}>
@@ -251,13 +301,17 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                     onChangeAmount(delegation.validator, floatValue)
                   }
                   value={amounts[delegation.validator] ?? undefined}
-                  slotRight={renderFormInputButton({
-                    label: stringGetter({ key: STRING_KEYS.MAX }),
-                    isInputEmpty: !amounts[delegation.validator],
-                    onClear: () => onChangeAmount(delegation.validator, undefined),
-                    onClick: () => onChangeAmount(delegation.validator, balance),
-                  })}
-                  disabled={isLoading}
+                  slotRight={
+                    <FormMaxInputToggleButton
+                      isInputEmpty={!amounts[delegation.validator]}
+                      isLoading={isLoading}
+                      onPressedChange={(isPressed: boolean) =>
+                        isPressed
+                          ? onChangeAmount(delegation.validator, balance)
+                          : onChangeAmount(delegation.validator, undefined)
+                      }
+                    />
+                  }
                 />
               </React.Fragment>
             );
@@ -265,20 +319,13 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         </$GridLayout>
       )}
 
-      <AlertMessage type={AlertType.Warning}>
-        {stringGetter({
-          key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
-        })}
-      </AlertMessage>
-
-      {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
-
       <$Footer>
         <UnstakeButtonAndReceipt
+          error={error}
           fee={fee ?? undefined}
-          isDisabled={!isAmountValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={totalAmount}
+          allAmountsEmpty={allAmountsEmpty}
         />
       </$Footer>
     </$Form>
@@ -305,15 +352,30 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
+
+  display: grid;
+  gap: var(--form-input-gap);
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-const $FormInputToggleButton = styled(ToggleButton)`
-  ${formMixins.inputInnerToggleButton}
+const $StakedAmount = styled.span`
+  ${layoutMixins.inlineRow}
+  color: var(--color-text-1);
+`;
 
-  svg {
-    color: var(--color-text-0);
-  }
+const $SpacedRow = styled.div`
+  ${layoutMixins.spacedRow}
+`;
+
+const $Button = styled(Button)`
+  --button-border: none;
+  --button-padding: 0;
+  --button-height: auto;
+  --button-hover-filter: none;
+`;
+
+const $AllButton = styled($Button)`
+  --button-textColor: var(--color-accent);
 `;

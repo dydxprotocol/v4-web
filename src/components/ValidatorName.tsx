@@ -3,12 +3,9 @@ import { useState } from 'react';
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import styled from 'styled-components';
 
-import { Link } from './Link';
-import { Output, OutputType } from './Output';
+import { layoutMixins } from '@/styles/layoutMixins';
 
-export type ValidatorNameProps = {
-  validator?: Validator;
-};
+import { Link } from './Link';
 
 export const ValidatorFaviconIcon = ({
   className,
@@ -40,32 +37,36 @@ export const ValidatorFaviconIcon = ({
   return null;
 };
 
-export const ValidatorName = ({ validator }: ValidatorNameProps) => {
-  if (!validator) {
-    return null;
-  }
-  const output = (
-    <$Output
-      type={OutputType.Text}
-      value={validator?.description?.moniker}
-      slotLeft={
-        <ValidatorFaviconIcon
-          url={validator?.description?.website}
-          fallbackText={validator?.description?.moniker}
-        />
-      }
-    />
+export const ValidatorName = ({ validator }: { validator?: Validator }) => {
+  return (
+    <$ValidatorName>
+      <ValidatorFaviconIcon
+        url={validator?.description?.website}
+        fallbackText={validator?.description?.moniker}
+      />
+      {validator?.description?.website ? (
+        <Link href={validator?.description?.website}>
+          <$TruncatedText>{validator?.description?.moniker} </$TruncatedText>
+        </Link>
+      ) : (
+        <$TruncatedText>{validator?.description?.moniker} </$TruncatedText>
+      )}
+    </$ValidatorName>
   );
-
-  if (validator?.description?.website) {
-    return (
-      <Link href={validator?.description?.website} withIcon>
-        {output}
-      </Link>
-    );
-  }
-  return output;
 };
+
+const $Img = styled.img`
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.25em;
+`;
+
+const $ValidatorName = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const $IconContainer = styled.div`
   display: flex;
@@ -80,14 +81,7 @@ const $IconContainer = styled.div`
   margin-right: 0.25em;
 `;
 
-const $Img = styled.img`
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.25em;
-`;
-
-const $Output = styled(Output)`
+const $TruncatedText = styled.div`
+  ${layoutMixins.textTruncate}
   color: var(--color-text-1);
 `;

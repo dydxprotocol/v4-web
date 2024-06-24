@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { ButtonAction } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { SMALL_USD_DECIMALS } from '@/constants/numbers';
@@ -16,6 +17,8 @@ import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -30,17 +33,19 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const chartDotsBackground = useAppSelector(getChartDotBackground);
+  const { validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
   const openStakingRewardDialog = useCallback(
     () =>
       dispatch(
         openDialog({
           type: DialogTypes.StakingReward,
-          dialogProps: { usdcRewards },
+          dialogProps: { validators: validators?.toArray() ?? [], usdcRewards },
         })
       ),
-    [dispatch, usdcRewards]
+    [dispatch, validators, usdcRewards]
   );
 
   return (
@@ -54,9 +59,15 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
         </$Title>
       }
       slotRight={
-        <$Button action={ButtonAction.Primary} onClick={openStakingRewardDialog}>
-          {stringGetter({ key: STRING_KEYS.CLAIM })}
-        </$Button>
+        canAccountTrade && (
+          <$Button
+            action={ButtonAction.Primary}
+            size={ButtonSize.Base}
+            onClick={openStakingRewardDialog}
+          >
+            {stringGetter({ key: STRING_KEYS.CLAIM })}
+          </$Button>
+        )
       }
     >
       <$InlineRow>
@@ -64,7 +75,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
-          fractionDigits={SMALL_USD_DECIMALS}
+          minimumFractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>
@@ -104,7 +115,6 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
 
 const $Button = styled(Button)`
   margin-right: var(--panel-paddingX);
-
   z-index: 1;
 `;
 

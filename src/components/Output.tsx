@@ -99,10 +99,12 @@ function formatNumberOutput(
     useGrouping = true,
     roundingMode = BigNumber.ROUND_HALF_UP,
     fractionDigits,
+    minimumFractionDigits,
     locale = navigator.language || 'en-US',
     showSign = ShowSign.Negative,
   }: {
     fractionDigits?: number | null;
+    minimumFractionDigits?: number;
     roundingMode?: BigNumber.RoundingMode;
     useGrouping?: boolean;
     locale?: string;
@@ -132,6 +134,19 @@ function formatNumberOutput(
       : {}),
   };
 
+  const getFormattedVal = (
+    val: BigNumber,
+    fallbackDecimals: number,
+    formattingOptions?: FormattingOptions
+  ) => {
+    const numDigits = fractionDigits ?? fallbackDecimals;
+    const precisionVal = minimumFractionDigits
+      ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
+      : val;
+    const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
+    return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
+  };
+
   const numberRenderers = {
     [OutputType.CompactNumber]: () => {
       if (!isNumber(value)) {
@@ -146,20 +161,9 @@ function formatNumberOutput(
         .format(Math.abs(value))
         .toLowerCase();
     },
-    [OutputType.Number]: () =>
-      valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
-        ...format,
-      }),
-    [OutputType.Fiat]: () =>
-      valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-        ...format,
-        prefix: '$',
-      }),
-    [OutputType.SmallFiat]: () =>
-      valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-        ...format,
-        prefix: '$',
-      }),
+    [OutputType.Number]: () => getFormattedVal(valueBN, 0),
+    [OutputType.Fiat]: () => getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' }),
+    [OutputType.SmallFiat]: () => getFormattedVal(valueBN, SMALL_USD_DECIMALS, { prefix: '$' }),
     [OutputType.CompactFiat]: () => {
       if (!isNumber(value)) {
         throw new Error('value must be a number for compact fiat output');
@@ -174,26 +178,14 @@ function formatNumberOutput(
         .format(Math.abs(value))
         .toLowerCase();
     },
-    [OutputType.Asset]: () =>
-      valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
-        ...format,
-      }),
+    [OutputType.Asset]: () => getFormattedVal(valueBN, TOKEN_DECIMALS),
     [OutputType.Percent]: () =>
-      valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
-        ...format,
-        suffix: '%',
-      }),
+      getFormattedVal(valueBN.times(100), PERCENT_DECIMALS, { suffix: '%' }),
     [OutputType.SmallPercent]: () =>
-      valueBN.times(100).toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
-        ...format,
-        suffix: '%',
-      }),
-    [OutputType.Multiple]: () =>
-      valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
-        ...format,
-        suffix: '×',
-      }),
+      getFormattedVal(valueBN.times(100), SMALL_PERCENT_DECIMALS, { suffix: '%' }),
+    [OutputType.Multiple]: () => getFormattedVal(valueBN, LEVERAGE_DECIMALS, { suffix: '×' }),
   };
+
   return `${sign ?? ''}${numberRenderers[type]}`;
 }
 
@@ -247,11 +239,17 @@ export enum ShowSign {
   None = 'None',
 }
 
+type FormattingOptions = {
+  prefix?: string;
+  suffix?: string;
+};
+
 type ElementProps = {
   type: OutputType;
   value?: BigNumberish | null;
   isLoading?: boolean;
   fractionDigits?: number | null;
+  minimumFractionDigits?: number;
   showSign?: ShowSign;
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
@@ -283,6 +281,7 @@ export const Output = ({
   value,
   isLoading,
   fractionDigits,
+  minimumFractionDigits,
   showSign = ShowSign.Negative,
   slotLeft,
   slotRight,
@@ -401,6 +400,7 @@ export const Output = ({
           value={formatNumberOutput(value, type, LOCALE_DECIMAL_SEPARATOR, LOCALE_GROUP_SEPARATOR, {
             useGrouping,
             fractionDigits,
+            minimumFractionDigits,
             locale,
             roundingMode,
             showSign: ShowSign.None,

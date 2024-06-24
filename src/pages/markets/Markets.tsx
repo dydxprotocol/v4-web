@@ -63,7 +63,8 @@ const $Page = styled.div`
 `;
 const $ContentSectionHeader = styled(ContentSectionHeader)`
   margin-top: 1rem;
-  margin-bottom: 0.25rem;
+  padding-top: 0;
+  margin-bottom: 0;
 
   h3 {
     font: var(--font-extra-medium);
@@ -81,7 +82,7 @@ const $ContentSectionHeader = styled(ContentSectionHeader)`
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 
   @media ${breakpoints.tablet} {
     ${layoutMixins.flexColumn}

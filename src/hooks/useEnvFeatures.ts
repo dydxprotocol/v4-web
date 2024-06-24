@@ -11,6 +11,7 @@ export interface EnvironmentFeatures {
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
   showMemoTransferField: boolean;
+  isStakingEnabled: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {

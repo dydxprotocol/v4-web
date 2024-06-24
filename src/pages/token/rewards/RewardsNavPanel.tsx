@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -14,8 +15,6 @@ import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 import { Tag } from '@/components/Tag';
-
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   title: string;
@@ -38,13 +37,14 @@ export const RewardsNavPanel = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const stakingEnabled = testFlags.enableStaking;
+
+  const { isStakingEnabled } = useEnvFeatures();
 
   return (
     <Panel
       className={className}
       slotHeaderContent={
-        <$Title stakingEnabled={stakingEnabled}>
+        <$Title stakingEnabled={isStakingEnabled}>
           {title} {titleTag && <$Tag>{titleTag}</$Tag>}
         </$Title>
       }

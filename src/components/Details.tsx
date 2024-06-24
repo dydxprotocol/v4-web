@@ -153,8 +153,6 @@ const detailsLayoutVariants = {
 
 const itemLayoutVariants = {
   column: css`
-    isolation: isolate;
-
     ${layoutMixins.scrollArea}
 
     ${layoutMixins.stickyArea0}

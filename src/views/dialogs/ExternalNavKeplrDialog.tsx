@@ -18,7 +18,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -33,7 +33,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const onExternalNavDialog = useCallback(() => {
     dispatch(closeDialog());
     dispatch(
-      openDialog({
+      forceOpenDialog({
         type: DialogTypes.ExternalLink,
         dialogProps: {
           buttonText: stringGetter({ key: STRING_KEYS.CONTINUE }),
