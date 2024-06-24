@@ -655,7 +655,19 @@ export const getTotalTradingRewards = (state: RootState) => state.account?.tradi
  * @returns account trading rewards aggregated by period
  */
 export const getHistoricalTradingRewards = (state: RootState) =>
-  state.account?.tradingRewards?.historical;
+  state.account?.tradingRewards?.filledHistory;
+
+/**
+ * @returns account historical trading rewards for the specified perid
+ */
+export const getTradingRewardsEventsForPeriod = () =>
+  createAppSelector(
+    [
+      (state: RootState) => state.account?.tradingRewards?.rawHistory,
+      (s, period: string) => period,
+    ],
+    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
+  );
 
 /**
  * @returns account historical trading rewards for the specified perid
@@ -663,7 +675,7 @@ export const getHistoricalTradingRewards = (state: RootState) =>
 export const getHistoricalTradingRewardsForPeriod = () =>
   createAppSelector(
     [getHistoricalTradingRewards, (s, period: string) => period],
-    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)
+    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
   );
 
 const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPeriod();
@@ -672,7 +684,7 @@ const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPe
  */
 export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
   [(s) => historicalRewardsForCurrentWeekSelector(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
-  (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
+  (historicalTradingRewards) => historicalTradingRewards?.[0]
 );
 
 /**
