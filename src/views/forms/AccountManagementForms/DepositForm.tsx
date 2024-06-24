@@ -34,7 +34,6 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { formMixins } from '@/styles/formMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
