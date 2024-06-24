@@ -65,7 +65,6 @@ export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & Elemen
             type={OutputType.Number}
             value={orderbookMidMarketPrice}
             fractionDigits={tickSizeDecimals}
-            useGrouping={false}
           />
         </$PriceOutputSpan>
         <span /> {/* Empty cell */}
