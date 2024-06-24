@@ -1,12 +1,12 @@
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-
-import { LinkOutIcon } from '@/icons';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -69,11 +69,7 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        LINK: (
-          <Link to="/terms">
-            <LinkOutIcon />
-          </Link>
-        ),
+        TERMS_OF_USE_LINK: <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon />,
       },
     });
   }
@@ -85,3 +81,7 @@ export const useComplianceState = () => {
     complianceMessage,
   };
 };
+
+const $Link = styled(Link)`
+  color: var(--color-text-1);
+`;
