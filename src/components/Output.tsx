@@ -58,11 +58,17 @@ export enum ShowSign {
   None = 'None',
 }
 
+type FormattingOptions = {
+  prefix?: string;
+  suffix?: string;
+};
+
 type ElementProps = {
   type: OutputType;
   value?: BigNumberish | null;
   isLoading?: boolean;
   fractionDigits?: number | null;
+  minimumFractionDigits?: number;
   showSign?: ShowSign;
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
@@ -94,6 +100,7 @@ export const Output = ({
   value,
   isLoading,
   fractionDigits,
+  minimumFractionDigits,
   showSign = ShowSign.Negative,
   slotLeft,
   slotRight,
@@ -239,6 +246,19 @@ export const Output = ({
           : {}),
       };
 
+      const getFormattedVal = (
+        val: BigNumber,
+        fallbackDecimals: number,
+        formattingOptions?: FormattingOptions
+      ) => {
+        const numDigits = fractionDigits ?? fallbackDecimals;
+        const precisionVal = minimumFractionDigits
+          ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
+          : val;
+        const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
+        return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
+      };
+
       const numberRenderers = {
         [OutputType.CompactNumber]: () => {
           if (!isNumber(value)) {
@@ -259,28 +279,17 @@ export const Output = ({
           );
         },
         [OutputType.Number]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
-              ...format,
-            })}
-            withSubscript={withSubscript}
-          />
+          <NumberValue value={getFormattedVal(valueBN, 0)} withSubscript={withSubscript} />
         ),
         [OutputType.Fiat]: () => (
           <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-              ...format,
-              prefix: '$',
-            })}
+            value={getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' })}
             withSubscript={withSubscript}
           />
         ),
         [OutputType.SmallFiat]: () => (
           <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-              ...format,
-              prefix: '$',
-            })}
+            value={getFormattedVal(valueBN, SMALL_USD_DECIMALS, { prefix: '$' })}
             withSubscript={withSubscript}
           />
         ),
@@ -305,38 +314,25 @@ export const Output = ({
         },
         [OutputType.Asset]: () => (
           <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
-              ...format,
-            })}
+            value={getFormattedVal(valueBN, TOKEN_DECIMALS)}
             withSubscript={withSubscript}
           />
         ),
         [OutputType.Percent]: () => (
           <NumberValue
-            value={valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
-              ...format,
-              suffix: '%',
-            })}
+            value={getFormattedVal(valueBN.times(100), PERCENT_DECIMALS, { suffix: '%' })}
             withSubscript={withSubscript}
           />
         ),
         [OutputType.SmallPercent]: () => (
           <NumberValue
-            value={valueBN
-              .times(100)
-              .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
-                ...format,
-                suffix: '%',
-              })}
+            value={getFormattedVal(valueBN.times(100), SMALL_PERCENT_DECIMALS, { suffix: '%' })}
             withSubscript={withSubscript}
           />
         ),
         [OutputType.Multiple]: () => (
           <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
-              ...format,
-              suffix: '×',
-            })}
+            value={getFormattedVal(valueBN, LEVERAGE_DECIMALS, { suffix: '×' })}
             withSubscript={withSubscript}
           />
         ),

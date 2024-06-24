@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 
-import { kollections } from '@dydxprotocol/v4-abacus';
 import styled from 'styled-components';
 
 import {
@@ -9,6 +8,7 @@ import {
   Nullable,
 } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -25,7 +25,7 @@ import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { getTradingRewardsEventsForPeriod } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
@@ -112,11 +112,13 @@ export const TradingRewardHistoryTable = ({
   const { isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
-    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, period.name);
+  const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
+    getTradingRewardsEventsForPeriod,
+    period.name
+  );
 
   const rewardsData = useMemo(() => {
-    return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];
+    return periodTradingRewards && canViewAccount ? periodTradingRewards : EMPTY_ARR;
   }, [periodTradingRewards, canViewAccount]);
 
   const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>

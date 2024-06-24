@@ -24,7 +24,7 @@ export const getSelectedTradeType = (type: Nullable<AbacusOrderTypes>) => {
 };
 
 export const getSelectedOrderSide = (side: Nullable<AbacusOrderSides>) => {
-  return side === AbacusOrderSide.sell ? OrderSide.SELL : OrderSide.BUY;
+  return side === AbacusOrderSide.Sell ? OrderSide.SELL : OrderSide.BUY;
 };
 
 export const hasPositionSideChanged = ({
@@ -147,11 +147,11 @@ export const calculateCrossPositionMargin = ({
  * @note v4-web is assuming that subaccountNumber >= 128 is used as childSubaccounts. API Traders may utilize these subaccounts differently.
  */
 export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<number>) => {
-  if (!subaccountNumber) return AbacusMarginMode.cross;
+  if (!subaccountNumber) return AbacusMarginMode.Cross;
 
   return subaccountNumber >= NUM_PARENT_SUBACCOUNTS
-    ? AbacusMarginMode.isolated
-    : AbacusMarginMode.cross;
+    ? AbacusMarginMode.Isolated
+    : AbacusMarginMode.Cross;
 };
 
 export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
@@ -159,7 +159,7 @@ export const getPositionMargin = ({ position }: { position: SubaccountPosition }
   const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
   const margin =
-    marginMode === AbacusMarginMode.cross
+    marginMode === AbacusMarginMode.Cross
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
           adjustedMmf: adjustedMmf.current,

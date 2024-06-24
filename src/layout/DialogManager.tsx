@@ -29,6 +29,7 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
+import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
@@ -83,6 +84,7 @@ export const DialogManager = () => {
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
     SelectMarginMode: (args) => <SelectMarginModeDialog {...args} {...modalProps} />,
+    SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
     Stake: (args) => <StakeDialog {...args} {...modalProps} />,
     StakingReward: (args) => <StakingRewardDialog {...args} {...modalProps} />,
     Trade: (args) => <TradeDialog {...args} {...modalProps} />,

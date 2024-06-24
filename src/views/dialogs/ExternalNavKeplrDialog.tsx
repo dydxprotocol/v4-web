@@ -18,7 +18,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 
 export const ExternalNavKeplrDialog = ({ setIsOpen }: DialogProps<ExternalNavKeplrDialogProps>) => {
   const stringGetter = useStringGetter();
@@ -29,7 +29,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: DialogProps<ExternalNavKep
   const onExternalNavDialog = useCallback(() => {
     dispatch(closeDialog());
     dispatch(
-      openDialog(
+      forceOpenDialog(
         DialogTypes.ExternalLink({
           buttonText: stringGetter({ key: STRING_KEYS.CONTINUE }),
           link: keplrDashboard,
@@ -43,7 +43,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: DialogProps<ExternalNavKep
         })
       )
     );
-  }, [dispatch]);
+  }, [dispatch, keplrDashboard, stringGetter]);
 
   return (
     <Dialog

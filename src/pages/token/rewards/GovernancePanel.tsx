@@ -3,22 +3,21 @@ import { useCallback } from 'react';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { RewardsNavPanel } from './RewardsNavPanel';
 
 export const GovernancePanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { governanceLearnMore } = useURLConfigs();
 
-  const stakingEnabled = testFlags.enableStaking;
+  const { isStakingEnabled } = useEnvFeatures();
+  const { governanceLearnMore } = useURLConfigs();
 
   const openKeplrDialog = useCallback(
     () => dispatch(openDialog(DialogTypes.ExternalNavKeplr())),
@@ -29,7 +28,7 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
     <RewardsNavPanel
       title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
       description={stringGetter({
-        key: stakingEnabled ? STRING_KEYS.GOVERNANCE_DETAILS : STRING_KEYS.GOVERNANCE_DESCRIPTION,
+        key: isStakingEnabled ? STRING_KEYS.GOVERNANCE_DETAILS : STRING_KEYS.GOVERNANCE_DESCRIPTION,
       })}
       learnMore={governanceLearnMore}
       onNav={openKeplrDialog}

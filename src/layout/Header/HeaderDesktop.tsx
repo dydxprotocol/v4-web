@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -31,18 +32,16 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
+  const { isStakingEnabled } = useEnvFeatures();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { complianceState } = useComplianceState();
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
-  const showChainTokenPage =
-    complianceState === ComplianceStates.FULL_ACCESS || testFlags.enableStaking;
+  const showChainTokenPage = complianceState === ComplianceStates.FULL_ACCESS || isStakingEnabled;
 
   const navItems = [
     {

@@ -98,6 +98,7 @@ export const Notification = ({
 const $Container = styled.div<{ isToast?: boolean }>`
   // Params
   --toast-icon-size: 1.75em;
+  --relativeTime-backgroundColor: var(--color-layer-2);
 
   // Rules
   ${popoverMixins.popover}
@@ -174,7 +175,7 @@ const $ActionItems = styled.div`
   right: 0;
   top: 0;
 
-  background-color: var(--color-layer-2);
+  background-color: var(--relativeTime-backgroundColor);
   font: var(--font-mini-book);
 
   display: none;

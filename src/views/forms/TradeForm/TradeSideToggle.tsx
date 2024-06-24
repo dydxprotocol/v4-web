@@ -36,8 +36,8 @@ export const TradeSideToggle = memo(({ className }: { className?: string }) => {
         abacusStateManager.setTradeValue({
           value:
             newSide === OrderSide.BUY
-              ? AbacusOrderSide.buy.rawValue
-              : AbacusOrderSide.sell.rawValue,
+              ? AbacusOrderSide.Buy.rawValue
+              : AbacusOrderSide.Sell.rawValue,
           field: TradeInputField.side,
         });
       }}

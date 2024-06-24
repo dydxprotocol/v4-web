@@ -154,16 +154,12 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.Asset}
               value={size}
-              fractionDigits={
-                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
-              }
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
             <Output
               type={OutputType.Asset}
               value={totalFilled}
-              fractionDigits={
-                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
-              }
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
           </TableCell>
         ),
@@ -317,7 +313,7 @@ const getOrdersTableColumnDef = ({
           const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
 
           const marginModeLabel =
-            marginMode === AbacusMarginMode.cross
+            marginMode === AbacusMarginMode.Cross
               ? stringGetter({ key: STRING_KEYS.CROSS })
               : stringGetter({ key: STRING_KEYS.ISOLATED });
           return <Output type={OutputType.Text} value={marginModeLabel} />;

@@ -18,7 +18,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 
 export const ExternalNavStrideDialog = ({
   setIsOpen,
@@ -31,7 +31,7 @@ export const ExternalNavStrideDialog = ({
   const openExternalNavDialog = useCallback(() => {
     dispatch(closeDialog());
     dispatch(
-      openDialog(
+      forceOpenDialog(
         DialogTypes.ExternalLink({
           buttonText: (
             <$Span>
@@ -50,7 +50,7 @@ export const ExternalNavStrideDialog = ({
         })
       )
     );
-  }, [dispatch, stringGetter]);
+  }, [dispatch, strideZoneApp, stringGetter]);
 
   return (
     <Dialog

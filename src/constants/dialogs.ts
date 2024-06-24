@@ -4,7 +4,7 @@ import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { BigNumberish } from '@/lib/numbers';
 
-import { SubaccountOrder, SubaccountPosition } from './abacus';
+import { AbacusPositionSides, Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
 import { NewMarketProposal } from './potentialMarkets';
 import { DydxChainAsset } from './wallets';
 
@@ -52,8 +52,18 @@ export type RateLimitDialogProps = { preventClose?: boolean };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type SharePNLAnalyticsDialogProps = {
+  marketId: string;
+  assetId: string;
+  leverage: Nullable<number>;
+  oraclePrice: Nullable<number>;
+  entryPrice: Nullable<number>;
+  unrealizedPnlPercent: Nullable<number>;
+  side: Nullable<AbacusPositionSides>;
+  sideLabel: Nullable<string>;
+};
 export type StakeDialogProps = {};
-export type StakingRewardDialogProps = { usdcRewards: BigNumberish };
+export type StakingRewardDialogProps = { usdcRewards: BigNumberish; validators: string[] };
 export type TradeDialogProps = {
   isOpen?: boolean;
   slotTrigger?: React.ReactNode;
@@ -103,6 +113,7 @@ export const DialogTypes = unionize(
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
+    SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
     Stake: ofType<StakeDialogProps>(),
     StakingReward: ofType<StakingRewardDialogProps>(),
     Trade: ofType<TradeDialogProps>(),

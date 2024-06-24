@@ -17,7 +17,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
-import { Icon, IconName } from '@/components/Icon';
+import { DropdownIcon } from '@/components/DropdownIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
@@ -198,9 +198,7 @@ export const MarketsDropdown = memo(
             )}
             <p>
               {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <$DropdownIcon aria-hidden="true">
-                <Icon iconName={IconName.Triangle} aria-hidden="true" />
-              </$DropdownIcon>
+              <DropdownIcon isOpen={isOpen} />
             </p>
           </$TriggerContainer>
         }
@@ -275,15 +273,6 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
     color: var(--color-text-0);
     font: var(--font-small-book);
   }
-`;
-
-const $DropdownIcon = styled.span`
-  margin-left: auto;
-
-  display: inline-flex;
-  transition: transform 0.3s var(--ease-out-expo);
-
-  font-size: 0.375rem;
 `;
 
 const $Popover = styled(Popover)`

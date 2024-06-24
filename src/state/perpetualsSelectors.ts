@@ -1,3 +1,4 @@
+import { Nullable } from '@/constants/abacus';
 import { Candle, TradingViewBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
@@ -43,6 +44,22 @@ export const getMarketData = (state: RootState, marketId: string) =>
  */
 export const getMarketIds = (state: RootState) =>
   Object.keys(getPerpetualMarkets(state) ?? EMPTY_OBJ);
+
+/**
+ * @returns clobPairIds of all markets, mapped by marketId.
+ */
+export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
+  return Object.entries(markets ?? {}).reduce(
+    (acc, [marketId, market]) => {
+      const clobPairId: Nullable<string> = market?.configs?.clobPairId;
+      if (clobPairId !== undefined) {
+        acc[marketId] = Number(clobPairId);
+      }
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+});
 
 /**
  * @returns PerpetualMarket data of the market the user is currently viewing
@@ -128,6 +145,11 @@ export const getCurrentMarketMidMarketPrice = (state: RootState) => {
   const currentMarketOrderbook = getCurrentMarketOrderbook(state);
   return currentMarketOrderbook?.midPrice;
 };
+
+export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSelector(
+  [getCurrentMarketMidMarketPrice, getCurrentMarketOraclePrice],
+  (midMarketPrice, oraclePrice) => midMarketPrice ?? oraclePrice
+);
 
 /**
  *

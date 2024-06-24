@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { DialogProps, PreferencesDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
 import { NotificationCategoryPreferences } from '@/constants/notifications';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -105,7 +106,7 @@ const usePreferenceMenu = () => {
             dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
           },
         },
-        {
+        isDev && {
           value: OtherPreference.GasToken,
           label: 'Pay gas with USDC',
           slotAfter: (
@@ -123,7 +124,7 @@ const usePreferenceMenu = () => {
             );
           },
         },
-      ],
+      ].filter(isTruthy),
     }),
     [stringGetter, defaultToAllMarkets, selectedGasDenom, setSelectedGasDenom]
   );

@@ -8,7 +8,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
-import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -43,10 +43,10 @@ import { ComplianceStates } from './constants/compliance';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useEnvFeatures } from './hooks/useEnvFeatures';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
-import { testFlags } from './lib/testFlags';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -67,12 +67,13 @@ const Content = () => {
   useAnalytics();
 
   const { isTablet, isNotTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
+  const { isStakingEnabled } = useEnvFeatures();
+  const { chainTokenLabel } = useTokenConfigs();
+
+  const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-  const { chainTokenLabel } = useTokenConfigs();
-  const location = useLocation();
-
-  const { complianceState } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -83,8 +84,7 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  const showChainTokenPage =
-    complianceState === ComplianceStates.FULL_ACCESS || testFlags.enableStaking;
+  const showChainTokenPage = complianceState === ComplianceStates.FULL_ACCESS || isStakingEnabled;
 
   return (
     <>
@@ -107,7 +107,7 @@ const Content = () => {
 
               <Route
                 path={`/${chainTokenLabel}/*`}
-                element={showChainTokenPage ? <TokenPage /> : <Navigate to={DEFAULT_TRADE_ROUTE} />}
+                element={showChainTokenPage ? <TokenPage /> : <Navigate to={AppRoute.Markets} />}
               />
 
               {isTablet && (
@@ -126,7 +126,7 @@ const Content = () => {
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
                 path="*"
-                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
+                element={<Navigate to={pathFromHash || AppRoute.Markets} replace />}
               />
             </Routes>
           </Suspense>
@@ -156,6 +156,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 const providers = [
   wrapProvider(PrivyProvider, {
     appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
+    clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
     config: privyConfig,
   }),
   wrapProvider(QueryClientProvider, { client: queryClient }),

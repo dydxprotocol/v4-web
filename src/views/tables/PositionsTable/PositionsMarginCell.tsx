@@ -35,7 +35,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     return {
       marginMode: derivedMarginMode,
       marginModeLabel:
-        derivedMarginMode === AbacusMarginMode.cross
+        derivedMarginMode === AbacusMarginMode.Cross
           ? stringGetter({ key: STRING_KEYS.CROSS })
           : stringGetter({ key: STRING_KEYS.ISOLATED }),
       margin: getPositionMargin({ position }),
@@ -46,7 +46,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     <TableCell
       stacked
       slotRight={
-        marginMode === AbacusMarginMode.isolated && (
+        marginMode === AbacusMarginMode.Isolated && (
           <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
             <$EditButton
               key="edit-margin"

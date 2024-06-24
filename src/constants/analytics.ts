@@ -185,6 +185,30 @@ export const AnalyticsEvents = unionize(
       type: string;
       id: string;
     }>(),
+
+    // Staking
+    StakeTransaction: ofType<{
+      txHash?: string;
+      amount?: number;
+      validatorAddress?: string;
+    }>(),
+    UnstakeTransaction: ofType<{
+      txHash?: string;
+      amount?: number;
+      validatorAddresses?: string[];
+    }>(),
+    ClaimTransaction: ofType<{
+      txHash?: string;
+      amount?: string;
+    }>(),
+    StakeInput: ofType<{
+      amount?: number;
+      validatorAddress?: string;
+    }>(),
+    UnstakeInput: ofType<{
+      amount?: number;
+      validatorAddress?: string;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

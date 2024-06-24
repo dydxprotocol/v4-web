@@ -60,6 +60,7 @@ export const OrderDetailsDialog = ({
     createdAtMilliseconds,
     expiresAtMilliseconds,
     marketId,
+    orderFlags,
     orderSide,
     postOnly,
     price,
@@ -74,13 +75,12 @@ export const OrderDetailsDialog = ({
     trailingPercent,
     triggerPrice,
     type,
-    orderFlags,
   } = useParameterizedSelector(getOrderDetails, orderId)! ?? {};
 
   const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);
 
   const marginModeLabel =
-    marginMode === AbacusMarginMode.cross
+    marginMode === AbacusMarginMode.Cross
       ? stringGetter({ key: STRING_KEYS.CROSS })
       : stringGetter({ key: STRING_KEYS.ISOLATED });
 
@@ -213,7 +213,11 @@ export const OrderDetailsDialog = ({
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  // we update short term orders to pending status when they are best effort canceled in Abacus
+  const isBestEffortCanceled =
+    (status === AbacusOrderStatus.Pending && cancelReason != null) ||
+    status === AbacusOrderStatus.Canceling;
+
   const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
 
   return (
