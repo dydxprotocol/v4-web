@@ -29,6 +29,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 
@@ -36,6 +37,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
@@ -103,6 +105,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [fromAmount, setFromAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
+
+  const { usdcLabel } = useTokenConfigs();
 
   // Async Data
   const { balance } = useAccountBalance({
@@ -349,7 +353,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         !debouncedAmountBN.isZero() &&
         MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
       ) {
-        return 'Amount must be greater than 10 USDC';
+        return stringGetter({
+          key: STRING_KEYS.AMOUNT_MINIMUM_ERROR,
+          params: {
+            NUMBER: MIN_CCTP_TRANSFER_AMOUNT,
+            TOKEN: usdcLabel,
+          },
+        });
       }
       if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
         return stringGetter({
@@ -447,9 +457,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               label={stringGetter({ key: STRING_KEYS.AMOUNT })}
               value={fromAmount}
               slotRight={
-                <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
-                  {stringGetter({ key: STRING_KEYS.MAX })}
-                </$FormInputButton>
+                <FormMaxInputToggleButton
+                  size={ButtonSize.XSmall}
+                  isInputEmpty={fromAmount === ''}
+                  isLoading={isLoading}
+                  onPressedChange={(isPressed: boolean) =>
+                    isPressed ? onClickMax() : setFromAmount('')
+                  }
+                />
               }
             />
           </$WithDetailsReceipt>
