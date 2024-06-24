@@ -118,8 +118,13 @@ export const useDrawOrderbook = ({
 
     // X values
     const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
+    // log scale to better show relative differences on orderbooks with large orders far from mid
+    const modifierFn = (num: number) => Math.log(1 + num);
     const barWidth = depthOrSizeValue
-      ? Math.min((depthOrSizeValue / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
+      ? Math.min(
+          (modifierFn(depthOrSizeValue) / modifierFn(histogramRange)) * maxHistogramBarWidth,
+          maxHistogramBarWidth
+        )
       : 0;
 
     const { gradient, bar } = getHistogramXValues({
