@@ -130,24 +130,31 @@ export const HeaderDesktop = () => {
       .querySelector('meta[name="smartbanner:button-url-apple"]')
       ?.getAttribute('content');
 
+    if (!androidUrl && !iosUrl) return null;
+
     return (
       <>
-        {androidUrl && (
-          <$IconButton
-            type={ButtonType.Link}
-            href={androidUrl}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.HelpCircle}
-          />
-        )}
-        {iosUrl && (
-          <$IconButton
-            type={ButtonType.Link}
-            href={iosUrl}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.HelpCircle}
-          />
-        )}
+        <$DownloadLinks>
+          <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
+          {androidUrl && (
+            <$AppLink
+              type={ButtonType.Link}
+              href={androidUrl}
+              shape={ButtonShape.Rectangle}
+              iconName={IconName.GooglePlay}
+            />
+          )}
+          {iosUrl && (
+            <$AppLink
+              type={ButtonType.Link}
+              href={iosUrl}
+              shape={ButtonShape.Rectangle}
+              iconName={IconName.Apple}
+            />
+          )}
+        </$DownloadLinks>
+
+        <VerticalSeparator />
       </>
     );
   };
@@ -272,7 +279,7 @@ const $LogoLink = styled(Link)`
 const $NavAfter = styled.div`
   ${layoutMixins.row}
   justify-self: end;
-  padding-right: 0.75rem;
+  padding: 0 0.75rem;
 
   gap: 0.5rem;
 
@@ -293,4 +300,26 @@ const $UnreadIndicator = styled.div`
   height: 0.4375rem;
   border-radius: 50%;
   background-color: var(--color-accent);
+`;
+
+const $DownloadLinks = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const $Download = styled.span`
+  font: var(--font-small-medium);
+  color: var(--color-text-0);
+`;
+
+const $AppLink = styled(IconButton)`
+  --button-icon-size: 1rem;
+  --button-padding: 0 0.5em;
+
+  // apple logo is white.
+  svg {
+    fill: var(--color-white);
+  }
 `;
