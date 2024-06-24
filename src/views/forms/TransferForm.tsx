@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
@@ -320,6 +320,12 @@ export const TransferForm = ({
     </$FormInputToggleButton>
   );
 
+  const onToggleMaxButton = useCallback(
+    (isPressed: boolean) =>
+      isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined),
+    [balanceBN, onChangeAmount]
+  );
+
   return (
     <$Form
       className={className}
@@ -394,9 +400,7 @@ export const TransferForm = ({
                 size={ButtonSize.XSmall}
                 isInputEmpty={size?.usdcSize == null}
                 isLoading={isLoading}
-                onPressedChange={(isPressed: boolean) =>
-                  isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined)
-                }
+                onPressedChange={onToggleMaxButton}
               />
             )
           }
