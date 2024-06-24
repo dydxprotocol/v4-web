@@ -102,6 +102,7 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
+    appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
@@ -398,6 +399,10 @@ class AbacusStateManager {
 
   sendSocketRequest = (requestText: string) => {
     this.websocket.send(requestText);
+  };
+
+  getChainById = (chainId: string) => {
+    return this.stateManager.getChainById(chainId);
   };
 }
 

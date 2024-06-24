@@ -230,7 +230,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
-          const estimatedDuration = formatSeconds(Math.max(toChainEta, 0));
+          const estimatedDuration =
+            typeof toChainEta === 'string' ? toChainEta : formatSeconds(Math.max(toChainEta, 0));
           const body = stringGetter({
             key: STRING_KEYS.DEPOSIT_STATUS,
             params: {
