@@ -404,6 +404,10 @@ class AbacusStateManager {
   sendSocketRequest = (requestText: string) => {
     this.websocket.send(requestText);
   };
+
+  getChainById = (chainId: string) => {
+    return this.stateManager.getChainById(chainId);
+  };
 }
 
 const abacusStateManager = new AbacusStateManager();

@@ -49,8 +49,16 @@ export const TransferStatusNotification = ({
   const hasError = error && Object.keys(error).length !== 0;
 
   const updateSecondsLeft = useCallback(() => {
-    const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration ?? 0) * 1000;
-    const toChainEta = (status?.toChain?.chainData?.estimatedRouteDuration ?? 0) * 1000;
+    const fromEstimatedRouteDuration = status?.fromChain?.chainData?.estimatedRouteDuration;
+    const toEstimatedRouteDuration = status?.toChain?.chainData?.estimatedRouteDuration;
+    if (
+      typeof fromEstimatedRouteDuration === 'string' ||
+      typeof toEstimatedRouteDuration === 'string'
+    ) {
+      return;
+    }
+    const fromChainEta = (fromEstimatedRouteDuration ?? 0) * 1000;
+    const toChainEta = (toEstimatedRouteDuration ?? 0) * 1000;
     setSecondsLeft(Math.floor((triggeredAt + fromChainEta + toChainEta - Date.now()) / 1000));
   }, [status]);
 
