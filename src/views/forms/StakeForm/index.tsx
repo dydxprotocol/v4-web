@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -33,8 +35,10 @@ import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndRec
 import { useAppDispatch } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type StakeFormProps = {
   onDone?: () => void;
@@ -105,8 +109,20 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
   }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
 
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount?: number, validator?: string) => {
+        track(AnalyticsEvent.StakeInput, {
+          amount,
+          validatorAddress: validator,
+        });
+      }, 1000),
+    []
+  );
+
   const onChangeAmount = (value?: BigNumber) => {
     setAmountBN(value);
+    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
   };
 
   const onStake = useCallback(async () => {
@@ -115,7 +131,14 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const tx = await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const txHash = hashFromTx(tx.hash);
+
+      track(AnalyticsEvent.StakeTransaction, {
+        txHash,
+        amount: amountBN.toNumber(),
+        validatorAddress: selectedValidator.operatorAddress,
+      });
       onDone?.();
     } catch (err) {
       log('StakeForm/onStake', err);
