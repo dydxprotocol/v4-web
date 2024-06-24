@@ -16,7 +16,7 @@ import {
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
+import { DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -49,6 +49,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
+import { MobileDownloadLinks } from '../MobileDownloadLinks';
 import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {
@@ -302,6 +303,7 @@ export const AccountMenu = () => {
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
         },
       ].filter(isTruthy)}
+      slotBottomContent={<MobileDownloadLinks withBadges />}
       align="end"
       sideOffset={16}
     >
@@ -367,6 +369,7 @@ const AssetActions = memo(
     </$InlineRow>
   )
 );
+
 const $AccountInfo = styled.div`
   ${layoutMixins.flexColumn}
 

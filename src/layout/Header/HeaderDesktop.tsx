@@ -2,7 +2,7 @@ import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonShape, ButtonType } from '@/constants/buttons';
+import { ButtonShape } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,6 +23,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
+import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
@@ -122,43 +123,6 @@ export const HeaderDesktop = () => {
     },
   ];
 
-  const renderMobileDownloadButtons = () => {
-    const androidUrl = document
-      .querySelector('meta[name="smartbanner:button-url-google"]')
-      ?.getAttribute('content');
-    const iosUrl = document
-      .querySelector('meta[name="smartbanner:button-url-apple"]')
-      ?.getAttribute('content');
-
-    if (!androidUrl && !iosUrl) return null;
-
-    return (
-      <>
-        <$DownloadLinks>
-          <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
-          {androidUrl && (
-            <$AppLink
-              type={ButtonType.Link}
-              href={androidUrl}
-              shape={ButtonShape.Rectangle}
-              iconName={IconName.GooglePlay}
-            />
-          )}
-          {iosUrl && (
-            <$AppLink
-              type={ButtonType.Link}
-              href={iosUrl}
-              shape={ButtonShape.Rectangle}
-              iconName={IconName.Apple}
-            />
-          )}
-        </$DownloadLinks>
-
-        <VerticalSeparator />
-      </>
-    );
-  };
-
   return (
     <$Header>
       <$LogoLink to="/">
@@ -180,7 +144,7 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
-        {renderMobileDownloadButtons()}
+        <MobileDownloadLinks />
 
         <$IconButton
           shape={ButtonShape.Rectangle}
@@ -300,26 +264,4 @@ const $UnreadIndicator = styled.div`
   height: 0.4375rem;
   border-radius: 50%;
   background-color: var(--color-accent);
-`;
-
-const $DownloadLinks = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const $Download = styled.span`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-`;
-
-const $AppLink = styled(IconButton)`
-  --button-icon-size: 1rem;
-  --button-padding: 0 0.5em;
-
-  // apple logo is white.
-  svg {
-    fill: var(--color-white);
-  }
 `;
