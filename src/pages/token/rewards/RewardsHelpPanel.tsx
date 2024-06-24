@@ -17,7 +17,7 @@ export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
 
   const { isStakingEnabled } = useEnvFeatures();
-  const { tradingRewardsLearnMore, mintscanValidatorsLearnMore } = useURLConfigs();
+  const { protocolStaking, tradingRewardsLearnMore } = useURLConfigs();
 
   return (
     <$HelpCard
@@ -63,7 +63,7 @@ export const RewardsHelpPanel = () => {
                     key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
                     params: {
                       HERE_LINK: (
-                        <$AccentLink href="https://protocolstaking.info/">
+                        <$AccentLink href={protocolStaking}>
                           {stringGetter({ key: STRING_KEYS.HERE })}
                         </$AccentLink>
                       ),
@@ -80,21 +80,6 @@ export const RewardsHelpPanel = () => {
                   }),
                   content: stringGetter({
                     key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER,
-                  }),
-                },
-                {
-                  header: stringGetter({
-                    key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_QUESTION,
-                  }),
-                  content: stringGetter({
-                    key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_ANSWER,
-                    params: {
-                      DOCUMENT_LINK: (
-                        <$AccentLink href={mintscanValidatorsLearnMore}>
-                          {stringGetter({ key: STRING_KEYS.DOCUMENT })}
-                        </$AccentLink>
-                      ),
-                    },
                   }),
                 },
               ]

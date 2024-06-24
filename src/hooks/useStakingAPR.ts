@@ -1,7 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { PERCENT_DECIMALS } from '@/constants/numbers';
-
 import { useEndpointsConfig } from './useEndpointsConfig';
 
 export const useStakingAPR = () => {
@@ -29,7 +27,5 @@ export const useStakingAPR = () => {
     refetchOnReconnect: false,
   });
 
-  const formattedAPR = data ? (data * 100).toFixed(PERCENT_DECIMALS) : undefined;
-
-  return formattedAPR;
+  return data;
 };
