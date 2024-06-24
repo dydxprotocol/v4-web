@@ -507,7 +507,3 @@ const $Footer = styled.footer`
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
-
-const $FormInputButton = styled(Button)`
-  ${formMixins.inputInnerButton}
-`;
