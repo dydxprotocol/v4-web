@@ -4,8 +4,9 @@ import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
  *
  * @params {
  *  @address cosmos network public address
- *  @bech32Prefix network to prepend (osmos, cosmos, axelar)
+ *  @bech32Prefix network to prepend (osmos, cosmos)
  * }
+ * @warning do not use this function for Evm-Compatible chain(Axelar, Evmos, etc.)
  * @returns new cosmos address with desired bech32 prefix
  */
 export function convertBech32Address({
