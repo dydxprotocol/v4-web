@@ -186,7 +186,11 @@ export const AccountDetailsAndHistory = () => {
                 {stringGetter({
                   key: STRING_KEYS.BLOCKED_MESSAGE,
                   params: {
-                    TERMS_OF_USE_LINK: <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon />,
+                    TERMS_OF_USE_LINK: (
+                      <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon>
+                        {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+                      </$Link>
+                    ),
                   },
                 })}
               </$EmptyCard>
@@ -319,4 +323,8 @@ const $EmptyCard = styled.div`
   button {
     width: fit-content;
   }
+`;
+
+const $Link = styled(Link)`
+  ${layoutMixins.spacedRow};
 `;
