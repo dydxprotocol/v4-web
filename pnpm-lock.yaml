@@ -36,8 +36,8 @@ dependencies:
     specifier: ^1.1.20
     version: 1.1.22
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.134
-    version: 1.1.134
+    specifier: ^1.1.138
+    version: 1.1.138
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1429,8 +1429,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.134:
-    resolution: {integrity: sha512-ni+l6G6hoRADkWc88Y8mlpHGYlUdekKWwplmI3nB7QuM6DlT9D26IOqBmZ++3hx3tWjKkwpvMCCpdPeDXfCBMw==}
+  /@dydxprotocol/v4-localization@1.1.138:
+    resolution: {integrity: sha512-Vb52xv7+yg1s6d6pGR41tzdBzaFSTIi6BoREXg5rXndBnBkB1nIC/bSosckj9ZSvcWG1ES9BBxZVQtdJ+iJkZA==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
