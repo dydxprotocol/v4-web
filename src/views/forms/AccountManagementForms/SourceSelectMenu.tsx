@@ -11,6 +11,7 @@ import {
   getMapOfLowestFeeTokensByChainId,
 } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
 
@@ -55,23 +56,11 @@ export const SourceSelectMenu = ({
   const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
   const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
-  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
+  const chainOptions = options?.chains?.toArray() ?? EMPTY_ARR;
+  const cosmosChainOptions = isMainnet ? cosmosChains.mainnets : cosmosChains.testnets;
 
-  const { cosmosChains, otherChains } = chains.reduce(
-    (acc, chain) => {
-      if (chain.string === 'Noble') {
-        acc.cosmosChains.push(chain);
-      } else {
-        acc.otherChains.push(chain);
-      }
-      return acc;
-    },
-    { cosmosChains: [], otherChains: [] } as {
-      cosmosChains: exchange.dydx.abacus.output.input.SelectionOption[];
-      otherChains: exchange.dydx.abacus.output.input.SelectionOption[];
-    }
-  );
+  const chains = isNotKeplrWallet ? chainOptions : cosmosChainOptions;
+  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -94,9 +83,8 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
-  const supportedChains = isNotKeplrDeposit ? chains : otherChains;
 
-  const chainItems = Object.values(supportedChains)
+  const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,
       label: chain.stringKey,
@@ -133,7 +121,6 @@ export const SourceSelectMenu = ({
   }));
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
-
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
 
   return (
@@ -158,14 +145,7 @@ export const SourceSelectMenu = ({
       <$ChainRow>
         {selectedChainOption ? (
           <>
-            <$Img
-              src={
-                selectedChainOption.string === 'Noble'
-                  ? NOBLE_ICON_URL
-                  : selectedChainOption.iconUrl ?? undefined
-              }
-              alt=""
-            />{' '}
+            <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
             {selectedChainOption.stringKey}
           </>
         ) : selectedExchangeOption ? (

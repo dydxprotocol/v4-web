@@ -8,7 +8,9 @@ import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
+import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -34,6 +36,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const { walletType } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -64,6 +67,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
+      if (walletType === WalletType.Keplr) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByDenom[token.value];
