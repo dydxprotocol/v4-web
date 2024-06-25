@@ -10,13 +10,6 @@ import styled from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
 import { SupportedLocales } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
-import {
-  DYDX_MAINNET_CHAIN_INFO,
-  DYDX_TESTNET_CHAIN_INFO,
-  NOBLE_MAINNET_CHAIN_INFO,
-  NOBLE_TESTNET_CHAIN_INFO,
-} from '@/constants/wallets';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -30,6 +23,8 @@ import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { GlobalStyle } from '@/styles/globalStyle';
 
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
+
+import { store } from '@/state/_store';
 import {
   AppColorMode,
   AppTheme,
@@ -39,10 +34,10 @@ import {
 } from '@/state/configs';
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
+import { getDYDXChainId, getNobleChainId } from '@/lib/squid';
 import { config } from '@/lib/wagmi';
 
 import './ladle.css';
-import { store } from "@/state/_store";
 
 const queryClient = new QueryClient();
 
@@ -57,9 +52,15 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, {
     grazOptions: {
-      chains: isMainnet
-        ? [DYDX_MAINNET_CHAIN_INFO, NOBLE_MAINNET_CHAIN_INFO]
-        : [DYDX_TESTNET_CHAIN_INFO, NOBLE_TESTNET_CHAIN_INFO],
+      chains: [
+        {
+          chainId: getDYDXChainId(),
+          bech32Config: {
+            bech32PrefixAccAddr: 'dydx',
+          },
+        },
+        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: 'noble' } },
+      ],
     },
   }),
   wrapProvider(WagmiConfig, { config }),

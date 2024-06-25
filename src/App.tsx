@@ -40,13 +40,6 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
 import { ComplianceStates } from './constants/compliance';
-import { isMainnet } from './constants/networks';
-import {
-  DYDX_MAINNET_CHAIN_INFO,
-  DYDX_TESTNET_CHAIN_INFO,
-  NOBLE_MAINNET_CHAIN_INFO,
-  NOBLE_TESTNET_CHAIN_INFO,
-} from './constants/wallets';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useComplianceState } from './hooks/useComplianceState';
@@ -54,6 +47,7 @@ import { useEnvFeatures } from './hooks/useEnvFeatures';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { getDYDXChainId, getNobleChainId } from './lib/squid';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -169,9 +163,15 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, {
     grazOptions: {
-      chains: isMainnet
-        ? [DYDX_MAINNET_CHAIN_INFO, NOBLE_MAINNET_CHAIN_INFO]
-        : [DYDX_TESTNET_CHAIN_INFO, NOBLE_TESTNET_CHAIN_INFO],
+      chains: [
+        {
+          chainId: getDYDXChainId(),
+          bech32Config: {
+            bech32PrefixAccAddr: 'dydx',
+          },
+        },
+        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: 'noble' } },
+      ],
     },
   }),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),

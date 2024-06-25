@@ -33,7 +33,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { getDYDXChainId, getNobleChainId } from '@/lib/squid';
+import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { resolveWagmiConnector } from '@/lib/wagmi';
@@ -53,6 +53,7 @@ export const useWalletConnection = () => {
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   useEffect(() => {
     // Cache last connected address
@@ -60,17 +61,16 @@ export const useWalletConnection = () => {
   }, [evmAddressWagmi]);
 
   // Cosmos wallet connection
-  const dydxChainId = getDYDXChainId();
   const nobleChainId = getNobleChainId();
   const [dydxAddress, saveDydxAddress] = useLocalStorage<DydxAddress | undefined>({
     key: LocalStorageKey.DydxAddress,
     defaultValue: undefined,
   });
   const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
-    chainId: dydxChainId,
+    chainId: selectedDydxChainId,
   });
   const { data: signerGraz } = useOfflineSignersGraz({
-    chainId: dydxChainId,
+    chainId: selectedDydxChainId,
   });
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
@@ -97,7 +97,6 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
   const wagmiConnector = useMemo(
     () =>
@@ -171,7 +170,7 @@ export const useWalletConnection = () => {
 
           if (!isConnectedGraz) {
             await connectGraz({
-              chainId: [dydxChainId, nobleChainId],
+              chainId: [selectedDydxChainId, nobleChainId],
               walletType: cosmosWalletType,
             });
           }
