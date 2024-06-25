@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { IconName } from '@/components/Icon';
@@ -12,27 +13,21 @@ import { VerticalSeparator } from '@/components/Separator';
 
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
   const stringGetter = useStringGetter();
+  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
-  const androidUrl = document
-    .querySelector('meta[name="smartbanner:button-url-google"]')
-    ?.getAttribute('content');
-  const iosUrl = document
-    .querySelector('meta[name="smartbanner:button-url-apple"]')
-    ?.getAttribute('content');
-
-  if (!androidUrl && !iosUrl) return null;
+  if (!appleAppStoreUrl && !googlePlayStoreUrl) return null;
 
   if (withBadges) {
     return (
       <$DownloadLinksInDropdown>
         <$Download>{stringGetter({ key: STRING_KEYS.GET_DYDX_ON_PHONE })}</$Download>
-        {androidUrl && (
-          <Link href={androidUrl}>
+        {googlePlayStoreUrl && (
+          <Link href={googlePlayStoreUrl}>
             <img src="/play-store.png" alt="google-play" />
           </Link>
         )}
-        {iosUrl && (
-          <Link href={iosUrl}>
+        {appleAppStoreUrl && (
+          <Link href={appleAppStoreUrl}>
             <img src="/app-store.png" alt="app-store" />
           </Link>
         )}
@@ -44,18 +39,18 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
     <>
       <$DownloadLinks>
         <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
-        {androidUrl && (
+        {googlePlayStoreUrl && (
           <$AppLink
             type={ButtonType.Link}
-            href={androidUrl}
+            href={googlePlayStoreUrl}
             shape={ButtonShape.Rectangle}
             iconName={IconName.GooglePlay}
           />
         )}
-        {iosUrl && (
+        {appleAppStoreUrl && (
           <$AppLink
             type={ButtonType.Link}
-            href={iosUrl}
+            href={appleAppStoreUrl}
             shape={ButtonShape.Rectangle}
             iconName={IconName.Apple}
           />
