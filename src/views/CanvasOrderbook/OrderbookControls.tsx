@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -46,8 +47,7 @@ export const OrderbookControls = ({
     [grouping?.multiplier.ordinal]
   );
   const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-  const { tickSizeDecimals: tSD } = currentMarketConfig ?? {};
-  const tickSizeDecimals = tSD ?? 2;
+  const tickSizeDecimals = currentMarketConfig?.tickSizeDecimals ?? USD_DECIMALS;
 
   return (
     <$OrderbookControlsContainer className={className}>
@@ -139,5 +139,5 @@ const $OrderbookZoomControl = styled.div`
 `;
 
 const $MinusSymbolCenter = styled.span`
-  margin-top: -2px;
+  margin-top: -0.125rem;
 `;

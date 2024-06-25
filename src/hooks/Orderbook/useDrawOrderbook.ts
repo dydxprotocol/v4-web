@@ -170,10 +170,10 @@ export const useDrawOrderbook = ({
     const padding = 15;
     ctx.beginPath();
     ctx.arc(rekt.x1 + padding, (rekt.y1 + rekt.y2) / 2, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#7774FF';
+    ctx.fillStyle = theme.accent;
     ctx.fill();
     ctx.lineWidth = 4;
-    ctx.strokeStyle = '#7774FF73';
+    ctx.strokeStyle = theme.accent;
     ctx.stroke();
   };
 
