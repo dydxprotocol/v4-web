@@ -36,7 +36,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { Orderbook } from '@/views/tables/Orderbook';
 
 import { useAppSelector } from '@/state/appTypes';
 import {
@@ -50,6 +49,7 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
+import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
@@ -235,7 +235,7 @@ export const TradeForm = ({
 
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
-      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
+      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
       <$InputsColumn>
         <TradeSizeInputs />
         <TradeFormInputs />
@@ -324,7 +324,7 @@ const $TradeForm = styled.form`
   --tradeBox-content-paddingLeft: ;
 
   /* Rules */
-  --orderbox-column-width: 140px;
+  --orderbox-column-width: 180px;
   --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
 
   min-height: 100%;
@@ -420,21 +420,11 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
           `}
   }
 `;
-const $Orderbook = styled(Orderbook)`
+const $Orderbook = styled(CanvasOrderbook)`
   width: 100%;
 
   @media ${breakpoints.notTablet} {
     display: none;
-  }
-
-  > table {
-    --tableCell-padding: 0.5em 1em;
-
-    scroll-snap-type: none;
-
-    thead {
-      display: none;
-    }
   }
 `;
 const $ToggleGroup = styled(ToggleGroup)`

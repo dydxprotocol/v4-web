@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
+import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
 import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
@@ -19,39 +19,49 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketData,
+  getCurrentMarketId,
+} from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
+import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
   maxRowsPerSide?: number;
+  layout?: 'vertical' | 'horizontal';
 };
 
 type StyleProps = {
   histogramSide?: 'left' | 'right';
+  hideHeader?: boolean;
 };
 
 export const CanvasOrderbook = forwardRef(
   (
     {
       histogramSide = 'right',
+      hideHeader = false,
+      layout = 'vertical',
       maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange } = useCalculateOrderbookData({
-      maxRowsPerSide,
-    });
+    const { asks, bids, hasOrderbook, histogramRange, currentGrouping } = useCalculateOrderbookData(
+      {
+        maxRowsPerSide,
+      }
+    );
 
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-    const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+    const { assetId: id } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
     const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
@@ -59,28 +69,37 @@ export const CanvasOrderbook = forwardRef(
      * Slice asks and bids to maxRowsPerSide using empty rows
      */
     const { asksSlice, bidsSlice } = useMemo(() => {
-      let newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
       const emptyAskRows =
         asks.length < maxRowsPerSide
           ? new Array<undefined>(maxRowsPerSide - asks.length).fill(undefined)
           : [];
-      newAsksSlice = [...emptyAskRows, ...asks.reverse()];
 
-      let newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
+      const newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
+        ...emptyAskRows,
+        ...asks.reverse(),
+      ];
+
       const emptyBidRows =
         bids.length < maxRowsPerSide
           ? new Array<undefined>(maxRowsPerSide - bids.length).fill(undefined)
           : [];
-      newBidsSlice = [...bids, ...emptyBidRows];
+      const newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
+        ...bids,
+        ...emptyBidRows,
+      ];
 
       return {
-        asksSlice: newAsksSlice,
+        asksSlice: layout === 'horizontal' ? newAsksSlice : newAsksSlice.reverse(),
         bidsSlice: newBidsSlice,
       };
-    }, [asks, bids]);
+    }, [asks, bids, layout, maxRowsPerSide]);
 
     const orderbookRef = useRef<HTMLDivElement>(null);
-    useCenterOrderbook({ orderbookRef, marketId: currentMarket });
+    useCenterOrderbook({
+      orderbookRef,
+      marketId: currentMarket,
+      disabled: layout === 'horizontal',
+    });
 
     /**
      * Display top or bottom middleRow when center middleRow is off screen
@@ -111,88 +130,124 @@ export const CanvasOrderbook = forwardRef(
       [currentInput, tickSizeDecimals]
     );
 
+    const [displayUnit, setDisplayUnit] = useState<'fiat' | 'asset'>('asset');
+
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
-      data: [...asksSlice].reverse(),
+      data: asksSlice,
       histogramRange,
       histogramSide,
+      displayUnit,
       side: 'ask',
     });
 
     const { canvasRef: bidsCanvasRef } = useDrawOrderbook({
       data: bidsSlice,
       histogramRange,
-      histogramSide,
+      histogramSide: layout === 'horizontal' ? 'left' : histogramSide,
+      displayUnit,
       side: 'bid',
     });
 
+    const usdTag = <Tag>USD</Tag>;
+    const assetTag = id ? <Tag>{id}</Tag> : undefined;
+    const asksOrderbook = (
+      <$OrderbookSideContainer $side="asks" $rows={maxRowsPerSide}>
+        <$HoverRows $bottom={layout !== 'horizontal'}>
+          {[...asksSlice].reverse().map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+            row ? (
+              <$Row
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
+                title={`${row.price}`}
+                onClick={() => {
+                  onRowAction(row.price);
+                }}
+              />
+            ) : (
+              // eslint-disable-next-line react/no-array-index-key
+              <$Row key={idx} />
+            )
+          )}
+        </$HoverRows>
+        <$OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
+      </$OrderbookSideContainer>
+    );
+    const bidsOrderbook = (
+      <$OrderbookSideContainer $side="bids" $rows={maxRowsPerSide}>
+        <$HoverRows>
+          {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+            row ? (
+              <$Row
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
+                title={`${row.price}`}
+                onClick={
+                  row?.price
+                    ? () => {
+                        onRowAction(row.price);
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              // eslint-disable-next-line react/no-array-index-key
+              <$Row key={idx} />
+            )
+          )}
+        </$HoverRows>
+        <$OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
+      </$OrderbookSideContainer>
+    );
     return (
       <$OrderbookContainer ref={ref}>
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          <$Header>
-            <span>
-              {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
-            </span>
-            <span>
-              {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
-            </span>
-            <span>{stringGetter({ key: STRING_KEYS.MINE })}</span>
-          </$Header>
-
-          {displaySide === 'top' && (
-            <$OrderbookMiddleRow side="top" tickSizeDecimals={tickSizeDecimals} />
+          {!hideHeader && (
+            <OrderbookControls
+              assetName={id}
+              selectedUnit={displayUnit}
+              setSelectedUnit={setDisplayUnit}
+              grouping={currentGrouping}
+            />
+          )}
+          {!hideHeader && (
+            <$Header>
+              <span>
+                {stringGetter({ key: STRING_KEYS.PRICE })} {usdTag}
+              </span>
+              <span>
+                {stringGetter({ key: STRING_KEYS.SIZE })}{' '}
+                {displayUnit === 'fiat' ? usdTag : assetTag}
+              </span>
+              <span>
+                {stringGetter({ key: STRING_KEYS.TOTAL })}{' '}
+                {displayUnit === 'fiat' ? usdTag : assetTag}
+              </span>
+            </$Header>
           )}
 
-          <$OrderbookWrapper ref={orderbookRef}>
-            <$OrderbookSideContainer $side="asks">
-              <$HoverRows $bottom>
-                {asksSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
-                  row ? (
-                    <$Row
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={idx}
-                      title={`${row.price}`}
-                      onClick={() => {
-                        onRowAction(row.price);
-                      }}
-                    />
-                  ) : (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <$Row key={idx} />
-                  )
-                )}
-              </$HoverRows>
-              <$OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
-            </$OrderbookSideContainer>
-
-            <OrderbookMiddleRow ref={orderbookMiddleRowRef} tickSizeDecimals={tickSizeDecimals} />
-
-            <$OrderbookSideContainer $side="bids">
-              <$HoverRows>
-                {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
-                  row ? (
-                    <$Row
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={idx}
-                      title={`${row.price}`}
-                      onClick={
-                        row?.price
-                          ? () => {
-                              onRowAction(row.price);
-                            }
-                          : undefined
-                      }
-                    />
-                  ) : (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <$Row key={idx} />
-                  )
-                )}
-              </$HoverRows>
-              <$OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
-            </$OrderbookSideContainer>
-          </$OrderbookWrapper>
-          {displaySide === 'bottom' && (
-            <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
+          {(displaySide === 'top' || layout === 'horizontal') && (
+            <$OrderbookMiddleRow
+              side="top"
+              tickSizeDecimals={tickSizeDecimals}
+              isHeader={layout === 'horizontal'}
+            />
+          )}
+          {layout === 'vertical' ? (
+            <>
+              <$OrderbookWrapper ref={orderbookRef}>
+                {asksOrderbook}
+                <OrderbookMiddleRow tickSizeDecimals={tickSizeDecimals} />
+                {bidsOrderbook}
+              </$OrderbookWrapper>
+              {displaySide === 'bottom' && (
+                <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
+              )}
+            </>
+          ) : (
+            <$HorizontalOrderbook>
+              {asksOrderbook}
+              {bidsOrderbook}
+            </$HorizontalOrderbook>
           )}
         </$OrderbookContent>
         {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
@@ -200,6 +255,7 @@ export const CanvasOrderbook = forwardRef(
     );
   }
 );
+
 const $OrderbookContainer = styled.div`
   display: flex;
   flex: 1 1 0%;
@@ -228,8 +284,16 @@ const $OrderbookWrapper = styled.div`
   flex: 1 1 0%;
 `;
 
-const $OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks' }>`
-  min-height: ${ORDERBOOK_HEIGHT}px;
+const $HorizontalOrderbook = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow-y: auto;
+`;
+
+const $OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks'; $rows: number }>`
+  ${({ $rows }) => css`
+    min-height: calc(${$rows} * ${ORDERBOOK_ROW_HEIGHT}px);
+  `}
   ${({ $side }) => css`
     --accent-color: ${$side === 'bids' ? 'var(--color-positive)' : 'var(--color-negative)'};
   `}

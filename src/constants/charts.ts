@@ -14,6 +14,7 @@ export type DepthChartDatum = {
   size: number;
   price: number;
   depth: Nullable<number>;
+  depthCost: number;
   seriesKey: DepthChartSeries;
 };
 
