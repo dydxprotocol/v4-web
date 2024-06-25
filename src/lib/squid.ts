@@ -10,6 +10,13 @@ import {
 } from '@skip-router/core';
 
 import { isMainnet } from '@/constants/networks';
+import {
+  RouteStatus,
+  SkipStatusResponse,
+  SkipTransactionStatus,
+  TransactionDataParams,
+  TransferDirection,
+} from '@/constants/skip';
 
 import abacusStateManager from './abacus';
 import { isTruthy } from './isTruthy';
@@ -104,33 +111,10 @@ const getChainNameFromId = (chainId: string | undefined) => {
   return chain?.chain_name;
 };
 
-type RouteStatus = {
-  chainId: string | undefined;
-  txHash: string | undefined;
-  status: string | undefined;
-};
-export type TransactionStatus = {
-  chainData: {
-    chainId: string | undefined;
-    chainName: string | undefined;
-    estimatedRouteDuration?: string | undefined;
-  };
-  transactionId: string | undefined;
-  transactionUrl: string | undefined;
-};
-
-type TransactionDataParams = {
-  chainId: string | undefined;
-  txHash: string | undefined;
-  status: string | undefined;
-  txUrl: string | undefined;
-  transferDirection: TransferDirection;
-};
-
 class TransactionData {
   routeStatus: RouteStatus;
 
-  transactionStatus: TransactionStatus;
+  transactionStatus: SkipTransactionStatus;
 
   constructor({ chainId, txHash, status, txUrl, transferDirection }: TransactionDataParams) {
     this.routeStatus = {
@@ -149,8 +133,6 @@ class TransactionData {
     };
   }
 }
-
-type TransferDirection = 'from' | 'to';
 
 const getSquidStatusFromState = (state: string | undefined) => {
   if (!state) return undefined;
@@ -267,15 +249,6 @@ export const formSkipStatusResponse = (
     fromChain: fromChainTxData?.transactionStatus,
     error: skipStatusResponse?.error?.message,
   };
-};
-
-export type SkipStatusResponse = {
-  axelarTransactionUrl: string | undefined;
-  squidTransactionStatus: string | undefined;
-  routeStatus: RouteStatus[];
-  toChain: TransactionStatus | undefined;
-  fromChain: TransactionStatus | undefined;
-  error: string | undefined;
 };
 
 export const fetchTransferStatus = ({

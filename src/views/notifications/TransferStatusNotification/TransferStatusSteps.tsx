@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
+import { SkipStatusResponse } from '@/constants/skip';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -20,7 +21,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 type ElementProps = {
-  status?: StatusResponse;
+  status?: StatusResponse | SkipStatusResponse;
   type: TransferNotificationTypes;
 };
 

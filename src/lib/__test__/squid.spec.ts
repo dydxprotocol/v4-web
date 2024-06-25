@@ -1,7 +1,9 @@
 import { SpyInstance, afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { SkipTransactionStatus } from '@/constants/skip';
+
 import abacusStateManager from '../abacus';
-import { TransactionStatus, formSkipStatusResponse } from '../squid';
+import { formSkipStatusResponse } from '../squid';
 import { depositFromUsdcEthPending, depositFromUsdcEthSuccess } from './fixtures/skipCctpDeposit';
 import { withdrawToUsdcEthPending, withdrawToUsdcEthSuccess } from './fixtures/skipCctpWithdrawal';
 import {
@@ -15,7 +17,7 @@ import {
   withdrawToBinanceBNBSuccess,
 } from './fixtures/skipNonCctpWithdrawal';
 
-const toChainPending: TransactionStatus = Object.freeze({
+const toChainPending: SkipTransactionStatus = Object.freeze({
   chainData: {
     chainId: undefined,
     chainName: undefined,

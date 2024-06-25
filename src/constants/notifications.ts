@@ -1,6 +1,6 @@
 import { StatusResponse } from '@0xsquid/sdk';
 
-import { SkipStatusResponse } from '@/lib/squid';
+import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
