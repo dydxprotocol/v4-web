@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { DialogProps, WithdrawalGatedDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -13,17 +14,11 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-  transferType: 'withdrawal' | 'transfer';
-  estimatedUnblockTime?: string | null;
-};
-
 export const WithdrawalGateDialog = ({
   setIsOpen,
   estimatedUnblockTime,
   transferType,
-}: ElementProps) => {
+}: DialogProps<WithdrawalGatedDialogProps>) => {
   const stringGetter = useStringGetter();
   const { withdrawalGateLearnMore } = useURLConfigs();
 

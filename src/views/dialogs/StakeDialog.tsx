@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, StakeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStakingAPR } from '@/hooks/useStakingAPR';
@@ -14,11 +15,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { StakeForm } from '@/views/forms/StakeForm';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const StakeDialog = ({ setIsOpen }: ElementProps) => {
+export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
   const stringGetter = useStringGetter();
 
   const { chainTokenLabel } = useTokenConfigs();

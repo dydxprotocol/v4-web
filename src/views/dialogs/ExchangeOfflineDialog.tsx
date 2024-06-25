@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
-import { DialogTypes } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, ExchangeOfflineDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
@@ -21,12 +21,10 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
-type ElementProps = {
-  preventClose?: boolean;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps) => {
+export const ExchangeOfflineDialog = ({
+  preventClose,
+  setIsOpen,
+}: DialogProps<ExchangeOfflineDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { status, statusErrorMessage } = useApiState();
@@ -34,7 +32,11 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
   const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
 
   useEffect(() => {
-    if (activeDialog?.type === DialogTypes.ExchangeOffline && status === AbacusApiStatus.NORMAL) {
+    if (
+      activeDialog != null &&
+      DialogTypes.is.ExchangeOffline(activeDialog) &&
+      status === AbacusApiStatus.NORMAL
+    ) {
       dispatch(closeDialog());
     }
   }, [status, selectedNetwork]);

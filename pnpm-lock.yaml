@@ -36,8 +36,8 @@ dependencies:
     specifier: ^1.1.20
     version: 1.1.22
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.134
-    version: 1.1.134
+    specifier: ^1.1.138
+    version: 1.1.138
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -260,6 +260,9 @@ dependencies:
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)
+  unionize:
+    specifier: ^3.1.0
+    version: 3.1.0
   use-latest:
     specifier: ^1.2.1
     version: 1.2.1(@types/react@18.3.3)(react@18.2.0)
@@ -1426,8 +1429,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.134:
-    resolution: {integrity: sha512-ni+l6G6hoRADkWc88Y8mlpHGYlUdekKWwplmI3nB7QuM6DlT9D26IOqBmZ++3hx3tWjKkwpvMCCpdPeDXfCBMw==}
+  /@dydxprotocol/v4-localization@1.1.138:
+    resolution: {integrity: sha512-Vb52xv7+yg1s6d6pGR41tzdBzaFSTIi6BoREXg5rXndBnBkB1nIC/bSosckj9ZSvcWG1ES9BBxZVQtdJ+iJkZA==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -18568,6 +18571,10 @@ packages:
       trough: 2.1.0
       vfile: 6.0.1
     dev: true
+
+  /unionize@3.1.0:
+    resolution: {integrity: sha512-LQZvbanzvpzvK0QYgRvnaA9VVe+g4nTbRlyoGGWDKFrZn0HJnDN5LC2Ti0+BxpKKOCrL3BQcRBVFPy/t12Y24Q==}
+    dev: false
 
   /unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}

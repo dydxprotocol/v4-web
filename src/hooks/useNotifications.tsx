@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   NotificationCategoryPreferences,
@@ -210,7 +210,7 @@ const useNotificationsContext = () => {
   );
 
   const onNotificationAction = (notification: Notification) => {
-    track(AnalyticsEvent.NotificationAction, { type: notification.type, id: notification.id });
+    track(AnalyticsEvents.NotificationAction({ type: notification.type, id: notification.id }));
     return actions[notification.type]?.(notification.id);
   };
 

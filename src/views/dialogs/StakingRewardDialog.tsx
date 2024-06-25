@@ -6,7 +6,8 @@ import styled, { css } from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
+import { DialogProps, StakingRewardDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
@@ -35,13 +36,11 @@ import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
-type ElementProps = {
-  validators: string[];
-  usdcRewards: BigNumberish;
-  setIsOpen: (open: boolean) => void;
-};
-
-export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: ElementProps) => {
+export const StakingRewardDialog = ({
+  usdcRewards,
+  setIsOpen,
+  validators,
+}: DialogProps<StakingRewardDialogProps>) => {
   const stringGetter = useStringGetter();
   const { usdcLabel, usdcDecimals } = useTokenConfigs();
 
@@ -123,10 +122,12 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       const tx = await withdrawReward(validators);
       const txHash = hashFromTx(tx.hash);
 
-      track(AnalyticsEvent.ClaimTransaction, {
-        txHash,
-        amount: usdcRewards.toString(),
-      });
+      track(
+        AnalyticsEvents.ClaimTransaction({
+          txHash,
+          amount: usdcRewards.toString(),
+        })
+      );
       setIsOpen(false);
     } catch (err) {
       log('StakeRewardDialog/withdrawReward', err);

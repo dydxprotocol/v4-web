@@ -36,10 +36,8 @@ export const MarginModeSelector = ({
   const handleClick = useCallback(() => {
     dispatch(
       openInTradeBox
-        ? openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
-        : openDialog({
-            type: DialogTypes.SelectMarginMode,
-          })
+        ? openDialogInTradeBox(TradeBoxDialogTypes.SelectMarginMode())
+        : openDialog(DialogTypes.SelectMarginMode())
     );
   }, [dispatch, openInTradeBox]);
 

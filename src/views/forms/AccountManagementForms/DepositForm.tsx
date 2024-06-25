@@ -10,7 +10,7 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
+import { AnalyticsEventPayloads } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -59,7 +59,7 @@ import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 
 type DepositFormProps = {
-  onDeposit?: (event?: AnalyticsEventData<AnalyticsEvent.TransferDeposit>) => void;
+  onDeposit?: (event?: AnalyticsEventPayloads['TransferDeposit']) => void;
   onError?: () => void;
 };
 

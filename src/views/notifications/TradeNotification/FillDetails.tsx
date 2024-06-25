@@ -1,6 +1,7 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
 
@@ -12,6 +13,8 @@ import { Details } from '@/components/Details';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 
+import { BigNumberish } from '@/lib/numbers';
+
 export const FillDetails = ({
   orderSide,
   tradeType,
@@ -22,9 +25,9 @@ export const FillDetails = ({
 }: {
   orderSide: OrderSide;
   tradeType?: TradeTypes;
-  filledAmount: any;
+  filledAmount: Nullable<BigNumberish>;
   assetId?: string;
-  averagePrice?: any;
+  averagePrice?: BigNumberish;
   tickSizeDecimals?: number;
 }) => {
   const stringGetter = useStringGetter();
