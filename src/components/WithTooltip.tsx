@@ -82,9 +82,9 @@ export const WithTooltip = ({
                 {tooltipBody && <dd>{tooltipBody}</dd>}
                 {tooltipLearnMore && (
                   <dd>
-                    <$LearnMore href={tooltipLearnMore}>
+                    <Link href={tooltipLearnMore} isAccent>
                       {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                    </$LearnMore>
+                    </Link>
                   </dd>
                 )}
                 <$Arrow />
@@ -148,8 +148,4 @@ const $Arrow = styled(Arrow)`
 
 const $Icon = styled(Icon)`
   color: var(--color-text-0);
-`;
-
-const $LearnMore = styled(Link)`
-  --link-color: var(--color-accent);
 `;

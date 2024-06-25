@@ -342,9 +342,9 @@ export const NewMarketPreviewStep = ({
               NUM_TOKENS_REQUIRED: initialDepositAmount,
               NATIVE_TOKEN_DENOM: chainTokenLabel,
               HERE: (
-                <$Link href={newMarketProposalLearnMore}>
+                <Link href={newMarketProposalLearnMore} isAccent isInline>
                   {stringGetter({ key: STRING_KEYS.HERE })}
-                </$Link>
+                </Link>
               ),
             },
           })}
@@ -421,9 +421,4 @@ const $ButtonRow = styled.div`
 const $Button = styled(Button)`
   --button-padding: 0;
   --button-height: auto;
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline;
 `;

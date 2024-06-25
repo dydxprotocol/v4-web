@@ -46,8 +46,6 @@ export const useStakingValidator = () => {
       currentDelegations?.map((d) => d.validator).includes(delegation)
     );
 
-    console.log('Xcxc', intersection);
-
     if (intersection.length > 0) {
       validatorOptions.push(...intersection);
     } else {
@@ -55,16 +53,6 @@ export const useStakingValidator = () => {
     }
 
     const response = await getValidators();
-
-    console.log(
-      'Xcxc',
-      response?.validators.map((v) => ({
-        name: v.description?.moniker,
-        status: v.status,
-        jailed: v.jailed,
-        address: v.operatorAddress,
-      }))
-    );
 
     // Filter out jailed and unbonded validators
     const availableValidators =

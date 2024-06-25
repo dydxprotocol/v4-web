@@ -44,9 +44,9 @@ export const RewardsHelpPanel = () => {
               key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
               params: {
                 HERE_LINK: (
-                  <$AccentLink href={tradingRewardsLearnMore}>
+                  <Link href={tradingRewardsLearnMore} isAccent isInline>
                     {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$AccentLink>
+                  </Link>
                 ),
               },
             }),
@@ -63,9 +63,9 @@ export const RewardsHelpPanel = () => {
                     key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
                     params: {
                       HERE_LINK: (
-                        <$AccentLink href={protocolStaking}>
+                        <Link href={protocolStaking} isAccent isInline>
                           {stringGetter({ key: STRING_KEYS.HERE })}
-                        </$AccentLink>
+                        </Link>
                       ),
                     },
                   }),
@@ -117,9 +117,4 @@ const $Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-const $AccentLink = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;

@@ -19,6 +19,7 @@ type ElementProps = {
 
 type StyleProps = {
   isInline?: boolean;
+  isAccent?: boolean;
   className?: string;
 };
 
@@ -31,6 +32,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       onClick,
       withIcon = false,
       isInline = false,
+      isAccent = false,
       className,
       ...props
     }: ElementProps & StyleProps,
@@ -39,6 +41,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     <$A
       ref={ref}
       isInline={isInline}
+      isAccent={isAccent}
       withIcon={withIcon}
       className={className}
       href={href}
@@ -60,7 +63,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
   )
 );
 const $A = styled.a<StyleProps & { withIcon: boolean }>`
-  --link-color: inherit;
+  --link-color: var(--color-text-1);
   color: var(--link-color);
 
   ${layoutMixins.spacedRow}
@@ -78,11 +81,24 @@ const $A = styled.a<StyleProps & { withIcon: boolean }>`
   ${({ isInline, withIcon }) =>
     isInline && withIcon
       ? css`
-          display: inline-flex;
+          ${layoutMixins.inlineRow}
+          text-decoration: underline;
         `
       : isInline
         ? css`
             display: inline;
+            text-decoration: underline;
           `
         : undefined}
+
+  ${({ isAccent }) =>
+    isAccent &&
+    css`
+      --link-color: var(--color-accent);
+      text-decoration: none;
+
+      &:visited {
+        color: var(--color-accent);
+      }
+    `}
 `;

@@ -37,12 +37,14 @@ export const NewMarketAgreementDialog = ({
             key: STRING_KEYS.NEW_MARKET_PROPOSAL_AGREEMENT,
             params: {
               DOCUMENTATION_LINK: (
-                <$Link
+                <Link
                   href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process"
                   withIcon
+                  isAccent
+                  isInline
                 >
                   {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
-                </$Link>
+                </Link>
               ),
               TERMS_OF_USE: <$TermsOfUseLink isInline />,
             },
@@ -93,12 +95,6 @@ const $Content = styled.div`
 
 const $TermsOfUseLink = styled(TermsOfUseLink)`
   --link-color: var(--color-accent);
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-flex;
-  text-decoration: underline;
 `;
 
 const $ButtonRow = styled.div`

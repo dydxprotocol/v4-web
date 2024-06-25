@@ -322,9 +322,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.BODY',
                 params: {
                   TWITTER_LINK: (
-                    <$Link href="https://twitter.com/dYdX/status/1785339109268935042">
+                    <Link
+                      href="https://twitter.com/dYdX/status/1785339109268935042"
+                      isAccent
+                      isInline
+                    >
                       {stringGetter({ key: STRING_KEYS.HERE })}
-                    </$Link>
+                    </Link>
                   ),
                 },
               }),
@@ -365,9 +369,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.BODY',
                 params: {
                   LEARN_MORE: (
-                    <$Link href={isolatedMarginLearnMore}>
+                    <Link href={isolatedMarginLearnMore} isAccent isInline>
                       {stringGetter({ key: STRING_KEYS.HERE })}
-                    </$Link>
+                    </Link>
                   ),
                 },
               }),
@@ -497,9 +501,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 MARKET_2: secondMarket,
                 DATE: outputDate,
                 HERE_LINK: (
-                  <$Link href={fetAgixMarketWindDownProposal}>
+                  <Link href={fetAgixMarketWindDownProposal} isAccent isInline>
                     {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
+                  </Link>
                 ),
               },
             }),
@@ -531,9 +535,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   MARKET_2: secondMarket,
                   DATE: outputDate,
                   HERE_LINK: (
-                    <$Link href={contractLossMechanismLearnMore}>
+                    <Link href={contractLossMechanismLearnMore} isAccent isInline>
                       {stringGetter({ key: STRING_KEYS.HERE })}
-                    </$Link>
+                    </Link>
                   ),
                 },
               }),
@@ -701,11 +705,6 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;
 
 const $Output = styled(Output)`

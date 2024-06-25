@@ -56,9 +56,9 @@ export const StakeButtonAndReceipt = ({
             key: STRING_KEYS.VALIDATORS_INFO_LINK,
             params: {
               MINTSCAN_LINK: (
-                <$Link href={mintscanValidatorsLearnMore}>
+                <Link href={mintscanValidatorsLearnMore} isInline>
                   {stringGetter({ key: STRING_KEYS.MINTSCAN })}
-                </$Link>
+                </Link>
               ),
             },
           })}
@@ -121,8 +121,3 @@ export const StakeButtonAndReceipt = ({
     />
   );
 };
-
-const $Link = styled(Link)`
-  display: inline;
-  text-decoration: underline;
-`;

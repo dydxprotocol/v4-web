@@ -165,7 +165,6 @@ const $Token = styled(Output)`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
 
   a {
     display: inline;
@@ -229,5 +228,4 @@ const $WithReceipt = styled(WithReceipt)`
 const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
 `;

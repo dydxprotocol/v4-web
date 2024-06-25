@@ -161,9 +161,9 @@ export const ValidatorDropdown = memo(
     );
 
     const slotTrigger = selectedValidator?.description?.website ? (
-      <$Link href={selectedValidator?.description?.website} withIcon>
+      <Link href={selectedValidator?.description?.website} withIcon>
         {output}
-      </$Link>
+      </Link>
     ) : (
       output
     );
@@ -218,10 +218,6 @@ const $Trigger = styled.span`
 `;
 
 const $Output = styled(Output)`
-  color: var(--color-text-1);
-`;
-
-const $Link = styled(Link)`
   color: var(--color-text-1);
 `;
 
