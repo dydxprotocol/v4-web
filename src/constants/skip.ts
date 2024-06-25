@@ -1,13 +1,13 @@
 export type RouteStatus = {
   chainId: string | undefined;
   txHash: string | undefined;
-  status: string | undefined;
+  status: 'success' | 'ongoing' | undefined;
 };
 export type SkipTransactionStatus = {
   chainData: {
     chainId: string | undefined;
     chainName: string | undefined;
-    estimatedRouteDuration?: string | undefined;
+    estimatedRouteDuration: string;
   };
   transactionId: string | undefined;
   transactionUrl: string | undefined;
