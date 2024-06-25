@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
+import { CancelPendingOrdersDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,17 +11,16 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 
 import { getNonZeroPendingPositions } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { CancelAllOrdersInMarketForm } from '../forms/CancelAllOrdersInMarketForm';
 
-type CancelAllOrdersDialogProps = {
-  setIsOpen?: (open: boolean) => void;
-  marketId: string;
-};
-
-export const CancelAllOrdersDialog = ({ setIsOpen, marketId }: CancelAllOrdersDialogProps) => {
+export const CancelAllOrdersDialog = ({
+  setIsOpen,
+  marketId,
+}: DialogProps<CancelPendingOrdersDialogProps>) => {
   const stringGetter = useStringGetter();
-  const allPending = useSelector(getNonZeroPendingPositions, shallowEqual);
+  const allPending = useAppSelector(getNonZeroPendingPositions, shallowEqual);
   const pendingPosition = useMemo(
     () => allPending?.find((p) => p.marketId === marketId),
     [allPending, marketId]

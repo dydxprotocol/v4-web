@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, RateLimitDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -9,12 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 
-type ElementProps = {
-  preventClose?: boolean;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const RateLimitDialog = ({ preventClose, setIsOpen }: ElementProps) => {
+export const RateLimitDialog = ({ preventClose, setIsOpen }: DialogProps<RateLimitDialogProps>) => {
   const stringGetter = useStringGetter();
 
   return (

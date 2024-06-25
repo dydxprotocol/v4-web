@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, UnstakeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -9,11 +10,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { UnstakeForm } from '@/views/forms/UnstakeForm';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const UnstakeDialog = ({ setIsOpen }: ElementProps) => {
+export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) => {
   const stringGetter = useStringGetter();
 
   const { chainTokenLabel } = useTokenConfigs();

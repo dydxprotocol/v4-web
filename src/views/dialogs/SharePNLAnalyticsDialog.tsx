@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
-import { AbacusPositionSides, Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
+import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { PositionSide } from '@/constants/trade';
 
@@ -27,18 +27,6 @@ import { closeDialog } from '@/state/dialogs';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
-type ElementProps = {
-  marketId: string;
-  assetId: string;
-  leverage: Nullable<number>;
-  oraclePrice: Nullable<number>;
-  entryPrice: Nullable<number>;
-  unrealizedPnlPercent: Nullable<number>;
-  side: Nullable<AbacusPositionSides>;
-  sideLabel: Nullable<string>;
-  setIsOpen: (open: boolean) => void;
-};
-
 const copyBlobToClipboard = async (blob: Blob | null) => {
   if (!blob) {
     return;
@@ -58,7 +46,7 @@ export const SharePNLAnalyticsDialog = ({
   entryPrice,
   unrealizedPnlPercent,
   setIsOpen,
-}: ElementProps) => {
+}: DialogProps<SharePNLAnalyticsDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 

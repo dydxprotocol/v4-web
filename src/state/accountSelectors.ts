@@ -27,7 +27,11 @@ import { getHydratedPositionData } from '@/lib/positions';
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getAssets } from './assetsSelectors';
-import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
+import {
+  getCurrentMarketId,
+  getCurrentMarketOrderbook,
+  getPerpetualMarkets,
+} from './perpetualsSelectors';
 
 /**
  * @param state
@@ -331,22 +335,34 @@ export const getSubaccountConditionalOrders = () =>
  * @param state
  * @returns list of orders that are in the open status
  */
-export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter((order) => order.status === AbacusOrderStatus.Open)
+export const getSubaccountOpenOrdersForCurrentMarket = createAppSelector(
+  [getSubaccountOrders, getCurrentMarketId],
+  (orders, marketId) =>
+    orders?.filter(
+      (order) =>
+        order.status === AbacusOrderStatus.Open && marketId != null && order.marketId === marketId
+    )
 );
 
-export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
-  [getSubaccountOpenStatusOrders],
-  (openOrders = []) => {
+export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
+  [getSubaccountOpenOrdersForCurrentMarket, getCurrentMarketOrderbook],
+  (openOrders = [], book = undefined) => {
+    const tickSize = book?.grouping?.tickSize;
     const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
     openOrders.forEach((order: SubaccountOrder) => {
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (orderSizeBySideAndPrice[side] ??= {});
-      if (byPrice[order.price]) {
-        byPrice[order.price] += order.size;
-      } else {
-        byPrice[order.price] = order.size;
-      }
+
+      const priceOrderbookLevel = (() => {
+        if (tickSize == null) {
+          return order.price;
+        }
+        const tickLevelUnrounded = order.price / tickSize;
+        const tickLevel =
+          side === OrderSide.BUY ? Math.floor(tickLevelUnrounded) : Math.ceil(tickLevelUnrounded);
+        return tickLevel * tickSize;
+      })();
+      byPrice[priceOrderbookLevel] = (byPrice[priceOrderbookLevel] ?? 0) + order.size;
     });
     return orderSizeBySideAndPrice;
   }

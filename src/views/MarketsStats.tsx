@@ -95,7 +95,9 @@ const $NewTag = styled(Tag)`
 `;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
-  margin-left: auto;
+  position: absolute;
+  top: 0.8125rem;
+  right: 1rem;
 
   & button {
     --button-toggle-off-backgroundColor: var(--color-layer-3);
@@ -108,11 +110,10 @@ const $ToggleGroupContainer = styled.div`
 `;
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
+  position: relative;
 
-  justify-content: space-between;
-  padding: 0.5rem 1.5rem;
-  gap: 0.375rem;
-  height: 2.5rem;
+  padding: 1rem 1.5rem;
+  gap: 0.25rem;
 
   & h4 {
     font: var(--font-base-medium);

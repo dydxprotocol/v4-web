@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
@@ -24,11 +25,15 @@ import {
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
+import { generateFadedColorVariant } from '@/lib/styles';
+
+import { useLocaleSeparators } from '../useLocaleSeparators';
 
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
   histogramRange: number;
   side: PerpetualMarketOrderbookLevel['side'];
+  displayUnit: 'fiat' | 'asset';
 };
 
 type StyleProps = {
@@ -48,10 +53,14 @@ export const useDrawOrderbook = ({
   histogramRange,
   histogramSide,
   side,
+  displayUnit,
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
   const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
+  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
+    useLocaleSeparators();
+
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
@@ -62,6 +71,7 @@ export const useDrawOrderbook = ({
   const [canvasWidth, setCanvasWidth] = useState(ORDERBOOK_WIDTH / ratio);
   const [canvasHeight, setCanvasHeight] = useState(ORDERBOOK_HEIGHT / ratio);
 
+  // Handle resize, sync to state
   useEffect(() => {
     const scaleCanvas = () => {
       if (!canvas) return;
@@ -109,8 +119,13 @@ export const useDrawOrderbook = ({
 
     // X values
     const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
+    // log scale to better show relative differences on orderbooks with large orders far from mid
+    const modifierFn = (num: number) => Math.log(1 + num);
     const barWidth = depthOrSizeValue
-      ? Math.min((depthOrSizeValue / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
+      ? Math.min(
+          (modifierFn(depthOrSizeValue) / modifierFn(histogramRange)) * maxHistogramBarWidth,
+          maxHistogramBarWidth
+        )
       : 0;
 
     const { gradient, bar } = getHistogramXValues({
@@ -152,19 +167,34 @@ export const useDrawOrderbook = ({
     ctx.fill();
   };
 
+  const drawMineCircle = ({ ctx, rekt }: { ctx: CanvasRenderingContext2D; rekt: Rekt }) => {
+    const padding = 15;
+    ctx.beginPath();
+    ctx.arc(rekt.x1 + padding, (rekt.y1 + rekt.y2) / 2, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = theme.accent;
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = generateFadedColorVariant(theme.accent, '73');
+    ctx.stroke();
+  };
+
   const drawText = ({
     animationType = OrderbookRowAnimationType.NONE,
     ctx,
-    mine,
+    depth,
+    depthCost,
     price,
     size,
+    sizeCost,
     rekt,
   }: {
     animationType?: OrderbookRowAnimationType;
     ctx: CanvasRenderingContext2D;
-    mine?: number;
+    depth?: number;
+    depthCost?: number;
     price?: number;
     size?: number;
+    sizeCost?: number;
     rekt: Rekt;
   }) => {
     const { y1 } = rekt;
@@ -192,31 +222,56 @@ export const useDrawOrderbook = ({
       }
     }
 
-    // Size text
-    if (size) {
-      ctx.fillStyle = updatedTextColor ?? textColor;
+    const format = {
+      decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+      ...{
+        groupSeparator: LOCALE_GROUP_SEPARATOR,
+        groupSize: 3,
+        secondaryGroupSize: 0,
+        fractionGroupSeparator: ' ',
+        fractionGroupSize: 0,
+      },
+    };
+
+    // Price text
+    if (price != null) {
+      ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        MustBigNumber(price).toFormat(
+          tickSizeDecimals ?? SMALL_USD_DECIMALS,
+          BigNumber.ROUND_HALF_UP,
+          {
+            ...format,
+          }
+        ),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
-    // Price text
-    if (price) {
-      ctx.fillStyle = textColor;
+    const decimalPlaces = displayUnit === 'asset' ? stepSizeDecimals ?? TOKEN_DECIMALS : 0;
+
+    // Size text
+    const displaySize = displayUnit === 'asset' ? size : sizeCost;
+    if (displaySize != null) {
+      ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
-        MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+        MustBigNumber(displaySize).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
+          ...format,
+        }),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
-    // Mine text
-    if (mine) {
+    // Depth text
+    const displayDepth = displayUnit === 'asset' ? depth : depthCost;
+    if (displayDepth != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        MustBigNumber(displayDepth).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
+          ...format,
+        }),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
@@ -235,7 +290,7 @@ export const useDrawOrderbook = ({
     animationType?: OrderbookRowAnimationType;
   }) => {
     if (!rowToRender) return;
-    const { depth, mine, price, size } = rowToRender;
+    const { depth, mine, price, size, depthCost, sizeCost } = rowToRender;
     const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
     const rekt = getRektFromIdx({
       idx,
@@ -269,11 +324,17 @@ export const useDrawOrderbook = ({
       rekt,
     });
 
+    if (mine && mine > 0) {
+      drawMineCircle({ ctx, rekt });
+    }
+
     // Size, Price, Mine
     drawText({
       animationType,
       ctx,
-      mine,
+      depth: depth ?? undefined,
+      depthCost,
+      sizeCost,
       price,
       size,
       rekt,
@@ -324,6 +385,7 @@ export const useDrawOrderbook = ({
     side,
     theme,
     currentOrderbookMap,
+    displayUnit,
   ]);
 
   return { canvasRef };

@@ -78,12 +78,11 @@ const Profile = () => {
       icon: { iconName: IconName.Deposit },
       onClick: () => {
         dispatch(
-          openDialog({
-            type: DialogTypes.ManageFunds,
-            dialogProps: {
+          openDialog(
+            DialogTypes.ManageFunds({
               selectedTransferType: TransferType.deposit.rawValue,
-            },
-          })
+            })
+          )
         );
       },
     },
@@ -93,12 +92,11 @@ const Profile = () => {
       icon: { iconName: IconName.Withdraw },
       onClick: () => {
         dispatch(
-          openDialog({
-            type: DialogTypes.ManageFunds,
-            dialogProps: {
+          openDialog(
+            DialogTypes.ManageFunds({
               selectedTransferType: TransferType.withdrawal.rawValue,
-            },
-          })
+            })
+          )
         );
       },
     },
@@ -108,12 +106,11 @@ const Profile = () => {
       icon: { iconName: IconName.Send },
       onClick: () => {
         dispatch(
-          openDialog({
-            type: DialogTypes.ManageFunds,
-            dialogProps: {
+          openDialog(
+            DialogTypes.ManageFunds({
               selectedTransferType: TransferType.transferOut.rawValue,
-            },
-          })
+            })
+          )
         );
       },
     },
@@ -123,7 +120,7 @@ const Profile = () => {
           label: stringGetter({ key: STRING_KEYS.SIGN_OUT }),
           icon: { iconName: IconName.Close },
           onClick: () => {
-            dispatch(openDialog({ type: DialogTypes.DisconnectWallet }));
+            dispatch(openDialog(DialogTypes.DisconnectWallet()));
           },
         }
       : {
@@ -131,7 +128,7 @@ const Profile = () => {
           label: stringGetter({ key: STRING_KEYS.CONNECT }),
           icon: { iconName: IconName.Transfer },
           onClick: () => {
-            dispatch(openDialog({ type: DialogTypes.Onboarding }));
+            dispatch(openDialog(DialogTypes.Onboarding()));
           },
         },
   ].filter(isTruthy);
@@ -188,7 +185,7 @@ const Profile = () => {
             {stringGetter({ key: STRING_KEYS.HELP })}
           </$InlineRow>
         }
-        onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+        onClick={() => dispatch(openDialog(DialogTypes.Help()))}
       />
 
       <$MigratePanel />

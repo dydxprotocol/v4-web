@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import styled from 'styled-components';
 
+import { DialogProps, HelpDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuConfig } from '@/constants/menus';
 
@@ -15,14 +16,10 @@ import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
 const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
 const latestVersion = import.meta.env.VITE_LAST_TAG;
 
-export const HelpDialog = ({ setIsOpen }: ElementProps) => {
+export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
   const stringGetter = useStringGetter();
   const { help: helpCenter, community } = useURLConfigs();
 

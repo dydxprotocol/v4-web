@@ -7,6 +7,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from './Link';
 
+const URL_START = 'https://';
+
 export const ValidatorFaviconIcon = ({
   className,
   url,
@@ -17,24 +19,29 @@ export const ValidatorFaviconIcon = ({
   fallbackText?: string;
 }) => {
   const [iconFail, setIconFail] = useState<boolean>(false);
+  const fallback = fallbackText ? (
+    <$IconContainer className={className}>{fallbackText.charAt(0)}</$IconContainer>
+  ) : null;
 
   if (url && !iconFail) {
-    const parsedUrl = new URL(url);
-    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-    return (
-      <$Img
-        className={className}
-        src={`${baseUrl}/favicon.ico`}
-        alt="validator favicon"
-        onError={() => setIconFail(true)}
-      />
-    );
-  }
-  if (fallbackText) {
-    return <$IconContainer className={className}>{fallbackText.charAt(0)}</$IconContainer>;
+    try {
+      const parsedUrl = url.startsWith(URL_START) ? new URL(url) : new URL(`${URL_START}${url}`);
+      const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+
+      return (
+        <$Img
+          className={className}
+          src={`${baseUrl}/favicon.ico`}
+          alt="validator favicon"
+          onError={() => setIconFail(true)}
+        />
+      );
+    } catch (error) {
+      return fallback;
+    }
   }
 
-  return null;
+  return fallback;
 };
 
 export const ValidatorName = ({ validator }: { validator?: Validator }) => {

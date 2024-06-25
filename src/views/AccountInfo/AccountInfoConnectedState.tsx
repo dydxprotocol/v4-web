@@ -84,7 +84,7 @@ export const AccountInfoConnectedState = () => {
           <$TransferButtons>
             <$Button
               state={{ isDisabled: !dydxAccounts }}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+              onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
               shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
             >
@@ -94,7 +94,7 @@ export const AccountInfoConnectedState = () => {
               <>
                 <$Button
                   state={{ isDisabled: !dydxAccounts }}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
                   shape={ButtonShape.Rectangle}
                   size={ButtonSize.XSmall}
                 >
@@ -106,10 +106,7 @@ export const AccountInfoConnectedState = () => {
                     iconName={IconName.Send}
                     onClick={() =>
                       dispatch(
-                        openDialog({
-                          type: DialogTypes.Transfer,
-                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
-                        })
+                        openDialog(DialogTypes.Transfer({ selectedAsset: DydxChainAsset.USDC }))
                       )
                     }
                   />
@@ -123,7 +120,7 @@ export const AccountInfoConnectedState = () => {
         {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <$CornerButton
             state={{ isDisabled: !dydxAccounts }}
-            onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
           >
             <$CircleContainer>
               <Icon iconName={IconName.Transfer} />

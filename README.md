@@ -176,6 +176,37 @@ Then run `pnpm install`
 
 **Remember to revert to remote abacus before making a PR.**
 
+# Local Localization (l10n) Development
+
+## Directory structure
+
+Our tooling assumes that the [v4-localization repo](https://github.com/dydxprotocol/v4-localization) is checked out alongside v4-web:
+
+```
+--- parent folder
+ |___ v4-web
+ |___ v4-localization
+```
+
+## Using your local v4-localization repo
+
+When you want to begin developing in v4-localization:
+**kill your dev server first** then use the following command:
+
+```
+pnpm run install-local-l10n
+```
+
+## Reverting to remote localization
+
+You'll need to unlink your local localization package with the following command:
+
+```
+pnpm run remove-local-l10n
+```
+
+Unlike with abacus, you will need to **restart your dev server** to see the revert take effect.
+
 # Deployments
 
 ## Deploying with Vercel

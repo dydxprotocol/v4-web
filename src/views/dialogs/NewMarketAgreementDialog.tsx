@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
+import { DialogProps, NewMarketAgreementDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
@@ -16,12 +17,10 @@ import { Checkbox } from '@/components/Checkbox';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 
-type ElementProps = {
-  acceptTerms: () => void;
-  setIsOpen: (open: boolean) => void;
-};
-
-export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProps) => {
+export const NewMarketAgreementDialog = ({
+  acceptTerms,
+  setIsOpen,
+}: DialogProps<NewMarketAgreementDialogProps>) => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
 
   const stringGetter = useStringGetter();

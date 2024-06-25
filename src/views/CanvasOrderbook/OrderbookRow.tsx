@@ -16,13 +16,14 @@ import { getCurrentMarketMidMarketPriceWithOraclePriceFallback } from '@/state/p
 
 type StyleProps = {
   side?: 'top' | 'bottom';
+  isHeader?: boolean;
 };
 
 type ElementProps = {
   tickSizeDecimals?: Nullable<number>;
 };
 
-export const OrderbookRow = styled.div`
+export const OrderbookRow = styled.div<{ isHeader?: boolean }>`
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -36,24 +37,34 @@ export const OrderbookRow = styled.div`
     flex: 1 1 0%;
     text-align: right;
   }
+
+  ${({ isHeader }) =>
+    isHeader
+      ? `
+  padding-left: 2rem;
+  gap: 2rem;
+  > span {
+    flex: 0 0 0%;
+  }
+  `
+      : ``}
 `;
 
 export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
-  ({ side, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
+  ({ side, isHeader, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
     const stringGetter = useStringGetter();
     const orderbookMidMarketPrice = useAppSelector(
       getCurrentMarketMidMarketPriceWithOraclePriceFallback
     );
 
     return (
-      <$OrderbookMiddleRow ref={ref} side={side}>
+      <$OrderbookMiddleRow ref={ref} side={side} isHeader={isHeader}>
         <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
         <$PriceOutputSpan>
           <$Output
             type={OutputType.Number}
             value={orderbookMidMarketPrice}
             fractionDigits={tickSizeDecimals}
-            useGrouping={false}
           />
         </$PriceOutputSpan>
         <span /> {/* Empty cell */}
