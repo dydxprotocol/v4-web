@@ -12,6 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 type ElementProps = {
   onClose?: () => void;
@@ -34,11 +35,7 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
         {stringGetter({
           key: STRING_KEYS.TOS_TITLE,
           params: {
-            TERMS_LINK: (
-              <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
-                {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-              </$Link>
-            ),
+            TERMS_LINK: <TermsOfUseLink isInline />,
             PRIVACY_POLICY_LINK: (
               <$Link href={`${BASE_ROUTE}${AppRoute.Privacy}`}>
                 {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}

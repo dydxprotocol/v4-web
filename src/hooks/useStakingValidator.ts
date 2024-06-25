@@ -46,6 +46,8 @@ export const useStakingValidator = () => {
       currentDelegations?.map((d) => d.validator).includes(delegation)
     );
 
+    console.log('Xcxc', intersection);
+
     if (intersection.length > 0) {
       validatorOptions.push(...intersection);
     } else {
@@ -53,6 +55,16 @@ export const useStakingValidator = () => {
     }
 
     const response = await getValidators();
+
+    console.log(
+      'Xcxc',
+      response?.validators.map((v) => ({
+        name: v.description?.moniker,
+        status: v.status,
+        jailed: v.jailed,
+        address: v.operatorAddress,
+      }))
+    );
 
     // Filter out jailed and unbonded validators
     const availableValidators =
@@ -92,7 +104,9 @@ export const useStakingValidator = () => {
 
     // Set the default validator to be the validator with the fewest tokens, selected from validators configured in the whitelist
     const whitelistedValidators = response?.validators.filter((validator) =>
-      validatorOptions.includes(validator.operatorAddress.toLowerCase())
+      availableValidators
+        .map((val) => val.operatorAddress.toLowerCase())
+        .includes(validator.operatorAddress.toLowerCase())
     );
 
     const validatorWithFewestTokens = (whitelistedValidators ?? availableValidators ?? []).reduce(
