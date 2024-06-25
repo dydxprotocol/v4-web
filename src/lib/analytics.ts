@@ -2,42 +2,34 @@ import {
   customIdentifyEvent,
   customTrackEvent,
   type AnalyticsEvent,
-  type AnalyticsEventData,
   type AnalyticsUserProperty,
-  type AnalyticsUserPropertyValue,
 } from '@/constants/analytics';
 
 import { testFlags } from './testFlags';
 
 const DEBUG_ANALYTICS = false;
 
-export const identify = <T extends AnalyticsUserProperty>(
-  property: T,
-  propertyValue: AnalyticsUserPropertyValue<T>
-) => {
+export const identify = (property: AnalyticsUserProperty) => {
   if (DEBUG_ANALYTICS) {
     // eslint-disable-next-line no-console
-    console.log(`[Analytics:Identify] ${property}`, propertyValue);
+    console.log(`[Analytics:Identify] ${property.type}`, property.payload);
   }
 
   const customEvent = customIdentifyEvent({
-    detail: { property, propertyValue },
+    detail: { property: property.type, propertyValue: property.payload },
   });
 
   globalThis.dispatchEvent(customEvent);
 };
 
-export const track = <T extends AnalyticsEvent>(
-  eventType: T,
-  eventData?: AnalyticsEventData<T>
-) => {
-  const eventDataWithReferrer = { ...(eventData ?? {}), referrer: testFlags.referrer };
+export const track = (event: AnalyticsEvent) => {
+  const eventDataWithReferrer = { ...(event.payload ?? {}), referrer: testFlags.referrer };
   if (DEBUG_ANALYTICS) {
     // eslint-disable-next-line no-console
-    console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
+    console.log(`[Analytics] ${event.type}`, eventDataWithReferrer);
   }
   const customEvent = customTrackEvent({
-    detail: { eventType, eventData: eventDataWithReferrer },
+    detail: { eventType: event.type, eventData: eventDataWithReferrer },
   });
 
   globalThis.dispatchEvent(customEvent);

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, WithdrawDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -10,11 +11,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
-export const WithdrawDialog = ({ setIsOpen }: ElementProps) => {
+export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 

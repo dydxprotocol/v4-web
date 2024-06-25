@@ -79,7 +79,7 @@ export const StakeRewardButtonAndReceipt = ({
   const [errorToDisplay, setErrorToDisplay] = useState(alert);
 
   const depositFunds = useCallback(
-    () => dispatch(forceOpenDialog({ type: DialogTypes.Deposit })),
+    () => dispatch(forceOpenDialog(DialogTypes.Deposit())),
     [dispatch]
   );
 

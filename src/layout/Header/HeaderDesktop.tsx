@@ -107,7 +107,7 @@ export const HeaderDesktop = () => {
               slotBefore: <Icon iconName={IconName.HelpCircle} />,
               label: stringGetter({ key: STRING_KEYS.HELP }),
               onClick: () => {
-                dispatch(openDialog({ type: DialogTypes.Help }));
+                dispatch(openDialog(DialogTypes.Help()));
               },
             },
             {
@@ -146,7 +146,7 @@ export const HeaderDesktop = () => {
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
-          onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+          onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         />
 
         <VerticalSeparator />

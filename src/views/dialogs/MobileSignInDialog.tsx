@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogProps, MobileSignInDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -20,10 +21,6 @@ import { TimeoutButton } from '@/components/TimeoutButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { log } from '@/lib/telemetry';
-
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
 
 enum MobileSignInState {
   Waiting = 'Waiting',
@@ -67,7 +64,7 @@ const MobileQrCode = ({
   );
 };
 
-export const MobileSignInDialog = ({ setIsOpen }: ElementProps) => {
+export const MobileSignInDialog = ({ setIsOpen }: DialogProps<MobileSignInDialogProps>) => {
   const [currentState, setCurrentState] = useState(MobileSignInState.Waiting);
   const [isScanning, setIsScanning] = useState(false);
   const stringGetter = useStringGetter();

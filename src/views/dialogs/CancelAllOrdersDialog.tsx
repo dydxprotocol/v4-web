@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
+import { CancelPendingOrdersDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -13,12 +14,10 @@ import { getNonZeroPendingPositions } from '@/state/accountSelectors';
 
 import { CancelAllOrdersInMarketForm } from '../forms/CancelAllOrdersInMarketForm';
 
-type CancelAllOrdersDialogProps = {
-  setIsOpen?: (open: boolean) => void;
-  marketId: string;
-};
-
-export const CancelAllOrdersDialog = ({ setIsOpen, marketId }: CancelAllOrdersDialogProps) => {
+export const CancelAllOrdersDialog = ({
+  setIsOpen,
+  marketId,
+}: DialogProps<CancelPendingOrdersDialogProps>) => {
   const stringGetter = useStringGetter();
   const allPending = useSelector(getNonZeroPendingPositions, shallowEqual);
   const pendingPosition = useMemo(

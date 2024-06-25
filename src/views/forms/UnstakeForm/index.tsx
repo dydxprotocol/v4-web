@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -128,11 +128,13 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
       const tx = await undelegate(amounts);
       const txHash = hashFromTx(tx.hash);
 
-      track(AnalyticsEvent.UnstakeTransaction, {
-        txHash,
-        amount: totalAmount,
-        validatorAddresses: Object.keys(amounts),
-      });
+      track(
+        AnalyticsEvents.UnstakeTransaction({
+          txHash,
+          amount: totalAmount,
+          validatorAddresses: Object.keys(amounts),
+        })
+      );
       onDone?.();
     } catch (err) {
       log('UnstakeForm/onUnstake', err);
@@ -149,10 +151,12 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const debouncedChangeTrack = useMemo(
     () =>
       debounce((amount: number | undefined, validator: string) => {
-        track(AnalyticsEvent.UnstakeInput, {
-          amount,
-          validatorAddress: validator,
-        });
+        track(
+          AnalyticsEvents.UnstakeInput({
+            amount,
+            validatorAddress: validator,
+          })
+        );
       }, 1000),
     []
   );

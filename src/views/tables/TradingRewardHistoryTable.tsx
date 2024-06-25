@@ -129,7 +129,7 @@ export const TradingRewardHistoryTable = ({
     })
   );
 
-  const getRowKey = useCallback((row: any) => row.startedAtInMilliseconds, []);
+  const getRowKey = useCallback((row: HistoricalTradingReward) => row.startedAtInMilliseconds, []);
 
   return (
     <$Table

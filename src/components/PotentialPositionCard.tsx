@@ -32,7 +32,7 @@ export const PotentialPositionCard = ({
   const dispatch = useAppDispatch();
   const onCancelOrders = useCallback(
     (marketId: string) => {
-      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
+      dispatch(openDialog(DialogTypes.CancelPendingOrders({ marketId })));
     },
     [dispatch]
   );
