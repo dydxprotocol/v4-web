@@ -10,6 +10,7 @@ import { OnboardingState } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -18,6 +19,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Link } from '@/components/Link';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
@@ -180,7 +182,14 @@ export const AccountDetailsAndHistory = () => {
         slotEmpty={
           <$EmptyChart>
             {complianceState === ComplianceStates.READ_ONLY ? (
-              <$EmptyCard>{stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}</$EmptyCard>
+              <$EmptyCard>
+                {stringGetter({
+                  key: STRING_KEYS.BLOCKED_MESSAGE,
+                  params: {
+                    TERMS_OF_USE_LINK: <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon />,
+                  },
+                })}
+              </$EmptyCard>
             ) : onboardingState !== OnboardingState.AccountConnected ? (
               <$EmptyCard>
                 <p>
