@@ -98,6 +98,7 @@ const $ToggleGroupContainer = styled.div`
   position: absolute;
   top: 0.8125rem;
   right: 1rem;
+  z-index: 2;
 
   & button {
     --button-toggle-off-backgroundColor: var(--color-layer-3);
@@ -112,7 +113,7 @@ const $SectionHeader = styled.div`
   ${layoutMixins.row}
   position: relative;
 
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.5rem 0;
   gap: 0.25rem;
 
   & h4 {
