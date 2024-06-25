@@ -29,6 +29,7 @@ import { WalletType, type EvmAddress } from '@/constants/wallets';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -131,13 +132,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [slippage, setSlippage] = useState(isCctp || isKeplrWallet ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
-  const { usdcLabel } = useTokenConfigs();
+  const { usdcLabel, usdcDecimals } = useTokenConfigs();
+  const { nobleValidator } = useEndpointsConfig();
 
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
     isCosmosChain: isKeplrWallet,
+    cosmosAddress: isKeplrWallet ? nobleAddress : undefined,
+    rpc: isKeplrWallet ? nobleValidator : undefined,
+    decimals: isKeplrWallet ? usdcDecimals : undefined,
   });
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
