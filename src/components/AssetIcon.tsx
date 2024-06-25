@@ -652,8 +652,15 @@ const assetIcons = {
   ZIL: '/currencies/zil.png',
   ZK: '/currencies/zk.png',
   ZKF: '/currencies/zkf.png',
+  ZRO: '/currencies/zro.png',
   ZRX: '/currencies/zrx.png',
 } as const;
+
+const Placeholder = ({ className, symbol }: { className?: string; symbol: string }) => (
+  <$Placeholder className={className}>
+    <span>{symbol[0]}</span>
+  </$Placeholder>
+);
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
   symbol != null && Object.hasOwn(assetIcons, symbol);
@@ -664,15 +671,32 @@ export const AssetIcon = ({
 }: {
   symbol?: Nullable<string>;
   className?: string;
-}) => (
-  <$Img
-    src={isAssetSymbol(symbol) ? assetIcons[symbol] : '/currencies/unavailable.png'}
-    className={className}
-    alt={symbol ?? undefined}
-  />
-);
+}) =>
+  isAssetSymbol(symbol) ? (
+    <$Img src={assetIcons[symbol]} className={className} alt={symbol} />
+  ) : (
+    <Placeholder className={className} symbol={symbol ?? ''} />
+  );
+
 const $Img = styled.img`
   width: auto;
   height: 1em;
   border-radius: 50%;
+`;
+
+const $Placeholder = styled.div`
+  background-color: var(--color-layer-5);
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  overflow: hidden;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0.5em;
+  }
 `;
