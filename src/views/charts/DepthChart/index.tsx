@@ -30,7 +30,7 @@ import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookV
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-import { OutputType } from '@/components/Output';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
@@ -55,11 +55,12 @@ const lerp = (percent: number, from: number, to: number) => from + percent * (to
 const formatNumber = (n: number, selectedLocale: string, isCompact: boolean = n >= 10000) => {
   const formattedNumber = Intl.NumberFormat(selectedLocale).format(n);
 
-  const compactNumber = Intl.NumberFormat(selectedLocale, {
-    compactDisplay: 'short',
-    notation: 'compact',
-    minimumSignificantDigits: 2,
-  }).format(n);
+  const compactNumber = formatNumberOutput(
+    n,
+    OutputType.CompactNumber,
+    { decimalSeparator: undefined, groupSeparator: undefined },
+    { locale: selectedLocale }
+  );
 
   return isCompact && compactNumber.length < formattedNumber.length
     ? compactNumber

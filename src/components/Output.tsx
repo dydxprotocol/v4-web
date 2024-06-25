@@ -41,8 +41,10 @@ export function formatDateOutput(
   selectedLocale: SupportedLocales,
   {
     useUTC,
+    dateFormat,
   }: {
     useUTC?: boolean;
+    dateFormat?: 'full' | 'long' | 'medium' | 'short' | undefined;
   }
 ) {
   if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
@@ -53,7 +55,7 @@ export function formatDateOutput(
       timeZone: useUTC ? 'UTC' : undefined,
     }),
     [OutputType.DateTime]: date.toLocaleString(selectedLocale, {
-      dateStyle: 'short',
+      dateStyle: dateFormat ?? 'short',
       timeStyle: 'short',
       timeZone: useUTC ? 'UTC' : undefined,
     }),
@@ -254,6 +256,9 @@ type ElementProps = {
   timeOptions?: {
     useUTC?: boolean;
   };
+  dateOptions?: {
+    format?: 'full' | 'long' | 'medium' | 'short' | undefined;
+  };
   tag?: React.ReactNode;
   withParentheses?: boolean;
   locale?: string;
@@ -282,6 +287,7 @@ export const Output = ({
     format: 'singleCharacter',
   },
   timeOptions,
+  dateOptions,
   tag,
   withParentheses,
   locale = navigator.language || 'en-US',
@@ -360,6 +366,7 @@ export const Output = ({
       if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
       const dateString = formatDateOutput(value, type, selectedLocale, {
         useUTC: timeOptions?.useUTC,
+        dateFormat: dateOptions?.format,
       });
 
       return (

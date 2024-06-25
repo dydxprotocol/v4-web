@@ -8,6 +8,8 @@ import { isMainnet } from '@/constants/networks';
 
 import { LinkOutIcon } from '@/icons';
 
+import { OutputType, formatDateOutput } from '@/components/Output';
+
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -52,9 +54,8 @@ export const useComplianceState = () => {
       key: STRING_KEYS.CLOSE_ONLY_MESSAGE,
       params: {
         DATE: updatedAtDate
-          ? updatedAtDate.toLocaleString(selectedLocale, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
+          ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, selectedLocale, {
+              dateFormat: 'medium',
             })
           : undefined,
         EMAIL: complianceSupportEmail,

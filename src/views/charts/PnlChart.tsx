@@ -16,6 +16,7 @@ import { timeUnits } from '@/constants/time';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
 
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
@@ -251,14 +252,12 @@ export const PnlChart = ({
 
   const tickFormatY = useCallback(
     (value: number) =>
-      new Intl.NumberFormat(selectedLocale, {
-        style: 'currency',
-        currency: 'USD',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      })
-        .format(Math.abs(value))
-        .toLowerCase(),
+      formatNumberOutput(
+        value,
+        OutputType.CompactFiat,
+        { decimalSeparator: undefined, groupSeparator: undefined },
+        { locale: selectedLocale }
+      ),
     [selectedLocale]
   );
 
