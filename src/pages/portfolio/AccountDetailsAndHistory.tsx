@@ -10,6 +10,7 @@ import { OnboardingState } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -18,6 +19,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Link } from '@/components/Link';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
@@ -180,7 +182,18 @@ export const AccountDetailsAndHistory = () => {
         slotEmpty={
           <$EmptyChart>
             {complianceState === ComplianceStates.READ_ONLY ? (
-              <$EmptyCard>{stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}</$EmptyCard>
+              <$Card>
+                {stringGetter({
+                  key: STRING_KEYS.BLOCKED_MESSAGE,
+                  params: {
+                    TERMS_OF_USE_LINK: (
+                      <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon>
+                        {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+                      </$Link>
+                    ),
+                  },
+                })}
+              </$Card>
             ) : onboardingState !== OnboardingState.AccountConnected ? (
               <$EmptyCard>
                 <p>
@@ -293,21 +306,28 @@ const $EmptyChart = styled.div`
   cursor: default;
 `;
 
-const $EmptyCard = styled.div`
-  width: 16.75rem;
-
-  ${layoutMixins.column};
-  font: var(--font-base-book);
-  gap: 1rem;
-
+const $Card = styled.div`
   padding: 1.25rem;
   margin: auto;
   background-color: var(--color-layer-3);
   border-radius: 0.5rem;
-  text-align: center;
   justify-items: center;
+  width: 16.75rem;
+  font: var(--font-base-book);
+`;
+
+const $EmptyCard = styled($Card)`
+  ${layoutMixins.column};
+
+  display: grid;
+  gap: 1rem;
 
   button {
     width: fit-content;
   }
+`;
+
+const $Link = styled(Link)`
+  ${layoutMixins.inlineRow};
+  text-decoration: underline;
 `;
