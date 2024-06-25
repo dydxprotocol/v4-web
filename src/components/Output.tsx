@@ -35,16 +35,14 @@ import { LoadingOutput } from './Loading/LoadingOutput';
 import { NumberValue } from './NumberValue';
 
 // see useFormattedDateOutput for how to get selectedLocale in app
-function formatDateOutput(
+export function formatDateOutput(
   value: string | number | null | undefined,
   type: OutputType.Date | OutputType.DateTime | OutputType.Time,
   selectedLocale: SupportedLocales,
   {
-    timeOptions,
+    useUTC,
   }: {
-    timeOptions?: {
-      useUTC?: boolean;
-    };
+    useUTC?: boolean;
   }
 ) {
   if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
@@ -52,19 +50,19 @@ function formatDateOutput(
   const dateString = {
     [OutputType.Date]: date.toLocaleString(selectedLocale, {
       dateStyle: 'medium',
-      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+      timeZone: useUTC ? 'UTC' : undefined,
     }),
     [OutputType.DateTime]: date.toLocaleString(selectedLocale, {
       dateStyle: 'short',
       timeStyle: 'short',
-      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+      timeZone: useUTC ? 'UTC' : undefined,
     }),
     [OutputType.Time]: date.toLocaleString(selectedLocale, {
       hour12: false,
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+      timeZone: useUTC ? 'UTC' : undefined,
     }),
   }[type];
   return dateString;
@@ -76,12 +74,12 @@ type RemoveArgsFromTupleForFormatDate<T> = T extends [...infer begin, unknown, i
 
 type FormatDateHookArgs = RemoveArgsFromTupleForFormatDate<Parameters<typeof formatDateOutput>>;
 
-function useFormattedDateOutput(...args: FormatDateHookArgs) {
+export function useFormattedDateOutput(...args: FormatDateHookArgs) {
   const selectedLocale = useAppSelector(getSelectedLocale);
   return formatDateOutput(args[0], args[1], selectedLocale, args[2]);
 }
 
-function formatNumberOutput(
+export function formatNumberOutput(
   value: BigNumberish | null | undefined,
   type:
     | OutputType.CompactNumber
@@ -93,8 +91,12 @@ function formatNumberOutput(
     | OutputType.Percent
     | OutputType.SmallPercent
     | OutputType.Multiple,
-  decimalSeparator: string | undefined,
-  groupSeparator: string | undefined,
+  // required args
+  {
+    decimalSeparator,
+    groupSeparator,
+  }: { decimalSeparator: string | undefined; groupSeparator: string | undefined },
+  // optional args
   {
     useGrouping = true,
     roundingMode = BigNumber.ROUND_HALF_UP,
@@ -186,15 +188,10 @@ function formatNumberOutput(
     [OutputType.Multiple]: () => getFormattedVal(valueBN, LEVERAGE_DECIMALS, { suffix: '×' }),
   };
 
-  return `${sign ?? ''}${numberRenderers[type]}`;
+  return `${sign ?? ''}${numberRenderers[type]()}`;
 }
 
-type RemoveArgsFromTupleForFormatNumber<T> = T extends [
-  ...infer begin,
-  unknown,
-  unknown,
-  infer options,
-]
+type RemoveArgsFromTupleForFormatNumber<T> = T extends [...infer begin, unknown, infer options]
   ? [...begin, options]
   : never;
 
@@ -202,16 +199,9 @@ type FormatNumberHookArgs = RemoveArgsFromTupleForFormatNumber<
   Parameters<typeof formatNumberOutput>
 >;
 
-function useFormattedNumberOutput(...args: FormatNumberHookArgs) {
-  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
-    useLocaleSeparators();
-  return formatNumberOutput(
-    args[0],
-    args[1],
-    LOCALE_DECIMAL_SEPARATOR,
-    LOCALE_GROUP_SEPARATOR,
-    args[2]
-  );
+export function useFormattedNumberOutput(...args: FormatNumberHookArgs) {
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  return formatNumberOutput(args[0], args[1], { decimalSeparator, groupSeparator }, args[2]);
 }
 
 export enum OutputType {
@@ -368,7 +358,9 @@ export const Output = ({
     case OutputType.Time:
     case OutputType.DateTime: {
       if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
-      const dateString = formatDateOutput(value, type, selectedLocale, { timeOptions });
+      const dateString = formatDateOutput(value, type, selectedLocale, {
+        useUTC: timeOptions?.useUTC,
+      });
 
       return (
         <$Text key={value} title={`${value ?? ''}${tag ? ` ${tag}` : ''}`} className={className}>
@@ -397,14 +389,19 @@ export const Output = ({
 
       const renderedNumber = (
         <NumberValue
-          value={formatNumberOutput(value, type, LOCALE_DECIMAL_SEPARATOR, LOCALE_GROUP_SEPARATOR, {
-            useGrouping,
-            fractionDigits,
-            minimumFractionDigits,
-            locale,
-            roundingMode,
-            showSign: ShowSign.None,
-          })}
+          value={formatNumberOutput(
+            value,
+            type,
+            { decimalSeparator: LOCALE_DECIMAL_SEPARATOR, groupSeparator: LOCALE_GROUP_SEPARATOR },
+            {
+              useGrouping,
+              fractionDigits,
+              minimumFractionDigits,
+              locale,
+              roundingMode,
+              showSign: ShowSign.None,
+            }
+          )}
           withSubscript={withSubscript}
         />
       );
