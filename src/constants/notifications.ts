@@ -1,5 +1,7 @@
 import { StatusResponse } from '@0xsquid/sdk';
 
+import { SkipStatusResponse } from './skip';
+
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
@@ -178,9 +180,10 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   isCctp?: boolean;
   errorCount?: number;
-  status?: StatusResponse;
+  status?: StatusResponse | SkipStatusResponse;
   isExchange?: boolean;
   requestId?: string;
+  tracked?: boolean;
 };
 
 export enum ReleaseUpdateNotificationIds {

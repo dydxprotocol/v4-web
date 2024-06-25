@@ -9,8 +9,9 @@ import type { TransferNotifcation } from '@/constants/notifications';
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { track } from '@/lib/analytics';
-import { fetchSquidStatus, STATUS_ERROR_GRACE_PERIOD } from '@/lib/squid';
+import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/lib/squid';
 
+import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
 
 const LocalNotificationsContext = createContext<
@@ -29,6 +30,7 @@ const TRANSFER_STATUS_FETCH_INTERVAL = 10_000;
 const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
+  const { skip } = useEndpointsConfig();
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
     version: string;
@@ -109,6 +111,7 @@ const useLocalNotificationsContext = () => {
               status: currentStatus,
               isExchange,
               requestId,
+              tracked,
             } = transferNotification;
 
             const hasErrors =
@@ -124,16 +127,28 @@ const useLocalNotificationsContext = () => {
                 currentStatus?.squidTransactionStatus === 'ongoing')
             ) {
               try {
-                const status = await fetchSquidStatus(
-                  {
-                    transactionId: txHash,
-                    toChainId,
-                    fromChainId,
-                  },
+                const skipParams = {
+                  transactionHash: txHash,
+                  chainId: fromChainId,
+                  baseUrl: skip,
+                };
+                // TODO: replace with statsig call
+                const useSkip = false;
+                if (!tracked && useSkip) {
+                  const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
+                  // if no tx hash was returned, transfer has not yet been tracked
+                  if (!trackedTxHash) return transferNotification;
+                  transferNotification.tracked = true;
+                }
+                const status = await fetchTransferStatus({
+                  transactionId: txHash,
+                  toChainId,
+                  fromChainId,
                   isCctp,
-                  undefined,
-                  requestId
-                );
+                  requestId,
+                  baseUrl: skip,
+                  useSkip,
+                });
                 if (status) {
                   transferNotification.status = status;
                   if (status.squidTransactionStatus === 'success') {
