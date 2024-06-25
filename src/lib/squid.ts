@@ -67,7 +67,7 @@ export const fetchSquidStatus = async (
 };
 
 export const getNobleChainId = () => {
-  return isMainnet ? NOBLE_MAINNET_CHAIN_INFO.chainId : NOBLE_TESTNET_CHAIN_INFO.chainId;
+  return isMainnet ? 'noble-1' : 'grand-1';
 };
 
 type SkipStatusParams = {

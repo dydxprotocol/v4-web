@@ -166,6 +166,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       if (evmAddress) {
         abacusStateManager.setTransfersSourceAddress(evmAddress);
       }
+      if (walletType === WalletType.Keplr && nobleAddress) {
+        abacusStateManager.setTransfersSourceAddress(nobleAddress);
+      }
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
         value: TransferType.deposit.rawValue,
@@ -174,7 +177,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress]);
+  }, [dydxAddress, evmAddress, nobleAddress, walletType]);
 
   useEffect(() => {
     if (error) onError?.();
@@ -188,9 +191,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       });
     }
     if (walletType === WalletType.Keplr) {
-      if (nobleAddress) {
-        abacusStateManager.setTransfersSourceAddress(nobleAddress);
-      }
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: getNobleChainId(),
