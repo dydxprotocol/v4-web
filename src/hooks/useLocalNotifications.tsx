@@ -127,14 +127,16 @@ const useLocalNotificationsContext = () => {
               cosmosTransferStatus?.step === 'depositToSubaccount' &&
               cosmosTransferStatus.status === 'success'
             ) {
-              track(AnalyticsEvent.TransferNotification, {
-                triggeredAt,
-                timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
-                toAmount: transferNotification.toAmount,
-                status: 'success',
-                type: transferNotification.type,
-                txHash,
-              });
+              track(
+                AnalyticsEvents.TransferNotification({
+                  triggeredAt,
+                  timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                  toAmount: transferNotification.toAmount,
+                  status: 'success',
+                  type: transferNotification.type,
+                  txHash,
+                })
+              );
               return transferNotification;
             }
 

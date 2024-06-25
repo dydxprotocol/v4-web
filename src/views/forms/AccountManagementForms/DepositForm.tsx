@@ -284,14 +284,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (walletType === WalletType.Keplr) {
           dispatch(closeDialog());
           dispatch(
-            openDialog({
-              type: DialogTypes.NobleDepositDialog,
-              dialogProps: {
+            openDialog(
+              DialogTypes.CosmosDeposit({
                 toChainId: selectedDydxChainId,
                 fromChainId: chainIdStr ?? undefined,
                 toAmount: summary?.usdcSize ?? undefined,
-              },
-            })
+              })
+            )
           );
           return;
         }
