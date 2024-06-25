@@ -78,11 +78,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     this.store = store;
   }
 
-  setHdkey(hdkey: Hdkey) {
+  setHdkey(hdkey?: Hdkey) {
     this.hdkey = hdkey;
   }
 
-  setLocalWallet(localWallet: LocalWallet) {
+  setLocalWallet(localWallet?: LocalWallet) {
     this.localWallet = localWallet;
   }
 

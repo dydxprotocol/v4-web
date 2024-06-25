@@ -127,6 +127,8 @@ class AbacusStateManager {
   // ------ Breakdown ------ //
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;
+    this.chainTransactions.setLocalWallet(undefined);
+    this.chainTransactions.setHdkey(undefined);
   };
 
   attemptDisconnectAccount = () => {
