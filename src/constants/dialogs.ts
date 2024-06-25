@@ -36,7 +36,7 @@ export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
 export type ManageFundsDialogProps = { selectedTransferType?: string };
 export type MnemonicExportDialogProps = {};
-export type MobileDownloadDialogProps = {};
+export type MobileDownloadDialogProps = { mobileAppUrl: string };
 export type MobileSignInDialogProps = {};
 export type NewMarketAgreementDialogProps = { acceptTerms: () => void };
 export type NewMarketMessageDetailsDialogProps = {

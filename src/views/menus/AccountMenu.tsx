@@ -22,6 +22,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -49,7 +50,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
-import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
+import { MobileDownloadLinks } from '../MobileDownloadLinks';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -75,6 +76,8 @@ export const AccountMenu = () => {
   const onRecoverKeys = () => {
     dispatch(openDialog(DialogTypes.Onboarding()));
   };
+
+  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
@@ -255,14 +258,20 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(getMobileAppUrl()
+        ...(appleAppStoreUrl ?? googlePlayStoreUrl
           ? [
               {
                 value: 'MobileDownload',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
                 onSelect: () => {
-                  dispatch(openDialog(DialogTypes.MobileDownload()));
+                  dispatch(
+                    openDialog(
+                      DialogTypes.MobileDownload({
+                        mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
+                      })
+                    )
+                  );
                 },
               },
             ]
@@ -302,6 +311,7 @@ export const AccountMenu = () => {
           onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
         },
       ].filter(isTruthy)}
+      slotBottomContent={<MobileDownloadLinks withBadges />}
       align="end"
       sideOffset={16}
     >
@@ -366,6 +376,7 @@ const AssetActions = memo(
     </$InlineRow>
   )
 );
+
 const $AccountInfo = styled.div`
   ${layoutMixins.flexColumn}
 

@@ -28,6 +28,7 @@ type StyleProps = {
 type ElementProps<T> = {
   children: React.ReactNode;
   items: DropdownMenuItem<T>[];
+  slotBottomContent?: React.ReactNode;
   slotTopContent?: React.ReactNode;
 };
 
@@ -40,6 +41,7 @@ export const DropdownMenu = forwardRefFn(
       children,
       className,
       items,
+      slotBottomContent,
       slotTopContent,
       side = 'bottom',
       sideOffset = 8,
@@ -70,6 +72,7 @@ export const DropdownMenu = forwardRefFn(
                 {item.separator && <$Separator />}
               </Fragment>
             ))}
+            {slotBottomContent}
           </$Content>
         </Portal>
       </Root>

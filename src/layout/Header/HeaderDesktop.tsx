@@ -23,6 +23,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
+import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
@@ -143,6 +144,8 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
+        <MobileDownloadLinks />
+
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
@@ -240,7 +243,7 @@ const $LogoLink = styled(Link)`
 const $NavAfter = styled.div`
   ${layoutMixins.row}
   justify-self: end;
-  padding-right: 0.75rem;
+  padding: 0 0.75rem;
 
   gap: 0.5rem;
 
