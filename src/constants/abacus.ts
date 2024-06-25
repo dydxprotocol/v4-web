@@ -96,6 +96,7 @@ export type NetworkConfigs = Abacus.exchange.dydx.abacus.output.NetworkConfigs;
 
 // ------ Assets ------ //
 export type Asset = Abacus.exchange.dydx.abacus.output.Asset;
+export type TransferChainInfo = Abacus.exchange.dydx.abacus.state.manager.TransferChainInfo;
 
 // ------ Inputs ------ //
 export type Inputs = Abacus.exchange.dydx.abacus.output.input.Input;

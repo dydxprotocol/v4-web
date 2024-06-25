@@ -1,5 +1,6 @@
 import { SpyInstance, afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { TransferChainInfo } from '@/constants/abacus';
 import { SkipTransactionStatus } from '@/constants/skip';
 
 import abacusStateManager from '../abacus';
@@ -27,11 +28,47 @@ const toChainPending = (chainId: string | undefined): SkipTransactionStatus => (
   transactionId: undefined,
 });
 
-const chainIdsToNames = {
-  1: { chainName: 'Ethereum' },
-  56: { chainName: 'BNB Smart Chain' },
-  'noble-1': { chainName: 'noble' },
-  'dydx-mainnet-1': { chainName: 'dydx' },
+const chainIdsToNames: { [key: string]: TransferChainInfo } = {
+  1: {
+    chainName: 'Ethereum',
+    chainId: 'noop',
+    logoUri: 'noop',
+    chainType: 'noop',
+    isTestnet: false,
+    copy: vi.fn(),
+    equals: vi.fn(),
+    hashCode: vi.fn(),
+  },
+  56: {
+    chainName: 'BNB Smart Chain',
+    chainId: 'noop',
+    logoUri: 'noop',
+    chainType: 'noop',
+    isTestnet: false,
+    copy: vi.fn(),
+    equals: vi.fn(),
+    hashCode: vi.fn(),
+  },
+  'noble-1': {
+    chainName: 'noble',
+    chainId: 'noop',
+    logoUri: 'noop',
+    chainType: 'noop',
+    isTestnet: false,
+    copy: vi.fn(),
+    equals: vi.fn(),
+    hashCode: vi.fn(),
+  },
+  'dydx-mainnet-1': {
+    chainName: 'dydx',
+    chainId: 'noop',
+    logoUri: 'noop',
+    chainType: 'noop',
+    isTestnet: false,
+    copy: vi.fn(),
+    equals: vi.fn(),
+    hashCode: vi.fn(),
+  },
 };
 
 let mockGetChainById: SpyInstance;
