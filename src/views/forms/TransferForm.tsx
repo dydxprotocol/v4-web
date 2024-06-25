@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
@@ -31,6 +31,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
@@ -319,6 +320,12 @@ export const TransferForm = ({
     </$FormInputToggleButton>
   );
 
+  const onToggleMaxButton = useCallback(
+    (isPressed: boolean) =>
+      isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined),
+    [balanceBN, onChangeAmount]
+  );
+
   return (
     <$Form
       className={className}
@@ -388,13 +395,14 @@ export const TransferForm = ({
           value={amount ?? undefined}
           slotRight={
             isUSDCSelected &&
-            balanceBN.gt(0) &&
-            renderFormInputButton({
-              label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: size?.usdcSize == null,
-              onClear: () => onChangeAmount(undefined),
-              onClick: () => onChangeAmount(balanceBN.toNumber()),
-            })
+            balanceBN.gt(0) && (
+              <FormMaxInputToggleButton
+                size={ButtonSize.XSmall}
+                isInputEmpty={size?.usdcSize == null}
+                isLoading={isLoading}
+                onPressedChange={onToggleMaxButton}
+              />
+            )
           }
           disabled={isLoading}
         />
