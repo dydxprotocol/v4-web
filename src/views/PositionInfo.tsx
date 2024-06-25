@@ -69,7 +69,6 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
 
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
   const { id } = currentMarketAssetData ?? {};
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const {
     adjustedImf,
@@ -287,18 +286,19 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const actions = (
     <$Actions>
       {isTablet ? (
-        <$ClosePositionButton
-          onClick={() => dispatch(openDialog({ type: DialogTypes.ClosePosition }))}
-        >
+        <$ClosePositionButton onClick={() => dispatch(openDialog(DialogTypes.ClosePosition()))}>
           {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
         </$ClosePositionButton>
       ) : (
         <$ClosePositionToggleButton
-          isPressed={tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition}
+          isPressed={
+            activeTradeBoxDialog != null &&
+            TradeBoxDialogTypes.is.ClosePosition(activeTradeBoxDialog)
+          }
           onPressedChange={(isPressed: boolean) => {
             dispatch(
               isPressed
-                ? openDialogInTradeBox({ type: TradeBoxDialogTypes.ClosePosition })
+                ? openDialogInTradeBox(TradeBoxDialogTypes.ClosePosition())
                 : closeDialogInTradeBox()
             );
 

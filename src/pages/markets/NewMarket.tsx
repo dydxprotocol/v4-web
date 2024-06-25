@@ -94,11 +94,11 @@ const NewMarket = () => {
     <$Page>
       <$HeaderSection>
         <$ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.SUGGEST_NEW_MARKET })}
+          title={stringGetter({ key: STRING_KEYS.LIST_A_NEW_MARKET })}
           slotRight={
             <IconButton iconName={IconName.Close} onClick={() => navigate(AppRoute.Markets)} />
           }
-          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}
+          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.LISTINGS_DESCRIPTION })}
         />
       </$HeaderSection>
       <$Content>

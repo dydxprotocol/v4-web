@@ -20,7 +20,7 @@ export const getLocalStorage = <Value>({
 }: {
   key: LocalStorageKey;
   defaultValue?: Value;
-  validateFn?: (value: any) => boolean;
+  validateFn?: (value: Value) => boolean;
 }) => {
   try {
     const unserializedValue = globalThis.localStorage?.getItem(key);

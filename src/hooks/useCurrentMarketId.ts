@@ -68,7 +68,8 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketId(marketId));
 
         if (
-          activeTradeBoxDialog?.type === TradeBoxDialogTypes.ClosePosition &&
+          activeTradeBoxDialog != null &&
+          TradeBoxDialogTypes.is.ClosePosition(activeTradeBoxDialog) &&
           openPositions?.find((position: SubaccountPosition) => position.id === marketId)
         ) {
           // Keep the close positions dialog open between market changes as long as there exists an open position

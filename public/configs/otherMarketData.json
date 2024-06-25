@@ -119,10 +119,10 @@
         "params": {
             "id": 2,
             "ticker": "ZK-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+            "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
             "priceExponent": -10,
             "minPriceChange": 800,
-            "minExchanges": 1,
+            "minExchanges": 3,
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Binance",
@@ -131,14 +131,14 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Gate",
-                    "ticker": "ZK_USDT",
+                    "exchangeName": "Bybit",
+                    "ticker": "ZKUSDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
                 },
                 {
-                    "exchangeName": "Huobi",
-                    "ticker": "zkusdt",
+                    "exchangeName": "Gate",
+                    "ticker": "ZK_USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
                 },
@@ -169,7 +169,7 @@
         },
         "meta": {
             "assetName": "zkSync",
-            "referencePrice": 0.2098343190454089,
+            "referencePrice": 0.20984104477748647,
             "cmcId": 24091
         }
     },
@@ -194,7 +194,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "POPCAT-SOL-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -428,7 +428,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "GME-SOL-2kdQwdXdwxSJdzFEFtuo9tpmA88FVjMH7F5kgBZNHPR5-9-2VzMCxFW3nj7pNDbF6WTJgxoJ8ekJS9hfquxPq8edLTY-9-Gg5UhU7AyhM142a7pdk6WBtdf9rv1VcmJQXgESLjxmsk-9tz6vYKiBDLYx2RnGWC5tESu4pyVE4jD6Tm56352UGte",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -608,7 +608,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "PONKE-SOL-D7rw7fyEzo9EQcozjqAHJwbdbywGcSLw1at5MioZtMZ4-9-8DcvfWidQ53a3SCBrWxBWL2UU5zEBAKEypApiiCCFu2Y-9-ECoptgCPMxXXWtxv3Zg2V3E7SpWp6SGqKqj32AcdWRQK-5uTwG3y3F5cx4YkodgTjWEHDrX5HDKZ5bZZ72x8eQ6zE",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -674,7 +674,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "MEW-SOL-4HqAjFKuQX7tnXEkxsjGQha3G4bcgER8qPXRahn9gj8F-5-BhNdEGJef9jSqT1iCEkFZ2bYZCdpC1vuiWtqDt87vBVp-9-CV3Gq5M2R7KRU5ey4LpnZYRR7r7vzKoV9Bt4mZ8P6bSB-879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -7528,7 +7528,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "RAY-SOL-Em6rHi68trYgBFyJ5261A2nhwuQWfLcirgzZZYoRcrkX-6-3mEFzHsJyu2Cpjrz6zPmTzP7uoLFj9SbbecGVzzkL1mJ-9-6Su6Ea97dBxecd5W92KcVvv6SzCurE2BXGgFe9LNGMpE-AVs9TA4nWDzfPJE9gGVNJMVhcQy3V9PGazuz33BfG2RA",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -10576,7 +10576,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "TRUMP-SOL-GwUn3JYQ5PC6P9cB9HsatJN7y7aw3BXrNqHPpoHtWyKF-8-5DNPt6WYgj3x7EmU4Fyqe3jDYPk2HMAB21H5N4Ggbev9-9-FAWLdBB8kmWZQ74KpYAYN3YaEW31Si8qrwuQPauFSoma-7Lco4QdQLaW6M4sxVhWe8BHjrykyzjcjGTo4a6qYGABK",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -24514,7 +24514,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "DUKO-SOL-HD7aZ6YrqAxVbGNAMEKxozcW1ZDU7pbKfd7XMmZtxyzk-6-A9J2mXPXfRZ7Sh2ymUgCJM4p9iUjZBcyAfrz49PoBBN4-9-FoBQDGey332Ppv1KiTow8z9oZP8n6mEPLyhedPdG1nUG-BGS69Ju7DRRVxw9b2B5TnrMLzVdJcscV8UtKywqNsgwx",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -24823,6 +24823,48 @@
             "cmcId": 30661
         }
     },
+    "KP3R": {
+        "title": "Add KP3R-USD perpetual market",
+        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KP3R-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+        "params": {
+            "id": 489,
+            "ticker": "KP3R-USD",
+            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+            "priceExponent": -8,
+            "minPriceChange": 800,
+            "minExchanges": 1,
+            "exchangeConfigJson": [
+                {
+                    "exchangeName": "Binance",
+                    "ticker": "KP3RUSDT",
+                    "adjustByMarket": "USDT-USD",
+                    "invert": false
+                },
+                {
+                    "exchangeName": "Okx",
+                    "ticker": "KP3R-USDT",
+                    "adjustByMarket": "USDT-USD",
+                    "invert": false
+                }
+            ],
+            "liquidityTier": 2,
+            "atomicResolution": -7,
+            "quantumConversionExponent": -9,
+            "defaultFundingPpm": 0,
+            "stepBaseQuantums": 1000000,
+            "subticksPerTick": 1000000,
+            "delayBlocks": 3600
+        },
+        "initialDeposit": {
+            "denom": "adydx",
+            "amount": "10000000000000000000000"
+        },
+        "meta": {
+            "assetName": "Keep3rV1",
+            "referencePrice": 61.84142249233301,
+            "cmcId": 7535
+        }
+    },
     "VLX": {
         "title": "Add VLX-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a VLX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -24922,7 +24964,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "BENDOG-SOL-2Pza1YUczgc4RWLhAgdXSJh4oYUspvhhAiSecFDd7ZJ3-9-2BFpMzi33JtpY4CGUjY7x5JPApy6f2AdkuLZsd1QGqRv-9-H1FPc9WQpA3GPnXMmzSjtt6gMuYuyDqYndBscaHNyCbv-47857wX96Tb4Ud3M3ka949iVRFmUqS33KLBxoVsqgfLK",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -26189,7 +26231,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "CHAT-SOL-FKCCPsYDgEoVpEhyE2XMFAXq5zWFrWHgpQjVEKQk1C54-9-9APPnbdEXbJpktfKSGbbdgYvj6K3ZFRDFwQUabFw6CHP-9-G9fse9D2feKdSjy4eLDQfuuBfxQDqektwNMG9smVBJr9-9kLGUEFwEuFzn9txDfGJ3FimGp9LjMtNPp4GvMLfkZSY",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -30157,7 +30199,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "WUF-SOL-96k7h5P1GbkQSYahCe8VJUpTKjg81mFzAdf9x3hfdJiE-4-3MAnPgGeGUzTNBp4Yf9tV5REqYe8C7HUoRbTn85rKWZN-9-GXfALBqNrQgBYrfrbQ4wU4kfqB3s7R8g5VT4qFzenVhP-8qDVQ9KWnBD2CMVqcFdvjfR5m6gPJ4Bt9sod8G2Yj9zU",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -30277,7 +30319,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "GUMMY-SOL-33AQRrPaZTckDJQd5DZstiwi11tcMVryu63V8rAHFF7N-9-4DHoHzkMHYqJeNDpkdeL6AGDymLFjJnS4SRsJHoT52Bm-9-FSv96pMp3x5XwFdYgqXUY47o7nSKhA6tvCHX1UZZPWnv-FMiecMsYhPdBf94zZKa7i6inK1GX7aypLf7QewNz1i6w",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -30697,7 +30739,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "GOL-SOL-ACuv7Frh33MqLZtv5aKjz4uh2ZZFauFQfm2t23Wk2Gkr-9-GDY1yj4VyCi4Wa57PFVVvEY7pDVwtjwMTmpgda3NQC8h-9-8GwoCLwbYKWXyqcJeo3TzcVGoWdRFuz7Qqn9ByZQ4d9s-E3E5grXmLfETytkBKVBHCLt7FcRAfQLLXftJqSYF1noJ",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -30733,7 +30775,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "MUMU-SOL-2Re1H89emr8hNacyDTrm1NU8VEhuwaJX7JwcdDqy5Q6g-6-4VPXFMpndqZhME27vMqtkuGtBo7hVTA9kEvo87zbjXsA-9-BjWyTUxXSNXN1GNzwR7iRhqmdc3XukYpWFfqy1o94DF2-FvMZrD1qC66Zw8VPrW15xN1N5owUPqpQgNQ5oH18mR4E",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -30979,7 +31021,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "HAMMY-SOL-324NgHgEDyU9d7TE9dkAkB2GNtqxdEU4PsYRTDL68qoR-6-4kPJL1LmempALPjjwMWSo6JRBjmKQY7HX3edozqmJBPe-9-9WZDqKjvpyoAShnp3Dg1725uyo2aQtgp8z7GG9XdB5NM-X131b3frGn4b8ue51EyvrnzWuTuBGoM93uRYrNteEFy",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -31129,7 +31171,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "KHAI-SOL-6g4rhxVTrN6SrtNvimq4QiU8yA5XScvwL6wxaMkegrtJ-8-7p2PrGMyeetNRqTKFraL7eYo2TbU3apWz6vfqrZFiPcG-9-2DaRg4UycKL9GSVfARBDrcensb89WD5PyyFX9NrMunLc-ECbK6PSMZ5yQaUYBocsXaVrax2fWADw2ijTqLGPtt9sC",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -32126,47 +32168,11 @@
             "cmcId": 3792
         }
     },
-    "BOOMER": {
-        "title": "Add BOOMER-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BOOMER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 663,
-            "ticker": "BOOMER-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Raydium",
-                    "ticker": "BOOMER-SOL-GkddXG7fCESrxyq7A867yF1ELyAitiEHXNZLvzqPvCsd-6-A9m7tqGPa8RaPCJs9bxX1Zz6YVzFeQBdwWSDs1XRHATP-9-8UpT41ihQSeb9jgdh41x4stNwbNRSDTyVuXDCubYG87W-31QgkNu26AY21VKWGCvAU2NzeCh56F9cRKtpXtmYLYMe",
-                    "adjustByMarket": "SOL-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Boomer on Sol",
-            "referencePrice": 0.2322073733338514,
-            "cmcId": -1
-        }
-    },
     "BILLY": {
         "title": "Add BILLY-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BILLY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 664,
+            "id": 663,
             "ticker": "BILLY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
@@ -32198,12 +32204,12 @@
             "cmcId": -1
         }
     },
-    "Bazinga": {
-        "title": "Add Bazinga-USD perpetual market",
+    "BAZINGA": {
+        "title": "Add BAZINGA-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a Bazinga-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 665,
-            "ticker": "Bazinga-USD",
+            "id": 664,
+            "ticker": "BAZINGA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
             "minPriceChange": 800,
@@ -32211,7 +32217,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "SOL-Bazinga-GHVSjfv2kEpiMSTXsxP1S9KZKNzqa4rG8u3qVGVvNiEU-9-GKpbD62S56ZFtTBR5C1tJE4ZgaPesu5jhuLhkY3BXXKb-6-DbK9zkkFDh9aHfV3TVbbDjrXtFtdecSbsGwfofW4KzvC-BhQgvhYpYVccRt5wJnxi13waXNaC3dJVcX6TjTNY9kee",
+                    "ticker": "SOL-BAZINGA-GHVSjfv2kEpiMSTXsxP1S9KZKNzqa4rG8u3qVGVvNiEU-9-GKpbD62S56ZFtTBR5C1tJE4ZgaPesu5jhuLhkY3BXXKb-6-DbK9zkkFDh9aHfV3TVbbDjrXtFtdecSbsGwfofW4KzvC-BhQgvhYpYVccRt5wJnxi13waXNaC3dJVcX6TjTNY9kee",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -32238,7 +32244,7 @@
         "title": "Add COK-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a COK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 666,
+            "id": 665,
             "ticker": "COK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
@@ -32249,7 +32255,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "COK-SOL-C4hk6k49gotrWP1b9j2ejPcPo4Lq59jVmfGwB2YYYGds-6-6mk1jhhWr6yeYxQkcrkia2wLHFyuy1LW6Xmj2MmwJ2x5-9-F8F7FGDKfqVEC4qpnVjigZHB8kijTx8qqpmc1fX8s1dY-1D5GHSzrcaSXLtUYxSCg4vWHdKGd7hFnasYPiPFYFGX",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -32274,7 +32280,7 @@
         "title": "Add DADDY-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DADDY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 667,
+            "id": 666,
             "ticker": "DADDY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
@@ -32310,7 +32316,7 @@
         "title": "Add LAIKA-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LAIKA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 668,
+            "id": 667,
             "ticker": "LAIKA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -13,
@@ -32346,7 +32352,7 @@
         "title": "Add NGMI-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NGMI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 669,
+            "id": 668,
             "ticker": "NGMI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
@@ -32357,7 +32363,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "NGMI-SOL-12gsGzqnqJx8JpWz3W6PGn7iL8MVU787xrWsAESC4udk-9-D1xPodmwjnsDuyXi6Dwapphs2w7cxU8MoyFSykYcnFFx-9-DhpMtmWVExvRyCVYw1Qp3JgcUzicLeea2UBXs7Rm5STM-xdMgrDfMUDwBgJU1s1TjgFAGipXrEPwjgNJRcvdwoRe",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -32378,47 +32384,11 @@
             "cmcId": -1
         }
     },
-    "Q": {
-        "title": "Add Q-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a Q-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 670,
-            "ticker": "Q-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Raydium",
-                    "ticker": "Q-SOL-GwjFP2SE691aitDr4JsymgaM3mF8xWLgeYZUCJRkLKs4-6-4mhZSMPAQ9hdmsKpzHJHsjZfSqdMK7noxbCJpFGjS5iv-9-4cGQG1p35BEnu2s5puRPNgdgwPndtZkXWUvLDi79SNWC-4qpJCwZzyofPEqf1E9x8VkAjzUzPCdcBu2MAKn42Bxzc",
-                    "adjustByMarket": "SOL-USD",
-                    "invert": true
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Qanouns",
-            "referencePrice": 0.4941327578084841,
-            "cmcId": -1
-        }
-    },
     "RETARDIO": {
         "title": "Add RETARDIO-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RETARDIO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 671,
+            "id": 670,
             "ticker": "RETARDIO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
@@ -32429,7 +32399,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "RETARDIO-SOL-HXzTvbuKKPyNMmLKJb8vaSUaRZsVS2J2AAsDuDm36rNC-6-HNcAAdLKHSRnwdmmWCYnP5Zcd11sfGpAoCuWFtugt2ma-9-5TcDuBbtU8Q6LagcM8wfw1Ux2MWgCC6Q1FY22FVDZnXX-5eLRsN6qDQTQSBF8KdW4B8mVpeeAzHCCwaDptzMyszxH",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -32454,7 +32424,7 @@
         "title": "Add RIZZ-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RIZZ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 672,
+            "id": 671,
             "ticker": "RIZZ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
@@ -32465,7 +32435,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "RIZZ-SOL-HwU1NBPGtyYxwZzKFQL84AE5HoAhipf8iyrrLh1VTHYi-9-BCSNEEiarHVozG87yqxxKXESn2HtwvL8so6ZPsrXnkRZ-9-mMHtpzf6vW5wuVmY2eK9YppLvXZoHRFJNGVuarL7r8F-GqRH1uyvawwFCXLuGswJsFBaY6YpnY8cpaGEs6QcXYnT",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -32490,7 +32460,7 @@
         "title": "Add SOLLY-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOLLY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
         "params": {
-            "id": 673,
+            "id": 672,
             "ticker": "SOLLY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
@@ -32501,7 +32471,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "SOLLY-SOL-FfBFwvJEtZKFgtpYxzudTxGgAGa5tHuti3V3yXtEdUZj-9-HYwRRicXWRhecHf23KDMNGwrKLbTCHn86YqiixWg5FSC-9-HaP6f4WrztNomrU8YCvgmk5NF17BSrcYH9oqsEr4CFfc-BCvxkyxQyg89wvyJopyERfX1TcBEj4ZtpKcmNFqaTvG5",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,

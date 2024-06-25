@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
 
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
@@ -47,56 +48,50 @@ export const DialogManager = () => {
   const activeDialog = useAppSelector(getActiveDialog);
 
   if (!activeDialog) return null;
-  const { dialogProps, type } = activeDialog;
 
   const modalProps = {
-    ...dialogProps,
     setIsOpen: (isOpen: boolean) => {
-      dispatch(
-        isOpen
-          ? openDialog({ type: activeDialog.type, dialogProps: activeDialog.dialogProps })
-          : closeDialog()
-      );
+      dispatch(isOpen ? openDialog(activeDialog) : closeDialog());
     },
   };
 
-  return {
-    [DialogTypes.AdjustIsolatedMargin]: <AdjustIsolatedMarginDialog {...modalProps} />,
-    [DialogTypes.AdjustTargetLeverage]: <AdjustTargetLeverageDialog {...modalProps} />,
-    [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
-    [DialogTypes.CancelPendingOrders]: <CancelAllOrdersDialog {...modalProps} />,
-    [DialogTypes.ComplianceConfig]: <ComplianceConfigDialog {...modalProps} />,
-    [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
-    [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
-    [DialogTypes.DisconnectWallet]: <DisconnectDialog {...modalProps} />,
-    [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
-    [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
-    [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
-    [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
-    [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
-    [DialogTypes.GeoCompliance]: <GeoComplianceDialog {...modalProps} />,
-    [DialogTypes.Help]: <HelpDialog {...modalProps} />,
-    [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
-    [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
-    [DialogTypes.MobileDownload]: <MobileDownloadDialog {...modalProps} />,
-    [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
-    [DialogTypes.NewMarketAgreement]: <NewMarketAgreementDialog {...modalProps} />,
-    [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
-    [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
-    [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
-    [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
-    [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
-    [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
-    [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
-    [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
-    [DialogTypes.Stake]: <StakeDialog {...modalProps} />,
-    [DialogTypes.StakingReward]: <StakingRewardDialog {...modalProps} />,
-    [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
-    [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
-    [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
-    [DialogTypes.SharePNLAnalytics]: <SharePNLAnalyticsDialog {...modalProps} />,
-    [DialogTypes.Unstake]: <UnstakeDialog {...modalProps} />,
-    [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
-    [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,
-  }[type];
+  return DialogTypes.match(activeDialog, {
+    AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
+    AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
+    ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
+    CancelPendingOrders: (args) => <CancelAllOrdersDialog {...args} {...modalProps} />,
+    ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
+    Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
+    DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
+    DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
+    ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,
+    ExternalLink: (args) => <ExternalLinkDialog {...args} {...modalProps} />,
+    ExternalNavStride: (args) => <ExternalNavStrideDialog {...args} {...modalProps} />,
+    FillDetails: (args) => <FillDetailsDialog {...args} {...modalProps} />,
+    GeoCompliance: (args) => <GeoComplianceDialog {...args} {...modalProps} />,
+    Help: (args) => <HelpDialog {...args} {...modalProps} />,
+    ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
+    ManageFunds: (args) => <ManageFundsDialog {...args} {...modalProps} />,
+    MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
+    MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
+    MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,
+    NewMarketAgreement: (args) => <NewMarketAgreementDialog {...args} {...modalProps} />,
+    NewMarketMessageDetails: (args) => <NewMarketMessageDetailsDialog {...args} {...modalProps} />,
+    Onboarding: (args) => <OnboardingDialog {...args} {...modalProps} />,
+    OrderDetails: (args) => <OrderDetailsDialog {...args} {...modalProps} />,
+    Preferences: (args) => <PreferencesDialog {...args} {...modalProps} />,
+    RateLimit: (args) => <RateLimitDialog {...args} {...modalProps} />,
+    RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
+    RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
+    SelectMarginMode: (args) => <SelectMarginModeDialog {...args} {...modalProps} />,
+    SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
+    Stake: (args) => <StakeDialog {...args} {...modalProps} />,
+    StakingReward: (args) => <StakingRewardDialog {...args} {...modalProps} />,
+    Trade: (args) => <TradeDialog {...args} {...modalProps} />,
+    Triggers: (args) => <TriggersDialog {...args} {...modalProps} />,
+    Transfer: (args) => <TransferDialog {...args} {...modalProps} />,
+    Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
+    Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
+    WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
+  });
 };

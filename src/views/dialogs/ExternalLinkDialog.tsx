@@ -1,8 +1,7 @@
-import type { ReactNode } from 'react';
-
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { DialogProps, ExternalLinkDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -12,15 +11,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 
-type ElementProps = {
-  buttonText?: ReactNode;
-  link: string;
-  linkDescription?: string;
-  title?: ReactNode;
-  slotContent?: ReactNode;
-  setIsOpen: (open: boolean) => void;
-};
-
 export const ExternalLinkDialog = ({
   setIsOpen,
   buttonText,
@@ -28,7 +18,7 @@ export const ExternalLinkDialog = ({
   linkDescription,
   title,
   slotContent,
-}: ElementProps) => {
+}: DialogProps<ExternalLinkDialogProps>) => {
   const stringGetter = useStringGetter();
   return (
     <Dialog

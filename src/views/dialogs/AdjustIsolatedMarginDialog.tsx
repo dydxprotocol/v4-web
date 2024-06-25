@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import type { SubaccountPosition } from '@/constants/abacus';
+import { AdjustIsolatedMarginDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -18,12 +18,10 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { AdjustIsolatedMarginForm } from '../forms/AdjustIsolatedMarginForm';
 
-type ElementProps = {
-  positionId: SubaccountPosition['id'];
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementProps) => {
+export const AdjustIsolatedMarginDialog = ({
+  positionId,
+  setIsOpen,
+}: DialogProps<AdjustIsolatedMarginDialogProps>) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(positionId), shallowEqual);
 

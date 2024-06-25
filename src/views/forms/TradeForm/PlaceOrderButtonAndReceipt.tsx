@@ -277,7 +277,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const depositButton = (
     <Button
       action={ButtonAction.Primary}
-      onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
     </Button>

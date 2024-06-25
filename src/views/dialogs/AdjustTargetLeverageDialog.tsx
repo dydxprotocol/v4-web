@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { AdjustTargetLeverageDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,11 +11,9 @@ import { Dialog } from '@/components/Dialog';
 
 import { AdjustTargetLeverageForm } from '../forms/AdjustTargetLeverageForm';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const AdjustTargetLeverageDialog = ({ setIsOpen }: ElementProps) => {
+export const AdjustTargetLeverageDialog = ({
+  setIsOpen,
+}: DialogProps<AdjustTargetLeverageDialogProps>) => {
   const stringGetter = useStringGetter();
 
   return (
