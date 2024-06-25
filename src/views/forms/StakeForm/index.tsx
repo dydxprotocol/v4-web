@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
+import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -33,8 +35,10 @@ import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndRec
 import { useAppDispatch } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 type StakeFormProps = {
   onDone?: () => void;
@@ -86,11 +90,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
-            setFee(
-              MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)).plus(
-                MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX)
-              )
-            );
+            setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
           }
         })
         .catch((err) => {
@@ -105,8 +105,22 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
   }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
 
+  const debouncedChangeTrack = useMemo(
+    () =>
+      debounce((amount?: number, validator?: string) => {
+        track(
+          AnalyticsEvents.StakeInput({
+            amount,
+            validatorAddress: validator,
+          })
+        );
+      }, 1000),
+    []
+  );
+
   const onChangeAmount = (value?: BigNumber) => {
     setAmountBN(value);
+    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
   };
 
   const onStake = useCallback(async () => {
@@ -115,7 +129,16 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const tx = await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
+      const txHash = hashFromTx(tx.hash);
+
+      track(
+        AnalyticsEvents.StakeTransaction({
+          txHash,
+          amount: amountBN.toNumber(),
+          validatorAddress: selectedValidator.operatorAddress,
+        })
+      );
       onDone?.();
     } catch (err) {
       log('StakeForm/onStake', err);
@@ -146,19 +169,9 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     },
   ];
 
-  const openKeplrDialog = () =>
-    dispatch(
-      forceOpenDialog({
-        type: DialogTypes.ExternalNavKeplr,
-      })
-    );
+  const openKeplrDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavKeplr()));
 
-  const openStrideDialog = () =>
-    dispatch(
-      forceOpenDialog({
-        type: DialogTypes.ExternalNavStride,
-      })
-    );
+  const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
 
   return (
     <$Form

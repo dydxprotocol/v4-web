@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogProps, ManageFundsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,12 +20,10 @@ import abacusStateManager from '@/lib/abacus';
 
 import { DepositDialogContent } from './DepositDialog/DepositDialogContent';
 
-type ElementProps = {
-  selectedTransferType?: string;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
+export const ManageFundsDialog = ({
+  setIsOpen,
+  selectedTransferType,
+}: DialogProps<ManageFundsDialogProps>) => {
   const stringGetter = useStringGetter();
   const { type } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;

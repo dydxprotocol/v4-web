@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxAddress } from '@/constants/wallets';
@@ -115,7 +115,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         const subaccounts = await getSubaccounts({ dydxAddress });
         hasPreviousTransactions = subaccounts.length > 0;
 
-        track(AnalyticsEvent.OnboardingAccountDerived, { hasPreviousTransactions });
+        track(AnalyticsEvents.OnboardingAccountDerived({ hasPreviousTransactions }));
 
         if (!hasPreviousTransactions) {
           setStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
@@ -134,7 +134,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         const { message } = parseWalletError({ error: err, stringGetter });
 
         if (message) {
-          track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
+          track(AnalyticsEvents.OnboardingWalletIsNonDeterministic());
           setError(message);
         }
         return;

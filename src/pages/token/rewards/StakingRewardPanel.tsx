@@ -40,10 +40,9 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const openStakingRewardDialog = useCallback(
     () =>
       dispatch(
-        openDialog({
-          type: DialogTypes.StakingReward,
-          dialogProps: { validators: validators?.toArray() ?? [], usdcRewards },
-        })
+        openDialog(
+          DialogTypes.StakingReward({ validators: validators?.toArray() ?? [], usdcRewards })
+        )
       ),
     [dispatch, validators, usdcRewards]
   );

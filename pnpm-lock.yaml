@@ -30,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.90
-    version: 1.7.90
+    specifier: 1.8.1
+    version: 1.8.1
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.24
     version: 1.1.24
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.136
-    version: 1.1.136
+    specifier: ^1.1.138
+    version: 1.1.138
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -260,6 +260,9 @@ dependencies:
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)
+  unionize:
+    specifier: ^3.1.0
+    version: 3.1.0
   use-latest:
     specifier: ^1.2.1
     version: 1.2.1(@types/react@18.3.3)(react@18.2.0)
@@ -1390,8 +1393,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.90:
-    resolution: {integrity: sha512-epLilQgcZOZMwIn1Zd1qsDTuKV7HlfyY0o+zYOyQB8rCEtAy7YqwSZWBCdLX1/ys1a/aT1Glbk+UHWj4TaORZg==}
+  /@dydxprotocol/v4-abacus@1.8.1:
+    resolution: {integrity: sha512-Vr9ZaEhY1KTJ9TYaabz2aFBWf4WXVkTjxmp2BAs85wwlrouEcf2wvc3LwCnpwFqHB14N+XUzkgH1ahcfkvVayw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -1426,8 +1429,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.136:
-    resolution: {integrity: sha512-H0RCCmadU/+vt3moR+ZWnVQti8f/m62+eQ1oMee1WaeulKgQ8jZpxpQHu9foRvM+sM7TRRJF9BRDCftaiwdzuw==}
+  /@dydxprotocol/v4-localization@1.1.138:
+    resolution: {integrity: sha512-Vb52xv7+yg1s6d6pGR41tzdBzaFSTIi6BoREXg5rXndBnBkB1nIC/bSosckj9ZSvcWG1ES9BBxZVQtdJ+iJkZA==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -12019,7 +12022,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
@@ -18569,6 +18571,10 @@ packages:
       trough: 2.1.0
       vfile: 6.0.1
     dev: true
+
+  /unionize@3.1.0:
+    resolution: {integrity: sha512-LQZvbanzvpzvK0QYgRvnaA9VVe+g4nTbRlyoGGWDKFrZn0HJnDN5LC2Ti0+BxpKKOCrL3BQcRBVFPy/t12Y24Q==}
+    dev: false
 
   /unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
+import { DialogProps, TradeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
@@ -20,13 +21,7 @@ import { MarginModeSelector } from '../forms/TradeForm/MarginModeSelector';
 import { TargetLeverageButton } from '../forms/TradeForm/TargetLeverageButton';
 import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
-type ElementProps = {
-  isOpen?: boolean;
-  setIsOpen?: (open: boolean) => void;
-  slotTrigger?: React.ReactNode;
-};
-
-export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
+export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<TradeDialogProps>) => {
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(

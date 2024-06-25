@@ -79,6 +79,7 @@ export type ParsingErrors = kollections.List<ParsingError>;
 // ------ Perpetuals/Markets ------ //
 export type PerpetualState = Abacus.exchange.dydx.abacus.output.PerpetualState;
 export type MarketOrderbook = Abacus.exchange.dydx.abacus.output.MarketOrderbook;
+export type MarketOrderbookGrouping = Abacus.exchange.dydx.abacus.output.MarketOrderbookGrouping;
 export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
@@ -208,6 +209,9 @@ export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
 export type HumanReadableSubaccountTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
+
+export type OrderbookGroupings = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
+export const OrderbookGrouping = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
 
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;

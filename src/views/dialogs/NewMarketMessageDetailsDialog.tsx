@@ -3,10 +3,10 @@ import { useMemo, useState } from 'react';
 import { utils } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
+import { DialogProps, NewMarketMessageDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
 import { isMainnet } from '@/constants/networks';
-import { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,14 +19,6 @@ import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { MustBigNumber } from '@/lib/numbers';
-
-type ElementProps = {
-  preventClose?: boolean;
-  setIsOpen?: (open: boolean) => void;
-  assetData: NewMarketProposal;
-  clobPairId?: number;
-  liquidityTier?: string;
-};
 
 export enum CodeToggleGroup {
   CREATE_ORACLE = 'CREATE_ORACLE',
@@ -42,7 +34,7 @@ export const NewMarketMessageDetailsDialog = ({
   liquidityTier,
   preventClose,
   setIsOpen,
-}: ElementProps) => {
+}: DialogProps<NewMarketMessageDetailsDialogProps>) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
   const { baseAsset, params, title } = assetData ?? {};
   const {
@@ -191,7 +183,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'liquidity_tier',
                       label: 'liquidity_tier',
-                      value: liquidityTier,
+                      value: `${liquidityTier}`,
                     },
                     {
                       key: 'market_type',
