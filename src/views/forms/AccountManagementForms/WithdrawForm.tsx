@@ -37,9 +37,9 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
@@ -363,7 +363,13 @@ export const WithdrawForm = () => {
         MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
       ) {
         return {
-          errorMessage: 'Amount must be greater than 10 USDC',
+          errorMessage: stringGetter({
+            key: STRING_KEYS.AMOUNT_MINIMUM_ERROR,
+            params: {
+              NUMBER: MIN_CCTP_TRANSFER_AMOUNT,
+              TOKEN: usdcLabel,
+            },
+          }),
         };
       }
     }
@@ -522,9 +528,14 @@ export const WithdrawForm = () => {
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           slotRight={
-            <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
-              {stringGetter({ key: STRING_KEYS.MAX })}
-            </$FormInputButton>
+            <FormMaxInputToggleButton
+              size={ButtonSize.XSmall}
+              isInputEmpty={withdrawAmount === ''}
+              isLoading={isLoading}
+              onPressedChange={(isPressed: boolean) =>
+                isPressed ? onClickMax() : setWithdrawAmount('')
+              }
+            />
           }
         />
       </$WithDetailsReceipt>
@@ -576,10 +587,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $FormInputButton = styled(Button)`
-  ${formMixins.inputInnerButton}
 `;
 
 const $CheckIcon = styled(Icon)`

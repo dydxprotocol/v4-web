@@ -1,12 +1,19 @@
 import { shallowEqual } from 'react-redux';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+<<<<<<< HEAD
+=======
+>>>>>>> d685f9a7c9c38572fdfbb748a20dde1b2778fb7b
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
+<<<<<<< HEAD
+=======
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Link } from '@/components/Link';
+>>>>>>> d685f9a7c9c38572fdfbb748a20dde1b2778fb7b
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -14,6 +21,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
 
@@ -69,7 +77,9 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        TERMS_OF_USE_LINK: <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon />,
+        TERMS_OF_USE_LINK: (
+          <TermsOfUseLink isInline />
+        ),
       },
     });
   }
@@ -81,7 +91,3 @@ export const useComplianceState = () => {
     complianceMessage,
   };
 };
-
-const $Link = styled(Link)`
-  color: var(--color-text-1);
-`;
