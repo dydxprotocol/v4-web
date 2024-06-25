@@ -90,5 +90,8 @@ export const useComplianceState = () => {
 };
 
 const $Link = styled(Link)`
-  ${layoutMixins.spacedRow};
+  ${layoutMixins.inlineRow};
+
+  --link-color: var(--color-text-1);
+  text-decoration: underline;
 `;

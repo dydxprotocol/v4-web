@@ -182,7 +182,7 @@ export const AccountDetailsAndHistory = () => {
         slotEmpty={
           <$EmptyChart>
             {complianceState === ComplianceStates.READ_ONLY ? (
-              <$EmptyCard>
+              <$Card>
                 {stringGetter({
                   key: STRING_KEYS.BLOCKED_MESSAGE,
                   params: {
@@ -193,7 +193,7 @@ export const AccountDetailsAndHistory = () => {
                     ),
                   },
                 })}
-              </$EmptyCard>
+              </$Card>
             ) : onboardingState !== OnboardingState.AccountConnected ? (
               <$EmptyCard>
                 <p>
@@ -306,19 +306,21 @@ const $EmptyChart = styled.div`
   cursor: default;
 `;
 
-const $EmptyCard = styled.div`
-  width: 16.75rem;
-
-  ${layoutMixins.column};
-  font: var(--font-base-book);
-  gap: 1rem;
-
+const $Card = styled.div`
   padding: 1.25rem;
   margin: auto;
   background-color: var(--color-layer-3);
   border-radius: 0.5rem;
-  text-align: center;
   justify-items: center;
+  width: 16.75rem;
+  font: var(--font-base-book);
+`;
+
+const $EmptyCard = styled($Card)`
+  ${layoutMixins.column};
+
+  display: grid;
+  gap: 1rem;
 
   button {
     width: fit-content;
@@ -326,5 +328,6 @@ const $EmptyCard = styled.div`
 `;
 
 const $Link = styled(Link)`
-  ${layoutMixins.spacedRow};
+  ${layoutMixins.inlineRow};
+  text-decoration: underline;
 `;
