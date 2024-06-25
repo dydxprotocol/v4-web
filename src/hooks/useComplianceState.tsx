@@ -10,7 +10,6 @@ import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from '@/components/Link';
-
 import { OutputType, formatDateOutput } from '@/components/Output';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
