@@ -135,15 +135,14 @@ export const TransferStatusNotification = ({
                 size={ButtonSize.Small}
                 onClick={() => {
                   dispatch(
-                    openDialog({
-                      type: DialogTypes.NobleDepositDialog,
-                      dialogProps: {
+                    openDialog(
+                      DialogTypes.CosmosDeposit({
                         toChainId,
                         fromChainId,
                         toAmount,
                         txHash,
-                      },
-                    })
+                      })
+                    )
                   );
                 }}
               >
@@ -198,6 +197,7 @@ export const TransferStatusNotification = ({
       slotCustomContent={customContent}
       slotAction={
         isToast &&
+        !isCosmosTransfer &&
         status && (
           <$Trigger
             isOpen={open}
@@ -217,7 +217,7 @@ export const TransferStatusNotification = ({
     />
   );
 
-  return isToast && !isCosmosTransfer ? (
+  return isToast ? (
     <WithReceipt
       hideReceipt={!open}
       side="bottom"

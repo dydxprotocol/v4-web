@@ -36,6 +36,12 @@ export type TokenInfo = {
   name: string;
 };
 
+type ChainOption = {
+  type: string;
+  stringKey: string;
+  iconUrl: string;
+};
+
 const cctpTokensByChainId = cctpTokens.reduce(
   (acc, token) => {
     if (!acc[token.chainId]) {
@@ -64,8 +70,10 @@ export const SourceSelectMenu = ({
   const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
   const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-  const chainOptions = options?.chains?.toArray() ?? EMPTY_ARR;
-  const cosmosChainOptions = isMainnet ? cosmosChains.mainnets : cosmosChains.testnets;
+  const chainOptions = (options?.chains?.toArray() ?? EMPTY_ARR) as ChainOption[];
+  const cosmosChainOptions: ChainOption[] = isMainnet
+    ? cosmosChains.mainnets
+    : cosmosChains.testnets;
 
   const chains = isNotKeplrWallet ? chainOptions : cosmosChainOptions;
   const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;

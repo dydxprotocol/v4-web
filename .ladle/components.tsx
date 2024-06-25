@@ -3,6 +3,7 @@ import '@/polyfills';
 import { useEffect, useState } from 'react';
 
 import '@/index.css';
+import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Provider } from 'react-redux';
@@ -34,7 +35,7 @@ import {
 } from '@/state/configs';
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
-import { getDYDXChainId, getNobleChainId } from '@/lib/squid';
+import { getDydxChainId, getNobleChainId } from '@/lib/squid';
 import { config } from '@/lib/wagmi';
 
 import './ladle.css';
@@ -54,12 +55,12 @@ const providers = [
     grazOptions: {
       chains: [
         {
-          chainId: getDYDXChainId(),
+          chainId: getDydxChainId(),
           bech32Config: {
-            bech32PrefixAccAddr: 'dydx',
+            bech32PrefixAccAddr: BECH32_PREFIX,
           },
         },
-        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: 'noble' } },
+        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX } },
       ],
     },
   }),

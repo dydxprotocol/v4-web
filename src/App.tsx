@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo } from 'react';
 
+import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -47,7 +48,7 @@ import { useEnvFeatures } from './hooks/useEnvFeatures';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
-import { getDYDXChainId, getNobleChainId } from './lib/squid';
+import { getDydxChainId, getNobleChainId } from './lib/squid';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -165,12 +166,12 @@ const providers = [
     grazOptions: {
       chains: [
         {
-          chainId: getDYDXChainId(),
+          chainId: getDydxChainId(),
           bech32Config: {
-            bech32PrefixAccAddr: 'dydx',
+            bech32PrefixAccAddr: BECH32_PREFIX,
           },
         },
-        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: 'noble' } },
+        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX } },
       ],
     },
   }),
