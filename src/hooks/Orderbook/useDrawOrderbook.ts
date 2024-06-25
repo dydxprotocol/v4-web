@@ -25,6 +25,7 @@ import {
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
+import { generateFadedColorVariant } from '@/lib/styles';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
 
@@ -173,7 +174,7 @@ export const useDrawOrderbook = ({
     ctx.fillStyle = theme.accent;
     ctx.fill();
     ctx.lineWidth = 4;
-    ctx.strokeStyle = theme.accent;
+    ctx.strokeStyle = generateFadedColorVariant(theme.accent, '73');
     ctx.stroke();
   };
 

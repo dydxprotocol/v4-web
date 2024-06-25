@@ -236,7 +236,10 @@ export const CanvasOrderbook = forwardRef(
             <>
               <$OrderbookWrapper ref={orderbookRef}>
                 {asksOrderbook}
-                <OrderbookMiddleRow tickSizeDecimals={tickSizeDecimals} />
+                <OrderbookMiddleRow
+                  tickSizeDecimals={tickSizeDecimals}
+                  ref={orderbookMiddleRowRef}
+                />
                 {bidsOrderbook}
               </$OrderbookWrapper>
               {displaySide === 'bottom' && (
