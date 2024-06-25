@@ -652,6 +652,7 @@ const assetIcons = {
   ZIL: '/currencies/zil.png',
   ZK: '/currencies/zk.png',
   ZKF: '/currencies/zkf.png',
+  ZRO: '/currencies/zro.png',
   ZRX: '/currencies/zrx.png',
 } as const;
 
