@@ -7,6 +7,8 @@ export type SkipTransactionStatus = {
   chainData: {
     chainId: string | undefined;
     chainName: string | undefined;
+    // TODO: change type to number once skip implements estimatedrouteduration
+    // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
     estimatedRouteDuration: string;
   };
   transactionId: string | undefined;

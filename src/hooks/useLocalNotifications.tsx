@@ -138,6 +138,7 @@ const useLocalNotificationsContext = () => {
                   const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                   // if no tx hash was returned, transfer has not yet been tracked
                   if (!trackedTxHash) return transferNotification;
+                  transferNotification.tracked = true;
                 }
                 const status = await fetchTransferStatus({
                   transactionId: txHash,

@@ -51,6 +51,8 @@ export const TransferStatusNotification = ({
   const updateSecondsLeft = useCallback(() => {
     const fromEstimatedRouteDuration = status?.fromChain?.chainData?.estimatedRouteDuration;
     const toEstimatedRouteDuration = status?.toChain?.chainData?.estimatedRouteDuration;
+    // TODO: remove typeguards once skip implements estimatedrouteduration
+    // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
     if (
       typeof fromEstimatedRouteDuration === 'string' ||
       typeof toEstimatedRouteDuration === 'string'

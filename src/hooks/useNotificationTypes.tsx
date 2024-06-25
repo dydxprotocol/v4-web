@@ -230,6 +230,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
+          // TODO: remove typeguards once skip implements estimatedrouteduration
+          // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
           const estimatedDuration =
             typeof toChainEta === 'string' ? toChainEta : formatSeconds(Math.max(toChainEta, 0));
           const body = stringGetter({
