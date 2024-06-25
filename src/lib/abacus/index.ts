@@ -127,6 +127,7 @@ class AbacusStateManager {
   // ------ Breakdown ------ //
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;
+    this.chainTransactions.clearAccounts();
   };
 
   attemptDisconnectAccount = () => {
