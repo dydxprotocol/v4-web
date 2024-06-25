@@ -23,6 +23,7 @@ export type CosmosDepositDialogProps = {
   toChainId?: string;
   fromChainId?: string;
   toAmount?: number;
+  txHash?: string;
 };
 export type DepositDialogProps = {};
 export type DisconnectWalletDialogProps = {};
