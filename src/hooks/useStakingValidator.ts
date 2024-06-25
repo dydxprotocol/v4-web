@@ -41,17 +41,6 @@ export const useStakingValidator = () => {
   );
 
   const queryFn = async () => {
-    const validatorOptions: string[] = [];
-    const intersection = validatorWhitelist.filter((delegation) =>
-      currentDelegations?.map((d) => d.validator).includes(delegation)
-    );
-
-    if (intersection.length > 0) {
-      validatorOptions.push(...intersection);
-    } else {
-      validatorOptions.push(...validatorWhitelist);
-    }
-
     const response = await getValidators();
 
     // Filter out jailed and unbonded validators
@@ -92,7 +81,7 @@ export const useStakingValidator = () => {
 
     // Set the default validator to be the validator with the fewest tokens, selected from validators configured in the whitelist
     const whitelistedValidators = response?.validators.filter((validator) =>
-      validatorOptions.includes(validator.operatorAddress.toLowerCase())
+      validatorWhitelist.includes(validator.operatorAddress.toLowerCase())
     );
 
     const validatorWithFewestTokens = (whitelistedValidators ?? availableValidators ?? []).reduce(
