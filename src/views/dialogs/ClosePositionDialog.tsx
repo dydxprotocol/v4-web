@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
+import { ClosePositionDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
@@ -28,11 +29,7 @@ import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
+export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDialogProps>) => {
   const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();

@@ -6,7 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
-import { CanvasOrderbook } from '@/views/CanvasOrderbook';
+import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
 enum Tab {

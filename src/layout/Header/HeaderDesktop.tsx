@@ -23,6 +23,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
+import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
@@ -107,7 +108,7 @@ export const HeaderDesktop = () => {
               slotBefore: <Icon iconName={IconName.HelpCircle} />,
               label: stringGetter({ key: STRING_KEYS.HELP }),
               onClick: () => {
-                dispatch(openDialog({ type: DialogTypes.Help }));
+                dispatch(openDialog(DialogTypes.Help()));
               },
             },
             {
@@ -143,10 +144,12 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
+        <MobileDownloadLinks />
+
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
-          onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+          onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         />
 
         <VerticalSeparator />
@@ -240,7 +243,7 @@ const $LogoLink = styled(Link)`
 const $NavAfter = styled.div`
   ${layoutMixins.row}
   justify-self: end;
-  padding-right: 0.75rem;
+  padding: 0 0.75rem;
 
   gap: 0.5rem;
 

@@ -32,7 +32,7 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
           <$Img src="/third-party/stride.png" alt="Stride" />
         </$Header>
       }
-      onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}
+      onClick={() => dispatch(openDialog(DialogTypes.ExternalNavStride()))}
     >
       <$Description>
         {stringGetter({

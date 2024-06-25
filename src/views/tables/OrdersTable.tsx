@@ -394,12 +394,7 @@ export const OrdersTable = ({
         'data-clearable': isOrderStatusClearable(row.status),
       })}
       onRowAction={(key: Key) =>
-        dispatch(
-          openDialog({
-            type: DialogTypes.OrderDetails,
-            dialogProps: { orderId: key },
-          })
-        )
+        dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
       }
       columns={columnKeys.map((key: OrdersTableColumnKey) =>
         getOrdersTableColumnDef({

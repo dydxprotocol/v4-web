@@ -22,7 +22,7 @@ export const TargetLeverageButton = ({ className }: { className?: string }) => {
 
   const dispatch = useAppDispatch();
   const handleClick = useCallback(() => {
-    dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+    dispatch(openDialog(DialogTypes.AdjustTargetLeverage()));
   }, [dispatch]);
 
   return (

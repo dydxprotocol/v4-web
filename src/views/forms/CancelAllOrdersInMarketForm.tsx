@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zipObject } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -22,6 +22,7 @@ import {
   getPendingIsolatedOrders,
   getSubaccount,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -41,14 +42,14 @@ export const CancelAllOrdersInMarketForm = ({
   onCancelComplete,
 }: CancelAllOrdersInMarketFormProps) => {
   const stringGetter = useStringGetter();
-  const pendingPositions = useSelector(getNonZeroPendingPositions, shallowEqual);
+  const pendingPositions = useAppSelector(getNonZeroPendingPositions, shallowEqual);
   const thisPendingPosition = useMemo(
     () => pendingPositions?.find((f) => f.marketId === marketId),
     [marketId, pendingPositions]
   );
-  const allPending = useSelector(getPendingIsolatedOrders, shallowEqual);
+  const allPending = useAppSelector(getPendingIsolatedOrders, shallowEqual);
   const pendingPositionOrders = allPending[marketId] ?? EMPTY_ARR;
-  const assetsData = useSelector(getAssets, shallowEqual);
+  const assetsData = useAppSelector(getAssets, shallowEqual);
 
   const [cancellingStatus, setCancellingStatus] = useState<Record<string, OrderCancelStatus>>({});
   const isCancelling = useMemo(
@@ -56,7 +57,7 @@ export const CancelAllOrdersInMarketForm = ({
     [cancellingStatus]
   );
   const { cancelOrder } = useSubaccount();
-  const { freeCollateral: crossFreeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral: crossFreeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const onCancel = useCallback(() => {
     if (isCancelling) {

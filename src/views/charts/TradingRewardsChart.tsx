@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { kollections } from '@dydxprotocol/v4-abacus';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
@@ -87,21 +86,20 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
-    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, SELECTED_PERIOD.name);
+  const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    SELECTED_PERIOD.name
+  );
 
   const rewardsData = useMemo(
     () =>
       periodTradingRewards && canViewAccount
-        ? periodTradingRewards
-            .toArray()
-            .reverse()
-            .map(
-              (datum): TradingRewardsDatum => ({
-                date: new Date(datum.endedAtInMilliseconds).valueOf(),
-                cumulativeAmount: datum.cumulativeAmount,
-              })
-            )
+        ? periodTradingRewards.reverse().map(
+            (datum): TradingRewardsDatum => ({
+              date: new Date(datum.endedAtInMilliseconds).valueOf(),
+              cumulativeAmount: datum.cumulativeAmount,
+            })
+          )
         : [],
     [periodTradingRewards, canViewAccount]
   );
