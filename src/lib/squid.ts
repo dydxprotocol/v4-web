@@ -108,7 +108,7 @@ const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON)
 const getChainNameFromId = (chainId: string | undefined) => {
   if (!chainId) return undefined;
   const chain = abacusStateManager.getChainById(chainId);
-  return chain?.chain_name;
+  return chain?.chainName;
 };
 
 class TransactionData {
@@ -157,7 +157,8 @@ const getTxDataFromIbcTransfer = (
 ) => {
   const txType = transferDirection === 'from' ? 'send_tx' : 'receive_tx';
   return new TransactionData({
-    chainId: ibcTransfer.packet_txs[txType]?.chain_id,
+    chainId:
+      ibcTransfer.packet_txs[txType]?.chain_id ?? ibcTransfer[`${transferDirection}_chain_id`],
     txUrl: ibcTransfer.packet_txs[txType]?.explorer_link,
     txHash: ibcTransfer.packet_txs[txType]?.tx_hash,
     status: ibcTransfer.state,
@@ -171,7 +172,7 @@ const getTxDataFromCCTPTransfer = (
 ) => {
   const txType = transferDirection === 'from' ? 'send_tx' : 'receive_tx';
   return new TransactionData({
-    chainId: cctpTransfer.txs[txType]?.chain_id,
+    chainId: cctpTransfer.txs[txType]?.chain_id ?? cctpTransfer[`${transferDirection}_chain_id`],
     txUrl: cctpTransfer.txs[txType]?.explorer_link,
     txHash: cctpTransfer.txs[txType]?.tx_hash,
     status: cctpTransfer.state,
@@ -186,7 +187,9 @@ const getTxDataFromAxelarTransfer = (
   const txType = transferDirection === 'from' ? 'send_tx' : 'execute_tx';
   if ('contract_call_with_token_txs' in axelarTransfer.txs) {
     return new TransactionData({
-      chainId: axelarTransfer.txs.contract_call_with_token_txs[txType]?.chain_id,
+      chainId:
+        axelarTransfer.txs.contract_call_with_token_txs[txType]?.chain_id ??
+        axelarTransfer[`${transferDirection}_chain_id`],
       txUrl: axelarTransfer.txs.contract_call_with_token_txs[txType]?.explorer_link,
       txHash: axelarTransfer.txs.contract_call_with_token_txs[txType]?.tx_hash,
       status: axelarTransfer.state,
@@ -194,7 +197,9 @@ const getTxDataFromAxelarTransfer = (
     });
   }
   return new TransactionData({
-    chainId: axelarTransfer.txs.send_token_txs[txType]?.chain_id,
+    chainId:
+      axelarTransfer.txs.send_token_txs[txType]?.chain_id ??
+      axelarTransfer[`${transferDirection}_chain_id`],
     txUrl: axelarTransfer.txs.send_token_txs[txType]?.explorer_link,
     txHash: axelarTransfer.txs.send_token_txs[txType]?.tx_hash,
     status: axelarTransfer.state,

@@ -17,9 +17,9 @@ import {
   withdrawToBinanceBNBSuccess,
 } from './fixtures/skipNonCctpWithdrawal';
 
-const toChainPending: SkipTransactionStatus = Object.freeze({
+const toChainPending = (chainId: string | undefined): SkipTransactionStatus => ({
   chainData: {
-    chainId: undefined,
+    chainId,
     chainName: undefined,
     estimatedRouteDuration: '<30 minutes',
   },
@@ -28,10 +28,10 @@ const toChainPending: SkipTransactionStatus = Object.freeze({
 });
 
 const chainIdsToNames = {
-  1: { chain_name: 'Ethereum' },
-  56: { chain_name: 'BNB Smart Chain' },
-  'noble-1': { chain_name: 'noble' },
-  'dydx-mainnet-1': { chain_name: 'dydx' },
+  1: { chainName: 'Ethereum' },
+  56: { chainName: 'BNB Smart Chain' },
+  'noble-1': { chainName: 'noble' },
+  'dydx-mainnet-1': { chainName: 'dydx' },
 };
 
 let mockGetChainById: SpyInstance;
@@ -58,6 +58,8 @@ describe('formSkipStatusResponse - non CCTP Deposit', () => {
   it('converts deposit from ethereum on ETH Pending payload', () => {
     const transferStatusResponse = depositFromEthereumEthPending;
     const expected = {
+      axelarTransactionUrl:
+        'https://axelarscan.io/gmp/0x6792ba9fa4d1a0316ffabad1541dc4c5ddcd8c4bb38b9a1368f08931f9c14e1c',
       squidTransactionStatus: 'ongoing',
       routeStatus: [
         {
@@ -66,7 +68,7 @@ describe('formSkipStatusResponse - non CCTP Deposit', () => {
           status: 'success',
         },
         {
-          chainId: undefined,
+          chainId: 'osmosis-1',
           status: 'ongoing',
           txHash: undefined,
         },
@@ -81,7 +83,7 @@ describe('formSkipStatusResponse - non CCTP Deposit', () => {
         transactionUrl:
           'https://etherscan.io/tx/0x6792ba9fa4d1a0316ffabad1541dc4c5ddcd8c4bb38b9a1368f08931f9c14e1c',
       },
-      toChain: toChainPending,
+      toChain: toChainPending('osmosis-1'),
       error: undefined,
     };
     const result = formSkipStatusResponse(transferStatusResponse);
@@ -163,8 +165,8 @@ describe('formSkipStatusResponse - non CCTP Withdrawal', () => {
       },
       toChain: {
         chainData: {
-          chainId: undefined,
-          chainName: undefined,
+          chainId: '56',
+          chainName: 'BNB Smart Chain',
           estimatedRouteDuration: '<30 minutes',
         },
         transactionId: undefined,
@@ -177,7 +179,7 @@ describe('formSkipStatusResponse - non CCTP Withdrawal', () => {
           status: 'success',
         },
         {
-          chainId: undefined,
+          chainId: '56',
           txHash: undefined,
           status: 'ongoing',
         },
@@ -249,8 +251,8 @@ describe('formSkipStatusResponse - CCTP Deposit', () => {
       },
       toChain: {
         chainData: {
-          chainId: undefined,
-          chainName: undefined,
+          chainId: 'noble-1',
+          chainName: 'noble',
           estimatedRouteDuration: '<30 minutes',
         },
         transactionId: undefined,
@@ -263,7 +265,7 @@ describe('formSkipStatusResponse - CCTP Deposit', () => {
           status: 'success',
         },
         {
-          chainId: undefined,
+          chainId: 'noble-1',
           txHash: undefined,
           status: 'ongoing',
         },
@@ -335,8 +337,8 @@ describe('formSkipStatusResponse - CCTP Withdrawal', () => {
       },
       toChain: {
         chainData: {
-          chainId: undefined,
-          chainName: undefined,
+          chainId: '1',
+          chainName: 'Ethereum',
           estimatedRouteDuration: '<30 minutes',
         },
         transactionId: undefined,
@@ -349,7 +351,7 @@ describe('formSkipStatusResponse - CCTP Withdrawal', () => {
           status: 'success',
         },
         {
-          chainId: undefined,
+          chainId: '1',
           txHash: undefined,
           status: 'ongoing',
         },
