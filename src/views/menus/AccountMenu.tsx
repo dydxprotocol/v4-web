@@ -258,7 +258,7 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(appleAppStoreUrl || googlePlayStoreUrl
+        ...(appleAppStoreUrl ?? googlePlayStoreUrl
           ? [
               {
                 value: 'MobileDownload',
