@@ -35,7 +35,7 @@ type ElementProps = {
   txHash?: string;
 };
 
-export const NobleDepositDialog = ({
+export const CosmosDepositDialog = ({
   setIsOpen,
   toChainId,
   fromChainId,
