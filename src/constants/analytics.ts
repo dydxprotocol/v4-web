@@ -1,4 +1,4 @@
-import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
+import { ofType, RecordOf, TagsOf, unionize, UnionOf } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
@@ -203,6 +203,7 @@ export const AnalyticsEvents = unionize(
       txHash?: string;
       amount?: number;
       validatorAddress?: string;
+      defaultValidatorAddress?: string;
     }>(),
     UnstakeTransaction: ofType<{
       txHash?: string;
