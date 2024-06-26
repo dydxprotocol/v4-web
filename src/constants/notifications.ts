@@ -186,7 +186,6 @@ export type TransferNotifcation = {
   isExchange?: boolean;
   requestId?: string;
   tracked?: boolean;
-  isCosmosTransfer?: boolean;
   cosmosTransferStatus?: {
     step: 'ibcTransfer' | 'depositToSubaccount';
     status: 'success' | 'error' | 'pending';

@@ -112,7 +112,6 @@ const useLocalNotificationsContext = () => {
               isExchange,
               requestId,
               tracked,
-              isCosmosTransfer,
               cosmosTransferStatus,
             } = transferNotification;
 
@@ -123,7 +122,6 @@ const useLocalNotificationsContext = () => {
               (currentStatus?.error && Object.keys(currentStatus.error).length !== 0);
 
             if (
-              isCosmosTransfer &&
               cosmosTransferStatus?.step === 'depositToSubaccount' &&
               cosmosTransferStatus.status === 'success'
             ) {

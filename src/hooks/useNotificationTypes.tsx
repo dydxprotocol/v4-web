@@ -211,16 +211,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
-          const {
-            fromChainId,
-            status,
-            txHash,
-            toAmount,
-            type,
-            isExchange,
-            isCosmosTransfer,
-            cosmosTransferStatus,
-          } = transfer;
+          const { fromChainId, status, txHash, toAmount, type, isExchange, cosmosTransferStatus } =
+            transfer;
 
           const transferType =
             type ??
@@ -228,6 +220,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
+          const isCosmosTransfer = cosmosTransferStatus !== undefined;
           if (isCosmosTransfer) {
             const icon = <$AssetIcon symbol="USDC" />;
             const isFinished =
