@@ -103,6 +103,8 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 
 // Logos
+// Commented out because of https://github.com/dydxprotocol/v4-web/pull/737
+// Left as comment for context in case people wonder why they're not imported here
 // export { default as ChaosLabsIcon } from './chaos-labs';
 // export { default as LogoShortIcon } from './logo-short';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
