@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { useFeatureGate, useStatsigUser } from '@statsig/react-bindings';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -15,6 +16,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { StatSigFlags, useStatSigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -54,6 +56,10 @@ const RewardsPage = () => {
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
   const canViewAccount = useAppSelector(calculateCanViewAccount);
+
+  const { user } = useStatsigUser();
+  const gate = useFeatureGate('ff_skip_migration');
+  console.log('Xcxc', useStatSigGateValue(StatSigFlags.ffSkipMigration), user, gate);
 
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390

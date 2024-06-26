@@ -13,6 +13,7 @@ import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/l
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
+import { StatSigFlags, useStatSigGateValue } from './useStatsig';
 
 const LocalNotificationsContext = createContext<
   ReturnType<typeof useLocalNotificationsContext> | undefined
@@ -133,7 +134,7 @@ const useLocalNotificationsContext = () => {
                   baseUrl: skip,
                 };
                 // TODO: replace with statsig call
-                const useSkip = false;
+                const useSkip = useStatSigGateValue(StatSigFlags.ffSkipMigration);
                 if (!tracked && useSkip) {
                   const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                   // if no tx hash was returned, transfer has not yet been tracked

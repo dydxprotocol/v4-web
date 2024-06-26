@@ -143,6 +143,12 @@ dependencies:
   '@skip-router/core':
     specifier: ^5.1.0
     version: 5.1.0(@types/react@18.3.3)(chain-registry@1.63.9)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)
+  '@statsig/js-client':
+    specifier: 1.4.0
+    version: 1.4.0
+  '@statsig/react-bindings':
+    specifier: 1.4.0
+    version: 1.4.0(react@18.2.0)
   '@tanstack/react-query':
     specifier: ^5.37.1
     version: 5.37.1(react@18.2.0)
@@ -6952,6 +6958,25 @@ packages:
       '@stablelib/keyagreement': 1.0.1
       '@stablelib/random': 1.0.2
       '@stablelib/wipe': 1.0.1
+    dev: false
+
+  /@statsig/client-core@1.4.0:
+    resolution: {integrity: sha512-ICz/4DyjMhp9H5GwLTrVUzWqfrO6Bm0RFx1wDd+KGnYx9g6Iwu3FKny5FRybnPSKW47jWidc+FpUi2kQ5AGPqw==}
+    dev: false
+
+  /@statsig/js-client@1.4.0:
+    resolution: {integrity: sha512-lDjFdHIvao7Ehj4xLd34WKsaoadsQv84RKv3LsBW/GanMTgquoJHZNQkZz4I1VqtqPkFN8Srqfpo29ATinZ18A==}
+    dependencies:
+      '@statsig/client-core': 1.4.0
+    dev: false
+
+  /@statsig/react-bindings@1.4.0(react@18.2.0):
+    resolution: {integrity: sha512-ZRPBF7JOqSyUe34FNghyDtvAcP5Z/Kca4jGTjrzW5lpi86OX0OftOt0LkGW6uDFkjXdpHr/CL+7YB8cSYFU1Eg==}
+    peerDependencies:
+      react: ^16.6.3 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@statsig/client-core': 1.4.0
+      react: 18.2.0
     dev: false
 
   /@svgr/babel-plugin-add-jsx-attribute@7.0.0(@babel/core@7.23.9):
