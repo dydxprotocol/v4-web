@@ -14,7 +14,6 @@ import {
   CaretIcon,
   CautionCircleIcon,
   CautionCircleStrokeIcon,
-  ChaosLabsIcon,
   ChatIcon,
   CheckCircleIcon,
   CheckIcon,
@@ -47,7 +46,6 @@ import {
   LinkOutIcon,
   ListIcon,
   LockIcon,
-  LogoShortIcon,
   MenuIcon,
   MigrateIcon,
   MintscanIcon,
@@ -88,6 +86,8 @@ import {
   WhitepaperIcon,
   WithdrawIcon,
 } from '@/icons';
+import { ChaosLabsIcon } from '@/icons/chaos-labs';
+import { LogoShortIcon } from '@/icons/logo-short';
 
 export enum IconName {
   AddressConnector = 'AddressConnector',

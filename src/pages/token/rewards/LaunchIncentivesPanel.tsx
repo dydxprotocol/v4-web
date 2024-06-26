@@ -13,7 +13,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { ChaosLabsIcon } from '@/icons';
+import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 

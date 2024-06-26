@@ -14,7 +14,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { BellStrokeIcon, LogoShortIcon } from '@/icons';
+import { BellStrokeIcon } from '@/icons';
+import { LogoShortIcon } from '@/icons/logo-short';
 import breakpoints from '@/styles/breakpoints';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

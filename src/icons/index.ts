@@ -1,3 +1,4 @@
+// TODO: get rid of this massive barrel file.
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
@@ -102,8 +103,8 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 
 // Logos
-export { default as ChaosLabsIcon } from './chaos-labs';
-export { default as LogoShortIcon } from './logo-short';
+// export { default as ChaosLabsIcon } from './chaos-labs';
+// export { default as LogoShortIcon } from './logo-short';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
 
 // Trade

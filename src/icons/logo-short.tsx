@@ -1,6 +1,6 @@
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
-const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => {
+export const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => {
   const theme = useAppThemeAndColorModeContext();
   const fill = theme.logoFill;
 
@@ -48,5 +48,3 @@ const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => {
     </svg>
   );
 };
-
-export default LogoShortIcon;
