@@ -221,6 +221,11 @@ export const AnalyticsEvents = unionize(
       amount?: number;
       validatorAddress?: string;
     }>(),
+    Error: ofType<{
+      location: string;
+      error: Error;
+      metadata?: any;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
