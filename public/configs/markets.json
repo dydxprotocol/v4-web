@@ -836,6 +836,15 @@
         "websiteLink": "https://www.bitcichain.com/en", 
         "whitepaperLink": "https://www.bitcichain.com/assets/files/whitepaper_en.pdf"
     }, 
+    "BLAST-USD": {
+      "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blast/", 
+      "name": "Blast", 
+      "tags": [
+          "Layer 2"
+      ], 
+      "websiteLink": "https://blast.io/en", 
+      "whitepaperLink": "https://docs.blast.io/about-blast"
+    }, 
     "BLOCK-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blockgames/", 
         "name": "BlockGames", 
@@ -4666,7 +4675,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ondo-finance/", 
         "name": "Ondo", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://ondo.foundation/", 
         "whitepaperLink": "https://docs.ondo.foundation/ondo-token"
