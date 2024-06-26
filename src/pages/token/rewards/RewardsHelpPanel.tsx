@@ -17,7 +17,12 @@ export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
 
   const { isStakingEnabled } = useEnvFeatures();
-  const { protocolStaking, tradingRewardsLearnMore } = useURLConfigs();
+  const { protocolStaking, tradingRewardsLearnMore, stakingAndClaimingRewardsLearnMore } =
+    useURLConfigs();
+
+  const hereLink = (href?: string) => (
+    <$AccentLink href={href}>{stringGetter({ key: STRING_KEYS.HERE })}</$AccentLink>
+  );
 
   return (
     <$HelpCard
@@ -43,11 +48,7 @@ export const RewardsHelpPanel = () => {
             content: stringGetter({
               key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
               params: {
-                HERE_LINK: (
-                  <$AccentLink href={tradingRewardsLearnMore}>
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$AccentLink>
-                ),
+                HERE_LINK: hereLink(tradingRewardsLearnMore),
               },
             }),
           },
@@ -62,17 +63,20 @@ export const RewardsHelpPanel = () => {
                   content: stringGetter({
                     key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
                     params: {
-                      HERE_LINK: (
-                        <$AccentLink href={protocolStaking}>
-                          {stringGetter({ key: STRING_KEYS.HERE })}
-                        </$AccentLink>
-                      ),
+                      HERE_LINK: hereLink(protocolStaking),
                     },
                   }),
                 },
                 {
-                  header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_QUESTION }),
-                  content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_ANSWER }),
+                  header: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_QUESTION,
+                  }),
+                  content: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_ANSWER,
+                    params: {
+                      HERE_LINK: hereLink(stakingAndClaimingRewardsLearnMore),
+                    },
+                  }),
                 },
                 {
                   header: stringGetter({

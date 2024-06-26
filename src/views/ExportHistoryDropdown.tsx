@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -232,10 +232,12 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         mutateExportTransfers();
       }
 
-      track(AnalyticsEvent.ExportDownloadClick, {
-        trades: checkedTrades,
-        transfers: checkedTransfers,
-      });
+      track(
+        AnalyticsEvents.ExportDownloadClick({
+          trades: checkedTrades,
+          transfers: checkedTransfers,
+        })
+      );
     },
     [checkedTrades, checkedTransfers, mutateExportTrades, mutateExportTransfers]
   );
@@ -244,7 +246,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     <DropdownMenu
       onOpenChange={(open) => {
         if (open) {
-          track(AnalyticsEvent.ExportCsvClick);
+          track(AnalyticsEvents.ExportCsvClick());
         }
       }}
       items={[
@@ -256,7 +258,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
               onCheckedChange={() => {
                 setCheckedTrades(!checkedTrades);
 
-                track(AnalyticsEvent.ExportTradesCheckboxClick, { value: !checkedTrades });
+                track(AnalyticsEvents.ExportTradesCheckboxClick({ value: !checkedTrades }));
               }}
             />
           ),
@@ -271,7 +273,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
               onCheckedChange={() => {
                 setCheckedTransfers(!checkedTransfers);
 
-                track(AnalyticsEvent.ExportTransfersCheckboxClick, { value: !checkedTrades });
+                track(AnalyticsEvents.ExportTransfersCheckboxClick({ value: !checkedTrades }));
               }}
             />
           ),

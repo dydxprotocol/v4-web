@@ -13,7 +13,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { ChaosLabsIcon } from '@/icons';
+import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -152,7 +152,7 @@ const LaunchIncentivesContent = () => {
       </$ChaosLabsLogo>
       <$ButtonRow>
         <$AboutButton
-          action={ButtonAction.Base}
+          action={ButtonAction.Secondary}
           onClick={() => {
             dispatch(
               openDialog(
@@ -165,7 +165,7 @@ const LaunchIncentivesContent = () => {
           {stringGetter({ key: STRING_KEYS.ABOUT })}
         </$AboutButton>
         <$LeaderboardButton
-          action={ButtonAction.Primary}
+          action={ButtonAction.Secondary}
           onClick={() => {
             dispatch(
               openDialog(
@@ -230,12 +230,13 @@ const $ButtonRow = styled.div`
 
 const $Button = styled(Button)`
   --button-padding: 0 1rem;
-`;
 
-const $AboutButton = styled($Button)`
   --button-textColor: var(--color-text-2);
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
+`;
+
+const $AboutButton = styled($Button)`
   flex-grow: 1;
 `;
 

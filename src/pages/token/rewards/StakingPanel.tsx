@@ -1,7 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,7 +18,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { Icon, IconName } from '@/components/Icon';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
@@ -77,14 +78,13 @@ export const StakingPanel = ({ className }: { className?: string }) => {
               {!canAccountTrade ? (
                 <OnboardingTriggerButton size={ButtonSize.Small} />
               ) : (
-                <Button
-                  slotLeft={<Icon iconName={IconName.Send} />}
+                <IconButton
+                  iconName={IconName.Send}
+                  shape={ButtonShape.Square}
                   size={ButtonSize.Small}
-                  action={ButtonAction.Primary}
+                  action={ButtonAction.Base}
                   onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
-                >
-                  {stringGetter({ key: STRING_KEYS.TRANSFER })}
-                </Button>
+                />
               )}
             </$ActionButtons>
           )}

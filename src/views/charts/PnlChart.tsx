@@ -14,8 +14,10 @@ import {
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
@@ -249,17 +251,15 @@ export const PnlChart = ({
     [xAccessorFunc, yAccessorFunc]
   );
 
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      new Intl.NumberFormat(selectedLocale, {
-        style: 'currency',
-        currency: 'USD',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      })
-        .format(Math.abs(value))
-        .toLowerCase(),
-    [selectedLocale]
+      formatNumberOutput(value, OutputType.CompactFiat, {
+        decimalSeparator,
+        groupSeparator,
+        locale: selectedLocale,
+      }),
+    [decimalSeparator, groupSeparator, selectedLocale]
   );
 
   const renderTooltip = useCallback(() => <div />, []);

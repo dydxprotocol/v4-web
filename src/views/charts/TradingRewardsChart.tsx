@@ -20,6 +20,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -28,6 +29,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
@@ -91,18 +93,19 @@ export const TradingRewardsChart = ({
     SELECTED_PERIOD.name
   );
 
-  const rewardsData = useMemo(
-    () =>
-      periodTradingRewards && canViewAccount
-        ? periodTradingRewards.reverse().map(
-            (datum): TradingRewardsDatum => ({
-              date: new Date(datum.endedAtInMilliseconds).valueOf(),
-              cumulativeAmount: datum.cumulativeAmount,
-            })
-          )
-        : [],
-    [periodTradingRewards, canViewAccount]
-  );
+  const rewardsData = useMemo(() => {
+    if (periodTradingRewards && canViewAccount) {
+      const res = periodTradingRewards.map(
+        (datum): TradingRewardsDatum => ({
+          date: new Date(datum.endedAtInMilliseconds).valueOf(),
+          cumulativeAmount: datum.cumulativeAmount,
+        })
+      );
+      res.sort((datumA, datumB) => datumA.date - datumB.date);
+      return res;
+    }
+    return [];
+  }, [periodTradingRewards, canViewAccount]);
 
   const oldestDataPointDate = rewardsData?.[0]?.date;
   const newestDataPointDate = rewardsData?.[rewardsData.length - 1]?.date;
@@ -198,18 +201,11 @@ export const TradingRewardsChart = ({
     [xAccessorFunc, yAccessorFunc]
   );
 
-  const language = navigator.language || 'en-US';
-
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      Intl.NumberFormat(language, {
-        style: 'decimal',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      })
-        .format(value)
-        .toLowerCase(),
-    [language]
+      formatNumberOutput(value, OutputType.CompactNumber, { decimalSeparator, groupSeparator }),
+    [decimalSeparator, groupSeparator]
   );
 
   const renderTooltip = useCallback(() => <div />, []);

@@ -82,6 +82,7 @@ const $MarketsStats = styled.section`
 const $Section = styled.div`
   background: var(--color-layer-3);
   border-radius: 0.625rem;
+  align-content: center;
 `;
 const $RecentlyListed = styled.h4`
   display: flex;
@@ -96,9 +97,13 @@ const $NewTag = styled(Tag)`
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;
-  top: 0.8125rem;
+  top: -0.25rem;
   right: 1rem;
   z-index: 2;
+
+  @media ${breakpoints.tablet} {
+    top: 0.8125rem;
+  }
 
   & button {
     --button-toggle-off-backgroundColor: var(--color-layer-3);
@@ -113,11 +118,15 @@ const $SectionHeader = styled.div`
   ${layoutMixins.row}
   position: relative;
 
-  padding: 1rem 1.5rem 0;
+  padding: 0 1.25rem 1.25rem;
   gap: 0.25rem;
 
   & h4 {
     font: var(--font-base-medium);
     color: var(--color-text-2);
+  }
+
+  @media ${breakpoints.tablet} {
+    padding: 1rem;
   }
 `;

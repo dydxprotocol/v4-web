@@ -803,6 +803,32 @@ function getMarketsToValidate(otherMarketsContent: string): Set<string> {
 
   return marketsToValidate;
 }
+function getAllMarketsToValidate(otherMarketsContent: string): Set<string> {
+  // Create a set to store all markets
+  const marketsToValidate = new Set<string>();
+
+  // Split the content by lines
+  const lines = otherMarketsContent.split('\n');
+
+  // Regex to find market lines
+  const marketRegex = /"([A-Z]+)": \{/;
+
+  // Iterate over each line to find all markets
+  lines.forEach(line => {
+    const match = line.trim().match(marketRegex);
+    if (match) {
+      marketsToValidate.add(match[1]);
+    }
+  });
+
+  // Log a message if no markets were found
+  if (marketsToValidate.size === 0) {
+    console.log('No markets to validate');
+  }
+
+  return marketsToValidate;
+}
+
 
 async function main(): Promise<void> {
   // Get markets to validate.

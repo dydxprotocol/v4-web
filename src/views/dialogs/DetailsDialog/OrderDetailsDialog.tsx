@@ -32,10 +32,9 @@ import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
+import { isMarketOrderType, isOrderStatusClearable } from '@/lib/orders';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 
 export const OrderDetailsDialog = ({
@@ -44,7 +43,6 @@ export const OrderDetailsDialog = ({
 }: DialogProps<OrderDetailsDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
 
@@ -100,7 +98,7 @@ export const OrderDetailsDialog = ({
     );
 
   const renderOrderTime = ({ timeInMs }: { timeInMs: Nullable<number> }) =>
-    timeInMs ? <time>{relativeTimeString({ timeInMs, selectedLocale })}</time> : '-';
+    timeInMs ? <Output type={OutputType.DateTime} value={timeInMs} /> : '-';
 
   const detailItems = (
     [

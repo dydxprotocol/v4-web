@@ -17,7 +17,6 @@ import { DydxChainAsset } from '@/constants/wallets';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -62,7 +61,6 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
-  const { showMemoTransferField } = useEnvFeatures();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
@@ -95,7 +93,7 @@ export const TransferForm = ({
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
-  const showMemoField = showMemoTransferField && isChainTokenSelected;
+  const showMemoField = isChainTokenSelected;
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
