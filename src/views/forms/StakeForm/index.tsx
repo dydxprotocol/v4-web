@@ -144,7 +144,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           txHash,
           amount: amountBN.toNumber(),
           validatorAddress: selectedValidator.operatorAddress,
-          defaultValidatorAddress: defaultValidator.operatorAddress,
+          defaultValidatorAddress: defaultValidator?.operatorAddress,
         })
       );
       onDone?.();
