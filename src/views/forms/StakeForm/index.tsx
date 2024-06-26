@@ -62,9 +62,10 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   // BN
   const newBalanceBN = balance.minus(amountBN ?? 0);
-  const maxAmountBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
+  const maxAmountBN = MustBigNumber(Math.max(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX, 0));
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
+  const isAmountEnoughForGas = balance.gte(AMOUNT_RESERVED_FOR_GAS_DYDX);
 
   useEffect(() => {
     // Initalize to default validator once on mount
@@ -72,7 +73,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   }, []);
 
   useEffect(() => {
-    if (amountBN && !isAmountValid) {
+    if (!isAmountEnoughForGas) {
+      setError({
+        key: STRING_KEYS.INSUFFICIENT_STAKE_BALANCE,
+        type: AlertType.Error,
+        message: stringGetter({ key: STRING_KEYS.INSUFFICIENT_STAKE_BALANCE }),
+      });
+    } else if (amountBN && !isAmountValid) {
       setError({
         key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
         type: AlertType.Error,
@@ -196,13 +203,15 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           }
           value={amountBN ? amountBN.toNumber() : undefined}
           slotRight={
-            <FormMaxInputToggleButton
-              isInputEmpty={!amountBN}
-              isLoading={isLoading}
-              onPressedChange={(isPressed: boolean) =>
-                isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
-              }
-            />
+            isAmountEnoughForGas && (
+              <FormMaxInputToggleButton
+                isInputEmpty={!amountBN}
+                isLoading={isLoading}
+                onPressedChange={(isPressed: boolean) =>
+                  isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
+                }
+              />
+            )
           }
         />
       </$WithDetailsReceipt>
