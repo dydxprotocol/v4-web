@@ -29,8 +29,8 @@ import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';
 import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
+import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';

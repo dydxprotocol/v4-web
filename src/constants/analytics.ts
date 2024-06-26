@@ -1,4 +1,4 @@
-import { ofType, RecordOf, TagsOf, unionize, UnionOf } from 'unionize';
+import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
