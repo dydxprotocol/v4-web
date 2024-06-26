@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
@@ -15,10 +14,11 @@ import {
 
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
+import { OutputType, formatNumberOutput } from '@/components/Output';
+
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
 import {
   getHistogramXValues,
   getRektFromIdx,
@@ -58,11 +58,13 @@ export const useDrawOrderbook = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
   const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
-  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
-    useLocaleSeparators();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
-  const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const {
+    stepSizeDecimals = TOKEN_DECIMALS,
+    tickSizeDecimals = SMALL_USD_DECIMALS,
+    stepSize,
+  } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
@@ -217,42 +219,32 @@ export const useDrawOrderbook = ({
       }
     }
 
-    const format = {
-      decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-      ...{
-        groupSeparator: LOCALE_GROUP_SEPARATOR,
-        groupSize: 3,
-        secondaryGroupSize: 0,
-        fractionGroupSeparator: ' ',
-        fractionGroupSize: 0,
-      },
-    };
-
     // Price text
     if (price != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(price).toFormat(
-          tickSizeDecimals ?? SMALL_USD_DECIMALS,
-          BigNumber.ROUND_HALF_UP,
-          {
-            ...format,
-          }
-        ),
+        formatNumberOutput(price, OutputType.Number, {
+          decimalSeparator,
+          groupSeparator,
+          fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
+        }),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
     const decimalPlaces = displayUnit === 'asset' ? stepSizeDecimals ?? TOKEN_DECIMALS : 0;
+    const displayType = displayUnit === 'asset' ? OutputType.CompactNumber : OutputType.Number;
 
     // Size text
     const displaySize = displayUnit === 'asset' ? size : sizeCost;
     if (displaySize != null) {
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
-        MustBigNumber(displaySize).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
-          ...format,
+        formatNumberOutput(displaySize, displayType, {
+          decimalSeparator,
+          groupSeparator,
+          fractionDigits: decimalPlaces,
         }),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
@@ -264,8 +256,10 @@ export const useDrawOrderbook = ({
     if (displayDepth != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(displayDepth).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
-          ...format,
+        formatNumberOutput(displayDepth, displayType, {
+          decimalSeparator,
+          groupSeparator,
+          fractionDigits: decimalPlaces,
         }),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
