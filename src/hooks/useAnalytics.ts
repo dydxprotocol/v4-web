@@ -25,12 +25,14 @@ import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
 import { useSelectedNetwork } from './useSelectedNetwork';
+import { StatSigFlags, useStatSigGateValue } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestTag = import.meta.env.VITE_LAST_TAG;
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
     useAccounts();
   const { indexerClient } = useDydxClient();
+  const isSkipEnabled = useStatSigGateValue(StatSigFlags.ffSkipMigration);
 
   /** User properties */
 
@@ -66,6 +68,11 @@ export const useAnalytics = () => {
       identify(AnalyticsUserProperties.Version(latestTag.split(`release/v`).at(-1)));
     }
   }, [latestTag]);
+
+  // AnalyticsUserProperty.ffSkipMigration
+  useEffect(() => {
+    identify(AnalyticsUserProperties.ffSkipMigration(isSkipEnabled));
+  }, [isSkipEnabled]);
 
   // AnalyticsUserProperty.Network
   const { selectedNetwork } = useSelectedNetwork();
