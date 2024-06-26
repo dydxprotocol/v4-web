@@ -14,6 +14,7 @@ import {
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 
 import { OutputType, formatNumberOutput } from '@/components/Output';
@@ -250,15 +251,16 @@ export const PnlChart = ({
     [xAccessorFunc, yAccessorFunc]
   );
 
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
       formatNumberOutput(
         value,
         OutputType.CompactFiat,
-        { decimalSeparator: undefined, groupSeparator: undefined },
+        { decimalSeparator, groupSeparator },
         { locale: selectedLocale }
       ),
-    [selectedLocale]
+    [decimalSeparator, groupSeparator, selectedLocale]
   );
 
   const renderTooltip = useCallback(() => <div />, []);
