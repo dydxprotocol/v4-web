@@ -56,8 +56,9 @@ export const useComplianceState = () => {
       key: STRING_KEYS.CLOSE_ONLY_MESSAGE,
       params: {
         DATE: updatedAtDate
-          ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, selectedLocale, {
+          ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, {
               dateFormat: 'medium',
+              selectedLocale,
             })
           : undefined,
         EMAIL: complianceSupportEmail,

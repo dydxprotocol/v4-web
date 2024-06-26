@@ -29,12 +29,11 @@ export const usePageTitlePriceUpdates = () => {
 
   useEffect(() => {
     if (id && orderbookMidMarketPrice && isNotTablet) {
-      const priceString = formatNumberOutput(
-        orderbookMidMarketPrice,
-        OutputType.Fiat,
-        { decimalSeparator, groupSeparator },
-        { fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS }
-      );
+      const priceString = formatNumberOutput(orderbookMidMarketPrice, OutputType.Fiat, {
+        decimalSeparator,
+        groupSeparator,
+        fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
+      });
       document.title = `${priceString} ${id} · ${DEFAULT_DOCUMENT_TITLE}`;
     } else {
       document.title = DEFAULT_DOCUMENT_TITLE;

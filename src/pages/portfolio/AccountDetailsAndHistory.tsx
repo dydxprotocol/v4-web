@@ -48,7 +48,8 @@ const usePortfolioValues = ({
   const accountValueLabel = useMemo(
     () =>
       activeDatum
-        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, selectedLocale, {
+        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, {
+            selectedLocale,
             dateFormat: 'medium',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),

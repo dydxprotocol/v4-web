@@ -203,7 +203,7 @@ export const TradingRewardsChart = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      formatNumberOutput(value, OutputType.CompactNumber, { decimalSeparator, groupSeparator }, {}),
+      formatNumberOutput(value, OutputType.CompactNumber, { decimalSeparator, groupSeparator }),
     [decimalSeparator, groupSeparator]
   );
 

@@ -438,12 +438,11 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {formatNumberOutput(
-                  usdcWithdrawalCapacity,
-                  OutputType.Number,
-                  { decimalSeparator, groupSeparator },
-                  { fractionDigits: TOKEN_DECIMALS }
-                )}
+                {formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
+                  decimalSeparator,
+                  groupSeparator,
+                  fractionDigits: TOKEN_DECIMALS,
+                })}
                 <$Tag>{usdcLabel}</$Tag>
               </span>
             ),

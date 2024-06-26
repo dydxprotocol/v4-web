@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
@@ -38,11 +38,16 @@ import { NumberValue } from './NumberValue';
 export function formatDateOutput(
   value: string | number | null | undefined,
   type: OutputType.Date | OutputType.DateTime | OutputType.Time,
-  selectedLocale: SupportedLocales,
   {
+    // required
+    selectedLocale,
+
+    // optional
     useUTC,
     dateFormat,
   }: {
+    selectedLocale: SupportedLocales;
+
     useUTC?: boolean;
     dateFormat?: 'full' | 'long' | 'medium' | 'short' | undefined;
   }
@@ -70,15 +75,26 @@ export function formatDateOutput(
   return dateString;
 }
 
-type RemoveArgsFromTupleForFormatDate<T> = T extends [...infer begin, unknown, infer options]
-  ? [...begin, options]
+// given an array whose last element is an object, return that array but with strings keys removed from last element
+type OmitFromLastElement<T extends any[], Strings extends string> = T extends [
+  ...infer begin,
+  infer options,
+]
+  ? [...begin, Omit<options, Strings>]
   : never;
 
-type FormatDateHookArgs = RemoveArgsFromTupleForFormatDate<Parameters<typeof formatDateOutput>>;
-
-export function useFormattedDateOutput(...args: FormatDateHookArgs) {
+// must manually memoize options object if you want proper memoization
+export function useFormattedDateOutput(
+  ...[value, type, options]: OmitFromLastElement<
+    Parameters<typeof formatDateOutput>,
+    'selectedLocale'
+  >
+) {
   const selectedLocale = useAppSelector(getSelectedLocale);
-  return formatDateOutput(args[0], args[1], selectedLocale, args[2]);
+  return useMemo(
+    () => formatDateOutput(value, type, { selectedLocale, ...options }),
+    [value, type, options, selectedLocale]
+  );
 }
 
 export function formatNumberOutput(
@@ -93,13 +109,11 @@ export function formatNumberOutput(
     | OutputType.Percent
     | OutputType.SmallPercent
     | OutputType.Multiple,
-  // required args
   {
+    // required
     decimalSeparator,
     groupSeparator,
-  }: { decimalSeparator: string | undefined; groupSeparator: string | undefined },
-  // optional args
-  {
+    // optional
     useGrouping = true,
     roundingMode = BigNumber.ROUND_HALF_UP,
     fractionDigits,
@@ -107,6 +121,9 @@ export function formatNumberOutput(
     locale = navigator.language || 'en-US',
     showSign = ShowSign.Negative,
   }: {
+    decimalSeparator: string | undefined;
+    groupSeparator: string | undefined;
+
     fractionDigits?: number | null;
     minimumFractionDigits?: number;
     roundingMode?: BigNumber.RoundingMode;
@@ -193,17 +210,18 @@ export function formatNumberOutput(
   return `${sign ?? ''}${numberRenderers[type]()}`;
 }
 
-type RemoveArgsFromTupleForFormatNumber<T> = T extends [...infer begin, unknown, infer options]
-  ? [...begin, options]
-  : never;
-
-type FormatNumberHookArgs = RemoveArgsFromTupleForFormatNumber<
-  Parameters<typeof formatNumberOutput>
->;
-
-export function useFormattedNumberOutput(...args: FormatNumberHookArgs) {
+// must manually memoize options object if you want proper memoization
+export function useFormattedNumberOutput(
+  ...[value, type, options]: OmitFromLastElement<
+    Parameters<typeof formatNumberOutput>,
+    'decimalSeparator' | 'groupSeparator'
+  >
+) {
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
-  return formatNumberOutput(args[0], args[1], { decimalSeparator, groupSeparator }, args[2]);
+  return useMemo(
+    () => formatNumberOutput(value, type, { decimalSeparator, groupSeparator, ...options }),
+    [decimalSeparator, groupSeparator, options, type, value]
+  );
 }
 
 export enum OutputType {
@@ -364,9 +382,10 @@ export const Output = ({
     case OutputType.Time:
     case OutputType.DateTime: {
       if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
-      const dateString = formatDateOutput(value, type, selectedLocale, {
+      const dateString = formatDateOutput(value, type, {
         useUTC: timeOptions?.useUTC,
         dateFormat: dateOptions?.format,
+        selectedLocale,
       });
 
       return (
@@ -396,19 +415,16 @@ export const Output = ({
 
       const renderedNumber = (
         <NumberValue
-          value={formatNumberOutput(
-            value,
-            type,
-            { decimalSeparator: LOCALE_DECIMAL_SEPARATOR, groupSeparator: LOCALE_GROUP_SEPARATOR },
-            {
-              useGrouping,
-              fractionDigits,
-              minimumFractionDigits,
-              locale,
-              roundingMode,
-              showSign: ShowSign.None,
-            }
-          )}
+          value={formatNumberOutput(value, type, {
+            decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+            groupSeparator: LOCALE_GROUP_SEPARATOR,
+            useGrouping,
+            fractionDigits,
+            minimumFractionDigits,
+            locale,
+            roundingMode,
+            showSign: ShowSign.None,
+          })}
           withSubscript={withSubscript}
         />
       );

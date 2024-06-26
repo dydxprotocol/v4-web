@@ -55,12 +55,11 @@ const lerp = (percent: number, from: number, to: number) => from + percent * (to
 const formatNumber = (n: number, selectedLocale: string, isCompact: boolean = n >= 10000) => {
   const formattedNumber = Intl.NumberFormat(selectedLocale).format(n);
 
-  const compactNumber = formatNumberOutput(
-    n,
-    OutputType.CompactNumber,
-    { decimalSeparator: undefined, groupSeparator: undefined },
-    { locale: selectedLocale }
-  );
+  const compactNumber = formatNumberOutput(n, OutputType.CompactNumber, {
+    decimalSeparator: undefined,
+    groupSeparator: undefined,
+    locale: selectedLocale,
+  });
 
   return isCompact && compactNumber.length < formattedNumber.length
     ? compactNumber

@@ -254,12 +254,11 @@ export const PnlChart = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      formatNumberOutput(
-        value,
-        OutputType.CompactFiat,
-        { decimalSeparator, groupSeparator },
-        { locale: selectedLocale }
-      ),
+      formatNumberOutput(value, OutputType.CompactFiat, {
+        decimalSeparator,
+        groupSeparator,
+        locale: selectedLocale,
+      }),
     [decimalSeparator, groupSeparator, selectedLocale]
   );
 
