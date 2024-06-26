@@ -557,6 +557,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
       // data-focused={isFocusVisible || undefined}
       style={{ width: column.props?.width }}
       ref={ref}
+      allowSorting={column.props?.allowsSorting ?? true}
       withScrollSnapColumns={withScrollSnapColumns}
     >
       <$Row>
@@ -814,7 +815,7 @@ const $Tr = styled.tr<{
     `}
 `;
 
-const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
+const $Th = styled.th<{ allowSorting: boolean; withScrollSnapColumns?: boolean }>`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -831,6 +832,16 @@ const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
     css`
       ${layoutMixins.scrollSnapItem}
     `}
+
+  ${({ allowSorting }) =>
+    allowSorting
+      ? css`
+          cursor: pointer;
+        `
+      : css`
+          cursor: default;
+          pointer-events: none;
+        `}
 
   white-space: nowrap;
   text-align: var(--table-cell-currentAlign);
