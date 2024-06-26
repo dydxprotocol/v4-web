@@ -135,7 +135,6 @@ const useLocalNotificationsContext = () => {
                   chainId: fromChainId,
                   baseUrl: skip,
                 };
-
                 if (!tracked && useSkip) {
                   const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                   // if no tx hash was returned, transfer has not yet been tracked

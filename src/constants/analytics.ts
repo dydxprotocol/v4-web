@@ -51,6 +51,9 @@ export const AnalyticsUserProperties = unionize(
     >(),
     Version: ofType<string | null>(),
 
+    // StatSigFlags
+    ffSkipMigration: ofType<boolean>(),
+
     // Network
     Network: ofType<DydxNetwork>(),
 
@@ -70,6 +73,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   Locale: 'selectedLocale',
   Breakpoint: 'breakpoint',
   Version: 'version',
+  ffSkipMigration: 'ffSkipMigration',
   Network: 'network',
   WalletType: 'walletType',
   WalletConnectionType: 'walletConnectionType',
