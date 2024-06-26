@@ -10,7 +10,7 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEventPayloads } from '@/constants/analytics';
+import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -49,6 +49,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -374,6 +375,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     if (routeErrors) {
+      track(
+        AnalyticsEvents.RouteError({
+          transferType: TransferType.deposit.name,
+          errorMessage: routeErrorMessage?.toString(),
+          amount: debouncedAmount,
+          chainId: chainIdStr?.toString(),
+          assetId: sourceToken?.toString(),
+        })
+      );
       return routeErrorMessage
         ? stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,

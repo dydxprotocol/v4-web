@@ -226,6 +226,13 @@ export const AnalyticsEvents = unionize(
       error: Error;
       metadata?: any;
     }>(),
+    RouteError: ofType<{
+      transferType: 'deposit' | 'withdrawal' | 'transferOut' | undefined;
+      errorMessage: string | undefined;
+      amount: string;
+      chainId: string | undefined;
+      assetId: string | undefined;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

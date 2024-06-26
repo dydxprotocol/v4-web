@@ -396,6 +396,15 @@ export const WithdrawForm = () => {
       };
 
     if (routeErrors) {
+      track(
+        AnalyticsEvents.RouteError({
+          transferType: TransferType.withdrawal.name,
+          errorMessage: routeErrorMessage?.toString(),
+          amount: debouncedAmount,
+          chainId: chainIdStr?.toString(),
+          assetId: toToken?.toString(),
+        })
+      );
       return {
         errorMessage: routeErrorMessage
           ? stringGetter({
