@@ -51,7 +51,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@dydxprotocol/v4-abacus": "1.8.6",
     "@dydxprotocol/v4-client-js": "^1.1.24",
-    "@dydxprotocol/v4-localization": "^1.1.138",
+    "@dydxprotocol/v4-localization": "^1.1.139",
     "@ethersproject/providers": "^5.7.2",
     "@hugocxl/react-to-image": "^0.0.9",
     "@js-joda/core": "^5.5.3",
