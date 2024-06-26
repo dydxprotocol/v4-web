@@ -438,7 +438,6 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
                 {formatNumberOutput(
                   usdcWithdrawalCapacity,
                   OutputType.Number,
