@@ -91,18 +91,19 @@ export const TradingRewardsChart = ({
     SELECTED_PERIOD.name
   );
 
-  const rewardsData = useMemo(
-    () =>
-      periodTradingRewards && canViewAccount
-        ? periodTradingRewards.reverse().map(
-            (datum): TradingRewardsDatum => ({
-              date: new Date(datum.endedAtInMilliseconds).valueOf(),
-              cumulativeAmount: datum.cumulativeAmount,
-            })
-          )
-        : [],
-    [periodTradingRewards, canViewAccount]
-  );
+  const rewardsData = useMemo(() => {
+    if (periodTradingRewards && canViewAccount) {
+      const res = periodTradingRewards.map(
+        (datum): TradingRewardsDatum => ({
+          date: new Date(datum.endedAtInMilliseconds).valueOf(),
+          cumulativeAmount: datum.cumulativeAmount,
+        })
+      );
+      res.sort((datumA, datumB) => datumA.date - datumB.date);
+      return res;
+    }
+    return [];
+  }, [periodTradingRewards, canViewAccount]);
 
   const oldestDataPointDate = rewardsData?.[0]?.date;
   const newestDataPointDate = rewardsData?.[rewardsData.length - 1]?.date;
