@@ -220,6 +220,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
+          const isCosmosTransfer = cosmosTransferStatus !== undefined;
           if (isCosmosTransfer) {
             const icon = <$AssetIcon symbol="USDC" />;
             const isFinished =

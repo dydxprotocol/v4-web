@@ -50,16 +50,8 @@ export const TransferStatusNotification = ({
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const dispatch = useAppDispatch();
-  const {
-    status,
-    toAmount,
-    isExchange,
-    isCosmosTransfer,
-    cosmosTransferStatus,
-    toChainId,
-    fromChainId,
-    txHash,
-  } = transfer;
+  const { status, toAmount, isExchange, cosmosTransferStatus, toChainId, fromChainId, txHash } =
+    transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -83,8 +75,9 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
+  const isCosmosTransfer = cosmosTransferStatus !== undefined;
   const isComplete = isCosmosTransfer
-    ? cosmosTransferStatus?.step === 'depositToSubaccount' &&
+    ? cosmosTransferStatus.step === 'depositToSubaccount' &&
       cosmosTransferStatus.status === 'success'
     : status?.squidTransactionStatus === 'success' || isExchange;
 

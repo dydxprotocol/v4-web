@@ -100,7 +100,6 @@ export const CosmosDepositDialog = ({
             toAmount,
             triggeredAt: Date.now(),
             type: TransferNotificationTypes.Deposit,
-            isCosmosTransfer: true,
             cosmosTransferStatus: {
               status: 'pending',
               step: 'depositToSubaccount',
@@ -137,7 +136,10 @@ export const CosmosDepositDialog = ({
           // const txHash = Buffer.from(tx.hash).toString('hex');
 
           const updatedTransferNotifications = transferNotifications.map((notification) => {
-            if (notification.txHash === step.ibcTransferTxHash && notification.isCosmosTransfer) {
+            if (
+              notification.txHash === step.ibcTransferTxHash &&
+              notification.cosmosTransferStatus !== undefined
+            ) {
               return {
                 ...notification,
                 cosmosTransferStatus: {
