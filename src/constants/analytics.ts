@@ -203,6 +203,7 @@ export const AnalyticsEvents = unionize(
       txHash?: string;
       amount?: number;
       validatorAddress?: string;
+      defaultValidatorAddress?: string;
     }>(),
     UnstakeTransaction: ofType<{
       txHash?: string;
