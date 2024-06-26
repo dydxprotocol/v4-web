@@ -27,6 +27,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -42,7 +43,7 @@ import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -345,6 +346,7 @@ export const WithdrawForm = () => {
   ];
 
   const { sanctionedAddresses } = useRestrictions();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   const { alertType, errorMessage } = useMemo(() => {
     if (isCctp) {
@@ -436,7 +438,11 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
+                {formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
+                  decimalSeparator,
+                  groupSeparator,
+                  fractionDigits: TOKEN_DECIMALS,
+                })}
                 <$Tag>{usdcLabel}</$Tag>
               </span>
             ),

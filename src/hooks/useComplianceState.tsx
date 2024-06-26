@@ -10,6 +10,7 @@ import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from '@/components/Link';
+import { OutputType, formatDateOutput } from '@/components/Output';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -55,9 +56,9 @@ export const useComplianceState = () => {
       key: STRING_KEYS.CLOSE_ONLY_MESSAGE,
       params: {
         DATE: updatedAtDate
-          ? updatedAtDate.toLocaleString(selectedLocale, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
+          ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, {
+              dateFormat: 'medium',
+              selectedLocale,
             })
           : undefined,
         EMAIL: complianceSupportEmail,
