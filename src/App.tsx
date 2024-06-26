@@ -160,6 +160,7 @@ const providers = [
     clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
     config: privyConfig,
   }),
+  wrapProvider(StatSigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
@@ -174,7 +175,6 @@ const providers = [
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(AppThemeAndColorModeProvider),
-  wrapProvider(StatSigProvider),
 ];
 
 const App = () => {

@@ -103,9 +103,6 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
-    // appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip : OnboardingConfig.RouterVendor.Squid; // should be skip, shoul dbe able to just import the client and check the gatee
-
-    // test by console logging here, it shoudl match whatever i expect
 
     this.stateManager = new AsyncAbacusStateManager(
       '',

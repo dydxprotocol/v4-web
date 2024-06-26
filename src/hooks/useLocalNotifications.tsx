@@ -32,6 +32,8 @@ const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
   const { skip } = useEndpointsConfig();
+  const useSkip = useStatSigGateValue(StatSigFlags.ffSkipMigration);
+
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
     version: string;
@@ -133,8 +135,7 @@ const useLocalNotificationsContext = () => {
                   chainId: fromChainId,
                   baseUrl: skip,
                 };
-                // TODO: replace with statsig call
-                const useSkip = useStatSigGateValue(StatSigFlags.ffSkipMigration);
+
                 if (!tracked && useSkip) {
                   const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                   // if no tx hash was returned, transfer has not yet been tracked
