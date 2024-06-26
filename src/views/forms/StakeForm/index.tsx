@@ -154,7 +154,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [isAmountValid, selectedValidator, amountBN, delegate, onDone]);
+  }, [isAmountValid, selectedValidator, defaultValidator, amountBN, delegate, onDone]);
 
   const amountDetailItems = [
     {
