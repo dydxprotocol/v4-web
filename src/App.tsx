@@ -19,6 +19,7 @@ import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
+import { StatSigProvider } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -173,6 +174,7 @@ const providers = [
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(AppThemeAndColorModeProvider),
+  wrapProvider(StatSigProvider),
 ];
 
 const App = () => {
