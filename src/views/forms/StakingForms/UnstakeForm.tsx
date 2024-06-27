@@ -29,8 +29,8 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
-import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
+import { UnstakeButtonAndReceipt } from '@/views/forms/StakingForms/UnstakeForm/UnstakeButtonAndReceipt';
+import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
