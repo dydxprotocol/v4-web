@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Provider } from 'react-redux';
 import styled from 'styled-components';
-import { WagmiConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 
 import { SupportedLocales } from '@/constants/localization';
 
@@ -23,6 +23,8 @@ import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { GlobalStyle } from '@/styles/globalStyle';
 
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
+
+import { store } from '@/state/_store';
 import {
   AppColorMode,
   AppTheme,
@@ -35,7 +37,6 @@ import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 import { config } from '@/lib/wagmi';
 
 import './ladle.css';
-import { store } from "@/state/_store";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +50,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
-  wrapProvider(WagmiConfig, { config }),
+  wrapProvider(WagmiProvider, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
