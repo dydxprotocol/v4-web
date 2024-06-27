@@ -154,6 +154,7 @@ const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
 export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferType;
+export type TransferTypeType = Abacus.exchange.dydx.abacus.output.input.TransferType;
 
 export const AdjustIsolatedMarginInputField =
   Abacus.exchange.dydx.abacus.state.model.AdjustIsolatedMarginInputField;

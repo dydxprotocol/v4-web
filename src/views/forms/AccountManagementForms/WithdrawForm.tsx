@@ -399,9 +399,9 @@ export const WithdrawForm = () => {
       track(
         AnalyticsEvents.RouteError({
           transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessage?.toString(),
+          errorMessage: routeErrorMessage ?? undefined,
           amount: debouncedAmount,
-          chainId: chainIdStr?.toString(),
+          chainId: chainIdStr ?? undefined,
           assetId: toToken?.toString(),
         })
       );

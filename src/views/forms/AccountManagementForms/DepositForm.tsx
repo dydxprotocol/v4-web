@@ -378,9 +378,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       track(
         AnalyticsEvents.RouteError({
           transferType: TransferType.deposit.name,
-          errorMessage: routeErrorMessage?.toString(),
+          errorMessage: routeErrorMessage ?? undefined,
           amount: debouncedAmount,
-          chainId: chainIdStr?.toString(),
+          chainId: chainIdStr ?? undefined,
           assetId: sourceToken?.toString(),
         })
       );
