@@ -62,7 +62,6 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
-  const { showMemoTransferField } = useEnvFeatures();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
@@ -95,7 +94,7 @@ export const TransferForm = ({
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
-  const showMemoField = showMemoTransferField && isChainTokenSelected;
+  const showMemoField = isChainTokenSelected;
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
