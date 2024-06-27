@@ -4,6 +4,8 @@ import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/lo
 
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
+// for each locale, an array of the correct compact number suffix to use for 10^{index}
+// e.g. for "en" we have ['', '', '', 'K', 'K', 'K', 'M', 'M', 'M', 'B', 'B', 'B', 'T', 'T', 'T']
 const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
   SUPPORTED_LOCALE_STRING_LABELS,
   (name, lang) =>
@@ -26,6 +28,8 @@ const zipObjectFn = <T extends string, K>(arr: T[], valueGenerator: (val: T) => 
     arr.map((val) => valueGenerator(val))
   );
 
+// for each locale, look up a given suffix (from map above) and get the correct power of ten to divide numbers by when using this suffix
+// e.g. for "en" if you look up "K" you get 3 (1000), if you look up "M" you get 6 (1,000,000)
 const supportedLocaleToSuffixPowers = mapValues(
   supportedLocaleToCompactSuffixByPowerOfTen,
   (values) => zipObjectFn([...new Set(values)], (f) => values.indexOf(f))
