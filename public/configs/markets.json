@@ -82,7 +82,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/acquire-fi/", 
         "name": "Acquire.Fi", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://acquire.fi/", 
         "whitepaperLink": "https://docsend.com/view/s/g6j5ms4bhubyrq8x"
@@ -979,7 +979,7 @@
         "name": "Boson Protocol", 
         "tags": [
             "NFT", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "http://bosonprotocol.io", 
         "whitepaperLink": "https://docsend.com/view/p7g9u8d8wiwnf9jn"
@@ -1038,7 +1038,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bytom/", 
         "name": "Bytom", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "http://bytom.io/", 
         "whitepaperLink": "https://github.com/Bytom/wiki"
@@ -1188,7 +1188,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/centrifuge/", 
         "name": "Centrifuge", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://centrifuge.io/", 
         "whitepaperLink": "https://centrifuge.io/cfg_token_summary.pdf"
@@ -1229,7 +1229,7 @@
             "NFT", 
             "Defi", 
             "Gaming", 
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://chromia.com/", 
@@ -1351,7 +1351,7 @@
         "name": "Clearpool", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://clearpool.finance/", 
         "whitepaperLink": null
@@ -1427,7 +1427,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/creditcoin/", 
         "name": "Creditcoin", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://creditcoin.org", 
         "whitepaperLink": "https://www.creditcoin.org/white-paper"
@@ -1898,7 +1898,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dusk/", 
         "name": "Dusk", 
         "tags": [
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://www.dusk.network", 
@@ -2868,10 +2868,10 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/hifi-finance-new/", 
         "name": "Hifi Finance", 
         "tags": [
-            "Real World assets", 
+            "RWA", 
             "Defi", 
             "Governance", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://hifi.finance/", 
         "whitepaperLink": "https://docs.hifi.finance/"
@@ -3713,7 +3713,7 @@
         "name": "Lisk", 
         "tags": [
             "Layer 2", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://Lisk.com/", 
         "whitepaperLink": "https://lisk.com/documentation/lisk-sdk/index.html"
@@ -3732,7 +3732,7 @@
         "name": "LTO Network", 
         "tags": [
             "NFT", 
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://www.ltonetwork.com/", 
@@ -4162,7 +4162,7 @@
         "name": "Maple", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://maple.finance/", 
         "whitepaperLink": "https://maple-finance.gitbook.io/maple/"
@@ -4468,7 +4468,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/neopin/", 
         "name": "NEOPIN", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://neopin.io/", 
         "whitepaperLink": "https://neopin.io/VisionPaper_V2.1.pdf"
@@ -4515,7 +4515,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/allianceblock-nexera/", 
         "name": "Nexera", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.nexera.foundation/", 
         "whitepaperLink": null
@@ -4642,7 +4642,7 @@
         "name": "MANTRA", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.mantrachain.io", 
         "whitepaperLink": "https://docs.mantrachain.io/"
@@ -4731,7 +4731,7 @@
         "name": "Opulous", 
         "tags": [
             "Entertainment", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://opulous.org/", 
         "whitepaperLink": null
@@ -4741,7 +4741,7 @@
         "name": "Oraichain", 
         "tags": [
             "Defi", 
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://orai.io/", 
@@ -4847,7 +4847,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pax-gold/", 
         "name": "PAX Gold", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.paxos.com/paxgold/", 
         "whitepaperLink": "https://www.paxos.com/pax-gold-whitepaper"
@@ -4980,7 +4980,7 @@
         "tags": [
             "NFT", 
             "Gaming", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://planetrefi.com/", 
         "whitepaperLink": null
@@ -5035,7 +5035,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polymesh/", 
         "name": "Polymesh", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://polymesh.network/", 
         "whitepaperLink": "https://polymesh.network/resources"
@@ -5103,9 +5103,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/parcl/", 
         "name": "Parcl", 
         "tags": [
-            "Real World assets", 
             "Governance", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.parcl.co/", 
         "whitepaperLink": "https://docs.parcl.co/"
@@ -5264,7 +5263,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/quant/", 
         "name": "Quant", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://quant.network/", 
         "whitepaperLink": null
@@ -5356,7 +5355,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ribbon-finance/", 
         "name": "Ribbon Finance", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.ribbon.finance/", 
         "whitepaperLink": "https://docs.ribbon.finance/"
@@ -5451,8 +5450,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/realio-network/", 
         "name": "Realio Network", 
         "tags": [
-            "Real World assets", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "http://www.realio.fund/", 
         "whitepaperLink": null
@@ -5544,7 +5542,7 @@
         "name": "Reserve Rights", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://reserve.org/", 
         "whitepaperLink": "https://reserve.org/protocol/2021_version/#main-content"
@@ -6424,7 +6422,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/origintrail/", 
         "name": "OriginTrail", 
         "tags": [
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://origintrail.io/", 
@@ -6435,7 +6433,7 @@
         "name": "Polytrade", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://polytrade.finance", 
         "whitepaperLink": "https://polytrade.finance/whitepaper.pdf"
@@ -6482,7 +6480,7 @@
         "name": "TrueFi", 
         "tags": [
             "Defi", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://truefi.io/", 
         "whitepaperLink": null
@@ -6500,7 +6498,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/trvl/", 
         "name": "TRVL", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "http://www.dtravel.com/", 
         "whitepaperLink": "https://docs.dtravel.com/"
@@ -6717,7 +6715,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/vempire-ddao/", 
         "name": "VEMP", 
         "tags": [
-            "Real World assets", 
+            "RWA", 
             "AR/VR", 
             "NFT", 
             "Defi", 
@@ -6739,7 +6737,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/vechain/", 
         "name": "VeChain", 
         "tags": [
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.vechain.org/", 
         "whitepaperLink": "https://www.vechain.org/whitepaper/#bit_65sv8"
@@ -6750,7 +6748,7 @@
         "tags": [
             "Entertainment", 
             "Gaming", 
-            "Real World Assets"
+            "RWA"
         ], 
         "websiteLink": "https://www.velocemediagroup.com/vext", 
         "whitepaperLink": "https://docs.velocemediagroup.com/whitepaper"
@@ -7148,7 +7146,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/chia-network/", 
         "name": "Chia", 
         "tags": [
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://www.chia.net/", 
@@ -7184,7 +7182,7 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/xdc-network/", 
         "name": "XDC Network", 
         "tags": [
-            "Real World Assets", 
+            "RWA", 
             "Layer 1"
         ], 
         "websiteLink": "https://www.xdc.org/", 
