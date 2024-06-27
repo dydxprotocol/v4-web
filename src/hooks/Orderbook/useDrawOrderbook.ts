@@ -240,7 +240,7 @@ export const useDrawOrderbook = ({
       formatNumberOutput(sizeToRender, OutputType.Number, {
         decimalSeparator,
         groupSeparator,
-        fractionDigits: tickSizeDecimals,
+        fractionDigits: 0,
       });
 
     // Size text
