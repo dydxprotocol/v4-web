@@ -46,7 +46,7 @@ import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors
 
 import { LocaleSeparators } from '../numbers';
 // eslint-disable-next-line import/no-cycle
-import { StatSigFlags, statsigClientPromise } from '../statsig';
+import { StatSigFlags, statsigCheckGatePromise } from '../statsig';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -104,10 +104,9 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
-    const useSkip = statsigClientPromise.then((client) =>
-      client.checkGate(StatSigFlags.ffSkipMigration)
-    );
-    if (useSkip) appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip;
+    statsigCheckGatePromise(StatSigFlags.ffSkipMigration).then((useSkip) => {
+      if (useSkip) appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip;
+    });
 
     this.stateManager = new AsyncAbacusStateManager(
       '',

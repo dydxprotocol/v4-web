@@ -1,13 +1,21 @@
+import { useEffect, useState } from 'react';
+
+import { StatsigClient } from '@statsig/js-client';
 import { StatsigProvider, useStatsigClient } from '@statsig/react-bindings';
 
-import { StatSigFlags, statsigClient } from '@/lib/statsig';
+import { StatSigFlags, statsigClientPromise } from '@/lib/statsig';
 
 export const StatSigProvider = ({ children }: { children: React.ReactNode }) => {
-  // const client = new StatsigClient(`${import.meta.env.VITE_STATSIG_CLIENT_KEY}`, {
-  //   // TODO: fill in with ip address
-  // });
-  // client.initializeSync();
-  return <StatsigProvider client={statsigClient}> {children} </StatsigProvider>;
+  const [client, setClient] = useState<StatsigClient | null>(null);
+  useEffect(() => {
+    const setAsyncClient = async () => {
+      const statsigClient = await statsigClientPromise;
+      setClient(statsigClient);
+    };
+    setAsyncClient();
+  }, [statsigClientPromise]);
+  if (!client) return <></>;
+  return <StatsigProvider client={client}> {children} </StatsigProvider>;
 };
 
 export const useStatSigGateValue = (gate: StatSigFlags) => {
