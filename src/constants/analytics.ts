@@ -1,5 +1,7 @@
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
+import { StatSigFlags } from '@/lib/statsig';
+
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
@@ -52,7 +54,7 @@ export const AnalyticsUserProperties = unionize(
     Version: ofType<string | null>(),
 
     // StatSigFlags
-    ffSkipMigration: ofType<boolean>(),
+    StatsigFlags: ofType<{ [key in StatSigFlags]?: boolean }>(),
 
     // Network
     Network: ofType<DydxNetwork>(),
@@ -73,7 +75,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   Locale: 'selectedLocale',
   Breakpoint: 'breakpoint',
   Version: 'version',
-  ffSkipMigration: 'ffSkipMigration',
+  StatsigFlags: 'statsigFlags',
   Network: 'network',
   WalletType: 'walletType',
   WalletConnectionType: 'walletConnectionType',

@@ -368,3 +368,5 @@ export type PerpetualMarketOrderbookLevel = OrderbookLine & {
   mine: number | undefined;
   key: string;
 };
+
+export const StatsigConfig = Abacus.exchange.dydx.abacus.state.manager.StatsigConfig;

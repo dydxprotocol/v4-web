@@ -29,6 +29,7 @@ import {
   HistoricalPnlPeriod,
   IOImplementations,
   OnboardingConfig,
+  StatsigConfig,
   TradeInputField,
   TransferInputField,
   TransferType,
@@ -45,8 +46,9 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
-import AbacusAnalytics from './analytics';
 // eslint-disable-next-line import/no-cycle
+import { StatSigFlags } from '../statsig';
+import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
 import AbacusFormatter from './formatter';
@@ -103,7 +105,6 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
-
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
@@ -408,6 +409,20 @@ class AbacusStateManager {
 
   getChainById = (chainId: string) => {
     return this.stateManager.getChainById(chainId);
+  };
+
+  /**
+   *
+   * Sets statsig configs to abacus. You must destructure the new flag you want to use
+   * and add it to the config construction in the correct order
+   *
+   * TODO: think of a more typesafe and elegant way to handle this
+   * TODO: make naming consistent between statsig FF name and boolean in abacus
+   * https://linear.app/dydx/project/feature-experimentation-6853beb333d7/overview
+   */
+  setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
+    const { [StatSigFlags.ffSkipMigration]: useSkip } = statsigConfig;
+    this.stateManager.statsigConfig = new StatsigConfig(useSkip);
   };
 }
 
