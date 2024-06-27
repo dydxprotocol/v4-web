@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { mapValues, range, zipObject } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import { SUPPORTED_LOCALE_STRING_LABELS } from '@/constants/localization';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
 import {
   ORDERBOOK_ANIMATION_DURATION,
@@ -17,6 +19,7 @@ import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode'
 import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import {
@@ -26,6 +29,7 @@ import {
   getYForElements,
 } from '@/lib/orderbookHelpers';
 import { generateFadedColorVariant } from '@/lib/styles';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
 
@@ -48,6 +52,33 @@ enum OrderbookRowAnimationType {
 
 export type Rekt = { x1: number; x2: number; y1: number; y2: number };
 
+const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
+  SUPPORTED_LOCALE_STRING_LABELS,
+  (name, lang) =>
+    range(15)
+      .map((a) =>
+        Intl.NumberFormat(lang, {
+          style: 'decimal',
+          notation: 'compact',
+          maximumSignificantDigits: 6,
+        }).format(Math.abs(10 ** a))
+      )
+      // first capture group grabs all the numbers with normal separator, then we grab any groups of whitespace+numbers
+      // this is so we know which languages keep whitespace before the suffix
+      .map((b) => b.replace(/(^[\d,.]+){1}(\s\d+)*/, ''))
+);
+
+const zipObjectFn = <T extends string, K>(arr: T[], valueGenerator: (val: T) => K) =>
+  zipObject(
+    arr,
+    arr.map((val) => valueGenerator(val))
+  );
+
+const supportedLocaleToSuffixPowers = mapValues(
+  supportedLocaleToCompactSuffixByPowerOfTen,
+  (values) => zipObjectFn([...new Set(values)], (f) => values.indexOf(f))
+);
+
 export const useDrawOrderbook = ({
   data,
   histogramRange,
@@ -59,12 +90,12 @@ export const useDrawOrderbook = ({
   const canvas = canvasRef.current;
   const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const {
-    stepSizeDecimals = TOKEN_DECIMALS,
-    tickSizeDecimals = SMALL_USD_DECIMALS,
-    stepSize,
-  } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const marketConfig = orEmptyObj(useAppSelector(getCurrentMarketConfig));
+  const stepSizeDecimals = marketConfig.stepSizeDecimals ?? TOKEN_DECIMALS;
+  const tickSizeDecimals = marketConfig.tickSizeDecimals ?? SMALL_USD_DECIMALS;
+  const stepSize = marketConfig.stepSize ?? 10 ** (-1 * TOKEN_DECIMALS);
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
@@ -226,26 +257,47 @@ export const useDrawOrderbook = ({
         formatNumberOutput(price, OutputType.Number, {
           decimalSeparator,
           groupSeparator,
-          fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
+          fractionDigits: tickSizeDecimals,
         }),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
-    const decimalPlaces = displayUnit === 'asset' ? stepSizeDecimals ?? TOKEN_DECIMALS : 0;
-    const displayType = displayUnit === 'asset' ? OutputType.CompactNumber : OutputType.Number;
+    const getAssetSizeString = (sizeToRender: number) => {
+      const { displayDivisor, displaySuffix } = (() => {
+        if (stepSizeDecimals !== 0 || stepSize == null || stepSize < 10) {
+          return { displayDivisor: 1, displaySuffix: '' };
+        }
+        const unitToUse =
+          supportedLocaleToCompactSuffixByPowerOfTen[selectedLocale][Math.log10(stepSize)];
+        return {
+          displayDivisor: 10 ** supportedLocaleToSuffixPowers[selectedLocale][unitToUse],
+          displaySuffix: unitToUse,
+        };
+      })();
+      return `${formatNumberOutput(sizeToRender / displayDivisor, OutputType.Number, {
+        decimalSeparator,
+        groupSeparator,
+        fractionDigits: stepSizeDecimals,
+      })}${displaySuffix}`;
+    };
+
+    const getSizeInFiatString = (sizeToRender: number) =>
+      formatNumberOutput(sizeToRender, OutputType.Number, {
+        decimalSeparator,
+        groupSeparator,
+        fractionDigits: tickSizeDecimals,
+      });
 
     // Size text
     const displaySize = displayUnit === 'asset' ? size : sizeCost;
     if (displaySize != null) {
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
-        formatNumberOutput(displaySize, displayType, {
-          decimalSeparator,
-          groupSeparator,
-          fractionDigits: decimalPlaces,
-        }),
+        displayUnit === 'asset'
+          ? getAssetSizeString(displaySize)
+          : getSizeInFiatString(displaySize),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
@@ -256,11 +308,9 @@ export const useDrawOrderbook = ({
     if (displayDepth != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        formatNumberOutput(displayDepth, displayType, {
-          decimalSeparator,
-          groupSeparator,
-          fractionDigits: decimalPlaces,
-        }),
+        displayUnit === 'asset'
+          ? getAssetSizeString(displayDepth)
+          : getSizeInFiatString(displayDepth),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
