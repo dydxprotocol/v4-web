@@ -27,6 +27,7 @@ import { WithReceipt } from '@/components/WithReceipt';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { getNobleChainId } from '@/lib/squid';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { TransferStatusSteps } from './TransferStatusSteps';
@@ -50,7 +51,7 @@ export const TransferStatusNotification = ({
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const dispatch = useAppDispatch();
-  const { status, toAmount, isExchange, cosmosTransferStatus, toChainId, fromChainId, txHash } =
+  const { status, toAmount, isExchange, toChainId, fromChainId, txHash, depositSubaccount } =
     transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
@@ -75,10 +76,10 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
-  const isCosmosTransfer = cosmosTransferStatus !== undefined;
+  const nobleChainId = getNobleChainId();
+  const isCosmosTransfer = [nobleChainId].includes(fromChainId ?? '');
   const isComplete = isCosmosTransfer
-    ? cosmosTransferStatus.step === 'depositToSubaccount' &&
-      cosmosTransferStatus.status === 'success'
+    ? status?.squidTransactionStatus === 'success' && depositSubaccount?.needToDeposit === false
     : status?.squidTransactionStatus === 'success' || isExchange;
 
   const inProgressStatusString =
