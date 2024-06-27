@@ -28,7 +28,7 @@ export enum MarketFilters {
   GAMING = 'Gaming',
   MEME = 'Meme',
   RWA = 'RWA',
-  ENT = 'Entertainment'
+  ENT = 'Entertainment',
 }
 
 export const MARKET_FILTER_LABELS = {
