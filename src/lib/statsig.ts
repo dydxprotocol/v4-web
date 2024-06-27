@@ -23,7 +23,7 @@ const initStatsig = async () => {
   return statsigClient;
 };
 
-export const statsigClient = await initStatsig();
+export const statsigClientPromise = initStatsig();
 
 export enum StatSigFlags {
   // When adding a flag here, make sure to add an analytics tracker in useAnalytics.ts
