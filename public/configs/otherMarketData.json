@@ -5432,10 +5432,10 @@
         "params": {
             "id": 89,
             "ticker": "PENDLE-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+            "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
             "priceExponent": -9,
             "minPriceChange": 800,
-            "minExchanges": 1,
+            "minExchanges": 3,
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Binance",
