@@ -1,21 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Description } from '@radix-ui/react-dialog';
-import Long from 'long';
 import styled from 'styled-components';
-import { parseUnits } from 'viem';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
-import { TransferNotificationTypes } from '@/constants/notifications';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -25,107 +19,19 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import abacusStateManager from '@/lib/abacus';
-
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
-  toChainId?: string;
-  fromChainId?: string;
   toAmount?: number;
   txHash?: string;
 };
 
-export const CosmosDepositDialog = ({
-  setIsOpen,
-  toChainId,
-  fromChainId,
-  toAmount,
-  txHash,
-}: ElementProps) => {
+export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { usdcGasDenom, usdcDecimals } = useTokenConfigs();
   const { isMobile } = useBreakpoints();
-  const { nobleAddress, dydxAddress } = useAccounts();
   const { deposit } = useSubaccount();
-  const { transferNotifications, addTransferNotification, setTransferNotifications } =
-    useLocalNotifications();
+  const { transferNotifications, setTransferNotifications } = useLocalNotifications();
 
-  const [step, setStep] = useState<{
-    value: 'ibcTransfer' | 'depositToSubaccount';
-    state: 'success' | 'error' | 'pending';
-    ibcTransferTxHash?: string;
-  }>({
-    value: txHash ? 'depositToSubaccount' : 'ibcTransfer',
-    state: 'pending',
-    ibcTransferTxHash: txHash,
-  });
-
-  useEffect(() => {
-    setStep((prev) => ({
-      ...prev,
-      value: txHash ? 'depositToSubaccount' : 'ibcTransfer',
-      ibcTransferTxHash: txHash,
-    }));
-  }, [txHash]);
-
-  const ibcFromNoble = useCallback(async () => {
-    try {
-      if (nobleAddress && dydxAddress && toAmount) {
-        const tx = await abacusStateManager.sendNobleIBC({
-          msgTypeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-          msg: {
-            sourcePort: 'transfer',
-            sourceChannel: isMainnet ? 'channel-33' : 'channel-21',
-            sender: nobleAddress,
-            receiver: dydxAddress,
-            token: {
-              denom: usdcGasDenom,
-              amount: parseUnits(toAmount.toString(), usdcDecimals).toString(),
-            },
-            timeoutTimestamp: Long.fromNumber(Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9),
-          },
-        });
-
-        if (tx !== undefined) {
-          const parsedTx = JSON.parse(tx);
-
-          if (parsedTx.error !== undefined || parsedTx.code !== 0) {
-            throw new Error(parsedTx.error);
-          }
-
-          addTransferNotification({
-            txHash: parsedTx.transactionHash,
-            toChainId,
-            fromChainId,
-            toAmount,
-            triggeredAt: Date.now(),
-            type: TransferNotificationTypes.Deposit,
-            cosmosTransferStatus: {
-              status: 'pending',
-              step: 'depositToSubaccount',
-            },
-          });
-
-          setStep({
-            value: 'depositToSubaccount',
-            state: 'pending',
-            ibcTransferTxHash: parsedTx.transactionHash,
-          });
-        }
-      }
-    } catch {
-      setStep((prev) => ({ ...prev, state: 'error' }));
-    }
-  }, [
-    nobleAddress,
-    dydxAddress,
-    toAmount,
-    usdcGasDenom,
-    usdcDecimals,
-    toChainId,
-    fromChainId,
-    txHash,
-  ]);
+  const [txStatus, setTxStatus] = useState<'success' | 'error' | 'pending'>('pending');
 
   const depositToSubaccount = useCallback(async () => {
     try {
@@ -133,18 +39,14 @@ export const CosmosDepositDialog = ({
         const tx = await deposit(toAmount);
 
         if (tx !== undefined) {
-          // const txHash = Buffer.from(tx.hash).toString('hex');
-
+          const depositTxHash = Buffer.from(tx.hash).toString('hex');
           const updatedTransferNotifications = transferNotifications.map((notification) => {
-            if (
-              notification.txHash === step.ibcTransferTxHash &&
-              notification.cosmosTransferStatus !== undefined
-            ) {
+            if (notification.txHash === txHash && notification.depositSubaccount?.needToDeposit) {
               return {
                 ...notification,
-                cosmosTransferStatus: {
-                  status: 'success' as const,
-                  step: 'depositToSubaccount' as const,
+                depositSubaccount: {
+                  txHash: depositTxHash,
+                  needToDeposit: false,
                 },
               };
             }
@@ -152,34 +54,15 @@ export const CosmosDepositDialog = ({
           });
           setTransferNotifications(updatedTransferNotifications);
 
-          setStep((prev) => ({
-            ...prev,
-            state: 'success',
-          }));
+          setTxStatus('success');
         } else {
           throw new Error('Transaction failed');
         }
       }
     } catch {
-      setStep((prev) => ({ ...prev, state: 'error' }));
+      setTxStatus('error');
     }
-  }, [toAmount, step.ibcTransferTxHash, transferNotifications]);
-
-  useEffect(() => {
-    if (step?.state === 'pending' && step.value === 'ibcTransfer') {
-      ibcFromNoble();
-    }
-  }, [step.state, step.value, ibcFromNoble]);
-
-  useEffect(() => {
-    if (step?.state === 'pending' && step.value === 'depositToSubaccount') {
-      depositToSubaccount();
-    }
-  }, [step.state, step.value, depositToSubaccount]);
-
-  const onRetry = () => {
-    setStep((prev) => ({ ...prev, state: 'pending' }));
-  };
+  }, [toAmount, txHash, transferNotifications]);
 
   const onClose = () => {
     setIsOpen?.(false);
@@ -192,10 +75,6 @@ export const CosmosDepositDialog = ({
       title: 'Send USDC',
       // TODO: Need to add localization
       description: 'Send IBC from Noble. USDC’s native chain.',
-      showStepNumber: false,
-      isPending: step?.value === 'ibcTransfer' && step?.state === 'pending',
-      isSuccess: step?.value === 'depositToSubaccount',
-      isError: step?.value === 'ibcTransfer' && step?.state === 'error',
     },
     {
       step: 2,
@@ -203,12 +82,12 @@ export const CosmosDepositDialog = ({
       title: 'Confirm Deposit',
       // TODO: Need to add localization
       description: 'Fund your dYdX subaccount balance once your IBC transfer has been received.',
-      showStepNumber: step?.value === 'ibcTransfer',
-      isPending: step?.value === 'depositToSubaccount' && step?.state === 'pending',
-      isSuccess: step?.value === 'depositToSubaccount' && step?.state === 'success',
-      isError: step?.value === 'depositToSubaccount' && step?.state === 'error',
     },
   ];
+
+  const isDepositSuccess = txStatus === 'success';
+  const isDepositError = txStatus === 'error';
+  const isDepositPending = txStatus === 'pending';
 
   return (
     <Dialog
@@ -218,14 +97,13 @@ export const CosmosDepositDialog = ({
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <$Content>
-        {stepItems.map((stepItem) => (
+        {stepItems.map((stepItem, index) => (
           <$StepItemContainer key={stepItem.step}>
             <$StepItem>
               <$Icon>
-                {stepItem.showStepNumber && <$StepNumber>{stepItem.step}</$StepNumber>}
-                {stepItem.isPending && <$LoadingSpinner />}
-                {stepItem.isSuccess && <$GreenCheckCircle />}
-                {stepItem.isError && <$WarningIcon iconName={IconName.Warning} />}
+                {index > 0 && isDepositPending && <$LoadingSpinner />}
+                {(index === 0 || isDepositSuccess) && <$GreenCheckCircle />}
+                {index > 0 && isDepositError && <$WarningIcon iconName={IconName.Warning} />}
               </$Icon>
               <div>
                 <$Title>{stepItem.title}</$Title>
@@ -237,17 +115,12 @@ export const CosmosDepositDialog = ({
         ))}
 
         <$Button
-          action={step?.state === 'success' ? ButtonAction.Primary : ButtonAction.Secondary}
+          action={isDepositError ? ButtonAction.Secondary : ButtonAction.Primary}
           type={ButtonType.Button}
-          disabled={step === undefined || step.state === 'pending'}
-          onClick={step?.state === 'error' ? onRetry : onClose}
+          onClick={isDepositSuccess ? onClose : depositToSubaccount}
         >
           {/* TODO: Need to add localization */}
-          {step?.state === 'error'
-            ? 'Try Again'
-            : step?.state === 'success'
-              ? 'Done'
-              : 'Waiting for Deposit'}
+          {isDepositError ? 'Try Again' : txStatus === 'success' ? 'Done' : 'Deposit'}
         </$Button>
       </$Content>
     </Dialog>
@@ -286,18 +159,6 @@ const $WarningIcon = styled(Icon)`
 
 const $LoadingSpinner = styled(LoadingSpinner)`
   --spinner-width: 2rem;
-`;
-
-const $StepNumber = styled.div`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-color: var(--color-layer-5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-2);
-  flex-shrink: 0;
 `;
 
 const $Title = styled.h3`

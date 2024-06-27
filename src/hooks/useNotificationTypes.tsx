@@ -55,6 +55,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { getNobleChainId } from '@/lib/squid';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -220,12 +221,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const isCosmosTransfer = cosmosTransferStatus !== undefined;
+          const nobleChainId = getNobleChainId();
+          const isCosmosTransfer = [nobleChainId].includes(fromChainId ?? '');
           if (isCosmosTransfer) {
             const icon = <$AssetIcon symbol="USDC" />;
-            const isFinished =
-              cosmosTransferStatus?.status === 'success' &&
-              cosmosTransferStatus?.step === 'depositToSubaccount';
+            const isFinished = depositSubaccount?.txHash && !depositSubaccount?.needToDeposit;
             const title = isFinished
               ? stringGetter({
                   key: STRING_KEYS.DEPOSIT,

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import Long from 'long';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -132,7 +133,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
-  const { usdcLabel, usdcDecimals } = useTokenConfigs();
+  const { usdcLabel, usdcDecimals, usdcGasDenom } = useTokenConfigs();
   const { nobleValidator } = useEndpointsConfig();
 
   // Async Data
@@ -300,17 +301,55 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       try {
         e.preventDefault();
 
-        if (walletType === WalletType.Keplr) {
-          dispatch(closeDialog());
-          dispatch(
-            openDialog(
-              DialogTypes.CosmosDeposit({
-                toChainId: selectedDydxChainId,
-                fromChainId: chainIdStr ?? undefined,
-                toAmount: summary?.usdcSize ?? undefined,
-              })
-            )
-          );
+        const nobleChainId = getNobleChainId();
+        if (chainIdStr === nobleChainId && summary?.usdcSize) {
+          setIsLoading(true);
+          const tx = {
+            msgTypeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+            msg: {
+              sourcePort: 'transfer',
+              sourceChannel: isMainnet ? 'channel-33' : 'channel-21',
+              sender: nobleAddress,
+              receiver: dydxAddress,
+              token: {
+                denom: usdcGasDenom,
+                amount: parseUnits(summary.usdcSize.toString(), usdcDecimals).toString(),
+              },
+              timeoutTimestamp: Long.fromNumber(
+                Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9
+              ),
+            },
+          };
+          const txResult = await abacusStateManager.sendNobleIBC(tx);
+
+          const parsedTx = JSON.parse(txResult);
+          const nobleTxHash = parsedTx.transactionHash;
+
+          if (nobleTxHash) {
+            addTransferNotification({
+              txHash: nobleTxHash,
+              toChainId: selectedDydxChainId,
+              fromChainId: chainIdStr || undefined,
+              toAmount: summary?.usdcSize || undefined,
+              triggeredAt: Date.now(),
+              isCctp,
+              type: TransferNotificationTypes.Deposit,
+              depositSubaccount: {
+                needToDeposit: true,
+              },
+            });
+            dispatch(closeDialog());
+            dispatch(
+              openDialog(
+                DialogTypes.CosmosDeposit({
+                  toChainId: selectedDydxChainId,
+                  fromChainId: chainIdStr ?? undefined,
+                  toAmount: summary?.usdcSize ?? undefined,
+                  txHash: nobleTxHash,
+                })
+              )
+            );
+          }
           return;
         }
 
