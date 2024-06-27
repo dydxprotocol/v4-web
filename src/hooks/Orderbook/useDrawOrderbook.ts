@@ -390,6 +390,7 @@ export const useDrawOrderbook = ({
     theme,
     currentOrderbookMap,
     displayUnit,
+    canvas,
   ]);
 
   return { canvasRef };
