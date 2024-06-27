@@ -8387,6 +8387,12 @@
                     "ticker": "RAY-USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
+                },
+                {
+                  "exchangeName": "Raydium",
+                  "ticker": "RAY-SOL-Em6rHi68trYgBFyJ5261A2nhwuQWfLcirgzZZYoRcrkX-6-3mEFzHsJyu2Cpjrz6zPmTzP7uoLFj9SbbecGVzzkL1mJ-9-6Su6Ea97dBxecd5W92KcVvv6SzCurE2BXGgFe9LNGMpE-AVs9TA4nWDzfPJE9gGVNJMVhcQy3V9PGazuz33BfG2RA",
+                  "adjustByMarket": "SOL-USD",
+                  "invert": false
                 }
             ],
             "liquidityTier": 2,
