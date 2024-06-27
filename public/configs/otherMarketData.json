@@ -850,7 +850,7 @@
                 },
                 {
                     "exchangeName": "Kraken",
-                    "ticker": "BTCUSD",
+                    "ticker": "XXBTZUSD",
                     "invert": false
                 },
                 {
@@ -921,11 +921,6 @@
                     "exchangeName": "Huobi",
                     "ticker": "ethusdt",
                     "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "ETHUSD",
                     "invert": false
                 },
                 {
@@ -1140,11 +1135,6 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Kraken",
-                    "ticker": "XRPUSD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Kucoin",
                     "ticker": "XRP-USDT",
                     "adjustByMarket": "USDT-USD",
@@ -1272,11 +1262,6 @@
                     "exchangeName": "Huobi",
                     "ticker": "dogeusdt",
                     "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "DOGEUSD",
                     "invert": false
                 },
                 {
@@ -2138,11 +2123,6 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Kraken",
-                    "ticker": "LTCUSD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Kucoin",
                     "ticker": "LTC-USDT",
                     "adjustByMarket": "USDT-USD",
@@ -2387,11 +2367,6 @@
                     "exchangeName": "Huobi",
                     "ticker": "etcusdt",
                     "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "ETCUSD",
                     "invert": false
                 },
                 {
@@ -2791,11 +2766,6 @@
                 {
                     "exchangeName": "CoinbasePro",
                     "ticker": "XLM-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "XLMUSD",
                     "invert": false
                 },
                 {
@@ -8823,11 +8793,6 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Kraken",
-                    "ticker": "CRVUSD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Kucoin",
                     "ticker": "CRV-USDT",
                     "adjustByMarket": "USDT-USD",
@@ -9545,11 +9510,6 @@
                     "exchangeName": "Gate",
                     "ticker": "DYDX_USDT",
                     "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "DYDXUSD",
                     "invert": false
                 },
                 {
@@ -10425,11 +10385,6 @@
                 {
                     "exchangeName": "CoinbasePro",
                     "ticker": "JTO-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "JTOUSD",
                     "invert": false
                 },
                 {

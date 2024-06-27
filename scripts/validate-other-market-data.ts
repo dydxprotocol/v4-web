@@ -322,9 +322,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     const { url, tickers, parseResp } = EXCHANGE_INFO[exchange.exchangeName];
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
-    if (exchange.exchangeName === ExchangeName.Bybit) {
-      continue; // exit the current iteration of the loop.
-    }
+    // if (exchange.exchangeName === ExchangeName.Bybit) {
+    //   continue; // exit the current iteration of the loop.
+    // }
 
     // TODO: Skip Raydium since ticker is idiosyncratic
     if (exchange.exchangeName === ExchangeName.Raydium) {
@@ -803,6 +803,32 @@ function getMarketsToValidate(otherMarketsContent: string): Set<string> {
 
   return marketsToValidate;
 }
+function getAllMarketsToValidate(otherMarketsContent: string): Set<string> {
+  // Create a set to store all markets
+  const marketsToValidate = new Set<string>();
+
+  // Split the content by lines
+  const lines = otherMarketsContent.split('\n');
+
+  // Regex to find market lines
+  const marketRegex = /"([A-Z]+)": \{/;
+
+  // Iterate over each line to find all markets
+  lines.forEach(line => {
+    const match = line.trim().match(marketRegex);
+    if (match) {
+      marketsToValidate.add(match[1]);
+    }
+  });
+
+  // Log a message if no markets were found
+  if (marketsToValidate.size === 0) {
+    console.log('No markets to validate');
+  }
+
+  return marketsToValidate;
+}
+
 
 async function main(): Promise<void> {
   // Get markets to validate.
