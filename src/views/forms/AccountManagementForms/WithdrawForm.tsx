@@ -53,6 +53,7 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
@@ -349,6 +350,7 @@ export const WithdrawForm = () => {
 
   const { sanctionedAddresses } = useRestrictions();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const { alertType, errorMessage } = useMemo(() => {
     if (isCctp) {
@@ -452,6 +454,7 @@ export const WithdrawForm = () => {
                 {formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
                   decimalSeparator,
                   groupSeparator,
+                  selectedLocale,
                   fractionDigits: TOKEN_DECIMALS,
                 })}
                 <$Tag>{usdcLabel}</$Tag>
@@ -470,7 +473,6 @@ export const WithdrawForm = () => {
     routeErrorMessage,
     freeCollateralBN,
     chainIdStr,
-    debouncedAmountBN,
     toToken,
     toAddress,
     sanctionedAddresses,

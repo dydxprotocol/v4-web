@@ -113,22 +113,23 @@ export function formatNumberOutput(
     // required
     decimalSeparator,
     groupSeparator,
+    selectedLocale,
+
     // optional
     useGrouping = true,
     roundingMode = BigNumber.ROUND_HALF_UP,
     fractionDigits,
     minimumFractionDigits,
-    locale = navigator.language || 'en-US',
     showSign = ShowSign.Negative,
   }: {
     decimalSeparator: string | undefined;
     groupSeparator: string | undefined;
+    selectedLocale: string;
 
     fractionDigits?: number | null;
     minimumFractionDigits?: number;
     roundingMode?: BigNumber.RoundingMode;
     useGrouping?: boolean;
-    locale?: string;
     showSign?: ShowSign;
   }
 ) {
@@ -174,7 +175,7 @@ export function formatNumberOutput(
         throw new Error('value must be a number for compact number output');
       }
 
-      return Intl.NumberFormat(locale, {
+      return Intl.NumberFormat(selectedLocale, {
         style: 'decimal',
         notation: 'compact',
         maximumSignificantDigits: 3,
@@ -190,7 +191,7 @@ export function formatNumberOutput(
         throw new Error('value must be a number for compact fiat output');
       }
 
-      return Intl.NumberFormat(locale, {
+      return Intl.NumberFormat(selectedLocale, {
         style: 'currency',
         currency: 'USD',
         notation: 'compact',
@@ -257,16 +258,23 @@ type FormattingOptions = {
 type ElementProps = {
   type: OutputType;
   value?: BigNumberish | null;
+
+  // general props
   isLoading?: boolean;
+  tag?: React.ReactNode;
+  slotLeft?: React.ReactNode;
+  slotRight?: React.ReactNode;
+
+  // only for numbers, but they are most common so we hoist
   fractionDigits?: number | null;
   minimumFractionDigits?: number;
   showSign?: ShowSign;
-  slotLeft?: React.ReactNode;
-  slotRight?: React.ReactNode;
   useGrouping?: boolean;
   roundingMode?: BigNumber.RoundingMode;
+  withParentheses?: boolean;
   withSubscript?: boolean;
-  relativeTimeFormatOptions?: {
+
+  relativeTimeOptions?: {
     format: 'long' | 'short' | 'narrow' | 'singleCharacter';
     resolution?: number;
     stripRelativeWords?: boolean;
@@ -277,9 +285,6 @@ type ElementProps = {
   dateOptions?: {
     format?: 'full' | 'long' | 'medium' | 'short' | undefined;
   };
-  tag?: React.ReactNode;
-  withParentheses?: boolean;
-  locale?: string;
 };
 
 type StyleProps = {
@@ -290,33 +295,33 @@ type StyleProps = {
 export type OutputProps = ElementProps & StyleProps;
 
 export const Output = ({
-  type,
   value,
   isLoading,
-  fractionDigits,
-  minimumFractionDigits,
-  showSign = ShowSign.Negative,
   slotLeft,
   slotRight,
+  tag,
+  className,
+  withBaseFont,
+  type,
+
   useGrouping = true,
-  withSubscript = false,
+  fractionDigits,
+  minimumFractionDigits,
   roundingMode = BigNumber.ROUND_HALF_UP,
-  relativeTimeFormatOptions = {
+  withSubscript = false,
+  withParentheses,
+  showSign = ShowSign.Negative,
+
+  dateOptions,
+  relativeTimeOptions = {
     format: 'singleCharacter',
   },
   timeOptions,
-  dateOptions,
-  tag,
-  withParentheses,
-  locale = navigator.language || 'en-US',
-  className,
-  withBaseFont,
 }: OutputProps) => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const isDetailsLoading = useContext(LoadingContext);
-  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
-    useLocaleSeparators();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   if (!!isLoading || !!isDetailsLoading) {
     return <LoadingOutput />;
@@ -342,7 +347,7 @@ export const Output = ({
       const timestamp = getTimestamp(value);
       if (!timestamp) return null;
 
-      if (relativeTimeFormatOptions.format === 'singleCharacter') {
+      if (relativeTimeOptions.format === 'singleCharacter') {
         const { timeString, unitStringKey } = getStringsForDateTimeDiff(
           DateTime.fromMillis(timestamp)
         );
@@ -355,7 +360,7 @@ export const Output = ({
           >
             <time
               dateTime={new Date(timestamp).toISOString()}
-              title={new Date(timestamp).toLocaleString(locale)}
+              title={new Date(timestamp).toLocaleString(selectedLocale)}
             >
               {timeString}
               {stringGetter({ key: unitStringKey })}
@@ -372,7 +377,7 @@ export const Output = ({
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
         >
-          <RelativeTime timestamp={timestamp} {...relativeTimeFormatOptions} />
+          <RelativeTime timestamp={timestamp} {...relativeTimeOptions} />
 
           {tag && <Tag>{tag}</Tag>}
         </$Text>
@@ -416,12 +421,12 @@ export const Output = ({
       const renderedNumber = (
         <NumberValue
           value={formatNumberOutput(value, type, {
-            decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-            groupSeparator: LOCALE_GROUP_SEPARATOR,
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
             useGrouping,
             fractionDigits,
             minimumFractionDigits,
-            locale,
             roundingMode,
             showSign: ShowSign.None,
           })}
