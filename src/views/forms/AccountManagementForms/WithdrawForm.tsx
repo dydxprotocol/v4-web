@@ -473,6 +473,7 @@ export const WithdrawForm = () => {
     routeErrorMessage,
     freeCollateralBN,
     chainIdStr,
+    debouncedAmountBN,
     toToken,
     toAddress,
     sanctionedAddresses,
