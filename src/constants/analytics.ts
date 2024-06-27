@@ -222,6 +222,18 @@ export const AnalyticsEvents = unionize(
       amount?: number;
       validatorAddress?: string;
     }>(),
+    Error: ofType<{
+      location: string;
+      error: Error;
+      metadata?: any;
+    }>(),
+    RouteError: ofType<{
+      transferType?: 'withdrawal' | 'deposit';
+      errorMessage?: string;
+      amount: string;
+      chainId?: string;
+      assetId?: string;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
