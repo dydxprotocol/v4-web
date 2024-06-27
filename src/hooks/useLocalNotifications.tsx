@@ -112,6 +112,7 @@ const useLocalNotificationsContext = () => {
               isExchange,
               requestId,
               tracked,
+              depositSubaccount,
             } = transferNotification;
 
             const hasErrors =
@@ -123,6 +124,7 @@ const useLocalNotificationsContext = () => {
             if (
               !isExchange &&
               !hasErrors &&
+              !depositSubaccount &&
               (!currentStatus?.squidTransactionStatus ||
                 currentStatus?.squidTransactionStatus === 'ongoing')
             ) {
@@ -201,6 +203,6 @@ const useLocalNotificationsContext = () => {
     // Transfer notifications
     transferNotifications,
     addTransferNotification,
-    setTransferNotifications,
+    setAllTransferNotifications,
   };
 };
