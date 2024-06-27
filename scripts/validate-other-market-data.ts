@@ -37,6 +37,7 @@ const LocalWalletModule = await import(
 );
 const LocalWallet = LocalWalletModule.default;
 
+const PATH_TO_OLD_PROPOSALS = 'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
 const PATH_TO_PROPOSALS = 'public/configs/otherMarketData.json';
 // TODO: Query MIN_DEPOSIT and VOTING_PERIOD_SECONDS from chain.
 const MIN_DEPOSIT = '10000000';
@@ -752,89 +753,57 @@ async function retry<T>(
   }
 }
 
-// getMarketsToValidate finds markets that are either added or modified.
-function getMarketsToValidate(otherMarketsContent: string): Set<string> {
-  const diffFile = process.env.DIFF;
-  if (!diffFile) {
-    throw new Error('Diff file does not exist');
-  }
+// getProposalsToValidate finds proposals that are either added or whose params are modified,
+// i.e. ignoring initialDeposit, meta, summary, title, etc.
+function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<string> {
+  const oldProposals: Record<string, Proposal> = JSON.parse(
+    readFileSync(PATH_TO_OLD_PROPOSALS, 'utf8')
+  );
 
-  // Get added/modified line numbers.
-  const diffContent = readFileSync(diffFile, 'utf8');
-  const diffLines = diffContent.split('\n');
-  const changedLines: number[] = [];
-  let currentLine = 0;
-  diffLines.forEach(line => {
-    if (line.startsWith('@@')) {
-      const match = line.match(/@@ \-(\d+),\d+ \+(\d+),\d+ @@/);
-      if (match) {
-        currentLine = parseInt(match[2], 10) - 1;
-      }
-    } else if (line.startsWith('+') && !line.startsWith('+++')) {
-      currentLine += 1; 
-      changedLines.push(currentLine);
-    } else if (!line.startsWith('-')) {
-      currentLine += 1;
-    }
-  });
-
-  // Get all added/modified markets.
   const marketsToValidate = new Set<string>();
-  const lines = otherMarketsContent.split('\n');
-  const findMarket = (lineNumber: number, lines: string[]) => {
-    for (let i = lineNumber - 1; i >= 0; i--) {
-      const line = lines[i].trim();
-      const match = line.match(/"([A-Z]+)": \{/);
-      if (match) {
-        return match[1];
-      }
+
+  for (const [name, newProposal] of Object.entries(newProposals)) {
+    if (!(name in oldProposals)) {
+      marketsToValidate.add(name);
+      continue;
     }
-    return null;
-  };
-  changedLines.forEach(line => {
-    const market = findMarket(line, lines);
-    if (market) {
-      marketsToValidate.add(market);
+
+    if (JSON.stringify(oldProposals[name].params) !== JSON.stringify(newProposal.params)) {
+      marketsToValidate.add(name);
     }
-  });
-  if (marketsToValidate.size === 0) {
-    console.log('No markets to validate');
   }
 
   return marketsToValidate;
 }
 
 async function main(): Promise<void> {
-  // Get markets to validate.
-  const fileContent = readFileSync(PATH_TO_PROPOSALS, 'utf8');
-  const marketsToValidate = getMarketsToValidate(fileContent);
-  console.log("\nValidating markets: ", marketsToValidate);
-  if (marketsToValidate.size === 0) {
-    return;
-  }
+  // Read new proposals.
+  const newProposals: Record<string, Proposal> = JSON.parse(readFileSync(PATH_TO_PROPOSALS, 'utf8'));
 
-  // Extract proposals.
-  const allMarkets = JSON.parse(fileContent)
-  const proposals: Proposal[] = Array.from(marketsToValidate).map(market => allMarkets[market]);
-
-  // Validate JSON schema.
-  console.log('Validating JSON schema of params...\n');
-  for (const proposal of proposals) {
+  // Validate JSON schema of all proposals.
+  console.log('Validating JSON schema of all proposals...\n');
+  for (const proposal of Object.values(newProposals)) {
     validateParamsSchema(proposal);
   }
 
-  // Validate proposal parameters.
-  console.log('\nValidating proposal parameters...\n');
-  for (const proposal of proposals) {
+  // Validate parameters of all proposals.
+  console.log('\nValidating parameters of all proposals...\n');
+  for (const proposal of Object.values(newProposals)) {
     // Validate exchange configuration of the market.
     await validateExchangeConfigJson(proposal.params.exchangeConfigJson);
   }
 
-  // Validate proposals against localnet.
-  console.log('\nTesting proposals against localnet...\n');
-  await validateAgainstLocalnet(proposals);
+  // Validate added/modified proposals against localnet.
+  const proposalsToValidate = getProposalsToValidate(newProposals);
+  console.log('\nTesting added/modified proposals against localnet...\n', proposalsToValidate);
+  if (proposalsToValidate.size === 0) {
+    return;
+  }
+  await validateAgainstLocalnet(
+    Array.from(proposalsToValidate).map((name) => newProposals[name])
+  );
 
-  console.log(`\nValidated ${proposals.length} markets. See log for specific names.`);
+  console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
 }
 
 main()
