@@ -20,7 +20,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from '@/components/Link';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType, ShowSign, formatDateOutput } from '@/components/Output';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
@@ -48,9 +48,9 @@ const usePortfolioValues = ({
   const accountValueLabel = useMemo(
     () =>
       activeDatum
-        ? new Date(activeDatum.createdAt).toLocaleString(selectedLocale, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, {
+            selectedLocale,
+            dateFormat: 'medium',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
     [activeDatum, selectedLocale, stringGetter]

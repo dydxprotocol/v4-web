@@ -1,5 +1,4 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { DateTime } from 'luxon';
 
 import {
   AbacusOrderStatus,
@@ -105,15 +104,6 @@ export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabl
     : [AbacusOrderType.TakeProfitMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
-
-export const relativeTimeString = ({
-  timeInMs,
-  selectedLocale,
-}: {
-  timeInMs: number;
-  selectedLocale: string;
-}) =>
-  DateTime.fromMillis(timeInMs).setLocale(selectedLocale).toLocaleString(DateTime.DATETIME_SHORT);
 
 type AddedProps = {
   asset: Asset | undefined;

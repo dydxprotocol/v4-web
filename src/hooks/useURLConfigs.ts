@@ -38,6 +38,7 @@ export interface LinksConfigs {
   contractLossMechanismLearnMore?: string;
   mintscanValidatorsLearnMore?: string;
   protocolStaking: string;
+  stakingAndClaimingRewardsLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -77,5 +78,7 @@ export const useURLConfigs = (): LinksConfigs => {
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
     mintscanValidatorsLearnMore: linksConfigs.mintscanValidatorsLearnMore,
     protocolStaking: linksConfigs.protocolStaking,
+    stakingAndClaimingRewardsLearnMore:
+      linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
   };
 };
