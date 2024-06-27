@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { useSwitchNetwork as useSwitchNetworkPrivy } from '@privy-io/wagmi-connector';
-import { useNetwork, useSwitchNetwork } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 import { WalletConnectionType } from '@/constants/wallets';
 
@@ -16,9 +16,9 @@ export const useMatchingEvmNetwork = ({
   switchAutomatically?: boolean;
   onError?: (error: Error) => void;
 }) => {
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const { walletConnectionType } = useWalletConnection();
-  const { isLoading, switchNetworkAsync } = useSwitchNetwork({ onError });
+  const { isPending, switchChainAsync } = useSwitchChain();
   const { isLoading: isLoadingPrivy, switchNetworkAsync: switchNetworkAsyncPrivy } =
     useSwitchNetworkPrivy({ onError });
 
@@ -33,7 +33,7 @@ export const useMatchingEvmNetwork = ({
       if (walletConnectionType === WalletConnectionType.Privy) {
         await switchNetworkAsyncPrivy?.(Number(chainId));
       } else {
-        await switchNetworkAsync?.(Number(chainId));
+        await switchChainAsync?.({ chainId: Number(chainId) }, { onError });
       }
     }
   }, [chainId, chain]);
@@ -47,6 +47,6 @@ export const useMatchingEvmNetwork = ({
   return {
     isMatchingNetwork,
     matchNetwork,
-    isSwitchingNetwork: isLoading || isLoadingPrivy,
+    isSwitchingNetwork: isPending || isLoadingPrivy,
   };
 };

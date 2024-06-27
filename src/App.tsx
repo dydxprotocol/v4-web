@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { WagmiConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
@@ -159,7 +159,7 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
-  wrapProvider(WagmiConfig, { config }),
+  wrapProvider(WagmiProvider, { config, reconnectOnMount: true }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),

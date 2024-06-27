@@ -32,13 +32,12 @@ import {
 } from 'viem/chains';
 import { Chain, configureChains, createConfig, mainnet } from 'wagmi';
 import { goerli } from 'wagmi/chains';
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import { publicProvider } from 'wagmi/providers/public';
+import {
+  coinbaseWallet as CoinbaseWalletConnector,
+  injected as InjectedConnector,
+  metaMask as MetaMaskConnector,
+  walletConnect as WalletConnectConnector,
+} from 'wagmi/connectors';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
@@ -88,6 +87,44 @@ const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   scroll,
   kava,
 ];
+
+const getAlchemyRPCUrls = (chainId: string, apiKey: string) => {
+  switch (chainId) {
+    case '1':
+      return `eth-mainnet.alchemyapi.io/v2/${apiKey}`;
+    case '11155111':
+      return `eth-sepolia.alchemyapi.io/v2/${apiKey}`;
+    case '137':
+      return `https://polygon-mainnet.g.alchemy.com/v2/${apiKey}`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+    case '80002':
+      return `https://polygon-amoy.g.alchemy.com/v2/your-alchemy-api-key`;
+
+    default:
+      return undefined;
+  }
+};
 
 const defaultSelectedNetwork = getLocalStorage({
   key: LocalStorageKey.SelectedNetwork,
@@ -186,7 +223,6 @@ const getConnectors = (walletConnectConfig: WalletConnectConfig) => [
 ];
 
 export const config = createConfig({
-  autoConnect: true,
   // connectors,
   publicClient,
   webSocketPublicClient,

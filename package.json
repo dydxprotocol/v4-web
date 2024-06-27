@@ -135,8 +135,8 @@
     "styled-components": "^5.3.11",
     "unionize": "^3.1.0",
     "use-latest": "^1.2.1",
-    "viem": "^1.20.0",
-    "wagmi": "^1.4.12"
+    "viem": "^2.16.2",
+    "wagmi": "^2.10.7"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",

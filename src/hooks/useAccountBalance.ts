@@ -4,9 +4,8 @@ import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
-import { useBalance } from 'wagmi';
-
-import { EvmAddress } from '@/constants/wallets';
+import { erc20Abi } from 'viem/_types/constants/abis';
+import { useBalance, useReadContracts } from 'wagmi';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -52,13 +51,38 @@ export const useAccountBalance = ({
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
-  const evmQuery = useBalance({
-    enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
+  const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
+
+  const evmNative = useBalance({
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
-    token:
-      addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS ? undefined : (addressOrDenom as EvmAddress),
-    watch: true,
+    query: {
+      enabled: Boolean(!isCosmosChain && isEVMnativeToken),
+    },
+  });
+
+  const tokenContract = {
+    address: addressOrDenom as `0x${string}`,
+    abi: erc20Abi,
+  } as const;
+
+  const evmToken = useReadContracts({
+    contracts: [
+      {
+        ...tokenContract,
+        functionName: 'balanceOf',
+        args: [evmAddress ?? '0x'],
+      } as const,
+      {
+        ...tokenContract,
+        functionName: 'decimals',
+      } as const,
+    ],
+    query: {
+      enabled: Boolean(
+        evmAddress && !isCosmosChain && addressOrDenom?.startsWith('0x') && !isEVMnativeToken
+      ),
+    },
   });
 
   const cosmosQueryFn = useCallback(async () => {
@@ -88,7 +112,8 @@ export const useAccountBalance = ({
     staleTime: 10_000,
   });
 
-  const { formatted: evmBalance } = evmQuery.data ?? {};
+  const { value: evmNativeBalance } = evmNative.data ?? {};
+  const evmBalance = isEVMnativeToken ? evmNativeBalance : evmToken.data?.[0];
   const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
@@ -105,7 +130,7 @@ export const useAccountBalance = ({
     nativeTokenBalance,
     nativeStakingBalance,
     usdcBalance,
-    queryStatus: isCosmosChain ? cosmosQuery.status : evmQuery.status,
-    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.fetchStatus === 'fetching',
+    queryStatus: isCosmosChain ? cosmosQuery.status : evmNative.status,
+    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmNative.isFetching,
   };
 };
