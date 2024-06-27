@@ -18,6 +18,7 @@ import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { identify, track } from '@/lib/analytics';
+import { StatSigFlags } from '@/lib/statsig';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';
@@ -25,7 +26,7 @@ import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
 import { useSelectedNetwork } from './useSelectedNetwork';
-import { StatSigFlags, useStatSigGateValue } from './useStatsig';
+import { useStatSigGateValue } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestTag = import.meta.env.VITE_LAST_TAG;

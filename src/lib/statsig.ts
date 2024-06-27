@@ -2,7 +2,7 @@ import { StatsigClient } from '@statsig/js-client';
 
 const fetchIp = async () => {
   const resp = await fetch('https://api.ipify.org?format=json');
-  return resp.json();
+  return (await resp.json())?.ip;
 };
 
 const initStatsig = async () => {
@@ -16,7 +16,7 @@ const initStatsig = async () => {
   );
   if (import.meta.env.VITE_DISABLE_STATSIG) return statsigClient;
   const ip = await fetchIp();
-  statsigClient.updateUserSync({
+  await statsigClient.updateUserAsync({
     ip,
   });
   await statsigClient.initializeSync();
