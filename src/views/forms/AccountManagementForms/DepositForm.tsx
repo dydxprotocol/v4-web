@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { type DeliverTxResponse } from '@cosmjs/stargate';
 import Long from 'long';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import { Abi, parseUnits } from 'viem';
+import { Abi, formatUnits, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
@@ -135,7 +136,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { usdcLabel, usdcDecimals, usdcGasDenom } = useTokenConfigs();
   const { nobleValidator } = useEndpointsConfig();
-
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
@@ -322,15 +322,23 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           };
           const txResult = await abacusStateManager.sendNobleIBC(tx);
 
-          const parsedTx = JSON.parse(txResult);
+          const parsedTx = JSON.parse(txResult) as DeliverTxResponse;
           const nobleTxHash = parsedTx.transactionHash;
 
           if (nobleTxHash) {
+            const coinReceived = [...parsedTx.events]
+              .reverse()
+              .find((event) => event.type === 'coin_received');
+            const amountAttribute = coinReceived?.attributes.find((attr) => attr.key === 'amount');
+            const toAmount = amountAttribute?.value.split(usdcGasDenom)[0];
+
             addTransferNotification({
               txHash: nobleTxHash,
               toChainId: selectedDydxChainId,
               fromChainId: chainIdStr || undefined,
-              toAmount: summary?.usdcSize || undefined,
+              toAmount: toAmount
+                ? MustBigNumber(formatUnits(BigInt(toAmount), usdcDecimals)).toNumber()
+                : summary?.usdcSize ?? undefined,
               triggeredAt: Date.now(),
               isCctp,
               type: TransferNotificationTypes.Deposit,

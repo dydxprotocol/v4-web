@@ -1,11 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { TransferNotificationTypes } from '@/constants/notifications';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,50 +22,78 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
+import { track } from '@/lib/analytics';
+
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
   toAmount?: number;
-  txHash?: string;
+  txHash: string;
 };
 
 export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
   const { deposit } = useSubaccount();
-  const { transferNotifications, setTransferNotifications } = useLocalNotifications();
+  const { setAllTransferNotifications } = useLocalNotifications();
+  const { dydxAddress } = useAccounts();
 
   const [txStatus, setTxStatus] = useState<'success' | 'error' | 'pending'>('pending');
 
   const depositToSubaccount = useCallback(async () => {
     try {
-      if (toAmount) {
+      if (toAmount && dydxAddress) {
         const tx = await deposit(toAmount);
 
         if (tx !== undefined) {
           const depositTxHash = Buffer.from(tx.hash).toString('hex');
-          const updatedTransferNotifications = transferNotifications.map((notification) => {
-            if (notification.txHash === txHash && notification.depositSubaccount?.needToDeposit) {
-              return {
-                ...notification,
-                depositSubaccount: {
-                  txHash: depositTxHash,
-                  needToDeposit: false,
-                },
-              };
-            }
-            return notification;
+
+          setAllTransferNotifications((transferNotification) => {
+            return {
+              ...transferNotification,
+              [dydxAddress]: transferNotification[dydxAddress].map((notification) => {
+                if (notification.txHash === txHash) {
+                  return {
+                    ...notification,
+                    depositSubaccount: {
+                      txHash: depositTxHash,
+                      needToDeposit: false,
+                    },
+                  };
+                }
+                return notification;
+              }),
+            };
           });
-          setTransferNotifications(updatedTransferNotifications);
+          track(
+            AnalyticsEvents.TransferNotification({
+              triggeredAt: undefined,
+              timeSpent: undefined,
+              txHash,
+              toAmount,
+              type: TransferNotificationTypes.Deposit,
+              status: 'success',
+            })
+          );
 
           setTxStatus('success');
         } else {
           throw new Error('Transaction failed');
         }
       }
-    } catch {
+    } catch (e) {
       setTxStatus('error');
     }
-  }, [toAmount, txHash, transferNotifications]);
+  }, [dydxAddress, setAllTransferNotifications, toAmount, txHash]);
+
+  useEffect(() => {
+    if (txStatus === 'pending') {
+      depositToSubaccount();
+    }
+  }, [depositToSubaccount, txStatus]);
+
+  const onRetry = () => {
+    setTxStatus('pending');
+  };
 
   const onClose = () => {
     setIsOpen?.(false);
@@ -74,7 +105,7 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProp
       // TODO: Need to add localization
       title: 'Send USDC',
       // TODO: Need to add localization
-      description: 'Send IBC from Noble. USDC’s native chain.',
+      description: 'Send IBC from Noble, USDC’s native chain.',
     },
     {
       step: 2,
@@ -115,9 +146,10 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProp
         ))}
 
         <$Button
-          action={isDepositError ? ButtonAction.Secondary : ButtonAction.Primary}
+          action={isDepositSuccess ? ButtonAction.Primary : ButtonAction.Secondary}
+          disabled={isDepositPending}
           type={ButtonType.Button}
-          onClick={isDepositSuccess ? onClose : depositToSubaccount}
+          onClick={isDepositSuccess ? onClose : onRetry}
         >
           {/* TODO: Need to add localization */}
           {isDepositError ? 'Try Again' : txStatus === 'success' ? 'Done' : 'Deposit'}

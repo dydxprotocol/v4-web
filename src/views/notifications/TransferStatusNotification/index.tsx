@@ -79,9 +79,8 @@ export const TransferStatusNotification = ({
   const nobleChainId = getNobleChainId();
   const isCosmosTransfer = [nobleChainId].includes(fromChainId ?? '');
   const isComplete = isCosmosTransfer
-    ? status?.squidTransactionStatus === 'success' && depositSubaccount?.needToDeposit === false
+    ? depositSubaccount?.txHash && depositSubaccount?.needToDeposit === false
     : status?.squidTransactionStatus === 'success' || isExchange;
-
   const inProgressStatusString =
     type === TransferNotificationTypes.Deposit
       ? secondsLeft > 0
@@ -100,6 +99,20 @@ export const TransferStatusNotification = ({
         ? STRING_KEYS.WITHDRAW_COMPLETE
         : inProgressStatusString;
 
+  const detailItems = [
+    {
+      key: 'amount',
+      label: 'Amount',
+      value: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      // TODO: Need to add localization
+      value: isComplete ? 'Complete' : 'Awaiting Confirmation',
+    },
+  ];
+
   const customContent =
     !status && !isExchange && !isCosmosTransfer ? (
       <LoadingDots size={3} />
@@ -107,21 +120,7 @@ export const TransferStatusNotification = ({
       <$BridgingStatus>
         {isCosmosTransfer ? (
           <>
-            <$Details
-              items={[
-                {
-                  key: 'amount',
-                  label: 'Amount',
-                  value: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
-                },
-                {
-                  key: 'status',
-                  label: 'Status',
-                  // TODO: Need to add localization
-                  value: isComplete ? 'Complete' : 'Awaiting Confirmation',
-                },
-              ]}
-            />
+            <$Details items={detailItems} />
             {!isToast && !isComplete && (
               <Button
                 action={ButtonAction.Primary}
