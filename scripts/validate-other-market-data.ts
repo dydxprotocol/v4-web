@@ -322,9 +322,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     const { url, tickers, parseResp } = EXCHANGE_INFO[exchange.exchangeName];
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
-    // if (exchange.exchangeName === ExchangeName.Bybit) {
-    //   continue; // exit the current iteration of the loop.
-    // }
+    if (exchange.exchangeName === ExchangeName.Bybit) {
+      continue; // exit the current iteration of the loop.
+    }
 
     // TODO: Skip Raydium since ticker is idiosyncratic
     if (exchange.exchangeName === ExchangeName.Raydium) {
