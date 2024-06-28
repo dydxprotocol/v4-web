@@ -27,10 +27,10 @@ import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton'
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/StakingForms/UnstakeForm/UnstakeButtonAndReceipt';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
+import { ValidatorName } from '@/views/forms/StakingForms/shared/ValidatorName';
 
 import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';

@@ -17,7 +17,6 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorDropdown } from '@/components/ValidatorDropdown';
 import { WithTooltip } from '@/components/WithTooltip';
 import {
   StakeButtonAlert,
@@ -25,6 +24,8 @@ import {
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+
+import { ValidatorDropdown } from './ValidatorDropdown';
 
 type ElementProps = {
   error?: StakeButtonAlert;
@@ -110,19 +111,13 @@ export const StakeButtonAndReceipt = ({
     },
   ];
 
-  // xcxc
-
   return (
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
       alert={error}
-      buttonText={
-        amount !== undefined
-          ? 'Preview Stake'
-          : stringGetter({
-              key: amount !== undefined ? 'Preview Stake' : STRING_KEYS.ENTER_AMOUNT_TO_STAKE,
-            })
-      }
+      buttonText={stringGetter({
+        key: amount !== undefined ? STRING_KEYS.PREVIEW_STAKE : STRING_KEYS.ENTER_AMOUNT_TO_STAKE,
+      })}
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
       isLoading={isLoading}

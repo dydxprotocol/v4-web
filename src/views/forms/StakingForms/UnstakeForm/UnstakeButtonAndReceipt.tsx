@@ -78,17 +78,13 @@ export const UnstakeButtonAndReceipt = ({
     },
   ];
 
-  // xcxc
-
   return (
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
       alert={error}
-      buttonText={
-        allAmountsEmpty
-          ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE })
-          : 'Preview unstake'
-      }
+      buttonText={stringGetter({
+        key: allAmountsEmpty ? STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE : STRING_KEYS.PREVIEW_UNSTAKE,
+      })}
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
       isLoading={isLoading}

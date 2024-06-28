@@ -30,6 +30,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { formMixins } from '@/styles/formMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
@@ -37,7 +38,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorFaviconIcon } from '@/components/ValidatorName';
+import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
@@ -67,7 +68,7 @@ export const StakeForm = ({
   const stringGetter = useStringGetter();
 
   const { delegate, getDelegateFee } = useSubaccount();
-  const { nativeTokenBalance: balance } = useAccountBalance();
+  const { nativeTokenBalance: balance, nativeStakingBalance } = useAccountBalance();
   const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
@@ -83,6 +84,9 @@ export const StakeForm = ({
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
   const isAmountEnoughForGas = balance.gte(AMOUNT_RESERVED_FOR_GAS_DYDX);
+  const newStakedBalance = amountBN
+    ? MustBigNumber(nativeStakingBalance).plus(amountBN)
+    : undefined;
 
   useEffect(() => {
     // Initalize to default validator once on mount
@@ -194,47 +198,106 @@ export const StakeForm = ({
     },
   ];
 
+  const previewItems = [
+    {
+      key: 'balance',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.STAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
+        </span>
+      ),
+      value: (
+        <DiffOutput
+          type={OutputType.Asset}
+          value={nativeStakingBalance}
+          sign={NumberSign.Positive}
+          newValue={newStakedBalance}
+          hasInvalidNewValue={MustBigNumber(newStakedBalance).isNegative()}
+          withDiff={
+            newStakedBalance !== undefined &&
+            !MustBigNumber(nativeStakingBalance).eq(newStakedBalance ?? 0)
+          }
+        />
+      ),
+    },
+    {
+      key: 'fees',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
+        </span>
+      ),
+      value: <Output type={OutputType.Asset} value={fee} />,
+    },
+  ];
+
   return (
     <$Form
       className={className}
       onSubmit={(e: FormEvent) => {
+        e.preventDefault();
         switch (currentStep) {
           case StakeFormSteps.EditInputs:
-            e.preventDefault();
             setCurrentStep(StakeFormSteps.PreviewOrder);
             break;
           case StakeFormSteps.PreviewOrder:
           default:
-            e.preventDefault();
             onStake();
         }
       }}
     >
       {currentStep === StakeFormSteps.PreviewOrder && (
-        <$TwoColumns>
-          <$Column>
-            {stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
-            <$StakeBox>
-              <$AssetIcon symbol={chainTokenLabel} />
-              <Output
-                value={amountBN ? amountBN.toNumber() : undefined}
-                type={OutputType.Asset}
-                tag={chainTokenLabel}
-              />
-            </$StakeBox>
-          </$Column>
-          <Icon iconName={IconName.Arrow} />
-          <$Column>
-            {stringGetter({ key: STRING_KEYS.VALIDATOR })}
-            <$StakeBox>
-              <$ValidatorIcon
-                url={selectedValidator?.description?.website}
-                fallbackText={selectedValidator?.description?.moniker}
-              />
-              {selectedValidator?.description?.moniker}
-            </$StakeBox>
-          </$Column>
-        </$TwoColumns>
+        <>
+          <$TwoRows>
+            <$Row>
+              <$Label>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })} </$Label>
+              <$Label>{stringGetter({ key: STRING_KEYS.VALIDATOR })}</$Label>
+            </$Row>
+            <$Row>
+              <$StakeBox>
+                <$AssetIcon symbol={chainTokenLabel} />
+                <Output
+                  value={amountBN ? amountBN.toNumber() : undefined}
+                  type={OutputType.Asset}
+                  tag={chainTokenLabel}
+                />
+              </$StakeBox>
+              <$ArrowIcon iconName={IconName.FastForward} />
+              <$StakeBox>
+                <$ValidatorIcon
+                  url={selectedValidator?.description?.website}
+                  fallbackText={selectedValidator?.description?.moniker}
+                />
+                {selectedValidator?.description?.moniker}
+              </$StakeBox>
+            </$Row>
+          </$TwoRows>
+          {/* <$TwoColumns>
+            <$Column>
+              {stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
+              <$StakeBox>
+                <$AssetIcon symbol={chainTokenLabel} />
+                <Output
+                  value={amountBN ? amountBN.toNumber() : undefined}
+                  type={OutputType.Asset}
+                  tag={chainTokenLabel}
+                />
+              </$StakeBox>
+            </$Column>
+            <Icon iconName={IconName.FastForward} />
+            <$Column>
+              {stringGetter({ key: STRING_KEYS.VALIDATOR })}
+              <$StakeBox>
+                <$ValidatorIcon
+                  url={selectedValidator?.description?.website}
+                  fallbackText={selectedValidator?.description?.moniker}
+                />
+                {selectedValidator?.description?.moniker}
+              </$StakeBox>
+            </$Column>
+          </$TwoColumns> */}
+          <$Details items={previewItems} />
+        </>
       )}
 
       {currentStep === StakeFormSteps.EditInputs && (
@@ -261,16 +324,14 @@ export const StakeForm = ({
               }
             />
           </$WithDetailsReceipt>
-          <$Footer>
-            <StakeButtonAndReceipt
-              error={error}
-              fee={fee}
-              isLoading={isLoading}
-              amount={amountBN}
-              selectedValidator={selectedValidator}
-              setSelectedValidator={setSelectedValidator}
-            />
-          </$Footer>
+          <StakeButtonAndReceipt
+            error={error}
+            fee={fee}
+            isLoading={isLoading}
+            amount={amountBN}
+            selectedValidator={selectedValidator}
+            setSelectedValidator={setSelectedValidator}
+          />
         </>
       )}
     </$Form>
@@ -282,35 +343,43 @@ const $Form = styled.form`
   --color-text-form: var(--color-text-0);
 `;
 
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
   color: var(--color-text-form);
 `;
 
-const $TwoColumns = styled.div`
+const $Details = styled(Details)`
+  --details-item-vertical-padding: 0.33rem;
+
+  background-color: var(--color-layer-2);
+  border-radius: 0.5em;
+  font-size: var(--details-item-fontSize, 0.8125em);
+  padding: 0.25rem 0.75rem 0.25rem;
+`;
+const $TwoRows = styled.div`
+  display: grid;
+  gap: 0.5rem;
+`;
+
+const $Row = styled.div`
   display: flex;
-  gap: 1rem;
   justify-content: space-between;
+  text-align: center;
+  gap: 0.5rem;
   align-items: center;
 `;
 
-const $Column = styled.div`
-  display: flex;
-  flex-direction: column;
+const $Label = styled.h3`
   color: var(--color-text-0);
   font: var(--font-small-medium);
+
   flex-basis: 50%;
-  align-items: center;
-  gap: 0.5rem;
+`;
+
+const $ArrowIcon = styled(Icon)`
+  color: var(--color-text-0);
+  width: 2.25rem;
+  height: 2.25rem;
 `;
 
 const $StakeBox = styled.div`

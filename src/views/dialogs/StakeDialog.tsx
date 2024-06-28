@@ -35,7 +35,7 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
   const stakingApr = useStakingAPR();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const [currentStep, setCurrentStep] = useState<StakeFormSteps>(StakeFormSteps.PreviewOrder);
+  const [currentStep, setCurrentStep] = useState<StakeFormSteps>(StakeFormSteps.EditInputs);
 
   const openKeplrDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavKeplr()));
   const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
@@ -75,27 +75,29 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
       slotFooter: legalDisclaimer,
     },
     [StakeFormSteps.PreviewOrder]: {
-      title: 'Preview Stake',
+      title: stringGetter({ key: STRING_KEYS.CONFIRM_STAKE }),
       description: stringGetter({ key: STRING_KEYS.STAKE_CONFIRMATION_DESCRIPTOR }),
       slotFooter: (
-        <div>
-          {canAccountTrade ? (
-            <$Row>
-              <$EditButton
-                action={ButtonAction.Base}
-                onClick={() => setCurrentStep(StakeFormSteps.EditInputs)}
-              >
-                {stringGetter({ key: STRING_KEYS.EDIT })}
-              </$EditButton>
-              <$SubmitButton action={ButtonAction.Primary} type={ButtonType.Submit}>
-                {stringGetter({ key: STRING_KEYS.CONFIRM_STAKE })}
-              </$SubmitButton>
-            </$Row>
-          ) : (
-            <$OnboardingTriggerButton size={ButtonSize.Base} />
-          )}
+        <>
+          <$Row>
+            {canAccountTrade ? (
+              <>
+                <$EditButton
+                  action={ButtonAction.Base}
+                  onClick={() => setCurrentStep(StakeFormSteps.EditInputs)}
+                >
+                  {stringGetter({ key: STRING_KEYS.EDIT })}
+                </$EditButton>
+                <$SubmitButton action={ButtonAction.Primary} type={ButtonType.Submit}>
+                  {stringGetter({ key: STRING_KEYS.CONFIRM_STAKE })}
+                </$SubmitButton>
+              </>
+            ) : (
+              <$OnboardingTriggerButton size={ButtonSize.Base} />
+            )}
+          </$Row>
           {legalDisclaimer}
-        </div>
+        </>
       ),
     },
   };
@@ -149,10 +151,10 @@ const $Output = styled(Output)`
 
 const $Row = styled.div`
   ${layoutMixins.inlineRow}
-
-  width: 100%;
   gap: 1rem;
+
   margin-bottom: var(--dialog-content-paddingBottom);
+  width: 100%;
 `;
 
 const $EditButton = styled(Button)`
@@ -176,5 +178,4 @@ const $Link = styled(Link)`
 
 const $OnboardingTriggerButton = styled(OnboardingTriggerButton)`
   width: 100%;
-  margin-bottom: var(--dialog-content-paddingBottom);
 `;
