@@ -14,6 +14,8 @@ export const StatSigProvider = ({ children }: { children: React.ReactNode }) => 
     };
     setAsyncClient();
   }, [statsigClientPromise]);
+  // we dont want the app to load until statsig configs have been loaded
+  // this enables us to use statsig on libs which load before the react app
   if (!client) return null;
   return <StatsigProvider client={client}> {children} </StatsigProvider>;
 };

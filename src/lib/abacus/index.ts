@@ -104,6 +104,18 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
+    this.stateManager = new AsyncAbacusStateManager(
+      '',
+      CURRENT_ABACUS_DEPLOYMENT,
+      appConfigs,
+      ioImplementations,
+      uiImplementations,
+      // @ts-ignore
+      this.stateNotifier
+    );
+
+    // Temporary hack to enable statsig flags on abacus.
+    // This works because the statsig provider will refuse to render the application until it generates the client
     statsigCheckGatePromise(StatSigFlags.ffSkipMigration).then((useSkip) => {
       if (useSkip) appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip;
 
