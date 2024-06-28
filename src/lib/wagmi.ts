@@ -122,7 +122,7 @@ const getAlchemyRPCUrls = (chainId: string, apiKey: string) => {
   }
 };
 
-const RPCTransports = WAGMI_SUPPORTED_CHAINS.reduce(
+const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
     const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
     const alchemyRPCUrls = alchemyKey && getAlchemyRPCUrls(chain.id.toString(), alchemyKey);
