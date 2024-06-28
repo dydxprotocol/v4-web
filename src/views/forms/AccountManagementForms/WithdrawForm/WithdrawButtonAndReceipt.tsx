@@ -61,6 +61,9 @@ export const WithdrawButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
+  const showExchangeRate = withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange;
+  const showMinAmountReceived = typeof summary?.toAmountMin === 'number';
+
   const submitButtonReceipt: DetailsItem[] = [
     {
       key: 'expected-amount-received',
@@ -75,7 +78,7 @@ export const WithdrawButtonAndReceipt = ({
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
       ),
     },
-    {
+    showMinAmountReceived && {
       key: 'minimum-amount-received',
       label: (
         <$RowWithGap>
@@ -92,21 +95,20 @@ export const WithdrawButtonAndReceipt = ({
       ),
       tooltip: 'minimum-amount-received',
     },
-    !exchange && {
+    showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value:
-        withdrawToken && typeof summary?.exchangeRate === 'number' ? (
-          <$RowWithGap>
-            <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
-            =
-            <Output
-              type={OutputType.Asset}
-              value={summary?.exchangeRate}
-              tag={withdrawToken?.symbol}
-            />
-          </$RowWithGap>
-        ) : undefined,
+      value: (
+        <$RowWithGap>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
+          =
+          <Output
+            type={OutputType.Asset}
+            value={summary?.exchangeRate}
+            tag={withdrawToken?.symbol}
+          />
+        </$RowWithGap>
+      ),
     },
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',

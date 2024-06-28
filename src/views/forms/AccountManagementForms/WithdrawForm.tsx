@@ -20,6 +20,7 @@ import {
   MIN_CCTP_TRANSFER_AMOUNT,
   NumberSign,
   TOKEN_DECIMALS,
+  USD_DECIMALS,
 } from '@/constants/numbers';
 import { WalletType } from '@/constants/wallets';
 
@@ -541,6 +542,7 @@ export const WithdrawForm = () => {
       <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}
+          decimals={USD_DECIMALS}
           onChange={onChangeAmount}
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}

@@ -100,6 +100,8 @@ export const DepositButtonAndReceipt = ({
   const sourceChainName =
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
+  const showExchangeRate = typeof summary?.exchangeRate === 'number';
+
   const submitButtonReceipt = [
     {
       key: 'expected-deposit-amount',
@@ -128,24 +130,16 @@ export const DepositButtonAndReceipt = ({
       ),
       tooltip: 'minimum-deposit-amount',
     },
-    {
+    showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value:
-        typeof summary?.exchangeRate === 'number' ? (
-          <$ExchangeRate>
-            <Output
-              type={OutputType.Asset}
-              value={1}
-              fractionDigits={0}
-              tag={sourceToken?.symbol}
-            />
-            =
-            <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-          </$ExchangeRate>
-        ) : (
-          <Output type={OutputType.Asset} />
-        ),
+      value: (
+        <$ExchangeRate>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
+          =
+          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
+        </$ExchangeRate>
+      ),
     },
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',
