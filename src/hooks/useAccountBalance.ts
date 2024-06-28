@@ -111,8 +111,15 @@ export const useAccountBalance = ({
     staleTime: 10_000,
   });
 
-  const { value: evmNativeBalance } = evmNative.data ?? {};
-  const evmBalance = isEVMnativeToken ? evmNativeBalance : evmToken.data?.[0];
+  const { value: evmNativeBalance, decimals: evmNativeDecimals } = evmNative.data ?? {};
+  const [evmTokenBalance, evmTokenDecimals] = evmToken.data ?? [];
+  const evmBalance = isEVMnativeToken
+    ? evmNativeBalance !== undefined && evmNativeDecimals !== undefined
+      ? formatUnits(evmNativeBalance, evmNativeDecimals)
+      : undefined
+    : evmTokenBalance?.result !== undefined && evmTokenDecimals?.result !== undefined
+      ? formatUnits(evmTokenBalance?.result, evmTokenDecimals?.result)
+      : undefined;
   const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
