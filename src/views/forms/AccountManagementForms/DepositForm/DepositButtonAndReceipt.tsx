@@ -173,7 +173,7 @@ export const DepositButtonAndReceipt = ({
           value={equity}
           newValue={newEquity} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
           sign={NumberSign.Positive}
-          withDiff={equity !== newEquity}
+          withDiff={equity !== newEquity && newEquity}
         />
       ),
     },
