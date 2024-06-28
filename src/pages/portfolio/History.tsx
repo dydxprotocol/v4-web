@@ -22,7 +22,7 @@ export const History = () => {
       {isNotTablet && (
         <$NavigationMenu
           orientation="horizontal"
-          slotAfter={<Styled.ExportButton />}
+          slotAfter={<$ExportButton />}
           items={[
             {
               group: 'navigation',
@@ -54,9 +54,8 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
-const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.ExportButton = styled(ExportHistoryDropdown)`
+const $ExportButton = styled(ExportHistoryDropdown)`
   margin-left: auto;
 `;
 
