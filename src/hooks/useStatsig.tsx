@@ -14,7 +14,7 @@ export const StatSigProvider = ({ children }: { children: React.ReactNode }) => 
     };
     setAsyncClient();
   }, [statsigClientPromise]);
-  if (!client) return <></>;
+  if (!client) return null;
   return <StatsigProvider client={client}> {children} </StatsigProvider>;
 };
 

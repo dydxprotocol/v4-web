@@ -106,17 +106,17 @@ class AbacusStateManager {
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
     statsigCheckGatePromise(StatSigFlags.ffSkipMigration).then((useSkip) => {
       if (useSkip) appConfigs.onboardingConfigs.routerVendor = OnboardingConfig.RouterVendor.Skip;
-    });
 
-    this.stateManager = new AsyncAbacusStateManager(
-      '',
-      CURRENT_ABACUS_DEPLOYMENT,
-      appConfigs,
-      ioImplementations,
-      uiImplementations,
-      // @ts-ignore
-      this.stateNotifier
-    );
+      this.stateManager = new AsyncAbacusStateManager(
+        '',
+        CURRENT_ABACUS_DEPLOYMENT,
+        appConfigs,
+        ioImplementations,
+        uiImplementations,
+        // @ts-ignore
+        this.stateNotifier
+      );
+    });
   }
 
   start = ({ network }: { network?: DydxNetwork } = {}) => {
