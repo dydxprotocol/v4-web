@@ -166,7 +166,9 @@ export const WithdrawButtonAndReceipt = ({
           value={leverage?.current}
           newValue={leverage?.postOrder}
           sign={NumberSign.Negative}
-          withDiff={Boolean(leverage?.current && leverage.current !== leverage?.postOrder)}
+          withDiff={Boolean(
+            leverage?.current && leverage?.postOrder && leverage.current !== leverage?.postOrder
+          )}
         />
       ),
     },
