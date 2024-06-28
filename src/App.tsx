@@ -1,7 +1,6 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { PrivyProvider } from '@privy-io/react-auth';
-import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
@@ -37,7 +36,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
+import { config, privyConfig } from '@/lib/wagmi';
 
 import { ComplianceStates } from './constants/compliance';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -161,8 +160,7 @@ const providers = [
   }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
-  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
-  wrapProvider(WagmiProvider, { config, reconnectOnMount: true }),
+  wrapProvider(WagmiProvider, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),

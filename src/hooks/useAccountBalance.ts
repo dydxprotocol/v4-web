@@ -3,8 +3,7 @@ import { useCallback } from 'react';
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
-import { formatUnits } from 'viem';
-import { erc20Abi } from 'viem/_types/constants/abis';
+import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';

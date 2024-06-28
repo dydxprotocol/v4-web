@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
@@ -93,21 +93,21 @@ export const useWalletConnection = () => {
 
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
-  const wagmiConnector = useMemo(
-    () =>
-      walletType && walletConnectionType
-        ? resolveWagmiConnector({
-            walletType,
-            walletConnection: {
-              type: walletConnectionType,
-            },
-            walletConnectConfig,
-          })
-        : undefined,
-    [walletConnectConfig, walletType, walletConnectionType]
-  );
+  // const wagmiConnector = useMemo(
+  //   () =>
+  //     walletType && walletConnectionType
+  //       ? resolveWagmiConnector({
+  //           walletType,
+  //           walletConnection: {
+  //             type: walletConnectionType,
+  //           },
+  //           walletConnectConfig,
+  //         })
+  //       : undefined,
+  //   [walletConnectConfig, walletType, walletConnectionType]
+  // );
 
-  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector });
+  const { connectAsync: connectWagmi } = useConnectWagmi();
   const { suggestAndConnect: connectGraz } = useConnectGraz();
   const [evmDerivedAddresses] = useLocalStorage({
     key: LocalStorageKey.EvmDerivedAddresses,
