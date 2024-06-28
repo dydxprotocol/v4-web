@@ -229,6 +229,7 @@ export const useDrawOrderbook = ({
         formatNumberOutput(price, OutputType.Number, {
           decimalSeparator,
           groupSeparator,
+          selectedLocale,
           fractionDigits: tickSizeDecimals,
         }),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
@@ -240,6 +241,7 @@ export const useDrawOrderbook = ({
       formatNumberOutput(sizeToRender, OutputType.Number, {
         decimalSeparator,
         groupSeparator,
+        selectedLocale,
         fractionDigits: 0,
       });
 
