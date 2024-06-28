@@ -248,7 +248,7 @@ export const StakeForm = ({
     >
       {currentStep === StakeFormSteps.PreviewOrder && (
         <>
-          <$TwoRows>
+          <$Rows>
             <$Row>
               <$Label>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })} </$Label>
               <$Label>{stringGetter({ key: STRING_KEYS.VALIDATOR })}</$Label>
@@ -271,31 +271,7 @@ export const StakeForm = ({
                 {selectedValidator?.description?.moniker}
               </$StakeBox>
             </$Row>
-          </$TwoRows>
-          {/* <$TwoColumns>
-            <$Column>
-              {stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
-              <$StakeBox>
-                <$AssetIcon symbol={chainTokenLabel} />
-                <Output
-                  value={amountBN ? amountBN.toNumber() : undefined}
-                  type={OutputType.Asset}
-                  tag={chainTokenLabel}
-                />
-              </$StakeBox>
-            </$Column>
-            <Icon iconName={IconName.FastForward} />
-            <$Column>
-              {stringGetter({ key: STRING_KEYS.VALIDATOR })}
-              <$StakeBox>
-                <$ValidatorIcon
-                  url={selectedValidator?.description?.website}
-                  fallbackText={selectedValidator?.description?.moniker}
-                />
-                {selectedValidator?.description?.moniker}
-              </$StakeBox>
-            </$Column>
-          </$TwoColumns> */}
+          </$Rows>
           <$Details items={previewItems} />
         </>
       )}
@@ -341,22 +317,23 @@ export const StakeForm = ({
 const $Form = styled.form`
   ${formMixins.transfersForm}
   --color-text-form: var(--color-text-0);
+  --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
   color: var(--color-text-form);
 `;
 
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
 
-  background-color: var(--color-layer-2);
+  background-color: var(--withReceipt-backgroundColor);
   border-radius: 0.5em;
   font-size: var(--details-item-fontSize, 0.8125em);
-  padding: 0.25rem 0.75rem 0.25rem;
+  padding: 0.25rem 0.75rem;
 `;
-const $TwoRows = styled.div`
+
+const $Rows = styled.div`
   display: grid;
   gap: 0.5rem;
 `;
@@ -364,25 +341,14 @@ const $TwoRows = styled.div`
 const $Row = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   text-align: center;
   gap: 0.5rem;
-  align-items: center;
-`;
-
-const $Label = styled.h3`
-  color: var(--color-text-0);
-  font: var(--font-small-medium);
-
-  flex-basis: 50%;
-`;
-
-const $ArrowIcon = styled(Icon)`
-  color: var(--color-text-0);
-  width: 2.25rem;
-  height: 2.25rem;
 `;
 
 const $StakeBox = styled.div`
+  --icon-size: 2rem;
+
   background-color: var(--color-layer-4);
   border-radius: 0.5em;
   width: 100%;
@@ -391,18 +357,32 @@ const $StakeBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   padding: 1rem 0.5rem;
 
   color: var(--color-text-1);
   font: var(--font-mini-medium);
 `;
 
+const $Label = styled.h3`
+  color: var(--color-text-form);
+  font: var(--font-small-medium);
+
+  flex-basis: 50%;
+`;
+
+const $ArrowIcon = styled(Icon)`
+  color: var(--color-text-form);
+
+  width: 2.25rem;
+  height: 2.25rem;
+`;
+
 const $AssetIcon = styled(AssetIcon)`
-  font-size: 2rem;
+  font-size: var(--icon-size);
 `;
 
 const $ValidatorIcon = styled(ValidatorFaviconIcon)`
-  height: 2rem;
-  width: 2rem;
+  height: var(--icon-size);
+  width: var(--icon-size);
 `;
