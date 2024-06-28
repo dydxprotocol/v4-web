@@ -57,7 +57,10 @@ export const getConsistentAssetSizeString = (
       return { displayDivisor: 1, displaySuffix: '' };
     }
     const unitToUse =
-      supportedLocaleToCompactSuffixByPowerOfTen[selectedLocale][Math.log10(stepSize)];
+      supportedLocaleToCompactSuffixByPowerOfTen[selectedLocale][Math.floor(Math.log10(stepSize))];
+    if (unitToUse == null) {
+      return { displayDivisor: 1, displaySuffix: '' };
+    }
     return {
       displayDivisor: 10 ** supportedLocaleToSuffixPowers[selectedLocale][unitToUse],
       displaySuffix: unitToUse,
