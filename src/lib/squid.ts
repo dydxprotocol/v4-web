@@ -70,10 +70,6 @@ export const getNobleChainId = () => {
   return isMainnet ? 'noble-1' : 'grand-1';
 };
 
-export const getDydxChainId = () => {
-  return isMainnet ? 'dydx-mainnet-1' : 'dydx-testnet-4';
-};
-
 type SkipStatusParams = {
   transactionHash: string;
   chainId: string | undefined;

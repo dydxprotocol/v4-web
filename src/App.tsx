@@ -1,6 +1,5 @@
 import { lazy, Suspense, useMemo } from 'react';
 
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -37,6 +36,7 @@ import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
+import { config as grazConfig } from '@/lib/graz';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
@@ -46,7 +46,6 @@ import { useBreakpoints } from './hooks/useBreakpoints';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
-import { getDydxChainId, getNobleChainId } from './lib/squid';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -159,20 +158,8 @@ const providers = [
   }),
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider, {
-    grazOptions: {
-      chains: [
-        {
-          chainId: getDydxChainId(),
-          bech32Config: {
-            bech32PrefixAccAddr: BECH32_PREFIX,
-          },
-        },
-        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX } },
-      ],
-    },
-  }),
-  wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
+  wrapProvider(GrazProvider, { grazOptions: grazConfig }),
+  wrapProvider(WagmiProvider, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
