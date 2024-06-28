@@ -43,6 +43,12 @@ const filterFunctions = {
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
+  [MarketFilters.ENT]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('ENT');
+  },
+  [MarketFilters.RWA]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('RWA');
+  },
 };
 
 export const useMarketsData = (
