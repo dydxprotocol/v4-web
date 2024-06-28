@@ -101,6 +101,7 @@ export const DepositButtonAndReceipt = ({
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
   const showExchangeRate = typeof summary?.exchangeRate === 'number';
+  const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
 
   const submitButtonReceipt = [
     {
@@ -114,7 +115,7 @@ export const DepositButtonAndReceipt = ({
         <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />
       ),
     },
-    {
+    showMinDepositAmount && {
       key: 'minimum-deposit-amount',
       label: (
         <span>
