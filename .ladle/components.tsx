@@ -3,7 +3,6 @@ import '@/polyfills';
 import { useEffect, useState } from 'react';
 
 import '@/index.css';
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Provider } from 'react-redux';
@@ -35,7 +34,7 @@ import {
 } from '@/state/configs';
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
-import { getDydxChainId, getNobleChainId } from '@/lib/squid';
+import { config as grazConfig } from '@/lib/graz';
 import { config } from '@/lib/wagmi';
 
 import './ladle.css';
@@ -51,19 +50,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 
 const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider, {
-    grazOptions: {
-      chains: [
-        {
-          chainId: getDydxChainId(),
-          bech32Config: {
-            bech32PrefixAccAddr: BECH32_PREFIX,
-          },
-        },
-        { chainId: getNobleChainId(), bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX } },
-      ],
-    },
-  }),
+  wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
