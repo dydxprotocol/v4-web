@@ -7,6 +7,7 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
+import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -15,7 +16,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details, DetailsItem } from '@/components/Details';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -69,11 +70,11 @@ export const WithdrawButtonAndReceipt = ({
   const fallbackRouteDuration = stringGetter({
     key: STRING_KEYS.X_MINUTES_LOWERCASED,
     params: {
-      X: '< 30',
+      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
 
-  const submitButtonReceipt: DetailsItem[] = [
+  const submitButtonReceipt = [
     {
       key: 'expected-amount-received',
 

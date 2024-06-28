@@ -7,6 +7,7 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
+import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -106,7 +107,7 @@ export const DepositButtonAndReceipt = ({
   const fallbackRouteDuration = stringGetter({
     key: STRING_KEYS.X_MINUTES_LOWERCASED,
     params: {
-      X: '< 30',
+      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
 
@@ -122,7 +123,7 @@ export const DepositButtonAndReceipt = ({
         <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />
       ),
     },
-    showMinDepositAmount && {
+    !!showMinDepositAmount && {
       key: 'minimum-deposit-amount',
       label: (
         <span>
@@ -138,7 +139,7 @@ export const DepositButtonAndReceipt = ({
       ),
       tooltip: 'minimum-deposit-amount',
     },
-    showExchangeRate && {
+    !!showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: (
