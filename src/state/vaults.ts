@@ -1,8 +1,19 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-type VaultMetadata = {};
+type VaultMetadata = { totalValue: number };
 
-type VaultDetails = {};
+type VaultDetails = {
+  allTimePnl: {
+    percent: number;
+    absolute: number;
+  };
+  thirtyDayReturnPercent: number;
+  currentLeverageMultiple: number;
+  currentPosition: {
+    asset: number;
+    usdc: number;
+  };
+};
 
 type VaultOwnership = {};
 
@@ -13,7 +24,7 @@ export interface VaultsState {
 }
 
 const initialState: VaultsState = {
-  vaults: {},
+  vaults: { 'PEPE-USD': { totalValue: 30_425 } },
   vaultDetails: {},
   userVaults: {},
 };
