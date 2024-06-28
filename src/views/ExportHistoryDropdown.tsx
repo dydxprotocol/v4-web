@@ -18,7 +18,7 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
-import { OutputType, formatNumber } from '@/components/Output';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { getIsAccountConnected, getSubaccountId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -49,26 +49,24 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
       const trades = await requestAllAccountFills(dydxAddress, subaccountNumber);
 
       const csvTrades = trades.map((fill) => {
-        const { sign: feeSign, formattedString: feeString } = formatNumber({
-          type: OutputType.Fiat,
-          value: fill.fee,
-          decimal: LOCALE_DECIMAL_SEPARATOR,
-          group: LOCALE_GROUP_SEPARATOR,
+        const fee = formatNumberOutput(fill.fee, OutputType.Fiat, {
+          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+          groupSeparator: LOCALE_GROUP_SEPARATOR,
         });
 
-        const { formattedString: priceString } = formatNumber({
-          type: OutputType.Fiat,
-          value: fill.price,
-          decimal: LOCALE_DECIMAL_SEPARATOR,
-          group: LOCALE_GROUP_SEPARATOR,
+        const price = formatNumberOutput(fill.price, OutputType.Fiat, {
+          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+          groupSeparator: LOCALE_GROUP_SEPARATOR,
         });
 
-        const { sign: totalSign, formattedString: totalString } = formatNumber({
-          type: OutputType.Fiat,
-          value: MustBigNumber(fill.price).times(fill.size),
-          decimal: LOCALE_DECIMAL_SEPARATOR,
-          group: LOCALE_GROUP_SEPARATOR,
-        });
+        const total = formatNumberOutput(
+          MustBigNumber(fill.price).times(fill.size),
+          OutputType.Fiat,
+          {
+            decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+            groupSeparator: LOCALE_GROUP_SEPARATOR,
+          }
+        );
 
         const sideKey = {
           [OrderSide.BUY]: STRING_KEYS.BUY,
@@ -83,9 +81,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             timeStyle: 'short',
           }),
           amount: fill.size,
-          price: priceString,
-          fee: feeSign ? `${feeSign}${feeString}` : feeString,
-          total: totalSign ? `${totalSign}${totalString}` : totalString,
+          price,
+          fee,
+          total,
           market: fill.market,
           side: sideKey
             ? stringGetter({
@@ -152,11 +150,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
       const transfers = await requestAllAccountTransfers(dydxAddress, subaccountNumber);
 
       const csvTransfers = transfers.map((transfer) => {
-        const { sign, formattedString } = formatNumber({
-          type: OutputType.Fiat,
-          value: transfer.size,
-          decimal: LOCALE_DECIMAL_SEPARATOR,
-          group: LOCALE_GROUP_SEPARATOR,
+        const amount = formatNumberOutput(transfer.size, OutputType.Fiat, {
+          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+          groupSeparator: LOCALE_GROUP_SEPARATOR,
         });
 
         return {
@@ -167,7 +163,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           action: transfer.type,
           sender: transfer.sender.address,
           recipient: transfer.recipient.address,
-          amount: sign ? `${sign}${formattedString}` : formattedString,
+          amount,
           transaction: transfer.transactionHash,
         };
       });
