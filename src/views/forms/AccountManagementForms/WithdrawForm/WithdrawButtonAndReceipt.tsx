@@ -61,8 +61,17 @@ export const WithdrawButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
-  const showExchangeRate = withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange;
-  const showMinAmountReceived = typeof summary?.toAmountMin === 'number';
+  const isSkipEnabled = true;
+  const showExchangeRate =
+    (!isSkipEnabled && !exchange) ||
+    (withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange);
+  const showMinAmountReceived = !isSkipEnabled || typeof summary?.toAmountMin === 'number';
+  const fallbackRouteDuration = stringGetter({
+    key: STRING_KEYS.X_MINUTES_LOWERCASED,
+    params: {
+      X: '< 30',
+    },
+  });
 
   const submitButtonReceipt: DetailsItem[] = [
     {
@@ -155,7 +164,9 @@ export const WithdrawButtonAndReceipt = ({
               },
             })}
           />
-        ) : undefined,
+        ) : isSkipEnabled ? (
+          fallbackRouteDuration
+        ) : null,
     },
     {
       key: 'leverage',

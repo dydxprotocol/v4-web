@@ -100,8 +100,15 @@ export const DepositButtonAndReceipt = ({
   const sourceChainName =
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
-  const showExchangeRate = typeof summary?.exchangeRate === 'number';
-  const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
+  const isSkipEnabled = true;
+  const showExchangeRate = typeof summary?.exchangeRate === 'number' || !isSkipEnabled;
+  const showMinDepositAmount = typeof summary?.toAmountMin === 'number' || !isSkipEnabled;
+  const fallbackRouteDuration = stringGetter({
+    key: STRING_KEYS.X_MINUTES_LOWERCASED,
+    params: {
+      X: '< 30',
+    },
+  });
 
   const submitButtonReceipt = [
     {
@@ -223,7 +230,9 @@ export const DepositButtonAndReceipt = ({
                         : Math.round(summary.estimatedRouteDuration / 60),
                   },
                 })
-              : null
+              : isSkipEnabled
+                ? fallbackRouteDuration
+                : null
           }
         />
       ),
