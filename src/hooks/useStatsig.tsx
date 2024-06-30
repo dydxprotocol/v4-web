@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
+import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import {
   StatsigProvider as StatsigProviderInternal,
   useStatsigClient,
 } from '@statsig/react-bindings';
 
-import { StatSigFlags, statsigClientPromise } from '@/lib/statsig';
+import { statsigClientPromise } from '@/lib/statsig';
 
 export const StatsigProvider = ({ children }: { children: React.ReactNode }) => {
   const [client, setClient] = useState<StatsigClient | null>(null);
@@ -29,10 +30,7 @@ export const useStatsigGateValue = (gate: StatSigFlags) => {
 
 export const useAllStatsigGateValues = () => {
   const { checkGate } = useStatsigClient();
-  return Object.values(StatSigFlags).reduce(
-    (acc, gate) => {
-      return { ...acc, [gate]: checkGate(gate) };
-    },
-    {} as { [key in StatSigFlags]?: boolean }
-  );
+  return Object.values(StatSigFlags).reduce((acc, gate) => {
+    return { ...acc, [gate]: checkGate(gate) };
+  }, {} as StatsigConfigType);
 };

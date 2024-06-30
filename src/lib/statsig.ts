@@ -1,3 +1,4 @@
+import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 
 const fetchIp = async () => {
@@ -35,6 +36,7 @@ const statsigCheckGatePromise = async (gateId: StatSigFlags) => {
  * This function should typically be avoided in favor of the useStatsig hook
  * This is used in useInitializePage to retrieve configs for abacus only once
  * inside of a useEffect hook.
+ *
  */
 export const statsigGetAllGateValuesPromise = async () => {
   const results = await Promise.all(
@@ -42,14 +44,7 @@ export const statsigGetAllGateValuesPromise = async () => {
       [gate]: await statsigCheckGatePromise(gate),
     }))
   );
-  return results.reduce(
-    (acc, gate) => {
-      return { ...acc, ...gate };
-    },
-    {} as { [key in StatSigFlags]?: boolean }
-  );
+  return results.reduce((acc, gate) => {
+    return { ...acc, ...gate };
+  }, {} as StatsigConfigType);
 };
-
-export enum StatSigFlags {
-  ffSkipMigration = 'ff_skip_migration',
-}

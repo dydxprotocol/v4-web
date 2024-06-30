@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-cycle
+import { StatSigFlags } from '@/types/statsig';
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
@@ -46,8 +48,6 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
-// eslint-disable-next-line import/no-cycle
-import { StatSigFlags } from '../statsig';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';

@@ -1,6 +1,5 @@
+import { StatSigFlags } from '@/types/statsig';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
-
-import { StatSigFlags } from '@/lib/statsig';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';

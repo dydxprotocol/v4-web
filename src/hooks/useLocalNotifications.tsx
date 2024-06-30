@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { useQuery } from '@tanstack/react-query';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -10,7 +11,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 import { track } from '@/lib/analytics';
 import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/lib/squid';
-import { StatSigFlags } from '@/lib/statsig';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
