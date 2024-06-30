@@ -6,9 +6,11 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -18,8 +20,10 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
+import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide } from '@/lib/tradeData';
@@ -52,7 +56,9 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     useAppSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
 
   const { id = '' } = currentMarketAssetData ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig ?? {};
+  const { stepSizeDecimals, tickSizeDecimals, stepSize } = currentMarketConfig ?? {};
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const rows = currentMarketLiveTrades.map(
     ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
@@ -95,11 +101,15 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         tag: id,
         renderCell: (row: RowData) => (
           <$SizeOutput
-            type={OutputType.Asset}
-            value={row.size}
-            fractionDigits={stepSizeDecimals}
+            type={OutputType.Text}
+            value={getConsistentAssetSizeString(row.size, {
+              decimalSeparator,
+              groupSeparator,
+              selectedLocale,
+              stepSize: stepSize ?? 10 ** (-1 * TOKEN_DECIMALS),
+              stepSizeDecimals: stepSizeDecimals ?? TOKEN_DECIMALS,
+            })}
             histogramSide={histogramSide}
-            useGrouping={false}
           />
         ),
       },
