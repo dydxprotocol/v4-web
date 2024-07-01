@@ -5,8 +5,7 @@
   "type": "module",
   "license": "AGPL-3.0",
   "engines": {
-    "node": ">=18",
-    "pnpm": "8.6.6"
+    "node": ">=18"
   },
   "scripts": {
     "dev": "cp ./template.html ./index.html && vite",
