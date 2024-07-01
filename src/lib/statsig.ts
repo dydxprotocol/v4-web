@@ -12,7 +12,6 @@ export const initStatsig = async () => {
       disableStorage: import.meta.env.VITE_DISABLE_STATSIG,
     }
   );
-  if (import.meta.env.VITE_DISABLE_STATSIG) return statsigClient;
   await statsigClient.initializeAsync();
   return statsigClient;
 };
