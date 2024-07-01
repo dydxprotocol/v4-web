@@ -96,6 +96,7 @@ export type NetworkConfigs = Abacus.exchange.dydx.abacus.output.NetworkConfigs;
 
 // ------ Assets ------ //
 export type Asset = Abacus.exchange.dydx.abacus.output.Asset;
+export type TransferChainInfo = Abacus.exchange.dydx.abacus.state.manager.TransferChainInfo;
 
 // ------ Inputs ------ //
 export type Inputs = Abacus.exchange.dydx.abacus.output.input.Input;
@@ -153,6 +154,7 @@ const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
 export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferType;
+export type TransferTypeType = Abacus.exchange.dydx.abacus.output.input.TransferType;
 
 export const AdjustIsolatedMarginInputField =
   Abacus.exchange.dydx.abacus.state.model.AdjustIsolatedMarginInputField;

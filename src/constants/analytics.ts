@@ -20,7 +20,7 @@ export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
 };
 export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
   detail: {
-    property: T;
+    property: (typeof AnalyticsUserPropertyLoggableTypes)[T];
     propertyValue: AnalyticsUserPropertyPayloads[T];
   };
 };
@@ -65,6 +65,18 @@ export const AnalyticsUserProperties = unionize(
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
+
+export const AnalyticsUserPropertyLoggableTypes = {
+  Locale: 'selectedLocale',
+  Breakpoint: 'breakpoint',
+  Version: 'version',
+  Network: 'network',
+  WalletType: 'walletType',
+  WalletConnectionType: 'walletConnectionType',
+  WalletAddress: 'walletAddress',
+  DydxAddress: 'dydxAddress',
+  SubaccountNumber: 'subaccountNumber',
+} as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
 export type AnalyticsUserPropertyTypes = TagsOf<typeof AnalyticsUserProperties>;
@@ -191,6 +203,7 @@ export const AnalyticsEvents = unionize(
       txHash?: string;
       amount?: number;
       validatorAddress?: string;
+      defaultValidatorAddress?: string;
     }>(),
     UnstakeTransaction: ofType<{
       txHash?: string;
@@ -208,6 +221,18 @@ export const AnalyticsEvents = unionize(
     UnstakeInput: ofType<{
       amount?: number;
       validatorAddress?: string;
+    }>(),
+    Error: ofType<{
+      location: string;
+      error: Error;
+      metadata?: any;
+    }>(),
+    RouteError: ofType<{
+      transferType?: 'withdrawal' | 'deposit';
+      errorMessage?: string;
+      amount: string;
+      chainId?: string;
+      assetId?: string;
     }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }

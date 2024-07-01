@@ -18,7 +18,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType, ShowSign, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
@@ -47,9 +47,9 @@ const usePortfolioValues = ({
   const accountValueLabel = useMemo(
     () =>
       activeDatum
-        ? new Date(activeDatum.createdAt).toLocaleString(selectedLocale, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, {
+            selectedLocale,
+            dateFormat: 'medium',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
     [activeDatum, selectedLocale, stringGetter]

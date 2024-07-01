@@ -93,7 +93,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
 
 const $MarketBillboardsWrapper = styled.div`
   ${layoutMixins.column}
-  gap: 1rem;
+  gap: 0.5rem;
 `;
 const $BillboardContainer = styled.div`
   ${layoutMixins.row}
@@ -101,7 +101,7 @@ const $BillboardContainer = styled.div`
   justify-content: space-between;
 
   background-color: var(--color-layer-3);
-  padding: 0.5rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-radius: 0.625rem;
 `;
 const $BillboardLink = styled(Button)`
@@ -119,12 +119,11 @@ const $BillboardTitle = styled.div`
 const $BillboardStat = styled.div`
   ${layoutMixins.column}
 
-  gap: 0.5rem;
   flex: 1;
 
   label {
     color: var(--color-text-0);
-    font: var(--font-base-medium);
+    font: var(--font-small-medium);
   }
 
   output {

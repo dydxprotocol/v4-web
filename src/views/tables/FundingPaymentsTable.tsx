@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -27,7 +26,6 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
-import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
@@ -91,11 +89,13 @@ export const FundingPaymentsTable = ({
             getCellValue: (row) => row.effectiveAtMilliSeconds,
             label: stringGetter({ key: STRING_KEYS.TIME }),
             renderCell: ({ effectiveAtMilliSeconds }) => {
-              // TODO: use OutputType.RelativeTime when ready
-              const { timeString, unitStringKey } = getStringsForDateTimeDiff(
-                DateTime.fromMillis(effectiveAtMilliSeconds)
+              return (
+                <Output
+                  type={OutputType.RelativeTime}
+                  value={effectiveAtMilliSeconds}
+                  relativeTimeOptions={{ format: 'singleCharacter' }}
+                />
               );
-              return `${timeString}${stringGetter({ key: unitStringKey })}`;
             },
           },
           {

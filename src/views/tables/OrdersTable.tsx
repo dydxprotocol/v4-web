@@ -3,7 +3,6 @@ import { Key, ReactNode, useEffect, useMemo } from 'react';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
-import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -52,7 +51,6 @@ import {
   isMarketOrderType,
   isOrderStatusClearable,
 } from '@/lib/orders';
-import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -200,15 +198,12 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.GOOD_TIL }),
         renderCell: ({ expiresAtMilliseconds }) => {
           if (!expiresAtMilliseconds) return <Output type={OutputType.Text} />;
-          // TODO: use OutputType.RelativeTime when ready
-          const { timeString, unitStringKey } = getStringsForDateTimeDiff(
-            DateTime.fromMillis(expiresAtMilliseconds)
-          );
 
           return (
             <Output
-              type={OutputType.Text}
-              value={`${timeString}${stringGetter({ key: unitStringKey })}`}
+              type={OutputType.RelativeTime}
+              value={expiresAtMilliseconds}
+              relativeTimeOptions={{ format: 'singleCharacter' }}
             />
           );
         },
@@ -250,7 +245,7 @@ const getOrdersTableColumnDef = ({
                 <>
                   <$TimeOutput
                     type={OutputType.RelativeTime}
-                    relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+                    relativeTimeOptions={{ format: 'singleCharacter' }}
                     value={createdAtMilliseconds}
                   />
                   <$AssetIconWithStatus>

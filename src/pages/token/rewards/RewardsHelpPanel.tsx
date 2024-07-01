@@ -17,7 +17,14 @@ export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
 
   const { isStakingEnabled } = useEnvFeatures();
-  const { protocolStaking, tradingRewardsLearnMore } = useURLConfigs();
+  const { protocolStaking, tradingRewardsLearnMore, stakingAndClaimingRewardsLearnMore } =
+    useURLConfigs();
+
+  const hereLink = (href?: string) => (
+    <Link isAccent isInline href={href}>
+      {stringGetter({ key: STRING_KEYS.HERE })}
+    </Link>
+  );
 
   return (
     <$HelpCard
@@ -43,11 +50,7 @@ export const RewardsHelpPanel = () => {
             content: stringGetter({
               key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
               params: {
-                HERE_LINK: (
-                  <Link href={tradingRewardsLearnMore} isAccent isInline>
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </Link>
-                ),
+                HERE_LINK: hereLink(tradingRewardsLearnMore),
               },
             }),
           },
@@ -62,17 +65,20 @@ export const RewardsHelpPanel = () => {
                   content: stringGetter({
                     key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
                     params: {
-                      HERE_LINK: (
-                        <Link href={protocolStaking} isAccent isInline>
-                          {stringGetter({ key: STRING_KEYS.HERE })}
-                        </Link>
-                      ),
+                      HERE_LINK: hereLink(protocolStaking),
                     },
                   }),
                 },
                 {
-                  header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_QUESTION }),
-                  content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_ANSWER }),
+                  header: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_QUESTION,
+                  }),
+                  content: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_ANSWER,
+                    params: {
+                      HERE_LINK: hereLink(stakingAndClaimingRewardsLearnMore),
+                    },
+                  }),
                 },
                 {
                   header: stringGetter({
@@ -89,6 +95,7 @@ export const RewardsHelpPanel = () => {
     </$HelpCard>
   );
 };
+
 const $HelpCard = styled(Panel)`
   --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;

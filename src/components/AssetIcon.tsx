@@ -76,6 +76,7 @@ const assetIcons = {
   BFC: '/currencies/bfc.png',
   BICO: '/currencies/bico.png',
   BIGTIME: '/currencies/bigtime.png',
+  BLAST: '/currencies/blast.png',
   BLOK: '/currencies/blok.png',
   BLUR: '/currencies/blur.png',
   BLZ: '/currencies/blz.png',
@@ -92,6 +93,7 @@ const assetIcons = {
   BORING: '/currencies/boring.png',
   BORK: '/currencies/bork.png',
   BOSON: '/currencies/boson.png',
+  BRETT: '/currencies/brett.png',
   BRISE: '/currencies/brise.png',
   BRWL: '/currencies/brwl.png',
   BSV: '/currencies/bsv.png',
@@ -259,6 +261,7 @@ const assetIcons = {
   ICP: '/currencies/icp.png',
   ICX: '/currencies/icx.png',
   ID: '/currencies/id.png',
+  IO: '/currencies/io.png',
   IDEX: '/currencies/idex.png',
   IGU: '/currencies/igu.png',
   ILV: '/currencies/ilv.png',
@@ -533,6 +536,7 @@ const assetIcons = {
   T: '/currencies/t.png',
   TAMA: '/currencies/tama.png',
   TAO: '/currencies/tao.png',
+  TAIKO: '/currencies/taiko.png',
   TAVA: '/currencies/tava.png',
   TEL: '/currencies/tel.png',
   TENET: '/currencies/tenet.png',
@@ -541,6 +545,7 @@ const assetIcons = {
   TIA: '/currencies/tia.png',
   TIME: '/currencies/time.png',
   TLM: '/currencies/tlm.png',
+  TLOS: '/currencies/tlos.png',
   TNSR: '/currencies/tnsr.png',
   TOMI: '/currencies/tomi.png',
   TON: '/currencies/ton.png',
@@ -559,7 +564,6 @@ const assetIcons = {
   TWT: '/currencies/twt.png',
   UFT: '/currencies/uft.png',
   UMA: '/currencies/uma.png',
-  UNAVAILABLE: '/currencies/unavailable.png',
   UNB: '/currencies/unb.png',
   UNFI: '/currencies/unfi.png',
   UNI: '/currencies/uni.png',
@@ -652,8 +656,15 @@ const assetIcons = {
   ZIL: '/currencies/zil.png',
   ZK: '/currencies/zk.png',
   ZKF: '/currencies/zkf.png',
+  ZRO: '/currencies/zro.png',
   ZRX: '/currencies/zrx.png',
 } as const;
+
+const Placeholder = ({ className, symbol }: { className?: string; symbol: string }) => (
+  <$Placeholder className={className}>
+    <span>{symbol[0]}</span>
+  </$Placeholder>
+);
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
   symbol != null && Object.hasOwn(assetIcons, symbol);
@@ -664,15 +675,32 @@ export const AssetIcon = ({
 }: {
   symbol?: Nullable<string>;
   className?: string;
-}) => (
-  <$Img
-    src={isAssetSymbol(symbol) ? assetIcons[symbol] : '/currencies/unavailable.png'}
-    className={className}
-    alt={symbol ?? undefined}
-  />
-);
+}) =>
+  isAssetSymbol(symbol) ? (
+    <$Img src={assetIcons[symbol]} className={className} alt={symbol} />
+  ) : (
+    <Placeholder className={className} symbol={symbol ?? ''} />
+  );
+
 const $Img = styled.img`
   width: auto;
   height: 1em;
   border-radius: 50%;
+`;
+
+const $Placeholder = styled.div`
+  background-color: var(--color-layer-5);
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  overflow: hidden;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0.5em;
+  }
 `;

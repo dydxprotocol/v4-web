@@ -27,6 +27,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -42,7 +43,7 @@ import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -52,12 +53,14 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
+import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -222,6 +225,7 @@ export const WithdrawForm = () => {
           }
         }
       } catch (err) {
+        log('WithdrawForm/onSubmit', err);
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
@@ -345,6 +349,8 @@ export const WithdrawForm = () => {
   ];
 
   const { sanctionedAddresses } = useRestrictions();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const { alertType, errorMessage } = useMemo(() => {
     if (isCctp) {
@@ -394,6 +400,15 @@ export const WithdrawForm = () => {
       };
 
     if (routeErrors) {
+      track(
+        AnalyticsEvents.RouteError({
+          transferType: TransferType.withdrawal.name,
+          errorMessage: routeErrorMessage ?? undefined,
+          amount: debouncedAmount,
+          chainId: chainIdStr ?? undefined,
+          assetId: toToken?.toString(),
+        })
+      );
       return {
         errorMessage: routeErrorMessage
           ? stringGetter({
@@ -436,7 +451,12 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
+                {formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                  fractionDigits: TOKEN_DECIMALS,
+                })}
                 <$Tag>{usdcLabel}</$Tag>
               </span>
             ),

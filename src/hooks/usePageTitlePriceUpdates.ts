@@ -5,6 +5,8 @@ import { shallowEqual } from 'react-redux';
 import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 
+import { OutputType, formatNumberOutput } from '@/components/Output';
+
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
@@ -14,12 +16,14 @@ import {
 } from '@/state/perpetualsSelectors';
 
 import { useBreakpoints } from './useBreakpoints';
+import { useLocaleSeparators } from './useLocaleSeparators';
 
 export const usePageTitlePriceUpdates = () => {
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const { isNotTablet } = useBreakpoints();
   const id = useAppSelector(getCurrentMarketId);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   const orderbookMidMarketPrice = useAppSelector(
     getCurrentMarketMidMarketPriceWithOraclePriceFallback
@@ -27,11 +31,13 @@ export const usePageTitlePriceUpdates = () => {
 
   useEffect(() => {
     if (id && orderbookMidMarketPrice && isNotTablet) {
-      const priceString = orderbookMidMarketPrice.toLocaleString(selectedLocale, {
-        minimumFractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
-        maximumFractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
+      const priceString = formatNumberOutput(orderbookMidMarketPrice, OutputType.Fiat, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+        fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
       });
-      document.title = `$${priceString} ${id} · ${DEFAULT_DOCUMENT_TITLE}`;
+      document.title = `${priceString} ${id} · ${DEFAULT_DOCUMENT_TITLE}`;
     } else {
       document.title = DEFAULT_DOCUMENT_TITLE;
     }

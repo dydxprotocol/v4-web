@@ -1,19 +1,12 @@
 import { shallowEqual } from 'react-redux';
-<<<<<<< HEAD
-=======
->>>>>>> d685f9a7c9c38572fdfbb748a20dde1b2778fb7b
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-<<<<<<< HEAD
-=======
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
-import { Link } from '@/components/Link';
->>>>>>> d685f9a7c9c38572fdfbb748a20dde1b2778fb7b
+import { OutputType, formatDateOutput } from '@/components/Output';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -21,7 +14,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 
-import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
 
@@ -60,9 +52,9 @@ export const useComplianceState = () => {
       key: STRING_KEYS.CLOSE_ONLY_MESSAGE,
       params: {
         DATE: updatedAtDate
-          ? updatedAtDate.toLocaleString(selectedLocale, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
+          ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, {
+              dateFormat: 'medium',
+              selectedLocale,
             })
           : undefined,
         EMAIL: complianceSupportEmail,
@@ -77,9 +69,7 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        TERMS_OF_USE_LINK: (
-          <TermsOfUseLink isInline />
-        ),
+        TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
       },
     });
   }
