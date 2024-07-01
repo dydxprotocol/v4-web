@@ -167,6 +167,7 @@ export const MarketsCompactTable = ({
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
       }
       columns={columns}
+      className={className}
       slotEmpty={
         <$MarketNotFound>
           {filters === MarketFilters.NEW ? (
