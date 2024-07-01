@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -17,7 +17,6 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Tag } from '@/components/Tag';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -27,9 +26,11 @@ import {
   getCurrentMarketVaultMetadata,
 } from '@/state/vaultSelectors';
 
+import { getNumberSign } from '@/lib/numbers';
+
 export const VaultDetails: React.FC = () => {
   const stringGetter = useStringGetter();
-  const { market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { market, configs } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { id, name } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { allTimePnl, currentLeverageMultiple, thirtyDayReturnPercent, currentPosition } =
     useAppSelector(getCurrentMarketVaultDetails) ?? {};
@@ -46,15 +47,7 @@ export const VaultDetails: React.FC = () => {
       key: 'all-time-pnl',
       label: 'All-time Vault P&L',
       value: (
-        <$ColoredReturn
-          $sign={
-            allTimePnl?.absolute == null || allTimePnl?.absolute === 0
-              ? NumberSign.Neutral
-              : allTimePnl.absolute > 0
-                ? NumberSign.Positive
-                : NumberSign.Negative
-          }
-        >
+        <$ColoredReturn $sign={getNumberSign(allTimePnl?.absolute)}>
           {allTimePnl?.absolute != null ? (
             <Output value={allTimePnl?.absolute} type={OutputType.CompactFiat} />
           ) : (
@@ -74,24 +67,22 @@ export const VaultDetails: React.FC = () => {
       label: 'Vault Position',
       value: (
         <$PositionContainer>
-          <$ColoredReturn
-            $sign={
-              currentPosition?.asset == null || currentPosition?.asset === 0
-                ? NumberSign.Neutral
-                : currentPosition?.asset > 0
-                  ? NumberSign.Positive
-                  : NumberSign.Negative
-            }
-          >
+          <$ColoredReturn $sign={getNumberSign(currentPosition?.asset)}>
             <Output
               value={currentPosition?.asset}
-              type={OutputType.CompactNumber}
-              showSign={ShowSign.Both}
+              type={OutputType.Asset}
+              tag={id}
+              showSign={ShowSign.Negative}
+              fractionDigits={configs?.stepSizeDecimals ?? TOKEN_DECIMALS}
             />
           </$ColoredReturn>
-          <Tag>{id}</Tag>
           <$MutedText>
-            <Output value={currentPosition?.usdc} type={OutputType.Fiat} withParentheses />
+            <Output
+              value={currentPosition?.usdc}
+              type={OutputType.Fiat}
+              withParentheses
+              fractionDigits={USD_DECIMALS}
+            />
           </$MutedText>
         </$PositionContainer>
       ),

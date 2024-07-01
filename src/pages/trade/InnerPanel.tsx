@@ -18,6 +18,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketHasVault } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 import { isPresent } from '@/lib/typeUtils';
 
 enum Tab {
@@ -32,6 +33,7 @@ export const InnerPanel = () => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const hasVault = useAppSelector(getCurrentMarketHasVault);
+  const showVaults = testFlags.enableVaults;
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -77,7 +79,7 @@ export const InnerPanel = () => {
           label: stringGetter({ key: STRING_KEYS.DETAILS }),
           value: Tab.Details,
         },
-        hasVault
+        hasVault && showVaults
           ? {
               content: <VaultDetails />,
               label: 'LP Vault', // todo stringGetter

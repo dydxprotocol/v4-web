@@ -40,6 +40,10 @@ class TestFlags {
     return !!this.queryParams.complianceapi;
   }
 
+  get enableVaults() {
+    return !!this.queryParams.vaults;
+  }
+
   get referrer() {
     return this.queryParams.utm_source;
   }
