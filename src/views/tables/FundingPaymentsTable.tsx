@@ -93,7 +93,7 @@ export const FundingPaymentsTable = ({
                 <Output
                   type={OutputType.RelativeTime}
                   value={effectiveAtMilliSeconds}
-                  relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+                  relativeTimeOptions={{ format: 'singleCharacter' }}
                 />
               );
             },

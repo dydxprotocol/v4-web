@@ -203,7 +203,7 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.RelativeTime}
               value={expiresAtMilliseconds}
-              relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+              relativeTimeOptions={{ format: 'singleCharacter' }}
             />
           );
         },
@@ -245,7 +245,7 @@ const getOrdersTableColumnDef = ({
                 <>
                   <$TimeOutput
                     type={OutputType.RelativeTime}
-                    relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+                    relativeTimeOptions={{ format: 'singleCharacter' }}
                     value={createdAtMilliseconds}
                   />
                   <$AssetIconWithStatus>
