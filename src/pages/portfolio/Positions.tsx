@@ -23,6 +23,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
+import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
@@ -39,6 +40,15 @@ export const Positions = () => {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
+
+  const handleViewVault = useCallback(
+    (vaultId: string) => {
+      navigate(`${AppRoute.Vaults}/${vaultId}`, {
+        state: { from: AppRoute.Portfolio },
+      });
+    },
+    [navigate]
+  );
 
   return (
     <>
@@ -89,6 +99,12 @@ export const Positions = () => {
           onViewOrders={handleViewUnopenedIsolatedOrders}
         />
       </DetachedSection>
+      <DetachedSection>
+        <$MaybeVaultPositionsPanel
+          header={<ContentSectionHeader title={stringGetter({ key: STRING_KEYS.VAULTS })} />}
+          onViewVault={handleViewVault}
+        />
+      </DetachedSection>
     </>
   );
 };
@@ -98,6 +114,15 @@ const $AttachedExpandingSection = styled(AttachedExpandingSection)`
 `;
 
 const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  > div {
+    padding-left: 1rem;
+  }
+`;
+
+const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
   margin-top: 1rem;
   margin-bottom: 1rem;
 
