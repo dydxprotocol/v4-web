@@ -8,9 +8,9 @@ import { useAppDispatch } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
-import { statsigGetAllGateValuesPromise } from '@/lib/statsig';
 
 import { useLocalStorage } from './useLocalStorage';
+import { useAllStatsigGateValues } from './useStatsig';
 
 export const useInitializePage = () => {
   const dispatch = useAppDispatch();
@@ -21,16 +21,11 @@ export const useInitializePage = () => {
     defaultValue: DEFAULT_APP_ENVIRONMENT,
     validateFn: validateAgainstAvailableEnvironments,
   });
+  const statsigConfig = useAllStatsigGateValues();
 
   useEffect(() => {
     dispatch(initializeLocalization());
-    const start = async () => {
-      const statsigConfig = await statsigGetAllGateValuesPromise();
-      abacusStateManager.setStatsigConfigs(statsigConfig);
-      abacusStateManager.start({ network: localStorageNetwork });
-    };
-    start();
-    // We intentionally want this to run only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    abacusStateManager.setStatsigConfigs(statsigConfig);
+    abacusStateManager.start({ network: localStorageNetwork });
+  }, [dispatch, localStorageNetwork, statsigConfig]);
 };
