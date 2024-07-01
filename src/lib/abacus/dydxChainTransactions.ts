@@ -1,5 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import type { IndexedTx } from '@cosmjs/stargate';
+import { type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
@@ -410,6 +410,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             : undefined,
         },
       };
+
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
       // take out fee from amount before sweeping
@@ -499,6 +500,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         typeUrl: params.typeUrl, // '/circle.cctp.v1.MsgDepositForBurn',
         value: params.value,
       };
+
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
       // take out fee from amount before sweeping

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
 
@@ -20,6 +21,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 
 import cctpTokens from '../../../../public/configs/cctp.json';
+import cosmosChains from '../../../../public/configs/cosmosChains.json';
 
 type ElementProps = {
   label?: string;
@@ -32,6 +34,12 @@ export type TokenInfo = {
   chainId: string;
   tokenAddress: string;
   name: string;
+};
+
+type ChainOption = {
+  type: string;
+  stringKey: string;
+  iconUrl: string;
 };
 
 const cctpTokensByChainId = cctpTokens.reduce(
@@ -57,13 +65,18 @@ export const SourceSelectMenu = ({
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
-  const chains =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
-    EMPTY_ARR;
 
-  const exchanges =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
-    EMPTY_ARR;
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
+  const isNotKeplrWallet = walletType !== WalletType.Keplr;
+
+  const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
+  const chainOptions = (options?.chains?.toArray() ?? EMPTY_ARR) as ChainOption[];
+  const cosmosChainOptions: ChainOption[] = isMainnet
+    ? cosmosChains.mainnets
+    : cosmosChains.testnets;
+
+  const chains = isNotKeplrWallet ? chainOptions : cosmosChainOptions;
+  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -76,7 +89,7 @@ export const SourceSelectMenu = ({
       onSelect: () => {
         onSelect(chain.type, 'chain');
       },
-      slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
+      slotBefore: <$Img src={chain.iconUrl} alt="" />,
       [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
         <$Text>
           {stringGetter({
@@ -93,6 +106,7 @@ export const SourceSelectMenu = ({
       ),
     }))
     .filter((chain) => {
+      if (!isNotKeplrWallet) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -116,16 +130,16 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
-  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
-          group: 'exchanges',
-          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-          items: exchangeItems,
-        },
+        isNotKeplrWallet &&
+          exchangeItems.length > 0 && {
+            group: 'exchanges',
+            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+            items: exchangeItems,
+          },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {

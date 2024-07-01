@@ -39,6 +39,7 @@ import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
+import { WalletType } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
@@ -244,11 +245,14 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, walletType?: WalletType) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
+      if (walletType === WalletType.Keplr) {
+        this.stateManager.cosmosWalletConnected = true;
+      }
     }
   };
 

@@ -4,7 +4,7 @@ import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-
 import {
   WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
-  useSuggestChainAndConnect as useConnectGraz,
+  useConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
   useOfflineSigners as useOfflineSignersGraz,
 } from 'graz';
@@ -21,7 +21,6 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
-  DYDX_CHAIN_INFO,
   WalletConnectionType,
   WalletType,
   wallets,
@@ -34,6 +33,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { resolveWagmiConnector } from '@/lib/wagmi';
@@ -53,6 +53,7 @@ export const useWalletConnection = () => {
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   useEffect(() => {
     // Cache last connected address
@@ -60,12 +61,17 @@ export const useWalletConnection = () => {
   }, [evmAddressWagmi]);
 
   // Cosmos wallet connection
+  const nobleChainId = getNobleChainId();
   const [dydxAddress, saveDydxAddress] = useLocalStorage<DydxAddress | undefined>({
     key: LocalStorageKey.DydxAddress,
     defaultValue: undefined,
   });
-  const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz();
-  const { signer: signerGraz } = useOfflineSignersGraz();
+  const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
+    chainId: selectedDydxChainId,
+  });
+  const { data: signerGraz } = useOfflineSignersGraz({
+    chainId: selectedDydxChainId,
+  });
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
   const dydxAddressGraz = dydxAccountGraz?.bech32Address;
@@ -91,7 +97,6 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
   const wagmiConnector = useMemo(
     () =>
@@ -108,7 +113,7 @@ export const useWalletConnection = () => {
   );
 
   const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector });
-  const { suggestAndConnect: connectGraz } = useConnectGraz();
+  const { connectAsync: connectGraz } = useConnectGraz();
   const [evmDerivedAddresses] = useLocalStorage({
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
@@ -165,7 +170,7 @@ export const useWalletConnection = () => {
 
           if (!isConnectedGraz) {
             await connectGraz({
-              chainInfo: DYDX_CHAIN_INFO,
+              chainId: [selectedDydxChainId, nobleChainId],
               walletType: cosmosWalletType,
             });
           }
@@ -300,6 +305,7 @@ export const useWalletConnection = () => {
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,
+    isConnectedGraz,
     signerGraz,
   };
 };

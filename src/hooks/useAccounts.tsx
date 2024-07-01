@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
+import { useOfflineSigners as useOfflineSignersGraz } from 'graz';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -21,6 +21,7 @@ import { getHasSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 
@@ -145,9 +146,13 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
+  const nobleChainId = getNobleChainId();
   const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
+  const { data: nobleSignerGraz } = useOfflineSignersGraz({
+    chainId: nobleChainId,
+  });
 
   const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
     try {
@@ -176,7 +181,9 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
+  const nobleAddress = useMemo(() => {
+    return localNobleWallet?.address;
+  }, [localNobleWallet]);
 
   const setWalletFromEvmSignature = async (signature: string) => {
     const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromEvmSignature({
@@ -219,7 +226,7 @@ const useAccountsContext = () => {
       } else if (connectedDydxAddress && signerGraz) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz as OfflineSigner));
+          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz.offlineSigner));
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
@@ -265,20 +272,27 @@ const useAccountsContext = () => {
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey, walletType);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey]);
+  }, [localDydxWallet, hdKey, dydxAddress, walletType]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
+      let nobleWallet: LocalWallet | undefined;
       if (hdKey?.mnemonic) {
-        const nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+      }
+      if (nobleSignerGraz !== undefined) {
+        nobleWallet = await LocalWallet.fromOfflineSigner(nobleSignerGraz.offlineSigner);
+      }
+
+      if (nobleWallet !== undefined) {
         abacusStateManager.setNobleWallet(nobleWallet);
         setLocalNobleWallet(nobleWallet);
       }
     };
     setNobleWallet();
-  }, [hdKey?.mnemonic]);
+  }, [hdKey?.mnemonic, nobleSignerGraz]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -358,6 +372,9 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+
+    // Noble accounts
+    localNobleWallet,
     nobleAddress,
 
     // Onboarding state

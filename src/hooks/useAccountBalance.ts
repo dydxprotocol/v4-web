@@ -4,14 +4,13 @@ import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
-import { useBalance } from 'wagmi';
+import { useBalance as useBalanceWagmi } from 'wagmi';
 
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
@@ -25,10 +24,10 @@ type UseAccountBalanceProps = {
 
   // Chain Items
   chainId?: string | number;
-  bech32AddrPrefix?: string;
   rpc?: string;
 
   isCosmosChain?: boolean;
+  cosmosAddress?: string;
 };
 
 /**
@@ -39,11 +38,11 @@ export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeee
 
 export const useAccountBalance = ({
   addressOrDenom,
-  bech32AddrPrefix,
   chainId,
   decimals = 0,
   rpc,
   isCosmosChain,
+  cosmosAddress,
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
@@ -52,7 +51,7 @@ export const useAccountBalance = ({
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
-  const evmQuery = useBalance({
+  const evmQuery = useBalanceWagmi({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
@@ -62,24 +61,19 @@ export const useAccountBalance = ({
   });
 
   const cosmosQueryFn = useCallback(async () => {
-    if (dydxAddress && bech32AddrPrefix && rpc && addressOrDenom) {
-      const address = convertBech32Address({
-        address: dydxAddress,
-        bech32Prefix: bech32AddrPrefix,
-      });
-
+    if (dydxAddress && cosmosAddress && rpc && addressOrDenom) {
       const client = await StargateClient.connect(rpc);
-      const balanceAsCoin = await client.getBalance(address, addressOrDenom);
+      const balanceAsCoin = await client.getBalance(cosmosAddress, addressOrDenom);
       await client.disconnect();
 
       return formatUnits(BigInt(balanceAsCoin.amount), decimals);
     }
     return undefined;
-  }, [addressOrDenom, chainId, rpc]);
+  }, [addressOrDenom, cosmosAddress, decimals, dydxAddress, rpc]);
 
   const cosmosQuery = useQuery({
-    enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: ['accountBalances', chainId, addressOrDenom],
+    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && rpc && addressOrDenom),
+    queryKey: ['accountBalances', chainId, cosmosAddress, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -87,7 +81,6 @@ export const useAccountBalance = ({
     refetchInterval: 10_000,
     staleTime: 10_000,
   });
-
   const { formatted: evmBalance } = evmQuery.data ?? {};
   const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 

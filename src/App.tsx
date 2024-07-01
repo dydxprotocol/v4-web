@@ -36,6 +36,7 @@ import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
+import { config as grazConfig } from '@/lib/graz';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
@@ -160,7 +161,7 @@ const providers = [
     config: privyConfig,
   }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
+  wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
