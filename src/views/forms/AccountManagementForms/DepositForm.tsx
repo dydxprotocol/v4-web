@@ -1,18 +1,23 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { type DeliverTxResponse } from '@cosmjs/stargate';
+import { GasPrice } from '@cosmjs/stargate';
+import { NobleClient } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import { Abi, formatUnits, parseUnits } from 'viem';
+import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
+import {
+  AnalyticsEventPayloads,
+  AnalyticsEvents,
+  DEFAULT_TRANSACTION_MEMO,
+} from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -96,11 +101,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     publicClientWagmi,
     nobleAddress,
     saveHasAcknowledgedTerms,
+    localNobleWallet,
+    walletType,
   } = useAccounts();
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
-
-  const { walletType } = useAccounts();
 
   const isKeplrWallet = walletType === WalletType.Keplr;
 
@@ -296,49 +301,61 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [signerWagmi, publicClientWagmi, sourceToken, requestPayload, evmAddress, debouncedAmount]);
 
+  const sendNobleIBC = useCallback(async () => {
+    const nobleClient = new NobleClient(nobleValidator);
+    if (!localNobleWallet) {
+      throw new Error('Missing local noble wallet');
+    }
+    await nobleClient.connect(localNobleWallet);
+
+    const amount = summary?.toAmount ?? 0;
+    const tx = {
+      typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+      value: {
+        sourcePort: 'transfer',
+        sourceChannel: isMainnet ? 'channel-33' : 'channel-21',
+        sender: nobleAddress,
+        receiver: dydxAddress,
+        token: {
+          denom: usdcGasDenom,
+          amount: parseUnits(amount.toString(), usdcDecimals).toString(),
+        },
+        timeoutTimestamp: Long.fromNumber(Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9),
+      },
+    };
+    const nobleGasPrice = GasPrice.fromString('0.1uusdc');
+    const memo = `${DEFAULT_TRANSACTION_MEMO} | ${nobleAddress}`;
+    const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
+
+    return txResult;
+  }, [
+    dydxAddress,
+    localNobleWallet,
+    nobleAddress,
+    nobleValidator,
+    summary?.toAmount,
+    usdcDecimals,
+    usdcGasDenom,
+  ]);
+
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
         e.preventDefault();
 
         const nobleChainId = getNobleChainId();
-        if (chainIdStr === nobleChainId && summary?.usdcSize) {
+        if (chainIdStr === nobleChainId) {
           setIsLoading(true);
-          const tx = {
-            msgTypeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-            msg: {
-              sourcePort: 'transfer',
-              sourceChannel: isMainnet ? 'channel-33' : 'channel-21',
-              sender: nobleAddress,
-              receiver: dydxAddress,
-              token: {
-                denom: usdcGasDenom,
-                amount: parseUnits(summary.usdcSize.toString(), usdcDecimals).toString(),
-              },
-              timeoutTimestamp: Long.fromNumber(
-                Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9
-              ),
-            },
-          };
-          const txResult = await abacusStateManager.sendNobleIBC(tx);
+          const txResult = await sendNobleIBC();
 
-          const parsedTx = JSON.parse(txResult) as DeliverTxResponse;
-          const nobleTxHash = parsedTx.transactionHash;
+          const nobleTxHash = txResult.transactionHash;
 
           if (nobleTxHash) {
-            const coinReceived = [...parsedTx.events]
-              .reverse()
-              .find((event) => event.type === 'coin_received');
-            const amountAttribute = coinReceived?.attributes.find((attr) => attr.key === 'amount');
-            const toAmount = amountAttribute?.value.split(usdcGasDenom)[0];
-
             addTransferNotification({
               txHash: nobleTxHash,
               toChainId: selectedDydxChainId,
               fromChainId: chainIdStr || undefined,
-              toAmount: toAmount
-                ? MustBigNumber(formatUnits(BigInt(toAmount), usdcDecimals)).toNumber()
-                : summary?.usdcSize ?? undefined,
+              toAmount: summary?.usdcSize ?? undefined,
               triggeredAt: Date.now(),
               isCctp,
               type: TransferNotificationTypes.Deposit,
@@ -352,7 +369,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
                 DialogTypes.CosmosDeposit({
                   toChainId: selectedDydxChainId,
                   fromChainId: chainIdStr ?? undefined,
-                  toAmount: summary?.usdcSize ?? undefined,
+                  toAmount: summary?.toAmount ?? undefined,
                   txHash: nobleTxHash,
                 })
               )
@@ -392,7 +409,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addOrUpdateTransferNotification({
             txHash,
-            toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
+            toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
@@ -424,7 +441,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, sendNobleIBC]
   );
 
   const amountInputReceipt = [

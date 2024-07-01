@@ -1,5 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { GasPrice, type IndexedTx } from '@cosmjs/stargate';
+import { type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
@@ -399,8 +399,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         },
       };
 
-      const nobleGasPrice = GasPrice.fromString('0.1uusdc');
-      const fee = await this.nobleClient.simulateTransaction([ibcMsg], nobleGasPrice);
+      const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
       // take out fee from amount before sweeping
       const amount =
