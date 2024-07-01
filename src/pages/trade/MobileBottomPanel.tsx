@@ -42,7 +42,7 @@ export const MobileBottomPanel = () => {
         hasVault && showVaults
           ? {
               value: InfoSection.Vault,
-              label: 'LP Vault',
+              label: stringGetter({ key: STRING_KEYS.LP_VAULT }),
               content: <VaultDetails />,
             }
           : undefined,

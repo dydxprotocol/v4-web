@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 
@@ -40,12 +41,12 @@ export const VaultDetails: React.FC = () => {
   const items = [
     {
       key: 'balance',
-      label: 'Vault Balance',
+      label: stringGetter({ key: STRING_KEYS.VAULT_BALANCE }),
       value: <Output value={totalValue} type={OutputType.CompactFiat} />,
     },
     {
       key: 'all-time-pnl',
-      label: 'All-time Vault P&L',
+      label: stringGetter({ key: STRING_KEYS.VAULT_ALL_TIME_PNL }),
       value: (
         <$ColoredReturn $sign={getNumberSign(allTimePnl?.absolute)}>
           {allTimePnl?.absolute != null ? (
@@ -59,12 +60,12 @@ export const VaultDetails: React.FC = () => {
     },
     {
       key: '30d-apr',
-      label: '30d APR',
+      label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
       value: <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />,
     },
     {
       key: 'vault-position',
-      label: 'Vault Position',
+      label: stringGetter({ key: STRING_KEYS.VAULT_POSITION }),
       value: (
         <$PositionContainer>
           <$ColoredReturn $sign={getNumberSign(currentPosition?.asset)}>
@@ -89,7 +90,7 @@ export const VaultDetails: React.FC = () => {
     },
     {
       key: 'vault-leverage',
-      label: 'Vault Leverage',
+      label: stringGetter({ key: STRING_KEYS.VAULT_LEVERAGE }),
       value: <Output value={currentLeverageMultiple} type={OutputType.Multiple} />,
     },
   ];
@@ -100,17 +101,12 @@ export const VaultDetails: React.FC = () => {
         <$WrapRow>
           <$MarketTitle>
             <AssetIcon symbol={id} />
-            {name} Vault
+            {stringGetter({ key: STRING_KEYS.ASSET_VAULT, params: { ASSET: name } })}
           </$MarketTitle>
         </$WrapRow>
 
         <$VaultDescription>
-          {/* Todo - stringGetter */}
-          <p>
-            Vaults provide automated liquidity on all dYdX markets. Vaults aim for a market-neutral
-            position by quoting both sides of the book. P&L will vary based on market conditions and
-            there&apos;s a risk of losing some or all of the USDC deposited.
-          </p>
+          <p>{stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}</p>
         </$VaultDescription>
 
         <$Buttons>
@@ -121,7 +117,7 @@ export const VaultDetails: React.FC = () => {
               size={ButtonSize.Small}
               slotRight={<Icon iconName={IconName.LinkOut} />}
             >
-              Vault Details
+              {stringGetter({ key: STRING_KEYS.VAULT_DETAILS })}
             </Button>
           </Link>
           {vaultsLearnMore && (
@@ -133,7 +129,7 @@ export const VaultDetails: React.FC = () => {
               href={vaultsLearnMore}
               slotRight={<Icon iconName={IconName.LinkOut} />}
             >
-              Vault FAQs
+              {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
             </Button>
           )}
         </$Buttons>
@@ -148,7 +144,7 @@ export const VaultDetails: React.FC = () => {
             size={ButtonSize.Small}
             slotLeft={<Icon iconName={IconName.Deposit} />}
           >
-            Deposit
+            {stringGetter({ key: STRING_KEYS.DEPOSIT })}
           </Button>
           <Button
             type={ButtonType.Button}
@@ -156,7 +152,7 @@ export const VaultDetails: React.FC = () => {
             size={ButtonSize.Small}
             slotLeft={<Icon iconName={IconName.Withdraw} />}
           >
-            Withdraw
+            {stringGetter({ key: STRING_KEYS.WITHDRAW })}
           </Button>
         </$DepositWithdrawButtons>
         <$Details items={items} withSeparators />

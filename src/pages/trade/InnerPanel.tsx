@@ -82,7 +82,7 @@ export const InnerPanel = () => {
         hasVault && showVaults
           ? {
               content: <VaultDetails />,
-              label: 'LP Vault', // todo stringGetter
+              label: stringGetter({ key: STRING_KEYS.LP_VAULT }),
               value: Tab.Vault,
             }
           : undefined,
