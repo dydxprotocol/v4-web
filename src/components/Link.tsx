@@ -93,9 +93,5 @@ const $A = styled.a<StyleProps & { withIcon: boolean }>`
     isAccent &&
     css`
       --link-color: var(--color-accent);
-
-      &:visited {
-        color: var(--color-accent);
-      }
     `}
 `;
