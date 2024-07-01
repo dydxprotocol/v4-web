@@ -46,7 +46,7 @@ export const NewMarketAgreementDialog = ({
                   {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
                 </Link>
               ),
-              TERMS_OF_USE: <$TermsOfUseLink isInline />,
+              TERMS_OF_USE: <TermsOfUseLink isInline isAccent />,
             },
           })}
         </p>
@@ -91,10 +91,6 @@ const $Content = styled.div`
     padding: 1rem;
     background-color: var(--color-layer-1);
   }
-`;
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  --link-color: var(--color-accent);
 `;
 
 const $ButtonRow = styled.div`
