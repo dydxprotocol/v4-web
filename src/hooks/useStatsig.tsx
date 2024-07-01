@@ -7,17 +7,17 @@ import {
   useStatsigClient,
 } from '@statsig/react-bindings';
 
-import { statsigClientPromise } from '@/lib/statsig';
+import { initStatsig } from '@/lib/statsig';
 
 export const StatsigProvider = ({ children }: { children: React.ReactNode }) => {
   const [client, setClient] = useState<StatsigClient | null>(null);
   useEffect(() => {
     const setAsyncClient = async () => {
-      const statsigClient = await statsigClientPromise;
+      const statsigClient = await initStatsig();
       setClient(statsigClient);
     };
     setAsyncClient();
-  }, [statsigClientPromise]);
+  }, [initStatsig]);
   // if no client, render without provider until a client exists
   if (!client) return <div>{children}</div>;
   return <StatsigProviderInternal client={client}> {children} </StatsigProviderInternal>;

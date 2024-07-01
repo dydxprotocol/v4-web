@@ -8,7 +8,7 @@ const fetchIp = async () => {
 
 let statsigClient: StatsigClient;
 
-const initStatsig = async () => {
+export const initStatsig = async () => {
   if (statsigClient) return statsigClient;
   statsigClient = new StatsigClient(
     import.meta.env.VITE_STATSIG_CLIENT_KEY,
@@ -25,13 +25,6 @@ const initStatsig = async () => {
   return statsigClient;
 };
 
-export const statsigClientPromise = initStatsig();
-
-const statsigCheckGatePromise = async (gateId: StatSigFlags) => {
-  const client = await statsigClientPromise;
-  return client.checkGate(gateId);
-};
-
 /**
  * This function should typically be avoided in favor of the useStatsig hook
  * This is used in useInitializePage to retrieve configs for abacus only once
@@ -39,12 +32,9 @@ const statsigCheckGatePromise = async (gateId: StatSigFlags) => {
  *
  */
 export const statsigGetAllGateValuesPromise = async () => {
-  const results = await Promise.all(
-    Object.values(StatSigFlags).map(async (gate) => ({
-      [gate]: await statsigCheckGatePromise(gate),
-    }))
-  );
-  return results.reduce((acc, gate) => {
-    return { ...acc, ...gate };
+  const client = await initStatsig();
+  const allGateValues = Object.values(StatSigFlags).reduce((acc, gate) => {
+    return { ...acc, [gate]: client.checkGate(gate) };
   }, {} as StatsigConfigType);
+  return allGateValues;
 };
