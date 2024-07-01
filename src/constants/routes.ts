@@ -1,5 +1,6 @@
 export enum AppRoute {
   Markets = '/markets',
+  Vaults = '/vaults',
   Portfolio = '/portfolio',
   Trade = '/trade',
   Profile = '/profile',
