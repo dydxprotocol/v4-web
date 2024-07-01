@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { useQuery } from '@tanstack/react-query';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -13,6 +14,7 @@ import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/l
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
+import { useStatsigGateValue } from './useStatsig';
 
 const LocalNotificationsContext = createContext<
   ReturnType<typeof useLocalNotificationsContext> | undefined
@@ -31,6 +33,8 @@ const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
   const { skip } = useEndpointsConfig();
+  const useSkip = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
     version: string;
@@ -132,8 +136,6 @@ const useLocalNotificationsContext = () => {
                   chainId: fromChainId,
                   baseUrl: skip,
                 };
-                // TODO: replace with statsig call
-                const useSkip = false;
                 if (!tracked && useSkip) {
                   const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                   // if no tx hash was returned, transfer has not yet been tracked

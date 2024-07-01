@@ -58,7 +58,7 @@ const getTransferHistoryTableColumnDef = ({
         renderCell: ({ updatedAtMilliseconds }) => (
           <$TimeOutput
             type={OutputType.RelativeTime}
-            relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+            relativeTimeOptions={{ format: 'singleCharacter' }}
             value={updatedAtMilliseconds}
           />
         ),

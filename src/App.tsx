@@ -19,6 +19,7 @@ import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
+import { StatsigProvider } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -159,6 +160,7 @@ const providers = [
     clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
     config: privyConfig,
   }),
+  wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
