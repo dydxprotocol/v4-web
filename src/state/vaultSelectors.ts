@@ -32,3 +32,7 @@ export const getVaultsTableData = createAppSelector(
       userInfo: userVaults[marketId],
     }))
 );
+
+export const getAllVaultsWithUserBalance = createAppSelector([getVaultsTableData], (vaults) =>
+  vaults.filter((v) => (v.userInfo?.userBalance ?? 0) > 0)
+);
