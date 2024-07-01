@@ -13,7 +13,7 @@ import { Tag } from '@/components/Tag';
 import {
   StakeRewardButtonAndReceipt,
   type StakeButtonAlert,
-} from '@/views/StakeRewardButtonAndReceipt';
+} from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
@@ -82,11 +82,9 @@ export const UnstakeButtonAndReceipt = ({
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
       alert={error}
-      buttonText={
-        allAmountsEmpty
-          ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE })
-          : stringGetter({ key: STRING_KEYS.UNSTAKE })
-      }
+      buttonText={stringGetter({
+        key: allAmountsEmpty ? STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE : STRING_KEYS.PREVIEW_UNSTAKE,
+      })}
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
       isLoading={isLoading}

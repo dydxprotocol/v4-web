@@ -8,7 +8,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
-import { UnstakeForm } from '@/views/forms/UnstakeForm';
+import { UnstakeForm } from '@/views/forms/StakingForms/UnstakeForm';
 
 export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) => {
   const stringGetter = useStringGetter();
