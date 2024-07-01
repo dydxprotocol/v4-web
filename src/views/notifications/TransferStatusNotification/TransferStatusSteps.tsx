@@ -82,7 +82,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
             CHAIN:
               type === TransferNotificationTypes.Deposit
                 ? 'dYdX'
-                : status?.toChain?.chainData?.chainName,
+                : status?.toChain?.chainData?.chainName ?? '...',
           },
         }),
         step: TransferStatusStep.ToChain,
