@@ -69,6 +69,7 @@ export const getConsistentAssetSizeString = (
   return `${formatNumberOutput(sizeToRender / displayDivisor, OutputType.Number, {
     decimalSeparator,
     groupSeparator,
+    selectedLocale,
     fractionDigits: stepSizeDecimals,
   })}${displaySuffix}`;
 };

@@ -257,7 +257,7 @@ export const PnlChart = ({
       formatNumberOutput(value, OutputType.CompactFiat, {
         decimalSeparator,
         groupSeparator,
-        locale: selectedLocale,
+        selectedLocale,
       }),
     [decimalSeparator, groupSeparator, selectedLocale]
   );

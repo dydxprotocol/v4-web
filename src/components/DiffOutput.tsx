@@ -22,42 +22,22 @@ export type DiffOutputProps = DiffArrowProps & OutputProps & ElementProps & Styl
 export const DiffOutput = ({
   className,
   direction,
-  fractionDigits,
   hasInvalidNewValue,
   sign,
-  tag,
-  type,
-  useGrouping,
   withDiff,
   layout = 'row',
-  showSign,
-  withBaseFont,
 
   value,
   newValue,
+
+  ...outputProps
 }: DiffOutputProps) => (
   <$DiffOutput className={className} layout={layout} withDiff={withDiff}>
-    <Output
-      fractionDigits={fractionDigits}
-      tag={tag}
-      type={type}
-      useGrouping={useGrouping}
-      value={value}
-      showSign={showSign}
-      withBaseFont={withBaseFont}
-    />
+    <Output value={value} {...outputProps} />
     {withDiff && (
       <$DiffValue hasInvalidNewValue={hasInvalidNewValue}>
         <DiffArrow direction={direction} sign={sign} />
-        <Output
-          fractionDigits={fractionDigits}
-          tag={tag}
-          type={type}
-          useGrouping={useGrouping}
-          value={newValue}
-          showSign={showSign}
-          withBaseFont={withBaseFont}
-        />
+        <Output value={newValue} {...outputProps} />
       </$DiffValue>
     )}
   </$DiffOutput>

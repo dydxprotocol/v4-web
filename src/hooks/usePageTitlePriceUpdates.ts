@@ -8,6 +8,7 @@ import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
   getCurrentMarketConfig,
   getCurrentMarketId,
@@ -20,6 +21,7 @@ import { useLocaleSeparators } from './useLocaleSeparators';
 export const usePageTitlePriceUpdates = () => {
   const { isNotTablet } = useBreakpoints();
   const id = useAppSelector(getCurrentMarketId);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
@@ -32,6 +34,7 @@ export const usePageTitlePriceUpdates = () => {
       const priceString = formatNumberOutput(orderbookMidMarketPrice, OutputType.Fiat, {
         decimalSeparator,
         groupSeparator,
+        selectedLocale,
         fractionDigits: tickSizeDecimals ?? SMALL_USD_DECIMALS,
       });
       document.title = `${priceString} ${id} · ${DEFAULT_DOCUMENT_TITLE}`;
