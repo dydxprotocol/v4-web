@@ -1,8 +1,9 @@
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { NumberSign } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -15,7 +16,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -29,7 +31,8 @@ export const VaultDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { id, name } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const {} = useAppSelector(getCurrentMarketVaultDetails) ?? {};
+  const { allTimePnl, currentLeverageMultiple, thirtyDayReturnPercent, currentPosition } =
+    useAppSelector(getCurrentMarketVaultDetails) ?? {};
   const { totalValue } = useAppSelector(getCurrentMarketVaultMetadata) ?? {};
   const { vaultsLearnMore } = useURLConfigs();
 
@@ -42,22 +45,61 @@ export const VaultDetails: React.FC = () => {
     {
       key: 'all-time-pnl',
       label: 'All-time Vault P&L',
-      value: market,
+      value: (
+        <$ColoredReturn
+          $sign={
+            allTimePnl?.absolute == null || allTimePnl?.absolute === 0
+              ? NumberSign.Neutral
+              : allTimePnl.absolute > 0
+                ? NumberSign.Positive
+                : NumberSign.Negative
+          }
+        >
+          {allTimePnl?.absolute != null ? (
+            <Output value={allTimePnl?.absolute} type={OutputType.CompactFiat} />
+          ) : (
+            '-'
+          )}{' '}
+          <Output value={allTimePnl?.percent} type={OutputType.Percent} withParentheses />
+        </$ColoredReturn>
+      ),
     },
     {
       key: '30d-apr',
       label: '30d APR',
-      value: market,
+      value: <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />,
     },
     {
       key: 'vault-position',
       label: 'Vault Position',
-      value: market,
+      value: (
+        <$PositionContainer>
+          <$ColoredReturn
+            $sign={
+              currentPosition?.asset == null || currentPosition?.asset === 0
+                ? NumberSign.Neutral
+                : currentPosition?.asset > 0
+                  ? NumberSign.Positive
+                  : NumberSign.Negative
+            }
+          >
+            <Output
+              value={currentPosition?.asset}
+              type={OutputType.CompactNumber}
+              showSign={ShowSign.Both}
+            />
+          </$ColoredReturn>
+          <Tag>{id}</Tag>
+          <$MutedText>
+            <Output value={currentPosition?.usdc} type={OutputType.Fiat} withParentheses />
+          </$MutedText>
+        </$PositionContainer>
+      ),
     },
     {
       key: 'vault-leverage',
       label: 'Vault Leverage',
-      value: market,
+      value: <Output value={currentLeverageMultiple} type={OutputType.Multiple} />,
     },
   ];
 
@@ -82,7 +124,12 @@ export const VaultDetails: React.FC = () => {
 
         <$Buttons>
           <Link to={`${AppRoute.Trade}/${market}`}>
-            <Button type={ButtonType.Button} shape={ButtonShape.Pill} size={ButtonSize.Small}>
+            <Button
+              type={ButtonType.Button}
+              shape={ButtonShape.Pill}
+              size={ButtonSize.Small}
+              slotRight={<Icon iconName={IconName.LinkOut} />}
+            >
               Vault Details
             </Button>
           </Link>
@@ -91,6 +138,7 @@ export const VaultDetails: React.FC = () => {
               type={ButtonType.Link}
               shape={ButtonShape.Pill}
               size={ButtonSize.Small}
+              action={ButtonAction.Navigation}
               href={vaultsLearnMore}
               slotRight={<Icon iconName={IconName.LinkOut} />}
             >
@@ -101,7 +149,7 @@ export const VaultDetails: React.FC = () => {
       </$Header>
 
       <$Header>
-        <$Buttons>
+        <$DepositWithdrawButtons>
           <Button
             type={ButtonType.Button}
             action={ButtonAction.Primary}
@@ -119,7 +167,7 @@ export const VaultDetails: React.FC = () => {
           >
             Withdraw
           </Button>
-        </$Buttons>
+        </$DepositWithdrawButtons>
         <$Details items={items} withSeparators />
       </$Header>
     </$VaultDetails>
@@ -166,6 +214,29 @@ const $MarketTitle = styled.h3`
     height: 2.25rem;
   }
 `;
+const $PositionContainer = styled.div`
+  display: flex;
+  gap: 0.2rem;
+`;
+const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
+  display: flex;
+  gap: 0.25rem;
+  ${({ $sign }) =>
+    $sign &&
+    {
+      [NumberSign.Positive]: css`
+        color: var(--color-positive);
+      `,
+      [NumberSign.Negative]: css`
+        color: var(--color-negative);
+      `,
+      [NumberSign.Neutral]: null,
+    }[$sign]}
+`;
+const $MutedText = styled.span`
+  color: var(--color-text-0);
+`;
+
 const $VaultDescription = styled.div`
   ${layoutMixins.column}
   gap: 0.5em;
@@ -184,6 +255,9 @@ const $Buttons = styled.div`
   gap: 0.5rem;
 
   overflow-x: auto;
+`;
+const $DepositWithdrawButtons = styled($Buttons)`
+  justify-content: end;
 `;
 const $Details = styled(Details)`
   font: var(--font-mini-book);

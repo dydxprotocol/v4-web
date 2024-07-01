@@ -25,7 +25,14 @@ export interface VaultsState {
 
 const initialState: VaultsState = {
   vaults: { 'PEPE-USD': { totalValue: 30_425 } },
-  vaultDetails: {},
+  vaultDetails: {
+    'PEPE-USD': {
+      allTimePnl: { absolute: 4_125, percent: 0.1252 },
+      currentLeverageMultiple: 1.2,
+      currentPosition: { asset: 17341235412, usdc: 423.67 },
+      thirtyDayReturnPercent: 0.1474,
+    },
+  },
   userVaults: {},
 };
 
