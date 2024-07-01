@@ -65,9 +65,9 @@ export const MigratePanel = ({ className }: { className?: string }) => {
     >
       <$Description>
         {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
-        <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK}>
-          {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-        </Link>
+        <$Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} isInline>
+          {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+        </$Link>
       </$Description>
     </$MigratePanel>
   ) : (
@@ -165,13 +165,10 @@ const $Token = styled(Output)`
 
 const $Description = styled.div`
   color: var(--color-text-0);
+`;
 
-  a {
-    display: inline;
-    ::before {
-      content: ' ';
-    }
-  }
+const $Link = styled(Link)`
+  margin-left: 0.5ch;
 `;
 
 const $Column = styled.div`

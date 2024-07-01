@@ -185,7 +185,7 @@ export const AccountDetailsAndHistory = () => {
                 {stringGetter({
                   key: STRING_KEYS.BLOCKED_MESSAGE,
                   params: {
-                    TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
+                    TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
                   },
                 })}
               </$Card>
@@ -320,4 +320,8 @@ const $EmptyCard = styled($Card)`
   button {
     width: fit-content;
   }
+`;
+
+const $TermsOfUseLink = styled(TermsOfUseLink)`
+  text-decoration: underline;
 `;

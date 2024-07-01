@@ -82,12 +82,10 @@ const $A = styled.a<StyleProps & { withIcon: boolean }>`
     isInline && withIcon
       ? css`
           ${layoutMixins.inlineRow}
-          text-decoration: underline;
         `
       : isInline
         ? css`
             display: inline;
-            text-decoration: underline;
           `
         : undefined}
 
@@ -95,7 +93,6 @@ const $A = styled.a<StyleProps & { withIcon: boolean }>`
     isAccent &&
     css`
       --link-color: var(--color-accent);
-      text-decoration: none;
 
       &:visited {
         color: var(--color-accent);

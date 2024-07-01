@@ -135,6 +135,10 @@ const $Content = styled(Content)`
   dd {
     font: var(--font-mini-book);
   }
+
+  a {
+    text-decoration: underline;
+  }
 `;
 
 const $Arrow = styled(Arrow)`

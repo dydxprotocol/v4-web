@@ -92,9 +92,7 @@ export const useStakingValidator = () => {
 
     // Set the default validator to be the validator with the fewest tokens, selected from validators configured in the whitelist
     const whitelistedValidators = response?.validators.filter((validator) =>
-      availableValidators
-        .map((val) => val.operatorAddress.toLowerCase())
-        .includes(validator.operatorAddress.toLowerCase())
+      validatorOptions.includes(validator.operatorAddress.toLowerCase())
     );
 
     const validatorWithFewestTokens = (whitelistedValidators ?? availableValidators ?? []).reduce(

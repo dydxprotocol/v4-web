@@ -136,6 +136,7 @@ export const OrderStatusNotification = ({
     />
   );
 };
+
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
