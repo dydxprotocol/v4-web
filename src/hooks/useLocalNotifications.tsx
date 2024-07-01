@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { useQuery } from '@tanstack/react-query';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -13,7 +14,7 @@ import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/l
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
-import { StatSigFlags, useStatSigGateValue } from './useStatsig';
+import { useStatsigGateValue } from './useStatsig';
 
 const LocalNotificationsContext = createContext<
   ReturnType<typeof useLocalNotificationsContext> | undefined
@@ -32,7 +33,7 @@ const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
   const { skip } = useEndpointsConfig();
-  const useSkip = useStatSigGateValue(StatSigFlags.ffSkipMigration);
+  const useSkip = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
