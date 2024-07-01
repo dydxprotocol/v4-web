@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-cycle
+import { StatSigFlags } from '@/types/statsig';
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
@@ -29,6 +31,7 @@ import {
   HistoricalPnlPeriod,
   IOImplementations,
   OnboardingConfig,
+  StatsigConfig,
   TradeInputField,
   TransferInputField,
   TransferType,
@@ -46,7 +49,6 @@ import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors
 
 import { LocaleSeparators } from '../numbers';
 import AbacusAnalytics from './analytics';
-// eslint-disable-next-line import/no-cycle
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
 import AbacusFormatter from './formatter';
@@ -103,7 +105,6 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
-
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
@@ -408,6 +409,21 @@ class AbacusStateManager {
 
   getChainById = (chainId: string) => {
     return this.stateManager.getChainById(chainId);
+  };
+
+  /**
+   *
+   * Updates Abacus' global StatsigConfig object.
+   * You must destructure the new flag you want to use from the config and set
+   * the relevant property on the StatsigConfig object.
+   *
+   * TODO: establish standardized naming conventions between
+   * statsig FF name and boolean propery in abacus StatsigConfig
+   * https://linear.app/dydx/project/feature-experimentation-6853beb333d7/overview
+   */
+  setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
+    const { [StatSigFlags.ffSkipMigration]: useSkip = false } = statsigConfig;
+    StatsigConfig.useSkip = useSkip;
   };
 }
 
