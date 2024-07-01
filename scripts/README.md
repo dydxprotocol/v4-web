@@ -8,7 +8,7 @@ Analytics service used to collect data to help the dYdX Product team make inform
 3. In your deploy scripts add `pnpm run build:inject-amplitude` after your pnpm build / vite build command.
 
 ### Hotjar
-User behavior tracking service used help the dYdX Product team make informed product decisions.
+User behavior tracking service used to help the dYdX Product team make informed product decisions.
 
 <b>To use with dydxprotocol/v4-web:</b>
 1. Hotjar account with Site Id and Hotjar version.
