@@ -124,6 +124,14 @@
         "websiteLink": "https://www.aergo.io/", 
         "whitepaperLink": "https://paper.aergo.io/AERGO_Whitepaper_v5.2.pdf"
     }, 
+    "AERO-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aerodrome-finance/",
+        "name": "Aerodrome Finance",
+        "tags": [
+            "Defi"
+        ],
+        "websiteLink": "https://aerodrome.finance/"
+    },
     "AEVO-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aevo/", 
         "name": "Aevo", 
