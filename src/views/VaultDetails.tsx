@@ -135,7 +135,7 @@ export const VaultDetails: React.FC = () => {
         </$Buttons>
       </$Header>
 
-      <$Header>
+      <$DetailsContainer>
         <$DepositWithdrawButtons>
           <Button
             type={ButtonType.Button}
@@ -156,7 +156,7 @@ export const VaultDetails: React.FC = () => {
           </Button>
         </$DepositWithdrawButtons>
         <$Details items={items} withSeparators />
-      </$Header>
+      </$DetailsContainer>
     </$VaultDetails>
   );
 };
@@ -169,11 +169,9 @@ const $VaultDetails = styled.div`
   --grid-max-columns: 2;
   --column-gap: 2.25em;
   --column-min-width: 18rem;
-  --column-max-width: 22rem;
+  --column-max-width: 24rem;
   --single-column-max-width: 25rem;
 
-  justify-content: center;
-  align-items: center;
   padding: clamp(0.5rem, 7.5%, 2.5rem);
   row-gap: 1rem;
 
@@ -181,9 +179,14 @@ const $VaultDetails = styled.div`
     padding: 0 clamp(0.5rem, 7.5%, 2.5rem);
   }
 `;
+
 const $Header = styled.header`
   ${layoutMixins.column}
+  align-content: start;
   gap: 1.25rem;
+`;
+const $DetailsContainer = styled($Header)`
+  gap: 0.25rem;
 `;
 const $WrapRow = styled.div`
   ${layoutMixins.row}
@@ -247,5 +250,9 @@ const $DepositWithdrawButtons = styled($Buttons)`
   justify-content: end;
 `;
 const $Details = styled(Details)`
-  font: var(--font-mini-book);
+  font: var(--font-base-book);
+  dd {
+    font-size: 1rem;
+  }
+  --details-item-vertical-padding: 1rem;
 `;
