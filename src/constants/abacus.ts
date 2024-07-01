@@ -87,6 +87,7 @@ export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketH
 export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualMarketType;
 
 // ------ Configs ------ //
+export const StatsigConfig = Abacus.exchange.dydx.abacus.state.manager.StatsigConfig;
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
 export type FeeDiscount = Abacus.exchange.dydx.abacus.output.FeeDiscount;
 export type FeeTier = Abacus.exchange.dydx.abacus.output.FeeTier;
