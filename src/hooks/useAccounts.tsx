@@ -372,6 +372,9 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+
+    // Noble accounts
+    localNobleWallet,
     nobleAddress,
 
     // Onboarding state
