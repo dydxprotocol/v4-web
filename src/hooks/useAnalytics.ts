@@ -32,10 +32,7 @@ export const useAnalytics = () => {
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
     useAccounts();
   const { indexerClient } = useDydxClient();
-  // all configs should be set by the time this provider loads
-  // we don't want to continuously ping statsig all the time to check for updates
-  // so we set it as a state item which holds referential equality
-  const [statsigConfig] = useState(useAllStatsigGateValues());
+  const statsigConfig = useAllStatsigGateValues();
   /** User properties */
 
   // AnalyticsUserProperty.Breakpoint

@@ -413,16 +413,17 @@ class AbacusStateManager {
 
   /**
    *
-   * Sets statsig configs to abacus. You must destructure the new flag you want to use
-   * and add it to the config construction in the correct order
+   * Updates Abacus' global StatsigConfig object.
+   * You must destructure the new flag you want to use from the config and set
+   * the relevant property on the StatsigConfig object.
    *
-   * TODO: think of a more typesafe and elegant way to handle this
-   * TODO: make naming consistent between statsig FF name and boolean in abacus
+   * TODO: establish standardized naming conventions between
+   * statsig FF name and boolean propery in abacus StatsigConfig
    * https://linear.app/dydx/project/feature-experimentation-6853beb333d7/overview
    */
   setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
-    const { [StatSigFlags.ffSkipMigration]: useSkip } = statsigConfig;
-    this.stateManager.statsigConfig = new StatsigConfig(useSkip);
+    const { [StatSigFlags.ffSkipMigration]: useSkip = false } = statsigConfig;
+    StatsigConfig.useSkip = useSkip;
   };
 }
 

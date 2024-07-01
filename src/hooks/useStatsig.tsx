@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
@@ -30,7 +30,10 @@ export const useStatsigGateValue = (gate: StatSigFlags) => {
 
 export const useAllStatsigGateValues = () => {
   const { checkGate } = useStatsigClient();
-  return Object.values(StatSigFlags).reduce((acc, gate) => {
-    return { ...acc, [gate]: checkGate(gate) };
-  }, {} as StatsigConfigType);
+  const allGateValues = useMemo(() => {
+    return Object.values(StatSigFlags).reduce((acc, gate) => {
+      return { ...acc, [gate]: checkGate(gate) };
+    }, {} as StatsigConfigType);
+  }, []);
+  return allGateValues;
 };

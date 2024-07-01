@@ -26,10 +26,11 @@ export const useInitializePage = () => {
     dispatch(initializeLocalization());
     const start = async () => {
       const statsigConfig = await statsigGetAllGateValuesPromise();
-      // TODO: send in an object instead, or something
       abacusStateManager.setStatsigConfigs(statsigConfig);
       abacusStateManager.start({ network: localStorageNetwork });
     };
     start();
+    // We intentionally want this to run only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
