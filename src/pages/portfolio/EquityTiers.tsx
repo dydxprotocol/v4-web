@@ -142,7 +142,6 @@ const $AndText = styled.span`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
   padding: 0 1rem;
   font: var(--font-small-book);
 

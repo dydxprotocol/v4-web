@@ -106,9 +106,9 @@ export const OrderStatusNotification = ({
               key: localOrder.errorStringKey,
               params: {
                 EQUITY_TIER_LEARN_MORE: (
-                  <$Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()}>
+                  <Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()} isInline>
                     {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-                  </$Link>
+                  </Link>
                 ),
               },
             })}
@@ -136,6 +136,7 @@ export const OrderStatusNotification = ({
     />
   );
 };
+
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
@@ -158,9 +159,4 @@ const $WarningIcon = styled(Icon)`
 const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-text-1);
-  display: inline-grid;
 `;

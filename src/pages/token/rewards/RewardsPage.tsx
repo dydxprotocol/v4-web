@@ -8,7 +8,7 @@ import { formatUnits } from 'viem';
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -24,7 +24,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { Link } from '@/components/Link';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
@@ -92,11 +92,7 @@ const RewardsPage = () => {
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
         params: {
-          TERMS_OF_USE_LINK: (
-            <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
-              {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-            </$Link>
-          ),
+          TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
         },
       })}
     </$LegalDisclaimer>
@@ -187,9 +183,4 @@ const $RightColumn = styled.div`
 const $LegalDisclaimer = styled.div`
   font: var(--font-mini-book);
   color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  display: inline-block;
-  text-decoration: underline;
 `;

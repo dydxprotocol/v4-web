@@ -8,6 +8,7 @@ import { TransferNotificationTypes } from '@/constants/notifications';
 import { SkipStatusResponse } from '@/constants/skip';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -40,6 +41,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
   const stringGetter = useStringGetter();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { mintscan: mintscanTxUrl } = useURLConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
@@ -81,8 +83,8 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
           params: {
             CHAIN:
               type === TransferNotificationTypes.Deposit
-                ? 'dYdX'
-                : status?.toChain?.chainData?.chainName,
+                ? chainTokenLabel
+                : status?.toChain?.chainData?.chainName ?? '...',
           },
         }),
         step: TransferStatusStep.ToChain,

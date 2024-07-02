@@ -146,7 +146,6 @@ const $Form = styled.form`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
   a {
     display: inline-grid;
     margin-left: 0.5ch;

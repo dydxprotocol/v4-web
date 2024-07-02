@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Link } from './Link';
+import { Link } from '@/components/Link';
 
 const URL_START = 'https://';
 

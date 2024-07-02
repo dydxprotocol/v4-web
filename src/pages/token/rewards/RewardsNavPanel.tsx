@@ -62,7 +62,7 @@ export const RewardsNavPanel = ({
       <$Description>
         {description}
         {learnMore && (
-          <$Link href={learnMore} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+          <$Link href={learnMore} isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
           </$Link>
         )}
@@ -103,15 +103,8 @@ const $IconButton = styled(IconButton)`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
 `;
 
 const $Link = styled(Link)`
-  display: inline;
-
-  ::before {
-    content: ' ';
-    display: inline-block;
-    white-space: pre-wrap;
-  }
+  margin-left: 0.5ch;
 `;
