@@ -41,8 +41,8 @@ export const MARKET_FILTER_LABELS = {
   [MarketFilters.NFT]: STRING_KEYS.NFT,
   [MarketFilters.GAMING]: STRING_KEYS.GAMING,
   [MarketFilters.MEME]: STRING_KEYS.MEME,
-  [MarketFilters.RWA]: 'RWA',
-  [MarketFilters.ENT]: 'ENT',
+  [MarketFilters.RWA]: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  [MarketFilters.ENT]: STRING_KEYS.ENTERTAINMENT,
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';

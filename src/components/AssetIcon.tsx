@@ -17,6 +17,7 @@ const assetIcons = {
   ADA: '/currencies/ada.png',
   ADX: '/currencies/adx.png',
   AERGO: '/currencies/aergo.png',
+  AERO: '/currencies/aero.png',
   AEVO: '/currencies/aevo.png',
   AGI: '/currencies/agi.png',
   AGIX: '/currencies/agix.png',
