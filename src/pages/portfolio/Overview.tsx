@@ -112,10 +112,12 @@ export const Overview = () => {
             <ContentSectionHeader
               title={stringGetter({ key: STRING_KEYS.VAULTS })}
               slotRight={
-                <$Link onClick={handleViewVaults} isAccent>
-                  {stringGetter({ key: STRING_KEYS.VIEW_ALL_VAULTS })}{' '}
-                  <Icon iconName={IconName.Arrow} />
-                </$Link>
+                isTablet && (
+                  <$Link onClick={handleViewVaults} isAccent>
+                    {stringGetter({ key: STRING_KEYS.VIEW_ALL_VAULTS })}{' '}
+                    <Icon iconName={IconName.Arrow} />
+                  </$Link>
+                )
               }
             />
           }
