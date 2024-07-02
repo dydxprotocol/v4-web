@@ -1,11 +1,11 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { PrivyProvider } from '@privy-io/react-auth';
+import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { WagmiProvider } from 'wagmi';
 
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
@@ -157,7 +157,7 @@ const providers = [
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
-  wrapProvider(WagmiProvider, { config }),
+  wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
