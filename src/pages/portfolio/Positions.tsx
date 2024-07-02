@@ -12,6 +12,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
@@ -47,6 +49,10 @@ export const Positions = () => {
         state: { from: AppRoute.Portfolio },
       });
     },
+    [navigate]
+  );
+  const handleViewVaults = useCallback(
+    () => navigate(AppRoute.Vaults, { state: { from: AppRoute.Portfolio } }),
     [navigate]
   );
 
@@ -101,7 +107,17 @@ export const Positions = () => {
       </DetachedSection>
       <DetachedSection>
         <$MaybeVaultPositionsPanel
-          header={<ContentSectionHeader title={stringGetter({ key: STRING_KEYS.VAULTS })} />}
+          header={
+            <ContentSectionHeader
+              title={stringGetter({ key: STRING_KEYS.VAULTS })}
+              slotRight={
+                <$Link onClick={handleViewVaults} isAccent>
+                  {stringGetter({ key: STRING_KEYS.VIEW_ALL_VAULTS })}{' '}
+                  <Icon iconName={IconName.Arrow} />
+                </$Link>
+              }
+            />
+          }
           onViewVault={handleViewVault}
         />
       </DetachedSection>
@@ -129,4 +145,8 @@ const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
   > div {
     padding-left: 1rem;
   }
+`;
+
+const $Link = styled(Link)`
+  font: var(--font-small-book);
 `;
