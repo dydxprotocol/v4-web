@@ -1,5 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -11,6 +12,7 @@ import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -97,11 +99,11 @@ export const DepositButtonAndReceipt = ({
     chain: chainIdStr,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { usdcLabel } = useTokenConfigs();
+  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   const sourceChainName =
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
-  const isSkipEnabled = true;
   const showExchangeRate = typeof summary?.exchangeRate === 'number' || !isSkipEnabled;
   const showMinDepositAmount = typeof summary?.toAmountMin === 'number' || !isSkipEnabled;
   const fallbackRouteDuration = stringGetter({

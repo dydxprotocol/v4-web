@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -10,6 +11,7 @@ import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -61,8 +63,8 @@ export const WithdrawButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
+  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const isSkipEnabled = true;
   const showExchangeRate =
     (!isSkipEnabled && !exchange) ||
     (withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange);
