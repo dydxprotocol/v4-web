@@ -10,7 +10,7 @@ import { Tag } from '@/components/Tag';
 import { TableCell } from './TableCell';
 
 interface AssetTableCellProps {
-  asset?: Asset;
+  asset?: Pick<Asset, 'name' | 'id'>;
   className?: string;
   stacked?: boolean;
 }

@@ -15,6 +15,7 @@ import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetu
 
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
+import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const filterFunctions = {
@@ -95,9 +96,9 @@ export const useMarketsData = (
     if (searchFilter) {
       return filtered.filter(
         ({ asset, id }) =>
-          !!asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          !!asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          !!id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          matchesSearchFilter(searchFilter, asset?.name) ||
+          matchesSearchFilter(searchFilter, asset?.id) ||
+          matchesSearchFilter(searchFilter, id)
       );
     }
     return filtered;
