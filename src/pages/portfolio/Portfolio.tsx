@@ -309,5 +309,4 @@ const $IconContainer = styled.div`
 
 const $MobileContent = styled.article`
   ${layoutMixins.contentContainerPage}
-  --content-container-width: var(100vw);
 `;
