@@ -117,6 +117,7 @@ export enum IconName {
   Deposit = 'Deposit',
   DepthChart = 'DepthChart',
   Discord = 'Discord',
+  Download = 'Download',
   Etherscan = 'Etherscan',
   ExportKeys = 'ExportKeys',
   Feedback = 'Feedback',
@@ -173,7 +174,6 @@ export enum IconName {
   Website = 'Website',
   Whitepaper = 'Whitepaper',
   Withdraw = 'Withdraw',
-  Download = 'Download',
   SocialX = 'SocialX',
 }
 
@@ -205,6 +205,7 @@ const icons = {
   [IconName.Deposit]: DepositIcon,
   [IconName.DepthChart]: DepthChartIcon,
   [IconName.Discord]: DiscordIcon,
+  [IconName.Download]: DownloadIcon,
   [IconName.Etherscan]: EtherscanIcon,
   [IconName.ExportKeys]: ExportKeysIcon,
   [IconName.Feedback]: FeedbackIcon,
@@ -260,7 +261,6 @@ const icons = {
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
-  [IconName.Download]: DownloadIcon,
   [IconName.SocialX]: SocialXIcon,
 } as Record<IconName, ElementType>;
 

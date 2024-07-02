@@ -16,6 +16,7 @@ import {
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
+import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -162,6 +163,109 @@ const useDydxClientContext = () => {
       return markets || [];
     } catch (error) {
       log('useDydxClient/getPerpetualMarkets', error);
+      return [];
+    }
+  };
+
+  const requestAllAccountFills = async (address: string, subaccountNumber: number) => {
+    try {
+      const {
+        fills = [],
+        totalResults,
+        pageSize,
+      } = await indexerClient.account.getParentSubaccountNumberFills(
+        address,
+        subaccountNumber,
+        undefined,
+        undefined,
+        100,
+        undefined,
+        undefined,
+        1
+      );
+
+      // We get all the pages but we should exclude the first one, we already have this data
+      const pages = Array.from(
+        {
+          length: Math.ceil(totalResults / pageSize) - 1,
+        },
+        (_, index) => index + 2
+      );
+
+      const results = await Promise.all(
+        pages.map((page) =>
+          indexerClient.account.getParentSubaccountNumberFills(
+            address,
+            subaccountNumber,
+            undefined,
+            undefined,
+            100,
+            undefined,
+            undefined,
+            page
+          )
+        )
+      );
+
+      const allFills: RawSubaccountFill[] = [...fills, ...results.map((data) => data.fills).flat()];
+
+      // sorts the data in descending order
+      return allFills.sort((fillA, fillB) => {
+        return new Date(fillB.createdAt).getTime() - new Date(fillA.createdAt).getTime();
+      });
+    } catch (error) {
+      log('useDydxClient/requestAllAccountFills', error);
+      return [];
+    }
+  };
+
+  const requestAllAccountTransfers = async (address: string, subaccountNumber: number) => {
+    try {
+      const {
+        transfers = [],
+        totalResults,
+        pageSize,
+      } = await indexerClient.account.getParentSubaccountNumberTransfers(
+        address,
+        subaccountNumber,
+        100,
+        undefined,
+        undefined,
+        1
+      );
+
+      // We get all the pages but we should exclude the first one, we already have this data
+      const pages = Array.from(
+        {
+          length: Math.ceil(totalResults / pageSize) - 1,
+        },
+        (_, index) => index + 2
+      );
+
+      const results = await Promise.all(
+        pages.map((page) =>
+          indexerClient.account.getParentSubaccountNumberTransfers(
+            address,
+            subaccountNumber,
+            100,
+            undefined,
+            undefined,
+            page
+          )
+        )
+      );
+
+      const allTransfers: RawSubaccountTransfer[] = [
+        ...transfers,
+        ...results.map((data) => data.transfers).flat(),
+      ];
+
+      // sorts the data in descending order
+      return allTransfers.sort((transferA, transferB) => {
+        return new Date(transferB.createdAt).getTime() - new Date(transferA.createdAt).getTime();
+      });
+    } catch (error) {
+      log('useDydxClient/requestAllAccountTransfers', error);
       return [];
     }
   };
@@ -324,6 +428,8 @@ const useDydxClientContext = () => {
     getWalletFromEvmSignature,
 
     // Public Methods
+    requestAllAccountTransfers,
+    requestAllAccountFills,
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
