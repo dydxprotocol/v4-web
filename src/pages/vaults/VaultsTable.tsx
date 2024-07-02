@@ -20,6 +20,8 @@ import { Toolbar } from '@/components/Toolbar';
 import { useAppSelector } from '@/state/appTypes';
 import { getVaultsTableData } from '@/state/vaultSelectors';
 
+import { matchesSearchFilter } from '@/lib/search';
+
 import { VaultFilter, VaultsFilter } from './VaultFilter';
 
 type VaultTableRow = ReturnType<typeof getVaultsTableData>[number];
@@ -37,9 +39,9 @@ export const VaultsTable = ({ className }: { className?: string }) => {
         (filter === VaultsFilter.ALL ||
           (filter === VaultsFilter.MINE && (vault.userInfo?.userBalance ?? 0) > 0)) &&
         (searchFilter.trim().length === 0 ||
-          !!vault.asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          !!vault.asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          !!vault.marketId?.toLocaleLowerCase().includes(searchFilter.toLowerCase()))
+          matchesSearchFilter(searchFilter, vault.asset?.name) ||
+          matchesSearchFilter(searchFilter, vault.asset?.id) ||
+          matchesSearchFilter(searchFilter, vault.marketId))
     );
   }, [filter, searchFilter, vaultsData]);
 
@@ -155,7 +157,6 @@ const $MarketNotFound = styled.div`
   padding: 2rem 1.5rem;
 
   h2 {
-    font: var(--font-medium-book);
-    font-weight: 500;
+    font: var(--font-medium-medium);
   }
 `;

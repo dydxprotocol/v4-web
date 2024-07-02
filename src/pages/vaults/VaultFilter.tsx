@@ -12,7 +12,7 @@ import { VerticalSeparator } from '@/components/Separator';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 export enum VaultsFilter {
-  ALL = 'All',
+  ALL = 'ALL',
   MINE = 'MINE',
 }
 
