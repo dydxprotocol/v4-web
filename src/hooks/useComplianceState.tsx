@@ -5,12 +5,9 @@ import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
-import { Link } from '@/components/Link';
 import { OutputType, formatDateOutput } from '@/components/Output';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -73,11 +70,7 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        TERMS_OF_USE_LINK: (
-          <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon>
-            {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-          </$Link>
-        ),
+        TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
       },
     });
   }
@@ -90,9 +83,6 @@ export const useComplianceState = () => {
   };
 };
 
-const $Link = styled(Link)`
-  ${layoutMixins.inlineRow};
-
-  --link-color: var(--color-text-1);
+const $TermsOfUseLink = styled(TermsOfUseLink)`
   text-decoration: underline;
 `;
