@@ -45,7 +45,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
               key: STRING_KEYS.CURRENTLY_STAKING_WITH,
               params: {
                 VALIDATOR: (
-                  <ValidatorName
+                  <$ValidatorName
                     validator={stakingValidators?.[currentDelegations[0].validator]?.[0]}
                   />
                 ),
@@ -90,4 +90,8 @@ const $Dialog = styled(Dialog)`
 const $StakedAmount = styled.span`
   ${layoutMixins.inlineRow}
   color: var(--color-text-1);
+`;
+
+const $ValidatorName = styled(ValidatorName)`
+  display: inline-flex;
 `;

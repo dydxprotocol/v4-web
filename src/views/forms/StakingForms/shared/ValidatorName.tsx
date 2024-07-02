@@ -6,9 +6,15 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Link } from '@/components/Link';
 import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
 
-export const ValidatorName = ({ validator }: { validator?: Validator }) => {
+export const ValidatorName = ({
+  validator,
+  className,
+}: {
+  validator?: Validator;
+  className?: string;
+}) => {
   return (
-    <$ValidatorName>
+    <$ValidatorName className={className}>
       <ValidatorFaviconIcon
         url={validator?.description?.website}
         fallbackText={validator?.description?.moniker}
