@@ -7,6 +7,14 @@ Analytics service used to collect data to help the dYdX Product team make inform
 2. Add API key in Github > Secrets and Variables > Actions as `AMPLITUDE_API_KEY`
 3. In your deploy scripts add `pnpm run build:inject-amplitude` after your pnpm build / vite build command.
 
+### Hotjar
+User behavior tracking service used to help the dYdX Product team make informed product decisions.
+
+<b>To use with dydxprotocol/v4-web:</b>
+1. Hotjar account with Site Id and Hotjar version.
+2. Add Site Id and Hotjar version in Github > Secrets and Variables > Actions as `HOTJAR_SITE_ID` and `HOTJAR_VERSION`
+3. In your deploy scripts add `pnpm run build:inject-hotjar` after your pnpm build / vite build command.
+
 ### Bugsnag
 Error handling service used to collect handled/unhandled errors within the app. The information collected is used to help debug and alert the engineering team of crashes/unhandled errors within the app to improve stability.
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -7,15 +8,17 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
+import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details, DetailsItem } from '@/components/Details';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -60,8 +63,20 @@ export const WithdrawButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
+  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const submitButtonReceipt: DetailsItem[] = [
+  const showExchangeRate =
+    (!isSkipEnabled && !exchange) ||
+    (withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange);
+  const showMinAmountReceived = !isSkipEnabled || typeof summary?.toAmountMin === 'number';
+  const fallbackRouteDuration = stringGetter({
+    key: STRING_KEYS.X_MINUTES_LOWERCASED,
+    params: {
+      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
+    },
+  });
+
+  const submitButtonReceipt = [
     {
       key: 'expected-amount-received',
 
@@ -75,7 +90,7 @@ export const WithdrawButtonAndReceipt = ({
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
       ),
     },
-    {
+    showMinAmountReceived && {
       key: 'minimum-amount-received',
       label: (
         <$RowWithGap>
@@ -92,21 +107,20 @@ export const WithdrawButtonAndReceipt = ({
       ),
       tooltip: 'minimum-amount-received',
     },
-    !exchange && {
+    showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value:
-        withdrawToken && typeof summary?.exchangeRate === 'number' ? (
-          <$RowWithGap>
-            <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
-            =
-            <Output
-              type={OutputType.Asset}
-              value={summary?.exchangeRate}
-              tag={withdrawToken?.symbol}
-            />
-          </$RowWithGap>
-        ) : undefined,
+      value: (
+        <$RowWithGap>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
+          =
+          <Output
+            type={OutputType.Asset}
+            value={summary?.exchangeRate}
+            tag={withdrawToken?.symbol}
+          />
+        </$RowWithGap>
+      ),
     },
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',
@@ -153,7 +167,9 @@ export const WithdrawButtonAndReceipt = ({
               },
             })}
           />
-        ) : undefined,
+        ) : isSkipEnabled ? (
+          fallbackRouteDuration
+        ) : null,
     },
     {
       key: 'leverage',
@@ -164,7 +180,9 @@ export const WithdrawButtonAndReceipt = ({
           value={leverage?.current}
           newValue={leverage?.postOrder}
           sign={NumberSign.Negative}
-          withDiff={Boolean(leverage?.current && leverage.current !== leverage?.postOrder)}
+          withDiff={Boolean(
+            leverage?.current && leverage?.postOrder && leverage.current !== leverage?.postOrder
+          )}
         />
       ),
     },

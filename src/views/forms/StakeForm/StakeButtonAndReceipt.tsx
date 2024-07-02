@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from 'react';
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
 import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -56,9 +55,9 @@ export const StakeButtonAndReceipt = ({
             key: STRING_KEYS.VALIDATORS_INFO_LINK,
             params: {
               MINTSCAN_LINK: (
-                <$Link href={mintscanValidatorsLearnMore}>
+                <Link href={mintscanValidatorsLearnMore} isInline withIcon>
                   {stringGetter({ key: STRING_KEYS.MINTSCAN })}
-                </$Link>
+                </Link>
               ),
             },
           })}
@@ -121,8 +120,3 @@ export const StakeButtonAndReceipt = ({
     />
   );
 };
-
-const $Link = styled(Link)`
-  display: inline;
-  text-decoration: underline;
-`;

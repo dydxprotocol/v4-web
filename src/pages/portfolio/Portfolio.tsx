@@ -133,7 +133,7 @@ const PortfolioPage = () => {
   return isTablet ? (
     <$PortfolioMobile>
       <PortfolioNavMobile />
-      {routesComponent}
+      <$MobileContent>{routesComponent}</$MobileContent>
     </$PortfolioMobile>
   ) : (
     <WithSidebar
@@ -305,4 +305,8 @@ const $IconContainer = styled.div`
   background-color: var(--color-layer-4);
   border-radius: 50%;
   margin-left: -0.25rem;
+`;
+
+const $MobileContent = styled.article`
+  ${layoutMixins.contentContainerPage}
 `;

@@ -21,7 +21,9 @@ export const RewardsHelpPanel = () => {
     useURLConfigs();
 
   const hereLink = (href?: string) => (
-    <$AccentLink href={href}>{stringGetter({ key: STRING_KEYS.HERE })}</$AccentLink>
+    <Link isAccent isInline href={href}>
+      {stringGetter({ key: STRING_KEYS.HERE })}
+    </Link>
   );
 
   return (
@@ -93,6 +95,7 @@ export const RewardsHelpPanel = () => {
     </$HelpCard>
   );
 };
+
 const $HelpCard = styled(Panel)`
   --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
@@ -121,9 +124,4 @@ const $Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-const $AccentLink = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;

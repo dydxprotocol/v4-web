@@ -51,7 +51,7 @@ export const PotentialPositionCard = ({
         <$Output type={OutputType.Fiat} value={freeCollateral?.current} />
       </$MarginRow>
       <$ActionRow>
-        <$Link onClick={() => onViewOrders(marketId)}>
+        <$Link onClick={() => onViewOrders(marketId)} isAccent>
           {stringGetter({ key: orderCount > 1 ? STRING_KEYS.VIEW_ORDERS : STRING_KEYS.VIEW })}{' '}
           <Icon iconName={IconName.Arrow} />
         </$Link>
@@ -109,7 +109,6 @@ const $ActionRow = styled.div`
 `;
 
 const $Link = styled(Link)`
-  --link-color: var(--color-accent);
   font: var(--font-small-book);
 `;
 

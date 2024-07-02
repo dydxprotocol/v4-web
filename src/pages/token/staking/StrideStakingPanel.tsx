@@ -39,9 +39,9 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
           key: STRING_KEYS.LIQUID_STAKE_STRIDE_DESCRIPTION,
           params: { TOKEN_DENOM: chainTokenLabel },
         })}
-        <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
+        <$Link isInline href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-        </Link>
+        </$Link>
       </$Description>
     </$Panel>
   );
@@ -65,7 +65,7 @@ const $Header = styled.div`
 
 const $Title = styled.h3`
   font: var(--font-medium-book);
-  color: var(--color-text-2);
+  color: var(--color-text-1);
 
   display: flex;
   align-items: center;
@@ -80,12 +80,8 @@ const $Img = styled.img`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
+`;
 
-  a {
-    display: inline;
-    ::before {
-      content: ' ';
-    }
-  }
+const $Link = styled(Link)`
+  margin-left: 0.5ch;
 `;
