@@ -17,6 +17,7 @@ type VaultDetails = {
 
 type VaultOwnership = {
   userBalance: number;
+  userReturn: number;
 };
 
 export interface VaultsState {
@@ -36,7 +37,7 @@ const initialState: VaultsState = {
     },
   },
   userVaults: {
-    'PEPE-USD': { userBalance: 10 },
+    'PEPE-USD': { userBalance: 10, userReturn: 3 },
   },
 };
 

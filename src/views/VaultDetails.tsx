@@ -21,23 +21,82 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketData } from '@/state/perpetualsSelectors';
-import {
-  getCurrentMarketVaultDetails,
-  getCurrentMarketVaultMetadata,
-} from '@/state/vaultSelectors';
+import { getCurrentMarketData, getPerpetualMarkets } from '@/state/perpetualsSelectors';
+import { getUserVaults, getVaultsDetails, getVaultsMetadata } from '@/state/vaultSelectors';
 
 import { getNumberSign } from '@/lib/numbers';
 
-export const VaultDetails: React.FC = () => {
-  const stringGetter = useStringGetter();
-  const { market, configs } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
-  const { id, name } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { allTimePnl, currentLeverageMultiple, thirtyDayReturnPercent, currentPosition } =
-    useAppSelector(getCurrentMarketVaultDetails) ?? {};
-  const { totalValue } = useAppSelector(getCurrentMarketVaultMetadata) ?? {};
-  const { vaultsLearnMore } = useURLConfigs();
+type MyVaultDetailsCardsProps = {
+  vaultId: string;
+  className?: string;
+};
 
+export const YourVaultDetailsCards = ({ vaultId, className }: MyVaultDetailsCardsProps) => {
+  const myVaultMetadata = useAppSelector(getUserVaults)?.[vaultId];
+  const items = [
+    {
+      key: 'balance',
+      label: 'Your Vault Balance',
+      value:
+        myVaultMetadata == null ? (
+          '-'
+        ) : (
+          <Output value={myVaultMetadata?.userBalance} type={OutputType.CompactFiat} />
+        ),
+    },
+    {
+      key: 'pnl',
+      label: 'Your All-time P&L',
+      value:
+        myVaultMetadata == null ? (
+          '-'
+        ) : (
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn)}>
+            <Output value={myVaultMetadata?.userReturn} type={OutputType.CompactFiat} />
+          </$ColoredReturn>
+        ),
+    },
+  ];
+  return (
+    <$CardsContainer className={className}>
+      {items.map((item) => (
+        <$DetailCard key={item.key}>
+          <$CardHeader>{item.label}</$CardHeader>
+          <$CardValue>{item.value}</$CardValue>
+        </$DetailCard>
+      ))}
+    </$CardsContainer>
+  );
+};
+
+const $CardsContainer = styled.div`
+  ${layoutMixins.gridEqualColumns}
+  flex-direction: row;
+  gap: 0.5rem;
+`;
+const $DetailCard = styled.div`
+  border: solid var(--border-width) var(--border-color);
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  font: var(--font-small-book);
+
+  ${layoutMixins.column};
+`;
+const $CardHeader = styled.div`
+  color: var(--color-text-0);
+`;
+const $CardValue = styled.div``;
+
+export const useVaultDetailsItems = (vaultId: string | null | undefined) => {
+  const stringGetter = useStringGetter();
+  const { configs, assetId } = useAppSelector(getPerpetualMarkets)?.[vaultId ?? ''] ?? {};
+  const { allTimePnl, currentLeverageMultiple, thirtyDayReturnPercent, currentPosition } =
+    useAppSelector(getVaultsDetails)[vaultId ?? ''] ?? {};
+  const { totalValue } = useAppSelector(getVaultsMetadata)[vaultId ?? ''] ?? {};
+
+  if (vaultId == null) {
+    return [];
+  }
   const items = [
     {
       key: 'balance',
@@ -72,7 +131,7 @@ export const VaultDetails: React.FC = () => {
             <Output
               value={currentPosition?.asset}
               type={OutputType.Asset}
-              tag={id}
+              tag={assetId}
               showSign={ShowSign.Negative}
               fractionDigits={configs?.stepSizeDecimals ?? TOKEN_DECIMALS}
             />
@@ -94,7 +153,16 @@ export const VaultDetails: React.FC = () => {
       value: <Output value={currentLeverageMultiple} type={OutputType.Multiple} />,
     },
   ];
+  return items;
+};
 
+export const VaultDetails: React.FC = () => {
+  const stringGetter = useStringGetter();
+  const { market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { vaultsLearnMore } = useURLConfigs();
+
+  const items = useVaultDetailsItems(market);
   return (
     <$VaultDetails>
       <$Header>
@@ -105,12 +173,14 @@ export const VaultDetails: React.FC = () => {
           </$MarketTitle>
         </$WrapRow>
 
+        {market && <YourVaultDetailsCards vaultId={market} />}
+
         <$VaultDescription>
           <p>{stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}</p>
         </$VaultDescription>
 
         <$Buttons>
-          <Link to={`${AppRoute.Trade}/${market}`}>
+          <Link to={`${AppRoute.Vaults}/${market}`}>
             <Button
               type={ButtonType.Button}
               shape={ButtonShape.Pill}
