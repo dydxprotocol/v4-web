@@ -58,7 +58,7 @@ const formatNumber = (n: number, selectedLocale: string, isCompact: boolean = n 
   const compactNumber = formatNumberOutput(n, OutputType.CompactNumber, {
     decimalSeparator: undefined,
     groupSeparator: undefined,
-    locale: selectedLocale,
+    selectedLocale,
   });
 
   return isCompact && compactNumber.length < formattedNumber.length

@@ -39,6 +39,7 @@ export interface LinksConfigs {
   mintscanValidatorsLearnMore?: string;
   protocolStaking: string;
   stakingAndClaimingRewardsLearnMore?: string;
+  vaultsLearnMore: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -80,5 +81,7 @@ export const useURLConfigs = (): LinksConfigs => {
     protocolStaking: linksConfigs.protocolStaking,
     stakingAndClaimingRewardsLearnMore:
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
+    // todo add to the link configs objects
+    vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
   };
 };

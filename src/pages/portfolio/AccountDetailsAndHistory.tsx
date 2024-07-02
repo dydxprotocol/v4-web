@@ -10,7 +10,6 @@ import { OnboardingState } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -19,8 +18,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Link } from '@/components/Link';
 import { Output, OutputType, ShowSign, formatDateOutput } from '@/components/Output';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
@@ -186,11 +185,7 @@ export const AccountDetailsAndHistory = () => {
                 {stringGetter({
                   key: STRING_KEYS.BLOCKED_MESSAGE,
                   params: {
-                    TERMS_OF_USE_LINK: (
-                      <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`} withIcon>
-                        {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-                      </$Link>
-                    ),
+                    TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
                   },
                 })}
               </$Card>
@@ -327,7 +322,6 @@ const $EmptyCard = styled($Card)`
   }
 `;
 
-const $Link = styled(Link)`
-  ${layoutMixins.inlineRow};
+const $TermsOfUseLink = styled(TermsOfUseLink)`
   text-decoration: underline;
 `;

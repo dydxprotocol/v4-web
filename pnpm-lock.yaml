@@ -30,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.8.6
-    version: 1.8.6
+    specifier: 1.8.15
+    version: 1.8.15
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.24
     version: 1.1.24
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.140
-    version: 1.1.140
+    specifier: ^1.1.142
+    version: 1.1.142
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -143,6 +143,12 @@ dependencies:
   '@skip-router/core':
     specifier: ^5.1.0
     version: 5.1.0(@types/react@18.3.3)(chain-registry@1.63.9)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)
+  '@statsig/js-client':
+    specifier: 1.4.0
+    version: 1.4.0
+  '@statsig/react-bindings':
+    specifier: 1.4.0
+    version: 1.4.0(react@18.2.0)
   '@tanstack/react-query':
     specifier: ^5.37.1
     version: 5.37.1(react@18.2.0)
@@ -1717,8 +1723,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.8.6:
-    resolution: {integrity: sha512-+uxqUAmJw42ETNaXHjcZE2hfMNaKaRY09oytqxPDkJdXWLbG98n1qyOHxwGOJp6apKuWnYwl4XcKBb3CSX3ejQ==}
+  /@dydxprotocol/v4-abacus@1.8.15:
+    resolution: {integrity: sha512-/4xBYtlo4HRY6AtlUybReWDvXBuyflS4N8FqbRWMwxDIY7lgh2alhx0pxHUHWfxFv46F74eOZvzc4O9tVgZjpA==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -1753,8 +1759,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.140:
-    resolution: {integrity: sha512-g6Ud8vteff+3dht+iGrwef+oLRoN9neFxwZ5wNfS8y47zEHPKgS5m4/WK6eBixOsrOfHVdgClLshz7VeKA9hRg==}
+  /@dydxprotocol/v4-localization@1.1.142:
+    resolution: {integrity: sha512-ikJUX/Csz6ZEZoqJkaHCmOLE5F5r73XlWhy64xgOHdMAt4d4WxkPp4cbxRNZd4mZ90nt9p2WXUOxLisPFak+vQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -6952,6 +6958,25 @@ packages:
       '@stablelib/keyagreement': 1.0.1
       '@stablelib/random': 1.0.2
       '@stablelib/wipe': 1.0.1
+    dev: false
+
+  /@statsig/client-core@1.4.0:
+    resolution: {integrity: sha512-ICz/4DyjMhp9H5GwLTrVUzWqfrO6Bm0RFx1wDd+KGnYx9g6Iwu3FKny5FRybnPSKW47jWidc+FpUi2kQ5AGPqw==}
+    dev: false
+
+  /@statsig/js-client@1.4.0:
+    resolution: {integrity: sha512-lDjFdHIvao7Ehj4xLd34WKsaoadsQv84RKv3LsBW/GanMTgquoJHZNQkZz4I1VqtqPkFN8Srqfpo29ATinZ18A==}
+    dependencies:
+      '@statsig/client-core': 1.4.0
+    dev: false
+
+  /@statsig/react-bindings@1.4.0(react@18.2.0):
+    resolution: {integrity: sha512-ZRPBF7JOqSyUe34FNghyDtvAcP5Z/Kca4jGTjrzW5lpi86OX0OftOt0LkGW6uDFkjXdpHr/CL+7YB8cSYFU1Eg==}
+    peerDependencies:
+      react: ^16.6.3 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@statsig/client-core': 1.4.0
+      react: 18.2.0
     dev: false
 
   /@svgr/babel-plugin-add-jsx-attribute@7.0.0(@babel/core@7.23.9):
@@ -12954,7 +12979,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}

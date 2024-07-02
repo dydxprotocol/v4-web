@@ -204,8 +204,12 @@ export const TradingRewardsChart = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      formatNumberOutput(value, OutputType.CompactNumber, { decimalSeparator, groupSeparator }),
-    [decimalSeparator, groupSeparator]
+      formatNumberOutput(value, OutputType.CompactNumber, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      }),
+    [decimalSeparator, groupSeparator, selectedLocale]
   );
 
   const renderTooltip = useCallback(() => <div />, []);
