@@ -21,6 +21,7 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { formMixins } from '@/styles/formMixins';
 
 import { DiffOutput } from '@/components/DiffOutput';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -34,7 +35,6 @@ import { hashFromTx } from '@/lib/txUtils';
 import { StakeFormInputContents } from './StakeFormInputContents';
 import { StakeFormPreviewContents } from './StakeFormPreviewContents';
 import { ValidatorDropdown } from './ValidatorDropdown';
-import { Link } from '@/components/Link';
 
 type ElementProps = {
   currentStep: StakeFormSteps;
