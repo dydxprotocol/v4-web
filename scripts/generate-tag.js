@@ -65,7 +65,7 @@ const cutTagForSemVer = (newSemVerNumber) => {
   }
   info('Cutting new tag...');
 
-  execSync(`git tag -a release/v${newSemVerNumber} -m "v4-web release v${newSemVerNumber}"`);
+  execSync(`git tag -s -a release/v${newSemVerNumber} -m "v4-web release v${newSemVerNumber}"`);
   execSync(`git push origin release/v${newSemVerNumber}`);
   info('New tag successfully published!');
   process.exit(0);
