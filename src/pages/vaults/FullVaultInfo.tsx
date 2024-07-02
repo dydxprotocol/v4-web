@@ -7,6 +7,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { YourVaultDetailsCards, useVaultDetailsItems } from '@/views/VaultDetails';
 
@@ -50,6 +51,7 @@ export const FullVaultInfo = ({ vaultId }: FullVaultInfoProps) => {
       <$HorizontalSeparatorFiller />
       <$HistoryRow>
         <$SectionTitle>{stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}</$SectionTitle>
+        <VaultTransactionsTable vaultId={vaultId} />
       </$HistoryRow>
     </$Container>
   );
@@ -107,7 +109,14 @@ const $SectionTitle = styled.div`
 type VaultTransactionsTableProps = { vaultId: string; className?: string };
 
 export const VaultTransactionsTable = ({ vaultId, className }: VaultTransactionsTableProps) => {
-  return <div>FullVaultInfo</div>;
+  return (
+    <$Empty>
+      <div>
+        <$Icon iconName={IconName.OrderPending} />
+      </div>
+      <div>You have no history.</div>
+    </$Empty>
+  );
 };
 
 const $Empty = styled.div`
@@ -119,9 +128,14 @@ const $Empty = styled.div`
 
   border: solid var(--border-width) var(--border-color);
   border-radius: 1rem;
-  margin: 1rem;
   margin-top: 0;
 
   color: var(--color-text-0);
   font: var(--font-base-book);
+`;
+
+const $Icon = styled(Icon)`
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
 `;
