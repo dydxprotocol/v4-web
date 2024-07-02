@@ -10,7 +10,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { AttachedExpandingSection } from '@/components/ContentSection';
+import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
@@ -41,49 +41,55 @@ export const Positions = () => {
   }, [navigate]);
 
   return (
-    <$AttachedExpandingSection>
-      {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.POSITIONS })} />}
+    <>
+      <$AttachedExpandingSection>
+        {isNotTablet && (
+          <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.POSITIONS })} />
+        )}
 
-      <PositionsTable
-        columnKeys={
-          isTablet
-            ? [
-                PositionsTableColumnKey.Details,
-                PositionsTableColumnKey.IndexEntry,
-                PositionsTableColumnKey.PnL,
-              ]
-            : [
-                PositionsTableColumnKey.Market,
-                PositionsTableColumnKey.Size,
-                PositionsTableColumnKey.Margin,
-                PositionsTableColumnKey.UnrealizedPnl,
-                PositionsTableColumnKey.RealizedPnl,
-                PositionsTableColumnKey.NetFunding,
-                PositionsTableColumnKey.AverageOpenAndClose,
-                PositionsTableColumnKey.LiquidationAndOraclePrice,
-                shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                shouldRenderActions && PositionsTableColumnKey.Actions,
-              ].filter(isTruthy)
-        }
-        currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
-        withOuterBorder={isNotTablet}
-        showClosePositionAction={shouldRenderActions}
-        navigateToOrders={() =>
-          navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
-            state: { from: AppRoute.Portfolio },
-          })
-        }
-      />
+        <PositionsTable
+          columnKeys={
+            isTablet
+              ? [
+                  PositionsTableColumnKey.Details,
+                  PositionsTableColumnKey.IndexEntry,
+                  PositionsTableColumnKey.PnL,
+                ]
+              : [
+                  PositionsTableColumnKey.Market,
+                  PositionsTableColumnKey.Size,
+                  PositionsTableColumnKey.Margin,
+                  PositionsTableColumnKey.UnrealizedPnl,
+                  PositionsTableColumnKey.RealizedPnl,
+                  PositionsTableColumnKey.NetFunding,
+                  PositionsTableColumnKey.AverageOpenAndClose,
+                  PositionsTableColumnKey.LiquidationAndOraclePrice,
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
+          }
+          currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
+          withOuterBorder={isNotTablet}
+          showClosePositionAction={shouldRenderActions}
+          navigateToOrders={() =>
+            navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+              state: { from: AppRoute.Portfolio },
+            })
+          }
+        />
+      </$AttachedExpandingSection>
 
-      <$MaybeUnopenedIsolatedPositionsPanel
-        header={
-          <ContentSectionHeader
-            title={stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
-          />
-        }
-        onViewOrders={handleViewUnopenedIsolatedOrders}
-      />
-    </$AttachedExpandingSection>
+      <DetachedSection>
+        <$MaybeUnopenedIsolatedPositionsPanel
+          header={
+            <ContentSectionHeader
+              title={stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
+            />
+          }
+          onViewOrders={handleViewUnopenedIsolatedOrders}
+        />
+      </DetachedSection>
+    </>
   );
 };
 

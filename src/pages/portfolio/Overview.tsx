@@ -79,6 +79,8 @@ export const Overview = () => {
           showClosePositionAction={shouldRenderActions}
           withOuterBorder
         />
+      </$AttachedExpandingSection>
+      <DetachedSection>
         <$MaybeUnopenedIsolatedPositionsPanel
           header={
             <ContentSectionHeader
@@ -87,7 +89,7 @@ export const Overview = () => {
           }
           onViewOrders={handleViewUnopenedIsolatedOrders}
         />
-      </$AttachedExpandingSection>
+      </DetachedSection>
     </div>
   );
 };
