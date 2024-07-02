@@ -40,8 +40,8 @@ export const SelectMarginModeForm = ({
         onValueChange={setMarginMode}
         radioItems={[
           {
-            value: AbacusMarginMode.cross.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.cross.rawValue] }),
+            value: AbacusMarginMode.Cross.rawValue,
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue] }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
@@ -49,8 +49,8 @@ export const SelectMarginModeForm = ({
             ),
           },
           {
-            value: AbacusMarginMode.isolated.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.isolated.rawValue] }),
+            value: AbacusMarginMode.Isolated.rawValue,
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue] }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
@@ -70,7 +70,9 @@ const $RadioButtonCards = styled(RadioButtonCards)`
   padding: 0;
 
   --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
+  --radio-button-cards-item-header-font: var(--font-medium-medium);
 `;
 const $TertiarySpan = styled.span`
   color: var(--color-text-0);
+  font: var(--font-base-medium);
 `;

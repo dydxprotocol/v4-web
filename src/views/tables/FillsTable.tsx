@@ -140,7 +140,7 @@ const getFillsTableColumnDef = ({
         renderCell: ({ createdAtMilliseconds }) => (
           <$TimeOutput
             type={OutputType.RelativeTime}
-            relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+            relativeTimeOptions={{ format: 'singleCharacter' }}
             value={createdAtMilliseconds}
           />
         ),
@@ -350,12 +350,7 @@ export const FillsTable = ({
       }
       getRowKey={(row: FillTableRow) => row.id}
       onRowAction={(key: Key) =>
-        dispatch(
-          openDialog({
-            type: DialogTypes.FillDetails,
-            dialogProps: { fillId: key },
-          })
-        )
+        dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
       }
       columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({

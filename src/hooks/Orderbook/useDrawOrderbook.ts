@@ -14,21 +14,29 @@ import {
 
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
+import { OutputType, formatNumberOutput } from '@/components/Output';
+
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
 import {
   getHistogramXValues,
   getRektFromIdx,
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
+import { generateFadedColorVariant } from '@/lib/styles';
+import { orEmptyObj } from '@/lib/typeUtils';
+
+import { useLocaleSeparators } from '../useLocaleSeparators';
 
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
   histogramRange: number;
   side: PerpetualMarketOrderbookLevel['side'];
+  displayUnit: 'fiat' | 'asset';
 };
 
 type StyleProps = {
@@ -48,12 +56,18 @@ export const useDrawOrderbook = ({
   histogramRange,
   histogramSide,
   side,
+  displayUnit,
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
   const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
-  const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+
+  const marketConfig = orEmptyObj(useAppSelector(getCurrentMarketConfig));
+  const stepSizeDecimals = marketConfig.stepSizeDecimals ?? TOKEN_DECIMALS;
+  const tickSizeDecimals = marketConfig.tickSizeDecimals ?? SMALL_USD_DECIMALS;
+  const stepSize = marketConfig.stepSize ?? 10 ** (-1 * TOKEN_DECIMALS);
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
@@ -62,6 +76,7 @@ export const useDrawOrderbook = ({
   const [canvasWidth, setCanvasWidth] = useState(ORDERBOOK_WIDTH / ratio);
   const [canvasHeight, setCanvasHeight] = useState(ORDERBOOK_HEIGHT / ratio);
 
+  // Handle resize, sync to state
   useEffect(() => {
     const scaleCanvas = () => {
       if (!canvas) return;
@@ -152,19 +167,34 @@ export const useDrawOrderbook = ({
     ctx.fill();
   };
 
+  const drawMineCircle = ({ ctx, rekt }: { ctx: CanvasRenderingContext2D; rekt: Rekt }) => {
+    const padding = 15;
+    ctx.beginPath();
+    ctx.arc(rekt.x1 + padding, (rekt.y1 + rekt.y2) / 2, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = theme.accent;
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = generateFadedColorVariant(theme.accent, '73');
+    ctx.stroke();
+  };
+
   const drawText = ({
     animationType = OrderbookRowAnimationType.NONE,
     ctx,
-    mine,
+    depth,
+    depthCost,
     price,
     size,
+    sizeCost,
     rekt,
   }: {
     animationType?: OrderbookRowAnimationType;
     ctx: CanvasRenderingContext2D;
-    mine?: number;
+    depth?: number;
+    depthCost?: number;
     price?: number;
     size?: number;
+    sizeCost?: number;
     rekt: Rekt;
   }) => {
     const { y1 } = rekt;
@@ -192,31 +222,62 @@ export const useDrawOrderbook = ({
       }
     }
 
-    // Size text
-    if (size) {
-      ctx.fillStyle = updatedTextColor ?? textColor;
+    // Price text
+    if (price != null) {
+      ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        formatNumberOutput(price, OutputType.Number, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: tickSizeDecimals,
+        }),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
-    // Price text
-    if (price) {
-      ctx.fillStyle = textColor;
+    const getSizeInFiatString = (sizeToRender: number) =>
+      formatNumberOutput(sizeToRender, OutputType.Number, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+        fractionDigits: 0,
+      });
+
+    // Size text
+    const displaySize = displayUnit === 'asset' ? size : sizeCost;
+    if (displaySize != null) {
+      ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
-        MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+        displayUnit === 'asset'
+          ? getConsistentAssetSizeString(displaySize, {
+              decimalSeparator,
+              groupSeparator,
+              selectedLocale,
+              stepSize,
+              stepSizeDecimals,
+            })
+          : getSizeInFiatString(displaySize),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
 
-    // Mine text
-    if (mine) {
+    // Depth text
+    const displayDepth = displayUnit === 'asset' ? depth : depthCost;
+    if (displayDepth != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        displayUnit === 'asset'
+          ? getConsistentAssetSizeString(displayDepth, {
+              decimalSeparator,
+              groupSeparator,
+              selectedLocale,
+              stepSize,
+              stepSizeDecimals,
+            })
+          : getSizeInFiatString(displayDepth),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
@@ -235,7 +296,7 @@ export const useDrawOrderbook = ({
     animationType?: OrderbookRowAnimationType;
   }) => {
     if (!rowToRender) return;
-    const { depth, mine, price, size } = rowToRender;
+    const { depth, mine, price, size, depthCost, sizeCost } = rowToRender;
     const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
     const rekt = getRektFromIdx({
       idx,
@@ -269,11 +330,17 @@ export const useDrawOrderbook = ({
       rekt,
     });
 
+    if (mine && mine > 0) {
+      drawMineCircle({ ctx, rekt });
+    }
+
     // Size, Price, Mine
     drawText({
       animationType,
       ctx,
-      mine,
+      depth: depth ?? undefined,
+      depthCost,
+      sizeCost,
       price,
       size,
       rekt,
@@ -324,6 +391,8 @@ export const useDrawOrderbook = ({
     side,
     theme,
     currentOrderbookMap,
+    displayUnit,
+    canvas,
   ]);
 
   return { canvasRef };

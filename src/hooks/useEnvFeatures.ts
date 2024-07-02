@@ -10,7 +10,7 @@ export interface EnvironmentFeatures {
   CCTPDepositOnly: boolean;
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
-  showMemoTransferField: boolean;
+  isStakingEnabled: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {

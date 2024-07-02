@@ -2,7 +2,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 
-const ChaosLabsIcon: React.FC = () => {
+export const ChaosLabsIcon: React.FC = () => {
   const appTheme = useAppSelector(getAppTheme);
 
   const fills = appTheme === AppTheme.Light ? ['#1482E5', '#000000'] : ['#1482E5', '#E5E9EB'];
@@ -57,5 +57,3 @@ const ChaosLabsIcon: React.FC = () => {
     </svg>
   );
 };
-
-export default ChaosLabsIcon;

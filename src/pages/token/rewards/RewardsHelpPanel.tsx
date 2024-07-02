@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -12,14 +13,18 @@ import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
-import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
-
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
-  const { tradingRewardsLearnMore } = useURLConfigs();
 
-  const stakingEnabled = testFlags.enableStaking;
+  const { isStakingEnabled } = useEnvFeatures();
+  const { protocolStaking, tradingRewardsLearnMore, stakingAndClaimingRewardsLearnMore } =
+    useURLConfigs();
+
+  const hereLink = (href?: string) => (
+    <Link isAccent isInline href={href}>
+      {stringGetter({ key: STRING_KEYS.HERE })}
+    </Link>
+  );
 
   return (
     <$HelpCard
@@ -45,44 +50,52 @@ export const RewardsHelpPanel = () => {
             content: stringGetter({
               key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
               params: {
-                HERE_LINK: (
-                  <$Link href={tradingRewardsLearnMore}>
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
-                ),
+                HERE_LINK: hereLink(tradingRewardsLearnMore),
               },
             }),
-          }, // xcxc edit
+          },
           {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
           },
-          stakingEnabled && {
-            header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
-            content: stringGetter({
-              key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
-              params: {
-                HERE_LINK: (
-                  <$Link href="https://protocolstaking.info/">
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
-                ),
-              },
-            }),
-          },
-          stakingEnabled && {
-            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_QUESTION }),
-            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_ANSWER }),
-          },
-          stakingEnabled && {
-            header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION }),
-            content: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER }),
-          },
-        ].filter(isTruthy)}
+          ...(isStakingEnabled
+            ? [
+                {
+                  header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
+                  content: stringGetter({
+                    key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
+                    params: {
+                      HERE_LINK: hereLink(protocolStaking),
+                    },
+                  }),
+                },
+                {
+                  header: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_QUESTION,
+                  }),
+                  content: stringGetter({
+                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_ANSWER,
+                    params: {
+                      HERE_LINK: hereLink(stakingAndClaimingRewardsLearnMore),
+                    },
+                  }),
+                },
+                {
+                  header: stringGetter({
+                    key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION,
+                  }),
+                  content: stringGetter({
+                    key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER,
+                  }),
+                },
+              ]
+            : []),
+        ]}
       />
     </$HelpCard>
   );
 };
+
 const $HelpCard = styled(Panel)`
   --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
@@ -101,7 +114,7 @@ const $Header = styled.div`
   padding: 1rem 1rem;
   border-bottom: var(--border-width) solid var(--border-color);
 
-  font: var(--font-small-book);
+  font: var(--font-base-book);
 
   @media ${breakpoints.notTablet} {
     padding: 1.5rem;
@@ -111,9 +124,4 @@ const $Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;

@@ -62,9 +62,9 @@ const NewMarket = () => {
           key: STRING_KEYS.ADD_MARKET_STEP_1_DESCRIPTION,
           params: {
             HERE: (
-              <$Link href={newMarketProposal.newMarketsMethodology}>
+              <Link href={newMarketProposal.newMarketsMethodology} isAccent isInline>
                 {stringGetter({ key: STRING_KEYS.HERE })}
-              </$Link>
+              </Link>
             ),
           },
         }),
@@ -94,11 +94,11 @@ const NewMarket = () => {
     <$Page>
       <$HeaderSection>
         <$ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.SUGGEST_NEW_MARKET })}
+          title={stringGetter({ key: STRING_KEYS.LIST_A_NEW_MARKET })}
           slotRight={
             <IconButton iconName={IconName.Close} onClick={() => navigate(AppRoute.Markets)} />
           }
-          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}
+          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.LISTINGS_DESCRIPTION })}
         />
       </$HeaderSection>
       <$Content>
@@ -238,11 +238,6 @@ const $Title = styled.span`
 
 const $Subtitle = styled.span`
   color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;
 
 const $FormContainer = styled.div`

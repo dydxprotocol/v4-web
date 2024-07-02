@@ -54,7 +54,7 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
                 slotLeft={<Icon iconName={IconName.Send} />}
                 size={ButtonSize.Small}
                 action={ButtonAction.Primary}
-                onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
               >
                 {stringGetter({ key: STRING_KEYS.TRANSFER })}
               </Button>
@@ -103,7 +103,7 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
           items={[
             {
               key: 'totalBalance',
-              label: 'Total balance',
+              label: stringGetter({ key: STRING_KEYS.TOTAL_BALANCE }),
               value: (
                 <Output
                   type={OutputType.Asset}

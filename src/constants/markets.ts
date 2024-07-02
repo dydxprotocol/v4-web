@@ -6,7 +6,7 @@ export type MarketData = {
   tickSizeDecimals: Nullable<number>;
   oneDaySparkline?: number[];
   isNew?: boolean;
-  listingDate?: Date;
+  clobPairId: number;
 } & PerpetualMarket &
   PerpetualMarket['perpetual'] &
   PerpetualMarket['configs'];
@@ -14,6 +14,7 @@ export type MarketData = {
 export enum MarketSorting {
   GAINERS = 'gainers',
   LOSERS = 'losers',
+  HIGHEST_CLOB_PAIR_ID = 'highest_clob_pair_id',
 }
 
 export enum MarketFilters {
@@ -26,6 +27,8 @@ export enum MarketFilters {
   NFT = 'NFT',
   GAMING = 'Gaming',
   MEME = 'Meme',
+  RWA = 'RWA',
+  ENT = 'Entertainment',
 }
 
 export const MARKET_FILTER_LABELS = {
@@ -38,6 +41,8 @@ export const MARKET_FILTER_LABELS = {
   [MarketFilters.NFT]: STRING_KEYS.NFT,
   [MarketFilters.GAMING]: STRING_KEYS.GAMING,
   [MarketFilters.MEME]: STRING_KEYS.MEME,
+  [MarketFilters.RWA]: 'RWA',
+  [MarketFilters.ENT]: 'ENT',
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';

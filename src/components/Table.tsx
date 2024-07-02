@@ -156,7 +156,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
-    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint as string]
+    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint]
   );
 
   const collator = useCollator();
@@ -557,6 +557,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
       // data-focused={isFocusVisible || undefined}
       style={{ width: column.props?.width }}
       ref={ref}
+      allowSorting={column.props?.allowsSorting ?? true}
       withScrollSnapColumns={withScrollSnapColumns}
     >
       <$Row>
@@ -566,8 +567,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
             aria-hidden="true"
             sortDirection={
               state.sortDescriptor?.column === column.key
-                ? state.sortDescriptor?.direction
-                : undefined
+                ? state.sortDescriptor?.direction ?? 'none'
+                : 'none'
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
@@ -814,7 +815,7 @@ const $Tr = styled.tr<{
     `}
 `;
 
-const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
+const $Th = styled.th<{ allowSorting: boolean; withScrollSnapColumns?: boolean }>`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -831,6 +832,16 @@ const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
     css`
       ${layoutMixins.scrollSnapItem}
     `}
+
+  ${({ allowSorting }) =>
+    allowSorting
+      ? css`
+          cursor: pointer;
+        `
+      : css`
+          cursor: default;
+          pointer-events: none;
+        `}
 
   white-space: nowrap;
   text-align: var(--table-cell-currentAlign);
@@ -857,7 +868,7 @@ const $Td = styled.td`
   }
 `;
 
-const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
+const $SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' | 'none' }>`
   float: right;
   margin-left: auto;
 
@@ -868,13 +879,18 @@ const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
 
   font-size: 0.375em;
 
-  ${$Th}[aria-sort="none"] & {
-    visibility: hidden;
-  }
-
-  ${$Th}[aria-sort="ascending"] & {
-    transform: scaleY(-1);
-  }
+  ${({ sortDirection }) =>
+    ({
+      ascending: css`
+        transform: scaleY(-1);
+      `,
+      descending: css`
+        transform: scaleY(1);
+      `,
+      none: css`
+        visibility: hidden;
+      `,
+    })[sortDirection]}
 `;
 
 const $Thead = styled.thead<TableStyleProps>`

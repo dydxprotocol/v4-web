@@ -92,6 +92,7 @@ Set environment variables via `.env`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 - `VITE_PRIVY_APP_ID` (optional): App ID used for enabling Privy authentication. For deployment of DYDX token holders use `clua5njf801bncvpa0woolzq4`.
+- `VITE_PRIVY_APP_CLIENT_ID` (optional): App Client ID used for enabling Privy authentication.
 
 ## Part 5: Configure entry points
 
@@ -175,6 +176,37 @@ git restore main pnpm-lock.yaml
 Then run `pnpm install`
 
 **Remember to revert to remote abacus before making a PR.**
+
+# Local Localization (l10n) Development
+
+## Directory structure
+
+Our tooling assumes that the [v4-localization repo](https://github.com/dydxprotocol/v4-localization) is checked out alongside v4-web:
+
+```
+--- parent folder
+ |___ v4-web
+ |___ v4-localization
+```
+
+## Using your local v4-localization repo
+
+When you want to begin developing in v4-localization:
+**kill your dev server first** then use the following command:
+
+```
+pnpm run install-local-l10n
+```
+
+## Reverting to remote localization
+
+You'll need to unlink your local localization package with the following command:
+
+```
+pnpm run remove-local-l10n
+```
+
+Unlike with abacus, you will need to **restart your dev server** to see the revert take effect.
 
 # Deployments
 

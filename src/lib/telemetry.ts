@@ -1,4 +1,7 @@
+import { AnalyticsEvents } from '@/constants/analytics';
 import { isDev } from '@/constants/networks';
+
+import { track } from './analytics';
 
 export const log = (location: string, error: Error, metadata?: any) => {
   if (isDev) {
@@ -13,6 +16,14 @@ export const log = (location: string, error: Error, metadata?: any) => {
       metadata,
     },
   });
+
+  track(
+    AnalyticsEvents.Error({
+      location,
+      error,
+      metadata,
+    })
+  );
 
   globalThis.dispatchEvent(customEvent);
 };

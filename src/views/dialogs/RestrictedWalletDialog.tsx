@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, RestrictedWalletDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
@@ -11,12 +12,10 @@ import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
-type ElementProps = {
-  preventClose?: boolean;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const RestrictedWalletDialog = ({ preventClose, setIsOpen }: ElementProps) => {
+export const RestrictedWalletDialog = ({
+  preventClose,
+  setIsOpen,
+}: DialogProps<RestrictedWalletDialogProps>) => {
   const stringGetter = useStringGetter();
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
@@ -17,7 +17,6 @@ import { DydxChainAsset } from '@/constants/wallets';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -31,6 +30,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
@@ -61,7 +61,6 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
-  const { showMemoTransferField } = useEnvFeatures();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
@@ -94,7 +93,7 @@ export const TransferForm = ({
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
-  const showMemoField = showMemoTransferField && isChainTokenSelected;
+  const showMemoField = isChainTokenSelected;
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
@@ -319,6 +318,12 @@ export const TransferForm = ({
     </$FormInputToggleButton>
   );
 
+  const onToggleMaxButton = useCallback(
+    (isPressed: boolean) =>
+      isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined),
+    [balanceBN, onChangeAmount]
+  );
+
   return (
     <$Form
       className={className}
@@ -388,13 +393,14 @@ export const TransferForm = ({
           value={amount ?? undefined}
           slotRight={
             isUSDCSelected &&
-            balanceBN.gt(0) &&
-            renderFormInputButton({
-              label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: size?.usdcSize == null,
-              onClear: () => onChangeAmount(undefined),
-              onClick: () => onChangeAmount(balanceBN.toNumber()),
-            })
+            balanceBN.gt(0) && (
+              <FormMaxInputToggleButton
+                size={ButtonSize.XSmall}
+                isInputEmpty={size?.usdcSize == null}
+                isLoading={isLoading}
+                onPressedChange={onToggleMaxButton}
+              />
+            )
           }
           disabled={isLoading}
         />
@@ -429,7 +435,7 @@ export const TransferForm = ({
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
             key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-            params: { USDC_BALANCE: `(${usdcBalance} USDC)` },
+            params: { TOKEN: usdcLabel, BALANCE: usdcBalance },
           })}
         </AlertMessage>
       )}
@@ -501,7 +507,5 @@ const $AddressValidationAlertMessage = styled(AlertMessage)`
 const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 
-  svg {
-    color: var(--color-text-0);
-  }
+  --button-padding: 0 0.5rem;
 `;

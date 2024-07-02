@@ -18,7 +18,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType, ShowSign, formatDateOutput } from '@/components/Output';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
@@ -46,9 +47,9 @@ const usePortfolioValues = ({
   const accountValueLabel = useMemo(
     () =>
       activeDatum
-        ? new Date(activeDatum.createdAt).toLocaleString(selectedLocale, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+        ? formatDateOutput(activeDatum.createdAt, OutputType.DateTime, {
+            selectedLocale,
+            dateFormat: 'medium',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
     [activeDatum, selectedLocale, stringGetter]
@@ -180,7 +181,14 @@ export const AccountDetailsAndHistory = () => {
         slotEmpty={
           <$EmptyChart>
             {complianceState === ComplianceStates.READ_ONLY ? (
-              <$EmptyCard>{stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}</$EmptyCard>
+              <$Card>
+                {stringGetter({
+                  key: STRING_KEYS.BLOCKED_MESSAGE,
+                  params: {
+                    TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
+                  },
+                })}
+              </$Card>
             ) : onboardingState !== OnboardingState.AccountConnected ? (
               <$EmptyCard>
                 <p>
@@ -293,21 +301,27 @@ const $EmptyChart = styled.div`
   cursor: default;
 `;
 
-const $EmptyCard = styled.div`
-  width: 16.75rem;
-
-  ${layoutMixins.column};
-  font: var(--font-base-book);
-  gap: 1rem;
-
+const $Card = styled.div`
   padding: 1.25rem;
   margin: auto;
   background-color: var(--color-layer-3);
   border-radius: 0.5rem;
-  text-align: center;
   justify-items: center;
+  width: 16.75rem;
+  font: var(--font-base-book);
+`;
+
+const $EmptyCard = styled($Card)`
+  ${layoutMixins.column};
+
+  display: grid;
+  gap: 1rem;
 
   button {
     width: fit-content;
   }
+`;
+
+const $TermsOfUseLink = styled(TermsOfUseLink)`
+  text-decoration: underline;
 `;

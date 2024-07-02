@@ -67,24 +67,33 @@ export const OrderStatusNotification = ({
   switch (submissionStatus) {
     case PlaceOrderStatuses.Placed:
     case PlaceOrderStatuses.Filled:
+    case PlaceOrderStatuses.Canceled:
       if (indexedOrderStatus) {
         // skip pending / best effort open state -> still show as submitted (loading)
-        if (indexedOrderStatus === AbacusOrderStatus.pending.rawValue) break;
+        if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
 
         orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
         orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
-      }
-      if (order && fill) {
-        customContent = (
-          <FillDetails
-            orderSide={ORDER_SIDES[order.side.name]}
-            tradeType={getTradeType(order.type.rawValue) ?? undefined}
-            filledAmount={order.totalFilled}
-            assetId={assetId}
-            averagePrice={order.price}
-            tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
-          />
-        );
+
+        if (order && fill) {
+          customContent = (
+            <FillDetails
+              orderSide={ORDER_SIDES[order.side.name]}
+              tradeType={getTradeType(order.type.rawValue) ?? undefined}
+              filledAmount={order.totalFilled}
+              assetId={assetId}
+              averagePrice={order.price}
+              tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
+            />
+          );
+        } else if (
+          indexedOrderStatus === AbacusOrderStatus.Canceled.rawValue &&
+          order?.cancelReason
+        ) {
+          // when there's no fill and has a cancel reason, i.e. just plain canceled
+          const cancelReason = order.cancelReason as keyof typeof STRING_KEYS;
+          customContent = <span>{stringGetter({ key: STRING_KEYS[cancelReason] })}</span>;
+        }
       }
       break;
     case PlaceOrderStatuses.Submitted:
@@ -97,9 +106,9 @@ export const OrderStatusNotification = ({
               key: localOrder.errorStringKey,
               params: {
                 EQUITY_TIER_LEARN_MORE: (
-                  <$Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()}>
+                  <Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()} isInline>
                     {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-                  </$Link>
+                  </Link>
                 ),
               },
             })}
@@ -127,6 +136,7 @@ export const OrderStatusNotification = ({
     />
   );
 };
+
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
@@ -149,9 +159,4 @@ const $WarningIcon = styled(Icon)`
 const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-text-1);
-  display: inline-grid;
 `;

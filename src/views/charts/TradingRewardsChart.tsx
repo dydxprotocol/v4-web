@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { kollections } from '@dydxprotocol/v4-abacus';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
@@ -21,6 +20,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -29,6 +29,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
@@ -39,7 +40,6 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -88,29 +88,24 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
-    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, SELECTED_PERIOD.name);
-
-  useEffect(() => {
-    // Initialize daily data for rewards chart
-    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
-  }, [canViewAccount]);
-
-  const rewardsData = useMemo(
-    () =>
-      periodTradingRewards && canViewAccount
-        ? periodTradingRewards
-            .toArray()
-            .reverse()
-            .map(
-              (datum): TradingRewardsDatum => ({
-                date: new Date(datum.endedAtInMilliseconds).valueOf(),
-                cumulativeAmount: datum.cumulativeAmount,
-              })
-            )
-        : [],
-    [periodTradingRewards, canViewAccount]
+  const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    SELECTED_PERIOD.name
   );
+
+  const rewardsData = useMemo(() => {
+    if (periodTradingRewards && canViewAccount) {
+      const res = periodTradingRewards.map(
+        (datum): TradingRewardsDatum => ({
+          date: new Date(datum.endedAtInMilliseconds).valueOf(),
+          cumulativeAmount: datum.cumulativeAmount,
+        })
+      );
+      res.sort((datumA, datumB) => datumA.date - datumB.date);
+      return res;
+    }
+    return [];
+  }, [periodTradingRewards, canViewAccount]);
 
   const oldestDataPointDate = rewardsData?.[0]?.date;
   const newestDataPointDate = rewardsData?.[rewardsData.length - 1]?.date;
@@ -206,18 +201,15 @@ export const TradingRewardsChart = ({
     [xAccessorFunc, yAccessorFunc]
   );
 
-  const language = navigator.language || 'en-US';
-
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const tickFormatY = useCallback(
     (value: number) =>
-      Intl.NumberFormat(language, {
-        style: 'decimal',
-        notation: 'compact',
-        maximumSignificantDigits: 3,
-      })
-        .format(value)
-        .toLowerCase(),
-    [language]
+      formatNumberOutput(value, OutputType.CompactNumber, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      }),
+    [decimalSeparator, groupSeparator, selectedLocale]
   );
 
   const renderTooltip = useCallback(() => <div />, []);

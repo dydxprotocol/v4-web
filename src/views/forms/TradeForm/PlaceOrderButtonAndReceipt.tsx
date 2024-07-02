@@ -1,6 +1,7 @@
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import type { TradeInputSummary } from '@/constants/abacus';
+import { AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -14,17 +15,30 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountId } from '@/state/accountSelectors';
+import {
+  calculateCanAccountTrade,
+  calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero,
+} from '@/state/accountCalculators';
+import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { nullIfZero } from '@/lib/numbers';
+import {
+  calculateCrossPositionMargin,
+  getTradeStateWithDoubleValuesHasDiff,
+} from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
   stringKey: string;
@@ -60,6 +74,12 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
+  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
+  const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
+    useAppSelector(getCurrentMarketPositionData, shallowEqual)
+  );
+
+  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -74,7 +94,56 @@ export const PlaceOrderButtonAndReceipt = ({
     currentInput !== 'transfer' &&
     !tradingUnavailable;
 
-  const { fee, price: expectedPrice, total, reward } = summary ?? {};
+  const { fee, price: expectedPrice, reward } = summary ?? {};
+
+  // check if required fields are filled and summary has been calculated
+  const areInputsFilled = fee != null || reward != null;
+
+  const isIsolatedMarketPostOrderPositionMarginZero = useAppSelector(
+    calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero
+  );
+
+  const renderMarginValue = () => {
+    if (marginMode === AbacusMarginMode.Cross) {
+      const currentCrossMargin = nullIfZero(
+        calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.current,
+          adjustedMmf: adjustedMmf?.current,
+        })
+      );
+
+      const postOrderCrossMargin = nullIfZero(
+        calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.postOrder,
+          adjustedMmf: adjustedMmf?.postOrder,
+        })
+      );
+
+      return (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Fiat}
+          value={currentCrossMargin}
+          newValue={postOrderCrossMargin}
+          withDiff={areInputsFilled && currentCrossMargin !== postOrderCrossMargin}
+        />
+      );
+    }
+
+    return (
+      <DiffOutput
+        useGrouping
+        type={OutputType.Fiat}
+        value={equity?.current}
+        newValue={isIsolatedMarketPostOrderPositionMarginZero ? null : equity?.postOrder}
+        withDiff={
+          isIsolatedMarketPostOrderPositionMarginZero
+            ? nullIfZero(equity?.current) != null
+            : areInputsFilled && getTradeStateWithDoubleValuesHasDiff(equity)
+        }
+      />
+    );
+  };
 
   const items = [
     {
@@ -84,7 +153,47 @@ export const PlaceOrderButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
         </WithTooltip>
       ),
-      value: <Output type={OutputType.Fiat} value={expectedPrice} useGrouping />,
+      value: (
+        <Output
+          useGrouping
+          fractionDigits={tickSizeDecimals}
+          type={OutputType.Fiat}
+          value={expectedPrice}
+        />
+      ),
+    },
+    {
+      key: 'liquidation-price',
+      label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
+      value: (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Fiat}
+          fractionDigits={tickSizeDecimals}
+          value={liquidationPrice?.current}
+          newValue={liquidationPrice?.postOrder}
+          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
+        />
+      ),
+    },
+    {
+      key: 'position-margin',
+      label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
+      value: renderMarginValue(),
+    },
+    {
+      key: 'position-leverage',
+      label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+      value: (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Multiple}
+          value={nullIfZero(leverage?.current)}
+          newValue={leverage?.postOrder}
+          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(leverage)}
+          showSign={ShowSign.None}
+        />
+      ),
     },
     {
       key: 'fee',
@@ -113,12 +222,7 @@ export const PlaceOrderButtonAndReceipt = ({
       ),
       tooltip: 'max-reward',
     },
-    {
-      key: 'total',
-      label: stringGetter({ key: STRING_KEYS.TOTAL }),
-      value: <Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />,
-    },
-  ];
+  ].filter(isTruthy);
 
   const returnToMarketState = () => ({
     buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
@@ -173,7 +277,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const depositButton = (
     <Button
       action={ButtonAction.Primary}
-      onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
     </Button>

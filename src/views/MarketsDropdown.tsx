@@ -17,15 +17,12 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
-import { Icon, IconName } from '@/components/Icon';
+import { DropdownIcon } from '@/components/DropdownIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -34,7 +31,6 @@ import { MarketFilter } from './MarketFilter';
 const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
@@ -88,7 +84,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.volume24H,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
           renderCell: ({ volume24H }) => (
-            <$Output type={OutputType.CompactFiat} value={volume24H} locale={selectedLocale} />
+            <$Output type={OutputType.CompactFiat} value={volume24H} />
           ),
         },
         {
@@ -96,15 +92,11 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.openInterestUSDC,
           label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
           renderCell: (row) => (
-            <$Output
-              type={OutputType.CompactFiat}
-              value={row.openInterestUSDC}
-              locale={selectedLocale}
-            />
+            <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
           ),
         },
       ] satisfies ColumnDef<MarketData>[],
-    [stringGetter, selectedLocale]
+    [stringGetter]
   );
 
   return (
@@ -198,9 +190,7 @@ export const MarketsDropdown = memo(
             )}
             <p>
               {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <$DropdownIcon aria-hidden="true">
-                <Icon iconName={IconName.Triangle} aria-hidden="true" />
-              </$DropdownIcon>
+              <DropdownIcon isOpen={isOpen} />
             </p>
           </$TriggerContainer>
         }
@@ -275,15 +265,6 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
     color: var(--color-text-0);
     font: var(--font-small-book);
   }
-`;
-
-const $DropdownIcon = styled.span`
-  margin-left: auto;
-
-  display: inline-flex;
-  transition: transform 0.3s var(--ease-out-expo);
-
-  font-size: 0.375rem;
 `;
 
 const $Popover = styled(Popover)`

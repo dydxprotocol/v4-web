@@ -15,12 +15,14 @@ import {
   type StringGetterFunction,
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
+import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -48,7 +50,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
-import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
+import { MobileDownloadLinks } from '../MobileDownloadLinks';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -60,7 +62,7 @@ export const AccountMenu = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
-  const { nativeTokenBalance } = useAccountBalance();
+  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
@@ -71,11 +73,11 @@ export const AccountMenu = () => {
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
 
-  const usdcBalance = freeCollateral?.current ?? 0;
-
   const onRecoverKeys = () => {
-    dispatch(openDialog({ type: DialogTypes.Onboarding }));
+    dispatch(openDialog(DialogTypes.Onboarding()));
   };
+
+  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
@@ -169,6 +171,24 @@ export const AccountMenu = () => {
                   stringGetter={stringGetter}
                 />
               </div>
+              {isDev && (
+                <div>
+                  <div>
+                    <$label>
+                      {stringGetter({
+                        key: STRING_KEYS.WALLET_BALANCE,
+                        params: { ASSET: usdcLabel },
+                      })}
+                      <AssetIcon symbol="USDC" />
+                    </$label>
+                    <$BalanceOutput
+                      type={OutputType.Asset}
+                      value={usdcBalance}
+                      fractionDigits={SMALL_USD_DECIMALS}
+                    />
+                  </div>
+                </div>
+              )}
               <div>
                 <div>
                   <$label>
@@ -178,7 +198,11 @@ export const AccountMenu = () => {
                     })}
                     <AssetIcon symbol="USDC" />
                   </$label>
-                  <$BalanceOutput type={OutputType.Asset} value={usdcBalance} fractionDigits={2} />
+                  <$BalanceOutput
+                    type={OutputType.Asset}
+                    value={freeCollateral?.current ?? 0}
+                    fractionDigits={USD_DECIMALS}
+                  />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.USDC}
@@ -209,7 +233,7 @@ export const AccountMenu = () => {
           value: 'Preferences',
           icon: <Icon iconName={IconName.Gear} />,
           label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
-          onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
+          onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
         },
         {
           value: 'DisplaySettings',
@@ -220,7 +244,7 @@ export const AccountMenu = () => {
               <Icon iconName={IconName.Moon} />
             ),
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
-          onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
+          onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
         },
         ...(isDev
           ? [
@@ -229,19 +253,25 @@ export const AccountMenu = () => {
                 icon: <Icon iconName={IconName.Gear} />,
                 label: 'Compliance Config',
                 onSelect: () => {
-                  dispatch(openDialog({ type: DialogTypes.ComplianceConfig }));
+                  dispatch(openDialog(DialogTypes.ComplianceConfig()));
                 },
               },
             ]
           : []),
-        ...(getMobileAppUrl()
+        ...(appleAppStoreUrl ?? googlePlayStoreUrl
           ? [
               {
                 value: 'MobileDownload',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
                 onSelect: () => {
-                  dispatch(openDialog({ type: DialogTypes.MobileDownload }));
+                  dispatch(
+                    openDialog(
+                      DialogTypes.MobileDownload({
+                        mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
+                      })
+                    )
+                  );
                 },
               },
             ]
@@ -252,14 +282,14 @@ export const AccountMenu = () => {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
-                onSelect: () => dispatch(openDialog({ type: DialogTypes.MobileSignIn })),
+                onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
               },
               {
                 value: 'MnemonicExport',
                 icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
                 highlightColor: 'destroy' as const,
-                onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
+                onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
               },
             ]
           : []),
@@ -278,9 +308,10 @@ export const AccountMenu = () => {
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
           highlightColor: 'destroy' as const,
-          onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
+          onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
         },
       ].filter(isTruthy)}
+      slotBottomContent={<MobileDownloadLinks withBadges />}
       align="end"
       sideOffset={16}
     >
@@ -310,42 +341,42 @@ const AssetActions = memo(
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialogType: DialogTypes.Deposit,
+            dialog: DialogTypes.Deposit(),
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
           },
         withOnboarding &&
           hasBalance && {
-            dialogType: DialogTypes.Withdraw,
+            dialog: DialogTypes.Withdraw(),
             iconName: IconName.Withdraw,
             tooltipStringKey: STRING_KEYS.WITHDRAW,
           },
         hasBalance &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialogType: DialogTypes.Transfer,
-            dialogProps: { selectedAsset: asset },
+            dialog: DialogTypes.Transfer({ selectedAsset: asset }),
             iconName: IconName.Send,
             tooltipStringKey: STRING_KEYS.TRANSFER,
           },
       ]
         .filter(isTruthy)
-        .map(({ iconName, tooltipStringKey, dialogType, dialogProps }) => (
+        .map(({ iconName, tooltipStringKey, dialog }) => (
           <$WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
           >
             <$IconButton
-              key={dialogType}
+              key={dialog.type}
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={iconName}
-              onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
+              onClick={() => dispatch(openDialog(dialog))}
             />
           </$WithTooltip>
         ))}
     </$InlineRow>
   )
 );
+
 const $AccountInfo = styled.div`
   ${layoutMixins.flexColumn}
 

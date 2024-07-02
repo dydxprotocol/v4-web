@@ -68,7 +68,8 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketId(marketId));
 
         if (
-          activeTradeBoxDialog?.type === TradeBoxDialogTypes.ClosePosition &&
+          activeTradeBoxDialog != null &&
+          TradeBoxDialogTypes.is.ClosePosition(activeTradeBoxDialog) &&
           openPositions?.find((position: SubaccountPosition) => position.id === marketId)
         ) {
           // Keep the close positions dialog open between market changes as long as there exists an open position
@@ -82,8 +83,9 @@ export const useCurrentMarketId = () => {
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (marketIds) {
+    if (hasMarketIds) {
       abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+      abacusStateManager.setTradeValue({ value: null, field: null });
     }
   }, [selectedNetwork, hasMarketIds, marketId]);
 };

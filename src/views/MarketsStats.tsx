@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, MarketSorting } from '@/constants/markets';
+import { MarketSorting } from '@/constants/markets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -35,7 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
           </$RecentlyListed>
         </$SectionHeader>
-        <MarketsCompactTable filters={MarketFilters.NEW} />
+        <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
       </$Section>
       <$Section>
         <$SectionHeader>
@@ -82,6 +82,7 @@ const $MarketsStats = styled.section`
 const $Section = styled.div`
   background: var(--color-layer-3);
   border-radius: 0.625rem;
+  align-content: center;
 `;
 const $RecentlyListed = styled.h4`
   display: flex;
@@ -95,7 +96,14 @@ const $NewTag = styled(Tag)`
 `;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
-  margin-left: auto;
+  position: absolute;
+  top: -0.25rem;
+  right: 1rem;
+  z-index: 2;
+
+  @media ${breakpoints.tablet} {
+    top: 0.8125rem;
+  }
 
   & button {
     --button-toggle-off-backgroundColor: var(--color-layer-3);
@@ -108,14 +116,17 @@ const $ToggleGroupContainer = styled.div`
 `;
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
+  position: relative;
 
-  justify-content: space-between;
-  padding: 1.125rem 1.5rem;
-  gap: 0.375rem;
-  height: 4rem;
+  padding: 0 1.25rem 1.25rem;
+  gap: 0.25rem;
 
   & h4 {
     font: var(--font-base-medium);
     color: var(--color-text-2);
+  }
+
+  @media ${breakpoints.tablet} {
+    padding: 1rem;
   }
 `;

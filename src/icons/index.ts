@@ -1,3 +1,4 @@
+// TODO: get rid of this massive barrel file.
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
@@ -22,12 +23,14 @@ export { default as CurrencySignIcon } from './currency-sign.svg';
 export { default as DepositIcon } from './deposit.svg';
 export { default as DepthChartIcon } from './depth-chart.svg';
 export { default as DiscordIcon } from './discord.svg';
+export { default as DownloadIcon } from './download.svg';
 export { default as ExportKeysIcon } from './export-keys.svg';
 export { default as FeedbackIcon } from './feedback.svg';
 export { default as FileIcon } from './file.svg';
 export { default as FundingChartIcon } from './funding-chart.svg';
 export { default as GearIcon } from './gear.svg';
 export { default as GiftboxIcon } from './giftbox.svg';
+export { default as GooglePlayIcon } from './google-play.svg';
 export { default as GovernanceIcon } from './governance.svg';
 export { default as HelpCircleIcon } from './help-circle.svg';
 export { default as HideIcon } from './hide.svg';
@@ -58,6 +61,7 @@ export { default as SearchIcon } from './search.svg';
 export { default as SendIcon } from './send.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as ShowIcon } from './show.svg';
+export { default as SocialXIcon } from './social-x.svg';
 export { default as StarIcon } from './star.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as TerminalIcon } from './terminal.svg';
@@ -99,8 +103,10 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 
 // Logos
-export { default as ChaosLabsIcon } from './chaos-labs';
-export { default as LogoShortIcon } from './logo-short';
+// Commented out because of https://github.com/dydxprotocol/v4-web/pull/737
+// Left as comment for context in case people wonder why they're not imported here
+// export { default as ChaosLabsIcon } from './chaos-labs';
+// export { default as LogoShortIcon } from './logo-short';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
 
 // Trade

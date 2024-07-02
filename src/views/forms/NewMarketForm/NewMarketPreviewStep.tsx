@@ -41,7 +41,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;
@@ -126,12 +125,11 @@ export const NewMarketPreviewStep = ({
 
         if (!hasAcceptedTerms) {
           dispatch(
-            openDialog({
-              type: DialogTypes.NewMarketAgreement,
-              dialogProps: {
+            openDialog(
+              DialogTypes.NewMarketAgreement({
                 acceptTerms: () => setHasAcceptedTerms(true),
-              },
-            })
+              })
+            )
           );
         } else {
           setIsLoading(true);
@@ -150,12 +148,10 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
-              // @ts-ignore - marketType is not required until v5
-              marketType: testFlags.withNewMarketType
-                ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+              marketType:
+                marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS
-                : undefined,
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
@@ -262,10 +258,9 @@ export const NewMarketPreviewStep = ({
                 size={ButtonSize.Small}
                 onClick={() =>
                   dispatch(
-                    openDialog({
-                      type: DialogTypes.NewMarketMessageDetails,
-                      dialogProps: { assetData, clobPairId, liquidityTier },
-                    })
+                    openDialog(
+                      DialogTypes.NewMarketMessageDetails({ assetData, clobPairId, liquidityTier })
+                    )
                   )
                 }
               >
@@ -347,9 +342,9 @@ export const NewMarketPreviewStep = ({
               NUM_TOKENS_REQUIRED: initialDepositAmount,
               NATIVE_TOKEN_DENOM: chainTokenLabel,
               HERE: (
-                <$Link href={newMarketProposalLearnMore}>
+                <Link href={newMarketProposalLearnMore} isAccent isInline>
                   {stringGetter({ key: STRING_KEYS.HERE })}
-                </$Link>
+                </Link>
               ),
             },
           })}
@@ -426,9 +421,4 @@ const $ButtonRow = styled.div`
 const $Button = styled(Button)`
   --button-padding: 0;
   --button-height: auto;
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline;
 `;

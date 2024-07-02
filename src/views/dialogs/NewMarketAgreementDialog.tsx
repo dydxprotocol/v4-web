@@ -3,8 +3,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
+import { DialogProps, NewMarketAgreementDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -15,13 +15,12 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-type ElementProps = {
-  acceptTerms: () => void;
-  setIsOpen: (open: boolean) => void;
-};
-
-export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProps) => {
+export const NewMarketAgreementDialog = ({
+  acceptTerms,
+  setIsOpen,
+}: DialogProps<NewMarketAgreementDialogProps>) => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
 
   const stringGetter = useStringGetter();
@@ -38,15 +37,16 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
             key: STRING_KEYS.NEW_MARKET_PROPOSAL_AGREEMENT,
             params: {
               DOCUMENTATION_LINK: (
-                <$Link href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process">
+                <Link
+                  href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process"
+                  withIcon
+                  isAccent
+                  isInline
+                >
                   {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
-                </$Link>
+                </Link>
               ),
-              TERMS_OF_USE: (
-                <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
-                  {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-                </$Link>
-              ),
+              TERMS_OF_USE: <TermsOfUseLink isInline isAccent />,
             },
           })}
         </p>
@@ -91,11 +91,6 @@ const $Content = styled.div`
     padding: 1rem;
     background-color: var(--color-layer-1);
   }
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-accent);
-  display: inline-block;
 `;
 
 const $ButtonRow = styled.div`

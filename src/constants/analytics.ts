@@ -1,31 +1,34 @@
+import { StatSigFlags } from '@/types/statsig';
+import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
+
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
-import type { DialogTypes } from './dialogs';
+import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
-type AnalyticsEventDataWithReferrer<T extends AnalyticsEvent> = AnalyticsEventData<T> & {
+type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventPayloads[T] & {
   referrer: string;
 };
-export type AnalyticsEventTrackMeta<T extends AnalyticsEvent> = {
+export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
-    eventType: AnalyticsEvent;
+    eventType: T;
     eventData: AnalyticsEventDataWithReferrer<T>;
   };
 };
-export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserProperty> = {
+export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
   detail: {
-    property: AnalyticsUserProperty;
-    propertyValue: AnalyticsUserPropertyValue<T>;
+    property: (typeof AnalyticsUserPropertyLoggableTypes)[T];
+    propertyValue: AnalyticsUserPropertyPayloads[T];
   };
 };
 
 // Do not update. this is used specifically to type how we create custom identify events.
 // If you want to update how identify events work, go to src/lib/analytics.ts
-export const customIdentifyEvent = <T extends AnalyticsUserProperty>(
+export const customIdentifyEvent = <T extends AnalyticsUserPropertyTypes>(
   meta: AnalyticsEventIdentifyMeta<T>
 ) => {
   return new CustomEvent('dydx:identify', meta);
@@ -33,224 +36,215 @@ export const customIdentifyEvent = <T extends AnalyticsUserProperty>(
 
 // Do not update. this is used specifically to type how we create custom track events.
 // If you want to update how track events work, go to src/lib/analytics.ts
-export const customTrackEvent = <T extends AnalyticsEvent>(meta: AnalyticsEventTrackMeta<T>) => {
+export const customTrackEvent = <T extends AnalyticsEventTypes>(
+  meta: AnalyticsEventTrackMeta<T>
+) => {
   return new CustomEvent('dydx:track', meta);
 };
 
 // User properties
-export enum AnalyticsUserProperty {
-  // Environment
-  Locale = 'selectedLocale',
-  Breakpoint = 'breakpoint',
-  Version = 'version',
+export const AnalyticsUserProperties = unionize(
+  {
+    // Environment
+    Locale: ofType<SupportedLocales>(),
+    Breakpoint: ofType<
+      'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
+    >(),
+    Version: ofType<string | null>(),
 
-  // Network
-  Network = 'network',
+    // StatSigFlags
+    StatsigFlags: ofType<{ [key in StatSigFlags]?: boolean }>(),
 
-  // Wallet
-  WalletType = 'walletType',
-  WalletConnectionType = 'walletConnectionType',
-  WalletAddress = 'walletAddress',
+    // Network
+    Network: ofType<DydxNetwork>(),
 
-  // Account
-  DydxAddress = 'dydxAddress',
-  SubaccountNumber = 'subaccountNumber',
-}
+    // Wallet
+    WalletType: ofType<WalletType | null>(),
+    WalletConnectionType: ofType<WalletConnectionType | null>(),
+    WalletAddress: ofType<EvmAddress | DydxAddress | null>(),
 
-export type AnalyticsUserPropertyValue<T extends AnalyticsUserProperty> =
-  // Environment
-  T extends AnalyticsUserProperty.Breakpoint
-    ? 'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
-    : T extends AnalyticsUserProperty.Locale
-      ? SupportedLocales
-      : T extends AnalyticsUserProperty.Version
-        ? string | undefined
-        : // Network
-          T extends AnalyticsUserProperty.Network
-          ? DydxNetwork
-          : // Wallet
-            T extends AnalyticsUserProperty.WalletType
-            ? WalletType | undefined
-            : T extends AnalyticsUserProperty.WalletConnectionType
-              ? WalletConnectionType | undefined
-              : T extends AnalyticsUserProperty.WalletAddress
-                ? EvmAddress | DydxAddress | undefined
-                : // Account
-                  T extends AnalyticsUserProperty.DydxAddress
-                  ? DydxAddress | undefined
-                  : T extends AnalyticsUserProperty.SubaccountNumber
-                    ? number | undefined
-                    : undefined;
+    // Account
+    DydxAddress: ofType<DydxAddress | null>(),
+    SubaccountNumber: ofType<number | null>(),
+  },
+  { tag: 'type' as const, value: 'payload' as const }
+);
 
-// Events
-export enum AnalyticsEvent {
-  // App
-  AppStart = 'AppStart',
-  NetworkStatus = 'NetworkStatus',
+export const AnalyticsUserPropertyLoggableTypes = {
+  Locale: 'selectedLocale',
+  Breakpoint: 'breakpoint',
+  Version: 'version',
+  StatsigFlags: 'statsigFlags',
+  Network: 'network',
+  WalletType: 'walletType',
+  WalletConnectionType: 'walletConnectionType',
+  WalletAddress: 'walletAddress',
+  DydxAddress: 'dydxAddress',
+  SubaccountNumber: 'subaccountNumber',
+} as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
-  // Navigation
-  NavigatePage = 'NavigatePage',
-  NavigateDialog = 'NavigateDialog',
-  NavigateDialogClose = 'NavigateDialogClose',
-  NavigateExternal = 'NavigateExternal',
+export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
+export type AnalyticsUserPropertyTypes = TagsOf<typeof AnalyticsUserProperties>;
+export type AnalyticsUserPropertyPayloads = RecordOf<typeof AnalyticsUserProperties>;
 
-  // Wallet
-  ConnectWallet = 'ConnectWallet',
-  DisconnectWallet = 'DisconnectWallet',
+export const AnalyticsEvents = unionize(
+  {
+    // App
+    AppStart: ofType<{}>(),
+    NetworkStatus: ofType<{
+      status: (typeof AbacusApiStatus)['name'];
+      /** Last time indexer node was queried successfully */
+      lastSuccessfulIndexerRpcQuery?: number;
+      /** Time elapsed since indexer node was queried successfully */
+      elapsedTime?: number;
+      blockHeight?: number;
+      indexerBlockHeight?: number;
+      trailingBlocks?: number;
+    }>(),
 
-  // Onboarding
-  OnboardingStepChanged = 'OnboardingStepChanged',
-  OnboardingAccountDerived = 'OnboardingAccountDerived',
-  OnboardingWalletIsNonDeterministic = 'OnboardingWalletIsNonDeterministic',
+    // Navigation
+    NavigatePage: ofType<{
+      path: string;
+    }>(),
+    NavigateDialog: ofType<{
+      type: DialogTypesTypes;
+    }>(),
+    NavigateDialogClose: ofType<{
+      type: DialogTypesTypes;
+    }>(),
+    NavigateExternal: ofType<{
+      link: string;
+    }>(),
 
-  // Transfers
-  TransferFaucet = 'TransferFaucet',
-  TransferFaucetConfirmed = 'TransferFaucetConfirmed',
-  TransferDeposit = 'TransferDeposit',
-  TransferWithdraw = 'TransferWithdraw',
-  TransferNotification = 'TransferNotification',
+    // Wallet
+    ConnectWallet: ofType<{
+      walletType: WalletType;
+      walletConnectionType: WalletConnectionType;
+    }>(),
+    DisconnectWallet: ofType<{}>(),
 
-  // Trading
-  TradeOrderTypeSelected = 'TradeOrderTypeSelected',
-  TradePlaceOrder = 'TradePlaceOrder',
-  TradePlaceOrderConfirmed = 'TradePlaceOrderConfirmed',
-  TradeCancelOrder = 'TradeCancelOrder',
-  TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
+    // Onboarding
+    OnboardingStepChanged: ofType<{
+      state: OnboardingState;
+      step?: OnboardingSteps;
+    }>(),
+    OnboardingAccountDerived: ofType<{
+      hasPreviousTransactions: boolean;
+    }>(),
+    OnboardingWalletIsNonDeterministic: ofType<{}>(),
 
-  // Notification
-  NotificationAction = 'NotificationAction',
-}
+    // Transfers
+    TransferFaucet: ofType<{}>(),
+    TransferFaucetConfirmed: ofType<{
+      /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+      roundtripMs: number;
+      /** URL/IP of node the order was sent to */
+      validatorUrl: string;
+    }>(),
+    TransferDeposit: ofType<{
+      chainId?: string;
+      tokenAddress?: string;
+      tokenSymbol?: string;
+      slippage?: number;
+      gasFee?: number;
+      bridgeFee?: number;
+      exchangeRate?: number;
+      estimatedRouteDuration?: number;
+      toAmount?: number;
+      toAmountMin?: number;
+    }>(),
+    TransferWithdraw: ofType<{
+      chainId?: string;
+      tokenAddress?: string;
+      tokenSymbol?: string;
+      slippage?: number;
+      gasFee?: number;
+      bridgeFee?: number;
+      exchangeRate?: number;
+      estimatedRouteDuration?: number;
+      toAmount?: number;
+      toAmountMin?: number;
+    }>(),
+    TransferNotification: ofType<{
+      type: TransferNotificationTypes | undefined;
+      toAmount: number | undefined;
+      timeSpent: Record<string, number> | number | undefined;
+      txHash: string;
+      status: 'new' | 'success' | 'error';
+      triggeredAt: number | undefined;
+    }>(),
 
-export type AnalyticsEventData<T extends AnalyticsEvent> =
-  // App
-  T extends AnalyticsEvent.AppStart
-    ? {}
-    : T extends AnalyticsEvent.NetworkStatus
-      ? {
-          status: (typeof AbacusApiStatus)['name'];
-          /** Last time indexer node was queried successfully */
-          lastSuccessfulIndexerRpcQuery?: number;
-          /** Time elapsed since indexer node was queried successfully */
-          elapsedTime?: number;
-          blockHeight?: number;
-          indexerBlockHeight?: number;
-          trailingBlocks?: number;
-        }
-      : // Navigation
-        T extends AnalyticsEvent.NavigatePage
-        ? {
-            path: string;
-          }
-        : T extends AnalyticsEvent.NavigateDialog
-          ? {
-              type: DialogTypes;
-            }
-          : T extends AnalyticsEvent.NavigateDialogClose
-            ? {
-                type: DialogTypes;
-              }
-            : T extends AnalyticsEvent.NavigateExternal
-              ? {
-                  link: string;
-                }
-              : // Wallet
-                T extends AnalyticsEvent.ConnectWallet
-                ? {
-                    walletType: WalletType;
-                    walletConnectionType: WalletConnectionType;
-                  }
-                : T extends AnalyticsEvent.DisconnectWallet
-                  ? {}
-                  : // Onboarding
-                    T extends AnalyticsEvent.OnboardingStepChanged
-                    ? {
-                        state: OnboardingState;
-                        step?: OnboardingSteps;
-                      }
-                    : T extends AnalyticsEvent.OnboardingAccountDerived
-                      ? {
-                          hasPreviousTransactions: boolean;
-                        }
-                      : // Transfers
-                        T extends AnalyticsEvent.TransferFaucet
-                        ? {}
-                        : T extends AnalyticsEvent.TransferFaucetConfirmed
-                          ? {
-                              /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-                              roundtripMs: number;
-                              /** URL/IP of node the order was sent to */
-                              validatorUrl: string;
-                            }
-                          : T extends AnalyticsEvent.TransferDeposit
-                            ? {
-                                chainId?: string;
-                                tokenAddress?: string;
-                                tokenSymbol?: string;
-                                slippage?: number;
-                                gasFee?: number;
-                                bridgeFee?: number;
-                                exchangeRate?: number;
-                                estimatedRouteDuration?: number;
-                                toAmount?: number;
-                                toAmountMin?: number;
-                              }
-                            : T extends AnalyticsEvent.TransferWithdraw
-                              ? {
-                                  chainId?: string;
-                                  tokenAddress?: string;
-                                  tokenSymbol?: string;
-                                  slippage?: number;
-                                  gasFee?: number;
-                                  bridgeFee?: number;
-                                  exchangeRate?: number;
-                                  estimatedRouteDuration?: number;
-                                  toAmount?: number;
-                                  toAmountMin?: number;
-                                }
-                              : // Trading
-                                T extends AnalyticsEvent.TradeOrderTypeSelected
-                                ? {
-                                    type: TradeTypes;
-                                  }
-                                : T extends AnalyticsEvent.TradePlaceOrder
-                                  ? HumanReadablePlaceOrderPayload & {
-                                      isClosePosition: boolean;
-                                    }
-                                  : T extends AnalyticsEvent.TradePlaceOrderConfirmed
-                                    ? {
-                                        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-                                        roundtripMs: number;
-                                        /** URL/IP of node the order was sent to */
-                                        validatorUrl: string;
-                                      }
-                                    : T extends AnalyticsEvent.TradeCancelOrder
-                                      ? {}
-                                      : T extends AnalyticsEvent.TradeCancelOrderConfirmed
-                                        ? {
-                                            /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
-                                            roundtripMs: number;
-                                            /** URL/IP of node the order was sent to */
-                                            validatorUrl: string;
-                                          }
-                                        : // Notifcation
-                                          T extends AnalyticsEvent.NotificationAction
-                                          ? {
-                                              type: string;
-                                              id: string;
-                                            }
-                                          : T extends AnalyticsEvent.TransferNotification
-                                            ? {
-                                                type: TransferNotificationTypes | undefined;
-                                                toAmount: number | undefined;
-                                                timeSpent:
-                                                  | Record<string, number>
-                                                  | number
-                                                  | undefined;
-                                                txHash: string;
-                                                status: 'new' | 'success' | 'error';
-                                                triggeredAt: number | undefined;
-                                              }
-                                            : never;
+    // Trading
+    TradeOrderTypeSelected: ofType<{
+      type: TradeTypes;
+    }>(),
+    TradePlaceOrder: ofType<
+      HumanReadablePlaceOrderPayload & {
+        isClosePosition: boolean;
+      }
+    >(),
+    TradePlaceOrderConfirmed: ofType<{
+      /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+      roundtripMs: number;
+      /** URL/IP of node the order was sent to */
+      validatorUrl: string;
+    }>(),
+    TradeCancelOrder: ofType<{}>(),
+    TradeCancelOrderConfirmed: ofType<{
+      /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
+      roundtripMs: number;
+      /** URL/IP of node the order was sent to */
+      validatorUrl: string;
+    }>(),
+
+    // Notification
+    NotificationAction: ofType<{
+      type: string;
+      id: string;
+    }>(),
+
+    // Staking
+    StakeTransaction: ofType<{
+      txHash?: string;
+      amount?: number;
+      validatorAddress?: string;
+      defaultValidatorAddress?: string;
+    }>(),
+    UnstakeTransaction: ofType<{
+      txHash?: string;
+      amount?: number;
+      validatorAddresses?: string[];
+    }>(),
+    ClaimTransaction: ofType<{
+      txHash?: string;
+      amount?: string;
+    }>(),
+    StakeInput: ofType<{
+      amount?: number;
+      validatorAddress?: string;
+    }>(),
+    UnstakeInput: ofType<{
+      amount?: number;
+      validatorAddress?: string;
+    }>(),
+    Error: ofType<{
+      location: string;
+      error: Error;
+      metadata?: any;
+    }>(),
+    RouteError: ofType<{
+      transferType?: 'withdrawal' | 'deposit';
+      errorMessage?: string;
+      amount: string;
+      chainId?: string;
+      assetId?: string;
+    }>(),
+  },
+  { tag: 'type' as const, value: 'payload' as const }
+);
+export type AnalyticsEvent = UnionOf<typeof AnalyticsEvents>;
+export type AnalyticsEventTypes = TagsOf<typeof AnalyticsEvents>;
+export type AnalyticsEventPayloads = RecordOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};

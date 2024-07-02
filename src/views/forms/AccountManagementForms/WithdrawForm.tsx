@@ -9,7 +9,7 @@ import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -20,6 +20,7 @@ import {
   MIN_CCTP_TRANSFER_AMOUNT,
   NumberSign,
   TOKEN_DECIMALS,
+  USD_DECIMALS,
 } from '@/constants/numbers';
 import { WalletType } from '@/constants/wallets';
 
@@ -27,6 +28,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -37,12 +39,12 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -52,12 +54,14 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
+import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -205,21 +209,24 @@ export const WithdrawForm = () => {
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
 
-            track(AnalyticsEvent.TransferWithdraw, {
-              chainId: toChainId,
-              tokenAddress: toToken?.address || undefined,
-              tokenSymbol: toToken?.symbol || undefined,
-              slippage: slippage || undefined,
-              gasFee: summary?.gasFee || undefined,
-              bridgeFee: summary?.bridgeFee || undefined,
-              exchangeRate: summary?.exchangeRate || undefined,
-              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-              toAmount: summary?.toAmount || undefined,
-              toAmountMin: summary?.toAmountMin || undefined,
-            });
+            track(
+              AnalyticsEvents.TransferWithdraw({
+                chainId: toChainId,
+                tokenAddress: toToken?.address || undefined,
+                tokenSymbol: toToken?.symbol || undefined,
+                slippage: slippage || undefined,
+                gasFee: summary?.gasFee || undefined,
+                bridgeFee: summary?.bridgeFee || undefined,
+                exchangeRate: summary?.exchangeRate || undefined,
+                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+                toAmount: summary?.toAmount || undefined,
+                toAmountMin: summary?.toAmountMin || undefined,
+              })
+            );
           }
         }
       } catch (err) {
+        log('WithdrawForm/onSubmit', err);
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
@@ -343,6 +350,8 @@ export const WithdrawForm = () => {
   ];
 
   const { sanctionedAddresses } = useRestrictions();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const { alertType, errorMessage } = useMemo(() => {
     if (isCctp) {
@@ -361,24 +370,19 @@ export const WithdrawForm = () => {
         MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
       ) {
         return {
-          errorMessage: 'Amount must be greater than 10 USDC',
+          errorMessage: stringGetter({
+            key: STRING_KEYS.AMOUNT_MINIMUM_ERROR,
+            params: {
+              NUMBER: MIN_CCTP_TRANSFER_AMOUNT,
+              TOKEN: usdcLabel,
+            },
+          }),
         };
       }
     }
     if (error) {
       return {
         errorMessage: error,
-      };
-    }
-
-    if (routeErrors) {
-      return {
-        errorMessage: routeErrorMessage
-          ? stringGetter({
-              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-              params: { ERROR_MESSAGE: routeErrorMessage },
-            })
-          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
       };
     }
 
@@ -395,6 +399,26 @@ export const WithdrawForm = () => {
           key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
         }),
       };
+
+    if (routeErrors) {
+      track(
+        AnalyticsEvents.RouteError({
+          transferType: TransferType.withdrawal.name,
+          errorMessage: routeErrorMessage ?? undefined,
+          amount: debouncedAmount,
+          chainId: chainIdStr ?? undefined,
+          assetId: toToken?.toString(),
+        })
+      );
+      return {
+        errorMessage: routeErrorMessage
+          ? stringGetter({
+              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+              params: { ERROR_MESSAGE: routeErrorMessage },
+            })
+          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
+      };
+    }
 
     if (debouncedAmountBN) {
       if (!chainIdStr && !exchange) {
@@ -428,7 +452,12 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
+                {formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                  fractionDigits: TOKEN_DECIMALS,
+                })}
                 <$Tag>{usdcLabel}</$Tag>
               </span>
             ),
@@ -516,13 +545,19 @@ export const WithdrawForm = () => {
       <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}
+          decimals={USD_DECIMALS}
           onChange={onChangeAmount}
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           slotRight={
-            <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
-              {stringGetter({ key: STRING_KEYS.MAX })}
-            </$FormInputButton>
+            <FormMaxInputToggleButton
+              size={ButtonSize.XSmall}
+              isInputEmpty={withdrawAmount === ''}
+              isLoading={isLoading}
+              onPressedChange={(isPressed: boolean) =>
+                isPressed ? onClickMax() : setWithdrawAmount('')
+              }
+            />
           }
         />
       </$WithDetailsReceipt>
@@ -574,10 +609,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $FormInputButton = styled(Button)`
-  ${formMixins.inputInnerButton}
 `;
 
 const $CheckIcon = styled(Icon)`

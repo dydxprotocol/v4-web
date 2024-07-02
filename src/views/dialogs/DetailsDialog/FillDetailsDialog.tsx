@@ -1,6 +1,6 @@
-import { DateTime } from 'luxon';
 import styled from 'styled-components';
 
+import { DialogProps, FillDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -13,19 +13,11 @@ import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 
 import { getFillDetails } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-type ElementProps = {
-  fillId: string;
-  setIsOpen: (open: boolean) => void;
-};
-
-export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
+export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetailsDialogProps>) => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const {
     asset,
@@ -84,13 +76,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
       {
         key: 'created-at',
         label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
-        value: (
-          <time>
-            {DateTime.fromMillis(createdAtMilliseconds)
-              .setLocale(selectedLocale)
-              .toLocaleString(DateTime.DATETIME_SHORT)}
-          </time>
-        ),
+        value: <Output type={OutputType.DateTime} value={createdAtMilliseconds} />,
       },
     ] satisfies DetailsItem[]
   ).filter((item) => Boolean(item.value));

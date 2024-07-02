@@ -145,7 +145,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
               shouldProcess = false;
               const { contents } = parsedMessage;
 
-              Object.keys(contents.markets ?? {}).forEach((market: any) => {
+              Object.keys(contents.markets ?? {}).forEach((market) => {
                 const status = contents.markets[market].status;
                 if (status === 'INITIALIZING') {
                   contents.markets[market].status = 'ONLINE';

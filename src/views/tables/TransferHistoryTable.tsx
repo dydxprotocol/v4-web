@@ -58,7 +58,7 @@ const getTransferHistoryTableColumnDef = ({
         renderCell: ({ updatedAtMilliseconds }) => (
           <$TimeOutput
             type={OutputType.RelativeTime}
-            relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+            relativeTimeOptions={{ format: 'singleCharacter' }}
             value={updatedAtMilliseconds}
           />
         ),
@@ -158,7 +158,7 @@ export const TransferHistoryTable = ({
           {canAccountTrade ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+              onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
             </Button>

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, ExternalNavStrideDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -18,13 +18,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
-export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
+export const ExternalNavStrideDialog = ({
+  setIsOpen,
+}: DialogProps<ExternalNavStrideDialogProps>) => {
   const stringGetter = useStringGetter();
   const { strideZoneApp, accountExportLearnMore } = useURLConfigs();
   const dispatch = useAppDispatch();
@@ -33,9 +31,8 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
   const openExternalNavDialog = useCallback(() => {
     dispatch(closeDialog());
     dispatch(
-      openDialog({
-        type: DialogTypes.ExternalLink,
-        dialogProps: {
+      forceOpenDialog(
+        DialogTypes.ExternalLink({
           buttonText: (
             <$Span>
               {stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE })}
@@ -50,10 +47,10 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
               CTA: stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE }),
             },
           }),
-        },
-      })
+        })
+      )
     );
-  }, [dispatch, stringGetter]);
+  }, [dispatch, strideZoneApp, stringGetter]);
 
   return (
     <Dialog

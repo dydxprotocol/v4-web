@@ -113,13 +113,12 @@ export const useWithdrawalInfo = ({
     ) {
       dispatch(closeDialog());
       dispatch(
-        openDialog({
-          type: DialogTypes.WithdrawalGated,
-          dialogProps: {
+        openDialog(
+          DialogTypes.WithdrawalGated({
             transferType,
             estimatedUnblockTime: withdrawalAndTransferGatingStatusValue.estimatedUnblockTime,
-          },
-        })
+          })
+        )
       );
     }
   }, [transferType, withdrawalAndTransferGatingStatusValue.isGated, withdrawalSafetyEnabled]);

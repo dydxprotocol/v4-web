@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import {
   AddressConnectorIcon,
+  AppleIcon,
   ArrowIcon,
   Bar3Icon,
   BellIcon,
@@ -13,7 +14,6 @@ import {
   CaretIcon,
   CautionCircleIcon,
   CautionCircleStrokeIcon,
-  ChaosLabsIcon,
   ChatIcon,
   CheckCircleIcon,
   CheckIcon,
@@ -29,6 +29,7 @@ import {
   DepositIcon,
   DepthChartIcon,
   DiscordIcon,
+  DownloadIcon,
   EtherscanIcon,
   ExportKeysIcon,
   FeedbackIcon,
@@ -36,6 +37,7 @@ import {
   FundingChartIcon,
   GearIcon,
   GiftboxIcon,
+  GooglePlayIcon,
   GovernanceIcon,
   HelpCircleIcon,
   HideIcon,
@@ -44,7 +46,6 @@ import {
   LinkOutIcon,
   ListIcon,
   LockIcon,
-  LogoShortIcon,
   MenuIcon,
   MigrateIcon,
   MintscanIcon,
@@ -70,6 +71,7 @@ import {
   SendIcon,
   ShareIcon,
   ShowIcon,
+  SocialXIcon,
   StarIcon,
   SunIcon,
   TerminalIcon,
@@ -84,9 +86,12 @@ import {
   WhitepaperIcon,
   WithdrawIcon,
 } from '@/icons';
+import { ChaosLabsIcon } from '@/icons/chaos-labs';
+import { LogoShortIcon } from '@/icons/logo-short';
 
 export enum IconName {
   AddressConnector = 'AddressConnector',
+  Apple = 'Apple',
   Arrow = 'Arrow',
   Bar3 = 'Bar3',
   Bell = 'Bell',
@@ -119,6 +124,7 @@ export enum IconName {
   FundingChart = 'FundingChart',
   Gear = 'Gear',
   Giftbox = 'Giftbox',
+  GooglePlay = 'GooglePlay',
   Governance = 'Governance',
   HelpCircle = 'HelpCircle',
   Hide = 'Hide',
@@ -167,10 +173,13 @@ export enum IconName {
   Website = 'Website',
   Whitepaper = 'Whitepaper',
   Withdraw = 'Withdraw',
+  Download = 'Download',
+  SocialX = 'SocialX',
 }
 
 const icons = {
   [IconName.AddressConnector]: AddressConnectorIcon,
+  [IconName.Apple]: AppleIcon,
   [IconName.Arrow]: ArrowIcon,
   [IconName.Bar3]: Bar3Icon,
   [IconName.Bell]: BellIcon,
@@ -203,6 +212,7 @@ const icons = {
   [IconName.FundingChart]: FundingChartIcon,
   [IconName.Gear]: GearIcon,
   [IconName.Giftbox]: GiftboxIcon,
+  [IconName.GooglePlay]: GooglePlayIcon,
   [IconName.Governance]: GovernanceIcon,
   [IconName.HelpCircle]: HelpCircleIcon,
   [IconName.Hide]: HideIcon,
@@ -250,6 +260,8 @@ const icons = {
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
+  [IconName.Download]: DownloadIcon,
+  [IconName.SocialX]: SocialXIcon,
 } as Record<IconName, ElementType>;
 
 type ElementProps = {

@@ -115,6 +115,7 @@ enum ExchangeName {
   Kucoin = 'Kucoin',
   Mexc = 'Mexc',
   Okx = 'Okx',
+  Raydium = 'Raydium',
 }
 
 interface PrometheusTimeSeries {
@@ -270,6 +271,17 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     },
     slinkyProviderName: 'okx_ws',
   },
+  [ExchangeName.Raydium]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'Raydium',
+  },
 };
 
 enum ValidationError {
@@ -298,7 +310,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
-      (!/usd$/i.test(exchange.ticker) && exchange.adjustByMarket === undefined) ||
+      (exchange.exchangeName !== ExchangeName.Raydium &&
+        !/usd$|usdc$/i.test(exchange.ticker) &&
+        exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
     ) {
       throw new Error(
@@ -309,7 +323,12 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
     if (exchange.exchangeName === ExchangeName.Bybit) {
-      return; // exit the current iteration of the loop.
+      continue; // exit the current iteration of the loop.
+    }
+
+    // TODO: Skip Raydium since ticker is idiosyncratic
+    if (exchange.exchangeName === ExchangeName.Raydium) {
+      continue; // exit the current iteration of the loop.
     }
 
     // Query exchange tickers if not yet.
@@ -402,7 +421,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1;
+      const proposalId: number = i + j + 1; 
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -490,7 +509,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
-  await sleep(300 * 1000);
+  await sleep(400 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
@@ -673,6 +692,7 @@ function validateParamsSchema(proposal: Proposal): void {
             exchangeName: { type: 'string' },
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
+            invert: {type: 'boolean', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
@@ -732,10 +752,96 @@ async function retry<T>(
   }
 }
 
+// getMarketsToValidate finds markets that are either added or modified.
+function getMarketsToValidate(otherMarketsContent: string): Set<string> {
+  const diffFile = process.env.DIFF;
+  if (!diffFile) {
+    throw new Error('Diff file does not exist');
+  }
+
+  // Get added/modified line numbers.
+  const diffContent = readFileSync(diffFile, 'utf8');
+  const diffLines = diffContent.split('\n');
+  const changedLines: number[] = [];
+  let currentLine = 0;
+  diffLines.forEach(line => {
+    if (line.startsWith('@@')) {
+      const match = line.match(/@@ \-(\d+),\d+ \+(\d+),\d+ @@/);
+      if (match) {
+        currentLine = parseInt(match[2], 10) - 1;
+      }
+    } else if (line.startsWith('+') && !line.startsWith('+++')) {
+      currentLine += 1; 
+      changedLines.push(currentLine);
+    } else if (!line.startsWith('-')) {
+      currentLine += 1;
+    }
+  });
+
+  // Get all added/modified markets.
+  const marketsToValidate = new Set<string>();
+  const lines = otherMarketsContent.split('\n');
+  const findMarket = (lineNumber: number, lines: string[]) => {
+    for (let i = lineNumber - 1; i >= 0; i--) {
+      const line = lines[i].trim();
+      const match = line.match(/"([A-Z]+)": \{/);
+      if (match) {
+        return match[1];
+      }
+    }
+    return null;
+  };
+  changedLines.forEach(line => {
+    const market = findMarket(line, lines);
+    if (market) {
+      marketsToValidate.add(market);
+    }
+  });
+  if (marketsToValidate.size === 0) {
+    console.log('No markets to validate');
+  }
+
+  return marketsToValidate;
+}
+function getAllMarketsToValidate(otherMarketsContent: string): Set<string> {
+  // Create a set to store all markets
+  const marketsToValidate = new Set<string>();
+
+  // Split the content by lines
+  const lines = otherMarketsContent.split('\n');
+
+  // Regex to find market lines
+  const marketRegex = /"([A-Z]+)": \{/;
+
+  // Iterate over each line to find all markets
+  lines.forEach(line => {
+    const match = line.trim().match(marketRegex);
+    if (match) {
+      marketsToValidate.add(match[1]);
+    }
+  });
+
+  // Log a message if no markets were found
+  if (marketsToValidate.size === 0) {
+    console.log('No markets to validate');
+  }
+
+  return marketsToValidate;
+}
+
+
 async function main(): Promise<void> {
-  // Read proposals from json file.
+  // Get markets to validate.
   const fileContent = readFileSync(PATH_TO_PROPOSALS, 'utf8');
-  const proposals: Proposal[] = Object.values(JSON.parse(fileContent));
+  const marketsToValidate = getMarketsToValidate(fileContent);
+  console.log("\nValidating markets: ", marketsToValidate);
+  if (marketsToValidate.size === 0) {
+    return;
+  }
+
+  // Extract proposals.
+  const allMarkets = JSON.parse(fileContent)
+  const proposals: Proposal[] = Array.from(marketsToValidate).map(market => allMarkets[market]);
 
   // Validate JSON schema.
   console.log('Validating JSON schema of params...\n');
@@ -753,6 +859,8 @@ async function main(): Promise<void> {
   // Validate proposals against localnet.
   console.log('\nTesting proposals against localnet...\n');
   await validateAgainstLocalnet(proposals);
+
+  console.log(`\nValidated ${proposals.length} markets. See log for specific names.`);
 }
 
 main()

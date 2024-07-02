@@ -10,8 +10,10 @@ interface EndpointsConfig {
   }[];
   validators: string[];
   '0xsquid': string;
+  skip: string;
   nobleValidator: string;
   faucet?: string;
+  stakingAPR?: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -22,7 +24,9 @@ export const useEndpointsConfig = () => {
     indexer: endpointsConfig.indexers[0], // assume there's only one option for indexer endpoints
     validators: endpointsConfig.validators,
     '0xsquid': endpointsConfig['0xsquid'],
+    skip: endpointsConfig.skip,
     nobleValidator: endpointsConfig.nobleValidator,
     faucet: endpointsConfig.faucet,
+    stakingAPR: endpointsConfig.stakingAPR,
   };
 };

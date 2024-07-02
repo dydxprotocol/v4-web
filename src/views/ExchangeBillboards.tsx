@@ -4,6 +4,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -14,7 +15,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { SparklineChart } from '@/components/visx/SparklineChart';
 
 type ExchangeBillboardsProps = {
   className?: string;
@@ -22,11 +22,11 @@ type ExchangeBillboardsProps = {
 
 export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
   const stringGetter = useStringGetter();
+  const { isStakingEnabled } = useEnvFeatures();
   const { chainTokenLabel } = useTokenConfigs();
 
   const {
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
-    feesEarnedChart,
   } = usePerpetualMarketsStats();
   return (
     <$MarketBillboardsWrapper>
@@ -53,39 +53,19 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
           type: OutputType.Fiat,
-          chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
-          link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
-          slotLeft: '~',
+          link: isStakingEnabled
+            ? `${chainTokenLabel}`
+            : `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
         },
-      ].map(
-        ({
-          key,
-          labelKey,
-          tagKey,
-          value,
-          fractionDigits,
-          type,
-          chartData,
-          link,
-          linkLabelKey,
-          slotLeft,
-        }) => (
-          <$BillboardContainer key={key}>
-            <$BillboardStat>
-              <$BillboardTitle>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label>{stringGetter({ key: labelKey })}</label>
-                <Tag>{stringGetter({ key: tagKey })}</Tag>
-              </$BillboardTitle>
-              <$Output
-                useGrouping
-                withBaseFont
-                fractionDigits={fractionDigits}
-                type={type}
-                value={value}
-                slotLeft={slotLeft}
-              />
+      ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
+        <$BillboardContainer key={key}>
+          <$BillboardStat>
+            <$BillboardTitle>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label>{stringGetter({ key: labelKey })}</label>
+              <Tag>{stringGetter({ key: tagKey })}</Tag>
+
               {link && linkLabelKey ? (
                 <$BillboardLink
                   href={link}
@@ -96,29 +76,24 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                   {stringGetter({ key: linkLabelKey })}
                 </$BillboardLink>
               ) : null}
-            </$BillboardStat>
-            {chartData ? (
-              <$BillboardChart>
-                <SparklineChart
-                  data={chartData}
-                  xAccessor={(datum) => datum.x}
-                  yAccessor={(datum) => datum.y}
-                  positive
-                />
-              </$BillboardChart>
-            ) : (
-              false
-            )}
-          </$BillboardContainer>
-        )
-      )}
+            </$BillboardTitle>
+            <$Output
+              useGrouping
+              withBaseFont
+              fractionDigits={fractionDigits}
+              type={type}
+              value={value}
+            />
+          </$BillboardStat>
+        </$BillboardContainer>
+      ))}
     </$MarketBillboardsWrapper>
   );
 };
 
 const $MarketBillboardsWrapper = styled.div`
   ${layoutMixins.column}
-  gap: 1rem;
+  gap: 0.5rem;
 `;
 const $BillboardContainer = styled.div`
   ${layoutMixins.row}
@@ -126,18 +101,15 @@ const $BillboardContainer = styled.div`
   justify-content: space-between;
 
   background-color: var(--color-layer-3);
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   border-radius: 0.625rem;
-`;
-const $BillboardChart = styled.div`
-  width: 130px;
-  height: 40px;
 `;
 const $BillboardLink = styled(Button)`
   --button-textColor: var(--color-accent);
   --button-height: unset;
   --button-padding: 0;
   justify-content: flex-start;
+  margin-left: auto;
 `;
 const $BillboardTitle = styled.div`
   ${layoutMixins.row}
@@ -147,11 +119,11 @@ const $BillboardTitle = styled.div`
 const $BillboardStat = styled.div`
   ${layoutMixins.column}
 
-  gap: 0.5rem;
+  flex: 1;
 
   label {
     color: var(--color-text-0);
-    font: var(--font-base-medium);
+    font: var(--font-small-medium);
   }
 
   output {

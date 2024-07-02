@@ -9,7 +9,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isDev, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import {
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
@@ -113,9 +113,8 @@ export const NewMarketSelectionStep = ({
         return false;
       }
 
-      // Disable Isolated markets if the user is not on Staging or Local deployment
       if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-        return isDev && exchangeConfigJson.length > 0;
+        return exchangeConfigJson.length > 0;
       }
 
       if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
@@ -271,10 +270,13 @@ export const NewMarketSelectionStep = ({
                     size={ButtonSize.Small}
                     onClick={() =>
                       dispatch(
-                        openDialog({
-                          type: DialogTypes.NewMarketMessageDetails,
-                          dialogProps: { assetData: assetToAdd, clobPairId, liquidityTier },
-                        })
+                        openDialog(
+                          DialogTypes.NewMarketMessageDetails({
+                            assetData: assetToAdd,
+                            clobPairId,
+                            liquidityTier,
+                          })
+                        )
                       )
                     }
                   >

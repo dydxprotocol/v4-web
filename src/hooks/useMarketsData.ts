@@ -11,7 +11,7 @@ import {
 
 import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
+import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
@@ -43,6 +43,12 @@ const filterFunctions = {
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
+  [MarketFilters.ENT]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('ENT');
+  },
+  [MarketFilters.RWA]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('RWA');
+  },
 };
 
 export const useMarketsData = (
@@ -54,6 +60,7 @@ export const useMarketsData = (
   marketFilters: MarketFilters[];
 } => {
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allPerpetualClobIds = orEmptyObj(useAppSelector(getPerpetualMarketsClobIds, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
@@ -65,20 +72,7 @@ export const useMarketsData = (
         const isNew = Boolean(
           sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
         );
-
-        /**
-         * There is no date in the services to determine when it was listed, but we can calculate it approximately.
-         * Keeping in mind that the `/sparklines` service using the period `SEVEN_DAYS` as a parameter,
-         * returns a maximum of 6 entries for each day with a timeframe of 4 hours.
-         * For this it is possible to estimate the listing date as follows:
-         * `Hours elapsed since listing = (Total sparklines entries * 6)`
-         */
-        let listingDate: Date | undefined;
-
-        if (isNew) {
-          listingDate = new Date();
-          listingDate.setHours(listingDate.getHours() - sevenDaySparklineEntries * 4);
-        }
+        const clobPairId = allPerpetualClobIds?.[marketData.id] ?? 0;
 
         return safeAssign(
           {},
@@ -86,7 +80,7 @@ export const useMarketsData = (
             asset: allAssets[marketData.assetId] ?? {},
             tickSizeDecimals: marketData.configs?.tickSizeDecimals,
             isNew,
-            listingDate,
+            clobPairId,
           },
           marketData,
           marketData.perpetual,

@@ -75,9 +75,11 @@ export function bytesToBigInt(u: Uint8Array): bigint {
   return negated ? -abs : abs;
 }
 
-export const getNumberSign = (n: any): NumberSign =>
+export const getNumberSign = (n: BigNumberish | null | undefined): NumberSign =>
   MustBigNumber(n).gt(0)
     ? NumberSign.Positive
     : MustBigNumber(n).lt(0)
       ? NumberSign.Negative
       : NumberSign.Neutral;
+
+export const nullIfZero = (n?: number | string | null) => (MustBigNumber(n).eq(0) ? null : n);

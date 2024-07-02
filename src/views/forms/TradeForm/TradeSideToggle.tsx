@@ -19,13 +19,14 @@ import abacusStateManager from '@/lib/abacus';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
-export const TradeSideToggle = memo(() => {
+export const TradeSideToggle = memo(({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const side = useAppSelector(getTradeSide, shallowEqual);
   const selectedOrderSide = getSelectedOrderSide(side);
 
   return (
     <$ToggleContainer
+      className={className}
       items={[
         { value: OrderSide.BUY, label: stringGetter({ key: STRING_KEYS.BUY }) },
         { value: OrderSide.SELL, label: stringGetter({ key: STRING_KEYS.SELL }) },
@@ -35,8 +36,8 @@ export const TradeSideToggle = memo(() => {
         abacusStateManager.setTradeValue({
           value:
             newSide === OrderSide.BUY
-              ? AbacusOrderSide.buy.rawValue
-              : AbacusOrderSide.sell.rawValue,
+              ? AbacusOrderSide.Buy.rawValue
+              : AbacusOrderSide.Sell.rawValue,
           field: TradeInputField.side,
         });
       }}
