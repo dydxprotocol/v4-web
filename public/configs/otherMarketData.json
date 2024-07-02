@@ -8211,17 +8211,6 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Huobi",
-                    "ticker": "oceanusdt",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "OCEANUSD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Kucoin",
                     "ticker": "OCEAN-USDT",
                     "adjustByMarket": "USDT-USD",
