@@ -12,6 +12,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
@@ -23,6 +25,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
+import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions';
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
 export const Overview = () => {
@@ -35,6 +38,19 @@ export const Overview = () => {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
+
+  const handleViewVault = useCallback(
+    (vaultId: string) => {
+      navigate(`${AppRoute.Vaults}/${vaultId}`, {
+        state: { from: AppRoute.Portfolio },
+      });
+    },
+    [navigate]
+  );
+  const handleViewVaults = useCallback(
+    () => navigate(AppRoute.Vaults, { state: { from: AppRoute.Portfolio } }),
+    [navigate]
+  );
 
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
@@ -90,6 +106,24 @@ export const Overview = () => {
           onViewOrders={handleViewUnopenedIsolatedOrders}
         />
       </DetachedSection>
+      <DetachedSection>
+        <$MaybeVaultPositionsPanel
+          header={
+            <ContentSectionHeader
+              title={stringGetter({ key: STRING_KEYS.VAULTS })}
+              slotRight={
+                isTablet && (
+                  <$Link onClick={handleViewVaults} isAccent>
+                    {stringGetter({ key: STRING_KEYS.VIEW_ALL_VAULTS })}{' '}
+                    <Icon iconName={IconName.Arrow} />
+                  </$Link>
+                )
+              }
+            />
+          }
+          onViewVault={handleViewVault}
+        />
+      </DetachedSection>
     </div>
   );
 };
@@ -105,4 +139,17 @@ const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositio
   > div {
     padding-left: 1rem;
   }
+`;
+
+const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  > div {
+    padding-left: 1rem;
+  }
+`;
+
+const $Link = styled(Link)`
+  font: var(--font-small-book);
 `;

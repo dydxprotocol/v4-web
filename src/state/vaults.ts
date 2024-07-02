@@ -35,7 +35,9 @@ const initialState: VaultsState = {
       thirtyDayReturnPercent: 0.1474,
     },
   },
-  userVaults: {},
+  userVaults: {
+    'PEPE-USD': { userBalance: 10 },
+  },
 };
 
 export const vaultsSlice = createSlice({
