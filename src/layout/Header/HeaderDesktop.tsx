@@ -24,6 +24,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
+import { Tag } from '@/components/Tag';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -33,6 +34,8 @@ import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
+
+import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -44,6 +47,7 @@ export const HeaderDesktop = () => {
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
   const showChainTokenPage = complianceState === ComplianceStates.FULL_ACCESS || isStakingEnabled;
+  const showVaults = testFlags.enableVaults;
 
   const navItems = [
     {
@@ -63,6 +67,16 @@ export const HeaderDesktop = () => {
           value: 'MARKETS',
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
+        },
+        showVaults && {
+          value: 'VAULTS',
+          label: (
+            <>
+              {stringGetter({ key: STRING_KEYS.VAULTS })}{' '}
+              <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+            </>
+          ),
+          href: AppRoute.Vaults,
         },
         showChainTokenPage && {
           value: chainTokenLabel,
@@ -265,4 +279,8 @@ const $UnreadIndicator = styled.div`
   height: 0.4375rem;
   border-radius: 50%;
   background-color: var(--color-accent);
+`;
+const $NewTag = styled(Tag)`
+  color: var(--color-accent);
+  background-color: var(--color-accent-faded);
 `;

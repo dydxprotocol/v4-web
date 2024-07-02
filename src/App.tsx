@@ -60,6 +60,8 @@ const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const TokenPage = lazy(() => import('@/pages/token/Token'));
+const VaultsPage = lazy(() => import('@/pages/vaults/Vaults'));
+const VaultPage = lazy(() => import('@/pages/vaults/Vault'));
 
 const queryClient = new QueryClient();
 
@@ -121,6 +123,11 @@ const Content = () => {
 
               <Route element={<GuardedMobileRoute />}>
                 <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
+              </Route>
+
+              <Route path={AppRoute.Vaults}>
+                <Route path=":vault" element={<VaultPage />} />
+                <Route path={AppRoute.Vaults} element={<VaultsPage />} />
               </Route>
 
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
