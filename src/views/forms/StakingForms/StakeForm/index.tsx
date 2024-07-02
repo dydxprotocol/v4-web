@@ -1,16 +1,6 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
-import { debounce } from 'lodash';
-import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
@@ -26,20 +16,15 @@ import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
-import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { FormInput } from '@/components/FormInput';
-import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
-import { Icon, IconName } from '@/components/Icon';
-import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics';
@@ -47,7 +32,9 @@ import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
-import { StakeButtonAndReceipt } from './StakeButtonAndReceipt';
+import { StakeFormInputContents } from './StakeFormInputContents';
+import { StakeFormPreviewContents } from './StakeFormPreviewContents';
+import { ValidatorDropdown } from './ValidatorDropdown';
 
 type ElementProps = {
   currentStep: StakeFormSteps;
@@ -66,11 +53,11 @@ export const StakeForm = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-
   const { delegate, getDelegateFee } = useSubaccount();
   const { nativeTokenBalance: balance, nativeStakingBalance } = useAccountBalance();
   const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
+  const { mintscanValidatorsLearnMore } = useURLConfigs();
 
   // Form states
   const [error, setError] = useState<StakeButtonAlert>();
@@ -79,14 +66,13 @@ export const StakeForm = ({
   const [isLoading, setIsLoading] = useState(false);
 
   // BN
-  const newBalanceBN = balance.minus(amountBN ?? 0);
   const maxAmountBN = MustBigNumber(Math.max(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX, 0));
+  const newStakedBalanceBN = amountBN
+    ? MustBigNumber(nativeStakingBalance).plus(amountBN)
+    : undefined;
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
   const isAmountEnoughForGas = balance.gte(AMOUNT_RESERVED_FOR_GAS_DYDX);
-  const newStakedBalance = amountBN
-    ? MustBigNumber(nativeStakingBalance).plus(amountBN)
-    : undefined;
 
   useEffect(() => {
     // Initalize to default validator once on mount
@@ -133,24 +119,6 @@ export const StakeForm = ({
     }
   }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
 
-  const debouncedChangeTrack = useMemo(
-    () =>
-      debounce((amount?: number, validator?: string) => {
-        track(
-          AnalyticsEvents.StakeInput({
-            amount,
-            validatorAddress: validator,
-          })
-        );
-      }, 1000),
-    []
-  );
-
-  const onChangeAmount = (value?: BigNumber) => {
-    setAmountBN(value);
-    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
-  };
-
   const onStake = useCallback(async () => {
     if (!isAmountValid || !selectedValidator) {
       return;
@@ -177,28 +145,44 @@ export const StakeForm = ({
     }
   }, [isAmountValid, selectedValidator, defaultValidator, amountBN, delegate, onDone]);
 
-  const amountDetailItems = [
+  const validatorSelectorDetailItem = {
+    key: 'validator',
+    label: (
+      <WithTooltip
+        tooltipString={stringGetter({
+          key: STRING_KEYS.VALIDATORS_INFO_LINK,
+          params: {
+            MINTSCAN_LINK: (
+              <$Link href={mintscanValidatorsLearnMore}>
+                {stringGetter({ key: STRING_KEYS.MINTSCAN })}
+              </$Link>
+            ),
+          },
+        })}
+      >
+        {stringGetter({
+          key: STRING_KEYS.VALIDATOR,
+        })}
+      </WithTooltip>
+    ),
+    value: (
+      <ValidatorDropdown
+        selectedValidator={selectedValidator}
+        setSelectedValidator={setSelectedValidator}
+      />
+    ),
+  };
+
+  const detailItems = [
     {
-      key: 'amount',
+      key: 'fees',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
+          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
         </span>
       ),
-      value: (
-        <DiffOutput
-          type={OutputType.Asset}
-          value={balance}
-          sign={NumberSign.Negative}
-          newValue={newBalanceBN}
-          hasInvalidNewValue={newBalanceBN.isNegative()}
-          withDiff={amountBN && balance && !amountBN.isNaN()}
-        />
-      ),
+      value: <Output type={OutputType.Asset} value={fee} />,
     },
-  ];
-
-  const previewItems = [
     {
       key: 'balance',
       label: (
@@ -211,23 +195,14 @@ export const StakeForm = ({
           type={OutputType.Asset}
           value={nativeStakingBalance}
           sign={NumberSign.Positive}
-          newValue={newStakedBalance}
-          hasInvalidNewValue={MustBigNumber(newStakedBalance).isNegative()}
+          newValue={newStakedBalanceBN}
+          hasInvalidNewValue={newStakedBalanceBN?.isNegative()}
           withDiff={
-            newStakedBalance !== undefined &&
-            !MustBigNumber(nativeStakingBalance).eq(newStakedBalance ?? 0)
+            newStakedBalanceBN !== undefined &&
+            !MustBigNumber(nativeStakingBalance).eq(newStakedBalanceBN ?? 0)
           }
         />
       ),
-    },
-    {
-      key: 'fees',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
-        </span>
-      ),
-      value: <Output type={OutputType.Asset} value={fee} />,
     },
   ];
 
@@ -246,143 +221,37 @@ export const StakeForm = ({
         }
       }}
     >
-      {currentStep === StakeFormSteps.PreviewOrder && (
-        <>
-          <$Rows>
-            <$Row>
-              <$Label>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })} </$Label>
-              <$Label>{stringGetter({ key: STRING_KEYS.VALIDATOR })}</$Label>
-            </$Row>
-            <$Row>
-              <$StakeBox>
-                <$AssetIcon symbol={chainTokenLabel} />
-                <Output
-                  value={amountBN ? amountBN.toNumber() : undefined}
-                  type={OutputType.Asset}
-                  tag={chainTokenLabel}
-                />
-              </$StakeBox>
-              <$ArrowIcon iconName={IconName.FastForward} />
-              <$StakeBox>
-                <$ValidatorIcon
-                  url={selectedValidator?.description?.website}
-                  fallbackText={selectedValidator?.description?.moniker}
-                />
-                {selectedValidator?.description?.moniker}
-              </$StakeBox>
-            </$Row>
-          </$Rows>
-          <$Details items={previewItems} />
-        </>
+      {currentStep === StakeFormSteps.EditInputs && (
+        <StakeFormInputContents
+          detailItems={[validatorSelectorDetailItem].concat(detailItems)}
+          selectedValidator={selectedValidator}
+          stakedAmount={amountBN}
+          maxStakeAmount={maxAmountBN}
+          fee={fee}
+          error={error}
+          isLoading={isLoading}
+          setStakedAmount={setAmountBN}
+        />
       )}
 
-      {currentStep === StakeFormSteps.EditInputs && (
-        <>
-          <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
-            <FormInput
-              id="stakeAmount"
-              label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
-              type={InputType.Number}
-              onChange={({ floatValue }: NumberFormatValues) =>
-                onChangeAmount(floatValue !== undefined ? MustBigNumber(floatValue) : undefined)
-              }
-              value={amountBN ? amountBN.toNumber() : undefined}
-              slotRight={
-                isAmountEnoughForGas && (
-                  <FormMaxInputToggleButton
-                    isInputEmpty={!amountBN}
-                    isLoading={isLoading}
-                    onPressedChange={(isPressed: boolean) =>
-                      isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
-                    }
-                  />
-                )
-              }
-            />
-          </$WithDetailsReceipt>
-          <StakeButtonAndReceipt
-            error={error}
-            fee={fee}
-            isLoading={isLoading}
-            amount={amountBN}
-            selectedValidator={selectedValidator}
-            setSelectedValidator={setSelectedValidator}
-          />
-        </>
+      {currentStep === StakeFormSteps.PreviewOrder && (
+        <StakeFormPreviewContents
+          detailItems={detailItems}
+          selectedValidator={selectedValidator}
+          stakedAmount={amountBN?.toNumber() ?? 0}
+          isLoading={isLoading}
+          setCurrentStep={setCurrentStep}
+        />
       )}
     </$Form>
   );
 };
 
 const $Form = styled.form`
-  ${formMixins.transfersForm}
-  --color-text-form: var(--color-text-0);
-  --withReceipt-backgroundColor: var(--color-layer-2);
+  ${formMixins.stakingForm}
 `;
 
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  color: var(--color-text-form);
-`;
-
-const $Details = styled(Details)`
-  --details-item-vertical-padding: 0.33rem;
-
-  background-color: var(--withReceipt-backgroundColor);
-  border-radius: 0.5em;
-  font-size: var(--details-item-fontSize, 0.8125em);
-  padding: 0.25rem 0.75rem;
-`;
-
-const $Rows = styled.div`
-  display: grid;
-  gap: 0.5rem;
-`;
-
-const $Row = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
-`;
-
-const $StakeBox = styled.div`
-  --icon-size: 2rem;
-
-  background-color: var(--color-layer-4);
-  border-radius: 0.5em;
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 0.5rem;
-
-  color: var(--color-text-1);
-  font: var(--font-mini-medium);
-`;
-
-const $Label = styled.h3`
-  color: var(--color-text-form);
-  font: var(--font-small-medium);
-
-  flex-basis: 50%;
-`;
-
-const $ArrowIcon = styled(Icon)`
-  color: var(--color-text-form);
-
-  width: 2.25rem;
-  height: 2.25rem;
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: var(--icon-size);
-`;
-
-const $ValidatorIcon = styled(ValidatorFaviconIcon)`
-  height: var(--icon-size);
-  width: var(--icon-size);
+const $Link = styled(Link)`
+  display: inline;
+  text-decoration: underline;
 `;

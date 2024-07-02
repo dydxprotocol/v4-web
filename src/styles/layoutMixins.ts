@@ -886,6 +886,13 @@ export const layoutMixins = {
     min-width: 1px;
   `,
 
+  textLineClamp: css`
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+  `,
+
   textOverflow: css`
     display: inline-block;
     overflow-x: auto;

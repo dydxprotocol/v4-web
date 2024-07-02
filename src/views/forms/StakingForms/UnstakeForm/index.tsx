@@ -1,15 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from 'react';
 
-import { debounce } from 'lodash';
-import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import { StakeFormSteps } from '@/constants/stakingForms';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStakingValidator } from '@/hooks/useStakingValidator';
@@ -18,35 +24,40 @@ import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
-import { FormInput } from '@/components/FormInput';
-import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
-import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { UnstakeButtonAndReceipt } from '@/views/forms/StakingForms/UnstakeForm/UnstakeButtonAndReceipt';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
-import { ValidatorName } from '@/views/forms/StakingForms/shared/ValidatorName';
 
 import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
-type UnstakeFormProps = {
+import { UnstakeFormInputContents } from './UnstakeFormInputContents';
+import { UnstakeFormPreviewContents } from './UnstakeFormPreviewContents';
+
+type ElementProps = {
+  currentStep: StakeFormSteps;
+  setCurrentStep: Dispatch<SetStateAction<StakeFormSteps>>;
   onDone?: () => void;
+};
+
+type StyleProps = {
   className?: string;
 };
 
-export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
+export const UnstakeForm = ({
+  currentStep,
+  setCurrentStep,
+  onDone,
+  className,
+}: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const { undelegate, getUndelegateFee } = useSubaccount();
-  const { nativeStakingBalance } = useAccountBalance();
-  const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
+  const { nativeTokenBalance } = useAccountBalance();
+  const { currentDelegations } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
@@ -73,13 +84,14 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const totalAmount = useMemo(() => {
     return Object.values(amounts).reduce((acc: number, value) => acc + (value ?? 0), 0);
   }, [amounts]);
+  const newStakedBalance = totalAmount
+    ? MustBigNumber(nativeTokenBalance).plus(totalAmount)
+    : undefined;
 
   const isTotalAmountValid = totalAmount && totalAmount > 0;
   const isAmountValid = isEachAmountValid && isTotalAmountValid;
   const allAmountsEmpty =
     !amounts || Object.values(amounts).filter((amount) => amount !== undefined).length === 0;
-  const showClearButton =
-    amounts && Object.values(amounts).filter((amount) => amount !== undefined).length > 0;
 
   useEffect(() => {
     if (!isAmountValid && !allAmountsEmpty) {
@@ -148,238 +160,84 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     }
   }, [isAmountValid, amounts, undelegate, onDone, totalAmount]);
 
-  const debouncedChangeTrack = useMemo(
-    () =>
-      debounce((amount: number | undefined, validator: string) => {
-        track(
-          AnalyticsEvents.UnstakeInput({
-            amount,
-            validatorAddress: validator,
-          })
-        );
-      }, 1000),
-    []
-  );
-
-  const onChangeAmount = useCallback((validator: string, value: number | undefined) => {
-    setAmounts((a) => ({ ...a, [validator]: value }));
-    debouncedChangeTrack(value, validator);
-  }, []);
-
-  const setAllUnstakeAmountsToMax = useCallback(() => {
-    currentDelegations?.forEach((delegation) => {
-      onChangeAmount(delegation.validator, MustBigNumber(delegation.amount).toNumber());
-    });
-  }, [currentDelegations, onChangeAmount]);
-
-  const clearAllUnstakeAmounts = useCallback(() => {
-    currentDelegations?.forEach((delegation) => {
-      onChangeAmount(delegation.validator, undefined);
-    });
-  }, [currentDelegations, onChangeAmount]);
-
-  let description = stringGetter({
-    key: STRING_KEYS.CURRENTLY_STAKING,
-    params: {
-      AMOUNT: (
-        <$StakedAmount>
-          {nativeStakingBalance}
-          <Tag>{chainTokenLabel}</Tag>
-        </$StakedAmount>
+  const transferDetailItems = [
+    {
+      key: 'balance',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
+        </span>
+      ),
+      value: (
+        <DiffOutput
+          type={OutputType.Asset}
+          value={nativeTokenBalance}
+          sign={NumberSign.Positive}
+          newValue={newStakedBalance}
+          hasInvalidNewValue={MustBigNumber(newStakedBalance).isNegative()}
+          withDiff={
+            newStakedBalance !== undefined &&
+            !MustBigNumber(nativeTokenBalance).eq(newStakedBalance ?? 0)
+          }
+        />
       ),
     },
-  });
-  if (currentDelegations?.length === 1) {
-    description = stringGetter({
-      key: STRING_KEYS.CURRENTLY_STAKING_WITH,
-      params: {
-        VALIDATOR: (
-          <ValidatorName validator={stakingValidators?.[currentDelegations[0].validator]?.[0]} />
-        ),
-      },
-    });
-  }
-
-  if (!stakingValidators) {
-    return null;
-  }
+    {
+      key: 'duration',
+      label: <span>{stringGetter({ key: STRING_KEYS.UNSTAKING_PERIOD })}</span>,
+      value: (
+        <Output type={OutputType.Text} value={`30 ${stringGetter({ key: STRING_KEYS.DAYS })}`} />
+      ),
+    },
+    {
+      key: 'fees',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
+        </span>
+      ),
+      value: <Output type={OutputType.Asset} value={fee} />,
+    },
+  ];
 
   return (
     <$Form
       className={className}
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        onUnstake();
+        switch (currentStep) {
+          case StakeFormSteps.EditInputs:
+            setCurrentStep(StakeFormSteps.PreviewOrder);
+            break;
+          case StakeFormSteps.PreviewOrder:
+          default:
+            onUnstake();
+        }
       }}
     >
-      <$Description>{description}</$Description>
-      {currentDelegations?.length === 1 && (
-        <$WithDetailsReceipt
-          side="bottom"
-          detailItems={[
-            {
-              key: 'amount',
-              label: (
-                <span>
-                  {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
-                </span>
-              ),
-              value: (
-                <DiffOutput
-                  type={OutputType.Asset}
-                  value={parseFloat(currentDelegations[0].amount)}
-                  sign={NumberSign.Negative}
-                  newValue={
-                    parseFloat(currentDelegations[0].amount) -
-                    (amounts[currentDelegations[0].validator] ?? 0)
-                  }
-                  hasInvalidNewValue={
-                    (amounts[currentDelegations[0].validator] ?? 0) >
-                    parseFloat(currentDelegations[0].amount)
-                  }
-                  withDiff={Boolean(
-                    (amounts[currentDelegations[0].validator] ?? 0) &&
-                      parseFloat(currentDelegations[0].amount)
-                  )}
-                />
-              ),
-            },
-          ]}
-        >
-          <FormInput
-            id="unstakeAmount"
-            label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_UNSTAKE })}
-            type={InputType.Number}
-            onChange={({ floatValue }: NumberFormatValues) =>
-              onChangeAmount(currentDelegations[0].validator, floatValue)
-            }
-            value={amounts[currentDelegations[0].validator] ?? undefined}
-            slotRight={
-              <FormMaxInputToggleButton
-                isInputEmpty={!amounts[currentDelegations[0].validator]}
-                isLoading={isLoading}
-                onPressedChange={(isPressed: boolean) =>
-                  isPressed
-                    ? onChangeAmount(
-                        currentDelegations[0].validator,
-                        parseFloat(currentDelegations[0].amount)
-                      )
-                    : onChangeAmount(currentDelegations[0].validator, undefined)
-                }
-              />
-            }
-          />
-        </$WithDetailsReceipt>
-      )}
-
-      {(currentDelegations?.length ?? 0) > 1 && (
-        <$GridLayout>
-          <div>
-            {stringGetter({
-              key: STRING_KEYS.VALIDATOR,
-            })}
-          </div>
-          <$SpacedRow>
-            {stringGetter({
-              key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
-            })}
-            {showClearButton ? (
-              <$Button onClick={clearAllUnstakeAmounts} action={ButtonAction.Reset}>
-                {stringGetter({ key: STRING_KEYS.CLEAR })}
-              </$Button>
-            ) : (
-              <$AllButton onClick={setAllUnstakeAmountsToMax}>
-                {stringGetter({ key: STRING_KEYS.ALL })}
-              </$AllButton>
-            )}
-          </$SpacedRow>
-          {currentDelegations?.map((delegation) => {
-            const balance = MustBigNumber(delegation.amount).toNumber();
-            return (
-              <React.Fragment key={delegation.validator}>
-                <ValidatorName validator={stakingValidators[delegation.validator]?.[0]} />
-                <FormInput
-                  key={delegation.validator}
-                  type={InputType.Number}
-                  onChange={({ floatValue }: NumberFormatValues) =>
-                    onChangeAmount(delegation.validator, floatValue)
-                  }
-                  value={amounts[delegation.validator] ?? undefined}
-                  slotRight={
-                    <FormMaxInputToggleButton
-                      isInputEmpty={!amounts[delegation.validator]}
-                      isLoading={isLoading}
-                      onPressedChange={(isPressed: boolean) =>
-                        isPressed
-                          ? onChangeAmount(delegation.validator, balance)
-                          : onChangeAmount(delegation.validator, undefined)
-                      }
-                    />
-                  }
-                />
-              </React.Fragment>
-            );
-          })}
-        </$GridLayout>
-      )}
-
-      <$Footer>
-        <UnstakeButtonAndReceipt
+      {currentStep === StakeFormSteps.EditInputs && (
+        <UnstakeFormInputContents
+          amounts={amounts}
+          detailItems={transferDetailItems}
+          fee={fee}
           error={error}
-          fee={fee ?? undefined}
-          isLoading={isLoading || Boolean(isAmountValid && !fee)}
-          amount={totalAmount}
-          allAmountsEmpty={allAmountsEmpty}
+          isLoading={isLoading}
+          setUnstakedAmounts={setAmounts}
         />
-      </$Footer>
+      )}
+
+      {currentStep === StakeFormSteps.PreviewOrder && (
+        <UnstakeFormPreviewContents
+          amounts={amounts}
+          detailItems={transferDetailItems}
+          isLoading={isLoading}
+          setCurrentStep={setCurrentStep}
+        />
+      )}
     </$Form>
   );
 };
 
 const $Form = styled.form`
-  ${formMixins.transfersForm}
-`;
-
-const $Description = styled.div`
-  ${layoutMixins.row}
-  gap: 0.25rem;
-
-  color: var(--color-text-0);
-`;
-
-const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-
-  display: grid;
-  gap: var(--form-input-gap);
-`;
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $StakedAmount = styled.span`
-  ${layoutMixins.inlineRow}
-  color: var(--color-text-1);
-`;
-
-const $SpacedRow = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $Button = styled(Button)`
-  --button-border: none;
-  --button-padding: 0;
-  --button-height: auto;
-  --button-hover-filter: none;
-`;
-
-const $AllButton = styled($Button)`
-  --button-textColor: var(--color-accent);
+  ${formMixins.stakingForm}
 `;
