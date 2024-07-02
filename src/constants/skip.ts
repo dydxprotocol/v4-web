@@ -33,3 +33,5 @@ export type SkipStatusResponse = {
   fromChain: SkipTransactionStatus | undefined;
   error: string | undefined;
 };
+
+export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;

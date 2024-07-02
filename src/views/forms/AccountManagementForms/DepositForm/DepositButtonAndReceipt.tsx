@@ -1,5 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -7,9 +8,11 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
+import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -96,9 +99,19 @@ export const DepositButtonAndReceipt = ({
     chain: chainIdStr,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { usdcLabel } = useTokenConfigs();
+  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   const sourceChainName =
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
+
+  const showExchangeRate = typeof summary?.exchangeRate === 'number' || !isSkipEnabled;
+  const showMinDepositAmount = typeof summary?.toAmountMin === 'number' || !isSkipEnabled;
+  const fallbackRouteDuration = stringGetter({
+    key: STRING_KEYS.X_MINUTES_LOWERCASED,
+    params: {
+      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
+    },
+  });
 
   const submitButtonReceipt = [
     {
@@ -112,7 +125,7 @@ export const DepositButtonAndReceipt = ({
         <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />
       ),
     },
-    {
+    !!showMinDepositAmount && {
       key: 'minimum-deposit-amount',
       label: (
         <span>
@@ -128,24 +141,16 @@ export const DepositButtonAndReceipt = ({
       ),
       tooltip: 'minimum-deposit-amount',
     },
-    {
+    !!showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value:
-        typeof summary?.exchangeRate === 'number' ? (
-          <$ExchangeRate>
-            <Output
-              type={OutputType.Asset}
-              value={1}
-              fractionDigits={0}
-              tag={sourceToken?.symbol}
-            />
-            =
-            <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-          </$ExchangeRate>
-        ) : (
-          <Output type={OutputType.Asset} />
-        ),
+      value: (
+        <$ExchangeRate>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
+          =
+          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
+        </$ExchangeRate>
+      ),
     },
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',
@@ -178,7 +183,7 @@ export const DepositButtonAndReceipt = ({
           value={equity}
           newValue={newEquity} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
           sign={NumberSign.Positive}
-          withDiff={equity !== newEquity}
+          withDiff={equity !== newEquity && !!newEquity}
         />
       ),
     },
@@ -228,7 +233,9 @@ export const DepositButtonAndReceipt = ({
                         : Math.round(summary.estimatedRouteDuration / 60),
                   },
                 })
-              : null
+              : isSkipEnabled
+                ? fallbackRouteDuration
+                : null
           }
         />
       ),
