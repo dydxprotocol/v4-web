@@ -94,6 +94,7 @@ export const MarketsCompactTable = ({
           ? {
               columnKey: 'listing',
               allowsSorting: false,
+              label: undefined,
               renderCell: ({ isNew }) => (
                 <$DetailsCell>
                   {isNew && (
@@ -123,7 +124,7 @@ export const MarketsCompactTable = ({
                 </$DetailsCell>
               ),
             },
-      ] as ColumnDef<MarketData>[],
+      ] satisfies ColumnDef<MarketData>[],
     [stringGetter, isTablet]
   );
 

@@ -19,6 +19,7 @@ import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
+import { StatsigProvider } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -59,6 +60,8 @@ const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const TokenPage = lazy(() => import('@/pages/token/Token'));
+const VaultsPage = lazy(() => import('@/pages/vaults/Vaults'));
+const VaultPage = lazy(() => import('@/pages/vaults/Vault'));
 
 const queryClient = new QueryClient();
 
@@ -122,6 +125,11 @@ const Content = () => {
                 <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
               </Route>
 
+              <Route path={AppRoute.Vaults}>
+                <Route path=":vault" element={<VaultPage />} />
+                <Route path={AppRoute.Vaults} element={<VaultsPage />} />
+              </Route>
+
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
@@ -159,6 +167,7 @@ const providers = [
     clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
     config: privyConfig,
   }),
+  wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),

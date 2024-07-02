@@ -140,7 +140,7 @@ const getFillsTableColumnDef = ({
         renderCell: ({ createdAtMilliseconds }) => (
           <$TimeOutput
             type={OutputType.RelativeTime}
-            relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+            relativeTimeOptions={{ format: 'singleCharacter' }}
             value={createdAtMilliseconds}
           />
         ),

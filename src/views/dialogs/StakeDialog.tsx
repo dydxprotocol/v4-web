@@ -88,14 +88,14 @@ const LegalDisclaimer = () => {
         key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
         params: {
           KEPLR_DASHBOARD_LINK: (
-            <$Link withIcon onClick={openKeplrDialog}>
+            <Link withIcon onClick={openKeplrDialog} isInline>
               {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
-            </$Link>
+            </Link>
           ),
           STRIDE_LINK: (
-            <$Link withIcon onClick={openStrideDialog}>
+            <Link withIcon onClick={openStrideDialog} isInline>
               Stride
-            </$Link>
+            </Link>
           ),
         },
       })}
@@ -124,9 +124,4 @@ const $LegalDisclaimer = styled.div`
   text-align: center;
   color: var(--color-text-0);
   font: var(--font-mini-book);
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-text-1);
-  display: inline-flex;
 `;

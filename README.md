@@ -85,6 +85,7 @@ Set environment variables via `.env`.
 - `VITE_TOKEN_MIGRATION_URI` (optional): The URL of the token migration website.
 - `AMPLITUDE_API_KEY` (optional): Amplitude API key for enabling Amplitude; used with `pnpm run build:inject-amplitude`.
 - `AMPLITUDE_SERVER_URL` (optional): Custom Amplitude server URL
+- `HOTJAR_SITE_ID`, `HOTJAR_VERSION` (optional): used for enabling Hotjar tracking; used with `pnpm run build:inject-hotjar`
 - `BUGSNAG_API_KEY` (optional): API key for enabling Bugsnag; used with `pnpm run build:inject-bugsnag`.
 - `IOS_APP_ID` (optional): iOS app ID used for enabling deep linking to the iOS app; used with `pnpm run build:inject-app-deeplinks`.
 - `INTERCOM_APP_ID` (optional): Used for enabling Intercom; utilized with `pnpm run build:inject-intercom`.
@@ -228,8 +229,9 @@ By default, the dev server runs in development mode and the build command runs i
 pnpm run build --mode testnet
 ```
 
-If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our scripts:
-`pnpm run build:inject-amplitude` and `pnpm run build:inject-bugsnag`. You will need to provide your own API keys for these services. In the Environment Variables section, name the variables as `AMPLITUDE_API_KEY` and `BUGSNAG_API_KEY` and provide the respective keys as their values.
+If you wish to incorporate analytics via Amplitude, Hotjar and Bugsnag, you can use our scripts:
+`pnpm run build:inject-amplitude`, `pnpm run build:inject-hotjar` and `pnpm run build:inject-bugsnag`. You will need to provide your own API keys for these services. In the Environment Variables section, name the variables as `AMPLITUDE_API_KEY`, `HOTJAR_SITE_ID`, `HOTJAR_VERSION` and `BUGSNAG_API_KEY` and provide the respective keys as their values.
+To incorporate all three services with a single command use `pnpm run build:inject-analytics`.
 
 If you wish to incorporate smart banner for iOS and/or Android apps, you can use our scripts:
 `pnpm run build:inject-smartbanner`. You will need to provide your own app configurations for these services. In the Environment Variables section, name the variables as `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL` and `SMARTBANNER_APPSTORE_URL` or `SMARTBANNER_GOOGLEPLAY_URL` and provide the respective values.

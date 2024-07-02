@@ -5,14 +5,25 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { MobileTabs } from '@/components/Tabs';
 import { MarketDetails } from '@/views/MarketDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
+import { VaultDetails } from '@/views/VaultDetails';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketHasVault } from '@/state/vaultSelectors';
+
+import { testFlags } from '@/lib/testFlags';
+import { isPresent } from '@/lib/typeUtils';
 
 enum InfoSection {
   Statistics = 'Statistics',
   About = 'About',
+  Vault = 'Vault',
 }
 
 export const MobileBottomPanel = () => {
   const stringGetter = useStringGetter();
+
+  const hasVault = useAppSelector(getCurrentMarketHasVault);
+  const showVaults = testFlags.enableVaults;
 
   return (
     <MobileTabs
@@ -28,7 +39,14 @@ export const MobileBottomPanel = () => {
           label: stringGetter({ key: STRING_KEYS.ABOUT }),
           content: <MarketDetails />,
         },
-      ]}
+        hasVault && showVaults
+          ? {
+              value: InfoSection.Vault,
+              label: stringGetter({ key: STRING_KEYS.LP_VAULT }),
+              content: <VaultDetails />,
+            }
+          : undefined,
+      ].filter(isPresent)}
       withBorders={false}
     />
   );

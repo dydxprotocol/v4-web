@@ -50,11 +50,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
     key: STRING_KEYS.ESTIMATED_APR_DATA_BASED_ON,
     params: {
       PROTOCOL_STAKING_LINK: (
-        <$Link href={protocolStaking} withIcon>
+        <Link href={protocolStaking} withIcon isInline>
           {stringGetter({
             key: STRING_KEYS.PROTOCOL_STAKING,
           })}
-        </$Link>
+        </Link>
       ),
     },
   });
@@ -226,10 +226,4 @@ const $Label = styled.div`
 const $BalanceOutput = styled(Output)`
   font-size: var(--fontSize-large);
   color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  text-decoration: underline;
-
-  ${layoutMixins.inlineRow}
 `;

@@ -16,6 +16,7 @@ import { localizationSlice } from './localization';
 import localizationMiddleware from './localizationMiddleware';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
+import { vaultsSlice } from './vaults';
 
 export const store = configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export const store = configureStore({
     localization: localizationSlice.reducer,
     notifications: notificationsSlice.reducer,
     perpetuals: perpetualsSlice.reducer,
+    vaults: vaultsSlice.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

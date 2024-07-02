@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -18,6 +18,8 @@ type ElementProps = {
 };
 
 type StyleProps = {
+  isInline?: boolean;
+  isAccent?: boolean;
   className?: string;
 };
 
@@ -26,16 +28,21 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     {
       analyticsConfig,
       children,
-      className,
       href,
       onClick,
       withIcon = false,
+      isInline = false,
+      isAccent = false,
+      className,
       ...props
     }: ElementProps & StyleProps,
     ref
   ) => (
     <$A
       ref={ref}
+      isInline={isInline}
+      isAccent={isAccent}
+      withIcon={withIcon}
       className={className}
       href={href}
       onClick={(e: React.MouseEvent) => {
@@ -55,8 +62,8 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     </$A>
   )
 );
-const $A = styled.a<StyleProps>`
-  --link-color: inherit;
+const $A = styled.a<StyleProps & { withIcon: boolean }>`
+  --link-color: var(--color-text-1);
   color: var(--link-color);
 
   ${layoutMixins.spacedRow}
@@ -70,4 +77,21 @@ const $A = styled.a<StyleProps>`
   &:visited {
     color: var(--link-color);
   }
+
+  ${({ isInline, withIcon }) =>
+    isInline && withIcon
+      ? css`
+          ${layoutMixins.inlineRow}
+        `
+      : isInline
+        ? css`
+            display: inline;
+          `
+        : undefined}
+
+  ${({ isAccent }) =>
+    isAccent &&
+    css`
+      --link-color: var(--color-accent);
+    `}
 `;

@@ -24,9 +24,6 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
@@ -34,7 +31,6 @@ import { MarketFilter } from './MarketFilter';
 const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
@@ -88,7 +84,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.volume24H,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
           renderCell: ({ volume24H }) => (
-            <$Output type={OutputType.CompactFiat} value={volume24H} locale={selectedLocale} />
+            <$Output type={OutputType.CompactFiat} value={volume24H} />
           ),
         },
         {
@@ -96,15 +92,11 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.openInterestUSDC,
           label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
           renderCell: (row) => (
-            <$Output
-              type={OutputType.CompactFiat}
-              value={row.openInterestUSDC}
-              locale={selectedLocale}
-            />
+            <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
           ),
         },
       ] satisfies ColumnDef<MarketData>[],
-    [stringGetter, selectedLocale]
+    [stringGetter]
   );
 
   return (

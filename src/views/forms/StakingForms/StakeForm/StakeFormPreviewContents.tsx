@@ -60,10 +60,13 @@ export const StakeFormPreviewContents = ({
 };
 
 const $AssetIcon = styled(AssetIcon)`
+  --icon-size: 2.25rem;
   font-size: var(--icon-size);
 `;
 
 const $ValidatorIcon = styled(ValidatorFaviconIcon)`
+  --icon-size: 2.25rem;
+
   height: var(--icon-size);
   width: var(--icon-size);
 `;

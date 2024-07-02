@@ -205,17 +205,6 @@ const $Title = styled.h3`
 
 const $Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
-
-  a {
-    display: inline;
-    text-decoration: underline;
-    text-underline-offset: 0.25rem;
-
-    ::before {
-      content: ' ';
-    }
-  }
 `;
 
 const $ButtonRow = styled.div`

@@ -1,3 +1,4 @@
+import { StatSigFlags } from '@/types/statsig';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
@@ -51,6 +52,9 @@ export const AnalyticsUserProperties = unionize(
     >(),
     Version: ofType<string | null>(),
 
+    // StatSigFlags
+    StatsigFlags: ofType<{ [key in StatSigFlags]?: boolean }>(),
+
     // Network
     Network: ofType<DydxNetwork>(),
 
@@ -70,6 +74,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   Locale: 'selectedLocale',
   Breakpoint: 'breakpoint',
   Version: 'version',
+  StatsigFlags: 'statsigFlags',
   Network: 'network',
   WalletType: 'walletType',
   WalletConnectionType: 'walletConnectionType',

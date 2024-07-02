@@ -12,6 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 type ElementProps = {
   onClose?: () => void;
@@ -34,15 +35,11 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
         {stringGetter({
           key: STRING_KEYS.TOS_TITLE,
           params: {
-            TERMS_LINK: (
-              <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
-                {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-              </$Link>
-            ),
+            TERMS_LINK: <TermsOfUseLink isInline />,
             PRIVACY_POLICY_LINK: (
-              <$Link href={`${BASE_ROUTE}${AppRoute.Privacy}`}>
+              <Link href={`${BASE_ROUTE}${AppRoute.Privacy}`} isInline isAccent>
                 {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
-              </$Link>
+              </Link>
             ),
           },
         })}
@@ -67,15 +64,6 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
     </>
   );
 };
-const $Link = styled(Link)`
-  display: inline-block;
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
 const $TOS = styled.section`
   background-color: var(--color-layer-4);
   padding: 1rem 1rem 1rem 2rem;
