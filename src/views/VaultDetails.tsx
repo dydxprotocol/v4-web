@@ -49,11 +49,7 @@ export const VaultDetails: React.FC = () => {
       label: stringGetter({ key: STRING_KEYS.VAULT_ALL_TIME_PNL }),
       value: (
         <$ColoredReturn $sign={getNumberSign(allTimePnl?.absolute)}>
-          {allTimePnl?.absolute != null ? (
-            <Output value={allTimePnl?.absolute} type={OutputType.CompactFiat} />
-          ) : (
-            '-'
-          )}{' '}
+          <Output value={allTimePnl?.absolute} type={OutputType.CompactFiat} />{' '}
           <Output value={allTimePnl?.percent} type={OutputType.Percent} withParentheses />
         </$ColoredReturn>
       ),
