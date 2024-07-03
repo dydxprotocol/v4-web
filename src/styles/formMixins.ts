@@ -174,4 +174,25 @@ export const formMixins = {
       --form-input-gap: 1rem;
     }
   `,
+
+  stakingForm: css`
+    ${() => inputsColumn}
+    --form-input-gap: 1.25rem;
+    --form-input-height: 3.5rem;
+    --form-input-height-mobile: 4rem;
+    --form-input-paddingY: 0.5rem;
+    --form-input-paddingX: 1rem;
+
+    --withReceipt-backgroundColor: var(--color-layer-2);
+
+    height: 100%;
+
+    label {
+      --label-textColor: var(--color-text-1);
+    }
+
+    @media ${breakpoints.tablet} {
+      --form-input-gap: 1rem;
+    }
+  `,
 } satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;

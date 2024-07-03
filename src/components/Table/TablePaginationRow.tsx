@@ -113,7 +113,7 @@ const $InlineRow = styled.div`
 
 const $PaginationRow = styled.div`
   ${layoutMixins.spacedRow}
-  padding: var(--tableCell-padding)
+  padding: var(--tableCell-padding);
 `;
 
 const $ToggleGroup = styled(ToggleGroup)`

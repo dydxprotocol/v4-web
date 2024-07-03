@@ -14,7 +14,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { ValidatorFaviconIcon } from '@/components/ValidatorName';
+import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
 
 import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
