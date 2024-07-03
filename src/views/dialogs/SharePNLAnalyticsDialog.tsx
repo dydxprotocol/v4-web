@@ -156,7 +156,7 @@ export const SharePNLAnalyticsDialog = ({
             options={{
               margin: 0,
               backgroundOptions: {
-                color: 'var(--color-layer-6)',
+                color: 'var(--color-layer-3)',
               },
               imageOptions: {
                 margin: 0,
