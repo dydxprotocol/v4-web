@@ -94,19 +94,6 @@ export const useWalletConnection = () => {
 
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
-  // const wagmiConnector = useMemo(
-  //   () =>
-  //     walletType && walletConnectionType
-  //       ? resolveWagmiConnector({
-  //           walletType,
-  //           walletConnection: {
-  //             type: walletConnectionType,
-  //           },
-  //           walletConnectConfig,
-  //         })
-  //       : undefined,
-  //   [walletConnectConfig, walletType, walletConnectionType]
-  // );
 
   const { connectAsync: connectWagmi } = useConnectWagmi();
   const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
