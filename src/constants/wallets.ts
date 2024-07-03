@@ -25,8 +25,6 @@ import {
   WalletConnectIcon,
 } from '@/icons';
 
-import { isMetaMask } from '@/lib/wallet/providers';
-
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 
 // Wallet connection types
@@ -219,7 +217,8 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: isMetaMask,
+    matchesInjectedEip1193: (provider) =>
+      Boolean(provider.isMetaMask) && !provider.overrideIsMetaMask,
     walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
   },
   [WalletType.OkxWallet]: {

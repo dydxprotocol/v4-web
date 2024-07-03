@@ -10,17 +10,6 @@ import {
 
 import { isTruthy } from '../isTruthy';
 
-// Injected EIP-1193 Providers
-/* prettier-ignore */
-export const isMetaMask = (provider: EIP1193Provider) => (
-  Boolean(provider.isMetaMask)
-    
-  /* not Coinbase Wallet browser extension */
-  && (
-    !(provider as InjectedCoinbaseWalletExtensionProvider).overrideIsMetaMask
-  )
-)
-
 /*
   The Coinbase Wallet browser extension displaces existing injected EIP-1193 providers into a custom data structure, such that:
     globalThis.ethereum satisfies {
