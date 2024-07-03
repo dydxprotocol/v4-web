@@ -43,6 +43,11 @@ export const SingleSessionNotificationTypes = [
 
 export type NotificationId = string | number;
 
+export type NotificationParams = {
+  type: NotificationType;
+  id: NotificationId;
+};
+
 export type NotificationTypeConfig<
   NotificationIdType extends NotificationId = string,
   NotificationUpdateKey = any,
@@ -69,8 +74,19 @@ export type NotificationTypeConfig<
        * @param true (default): Notification initialized with status NotificationStatus.Triggered
        * @param false: Notification initialized with status NotificationStatus.Cleared
        */
-      isNew?: boolean
+      isNew?: boolean,
+
+      /**
+       * @param false (default): Notification should not be retriggered if it's been seen/cleared/hidden
+       * @param true:  Notification should be retriggered if status was NotificationStatus.Hidden
+       */
+      shouldUnhide?: boolean
     ) => void;
+
+    /**
+     * Hide (mark clear) a notification based on condition other than user action
+     */
+    hideNotification: ({ type, id }: NotificationParams) => void;
 
     lastUpdated: number;
   }) => void;

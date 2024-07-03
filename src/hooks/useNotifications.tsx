@@ -12,6 +12,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   NotificationCategoryPreferences,
+  NotificationParams,
   NotificationStatus,
   NotificationType,
   NotificationTypeCategory,
@@ -149,6 +150,15 @@ const useNotificationsContext = () => {
     [updateStatus]
   );
 
+  const hideNotification = useCallback(
+    ({ type, id }: NotificationParams) => {
+      const key = getKey({ type, id });
+      const { [key]: notif } = notifications;
+      if (notif) markCleared(notif);
+    },
+    [notifications, markCleared, getKey]
+  );
+
   const markAllCleared = useCallback(() => {
     Object.values(notifications).forEach((n) => markCleared(n));
   }, [notifications, markCleared]);
@@ -161,7 +171,7 @@ const useNotificationsContext = () => {
     useTrigger({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       trigger: useCallback(
-        (id, displayData, updateKey, isNew = true) => {
+        (id, displayData, updateKey, isNew = true, shouldUnhide = false) => {
           const key = getKey({ type, id });
 
           const notification = notifications[key];
@@ -185,6 +195,9 @@ const useNotificationsContext = () => {
 
               thisNotification.updateKey = updateKey;
               updateStatus(thisNotification, NotificationStatus.Updated);
+            } else if (shouldUnhide && notification.status === NotificationStatus.Cleared) {
+              const thisNotification = notifications[key];
+              updateStatus(thisNotification, NotificationStatus.Triggered);
             }
           } else {
             // Notification is disabled - remove it
@@ -196,6 +209,8 @@ const useNotificationsContext = () => {
         },
         [notifications, updateStatus, notificationPreferences[notificationCategory]]
       ),
+
+      hideNotification,
 
       lastUpdated: notificationsLastUpdated,
     });
