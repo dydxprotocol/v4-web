@@ -6,8 +6,6 @@ export const LogoIcon = ({ id, className }: LogoIconProps) => {
   const theme = useAppThemeAndColorModeContext();
   const fill = theme.logoFill;
 
-  console.log('xcxc', fill);
-
   return (
     <svg
       width="363"
