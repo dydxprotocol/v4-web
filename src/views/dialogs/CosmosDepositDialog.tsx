@@ -27,7 +27,7 @@ import { track } from '@/lib/analytics';
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
   toAmount?: number;
-  txHash: string;
+  txHash?: string;
 };
 
 export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProps) => {
@@ -41,7 +41,7 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProp
 
   const depositToSubaccount = useCallback(async () => {
     try {
-      if (toAmount && dydxAddress) {
+      if (toAmount && dydxAddress && txHash) {
         const tx = await deposit(toAmount);
 
         if (tx !== undefined) {
