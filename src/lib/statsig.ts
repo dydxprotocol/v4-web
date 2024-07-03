@@ -4,6 +4,14 @@ import { StatsigClient } from '@statsig/js-client';
 let statsigClient: StatsigClient;
 let initPromise: Promise<StatsigClient> | null = null;
 
+/**
+ * This method creates a promise and assigns it to the variable initPromise.
+ * If an initPromise has already been generated, it returns the existing promise.
+ * This causes all calls to this function to always return the statsigClient only after
+ * it has retrieved all values from statsig
+ *
+ * @returns initPromise: a promise that returns the statsig client only after it is initialized
+ */
 export const initStatsig = async () => {
   if (initPromise) {
     return initPromise;
@@ -12,6 +20,7 @@ export const initStatsig = async () => {
   initPromise = (async () => {
     statsigClient = new StatsigClient(
       import.meta.env.VITE_STATSIG_CLIENT_KEY ?? '',
+      // TODO: create a top level settings.ts file to coerce boolean env vars to actual boolean
       import.meta.env.VITE_TEST_USER_ID === 'true' ? { userID: 'test-id' } : {},
       {
         disableLogging: import.meta.env.VITE_DISABLE_STATSIG,
