@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { NumberSign } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -16,6 +17,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
+import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
@@ -61,7 +63,12 @@ export const SharePNLAnalyticsDialog = ({
       await copyBlobToClipboard(blob);
 
       triggerTwitterIntent({
-        text: `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`,
+        text: `${stringGetter({
+          key: STRING_KEYS.TWEET_MARKET_POSITION,
+          params: {
+            MARKET: assetId,
+          },
+        })}\n\n#dYdX #${assetId}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
       });
 
@@ -111,11 +118,10 @@ export const SharePNLAnalyticsDialog = ({
             value={unrealizedPnlPercent}
             showSign={ShowSign.None}
             slotLeft={
-              !unrealizedPnlIsNegative ? (
-                <$ArrowUpIcon iconName={IconName.Arrow} />
-              ) : (
-                <$ArrowDownIcon iconName={IconName.Arrow} />
-              )
+              <DiffArrow
+                direction={unrealizedPnlIsNegative ? 'down' : 'up'}
+                sign={unrealizedPnlIsNegative ? NumberSign.Negative : NumberSign.Positive}
+              />
             }
           />
 
@@ -219,12 +225,12 @@ const $ShareableCardSide = styled.div`
 const $ShareableCardTitle = styled.div`
   ${layoutMixins.row};
   gap: 0.5rem;
-  font-weight: var(--fontWeight-medium);
   margin-bottom: 0.75rem;
 `;
 
 const $ShareableCardTitleAsset = styled.span`
-  color: var(--color-white);
+  font: var(--font-base-bold);
+  color: var(--color-text-2);
 `;
 
 const $ShareableCardStats = styled.div`
@@ -235,17 +241,14 @@ const $ShareableCardStats = styled.div`
 `;
 
 const $ShareableCardStatLabel = styled.div`
-  font: var(--font-base-medium);
+  font: var(--font-base-bold);
   text-align: right;
+  color: var(--color-text-0);
 `;
 
 const $ShareableCardStatOutput = styled(Output)`
-  font: var(--font-base-medium);
+  font: var(--font-base-bold);
   color: var(--color-text-2);
-
-  * {
-    color: var(--color-text-2);
-  }
 `;
 
 const $AssetIcon = styled(AssetIcon)`
@@ -265,6 +268,8 @@ const $QrCode = styled(QrCode)`
 
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
   font-size: 2.25rem;
+  font-weight: var(--fontWeight-bold);
+
   color: var(--output-sign-color);
   --secondary-item-color: currentColor;
   --output-sign-color: ${({ isNegative }) =>
@@ -273,18 +278,6 @@ const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
         ? `var(--color-negative)`
         : `var(--color-positive)`
       : `var(--color-text-1)`};
-`;
-
-const $ArrowUpIcon = styled(Icon)<{ negative?: boolean }>`
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
-  transform: rotateZ(-90deg);
-`;
-
-const $ArrowDownIcon = styled(Icon)<{ negative?: boolean }>`
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
-  transform: rotateZ(90deg);
 `;
 
 const $Logo = styled(LogoIcon)`
