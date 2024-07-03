@@ -7,13 +7,13 @@ import {
   useStatsigClient,
 } from '@statsig/react-bindings';
 
-import { initStatsig } from '@/lib/statsig';
+import { initStatsigAsync } from '@/lib/statsig';
 
 export const StatsigProvider = ({ children }: { children: React.ReactNode }) => {
   const [statsigClient, setStatsigClient] = useState<StatsigClient | null>(null);
   useEffect(() => {
     const init = async () => {
-      const client = await initStatsig();
+      const client = await initStatsigAsync();
       setStatsigClient(client);
     };
     init();

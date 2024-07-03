@@ -8,7 +8,7 @@ import { useAppDispatch } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
-import { statsigConfigPromise } from '@/lib/statsig';
+import { getStatsigConfigAsync } from '@/lib/statsig';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -25,7 +25,7 @@ export const useInitializePage = () => {
   useEffect(() => {
     dispatch(initializeLocalization());
     const start = async () => {
-      const statsigConfig = await statsigConfigPromise();
+      const statsigConfig = await getStatsigConfigAsync();
       abacusStateManager.setStatsigConfigs(statsigConfig);
       abacusStateManager.start({ network: localStorageNetwork });
     };

@@ -1,5 +1,8 @@
 import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
+import { merge } from 'lodash';
+
+import { log } from './telemetry';
 
 let statsigClient: StatsigClient;
 let initPromise: Promise<StatsigClient> | null = null;
@@ -12,7 +15,7 @@ let initPromise: Promise<StatsigClient> | null = null;
  *
  * @returns initPromise: a promise that returns the statsig client only after it is initialized
  */
-export const initStatsig = async () => {
+export const initStatsigAsync = async () => {
   if (initPromise) {
     return initPromise;
   }
@@ -35,14 +38,32 @@ export const initStatsig = async () => {
 
 /**
  *
+ * @param client statsig client to check
+ * @param gateId
+ * @returns
+ */
+const checkGateTyped = (client: StatsigClient, gateId: StatSigFlags) => {
+  return client.checkGate(gateId);
+};
+
+/**
+ *
  * This is used only in useInitializePage to block abacus start on the fully loaded async statsig config.
  * This prevents new users from automatically received a 'false' for all feature gates because they
  * don't have a statsig value cached.
+ *
+ * Try catches in case the statsig init or gatechecks fail.
  */
-export const statsigConfigPromise = async () => {
-  const client = await initStatsig();
-  const allGateValues = Object.values(StatSigFlags).reduce((acc, gate) => {
-    return { ...acc, [gate]: client.checkGate(gate) };
-  }, {} as StatsigConfigType);
-  return allGateValues;
+export const getStatsigConfigAsync = async (): Promise<StatsigConfigType> => {
+  try {
+    const client = await initStatsigAsync();
+    const gateValuesList = Object.values(StatSigFlags).map((gateId) => ({
+      [gateId]: checkGateTyped(client, gateId),
+    }));
+    const statsigConfig = merge({}, ...gateValuesList);
+    return statsigConfig;
+  } catch (err) {
+    log('statsig/statsigConfigPromise', err);
+    return {};
+  }
 };
