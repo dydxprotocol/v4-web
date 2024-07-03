@@ -8209,17 +8209,6 @@
                     "ticker": "OCEAN_USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "OCEANUSD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "OCEAN-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -18161,48 +18150,6 @@
             "cmcId": 3701
         }
     },
-    "NOIA": {
-        "title": "Add NOIA-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NOIA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 320,
-            "ticker": "NOIA-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Huobi",
-                    "ticker": "noiausdt",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "NOIA-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Synternet",
-            "referencePrice": 0.13138077663844094,
-            "cmcId": 4191
-        }
-    },
     "PHB": {
         "title": "Add PHB-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PHB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -26705,48 +26652,6 @@
             "assetName": "UniLend",
             "referencePrice": 0.3298905798480403,
             "cmcId": 7412
-        }
-    },
-    "VLX": {
-        "title": "Add VLX-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a VLX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 499,
-            "ticker": "VLX-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -12,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Huobi",
-                    "ticker": "vlxusdt",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "VLX-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -3,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Velas",
-            "referencePrice": 0.009805846036618798,
-            "cmcId": 4747
         }
     },
     "KP3R": {
