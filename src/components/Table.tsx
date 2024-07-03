@@ -229,7 +229,6 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   const isEmpty = data.length === 0;
   const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
-  console.log('inner', data, list);
   return (
     <$TableWrapper
       className={className}
