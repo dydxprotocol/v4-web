@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 
 import { OutputType, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
@@ -15,6 +14,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 
+import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
 
@@ -24,6 +24,7 @@ export const useComplianceState = () => {
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { checkForGeo } = useEnvFeatures();
 
   const updatedAtDate = complianceUpdatedAt ? new Date(complianceUpdatedAt) : undefined;
   updatedAtDate?.setDate(updatedAtDate.getDate() + CLOSE_ONLY_GRACE_PERIOD);
@@ -41,7 +42,7 @@ export const useComplianceState = () => {
     complianceState = ComplianceStates.CLOSE_ONLY;
   } else if (
     complianceStatus === ComplianceStatus.BLOCKED ||
-    (geo && isBlockedGeo(geo) && isMainnet)
+    (geo && isBlockedGeo(geo) && checkForGeo)
   ) {
     complianceState = ComplianceStates.READ_ONLY;
   }
