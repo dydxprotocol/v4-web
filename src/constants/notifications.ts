@@ -108,6 +108,9 @@ export enum NotificationStatus {
   /** Toast or NotificationsMenu item interacted with or dismissed. "Seen" in NotificationsMenu. */
   Seen,
 
+  /** Toast or NotificationsMenu item marked as hidden by non-user action. Can be unhidden since it's not explicitly cleared by user. */
+  Hidden,
+
   /** Notification marked for deletion. Hidden in NotificationsMenu. */
   Cleared,
 }

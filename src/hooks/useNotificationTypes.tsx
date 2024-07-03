@@ -581,9 +581,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
             },
             [],
             true,
-            true
+            true // unhide on new error (i.e. normal -> not normal api status)
           );
         } else {
+          // hide/expire existing notification if no error
           hideNotification({
             type: NotificationType.ApiError,
             id: NotificationType.ApiError,

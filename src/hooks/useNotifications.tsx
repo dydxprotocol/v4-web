@@ -129,7 +129,7 @@ const useNotificationsContext = () => {
     [getKey]
   );
 
-  const { markUnseen, markSeen, markCleared } = useMemo(
+  const { markUnseen, markSeen, markHidden, markCleared } = useMemo(
     () => ({
       markUnseen: (notification: Notification) => {
         if (notification.status < NotificationStatus.Unseen) {
@@ -139,6 +139,11 @@ const useNotificationsContext = () => {
       markSeen: (notification: Notification) => {
         if (notification.status < NotificationStatus.Seen) {
           updateStatus(notification, NotificationStatus.Seen);
+        }
+      },
+      markHidden: (notification: Notification) => {
+        if (notification.status < NotificationStatus.Hidden) {
+          updateStatus(notification, NotificationStatus.Hidden);
         }
       },
       markCleared: (notification: Notification) => {
@@ -154,9 +159,9 @@ const useNotificationsContext = () => {
     ({ type, id }: NotificationParams) => {
       const key = getKey({ type, id });
       const { [key]: notif } = notifications;
-      if (notif) markCleared(notif);
+      if (notif) markHidden(notif);
     },
-    [notifications, markCleared, getKey]
+    [notifications, markHidden, getKey]
   );
 
   const markAllCleared = useCallback(() => {
@@ -195,9 +200,9 @@ const useNotificationsContext = () => {
 
               thisNotification.updateKey = updateKey;
               updateStatus(thisNotification, NotificationStatus.Updated);
-            } else if (shouldUnhide && notification.status === NotificationStatus.Cleared) {
+            } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
               const thisNotification = notifications[key];
-              updateStatus(thisNotification, NotificationStatus.Triggered);
+              updateStatus(thisNotification, NotificationStatus.Updated);
             }
           } else {
             // Notification is disabled - remove it
