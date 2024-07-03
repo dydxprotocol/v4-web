@@ -57,4 +57,5 @@ jobs:
       - name: Validate other market data
         env:
           DIFF: otherMarketDiff.txt
+          RAYDIUM_URL: ${{ secrets.RAYDIUM_URL }}
         run: pnpx tsx scripts/validate-other-market-data.ts
