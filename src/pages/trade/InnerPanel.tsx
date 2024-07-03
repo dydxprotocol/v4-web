@@ -8,32 +8,25 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Tabs } from '@/components/Tabs';
 import { MarketDetails } from '@/views/MarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
-import { VaultDetails } from '@/views/VaultDetails';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TvChart';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketHasVault } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
-import { isPresent } from '@/lib/typeUtils';
 
 enum Tab {
   Price = 'Price',
   Depth = 'Depth',
   Funding = 'Funding',
   Details = 'Details',
-  Vault = 'Vault',
 }
 
 export const InnerPanel = () => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
-  const hasVault = useAppSelector(getCurrentMarketHasVault);
-  const showVaults = testFlags.enableVaults;
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -79,14 +72,7 @@ export const InnerPanel = () => {
           label: stringGetter({ key: STRING_KEYS.DETAILS }),
           value: Tab.Details,
         },
-        hasVault && showVaults
-          ? {
-              content: <VaultDetails />,
-              label: stringGetter({ key: STRING_KEYS.LP_VAULT }),
-              value: Tab.Vault,
-            }
-          : undefined,
-      ].filter(isPresent)}
+      ]}
       slotToolbar={<MarketLinks />}
       withTransitions={false}
     />

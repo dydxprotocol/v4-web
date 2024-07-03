@@ -242,6 +242,7 @@ const Profile = () => {
             FillsTableColumnKey.AmountTag,
           ]}
           withInnerBorders={false}
+          initialPageSize={5}
         />
       </$HistoryPanel>
 
@@ -399,15 +400,14 @@ const $HistoryPanel = styled(Panel)`
   --panel-content-paddingX: 0;
 
   > div > div {
-    margin-top: 0.5rem;
-    --scrollArea-height: 10rem;
+    margin-top: 1px;
     border-radius: 0.875rem;
   }
 
   table {
-    max-height: 10rem;
     --tableCell-padding: 0.25rem 1rem;
     --tableRow-backgroundColor: var(--color-layer-3);
+    --tableStickyRow-backgroundColor: var(--color-layer-3);
     background-color: var(--color-layer-3);
     thead {
       color: var(--color-text-0);

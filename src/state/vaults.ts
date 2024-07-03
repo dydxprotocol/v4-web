@@ -15,12 +15,14 @@ type VaultDetails = {
   };
 };
 
-type VaultOwnership = {};
+type VaultOwnership = {
+  userBalance: number;
+};
 
 export interface VaultsState {
   vaults: Record<string, VaultMetadata>;
-  vaultDetails: Record<string, VaultDetails>;
-  userVaults: Record<string, VaultOwnership>;
+  vaultDetails: Record<string, VaultDetails | undefined>;
+  userVaults: Record<string, VaultOwnership | undefined>;
 }
 
 const initialState: VaultsState = {
@@ -33,7 +35,9 @@ const initialState: VaultsState = {
       thirtyDayReturnPercent: 0.1474,
     },
   },
-  userVaults: {},
+  userVaults: {
+    'PEPE-USD': { userBalance: 10 },
+  },
 };
 
 export const vaultsSlice = createSlice({
