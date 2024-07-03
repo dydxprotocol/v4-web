@@ -47,7 +47,8 @@ jobs:
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
-          DOCKER_BUILDKIT=1 make localnet-startd
+          DOCKER_BUILDKIT=1 make localnet-init
+          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL={{ secrets.RAYDIUM_URL }}
 
       - name: Get diff of otherMarketData.json
         run: |
@@ -57,5 +58,4 @@ jobs:
       - name: Validate other market data
         env:
           DIFF: otherMarketDiff.txt
-          RAYDIUM_URL: ${{ secrets.RAYDIUM_URL }}
         run: pnpx tsx scripts/validate-other-market-data.ts

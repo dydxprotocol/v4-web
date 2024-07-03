@@ -272,7 +272,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     slinkyProviderName: 'okx_ws',
   },
   [ExchangeName.Raydium]: {
-    url: process.env.RAYDIUM_URL ?? '',
+    url: '',
     tickers: null,
     parseResp: (response: any) => {
       return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
