@@ -1,5 +1,5 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
@@ -100,9 +100,12 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.UNSTAKED,
                 })}
               </WithTooltip>
-              {stakingApr && <$Tag sign={TagSign.Positive}>{aprText}</$Tag>}
             </$Label>
-            <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+            <$BalanceOutput
+              type={OutputType.Asset}
+              value={nativeTokenBalance}
+              isPositive={nativeTokenBalance.gt(0)}
+            />
           </div>
           {showStakingActions && (
             <div>
@@ -123,9 +126,13 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.STAKED,
                 })}
               </WithTooltip>
-              {stakingApr && <$Tag>{aprText}</$Tag>}
+              {stakingApr && <$Tag sign={TagSign.Positive}>{aprText}</$Tag>}
             </$Label>
-            <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
+            <$BalanceOutput
+              type={OutputType.Asset}
+              value={nativeStakingBalance}
+              isPositive={nativeStakingBalance > 0}
+            />
           </div>
           {showStakingActions && nativeStakingBalance > 0 && (
             <div>
@@ -223,7 +230,15 @@ const $Label = styled.div`
   gap: 0.5rem;
 `;
 
-const $BalanceOutput = styled(Output)`
+const $BalanceOutput = styled(Output)<{ isPositive: boolean }>`
   font-size: var(--fontSize-large);
-  color: var(--color-text-0);
+
+  ${({ isPositive }) =>
+    isPositive
+      ? css`
+          color: var(--color-text-2);
+        `
+      : css`
+          color: var(--color-text-0);
+        `}
 `;
