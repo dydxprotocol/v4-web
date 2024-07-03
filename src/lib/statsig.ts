@@ -24,9 +24,12 @@ export const initStatsig = async () => {
   return initPromise;
 };
 
-// TODO: figure out how to init statsig async so we get configs on the first page load without breaking app state
-// https://linear.app/dydx/project/feature-experimentation-6853beb333d7/overview
-
+/**
+ *
+ * This is used only in useInitializePage to block abacus start on the fully loaded async statsig config.
+ * This prevents new users from automatically received a 'false' for all feature gates because they
+ * don't have a statsig value cached.
+ */
 export const statsigConfigPromise = async () => {
   const client = await initStatsig();
   const allGateValues = Object.values(StatSigFlags).reduce((acc, gate) => {
