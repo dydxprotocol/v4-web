@@ -113,7 +113,6 @@ const $InlineRow = styled.div`
 
 const $PaginationRow = styled.div`
   ${layoutMixins.spacedRow}
-  background: var(--tableStickyRow-backgroundColor);
   padding: var(--tableCell-padding);
 `;
 
