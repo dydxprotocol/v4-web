@@ -209,14 +209,16 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     getKey: internalGetRowKey,
     load: async ({ sortDescriptor }) => ({
       items: sortDescriptor?.column
-        ? data.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
+        ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
         : data,
     }),
 
     initialSortDescriptor: defaultSortDescriptor,
 
     sort: async ({ items, sortDescriptor }) => ({
-      items: items.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction)),
+      items: [...items].sort((a, b) =>
+        sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction)
+      ),
     }),
   });
 
@@ -227,6 +229,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   const isEmpty = data.length === 0;
   const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
+  console.log('inner', data, list);
   return (
     <$TableWrapper
       className={className}

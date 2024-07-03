@@ -15,9 +15,16 @@ type VaultDetails = {
   };
 };
 
+export type VaultTransaction = {
+  timestampMs: number;
+  amountUsdc: number;
+  type: 'withdrawal' | 'deposit';
+  id: string;
+};
 type VaultOwnership = {
   userBalance: number;
   userReturn: number;
+  transactionHistory: VaultTransaction[];
 };
 
 export interface VaultsState {
@@ -37,7 +44,24 @@ const initialState: VaultsState = {
     },
   },
   userVaults: {
-    'PEPE-USD': { userBalance: 10, userReturn: 3 },
+    'PEPE-USD': {
+      userBalance: 10,
+      userReturn: 3,
+      transactionHistory: [
+        {
+          timestampMs: new Date('8/1/24').valueOf(),
+          amountUsdc: 100,
+          type: 'deposit',
+          id: '1',
+        },
+        {
+          timestampMs: new Date('8/8/24').valueOf(),
+          amountUsdc: 150,
+          type: 'withdrawal',
+          id: '2',
+        },
+      ],
+    },
   },
 };
 

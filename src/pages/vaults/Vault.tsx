@@ -37,7 +37,7 @@ const Vault = () => {
   const stringGetter = useStringGetter();
   const vaultId = useCurrentVaultId();
 
-  const { configs, assetId } = orEmptyObj(useAppSelector(getPerpetualMarkets)?.[vaultId ?? '']);
+  const { assetId } = orEmptyObj(useAppSelector(getPerpetualMarkets)?.[vaultId ?? '']);
   const asset = useAppSelector(getAssets)?.[assetId ?? ''];
 
   useDocumentTitle(
