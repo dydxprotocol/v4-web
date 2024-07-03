@@ -51,7 +51,7 @@
     "@cosmjs/proto-signing": "^0.32.1",
     "@cosmjs/stargate": "^0.32.1",
     "@cosmjs/tendermint-rpc": "^0.32.1",
-    "@dydxprotocol/v4-abacus": "1.8.22",
+    "@dydxprotocol/v4-abacus": "1.8.24",
     "@dydxprotocol/v4-client-js": "^1.1.24",
     "@dydxprotocol/v4-localization": "^1.1.145",
     "@ethersproject/providers": "^5.7.2",
