@@ -1,58 +1,63 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import BigNumber from 'bignumber.js';
-import { debounce } from 'lodash';
-import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import { StakeFormSteps } from '@/constants/stakingForms';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 
 import { DiffOutput } from '@/components/DiffOutput';
-import { FormInput } from '@/components/FormInput';
-import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
-import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
-import { OutputType } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
-import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';
-
-import { useAppDispatch } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
+import { WithTooltip } from '@/components/WithTooltip';
+import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
-type StakeFormProps = {
+import { StakeFormInputContents } from './StakeFormInputContents';
+import { StakeFormPreviewContents } from './StakeFormPreviewContents';
+import { ValidatorDropdown } from './ValidatorDropdown';
+
+type ElementProps = {
+  currentStep: StakeFormSteps;
+  setCurrentStep: Dispatch<SetStateAction<StakeFormSteps>>;
   onDone?: () => void;
+};
+
+type StyleProps = {
   className?: string;
 };
 
-export const StakeForm = ({ onDone, className }: StakeFormProps) => {
-  const dispatch = useAppDispatch();
+export const StakeForm = ({
+  currentStep,
+  setCurrentStep,
+  onDone,
+  className,
+}: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-
   const { delegate, getDelegateFee } = useSubaccount();
-  const { nativeTokenBalance: balance } = useAccountBalance();
+  const { nativeTokenBalance: balance, nativeStakingBalance } = useAccountBalance();
   const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
+  const { mintscanValidatorsLearnMore } = useURLConfigs();
 
   // Form states
   const [error, setError] = useState<StakeButtonAlert>();
@@ -61,8 +66,10 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // BN
-  const newBalanceBN = balance.minus(amountBN ?? 0);
   const maxAmountBN = MustBigNumber(Math.max(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX, 0));
+  const newStakedBalanceBN = amountBN
+    ? MustBigNumber(nativeStakingBalance).plus(amountBN)
+    : undefined;
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
   const isAmountEnoughForGas = balance.gte(AMOUNT_RESERVED_FOR_GAS_DYDX);
@@ -88,7 +95,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     } else {
       setError(undefined);
     }
-  }, [stringGetter, amountBN, isAmountValid]);
+  }, [stringGetter, amountBN, isAmountValid, isAmountEnoughForGas]);
 
   useEffect(() => {
     if (isAmountValid && selectedValidator) {
@@ -111,24 +118,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
       setFee(undefined);
     }
   }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
-
-  const debouncedChangeTrack = useMemo(
-    () =>
-      debounce((amount?: number, validator?: string) => {
-        track(
-          AnalyticsEvents.StakeInput({
-            amount,
-            validatorAddress: validator,
-          })
-        );
-      }, 1000),
-    []
-  );
-
-  const onChangeAmount = (value?: BigNumber) => {
-    setAmountBN(value);
-    debouncedChangeTrack(value?.toNumber(), selectedValidator?.operatorAddress);
-  };
 
   const onStake = useCallback(async () => {
     if (!isAmountValid || !selectedValidator) {
@@ -156,123 +145,108 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
   }, [isAmountValid, selectedValidator, defaultValidator, amountBN, delegate, onDone]);
 
-  const amountDetailItems = [
+  const validatorSelectorDetailItem = {
+    key: 'validator',
+    label: (
+      <WithTooltip
+        tooltipString={stringGetter({
+          key: STRING_KEYS.VALIDATORS_INFO_LINK,
+          params: {
+            MINTSCAN_LINK: (
+              <Link href={mintscanValidatorsLearnMore} isInline withIcon>
+                {stringGetter({ key: STRING_KEYS.MINTSCAN })}
+              </Link>
+            ),
+          },
+        })}
+      >
+        {stringGetter({
+          key: STRING_KEYS.VALIDATOR,
+        })}
+      </WithTooltip>
+    ),
+    value: (
+      <ValidatorDropdown
+        selectedValidator={selectedValidator}
+        setSelectedValidator={setSelectedValidator}
+      />
+    ),
+  };
+
+  const detailItems = [
     {
-      key: 'amount',
+      key: 'fees',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
+          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
+        </span>
+      ),
+      value: <Output type={OutputType.Asset} value={fee} />,
+    },
+    {
+      key: 'balance',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.STAKED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
         </span>
       ),
       value: (
         <DiffOutput
           type={OutputType.Asset}
-          value={balance}
-          sign={NumberSign.Negative}
-          newValue={newBalanceBN}
-          hasInvalidNewValue={newBalanceBN.isNegative()}
-          withDiff={amountBN && balance && !amountBN.isNaN()}
+          value={nativeStakingBalance}
+          sign={NumberSign.Positive}
+          newValue={newStakedBalanceBN}
+          hasInvalidNewValue={newStakedBalanceBN?.isNegative()}
+          withDiff={
+            newStakedBalanceBN !== undefined &&
+            !MustBigNumber(nativeStakingBalance).eq(newStakedBalanceBN ?? 0)
+          }
         />
       ),
     },
   ];
-
-  const openKeplrDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavKeplr()));
-
-  const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
 
   return (
     <$Form
       className={className}
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        onStake();
+        switch (currentStep) {
+          case StakeFormSteps.EditInputs:
+            setCurrentStep(StakeFormSteps.PreviewOrder);
+            break;
+          case StakeFormSteps.PreviewOrder:
+          default:
+            onStake();
+        }
       }}
     >
-      <$Description>
-        {stringGetter({
-          key: STRING_KEYS.STAKE_DESCRIPTION,
-        })}
-      </$Description>
-      <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
-        <FormInput
-          id="stakeAmount"
-          label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
-          type={InputType.Number}
-          onChange={({ floatValue }: NumberFormatValues) =>
-            onChangeAmount(floatValue !== undefined ? MustBigNumber(floatValue) : undefined)
-          }
-          value={amountBN ? amountBN.toNumber() : undefined}
-          slotRight={
-            isAmountEnoughForGas && (
-              <FormMaxInputToggleButton
-                isInputEmpty={!amountBN}
-                isLoading={isLoading}
-                onPressedChange={(isPressed: boolean) =>
-                  isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
-                }
-              />
-            )
-          }
-        />
-      </$WithDetailsReceipt>
-
-      <$Footer>
-        <StakeButtonAndReceipt
-          error={error}
-          fee={fee}
-          isLoading={isLoading}
-          amount={amountBN}
+      {currentStep === StakeFormSteps.EditInputs && (
+        <StakeFormInputContents
+          detailItems={[validatorSelectorDetailItem].concat(detailItems)}
           selectedValidator={selectedValidator}
-          setSelectedValidator={setSelectedValidator}
+          stakedAmount={amountBN}
+          maxStakeAmount={maxAmountBN}
+          fee={fee}
+          error={error}
+          isLoading={isLoading}
+          setStakedAmount={setAmountBN}
         />
-        <$LegalDisclaimer>
-          {stringGetter({
-            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
-            params: {
-              KEPLR_DASHBOARD_LINK: (
-                <Link withIcon onClick={openKeplrDialog} isInline>
-                  {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
-                </Link>
-              ),
-              STRIDE_LINK: (
-                <Link withIcon onClick={openStrideDialog} isInline>
-                  Stride
-                </Link>
-              ),
-            },
-          })}
-        </$LegalDisclaimer>
-      </$Footer>
+      )}
+
+      {currentStep === StakeFormSteps.PreviewOrder && (
+        <StakeFormPreviewContents
+          detailItems={detailItems}
+          selectedValidator={selectedValidator}
+          stakedAmount={amountBN?.toNumber() ?? 0}
+          isLoading={isLoading}
+          setCurrentStep={setCurrentStep}
+        />
+      )}
     </$Form>
   );
 };
 
 const $Form = styled.form`
-  ${formMixins.transfersForm}
-  --color-text-form: var(--color-text-0);
-`;
-
-const $Description = styled.div`
-  color: var(--color-text-0);
-`;
-
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-  color: var(--color-text-form);
-`;
-
-const $LegalDisclaimer = styled.div`
-  text-align: center;
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
+  ${formMixins.stakingForm}
 `;
