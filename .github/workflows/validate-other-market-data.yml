@@ -48,7 +48,7 @@ jobs:
           make build
           echo "Starting localnet..."
           DOCKER_BUILDKIT=1 make localnet-init
-          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL={{ secrets.RAYDIUM_URL }}
+          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
 
       - name: Get diff of otherMarketData.json
         run: |
