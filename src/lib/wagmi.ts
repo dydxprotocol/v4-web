@@ -95,27 +95,40 @@ const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   kava,
 ];
 
-const getAlchemyRPCUrls = (chainId: string, apiKey: string) => {
+enum ChainId {
+  ETH_MAINNET = '1',
+  ETH_SEPOLIA = '11155111',
+  POLYGON_MAINNET = '137',
+  POLYGON_MUMBAI = '80002',
+  OPT_MAINNET = '10',
+  OPT_SEPOLIA = '11155420',
+  ARB_MAINNET = '42161',
+  ARB_SEPOLIA = '421614',
+  BASE_MAINNET = '8453',
+  BASE_SEPOLIA = '84532',
+}
+
+const getAlchemyRPCUrls = (chainId: ChainId, apiKey: string) => {
   switch (chainId) {
-    case '1':
+    case ChainId.ETH_MAINNET:
       return `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
-    case '11155111':
+    case ChainId.ETH_SEPOLIA:
       return `https://eth-sepolia.g.alchemy.com/v2/${apiKey}`;
-    case '137':
+    case ChainId.POLYGON_MAINNET:
       return `https://polygon-mainnet.g.alchemy.com/v2/${apiKey}`;
-    case '80002':
+    case ChainId.POLYGON_MUMBAI:
       return `https://polygon-amoy.g.alchemy.com/v2/${apiKey}`;
-    case '10':
+    case ChainId.OPT_MAINNET:
       return `https://opt-mainnet.g.alchemy.com/v2/${apiKey}`;
-    case '11155420':
+    case ChainId.OPT_SEPOLIA:
       return `https://opt-sepolia.g.alchemy.com/v2/${apiKey}`;
-    case '42161':
+    case ChainId.ARB_MAINNET:
       return `https://arb-mainnet.g.alchemy.com/v2/${apiKey}`;
-    case '421614':
+    case ChainId.ARB_SEPOLIA:
       return `https://arb-sepolia.g.alchemy.com/v2/${apiKey}`;
-    case '8453':
+    case ChainId.BASE_MAINNET:
       return `https://base-mainnet.g.alchemy.com/v2/${apiKey}`;
-    case '84532':
+    case ChainId.BASE_SEPOLIA:
       return `https://base-sepolia.g.alchemy.com/v2/${apiKey}`;
     default:
       return undefined;
@@ -125,7 +138,8 @@ const getAlchemyRPCUrls = (chainId: string, apiKey: string) => {
 const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
     const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
-    const alchemyRPCUrls = alchemyKey && getAlchemyRPCUrls(chain.id.toString(), alchemyKey);
+    const alchemyRPCUrls =
+      alchemyKey && getAlchemyRPCUrls(chain.id.toString() as ChainId, alchemyKey);
     transports[chain.id] = fallback(
       [alchemyRPCUrls && http(alchemyRPCUrls), http(chain.rpcUrls.default.http[0]), http()].filter(
         isTruthy
