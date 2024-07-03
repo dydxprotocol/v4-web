@@ -9,11 +9,10 @@ export const initStatsig = async () => {
     return initPromise;
   }
   if (statsigClient) return statsigClient;
-
   initPromise = (async () => {
     statsigClient = new StatsigClient(
       import.meta.env.VITE_STATSIG_CLIENT_KEY ?? '',
-      { userID: 'test-id' },
+      import.meta.env.VITE_TEST_USER_ID === 'true' ? { userID: 'test-id' } : {},
       {
         disableLogging: import.meta.env.VITE_DISABLE_STATSIG,
         disableStorage: import.meta.env.VITE_DISABLE_STATSIG,
