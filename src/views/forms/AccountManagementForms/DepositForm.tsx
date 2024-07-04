@@ -25,6 +25,7 @@ import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   DEFAULT_GAS_LIMIT,
+  DEFAULT_NOBLE_GAS_FEE,
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
   MIN_CCTP_TRANSFER_AMOUNT,
@@ -255,9 +256,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const onClickMax = useCallback(() => {
     if (balance) {
+      const nobleChainId = getNobleChainId();
+      if (chainIdStr === nobleChainId) {
+        setFromAmount(balanceBN.minus(DEFAULT_NOBLE_GAS_FEE).toString());
+        return;
+      }
       setFromAmount(balanceBN.toString());
     }
-  }, [balance, setFromAmount]);
+  }, [balance, balanceBN, chainIdStr]);
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
