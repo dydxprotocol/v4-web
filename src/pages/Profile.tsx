@@ -36,11 +36,11 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
-import { GovernancePanel } from './token/rewards/GovernancePanel';
-import { LaunchIncentivesPanel } from './token/rewards/LaunchIncentivesPanel';
-import { MigratePanel } from './token/rewards/MigratePanel';
-import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
-import { StakingPanel } from './token/rewards/StakingPanel';
+import { GovernancePanel } from './token/GovernancePanel';
+import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
+import { MigratePanel } from './token/MigratePanel';
+import { NewMarketsPanel } from './token/NewMarketsPanel';
+import { StakingPanel } from './token/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 

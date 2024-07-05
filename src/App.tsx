@@ -56,7 +56,7 @@ const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
-const RewardsPage = lazy(() => import('@/pages/token/rewards/RewardsPage'));
+const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultsPage = lazy(() => import('@/pages/vaults/Vaults'));
 
 const queryClient = new QueryClient();

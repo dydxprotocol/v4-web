@@ -115,7 +115,6 @@ const RewardsPage = () => {
             <UnbondingPanels />
             <TradingRewardsChartPanel />
             <LaunchIncentivesPanel />
-            <TradingRewardsSummaryPanel />
             <NewMarketsPanel />
             <GovernancePanel />
             <RewardHistoryPanel />
