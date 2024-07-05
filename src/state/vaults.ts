@@ -1,20 +1,28 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-type VaultMetadata = { totalValue: number };
-
 type VaultDetails = {
+  totalValue: number;
   allTimePnl: {
     percent: number;
     absolute: number;
   };
   thirtyDayReturnPercent: number;
-  currentLeverageMultiple: number;
-  currentPosition: {
-    asset: number;
-    usdc: number;
-  };
+  positions: Array<{
+    asset: { id: string; name: string };
+    marketId: string;
+    marginUsdc: number;
+    currentLeverageMultiple: number;
+    currentPosition: {
+      asset: number;
+      usdc: number;
+    };
+    thirtyDayPnl: {
+      percent: number;
+      absolute: number;
+      sparklinePoints: number[];
+    };
+  }>;
 };
-
 export type VaultTransaction = {
   timestampMs: number;
   amountUsdc: number;
@@ -28,40 +36,43 @@ type VaultOwnership = {
 };
 
 export interface VaultsState {
-  vaults: Record<string, VaultMetadata>;
-  vaultDetails: Record<string, VaultDetails | undefined>;
-  userVaults: Record<string, VaultOwnership | undefined>;
+  vaultDetails: VaultDetails;
+  userVaults: VaultOwnership | undefined;
 }
 
 const initialState: VaultsState = {
-  vaults: { 'PEPE-USD': { totalValue: 30_425 } },
   vaultDetails: {
-    'PEPE-USD': {
-      allTimePnl: { absolute: 4_125, percent: 0.1252 },
-      currentLeverageMultiple: 1.2,
-      currentPosition: { asset: 17341235412, usdc: 423.67 },
-      thirtyDayReturnPercent: 0.1474,
-    },
+    totalValue: 30_425,
+    allTimePnl: { absolute: 4_125, percent: 0.1252 },
+    thirtyDayReturnPercent: 0.1474,
+    positions: [
+      {
+        asset: { id: 'PEPE', name: 'Pepe' },
+        marketId: 'PEPE-USD',
+        marginUsdc: 10_000,
+        currentLeverageMultiple: 1.2,
+        currentPosition: { asset: 17341235412, usdc: 423.67 },
+        thirtyDayPnl: { percent: 0.123, absolute: 1123, sparklinePoints: [1, 2, 3, 4, 5] },
+      },
+    ],
   },
   userVaults: {
-    'PEPE-USD': {
-      userBalance: 10,
-      userReturn: 3,
-      transactionHistory: [
-        {
-          timestampMs: new Date('8/1/24').valueOf(),
-          amountUsdc: 100,
-          type: 'deposit',
-          id: '1',
-        },
-        {
-          timestampMs: new Date('8/8/24').valueOf(),
-          amountUsdc: 150,
-          type: 'withdrawal',
-          id: '2',
-        },
-      ],
-    },
+    userBalance: 10,
+    userReturn: 3,
+    transactionHistory: [
+      {
+        timestampMs: new Date('8/1/24').valueOf(),
+        amountUsdc: 100,
+        type: 'deposit',
+        id: '1',
+      },
+      {
+        timestampMs: new Date('8/8/24').valueOf(),
+        amountUsdc: 150,
+        type: 'withdrawal',
+        id: '2',
+      },
+    ],
   },
 };
 
@@ -69,10 +80,10 @@ export const vaultsSlice = createSlice({
   name: 'Vaults',
   initialState,
   reducers: {
-    setVaults: (state: VaultsState, action: PayloadAction<Record<string, VaultMetadata>>) => {
-      state.vaults = action.payload;
+    setVault: (state: VaultsState, action: PayloadAction<VaultDetails>) => {
+      state.vaultDetails = action.payload;
     },
   },
 });
 
-export const { setVaults } = vaultsSlice.actions;
+export const { setVault } = vaultsSlice.actions;

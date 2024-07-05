@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -13,26 +13,24 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { ColumnDef, Table } from '@/components/Table';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { getUserVaults, getVaultsDetails, getVaultsMetadata } from '@/state/vaultSelectors';
+import { getUserVault, getVaultDetails } from '@/state/vaultSelectors';
 import { VaultTransaction } from '@/state/vaults';
 
 import { getNumberSign } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+
+import { VaultsTable } from './VaultsTable';
 
 type MyVaultDetailsCardsProps = {
-  vaultId: string;
   className?: string;
 };
 
-const YourVaultDetailsCards = ({ vaultId, className }: MyVaultDetailsCardsProps) => {
-  const myVaultMetadata = useAppSelector(getUserVaults)?.[vaultId];
+const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) => {
+  const myVaultMetadata = useAppSelector(getUserVault);
   const items = [
     {
       key: 'balance',
@@ -87,16 +85,10 @@ const $CardHeader = styled.div`
 `;
 const $CardValue = styled.div``;
 
-export const useVaultDetailsItems = (vaultId: string | null | undefined) => {
+export const useVaultDetailsItems = () => {
   const stringGetter = useStringGetter();
-  const { configs, assetId } = useAppSelector(getPerpetualMarkets)?.[vaultId ?? ''] ?? {};
-  const { allTimePnl, currentLeverageMultiple, thirtyDayReturnPercent, currentPosition } =
-    useAppSelector(getVaultsDetails)[vaultId ?? ''] ?? {};
-  const { totalValue } = useAppSelector(getVaultsMetadata)[vaultId ?? ''] ?? {};
+  const { allTimePnl, thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
 
-  if (vaultId == null) {
-    return [];
-  }
   const items = [
     {
       key: 'balance',
@@ -122,44 +114,10 @@ export const useVaultDetailsItems = (vaultId: string | null | undefined) => {
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
       value: <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />,
     },
-    {
-      key: 'vault-position',
-      label: stringGetter({ key: STRING_KEYS.VAULT_POSITION }),
-      value: (
-        <$PositionContainer>
-          <$ColoredReturn $sign={getNumberSign(currentPosition?.asset)}>
-            <Output
-              value={currentPosition?.asset}
-              type={OutputType.Asset}
-              tag={assetId}
-              showSign={ShowSign.Negative}
-              fractionDigits={configs?.stepSizeDecimals ?? TOKEN_DECIMALS}
-            />
-          </$ColoredReturn>
-          <$MutedText>
-            <Output
-              value={currentPosition?.usdc}
-              type={OutputType.Fiat}
-              withParentheses
-              fractionDigits={USD_DECIMALS}
-            />
-          </$MutedText>
-        </$PositionContainer>
-      ),
-    },
-    {
-      key: 'vault-leverage',
-      label: stringGetter({ key: STRING_KEYS.VAULT_LEVERAGE }),
-      value: <Output value={currentLeverageMultiple} type={OutputType.Multiple} />,
-    },
   ];
   return items;
 };
 
-const $PositionContainer = styled.div`
-  display: flex;
-  gap: 0.2rem;
-`;
 const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
   display: flex;
   gap: 0.25rem;
@@ -175,28 +133,21 @@ const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
       [NumberSign.Neutral]: null,
     }[$sign]}
 `;
-const $MutedText = styled.span`
-  color: var(--color-text-0);
-`;
 
-type FullVaultInfoProps = {
-  vaultId: string;
-};
+type FullVaultInfoProps = { className?: string };
 
-export const FullVaultInfo = ({ vaultId }: FullVaultInfoProps) => {
+export const FullVaultInfo = ({ className }: FullVaultInfoProps) => {
   const stringGetter = useStringGetter();
-  const { assetId } = orEmptyObj(useAppSelector(getPerpetualMarkets)?.[vaultId ?? '']);
-  const asset = useAppSelector(getAssets)?.[assetId ?? ''];
 
-  const detailItems = useVaultDetailsItems(vaultId);
+  const detailItems = useVaultDetailsItems();
   return (
-    <$Container>
+    <$Container className={className}>
       <$HeaderRow>
         <$MarketTitle>
-          <AssetIcon symbol={assetId} />
-          {stringGetter({ key: STRING_KEYS.ASSET_VAULT, params: { ASSET: asset?.name ?? '' } })}
+          <AssetIcon symbol="BTC" />
+          {stringGetter({ key: STRING_KEYS.ASSET_VAULT, params: { ASSET: 'BTC' } })}
         </$MarketTitle>
-        <$YourVaultDetailsCards vaultId={vaultId} />
+        <$YourVaultDetailsCards />
       </$HeaderRow>
       <$DetailsRow>
         {detailItems
@@ -211,10 +162,7 @@ export const FullVaultInfo = ({ vaultId }: FullVaultInfoProps) => {
       <$HorizontalSeparatorFiller />
       <$PnlRow />
       <$HorizontalSeparatorFiller />
-      <$HistoryRow>
-        <$SectionTitle>{stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}</$SectionTitle>
-        <VaultTransactionsTable vaultId={vaultId} />
-      </$HistoryRow>
+      <$VaultsTable />
     </$Container>
   );
 };
@@ -261,18 +209,14 @@ const $DetailLabel = styled.div`
 const $DetailValue = styled.div``;
 
 const $PnlRow = styled.div``;
-const $HistoryRow = styled.div``;
 
-const $SectionTitle = styled.div`
-  font: var(--font-large-medium);
-  margin-bottom: 1rem;
-`;
+const $VaultsTable = styled(VaultsTable)``;
 
-type VaultTransactionsTableProps = { vaultId: string; className?: string };
+type VaultTransactionsTableProps = { className?: string };
 
-export const VaultTransactionsTable = ({ vaultId, className }: VaultTransactionsTableProps) => {
+export const VaultTransactionsTable = ({ className }: VaultTransactionsTableProps) => {
   const stringGetter = useStringGetter();
-  const transactions = useAppSelector(getUserVaults)?.[vaultId]?.transactionHistory ?? EMPTY_ARR;
+  const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
 
   const columns = useMemo<ColumnDef<VaultTransaction>[]>(
     () =>

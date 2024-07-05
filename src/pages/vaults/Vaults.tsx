@@ -12,7 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Link } from '@/components/Link';
 
-import { VaultsTable } from './VaultsTable';
+import { FullVaultInfo, VaultTransactionsTable } from './FullVaultInfo';
 
 const Vaults = () => {
   const stringGetter = useStringGetter();
@@ -22,23 +22,22 @@ const Vaults = () => {
 
   return (
     <$Page>
-      <$HeaderSection>
-        <$ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.VAULTS_OVERVIEW })}
-          subtitle={
-            <$HeaderSubtitleContainer>
-              {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}{' '}
-              {vaultsLearnMore != null && (
-                <$Link href={vaultsLearnMore} withIcon>
-                  {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
-                </$Link>
-              )}
-            </$HeaderSubtitleContainer>
-          }
-        />
-      </$HeaderSection>
-
-      <$VaultsTable />
+      <$Container>
+        <$TwoColumnContainer>
+          <$VaultDetailsColumn>
+            <FullVaultInfo />
+          </$VaultDetailsColumn>
+          <$VaultDepositWithdrawFormColumn>
+            <$PlaceholderBox />
+            <$HistoryRow>
+              <$SectionTitle>
+                {stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}
+              </$SectionTitle>
+              <VaultTransactionsTable />
+            </$HistoryRow>
+          </$VaultDepositWithdrawFormColumn>
+        </$TwoColumnContainer>
+      </$Container>
     </$Page>
   );
 };
@@ -46,6 +45,7 @@ const Vaults = () => {
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
 `;
+
 const $ContentSectionHeader = styled(ContentSectionHeader)`
   margin-top: 1rem;
   padding-top: 0;
@@ -80,11 +80,47 @@ const $HeaderSection = styled.section`
     margin-bottom: 1rem;
   }
 `;
-const $VaultsTable = styled(VaultsTable)`
-  ${layoutMixins.contentSectionAttached}
-`;
+
 const $Link = styled(Link)`
   --link-color: var(--color-text-2);
   display: inline-block;
 `;
+
+const $Container = styled.div`
+  padding: 1rem;
+`;
+const $NavHeader = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+const $OverviewLink = styled(Link)`
+  --link-color: var(--color-text-0);
+`;
+
+const $TwoColumnContainer = styled.div`
+  ${layoutMixins.contentSectionDetached}
+  ${layoutMixins.flexEqualColumns}
+  flex-wrap: wrap;
+  gap: 2.5rem;
+`;
+const $VaultDetailsColumn = styled.div`
+  min-width: 30rem;
+`;
+const $VaultDepositWithdrawFormColumn = styled.div`
+  max-width: min-content;
+`;
+const $PlaceholderBox = styled.div`
+  width: 25rem;
+  height: 22rem;
+  border-radius: 0.7rem;
+  background-color: var(--color-layer-3);
+`;
+const $HistoryRow = styled.div``;
+
+const $SectionTitle = styled.div`
+  font: var(--font-large-medium);
+  margin-bottom: 1rem;
+`;
+
 export default Vaults;

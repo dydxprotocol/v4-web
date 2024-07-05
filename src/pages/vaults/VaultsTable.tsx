@@ -18,13 +18,13 @@ import { AssetTableCell } from '@/components/Table/AssetTableCell';
 import { Toolbar } from '@/components/Toolbar';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getVaultsTableData } from '@/state/vaultSelectors';
+import { getVaultDetails } from '@/state/vaultSelectors';
 
 import { matchesSearchFilter } from '@/lib/search';
 
 import { VaultFilter, VaultsFilter } from './VaultFilter';
 
-type VaultTableRow = ReturnType<typeof getVaultsTableData>[number];
+type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
 export const VaultsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -32,18 +32,16 @@ export const VaultsTable = ({ className }: { className?: string }) => {
   const [filter, setFilter] = useState<VaultsFilter>(VaultsFilter.ALL);
   const navigate = useNavigate();
 
-  const vaultsData = useAppSelector(getVaultsTableData);
+  const vaultsData = useAppSelector(getVaultDetails)?.positions;
   const filteredVaultsData = useMemo(() => {
     return vaultsData.filter(
       (vault) =>
-        (filter === VaultsFilter.ALL ||
-          (filter === VaultsFilter.MINE && (vault.userInfo?.userBalance ?? 0) > 0)) &&
-        (searchFilter.trim().length === 0 ||
-          matchesSearchFilter(searchFilter, vault.asset?.name) ||
-          matchesSearchFilter(searchFilter, vault.asset?.id) ||
-          matchesSearchFilter(searchFilter, vault.marketId))
+        searchFilter.trim().length === 0 ||
+        matchesSearchFilter(searchFilter, vault.asset.name) ||
+        matchesSearchFilter(searchFilter, vault.asset.id) ||
+        matchesSearchFilter(searchFilter, vault.marketId)
     );
-  }, [filter, searchFilter, vaultsData]);
+  }, [searchFilter, vaultsData]);
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
     () =>
@@ -56,17 +54,9 @@ export const VaultsTable = ({ className }: { className?: string }) => {
         },
         {
           columnKey: 'vault-balance',
-          getCellValue: (row) => row.vault.totalValue,
+          getCellValue: (row) => row.marginUsdc,
           label: stringGetter({ key: STRING_KEYS.VAULT_BALANCE }),
-          renderCell: ({ vault }) => <Output value={vault?.totalValue} type={OutputType.Fiat} />,
-        },
-        {
-          columnKey: 'your-balance',
-          getCellValue: (row) => row.userInfo?.userBalance,
-          label: stringGetter({ key: STRING_KEYS.YOUR_BALANCE }),
-          renderCell: ({ userInfo }) => (
-            <Output value={userInfo?.userBalance} type={OutputType.Fiat} />
-          ),
+          renderCell: ({ marginUsdc }) => <Output value={marginUsdc} type={OutputType.Fiat} />,
         },
       ] satisfies ColumnDef<VaultTableRow>[],
     [stringGetter]
