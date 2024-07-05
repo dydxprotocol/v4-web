@@ -6,7 +6,6 @@ import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -52,25 +51,7 @@ export const OrderbookControls = ({
   return (
     <$OrderbookControlsContainer className={className}>
       <$OrderbookUnitControl>
-        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_UNITS })}</$OrderbookLabel>
-        <ToggleGroup
-          items={[
-            { label: assetName ?? '', value: 'asset' as const },
-            { label: 'USD', value: 'fiat' as const },
-          ]}
-          shape={ButtonShape.Rectangle}
-          value={selectedUnit}
-          onValueChange={setSelectedUnit}
-        />
-      </$OrderbookUnitControl>
-      <$OrderbookZoomControl>
-        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_GROUPING })}</$OrderbookLabel>
-        <$ZoomControls>
-          <Output
-            value={grouping?.tickSize}
-            type={OutputType.Fiat}
-            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
-          />
+      <$ZoomControls>
           <$ButtonGroup>
             <Button
               size={ButtonSize.XSmall}
@@ -87,8 +68,22 @@ export const OrderbookControls = ({
               +
             </Button>
           </$ButtonGroup>
+          <Output
+            value={grouping?.tickSize}
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
+          />
         </$ZoomControls>
-      </$OrderbookZoomControl>
+        <ToggleGroup
+          items={[
+            { label: assetName ?? '', value: 'asset' as const },
+            { label: 'USD', value: 'fiat' as const },
+          ]}
+          shape={ButtonShape.Rectangle}
+          value={selectedUnit}
+          onValueChange={setSelectedUnit}
+        />
+      </$OrderbookUnitControl>
     </$OrderbookControlsContainer>
   );
 };
