@@ -27,7 +27,7 @@ import {
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -276,6 +276,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const { isStakingEnabled } = useEnvFeatures();
 
       const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
@@ -384,7 +385,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (currentDate <= stakingLiveExpirationDate) {
+        if (isStakingEnabled && currentDate <= stakingLiveExpirationDate) {
           trigger(
             ReleaseUpdateNotificationIds.InAppStakingLive,
             {
@@ -448,14 +449,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
+      const { isStakingEnabled } = useEnvFeatures();
+
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (
-          notificationId === INCENTIVES_SEASON_NOTIFICATION_ID ||
-          notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID
-        ) {
-          navigate(`${chainTokenLabel}`);
+        if (notificationId === INCENTIVES_SEASON_NOTIFICATION_ID) {
+          if (isStakingEnabled) {
+            navigate(`${chainTokenLabel}`);
+          } else {
+            navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+          }
+        } else if (notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID) {
+          if (isStakingEnabled) {
+            navigate(`${chainTokenLabel}`);
+          } else {
+            navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
+          }
         }
       };
     },
