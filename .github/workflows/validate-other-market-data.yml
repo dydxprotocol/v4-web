@@ -12,9 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Set up pnpm
-        uses: dydxprotocol/setup-pnpm@v1
+        uses: dydxprotocol/setup-pnpm@v2.0.0
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -27,7 +27,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           pnpm install --loglevel warn
-      
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -53,7 +53,7 @@ jobs:
         run: |
           git fetch origin
           git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
-      
+
       - name: Validate other market data
         env:
           DIFF: otherMarketDiff.txt

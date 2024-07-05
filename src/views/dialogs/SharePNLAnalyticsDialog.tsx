@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -26,6 +27,7 @@ import { Tag, TagSign } from '@/components/Tag';
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -172,6 +174,7 @@ export const SharePNLAnalyticsDialog = ({
           action={ButtonAction.Secondary}
           slotLeft={<Icon iconName={IconName.Copy} />}
           onClick={() => {
+            track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
             convert();
           }}
           state={{
@@ -184,6 +187,7 @@ export const SharePNLAnalyticsDialog = ({
           action={ButtonAction.Primary}
           slotLeft={<Icon iconName={IconName.SocialX} />}
           onClick={() => {
+            track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
             convertShare();
           }}
           state={{
