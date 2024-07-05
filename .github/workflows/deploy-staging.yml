@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up pnpm
-        uses: dydxprotocol/setup-pnpm@v1
+        uses: dydxprotocol/setup-pnpm@v2.0.0
 
       - name: Set up Node
         uses: actions/setup-node@v3
