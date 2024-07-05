@@ -42,7 +42,6 @@ import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
-import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 const RewardsPage = () => {

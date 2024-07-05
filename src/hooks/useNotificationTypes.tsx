@@ -62,7 +62,6 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
-import { useEnvFeatures } from './useEnvFeatures';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
