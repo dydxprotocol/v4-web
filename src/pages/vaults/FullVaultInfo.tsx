@@ -29,7 +29,7 @@ type MyVaultDetailsCardsProps = {
   className?: string;
 };
 
-const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) => {
+export const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const items = [
     {
@@ -70,20 +70,22 @@ const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) => {
 const $CardsContainer = styled.div`
   ${layoutMixins.gridEqualColumns}
   flex-direction: row;
-  gap: 0.5rem;
+  gap: 1rem;
 `;
 const $DetailCard = styled.div`
   border: solid var(--border-width) var(--border-color);
   border-radius: 0.7rem;
-  padding: 0.5rem 0.75rem;
-  font: var(--font-small-book);
+  padding: 0.85rem 1rem;
+  font: var(--font-base-book);
 
   ${layoutMixins.column};
 `;
 const $CardHeader = styled.div`
   color: var(--color-text-0);
 `;
-const $CardValue = styled.div``;
+const $CardValue = styled.div`
+  font: var(--font-medium-book);
+`;
 
 export const useVaultDetailsItems = () => {
   const stringGetter = useStringGetter();
@@ -147,7 +149,6 @@ export const FullVaultInfo = ({ className }: FullVaultInfoProps) => {
           <AssetIcon symbol="BTC" />
           {stringGetter({ key: STRING_KEYS.ASSET_VAULT, params: { ASSET: 'BTC' } })}
         </$MarketTitle>
-        <$YourVaultDetailsCards />
       </$HeaderRow>
       <$DetailsRow>
         {detailItems
@@ -185,9 +186,6 @@ const $MarketTitle = styled.h3`
     height: 2.25rem;
   }
 `;
-const $YourVaultDetailsCards = styled(YourVaultDetailsCards)`
-  min-width: min-content;
-`;
 
 const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
   display: flex;
@@ -200,13 +198,16 @@ const $DetailsRow = styled.div`
 `;
 const $DetailItem = styled.div`
   ${layoutMixins.flexColumn}
-  font: var(--font-small-book);
+  font: var(--font-base-book);
   padding: 0 0.5rem;
+  gap: 0.25rem;
 `;
 const $DetailLabel = styled.div`
   color: var(--color-text-0);
 `;
-const $DetailValue = styled.div``;
+const $DetailValue = styled.div`
+  font: var(--font-medium-book);
+`;
 
 const $PnlRow = styled.div``;
 

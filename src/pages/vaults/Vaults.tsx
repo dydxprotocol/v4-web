@@ -12,7 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Link } from '@/components/Link';
 
-import { FullVaultInfo, VaultTransactionsTable } from './FullVaultInfo';
+import { FullVaultInfo, VaultTransactionsTable, YourVaultDetailsCards } from './FullVaultInfo';
 
 const Vaults = () => {
   const stringGetter = useStringGetter();
@@ -28,6 +28,7 @@ const Vaults = () => {
             <FullVaultInfo />
           </$VaultDetailsColumn>
           <$VaultDepositWithdrawFormColumn>
+            <$YourVaultDetailsCards />
             <$PlaceholderBox />
             <$HistoryRow>
               <$SectionTitle>
@@ -45,6 +46,8 @@ const Vaults = () => {
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
 `;
+
+const $YourVaultDetailsCards = styled(YourVaultDetailsCards)``;
 
 const $ContentSectionHeader = styled(ContentSectionHeader)`
   margin-top: 1rem;
@@ -109,6 +112,8 @@ const $VaultDetailsColumn = styled.div`
 `;
 const $VaultDepositWithdrawFormColumn = styled.div`
   max-width: min-content;
+  ${layoutMixins.flexColumn}
+  gap: 1.5rem;
 `;
 const $PlaceholderBox = styled.div`
   width: 25rem;
