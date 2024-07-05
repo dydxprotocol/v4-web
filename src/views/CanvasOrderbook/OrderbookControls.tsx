@@ -8,8 +8,6 @@ import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constant
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks/useStringGetter';
-
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -34,7 +32,6 @@ export const OrderbookControls = ({
   setSelectedUnit,
   grouping,
 }: OrderbookControlsProps) => {
-  const stringGetter = useStringGetter();
   const modifyScale = useCallback(
     (direction: number) => {
       const start = grouping?.multiplier.ordinal ?? 0;
@@ -51,7 +48,7 @@ export const OrderbookControls = ({
   return (
     <$OrderbookControlsContainer className={className}>
       <$OrderbookUnitControl>
-      <$ZoomControls>
+        <$ZoomControls>
           <$ButtonGroup>
             <Button
               size={ButtonSize.XSmall}
@@ -88,11 +85,6 @@ export const OrderbookControls = ({
   );
 };
 
-const $OrderbookLabel = styled.div`
-  display: inline-flex;
-  align-items: center;
-`;
-
 const $OrderbookControlsContainer = styled.div`
   color: var(--color-text-0);
   font: var(--font-small-book);
@@ -124,13 +116,6 @@ const $OrderbookUnitControl = styled.div`
   justify-content: space-between;
   gap: 0.5rem;
   border-bottom: var(--border);
-`;
-
-const $OrderbookZoomControl = styled.div`
-  gap: 1rem;
-  display: flex;
-  justify-content: space-between;
-  box-shadow: 0 0 0 var(--border-width) var(--border-color);
 `;
 
 const $MinusSymbolCenter = styled.span`
