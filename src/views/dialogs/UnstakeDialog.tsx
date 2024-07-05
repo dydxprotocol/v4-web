@@ -33,35 +33,38 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
   const dialogProps: {
     [key in StakeFormSteps]: {
       title: string;
-      description: string;
+      description: React.ReactNode;
       slotIcon?: JSX.Element;
     };
   } = {
     [StakeFormSteps.EditInputs]: {
       title: stringGetter({ key: STRING_KEYS.UNSTAKE }),
-      description:
-        currentDelegations?.length === 1
-          ? stringGetter({
-              key: STRING_KEYS.CURRENTLY_STAKING_WITH,
-              params: {
-                VALIDATOR: (
-                  <$ValidatorName
-                    validator={stakingValidators?.[currentDelegations[0].validator]?.[0]}
-                  />
-                ),
-              },
-            })
-          : stringGetter({
-              key: STRING_KEYS.CURRENTLY_STAKING,
-              params: {
-                AMOUNT: (
-                  <$StakedAmount>
-                    {nativeStakingBalance}
-                    <Tag>{chainTokenLabel} </Tag>
-                  </$StakedAmount>
-                ),
-              },
-            }),
+      description: (
+        <$Description>
+          {currentDelegations?.length === 1
+            ? stringGetter({
+                key: STRING_KEYS.CURRENTLY_STAKING_WITH,
+                params: {
+                  VALIDATOR: (
+                    <$ValidatorName
+                      validator={stakingValidators?.[currentDelegations[0].validator]?.[0]}
+                    />
+                  ),
+                },
+              })
+            : stringGetter({
+                key: STRING_KEYS.CURRENTLY_STAKING,
+                params: {
+                  AMOUNT: (
+                    <$StakedAmount>
+                      {nativeStakingBalance}
+                      <Tag>{chainTokenLabel} </Tag>
+                    </$StakedAmount>
+                  ),
+                },
+              })}
+        </$Description>
+      ),
       slotIcon: <AssetIcon symbol={chainTokenLabel} />,
     },
     [StakeFormSteps.PreviewOrder]: {
@@ -85,6 +88,10 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
 
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
+`;
+
+const $Description = styled.div`
+  ${layoutMixins.inlineRow}
 `;
 
 const $StakedAmount = styled.span`
