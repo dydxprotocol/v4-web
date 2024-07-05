@@ -25,7 +25,7 @@ jobs:
 
       - name: Set up pnpm
         if: steps.check_env.outputs.should_run_tests == 'true'
-        uses: dydxprotocol/setup-pnpm@v1
+        uses: dydxprotocol/setup-pnpm@v2.0.0
 
       - name: Set up Node
         if: steps.check_env.outputs.should_run_tests == 'true'
