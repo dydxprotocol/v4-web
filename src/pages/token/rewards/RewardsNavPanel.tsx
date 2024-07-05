@@ -1,11 +1,10 @@
 import React from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -38,13 +37,11 @@ export const RewardsNavPanel = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
-  const { isStakingEnabled } = useEnvFeatures();
-
   return (
     <Panel
       className={className}
       slotHeaderContent={
-        <$Title stakingEnabled={isStakingEnabled}>
+        <$Title>
           {title} {titleTag && <$Tag>{titleTag}</$Tag>}
         </$Title>
       }
@@ -71,20 +68,11 @@ export const RewardsNavPanel = ({
   );
 };
 
-const $Title = styled.h3<{ stakingEnabled: boolean }>`
+const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
-
-  ${({ stakingEnabled }) =>
-    stakingEnabled
-      ? css`
-          margin-bottom: -1.5rem;
-          color: var(--color-text-1);
-        `
-      : css`
-          margin-bottom: -1rem;
-          color: var(--color-text-2);
-        `}
+  margin-bottom: -1.5rem;
+  color: var(--color-text-1);
 `;
 
 const $Tag = styled(Tag)`
