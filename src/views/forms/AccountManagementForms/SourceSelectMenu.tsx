@@ -11,7 +11,6 @@ import {
   getMapOfLowestFeeTokensByChainId,
 } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
 
@@ -56,12 +55,8 @@ export const SourceSelectMenu = ({
   const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
   const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-  const chainOptions = (options?.chains?.toArray() ?? EMPTY_ARR) as ChainOption[];
-  const cosmosChainOptions: ChainOption[] = isMainnet
-    ? cosmosChains.mainnets
-    : cosmosChains.testnets;
+  const chains = (options?.chains?.toArray() ?? EMPTY_ARR) as ChainOption[];
 
-  const chains = isNotKeplrWallet ? chainOptions : cosmosChainOptions;
   const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);

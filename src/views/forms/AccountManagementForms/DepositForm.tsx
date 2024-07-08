@@ -262,14 +262,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const onClickMax = useCallback(() => {
     if (balance) {
-      const nobleChainId = getNobleChainId();
       if (chainIdStr === nobleChainId) {
         setFromAmount(balanceBN.minus(DEFAULT_NOBLE_GAS_FEE).toString());
         return;
       }
       setFromAmount(balanceBN.toString());
     }
-  }, [balance, balanceBN, chainIdStr]);
+  }, [balance, balanceBN, chainIdStr, nobleChainId]);
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
