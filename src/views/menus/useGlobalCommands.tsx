@@ -42,83 +42,87 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
 
   return [
     {
-      group: 'themes',
-      groupLabel: 'Themes',
+      group: 'preferences',
+      groupLabel: 'Preferences',
       items: [
         {
-          value: AppTheme.Classic,
-          label: 'Set Classic Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Classic));
+          value: 'themes',
+          label: 'Themes',
+          subitems: [{
+            value: AppTheme.Classic,
+            label: 'Set Classic Theme',
+            onSelect: () => {
+              dispatch(setAppThemeSetting(AppTheme.Classic));
+            },
           },
+          {
+            value: AppThemeSystemSetting.System,
+            label: 'Set System Theme',
+            onSelect: () => {
+              dispatch(setAppThemeSetting(AppThemeSystemSetting.System));
+            },
+          },
+          {
+            value: AppTheme.Light,
+            label: 'Set Light Theme',
+            onSelect: () => {
+              dispatch(setAppThemeSetting(AppTheme.Light));
+            },
+          },
+          {
+            value: AppTheme.Dark,
+            label: 'Set Dark Theme',
+            onSelect: () => {
+              dispatch(setAppThemeSetting(AppTheme.Dark));
+            },
+          }],
         },
         {
-          value: AppThemeSystemSetting.System,
-          label: 'Set System Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppThemeSystemSetting.System));
-          },
+          value: 'colorPreferences',
+          label: 'Color Preferences',
+          subitems: [
+            {
+              value: AppColorMode.GreenUp,
+              label: 'Set Green is Up',
+              onSelect: () => {
+                dispatch(setAppColorMode(AppColorMode.GreenUp));
+              },
+            },
+            {
+              value: AppColorMode.RedUp,
+              label: 'Set Red is Up',
+              onSelect: () => {
+                dispatch(setAppColorMode(AppColorMode.RedUp));
+              },
+            },
+          ],
         },
         {
-          value: AppTheme.Light,
-          label: 'Set Light Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Light));
-          },
-        },
-        {
-          value: AppTheme.Dark,
-          label: 'Set Dark Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Dark));
-          },
-        },
-      ],
-    },
-    {
-      group: 'colorPreferences',
-      groupLabel: 'Color Preferences',
-      items: [
-        {
-          value: AppColorMode.GreenUp,
-          label: 'Set Green is Up',
-          onSelect: () => {
-            dispatch(setAppColorMode(AppColorMode.GreenUp));
-          },
-        },
-        {
-          value: AppColorMode.RedUp,
-          label: 'Set Red is Up',
-          onSelect: () => {
-            dispatch(setAppColorMode(AppColorMode.RedUp));
-          },
-        },
-      ],
-    },
-    {
-      group: 'layout',
-      groupLabel: 'Layout',
-      items: [
-        {
-          value: LayoutItems.setDefaultLayout,
-          label: 'Set Default Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Default));
-          },
-        },
-        {
-          value: LayoutItems.setReverseLayout,
-          label: 'Set Reverse Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Reverse));
-          },
-        },
-        {
-          value: LayoutItems.setAlternativeLayout,
-          label: 'Set Alternative Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Alternative));
-          },
+          value: 'layout',
+          label: 'Layout',
+          subitems: [
+            {
+              value: LayoutItems.setDefaultLayout,
+              label: 'Set Default Layout',
+              onSelect: () => {
+                dispatch(setSelectedTradeLayout(TradeLayouts.Default));
+              },
+            },
+            {
+              value: LayoutItems.setReverseLayout,
+              label: 'Set Reverse Layout',
+              onSelect: () => {
+                dispatch(setSelectedTradeLayout(TradeLayouts.Reverse));
+              },
+            },
+            {
+              value: LayoutItems.setAlternativeLayout,
+              label: 'Set Alternative Layout',
+              onSelect: () => {
+                dispatch(setSelectedTradeLayout(TradeLayouts.Alternative));
+              },
+            },
+          ],
         },
       ],
     },
