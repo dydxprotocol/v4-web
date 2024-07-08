@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { TransferType } from '../abacus';
 import {
   getLowestFeeChainNames,
   getMapOfLowestFeeTokensByChainId,
   getMapOfLowestFeeTokensByDenom,
-} from '../cctp';
+} from '@/constants/cctp';
+
+import { TransferType } from '../abacus';
 
 describe('getLowestFeeChainNames', () => {
   it('withdrawals - returns non eth cctp mainnet chain names as an array', () => {
