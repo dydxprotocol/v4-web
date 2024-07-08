@@ -5,12 +5,6 @@
     "name": "Ethereum"
   },
   {
-    "chainId": "5",
-    "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    "name": "Ethereum Goerli",
-    "isTestnet": true
-  },
-  {
     "chainId": "43114",
     "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
     "name": "Avalanche"

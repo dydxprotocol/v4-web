@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
@@ -17,8 +20,7 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
-import cctpTokens from '../../../../public/configs/cctp.json';
-import { TokenInfo } from './SourceSelectMenu';
+import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
   selectedToken?: TransferInputTokenResource;
@@ -26,24 +28,13 @@ type ElementProps = {
   isExchange?: boolean;
 };
 
-const CURVE_DAO_TOKEN_ADDRESS = '0xD533a949740bb3306d119CC777fa900bA034cd52';
-
-const cctpTokensByAddress = cctpTokens.reduce(
-  (acc, token) => {
-    if (!acc[token.tokenAddress]) {
-      acc[token.tokenAddress] = [];
-    }
-    acc[token.tokenAddress].push(token);
-    return acc;
-  },
-  {} as Record<string, TokenInfo[]>
-);
-
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+
+  const cctpTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
@@ -61,39 +52,23 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       },
       slotBefore: (
         // the curve dao token svg causes the web app to lag when rendered
-        <$Img
-          src={token.type !== CURVE_DAO_TOKEN_ADDRESS ? token.iconUrl ?? undefined : undefined}
-          alt=""
-        />
+        <$Img src={token.iconUrl ?? undefined} alt="" />
       ),
-      slotAfter: !!cctpTokensByAddress[token.type] && (
-        <$Text>
-          {stringGetter({
-            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
-            params: {
-              LOWEST_FEES_HIGHLIGHT_TEXT: (
-                <$GreenHighlight>
-                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
-                </$GreenHighlight>
-              ),
-            },
-          })}
-        </$Text>
-      ),
+      slotAfter: !!cctpTokensByDenom[token.type] && <LowestFeesDecoratorText />,
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
-        return !!cctpTokensByAddress[token.value];
+        return !!cctpTokensByDenom[token.value];
       }
       // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
       if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
-        return !!cctpTokensByAddress[token.value];
+        return !!cctpTokensByDenom[token.value];
       }
       return true;
     })
-    .sort((token) => (cctpTokensByAddress[token.value] ? -1 : 1));
+    .sort((token) => (cctpTokensByDenom[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu
@@ -137,14 +112,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     </SearchSelectMenu>
   );
 };
-const $Text = styled.div`
-  font: var(--font-small-regular);
-  color: var(--color-text-0);
-`;
-
-const $GreenHighlight = styled.span`
-  color: var(--color-green);
-`;
 
 const $AssetRow = styled.div`
   ${layoutMixins.row}
