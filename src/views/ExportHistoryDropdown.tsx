@@ -52,11 +52,13 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         const fee = formatNumberOutput(fill.fee, OutputType.Fiat, {
           decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
           groupSeparator: LOCALE_GROUP_SEPARATOR,
+          selectedLocale,
         });
 
         const price = formatNumberOutput(fill.price, OutputType.Fiat, {
           decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
           groupSeparator: LOCALE_GROUP_SEPARATOR,
+          selectedLocale,
         });
 
         const total = formatNumberOutput(
@@ -65,6 +67,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           {
             decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
             groupSeparator: LOCALE_GROUP_SEPARATOR,
+            selectedLocale,
           }
         );
 
@@ -153,6 +156,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         const amount = formatNumberOutput(transfer.size, OutputType.Fiat, {
           decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
           groupSeparator: LOCALE_GROUP_SEPARATOR,
+          selectedLocale,
         });
 
         return {
