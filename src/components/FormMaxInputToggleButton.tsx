@@ -43,5 +43,5 @@ const $FormMaxInputToggleButton = styled(ToggleButton)`
 
   --button-padding: 0 0.5rem;
   --button-backgroundColor: var(--color-accent);
-  --button-textColor: var(--color-text-2);
+  --button-textColor: var(--color-text-button);
 `;
