@@ -30,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.8.24
-    version: 1.8.24
+    specifier: 1.8.29
+    version: 1.8.29
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.1.24
-    version: 1.1.24
+    specifier: ^1.1.26
+    version: 1.1.26
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.145
-    version: 1.1.145
+    specifier: ^1.1.146
+    version: 1.1.146
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -2182,7 +2182,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
-    dev: false
 
   /@babel/template@7.23.9:
     resolution: {integrity: sha512-+xrD2BWLpvHKNmX2QbpdpsBaWnRxahMwJjO+KZk2JOElj5nSmKezyS1B4u+QbHMTX69t4ukm6hh9lsYQ7GHCKA==}
@@ -2528,10 +2527,10 @@ packages:
   /@cosmjs/amino@0.31.0:
     resolution: {integrity: sha512-xJ5CCEK7H79FTpOuEmlpSzVI+ZeYESTVvO3wHDgbnceIyAne3C68SvyaKqLUR4uJB0Z4q4+DZHbqW6itUiv4lA==}
     dependencies:
-      '@cosmjs/crypto': 0.31.0
-      '@cosmjs/encoding': 0.31.0
-      '@cosmjs/math': 0.31.0
-      '@cosmjs/utils': 0.31.0
+      '@cosmjs/crypto': 0.31.3
+      '@cosmjs/encoding': 0.31.3
+      '@cosmjs/math': 0.31.3
+      '@cosmjs/utils': 0.31.3
     dev: false
 
   /@cosmjs/amino@0.31.3:
@@ -2647,6 +2646,7 @@ packages:
       libsodium-wrappers: 0.7.13
     dev: false
 
+<<<<<<< HEAD
   /@cosmjs/crypto@0.31.0:
     resolution: {integrity: sha512-UaqCe6Tgh0pe1QlZ66E13t6FlIF86QrnBXXq+EN7Xe1Rouza3fJ1ojGlPleJZkBoq3tAyYVIOOqdZIxtVj/sIQ==}
     dependencies:
@@ -2659,6 +2659,8 @@ packages:
       libsodium-wrappers-sumo: 0.7.11
     dev: false
 
+=======
+>>>>>>> eb970395 (feat: bump packages to get smart relay and l10n updates)
   /@cosmjs/crypto@0.31.3:
     resolution: {integrity: sha512-vRbvM9ZKR2017TO73dtJ50KxoGcFzKtKI7C8iO302BQ5p+DuB+AirUg1952UpSoLfv5ki9O416MFANNg8UN/EQ==}
     dependencies:
@@ -2750,13 +2752,6 @@ packages:
       xstream: 11.14.0
     dev: false
 
-  /@cosmjs/json-rpc@0.31.0:
-    resolution: {integrity: sha512-Ix2Cil2qysiLNrX+E0w3vtwCrqxGVq8jklpLA7B2vtMrw7tru/rS65fdFSy8ep0wUNLL6Ud32VXa5K0YObDOMA==}
-    dependencies:
-      '@cosmjs/stream': 0.31.0
-      xstream: 11.14.0
-    dev: false
-
   /@cosmjs/json-rpc@0.31.3:
     resolution: {integrity: sha512-7LVYerXjnm69qqYR3uA6LGCrBW2EO5/F7lfJxAmY+iII2C7xO3a0vAjMSt5zBBh29PXrJVS6c2qRP22W1Le2Wg==}
     dependencies:
@@ -2843,11 +2838,11 @@ packages:
   /@cosmjs/proto-signing@0.31.0:
     resolution: {integrity: sha512-JNlyOJRkn8EKB9mCthkjr6lVX6eyVQ09PFdmB4/DR874E62dFTvQ+YvyKMAgN7K7Dcjj26dVlAD3f6Xs7YOGDg==}
     dependencies:
-      '@cosmjs/amino': 0.31.0
-      '@cosmjs/crypto': 0.31.0
-      '@cosmjs/encoding': 0.31.0
-      '@cosmjs/math': 0.31.0
-      '@cosmjs/utils': 0.31.0
+      '@cosmjs/amino': 0.31.3
+      '@cosmjs/crypto': 0.31.3
+      '@cosmjs/encoding': 0.31.3
+      '@cosmjs/math': 0.31.3
+      '@cosmjs/utils': 0.31.3
       cosmjs-types: 0.8.0
       long: 4.0.0
     dev: false
@@ -2890,18 +2885,6 @@ packages:
     resolution: {integrity: sha512-r6MpDL+9N+qOS/D5VaxnPaMJ3flwQ36G+vPvYJsXArj93BjgyFB7BwWwXCQDzZ+23cfChPUfhbINOenr8N2Kow==}
     dependencies:
       '@cosmjs/stream': 0.30.1
-      isomorphic-ws: 4.0.1(ws@7.5.9)
-      ws: 7.5.9
-      xstream: 11.14.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
-  /@cosmjs/socket@0.31.0:
-    resolution: {integrity: sha512-WDh9gTyiP3OCXvSAJJn33+Ef3XqMWag+bpR1TdMBxTmlTxuvU+kPy4cf6P2OF+jkkUBEA5Se2EAju0eFbJMT+w==}
-    dependencies:
-      '@cosmjs/stream': 0.31.0
       isomorphic-ws: 4.0.1(ws@7.5.9)
       ws: 7.5.9
       xstream: 11.14.0
@@ -3099,13 +3082,13 @@ packages:
   /@cosmjs/tendermint-rpc@0.31.0:
     resolution: {integrity: sha512-yo9xbeuI6UoEKIhFZ9g0dvUKLqnBzwdpEc/uldQygQc51j38gQVwFko+6sjmhieJqRYYvrYumcbJMiV6GFM9aA==}
     dependencies:
-      '@cosmjs/crypto': 0.31.0
-      '@cosmjs/encoding': 0.31.0
-      '@cosmjs/json-rpc': 0.31.0
-      '@cosmjs/math': 0.31.0
-      '@cosmjs/socket': 0.31.0
-      '@cosmjs/stream': 0.31.0
-      '@cosmjs/utils': 0.31.0
+      '@cosmjs/crypto': 0.31.3
+      '@cosmjs/encoding': 0.31.3
+      '@cosmjs/json-rpc': 0.31.3
+      '@cosmjs/math': 0.31.3
+      '@cosmjs/socket': 0.31.3
+      '@cosmjs/stream': 0.31.3
+      '@cosmjs/utils': 0.31.3
       axios: 0.21.4
       readonly-date: 1.0.0
       xstream: 11.14.0
@@ -3203,23 +3186,23 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.8.24:
-    resolution: {integrity: sha512-Vz4W83ft/ttBmlflHorQG01UhXd7swio5PVkWM6RT53gONvSJIoWK9/ALRY5Y8qY67Yxl7ANtvD3/FtTH+EKog==}
+  /@dydxprotocol/v4-abacus@1.8.29:
+    resolution: {integrity: sha512-ABeOx8OjO/6jZ3xK6BLCavwOpX38pL7M3tsi/ZjUC6vAZplsPVG0+Oz0Ynv82uRdWLbrl2Sypy+auzWkEB+4rw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.1.24:
-    resolution: {integrity: sha512-SGz1dIwdqzzAClKdyRiBrP6HrNTitwRbY81AXHa0ZShX3KF6+9XpDeMe3jsSMwhPoS466m/gFm4NbV7zja4uiA==}
+  /@dydxprotocol/v4-client-js@1.1.26:
+    resolution: {integrity: sha512-TvEgIcTvTCKLnYQbHhnydhfRw5muhOtkXQWVpAIMsGPte2fwujM1h+9E9i5wVS2gjWUChpXwu5LYaxsN2dD7Tg==}
     dependencies:
-      '@cosmjs/amino': 0.32.2
-      '@cosmjs/encoding': 0.32.2
-      '@cosmjs/math': 0.32.2
-      '@cosmjs/proto-signing': 0.32.2
-      '@cosmjs/stargate': 0.32.2
-      '@cosmjs/tendermint-rpc': 0.32.2
-      '@cosmjs/utils': 0.32.2
+      '@cosmjs/amino': 0.32.3
+      '@cosmjs/encoding': 0.32.3
+      '@cosmjs/math': 0.32.3
+      '@cosmjs/proto-signing': 0.32.3
+      '@cosmjs/stargate': 0.32.3
+      '@cosmjs/tendermint-rpc': 0.32.3
+      '@cosmjs/utils': 0.32.3
       '@dydxprotocol/v4-proto': 5.0.0-dev.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.3.2
@@ -3231,16 +3214,16 @@ packages:
       ethereum-cryptography: 2.1.2
       ethers: 6.6.1
       long: 4.0.0
-      protobufjs: 6.11.4
-      ws: 8.17.0
+      protobufjs: 7.3.2
+      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.145:
-    resolution: {integrity: sha512-AfwVKq9G6iIUBMujlBXJNNC87e3V72qNVGQ8pAjQoB1vwgbW9s6dGz4iT7mpl201HrfZ23VjiHdGIKsqwPFlWg==}
+  /@dydxprotocol/v4-localization@1.1.146:
+    resolution: {integrity: sha512-SIrbX60OeqHbSlEaImnrBO46a4S0c4BDCQzIKO+22RS8DQWm33lXH2h5NDitsiP1m8o9ebCBm16GEdtRiSP6cw==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -5237,7 +5220,7 @@ packages:
   /@osmonauts/lcd@0.6.0:
     resolution: {integrity: sha512-vz9VavXrEfxZoXbSAfNfk90MLpn34XtBYPV3L9YilE+s56AhqYxUh83nne9J5somnTRfGnyR3oeV8C+lHkqiuA==}
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       axios: 0.27.2
     transitivePeerDependencies:
       - debug
@@ -5637,7 +5620,7 @@ packages:
   /@radix-ui/primitive@1.0.0:
     resolution: {integrity: sha512-3e7rn8FDMin4CgeL7Z/49smCA3rFYY3Ha2rUQ7HRWFadS5iCRw08ZgVT1LaNTCNqgvrUiyczLflrVrF0SRQtNA==}
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
     dev: false
 
   /@radix-ui/primitive@1.0.1:
@@ -5688,7 +5671,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.6)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.3.3
       '@types/react-dom': 18.2.6
@@ -5781,7 +5764,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       react: 18.2.0
     dev: false
 
@@ -5804,7 +5787,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       react: 18.2.0
     dev: false
 
@@ -5903,7 +5886,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/primitive': 1.0.0
       '@radix-ui/react-compose-refs': 1.0.0(react@18.2.0)
       '@radix-ui/react-primitive': 1.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -5995,7 +5978,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       react: 18.2.0
     dev: false
 
@@ -6019,7 +6002,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-compose-refs': 1.0.0(react@18.2.0)
       '@radix-ui/react-primitive': 1.0.0(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-use-callback-ref': 1.0.0(react@18.2.0)
@@ -6092,7 +6075,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-use-layout-effect': 1.0.0(react@18.2.0)
       react: 18.2.0
     dev: false
@@ -6285,7 +6268,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-primitive': 1.0.0(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -6339,7 +6322,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-compose-refs': 1.0.0(react@18.2.0)
       '@radix-ui/react-use-layout-effect': 1.0.0(react@18.2.0)
       react: 18.2.0
@@ -6374,7 +6357,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-slot': 1.0.0(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -6558,7 +6541,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-compose-refs': 1.0.0(react@18.2.0)
       react: 18.2.0
     dev: false
@@ -6779,7 +6762,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       react: 18.2.0
     dev: false
 
@@ -6802,7 +6785,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-use-callback-ref': 1.0.0(react@18.2.0)
       react: 18.2.0
     dev: false
@@ -6827,7 +6810,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-use-callback-ref': 1.0.0(react@18.2.0)
       react: 18.2.0
     dev: false
@@ -6841,7 +6824,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@18.3.3)(react@18.2.0)
       '@types/react': 18.3.3
       react: 18.2.0
@@ -6852,7 +6835,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
       react: 18.2.0
     dev: false
 
@@ -16405,7 +16388,7 @@ packages:
   /history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.24.7
     dev: true
 
   /hmac-drbg@1.0.1:
@@ -24608,19 +24591,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-
-  /ws@8.17.0:
-    resolution: {integrity: sha512-uJq6108EgZMAl20KagGkzCKfMEjxmKvZHG7Tlq0Z6nOky7YF7aq4mOx6xK8TJ/i1LeK4Qus7INktacctDgY8Ow==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
