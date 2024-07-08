@@ -6,6 +6,8 @@ import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
+import { EvmAddress } from '@/constants/wallets';
+
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
@@ -61,7 +63,7 @@ export const useAccountBalance = ({
   });
 
   const tokenContract = {
-    address: addressOrDenom as `0x${string}`,
+    address: addressOrDenom as EvmAddress,
     abi: erc20Abi,
   } as const;
 

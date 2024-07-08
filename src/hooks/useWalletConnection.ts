@@ -226,9 +226,9 @@ export const useWalletConnection = () => {
           evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature;
         if (
           walletConnection &&
-          walletConnection?.type !== WalletConnectionType.Privy &&
-          walletConnection?.type !== WalletConnectionType.CosmosSigner &&
-          walletConnection?.type !== WalletConnectionType.TestWallet &&
+          walletConnection.type !== WalletConnectionType.Privy &&
+          walletConnection.type !== WalletConnectionType.CosmosSigner &&
+          walletConnection.type !== WalletConnectionType.TestWallet &&
           !isConnectedWagmi &&
           !isAccountConnected
         ) {

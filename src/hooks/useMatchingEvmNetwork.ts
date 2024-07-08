@@ -11,10 +11,12 @@ export const useMatchingEvmNetwork = ({
   chainId,
   switchAutomatically = false,
   onError,
+  onSuccess,
 }: {
   chainId?: string | number;
   switchAutomatically?: boolean;
   onError?: (error: Error) => void;
+  onSuccess?: () => void;
 }) => {
   const { chain } = useAccount();
   const { walletConnectionType } = useWalletConnection();
@@ -32,7 +34,7 @@ export const useMatchingEvmNetwork = ({
       if (walletConnectionType === WalletConnectionType.Privy) {
         await wallets?.[0].switchChain(Number(chainId));
       } else {
-        await switchChainAsync?.({ chainId: Number(chainId) }, { onError });
+        await switchChainAsync?.({ chainId: Number(chainId) }, { onError, onSuccess });
       }
     }
   }, [chainId, chain]);
