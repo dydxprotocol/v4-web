@@ -14,7 +14,6 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -33,7 +32,6 @@ import { useAppSelector } from '@/state/appTypes';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
@@ -44,7 +42,6 @@ import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
-import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 const RewardsPage = () => {
@@ -57,7 +54,6 @@ const RewardsPage = () => {
 
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
-  const { isStakingEnabled } = useEnvFeatures();
 
   const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
@@ -79,8 +75,8 @@ const RewardsPage = () => {
 
   const showMigratePanel =
     import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
-  const showGeoblockedPanel = isStakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && isStakingEnabled;
+  const showGeoblockedPanel = complianceState !== ComplianceStates.FULL_ACCESS;
+  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel;
 
   const stakingRewardPanel = (
     <StakingRewardPanel
@@ -103,53 +99,60 @@ const RewardsPage = () => {
     abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
   }, [canViewAccount]);
 
-  return isTablet ? (
-    <div>
-      <ContentSectionHeader
-        title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-        slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
-      />
-      <$DetachedSection>
-        {showGeoblockedPanel && <GeoblockedPanel />}
-        {showStakingRewardPanel && stakingRewardPanel}
-        {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-        {isStakingEnabled && <UnbondingPanels />}
-        {isStakingEnabled && <TradingRewardsChartPanel />}
-        <LaunchIncentivesPanel />
-        {!isStakingEnabled && <TradingRewardsSummaryPanel />}
-        {isStakingEnabled && <NewMarketsPanel />}
-        {isStakingEnabled && <GovernancePanel />}
-        <RewardHistoryPanel />
-        <RewardsHelpPanel />
-        {isStakingEnabled && legalDisclaimer}
-      </$DetachedSection>
-    </div>
-  ) : (
-    <$DetachedSection>
-      {showMigratePanel && <MigratePanel />}
-      <$DoubleColumnView>
-        <$LeftColumn>
-          {isStakingEnabled && <TradingRewardsChartPanel />}
-          <LaunchIncentivesPanel />
-          {!isStakingEnabled && <TradingRewardsSummaryPanel />}
-          <RewardHistoryPanel />
-        </$LeftColumn>
-        <$RightColumn>
-          {showGeoblockedPanel && <GeoblockedPanel />}
-          {showStakingRewardPanel && stakingRewardPanel}
-          {isStakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-          {isStakingEnabled && <UnbondingPanels />}
-          {isStakingEnabled && <NewMarketsPanel />}
-          {isStakingEnabled && <GovernancePanel />}
-          <RewardsHelpPanel />
-          {isStakingEnabled && legalDisclaimer}
-        </$RightColumn>
-      </$DoubleColumnView>
-    </$DetachedSection>
+  return (
+    <$Page>
+      {isTablet ? (
+        <div>
+          <ContentSectionHeader
+            title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+            slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
+          />
+          <$DetachedSection>
+            {showGeoblockedPanel && <GeoblockedPanel />}
+            {showStakingRewardPanel && stakingRewardPanel}
+            <StakingPanel />
+            <UnbondingPanels />
+            <TradingRewardsChartPanel />
+            <LaunchIncentivesPanel />
+            <NewMarketsPanel />
+            <GovernancePanel />
+            <RewardHistoryPanel />
+            <RewardsHelpPanel />
+            {legalDisclaimer}
+          </$DetachedSection>
+        </div>
+      ) : (
+        <$DetachedSection>
+          {showMigratePanel && <MigratePanel />}
+          <$DoubleColumnView>
+            <$LeftColumn>
+              <TradingRewardsChartPanel />
+              <LaunchIncentivesPanel />
+              <RewardHistoryPanel />
+            </$LeftColumn>
+            <$RightColumn>
+              {showGeoblockedPanel && <GeoblockedPanel />}
+              {showStakingRewardPanel && stakingRewardPanel}
+              <StakingPanel />
+              <UnbondingPanels />
+              <NewMarketsPanel />
+              <GovernancePanel />
+              <RewardsHelpPanel />
+              {legalDisclaimer}
+            </$RightColumn>
+          </$DoubleColumnView>
+        </$DetachedSection>
+      )}
+      ;
+    </$Page>
   );
 };
 
 export default RewardsPage;
+
+const $Page = styled.div`
+  ${layoutMixins.contentContainerPage}
+`;
 
 const $DetachedSection = styled(DetachedSection)`
   display: flex;
