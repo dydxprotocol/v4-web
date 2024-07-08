@@ -100,6 +100,12 @@ export const getTriggerOrdersInputErrors = (state: RootState) => {
 export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerOrdersInputs;
 
 /**
+ * @param state
+ * @returns Trigger Form Input states for display. Abacus inputs should track these values.
+ */
+export const getTriggerFormInputs = (state: RootState) => state.inputs.triggerFormInputs;
+
+/**
  * @returns AdjustIsolatedMarginInputs
  */
 export const getAdjustIsolatedMarginInputs = (state: RootState) =>

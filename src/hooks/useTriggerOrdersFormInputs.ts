@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch } from 'react-redux';
 
 import { AbacusOrderType, SubaccountOrder, TriggerOrdersInputField } from '@/constants/abacus';
 
 import { useAppSelector } from '@/state/appTypes';
+import { setTriggerFormInputs } from '@/state/inputs';
 import { getTriggerOrdersInputErrors } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -23,6 +24,7 @@ export const useTriggerOrdersFormInputs = ({
   stopLossOrder?: SubaccountOrder;
   takeProfitOrder?: SubaccountOrder;
 }) => {
+  const dispatch = useDispatch();
   const inputErrors = useAppSelector(getTriggerOrdersInputErrors, shallowEqual);
 
   const [differingOrderSizes, setDifferingOrderSizes] = useState(false);
@@ -50,6 +52,14 @@ export const useTriggerOrdersFormInputs = ({
           value: stopLossOrder.size,
         },
         {
+          field: TriggerOrdersInputField.stopLossOrderType,
+          value: stopLossOrder.type.rawValue,
+        },
+      ].map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
+
+      // Fields which use form inputs
+      [
+        {
           field: TriggerOrdersInputField.stopLossPrice,
           value: MustBigNumber(stopLossOrder.triggerPrice).toString(),
         },
@@ -57,13 +67,16 @@ export const useTriggerOrdersFormInputs = ({
           field: TriggerOrdersInputField.stopLossLimitPrice,
           value: MustBigNumber(stopLossOrder.price).toString(),
         },
-        {
-          field: TriggerOrdersInputField.stopLossOrderType,
-          value: stopLossOrder.type.rawValue,
-        },
       ]
         .filter(isTruthy)
-        .map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
+        .forEach(({ field, value }) => {
+          dispatch(
+            setTriggerFormInputs({
+              [field.rawValue]: value,
+            })
+          );
+          abacusStateManager.setTriggerOrdersValue({ field, value });
+        });
     } else {
       abacusStateManager.setTriggerOrdersValue({
         field: TriggerOrdersInputField.stopLossOrderType,
@@ -72,6 +85,7 @@ export const useTriggerOrdersFormInputs = ({
     }
 
     if (takeProfitOrder) {
+      // Initialize trigger order data on mount
       [
         {
           field: TriggerOrdersInputField.takeProfitOrderId,
@@ -82,6 +96,14 @@ export const useTriggerOrdersFormInputs = ({
           value: takeProfitOrder.size,
         },
         {
+          field: TriggerOrdersInputField.takeProfitOrderType,
+          value: takeProfitOrder.type.rawValue,
+        },
+      ].map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
+
+      // Fields which also use form inputs
+      [
+        {
           field: TriggerOrdersInputField.takeProfitPrice,
           value: MustBigNumber(takeProfitOrder.triggerPrice).toString(),
         },
@@ -89,13 +111,16 @@ export const useTriggerOrdersFormInputs = ({
           field: TriggerOrdersInputField.takeProfitLimitPrice,
           value: MustBigNumber(takeProfitOrder.price).toString(),
         },
-        {
-          field: TriggerOrdersInputField.takeProfitOrderType,
-          value: takeProfitOrder.type.rawValue,
-        },
       ]
         .filter(isTruthy)
-        .map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
+        .forEach(({ field, value }) => {
+          dispatch(
+            setTriggerFormInputs({
+              [field.rawValue]: value,
+            })
+          );
+          abacusStateManager.setTriggerOrdersValue({ field, value });
+        });
     } else {
       abacusStateManager.setTriggerOrdersValue({
         field: TriggerOrdersInputField.takeProfitOrderType,
