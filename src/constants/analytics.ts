@@ -1,4 +1,5 @@
 import { StatSigFlags } from '@/types/statsig';
+import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
@@ -100,6 +101,11 @@ export const AnalyticsEvents = unionize(
       blockHeight?: number;
       indexerBlockHeight?: number;
       trailingBlocks?: number;
+    }>(),
+    SwitchedLanguageToEULanguage: ofType<{
+      previousLocale: SupportedLocale;
+      newLocale: SupportedLocale;
+      browserLanguage?: string;
     }>(),
 
     // Export CSV
