@@ -17,8 +17,11 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { HorizontalSeparatorFiller, VerticalSeparator } from '@/components/Separator';
 import { ColumnDef, Table } from '@/components/Table';
+import { Tag, TagSize, TagType } from '@/components/Tag';
+import { PnlChart } from '@/views/charts/PnlChart';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getUserVault, getVaultDetails } from '@/state/vaultSelectors';
 import { VaultTransaction } from '@/state/vaults';
 
@@ -133,6 +136,8 @@ export const FullVaultInfo = ({ className }: FullVaultInfoProps) => {
   const { vaultsLearnMore } = useURLConfigs();
 
   const detailItems = useVaultDetailsItems();
+  const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
+  const selectedLocale = useAppSelector(getSelectedLocale);
   return (
     <$Container className={className}>
       <$HeaderRow>
@@ -157,11 +162,18 @@ export const FullVaultInfo = ({ className }: FullVaultInfoProps) => {
       </$HeaderRow>
 
       <$HorizontalSeparatorFiller />
-      <$PnlRow />
+      <$PnlRow>
+        <$PnlChart selectedLocale={selectedLocale} />
+      </$PnlRow>
 
       <$HorizontalSeparatorFiller />
       <div>
-        <$SectionTitle>{stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}</$SectionTitle>
+        <$SectionTitle>
+          {stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}{' '}
+          <Tag size={TagSize.Medium} type={TagType.Number}>
+            {numPositions}
+          </Tag>
+        </$SectionTitle>
         <$VaultsTable />
       </div>
     </$Container>
@@ -184,7 +196,9 @@ const $VaultImg = styled.img`
 
 const $SectionTitle = styled.div`
   font: var(--font-large-medium);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  ${layoutMixins.row}
+  gap: 0.5rem;
 `;
 
 const $Container = styled.div`
@@ -226,7 +240,16 @@ const $DetailValue = styled.div`
   font: var(--font-medium-book);
 `;
 
-const $PnlRow = styled.div``;
+const $PnlRow = styled.div`
+  height: 30rem;
+`;
+const $PnlChart = styled(PnlChart)`
+  height: 30rem;
+  background-color: var(--color-layer-2);
+
+  // todo remember to grab colors
+  --pnl-line-color: var(--color-positive);
+`;
 
 const $VaultsTable = styled(VaultsTable)``;
 
@@ -244,7 +267,16 @@ export const VaultTransactionsTable = ({ className }: VaultTransactionsTableProp
           getCellValue: (row) => row.timestampMs,
           label: stringGetter({ key: STRING_KEYS.TIME }),
           renderCell: ({ timestampMs }) => (
-            <Output value={timestampMs} type={OutputType.Date} dateOptions={{ format: 'medium' }} />
+            <$Stack>
+              <Output
+                value={timestampMs}
+                type={OutputType.Date}
+                dateOptions={{ format: 'medium' }}
+              />
+              <$TimeText>
+                <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
+              </$TimeText>
+            </$Stack>
           ),
         },
         {
@@ -310,4 +342,16 @@ const $Icon = styled(Icon)`
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
 ` as typeof Table;
+
+const $Stack = styled.div`
+  ${layoutMixins.column}
+`;
+
+const $TimeText = styled.div`
+  font-size: 0.75rem;
+  line-height: 0.7rem;
+  color: var(--color-text-0);
+`;

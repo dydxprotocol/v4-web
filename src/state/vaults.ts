@@ -52,7 +52,11 @@ const initialState: VaultsState = {
         marginUsdc: 10_000,
         currentLeverageMultiple: 1.2,
         currentPosition: { asset: 17341235412, usdc: 423.67 },
-        thirtyDayPnl: { percent: 0.123, absolute: 1123, sparklinePoints: [1, 2, 3, 4, 5] },
+        thirtyDayPnl: {
+          percent: 0.123,
+          absolute: 1123,
+          sparklinePoints: [1, 2, 3, 2, 1, 4, 3, 1, 3, 1, 2],
+        },
       },
     ],
   },
@@ -61,13 +65,13 @@ const initialState: VaultsState = {
     userReturn: 3,
     transactionHistory: [
       {
-        timestampMs: new Date('8/1/24').valueOf(),
+        timestampMs: new Date('8/1/24 1:23 PM').valueOf(),
         amountUsdc: 100,
         type: 'deposit',
         id: '1',
       },
       {
-        timestampMs: new Date('8/8/24').valueOf(),
+        timestampMs: new Date('8/8/24 5:27 AM').valueOf(),
         amountUsdc: 150,
         type: 'withdrawal',
         id: '2',
