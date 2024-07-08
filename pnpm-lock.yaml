@@ -221,6 +221,9 @@ dependencies:
   ethers:
     specifier: ^6.6.1
     version: 6.6.1
+  export-to-csv:
+    specifier: ^1.2.3
+    version: 1.2.3
   graz:
     specifier: ^0.0.43
     version: 0.0.43(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
@@ -13103,6 +13106,11 @@ packages:
       jest-message-util: 29.7.0
       jest-util: 29.7.0
     dev: true
+
+  /export-to-csv@1.2.3:
+    resolution: {integrity: sha512-N+hWdpEQNSn4BeltgusTuW65gC+2B5hmOWe4Eu0gw0NwKq92dzD+5ObSSBUeKTy7k+PGG7xDqaThPg8elZ7k+g==}
+    engines: {node: ^v12.20.0 || >=v14.13.0}
+    dev: false
 
   /ext@1.7.0:
     resolution: {integrity: sha512-6hxeJYaL110a9b5TEJSj0gojyHQAmA2ch5Os+ySCiA1QGdS697XWY1pzsrSjqA9LDEEgdB/KypIlR59RcLuHYw==}
