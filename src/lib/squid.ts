@@ -2,9 +2,13 @@ import { GetStatus, StatusResponse } from '@0xsquid/sdk';
 import {
   AxelarTransferInfoJSON,
   CCTPTransferInfoJSON,
+  OperationJSON,
+  RouteRequestGivenInJSON,
+  RouteResponseJSON,
   TrackTxResponseJSON,
   TransferEventJSON,
   TransferInfoJSON,
+  TransferJSON,
   TransferStatusJSON,
   TxStatusResponseJSON,
 } from '@skip-router/core';
@@ -76,6 +80,11 @@ type SkipStatusParams = {
   baseUrl: string | undefined;
 };
 
+type SkipRouteParams = {
+  routeRequestGivenIn: RouteRequestGivenInJSON;
+  baseUrl: string | undefined;
+};
+
 const DEFAULT_SKIP_URL = 'https://api.skip.money';
 
 export const trackSkipTx = async ({
@@ -116,6 +125,26 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
   const statusResponse = await response.json();
   return formSkipStatusResponse(statusResponse);
 };
+
+export const fetchSkipRoute = async ({
+  routeRequestGivenIn,
+  baseUrl,
+}: SkipRouteParams): Promise<RouteResponseJSON | undefined> => {
+  const response = await fetch(`${baseUrl ?? DEFAULT_SKIP_URL}/v2/fungible/route`, {
+    method: 'POST',
+    body: JSON.stringify(routeRequestGivenIn),
+  });
+  return response.json();
+};
+
+export function isTransferOperation(operation: OperationJSON): operation is {
+  transfer: TransferJSON;
+  tx_index: number;
+  amount_in: string;
+  amount_out: string;
+} {
+  return (operation as { transfer: TransferJSON }).transfer !== undefined;
+}
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
   return skipStatusResponse.transfers[0];

@@ -65,7 +65,12 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS, getNobleChainId } from '@/lib/squid';
+import {
+  NATIVE_TOKEN_ADDRESS,
+  fetchSkipRoute,
+  getNobleChainId,
+  isTransferOperation,
+} from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -124,6 +129,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // todo are these guaranteed to be base 10?
   // eslint-disable-next-line radix
   const chainId = chainIdStr && !isKeplrWallet ? parseInt(chainIdStr) : chainIdStr ?? undefined;
+  const nobleChainId = getNobleChainId();
 
   // User inputs
   const sourceToken = useMemo(
@@ -140,8 +146,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
-  const { usdcLabel, usdcDecimals, usdcGasDenom } = useTokenConfigs();
-  const { nobleValidator } = useEndpointsConfig();
+  const { usdcLabel, usdcDecimals, usdcGasDenom, usdcDenom } = useTokenConfigs();
+  const { nobleValidator, skip } = useEndpointsConfig();
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
@@ -205,10 +211,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (walletType === WalletType.Keplr) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
-        value: getNobleChainId(),
+        value: nobleChainId,
       });
     }
-  }, [nobleAddress, walletType]);
+  }, [nobleAddress, nobleChainId, walletType]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
@@ -315,32 +321,69 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     await nobleClient.connect(localNobleWallet);
 
     const amount = summary?.toAmount ?? 0;
-    const tx = {
-      typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-      value: {
-        sourcePort: 'transfer',
-        sourceChannel: isMainnet ? 'channel-33' : 'channel-21',
-        sender: nobleAddress,
-        receiver: dydxAddress,
-        token: {
-          denom: usdcGasDenom,
-          amount: parseUnits(amount.toString(), usdcDecimals).toString(),
+    const parsedAmount = parseUnits(amount.toString(), usdcDecimals).toString();
+
+    const ibcTransfer = (sourceChannel: string) => {
+      return {
+        typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+        value: {
+          sourcePort: 'transfer',
+          sourceChannel,
+          sender: nobleAddress,
+          receiver: dydxAddress,
+          token: {
+            denom: usdcGasDenom,
+            amount: parsedAmount,
+          },
+          timeoutTimestamp: Long.fromNumber(Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9),
         },
-        timeoutTimestamp: Long.fromNumber(Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9),
-      },
+      };
     };
     const nobleGasPrice = GasPrice.fromString('0.1uusdc');
     const memo = `${DEFAULT_TRANSACTION_MEMO} | ${nobleAddress}`;
-    const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
 
-    return txResult;
+    if (isMainnet) {
+      try {
+        const route = await fetchSkipRoute({
+          baseUrl: skip,
+          routeRequestGivenIn: {
+            amount_in: parsedAmount,
+            source_asset_chain_id: nobleChainId,
+            source_asset_denom: usdcGasDenom,
+            dest_asset_chain_id: selectedDydxChainId,
+            dest_asset_denom: usdcDenom,
+          },
+        });
+
+        const transferOperation = route?.operations.find(isTransferOperation);
+        const transferChannel = transferOperation?.transfer.channel;
+
+        if (!transferChannel) {
+          throw new Error('Failed to get transfer channel');
+        }
+
+        const tx = ibcTransfer(transferChannel);
+        const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
+        return txResult;
+      } catch (e) {
+        throw new Error('Failed to send IBC transfer');
+      }
+    } else {
+      const tx = ibcTransfer('channel-21');
+      const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
+      return txResult;
+    }
   }, [
     dydxAddress,
     localNobleWallet,
     nobleAddress,
+    nobleChainId,
     nobleValidator,
+    selectedDydxChainId,
+    skip,
     summary?.toAmount,
     usdcDecimals,
+    usdcDenom,
     usdcGasDenom,
   ]);
 
@@ -349,7 +392,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       try {
         e.preventDefault();
 
-        const nobleChainId = getNobleChainId();
         if (chainIdStr === nobleChainId) {
           setIsLoading(true);
           const txResult = await sendNobleIBC();
@@ -447,7 +489,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, sendNobleIBC]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId, sendNobleIBC]
   );
 
   const amountInputReceipt = [
