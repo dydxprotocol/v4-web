@@ -13,6 +13,12 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
+import { AlertMessage } from '@/components/AlertMessage';
+import { Button } from '@/components/Button';
+import { DetailsItem } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
+import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -20,13 +26,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
-
-import { AlertMessage } from '../components/AlertMessage';
-import { Button } from '../components/Button';
-import { DetailsItem } from '../components/Details';
-import { Icon, IconName } from '../components/Icon';
-import { WithDetailsReceipt } from '../components/WithDetailsReceipt';
-import { WithTooltip } from '../components/WithTooltip';
 
 type StakeButtonWarning = {
   type: AlertType.Warning | AlertType.Info;
@@ -170,8 +169,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
   --withReceipt-backgroundColor: var(--color-layer-2);
-
-  color: var(--color-text-form);
   width: 100%;
 
   ${({ isForm }) =>

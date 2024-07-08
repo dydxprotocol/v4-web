@@ -558,7 +558,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
   {
     type: NotificationType.ApiError,
-    useTrigger: ({ trigger }) => {
+    useTrigger: ({ trigger, hideNotification }) => {
       const stringGetter = useStringGetter();
       const { statusErrorMessage } = useApiState();
       const { statusPage } = useURLConfigs();
@@ -579,8 +579,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
               ),
             },
-            []
+            [],
+            true,
+            true // unhide on new error (i.e. normal -> not normal api status)
           );
+        } else {
+          // hide/expire existing notification if no error
+          hideNotification({
+            type: NotificationType.ApiError,
+            id: NotificationType.ApiError,
+          });
         }
       }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title]);
     },

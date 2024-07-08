@@ -208,7 +208,7 @@ export const AccountMenu = () => {
                   asset={DydxChainAsset.USDC}
                   complianceState={complianceState}
                   dispatch={dispatch}
-                  hasBalance={MustBigNumber(usdcBalance).gt(0)}
+                  hasBalance={MustBigNumber(freeCollateral?.current).gt(0)}
                   stringGetter={stringGetter}
                   withOnboarding
                 />

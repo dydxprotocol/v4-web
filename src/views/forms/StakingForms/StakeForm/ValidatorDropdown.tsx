@@ -22,7 +22,7 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { Tag } from '@/components/Tag';
-import { ValidatorFaviconIcon } from '@/components/ValidatorName';
+import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
 
 import { MustBigNumber } from '@/lib/numbers';
 

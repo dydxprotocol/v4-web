@@ -40,6 +40,7 @@
   --font-base-regular: var(--fontWeight-regular) var(--fontSize-base) var(--fontFamily-base);
   --font-base-book: var(--fontWeight-book) var(--fontSize-base) var(--fontFamily-base);
   --font-base-medium: var(--fontWeight-medium) var(--fontSize-base) var(--fontFamily-base);
+  --font-base-bold: var(--fontWeight-bold) var(--fontSize-base) var(--fontFamily-base);
 
   --font-medium-regular: var(--fontWeight-regular) var(--fontSize-medium) var(--fontFamily-base);
   --font-medium-book: var(--fontWeight-book) var(--fontSize-medium) var(--fontFamily-base);

@@ -227,6 +227,15 @@ export const AnalyticsEvents = unionize(
       amount?: number;
       validatorAddress?: string;
     }>(),
+
+    // Sharing
+    SharePnlShared: ofType<{
+      asset: string;
+    }>(),
+    SharePnlCopied: ofType<{
+      asset: string;
+    }>(),
+
     Error: ofType<{
       location: string;
       error: Error;

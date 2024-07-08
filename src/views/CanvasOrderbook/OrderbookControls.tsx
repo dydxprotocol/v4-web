@@ -6,10 +6,7 @@ import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-
-import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
@@ -35,7 +32,6 @@ export const OrderbookControls = ({
   setSelectedUnit,
   grouping,
 }: OrderbookControlsProps) => {
-  const stringGetter = useStringGetter();
   const modifyScale = useCallback(
     (direction: number) => {
       const start = grouping?.multiplier.ordinal ?? 0;
@@ -52,25 +48,7 @@ export const OrderbookControls = ({
   return (
     <$OrderbookControlsContainer className={className}>
       <$OrderbookUnitControl>
-        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_UNITS })}</$OrderbookLabel>
-        <ToggleGroup
-          items={[
-            { label: assetName ?? '', value: 'asset' as const },
-            { label: 'USD', value: 'fiat' as const },
-          ]}
-          shape={ButtonShape.Rectangle}
-          value={selectedUnit}
-          onValueChange={setSelectedUnit}
-        />
-      </$OrderbookUnitControl>
-      <$OrderbookZoomControl>
-        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_GROUPING })}</$OrderbookLabel>
         <$ZoomControls>
-          <Output
-            value={grouping?.tickSize}
-            type={OutputType.Fiat}
-            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
-          />
           <$ButtonGroup>
             <Button
               size={ButtonSize.XSmall}
@@ -87,16 +65,25 @@ export const OrderbookControls = ({
               +
             </Button>
           </$ButtonGroup>
+          <Output
+            value={grouping?.tickSize}
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
+          />
         </$ZoomControls>
-      </$OrderbookZoomControl>
+        <ToggleGroup
+          items={[
+            { label: assetName ?? '', value: 'asset' as const },
+            { label: 'USD', value: 'fiat' as const },
+          ]}
+          shape={ButtonShape.Rectangle}
+          value={selectedUnit}
+          onValueChange={setSelectedUnit}
+        />
+      </$OrderbookUnitControl>
     </$OrderbookControlsContainer>
   );
 };
-
-const $OrderbookLabel = styled.div`
-  display: inline-flex;
-  align-items: center;
-`;
 
 const $OrderbookControlsContainer = styled.div`
   color: var(--color-text-0);
@@ -129,13 +116,6 @@ const $OrderbookUnitControl = styled.div`
   justify-content: space-between;
   gap: 0.5rem;
   border-bottom: var(--border);
-`;
-
-const $OrderbookZoomControl = styled.div`
-  gap: 1rem;
-  display: flex;
-  justify-content: space-between;
-  box-shadow: 0 0 0 var(--border-width) var(--border-color);
 `;
 
 const $MinusSymbolCenter = styled.span`

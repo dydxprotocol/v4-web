@@ -12,9 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Set up pnpm
-        uses: dydxprotocol/setup-pnpm@v1
+        uses: dydxprotocol/setup-pnpm@v2.0.0
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -27,7 +27,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           pnpm install --loglevel warn
-      
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -54,6 +54,6 @@ jobs:
         with:
           ref: 'main'
           path: 'v4-web-main-other-market-validation'
-      
+
       - name: Validate other market data
         run: pnpx tsx scripts/validate-other-market-data.ts

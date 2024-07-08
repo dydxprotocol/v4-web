@@ -25,7 +25,7 @@ import { Tag } from '@/components/Tag';
 import {
   StakeRewardButtonAndReceipt,
   type StakeButtonAlert,
-} from '@/views/StakeRewardButtonAndReceipt';
+} from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
