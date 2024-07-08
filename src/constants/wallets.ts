@@ -1,6 +1,7 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
 import type { ExternalProvider } from '@ethersproject/providers';
 import type { suggestChain } from 'graz';
+import { EIP1193Provider } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -23,8 +24,6 @@ import {
   TrustWalletIcon,
   WalletConnectIcon,
 } from '@/icons';
-
-import { isMetaMask } from '@/lib/wallet/providers';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 
@@ -218,7 +217,8 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: isMetaMask,
+    matchesInjectedEip1193: (provider) =>
+      Boolean(provider.isMetaMask) && !provider.overrideIsMetaMask,
     walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
   },
   [WalletType.OkxWallet]: {
@@ -280,15 +280,15 @@ export const wallets: Record<WalletType, WalletConfig> = {
 };
 
 // Injected EIP-1193 Providers
-export type InjectedEthereumProvider = ExternalProvider;
+export type InjectedEthereumProvider = EIP1193Provider;
 
-export type InjectedWeb3Provider = ExternalProvider;
+export type InjectedWeb3Provider = EIP1193Provider;
 
 export type InjectedCoinbaseWalletExtensionProvider = InjectedEthereumProvider & {
   isMetaMask: true;
   overrideIsMetaMask: true;
-  providerMap: Map<'MetaMask' | 'CoinbaseWallet', ExternalProvider>;
-  providers: ExternalProvider[];
+  providerMap: Map<'MetaMask' | 'CoinbaseWallet', EIP1193Provider>;
+  providers: EIP1193Provider[];
 };
 
 export type WithInjectedEthereumProvider = {
@@ -309,7 +309,7 @@ export type WithInjectedOkxWalletProvider = {
 
 export type WalletConnection = {
   type: WalletConnectionType;
-  provider?: ExternalProvider;
+  provider?: EIP1193Provider;
 };
 
 /**

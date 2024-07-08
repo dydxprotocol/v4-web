@@ -1,4 +1,4 @@
-import type { ExternalProvider } from '@ethersproject/providers';
+import { EIP1193Provider } from 'viem';
 
 import {
   type InjectedCoinbaseWalletExtensionProvider,
@@ -9,17 +9,6 @@ import {
 } from '@/constants/wallets';
 
 import { isTruthy } from '../isTruthy';
-
-// Injected EIP-1193 Providers
-/* prettier-ignore */
-export const isMetaMask = (provider: ExternalProvider) => (
-  Boolean(provider.isMetaMask)
-    
-  /* not Coinbase Wallet browser extension */
-  && (
-    !(provider as InjectedCoinbaseWalletExtensionProvider).overrideIsMetaMask
-  )
-)
 
 /*
   The Coinbase Wallet browser extension displaces existing injected EIP-1193 providers into a custom data structure, such that:
@@ -35,7 +24,7 @@ const isCoinbaseWalletBrowserExtension = (
 ): ethereum is InjectedCoinbaseWalletExtensionProvider =>
   ethereum && 'overrideIsMetaMask' in ethereum && ethereum.overrideIsMetaMask;
 
-export const detectInjectedEip1193Providers = (): ExternalProvider[] => {
+export const detectInjectedEip1193Providers = (): EIP1193Provider[] => {
   const ethereumProvider = (globalThis as typeof globalThis & WithInjectedEthereumProvider)
     ?.ethereum;
 
