@@ -7,14 +7,15 @@ import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
-import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { HorizontalSeparatorFiller, VerticalSeparator } from '@/components/Separator';
 import { ColumnDef, Table } from '@/components/Table';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -75,7 +76,7 @@ const $CardsContainer = styled.div`
 const $DetailCard = styled.div`
   border: solid var(--border-width) var(--border-color);
   border-radius: 0.7rem;
-  padding: 0.85rem 1rem;
+  padding: 0.5rem 1rem;
   font: var(--font-base-book);
 
   ${layoutMixins.column};
@@ -85,44 +86,33 @@ const $CardHeader = styled.div`
 `;
 const $CardValue = styled.div`
   font: var(--font-medium-book);
+  line-height: 1.2rem;
 `;
 
 export const useVaultDetailsItems = () => {
   const stringGetter = useStringGetter();
-  const { allTimePnl, thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
+  const { thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
 
   const items = [
     {
-      key: 'balance',
-      label: stringGetter({ key: STRING_KEYS.VAULT_BALANCE }),
-      value: <Output value={totalValue} type={OutputType.CompactFiat} />,
-    },
-    {
-      key: 'all-time-pnl',
-      label: stringGetter({ key: STRING_KEYS.VAULT_ALL_TIME_PNL }),
+      key: '30d-apr',
+      label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
       value: (
-        <$ColoredReturn $sign={getNumberSign(allTimePnl?.absolute)}>
-          {allTimePnl?.absolute != null ? (
-            <Output value={allTimePnl?.absolute} type={OutputType.CompactFiat} />
-          ) : (
-            '-'
-          )}{' '}
-          <Output value={allTimePnl?.percent} type={OutputType.Percent} withParentheses />
+        <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
+          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />
         </$ColoredReturn>
       ),
     },
     {
-      key: '30d-apr',
-      label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
-      value: <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />,
+      key: 'balance',
+      label: 'TVL',
+      value: <Output value={totalValue} type={OutputType.Fiat} fractionDigits={0} />,
     },
   ];
   return items;
 };
 
 const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
-  display: flex;
-  gap: 0.25rem;
   ${({ $sign }) =>
     $sign &&
     {
@@ -140,51 +130,82 @@ type FullVaultInfoProps = { className?: string };
 
 export const FullVaultInfo = ({ className }: FullVaultInfoProps) => {
   const stringGetter = useStringGetter();
+  const { vaultsLearnMore } = useURLConfigs();
 
   const detailItems = useVaultDetailsItems();
   return (
     <$Container className={className}>
       <$HeaderRow>
         <$MarketTitle>
-          <AssetIcon symbol="BTC" />
-          {stringGetter({ key: STRING_KEYS.ASSET_VAULT, params: { ASSET: 'BTC' } })}
+          <$VaultImg src="/dydx-chain.png" />
+          <div>
+            <$MarketTitleText>{stringGetter({ key: STRING_KEYS.VAULT })}</$MarketTitleText>
+            <$LearnMoreLink href={vaultsLearnMore} withIcon>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            </$LearnMoreLink>
+          </div>
         </$MarketTitle>
-      </$HeaderRow>
-      <$DetailsRow>
-        {detailItems
-          .filter((i) => i.key !== 'balance')
-          .map((item) => (
+        {detailItems.map((item) => (
+          <>
+            <$VerticalSeparator />
             <$DetailItem key={item.key}>
               <$DetailLabel>{item.label}</$DetailLabel>
               <$DetailValue>{item.value}</$DetailValue>
             </$DetailItem>
-          ))}
-      </$DetailsRow>
+          </>
+        ))}
+      </$HeaderRow>
+
       <$HorizontalSeparatorFiller />
       <$PnlRow />
+
       <$HorizontalSeparatorFiller />
-      <$VaultsTable />
+      <div>
+        <$SectionTitle>{stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}</$SectionTitle>
+        <$VaultsTable />
+      </div>
     </$Container>
   );
 };
+
+const $VerticalSeparator = styled(VerticalSeparator)`
+  &&& {
+    height: 2rem;
+  }
+`;
+const $LearnMoreLink = styled(Link)`
+  font: var(--font-small-book);
+  color: var(--color-text-1);
+`;
+const $VaultImg = styled.img`
+  width: 3.5rem;
+  height: 3.5rem;
+`;
+
+const $SectionTitle = styled.div`
+  font: var(--font-large-medium);
+  margin-bottom: 0.5rem;
+`;
 
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.25rem;
 `;
-const $HeaderRow = styled.div`
-  ${layoutMixins.flexEqualRow}
-  justify-content: space-between;
-`;
-const $MarketTitle = styled.h3`
-  ${layoutMixins.row}
-  font: var(--font-large-medium);
-  gap: 1.25rem;
 
-  img {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
+const $HeaderRow = styled.div`
+  ${layoutMixins.flexWrap}
+  gap: 1.5rem;
+  margin-bottom: 0.625rem;
+`;
+
+const $MarketTitleText = styled.h3`
+  font: var(--font-extra-medium);
+  color: var(--color-text-2);
+`;
+
+const $MarketTitle = styled.div`
+  ${layoutMixins.row}
+  gap: 1.25rem;
 `;
 
 const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
@@ -192,10 +213,6 @@ const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
   min-height: 1px;
 `;
 
-const $DetailsRow = styled.div`
-  ${layoutMixins.flexWrap}
-  gap: 2rem;
-`;
 const $DetailItem = styled.div`
   ${layoutMixins.flexColumn}
   font: var(--font-base-book);

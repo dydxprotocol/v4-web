@@ -1,4 +1,4 @@
-import { Key, useMemo, useState } from 'react';
+import { Key, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -9,39 +9,22 @@ import { AppRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { AssetTableCell } from '@/components/Table/AssetTableCell';
-import { Toolbar } from '@/components/Toolbar';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getVaultDetails } from '@/state/vaultSelectors';
-
-import { matchesSearchFilter } from '@/lib/search';
-
-import { VaultFilter, VaultsFilter } from './VaultFilter';
 
 type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
 export const VaultsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const [searchFilter, setSearchFilter] = useState<string>('');
-  const [filter, setFilter] = useState<VaultsFilter>(VaultsFilter.ALL);
   const navigate = useNavigate();
 
   const vaultsData = useAppSelector(getVaultDetails)?.positions;
-  const filteredVaultsData = useMemo(() => {
-    return vaultsData.filter(
-      (vault) =>
-        searchFilter.trim().length === 0 ||
-        matchesSearchFilter(searchFilter, vault.asset.name) ||
-        matchesSearchFilter(searchFilter, vault.asset.id) ||
-        matchesSearchFilter(searchFilter, vault.marketId)
-    );
-  }, [searchFilter, vaultsData]);
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
     () =>
@@ -63,70 +46,24 @@ export const VaultsTable = ({ className }: { className?: string }) => {
   );
 
   return (
-    <>
-      <$Toolbar>
-        <VaultFilter
-          onChangeFilter={setFilter}
-          selectedFilter={filter}
-          onSearchTextChange={setSearchFilter}
-        />
-      </$Toolbar>
-
-      <$Table
-        withInnerBorders
-        data={filteredVaultsData}
-        getRowKey={(row) => row.marketId}
-        label={stringGetter({ key: STRING_KEYS.VAULTS })}
-        onRowAction={(marketId: Key) =>
-          navigate(`${AppRoute.Vaults}/${marketId}`, { state: { from: AppRoute.Vaults } })
-        }
-        defaultSortDescriptor={{
-          column: 'vault-balance',
-          direction: 'descending',
-        }}
-        columns={columns}
-        paginationBehavior="showAll"
-        className={className}
-        slotEmpty={
-          <$MarketNotFound>
-            <div>
-              <h2>
-                {stringGetter({
-                  key: STRING_KEYS.QUERY_NOT_FOUND,
-                  params: {
-                    QUERY:
-                      searchFilter.trim().length > 0
-                        ? searchFilter
-                        : filter === VaultsFilter.MINE
-                          ? stringGetter({ key: STRING_KEYS.MY_VAULTS })
-                          : '',
-                  },
-                })}
-              </h2>
-              <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
-            </div>
-          </$MarketNotFound>
-        }
-      />
-    </>
+    <$Table
+      withInnerBorders
+      data={vaultsData}
+      getRowKey={(row) => row.marketId}
+      label={stringGetter({ key: STRING_KEYS.VAULTS })}
+      onRowAction={(marketId: Key) =>
+        navigate(`${AppRoute.Vaults}/${marketId}`, { state: { from: AppRoute.Vaults } })
+      }
+      defaultSortDescriptor={{
+        column: 'vault-balance',
+        direction: 'descending',
+      }}
+      columns={columns}
+      paginationBehavior="showAll"
+      className={className}
+    />
   );
 };
-const $Toolbar = styled(Toolbar)`
-  max-width: 100vw;
-  overflow: hidden;
-  margin-bottom: 0.625rem;
-  padding-left: 0.375rem;
-  padding-right: 0;
-
-  @media ${breakpoints.desktopSmall} {
-    padding-right: 0.375rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-`;
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
@@ -137,16 +74,3 @@ const $Table = styled(Table)`
     }
   }
 ` as typeof Table;
-
-const $MarketNotFound = styled.div`
-  ${layoutMixins.column}
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
-
-  h2 {
-    font: var(--font-medium-medium);
-  }
-`;

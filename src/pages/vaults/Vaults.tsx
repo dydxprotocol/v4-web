@@ -4,21 +4,15 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-
-import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { Link } from '@/components/Link';
 
 import { FullVaultInfo, VaultTransactionsTable, YourVaultDetailsCards } from './FullVaultInfo';
 
 const Vaults = () => {
   const stringGetter = useStringGetter();
-  const { vaultsLearnMore } = useURLConfigs();
 
-  useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULTS_OVERVIEW }));
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
 
   return (
     <$Page>
@@ -49,58 +43,9 @@ const $Page = styled.div`
 
 const $YourVaultDetailsCards = styled(YourVaultDetailsCards)``;
 
-const $ContentSectionHeader = styled(ContentSectionHeader)`
-  margin-top: 1rem;
-  padding-top: 0;
-  margin-bottom: 0;
-
-  h3 {
-    font: var(--font-extra-medium);
-  }
-
-  @media ${breakpoints.tablet} {
-    margin-top: 0;
-    padding: 1.25rem 1.5rem 0;
-
-    h3 {
-      font: var(--font-extra-medium);
-    }
-  }
-`;
-const $HeaderSubtitleContainer = styled.span`
-  display: block;
-  max-width: 34rem;
-`;
-const $HeaderSection = styled.section`
-  ${layoutMixins.contentSectionDetached}
-
-  margin-bottom: 1.5rem;
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.flexColumn}
-    gap: 1rem;
-
-    margin-bottom: 1rem;
-  }
-`;
-
-const $Link = styled(Link)`
-  --link-color: var(--color-text-2);
-  display: inline-block;
-`;
-
 const $Container = styled.div`
   padding: 1rem;
 `;
-const $NavHeader = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-const $OverviewLink = styled(Link)`
-  --link-color: var(--color-text-0);
-`;
-
 const $TwoColumnContainer = styled.div`
   ${layoutMixins.contentSectionDetached}
   ${layoutMixins.flexEqualColumns}
@@ -113,7 +58,7 @@ const $VaultDetailsColumn = styled.div`
 const $VaultDepositWithdrawFormColumn = styled.div`
   max-width: min-content;
   ${layoutMixins.flexColumn}
-  gap: 1.5rem;
+  gap: 1.25rem;
 `;
 const $PlaceholderBox = styled.div`
   width: 25rem;

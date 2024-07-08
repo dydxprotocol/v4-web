@@ -39,14 +39,11 @@ export const Overview = () => {
     });
   }, [navigate]);
 
-  const handleViewVault = useCallback(
-    (vaultId: string) => {
-      navigate(`${AppRoute.Vaults}/${vaultId}`, {
-        state: { from: AppRoute.Portfolio },
-      });
-    },
-    [navigate]
-  );
+  const handleViewVault = useCallback(() => {
+    navigate(`${AppRoute.Vaults}`, {
+      state: { from: AppRoute.Portfolio },
+    });
+  }, [navigate]);
   const handleViewVaults = useCallback(
     () => navigate(AppRoute.Vaults, { state: { from: AppRoute.Portfolio } }),
     [navigate]
@@ -110,11 +107,11 @@ export const Overview = () => {
         <$MaybeVaultPositionsPanel
           header={
             <ContentSectionHeader
-              title={stringGetter({ key: STRING_KEYS.VAULTS })}
+              title={stringGetter({ key: STRING_KEYS.VAULT })}
               slotRight={
                 isTablet && (
                   <$Link onClick={handleViewVaults} isAccent>
-                    {stringGetter({ key: STRING_KEYS.VIEW_ALL_VAULTS })}{' '}
+                    {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}{' '}
                     <Icon iconName={IconName.Arrow} />
                   </$Link>
                 )
