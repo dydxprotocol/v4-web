@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -16,7 +15,6 @@ import { Panel } from '@/components/Panel';
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
 
-  const { isStakingEnabled } = useEnvFeatures();
   const { protocolStaking, tradingRewardsLearnMore, stakingAndClaimingRewardsLearnMore } =
     useURLConfigs();
 
@@ -58,38 +56,34 @@ export const RewardsHelpPanel = () => {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
           },
-          ...(isStakingEnabled
-            ? [
-                {
-                  header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
-                  content: stringGetter({
-                    key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
-                    params: {
-                      HERE_LINK: hereLink(protocolStaking),
-                    },
-                  }),
-                },
-                {
-                  header: stringGetter({
-                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_QUESTION,
-                  }),
-                  content: stringGetter({
-                    key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_ANSWER,
-                    params: {
-                      HERE_LINK: hereLink(stakingAndClaimingRewardsLearnMore),
-                    },
-                  }),
-                },
-                {
-                  header: stringGetter({
-                    key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION,
-                  }),
-                  content: stringGetter({
-                    key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER,
-                  }),
-                },
-              ]
-            : []),
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
+              params: {
+                HERE_LINK: hereLink(protocolStaking),
+              },
+            }),
+          },
+          {
+            header: stringGetter({
+              key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_QUESTION,
+            }),
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_REWARDS_ANSWER,
+              params: {
+                HERE_LINK: hereLink(stakingAndClaimingRewardsLearnMore),
+              },
+            }),
+          },
+          {
+            header: stringGetter({
+              key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION,
+            }),
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER,
+            }),
+          },
         ]}
       />
     </$HelpCard>

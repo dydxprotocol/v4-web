@@ -40,11 +40,8 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
-import { ComplianceStates } from './constants/compliance';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
-import { useComplianceState } from './hooks/useComplianceState';
-import { useEnvFeatures } from './hooks/useEnvFeatures';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
@@ -59,7 +56,7 @@ const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
-const TokenPage = lazy(() => import('@/pages/token/Token'));
+const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultsPage = lazy(() => import('@/pages/vaults/Vaults'));
 
 const queryClient = new QueryClient();
@@ -69,8 +66,6 @@ const Content = () => {
   useAnalytics();
 
   const { isTablet, isNotTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
-  const { isStakingEnabled } = useEnvFeatures();
   const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
@@ -85,8 +80,6 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
-
-  const showChainTokenPage = complianceState === ComplianceStates.FULL_ACCESS || isStakingEnabled;
 
   return (
     <>
@@ -107,10 +100,7 @@ const Content = () => {
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
-              <Route
-                path={`/${chainTokenLabel}/*`}
-                element={showChainTokenPage ? <TokenPage /> : <Navigate to={AppRoute.Markets} />}
-              />
+              <Route path={`/${chainTokenLabel}/*`} element={<RewardsPage />} />
 
               {isTablet && (
                 <>
