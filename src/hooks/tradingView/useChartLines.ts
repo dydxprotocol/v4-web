@@ -106,9 +106,9 @@ export const useChartLines = ({
       const quantity = Math.abs(size).toString();
 
       if (maybePositionLine) {
-        // if (maybePositionLine.getPrice() !== formattedPrice) {
-        maybePositionLine.setPrice(formattedPrice);
-        // }
+        if (maybePositionLine.getPrice() !== formattedPrice) {
+          maybePositionLine.setPrice(formattedPrice);
+        }
         if (maybePositionLine.getQuantity() !== quantity) {
           maybePositionLine.setQuantity(quantity);
         }
