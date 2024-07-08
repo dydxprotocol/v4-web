@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -35,6 +35,8 @@ export const useChartLines = ({
   isChartReady: boolean;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
+  const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
+  const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
   const stringGetter = useStringGetter();
 
@@ -52,42 +54,83 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  useEffect(() => {
-    return () => deleteChartLines();
-  }, [currentMarketId]);
-
-  useEffect(() => {
-    if (isChartReady && displayButton) {
-      displayButton.onclick = () => setShowOrderLines(!showOrderLines);
-    }
-  }, [isChartReady, showOrderLines]);
-
-  useEffect(() => {
-    if (!isAccountConnected) {
-      deleteChartLines();
-    }
-  }, [isAccountConnected]);
-
-  useEffect(() => {
-    if (isChartReady && tvWidget) {
-      tvWidget.onChartReady(() => {
-        tvWidget.headerReady().then(() => {
-          tvWidget.chart().dataReady(() => {
-            if (showOrderLines) {
-              displayButton?.classList?.add('order-lines-active');
-              drawOrderLines();
-              drawPositionLines();
-            } else {
-              displayButton?.classList?.remove('order-lines-active');
-              deleteChartLines();
-            }
-          });
+  const setLineColors = useCallback(
+    ({ chartLine }: { chartLine: ChartLine }) => {
+      const { line, chartLineType } = chartLine;
+      const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
+        getChartLineColors({
+          appTheme,
+          appColorMode,
+          chartLineType,
         });
-      });
-    }
-  }, [isChartReady, showOrderLines, currentMarketPositionData, currentMarketOrders]);
 
-  const drawPositionLines = () => {
+      line
+        .setQuantityBorderColor(borderColor)
+        .setBodyBackgroundColor(backgroundColor)
+        .setBodyBorderColor(borderColor)
+        .setBodyTextColor(textColor)
+        .setQuantityTextColor(textButtonColor);
+
+      if (maybeQuantityColor != null) {
+        line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+      }
+    },
+    [appColorMode, appTheme]
+  );
+
+  const maybeDrawPositionLine = useCallback(
+    ({
+      key,
+      label,
+      chartLineType,
+      price,
+      size,
+    }: {
+      key: string;
+      label: string;
+      chartLineType: PositionLineType;
+      price?: number | null;
+      size?: number | null;
+    }) => {
+      const shouldShow = !!(size && price);
+      const maybePositionLine = chartLinesRef.current[key]?.line;
+
+      if (!shouldShow) {
+        if (maybePositionLine) {
+          maybePositionLine.remove();
+          delete chartLinesRef.current[key];
+        }
+        return;
+      }
+      const formattedPrice = MustBigNumber(price).toNumber();
+      const quantity = Math.abs(size).toString();
+
+      if (maybePositionLine) {
+        // if (maybePositionLine.getPrice() !== formattedPrice) {
+        maybePositionLine.setPrice(formattedPrice);
+        // }
+        if (maybePositionLine.getQuantity() !== quantity) {
+          maybePositionLine.setQuantity(quantity);
+        }
+      } else {
+        const positionLine = tvWidget
+          ?.chart()
+          .createPositionLine({ disableUndo: false })
+          .setPrice(formattedPrice)
+          .setQuantity(quantity)
+          .setText(label);
+
+        if (positionLine) {
+          const chartLine: ChartLine = { line: positionLine, chartLineType };
+          setLineColors({ chartLine });
+          chartLinesRef.current[key] = chartLine;
+        }
+      }
+    },
+    [setLineColors, tvWidget]
+  );
+
+  const drawPositionLines = useCallback(() => {
     if (!currentMarketPositionData) return;
 
     const entryPrice = currentMarketPositionData.entryPrice?.current;
@@ -112,59 +155,9 @@ export const useChartLines = ({
       price: liquidationPrice,
       size,
     });
-  };
+  }, [stringGetter, currentMarketPositionData, maybeDrawPositionLine]);
 
-  const maybeDrawPositionLine = ({
-    key,
-    label,
-    chartLineType,
-    price,
-    size,
-  }: {
-    key: string;
-    label: string;
-    chartLineType: PositionLineType;
-    price?: number | null;
-    size?: number | null;
-  }) => {
-    const shouldShow = !!(size && price);
-    const maybePositionLine = chartLinesRef.current[key]?.line;
-
-    if (!shouldShow) {
-      if (maybePositionLine) {
-        maybePositionLine.remove();
-        delete chartLinesRef.current[key];
-      }
-      return;
-    }
-
-    const formattedPrice = MustBigNumber(price).toNumber();
-    const quantity = Math.abs(size).toString();
-
-    if (maybePositionLine) {
-      if (maybePositionLine.getPrice() !== formattedPrice) {
-        maybePositionLine.setPrice(formattedPrice);
-      }
-      if (maybePositionLine.getQuantity() !== quantity) {
-        maybePositionLine.setQuantity(quantity);
-      }
-    } else {
-      const positionLine = tvWidget
-        ?.chart()
-        .createPositionLine({ disableUndo: false })
-        .setPrice(formattedPrice)
-        .setQuantity(quantity)
-        .setText(label);
-
-      if (positionLine) {
-        const chartLine: ChartLine = { line: positionLine, chartLineType };
-        setLineColors({ chartLine });
-        chartLinesRef.current[key] = chartLine;
-      }
-    }
-  };
-
-  const drawOrderLines = () => {
+  const drawOrderLines = useCallback(() => {
     if (!currentMarketOrders) return;
 
     currentMarketOrders.forEach(
@@ -229,7 +222,25 @@ export const useChartLines = ({
         }
       }
     );
-  };
+  }, [setLineColors, stringGetter, currentMarketOrders, tvWidget]);
+
+  const drawChartLines = useCallback(
+    (widget: TvWidget) => {
+      widget.onChartReady(() => {
+        widget.headerReady().then(() => {
+          widget.chart().dataReady(() => {
+            if (showOrderLines) {
+              drawOrderLines();
+              drawPositionLines();
+            } else {
+              deleteChartLines();
+            }
+          });
+        });
+      });
+    },
+    [drawPositionLines, drawOrderLines, showOrderLines]
+  );
 
   const deleteChartLines = () => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {
@@ -238,26 +249,63 @@ export const useChartLines = ({
     chartLinesRef.current = {};
   };
 
-  const setLineColors = ({ chartLine }: { chartLine: ChartLine }) => {
-    const { line, chartLineType } = chartLine;
-    const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-      getChartLineColors({
-        appTheme,
-        appColorMode,
-        chartLineType,
-      });
-
-    line
-      .setQuantityBorderColor(borderColor)
-      .setBodyBackgroundColor(backgroundColor)
-      .setBodyBorderColor(borderColor)
-      .setBodyTextColor(textColor)
-      .setQuantityTextColor(textButtonColor);
-
-    if (maybeQuantityColor != null) {
-      line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+  useEffect(() => {
+    if (isChartReady && displayButton) {
+      displayButton.onclick = () => setShowOrderLines(!showOrderLines);
     }
-  };
+  }, [isChartReady, showOrderLines, displayButton]);
+
+  useEffect(() => {
+    if (showOrderLines) {
+      displayButton?.classList?.add('order-lines-active');
+    } else {
+      displayButton?.classList?.remove('order-lines-active');
+    }
+  }, [showOrderLines, displayButton?.classList]);
+
+  useEffect(() => {
+    // Clear lines when switching markets
+    return () => deleteChartLines();
+  }, [currentMarketId]);
+
+  useEffect(() => {
+    if (isChartReady && tvWidget && currentMarketPositionData) {
+      // Manual call to draw chart lines on initial render of chart
+      if (!initialWidget) {
+        drawChartLines(tvWidget);
+        setInitialWidget(tvWidget);
+        setLastMarket(currentMarketId);
+      } else if (currentMarketId && lastMarket !== currentMarketId) {
+        // Subscribe to update chart lines whenever symbol has changed
+        tvWidget
+          .activeChart()
+          .onSymbolChanged()
+          .subscribe(
+            null,
+            () => {
+              drawChartLines(tvWidget);
+            },
+            true
+          );
+        setLastMarket(currentMarketId);
+      }
+    }
+  }, [
+    initialWidget,
+    tvWidget,
+    isChartReady,
+    currentMarketId,
+    lastMarket,
+    currentMarketPositionData,
+    drawChartLines,
+  ]);
+
+  useEffect(() => {
+    // Clear lines when disconnecting account
+    if (!isAccountConnected) {
+      deleteChartLines();
+    }
+  }, [isAccountConnected]);
 
   return { chartLines: chartLinesRef.current };
 };
