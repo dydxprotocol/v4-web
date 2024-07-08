@@ -29,10 +29,6 @@ enum LayoutItems {
   setAlternativeLayout = 'SetAlternativeLayout',
 }
 
-enum NavItems {
-  NavigateToMarket = 'NavigateToMarket',
-}
-
 export const useGlobalCommands = (): MenuConfig<string, string> => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -148,21 +144,15 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
     //   ],
     // },
     {
-      group: 'navigation',
-      groupLabel: 'Navigation',
-      items: [
-        {
-          value: NavItems.NavigateToMarket,
-          label: 'Navigate to Market',
-          subitems: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
-            value: market ?? '',
-            slotBefore: <AssetIcon symbol={id} />,
-            label: name ?? '',
-            tag: id,
-            onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
-          })),
-        },
-      ],
+      group: 'markets',
+      groupLabel: 'Markets',
+      items: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
+        value: market ?? '',
+        slotBefore: <AssetIcon symbol={id} />,
+        label: name ?? '',
+        tag: id,
+        onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
+      })),
     },
   ];
 };
