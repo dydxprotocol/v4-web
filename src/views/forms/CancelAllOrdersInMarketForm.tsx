@@ -102,7 +102,7 @@ export const CancelAllOrdersInMarketForm = ({
         key: 'open-orders',
         label: <span>{stringGetter({ key: STRING_KEYS.OPEN_ORDERS })}</span>,
         value: (
-          <$DiffOutput
+          <DiffOutput
             type={OutputType.Number}
             value={pendingPositionOrders.length}
             newValue={0}
@@ -115,7 +115,7 @@ export const CancelAllOrdersInMarketForm = ({
         key: 'position-margin',
         label: <span>{stringGetter({ key: STRING_KEYS.POSITION_MARGIN })}</span>,
         value: (
-          <$DiffOutput
+          <DiffOutput
             type={OutputType.Fiat}
             value={thisPendingPosition?.freeCollateral?.current ?? 0}
             newValue={0}
@@ -128,7 +128,7 @@ export const CancelAllOrdersInMarketForm = ({
         key: 'cross-free-collateral',
         label: <span>{stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL })}</span>,
         value: (
-          <$DiffOutput
+          <DiffOutput
             type={OutputType.Fiat}
             value={crossFreeCollateral?.current}
             newValue={MustBigNumber(crossFreeCollateral?.current).plus(
@@ -194,5 +194,3 @@ const $ConfirmationText = styled.div`
 const $Button = styled(Button)`
   width: 100%;
 `;
-
-const $DiffOutput = styled(DiffOutput)``;
