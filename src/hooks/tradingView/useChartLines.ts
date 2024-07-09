@@ -130,15 +130,25 @@ export const useChartLines = ({
     [setLineColors, tvWidget]
   );
 
-  const drawPositionLines = useCallback(() => {
-    if (!currentMarketPositionData) return;
+  const updatePositionLines = useCallback(() => {
+    const entryLineKey = `entry-${currentMarketId}`;
+    const liquidationLineKey = `liquidation-${currentMarketId}`;
+
+    if (!currentMarketPositionData) {
+      // Clear position and liquidation lines if market position has been cleared
+      [entryLineKey, liquidationLineKey].forEach((key) => {
+        const maybePositionLine = chartLinesRef.current[key]?.line;
+        if (maybePositionLine) {
+          maybePositionLine.remove();
+          delete chartLinesRef.current[key];
+        }
+      });
+      return;
+    }
 
     const entryPrice = currentMarketPositionData.entryPrice?.current;
     const liquidationPrice = currentMarketPositionData.liquidationPrice?.current;
     const size = currentMarketPositionData.size?.current;
-
-    const entryLineKey = `entry-${currentMarketPositionData.id}`;
-    const liquidationLineKey = `liquidation-${currentMarketPositionData.id}`;
 
     maybeDrawPositionLine({
       key: entryLineKey,
@@ -155,9 +165,11 @@ export const useChartLines = ({
       price: liquidationPrice,
       size,
     });
-  }, [stringGetter, currentMarketPositionData, maybeDrawPositionLine]);
+  }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
-  const drawOrderLines = useCallback(() => {
+  const updateOrderLines = useCallback(() => {
+    // We don't need to worry about clearing chart lines for cancelled market orders since they will persist in
+    // currentMarketOrders, just with a cancelReason
     if (!currentMarketOrders) return;
 
     currentMarketOrders.forEach(
@@ -224,53 +236,39 @@ export const useChartLines = ({
     );
   }, [setLineColors, stringGetter, currentMarketOrders, tvWidget]);
 
+  const clearChartLines = useCallback(() => {
+    Object.values(chartLinesRef.current).forEach(({ line }) => {
+      line.remove();
+    });
+    chartLinesRef.current = {};
+  }, []);
+
   const drawChartLines = useCallback(
     (widget: TvWidget) => {
       widget.onChartReady(() => {
         widget.headerReady().then(() => {
           widget.chart().dataReady(() => {
             if (showOrderLines) {
-              drawOrderLines();
-              drawPositionLines();
+              updateOrderLines();
+              updatePositionLines();
             } else {
-              deleteChartLines();
+              clearChartLines();
             }
           });
         });
       });
     },
-    [drawPositionLines, drawOrderLines, showOrderLines]
+    [updatePositionLines, updateOrderLines, clearChartLines, showOrderLines]
   );
 
-  const deleteChartLines = () => {
-    Object.values(chartLinesRef.current).forEach(({ line }) => {
-      line.remove();
-    });
-    chartLinesRef.current = {};
-  };
+  // Effects
 
   useEffect(() => {
+    // Initialize onClick for chart line toggle
     if (isChartReady && displayButton) {
-      displayButton.onclick = () => setShowOrderLines(!showOrderLines);
+      displayButton.onclick = () => setShowOrderLines((prev) => !prev);
     }
-  }, [isChartReady, showOrderLines, displayButton]);
-
-  useEffect(() => {
-    if (showOrderLines) {
-      displayButton?.classList?.add('order-lines-active');
-      if (tvWidget) {
-        drawChartLines(tvWidget);
-      }
-    } else {
-      displayButton?.classList?.remove('order-lines-active');
-      deleteChartLines();
-    }
-  }, [showOrderLines, displayButton?.classList, tvWidget, drawChartLines]);
-
-  useEffect(() => {
-    // Clear lines when switching markets
-    return () => deleteChartLines();
-  }, [currentMarketId]);
+  }, [isChartReady, displayButton]);
 
   useEffect(() => {
     if (isChartReady && tvWidget && currentMarketPositionData) {
@@ -280,7 +278,7 @@ export const useChartLines = ({
         setInitialWidget(tvWidget);
         setLastMarket(currentMarketId);
       } else if (currentMarketId && lastMarket !== currentMarketId) {
-        // Subscribe to update chart lines whenever symbol has changed
+        // Subscribe to update chart lines whenever market (symbol) has changed
         tvWidget
           .activeChart()
           .onSymbolChanged()
@@ -304,12 +302,40 @@ export const useChartLines = ({
     drawChartLines,
   ]);
 
+  useEffect(
+    // Update chart lines on toggle
+    () => {
+      if (showOrderLines) {
+        displayButton?.classList?.add('order-lines-active');
+        updateOrderLines();
+        if (lastMarket === currentMarketId) {
+          // We only want to update the position lines if the market has not changed (the changed market
+          // scenario is handled in the effect above; if we trigger it here, it'll run before the onSubscribe
+          // callback with the incorrect tick precision)
+          updatePositionLines();
+        }
+      } else {
+        displayButton?.classList?.remove('order-lines-active');
+        clearChartLines();
+      }
+    },
+    // We intentionally can avoid calling this hook when currentMarketId/lastMarket/market position deps change since
+    // these scenarios are handled in the above hooks
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showOrderLines, displayButton?.classList, updateOrderLines, clearChartLines]
+  );
+
+  useEffect(() => {
+    // Clear lines when switching markets
+    return () => clearChartLines();
+  }, [currentMarketId, clearChartLines]);
+
   useEffect(() => {
     // Clear lines when disconnecting account
     if (!isAccountConnected) {
-      deleteChartLines();
+      clearChartLines();
     }
-  }, [isAccountConnected]);
+  }, [isAccountConnected, clearChartLines]);
 
   return { chartLines: chartLinesRef.current };
 };
