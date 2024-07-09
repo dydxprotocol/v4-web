@@ -2044,12 +2044,6 @@
                     "ticker": "RNDR-USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "RNDR-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -14690,14 +14684,8 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Kucoin",
-                    "ticker": "CQT-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "CQT-USDT",
+                    "exchangeName": "Gate",
+                    "ticker": "CQT_USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
                 }
@@ -15384,11 +15372,6 @@
                     "exchangeName": "Huobi",
                     "ticker": "wavesusdt",
                     "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kraken",
-                    "ticker": "WAVESUSD",
                     "invert": false
                 },
                 {
