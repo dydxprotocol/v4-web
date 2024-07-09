@@ -31,7 +31,10 @@ export type VaultTransaction = {
 };
 type VaultOwnership = {
   userBalance: number;
-  userReturn: number;
+  userReturn: {
+    absolute: number;
+    percent: number;
+  };
   transactionHistory: VaultTransaction[];
 };
 
@@ -61,8 +64,8 @@ const initialState: VaultsState = {
     ],
   },
   userVault: {
-    userBalance: 10,
-    userReturn: 3,
+    userBalance: 10430,
+    userReturn: { absolute: 1923.61, percent: 0.1243 },
     transactionHistory: [
       {
         timestampMs: new Date('8/1/24 1:23 PM').valueOf(),

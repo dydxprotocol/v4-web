@@ -12,6 +12,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getUserVault } from '@/state/vaultSelectors';
@@ -36,22 +37,33 @@ const Vaults = () => {
             <$YourVaultDetailsCards />
             <$PlaceholderBox />
             <$HistoryCard>
-              <$HistoryTitle>
-                <$HistoryTitleText>
-                  {stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}
-                  <$HistoryCount>{transactions.length}</$HistoryCount>
-                </$HistoryTitleText>
-                <$ShowHideHistoryButton
-                  size={ButtonSize.XSmall}
-                  shape={ButtonShape.Pill}
-                  onClick={() => setShowHistory((o) => !o)}
-                >
-                  {showHistory
-                    ? stringGetter({ key: STRING_KEYS.HIDE })
-                    : stringGetter({ key: STRING_KEYS.VIEW })}
-                </$ShowHideHistoryButton>
-              </$HistoryTitle>
-              {showHistory && <VaultTransactionsTable />}
+              {transactions.length > 0 ? (
+                <>
+                  <$HistoryTitle>
+                    <$HistoryTitleText>
+                      {stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}
+                      <$HistoryCount>{transactions.length}</$HistoryCount>
+                    </$HistoryTitleText>
+                    <$ShowHideHistoryButton
+                      size={ButtonSize.XSmall}
+                      shape={ButtonShape.Pill}
+                      onClick={() => setShowHistory((o) => !o)}
+                    >
+                      {showHistory
+                        ? stringGetter({ key: STRING_KEYS.HIDE })
+                        : stringGetter({ key: STRING_KEYS.VIEW })}
+                    </$ShowHideHistoryButton>
+                  </$HistoryTitle>
+                  {showHistory && <VaultTransactionsTable />}
+                </>
+              ) : (
+                <$Empty>
+                  <div>
+                    <$Icon iconName={IconName.OrderPending} />
+                  </div>
+                  <div>You have no vault deposits.</div>
+                </$Empty>
+              )}
             </$HistoryCard>
           </$VaultDepositWithdrawFormColumn>
         </$TwoColumnContainer>
@@ -65,6 +77,20 @@ const $Page = styled.div`
 `;
 
 const $YourVaultDetailsCards = styled(YourVaultDetailsCards)``;
+
+const $Empty = styled.div`
+  ${layoutMixins.column}
+  padding: 1rem;
+  color: var(--color-text-0);
+  justify-items: center;
+  align-content: center;
+`;
+
+const $Icon = styled(Icon)`
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
+`;
 
 const $Container = styled.div`
   padding: 1rem;

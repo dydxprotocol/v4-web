@@ -33,6 +33,10 @@ type MyVaultDetailsCardsProps = {
   className?: string;
 };
 
+const EmptyValue = () => <$EmptyValue>—</$EmptyValue>;
+const $EmptyValue = styled.span`
+  color: var(--color-text-0);
+`;
 export const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const items = [
@@ -40,21 +44,32 @@ export const YourVaultDetailsCards = ({ className }: MyVaultDetailsCardsProps) =
       key: 'balance',
       label: 'Your Vault Balance',
       value:
-        myVaultMetadata == null ? (
-          '-'
+        myVaultMetadata == null || myVaultMetadata.userBalance === 0 ? (
+          <EmptyValue />
         ) : (
-          <Output value={myVaultMetadata?.userBalance} type={OutputType.CompactFiat} />
+          <Output value={myVaultMetadata?.userBalance} type={OutputType.Fiat} />
         ),
     },
     {
       key: 'pnl',
       label: 'Your All-time P&L',
       value:
-        myVaultMetadata == null ? (
-          '-'
+        myVaultMetadata == null || myVaultMetadata?.userReturn.absolute === 0 ? (
+          <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn)}>
-            <Output value={myVaultMetadata?.userReturn} type={OutputType.CompactFiat} />
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn.absolute)}>
+            <$OutputRow>
+              <Output
+                value={myVaultMetadata?.userReturn.absolute}
+                type={OutputType.Fiat}
+                fractionDigits={0}
+              />
+              <Output
+                value={myVaultMetadata?.userReturn.percent}
+                type={OutputType.Percent}
+                withParentheses
+              />
+            </$OutputRow>
           </$ColoredReturn>
         ),
     },
@@ -86,6 +101,10 @@ const $DetailCard = styled.div`
 `;
 const $CardHeader = styled.div`
   color: var(--color-text-0);
+`;
+const $OutputRow = styled.div`
+  ${layoutMixins.row}
+  gap: .5rem;
 `;
 const $CardValue = styled.div`
   font: var(--font-medium-book);
