@@ -39,8 +39,8 @@ export const ComboboxMenu = <
   onItemSelected,
 
   title,
-  inputPlaceholder = 'Search…',
-  slotEmpty = 'No items found.',
+  inputPlaceholder = 'Search…', // TODO: i18n
+  slotEmpty = 'No items found.', // TODO: i18n
   withSearch = true,
 
   className,
