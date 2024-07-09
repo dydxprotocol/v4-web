@@ -7,7 +7,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -23,7 +22,6 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const { isStakingEnabled } = useEnvFeatures();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { newMarketProposal } = useGovernanceVariables();
@@ -40,40 +38,25 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
   if (!hasPotentialMarketsData) return null;
 
   const description = stringGetter({
-    key: isStakingEnabled
-      ? STRING_KEYS.ADD_NEW_MARKET_DETAILS
-      : STRING_KEYS.NEW_MARKET_REWARDS_ENTRY_DESCRIPTION,
-    params: isStakingEnabled
-      ? {
-          AMOUNT: (
-            <$Output
-              useGrouping
-              type={OutputType.Number}
-              value={initialDepositAmountBN}
-              fractionDigits={initialDepositAmountDecimals}
-            />
-          ),
-          NATIVE_TOKEN_DENOM: chainTokenLabel,
-        }
-      : {
-          REQUIRED_NUM_TOKENS: (
-            <$Output
-              useGrouping
-              type={OutputType.Number}
-              value={initialDepositAmountBN}
-              fractionDigits={initialDepositAmountDecimals}
-            />
-          ),
-          NATIVE_TOKEN_DENOM: chainTokenLabel,
-        },
+    key: STRING_KEYS.ADD_NEW_MARKET_DETAILS,
+    params: {
+      AMOUNT: (
+        <$Output
+          useGrouping
+          type={OutputType.Number}
+          value={initialDepositAmountBN}
+          fractionDigits={initialDepositAmountDecimals}
+        />
+      ),
+      NATIVE_TOKEN_DENOM: chainTokenLabel,
+    },
   });
 
   return (
     <RewardsNavPanel
       title={stringGetter({
-        key: isStakingEnabled ? STRING_KEYS.ADD_NEW_MARKET_CAPITALIZED : STRING_KEYS.ADD_A_MARKET,
+        key: STRING_KEYS.ADD_NEW_MARKET_CAPITALIZED,
       })}
-      titleTag={isStakingEnabled ? undefined : stringGetter({ key: STRING_KEYS.NEW })}
       description={description}
       onNav={navToMarket}
       className={className}

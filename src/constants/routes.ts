@@ -29,13 +29,6 @@ export enum HistoryRoute {
   Payments = 'payments',
 }
 
-// OTE-459: Deprecate this route
-export enum TokenRoute {
-  TradingRewards = 'trading-rewards',
-  StakingRewards = 'staking-rewards',
-  Governance = 'governance',
-}
-
 export enum MobileSettingsRoute {
   Language = 'language',
   Notifications = 'notifications',
