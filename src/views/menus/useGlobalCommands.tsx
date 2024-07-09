@@ -73,17 +73,13 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
           label: chainTokenLabel,
           onSelect: () => navigate(`/${chainTokenLabel}`),
         },
-        ...(showVaults
-          ? [
-              {
-                value: 'vaults',
-                slotBefore: <Icon iconName={IconName.Governance} />,
-                label: stringGetter({ key: STRING_KEYS.VAULTS }),
-                onSelect: () => navigate(AppRoute.Vaults),
-              },
-            ]
-          : []),
-      ],
+        showVaults && {
+          value: 'vaults',
+          slotBefore: <Icon iconName={IconName.Governance} />,
+          label: stringGetter({ key: STRING_KEYS.VAULTS }),
+          onSelect: () => navigate(AppRoute.Vaults),
+        },
+      ].filter((x) => !!x),
     },
     {
       group: 'other',
@@ -148,17 +144,17 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
       items: [
         {
           value: LayoutItems.setDefaultLayout,
-          label: 'Set Default Layout',
+          label: stringGetter({ key: STRING_KEYS.SET_DEFAULT_LAYOUT }),
           onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Default)),
         },
         {
           value: LayoutItems.setReverseLayout,
-          label: 'Set Reverse Layout',
+          label: stringGetter({ key: STRING_KEYS.SET_REVERSE_LAYOUT }),
           onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Reverse)),
         },
         {
           value: LayoutItems.setAlternativeLayout,
-          label: 'Set Alternative Layout',
+          label: stringGetter({ key: STRING_KEYS.SET_ALTERNATIVE_LAYOUT }),
           onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Alternative)),
         },
       ],
