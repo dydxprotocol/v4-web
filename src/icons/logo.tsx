@@ -33,7 +33,7 @@ export const LogoIcon = ({ id, className }: LogoIconProps) => {
       <path d="M169.089 0L91 111.991H115.481L193.495 0H169.089Z" fill={fill} />
       <path
         d="M115.5 0L140 34L126.5 53L90 0H115.5Z"
-        fill={`url(#${id ? `${id}_logo_gradient_2` : 'paint2_linear'})`}
+        fill={`url(#${id ? `${id}_logo_gradient_0` : 'paint0_linear'})`}
       />
       <path
         fillRule="evenodd"
@@ -50,8 +50,8 @@ export const LogoIcon = ({ id, className }: LogoIconProps) => {
           y2="46.7483"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="white" />
-          <stop offset="1" stopColor="white" stopOpacity="0.55" />
+          <stop stopColor={`${fill}`} />
+          <stop offset="1" stopColor={`${fill}`} stopOpacity="0.55" />
         </linearGradient>
         <linearGradient
           id={id ? `${id}_logo_gradient_1` : 'paint1_linear'}
@@ -63,17 +63,6 @@ export const LogoIcon = ({ id, className }: LogoIconProps) => {
         >
           <stop stopColor="#6966FF" />
           <stop offset="1" stopColor="#6966FF" stopOpacity="0.36" />
-        </linearGradient>
-        <linearGradient
-          id={id ? `${id}_logo_gradient_2` : 'paint2_linear'}
-          x1="110"
-          y1="7.27451"
-          x2="144.132"
-          y2="49.0118"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="white" />
-          <stop offset="1" stopColor="white" stopOpacity="0.55" />
         </linearGradient>
       </defs>
     </svg>

@@ -27,6 +27,15 @@ import { Tag } from './Tag';
 type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onSelectItem?: (value: MenuItemValue) => void;
+  onSelectGroup?: (value: MenuGroupValue) => void;
+  /**
+   * Optional slot to add content before the menu item rendering area
+   */
+  slotBefore?: React.ReactNode;
+  /**
+   * Optional slot to add content after the menu item rendering area
+   */
+  slotAfter?: React.ReactNode;
 };
 
 type StyleProps = {
@@ -104,6 +113,8 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
   itemOrientation = 'horizontal',
   submenuPlacement = 'inline', // orientation === 'horizontal' ? 'viewport' : 'inline',
   dir = 'ltr',
+  slotAfter,
+  slotBefore,
   className,
 }: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => {
   const renderSubitems = ({
@@ -148,6 +159,8 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
 
   return (
     <$Root orientation={orientation} dir={dir} className={className}>
+      {slotBefore}
+
       {items.map((group) => (
         <$Group key={group.group}>
           {group.groupLabel && (
@@ -171,6 +184,8 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
       ))}
 
       {submenuPlacement === 'viewport' && <$Viewport data-orientation={orientation} />}
+
+      {slotAfter}
     </$Root>
   );
 };

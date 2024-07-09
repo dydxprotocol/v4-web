@@ -102,6 +102,19 @@ export const AnalyticsEvents = unionize(
       trailingBlocks?: number;
     }>(),
 
+    // Export CSV
+    ExportCsvClick: ofType<{}>(),
+    ExportDownloadClick: ofType<{
+      trades: boolean;
+      transfers: boolean;
+    }>(),
+    ExportTradesCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
+    ExportTransfersCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
+
     // Navigation
     NavigatePage: ofType<{
       path: string;
@@ -227,6 +240,15 @@ export const AnalyticsEvents = unionize(
       amount?: number;
       validatorAddress?: string;
     }>(),
+
+    // Sharing
+    SharePnlShared: ofType<{
+      asset: string;
+    }>(),
+    SharePnlCopied: ofType<{
+      asset: string;
+    }>(),
+
     Error: ofType<{
       location: string;
       error: Error;

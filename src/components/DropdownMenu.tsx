@@ -1,6 +1,15 @@
 import { Fragment, type Ref } from 'react';
 
-import { Content, Item, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu';
+import {
+  Content,
+  Item,
+  Portal,
+  Root,
+  Separator,
+  Trigger,
+  type DropdownMenuProps as RadixDropdownMenuProps,
+  type DropdownMenuTriggerProps as RadixDropdownMenuTriggerProps,
+} from '@radix-ui/react-dropdown-menu';
 import styled from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -13,7 +22,7 @@ export type DropdownMenuItem<T> = {
   value: T;
   icon?: React.ReactNode;
   label: React.ReactNode;
-  onSelect?: () => void;
+  onSelect?: (e: Event) => void;
   separator?: boolean;
   highlightColor?: 'accent' | 'create' | 'destroy';
 };
@@ -32,7 +41,11 @@ type ElementProps<T> = {
   slotTopContent?: React.ReactNode;
 };
 
-type DropdownMenuProps<T> = StyleProps & ElementProps<T>;
+export type DropdownMenuProps<T> = StyleProps &
+  ElementProps<T> &
+  RadixDropdownMenuProps & {
+    triggerOptions?: RadixDropdownMenuTriggerProps;
+  };
 
 export const DropdownMenu = forwardRefFn(
   <T extends string>(
@@ -45,12 +58,14 @@ export const DropdownMenu = forwardRefFn(
       slotTopContent,
       side = 'bottom',
       sideOffset = 8,
+      triggerOptions,
+      ...rest
     }: DropdownMenuProps<T>,
     ref: Ref<HTMLButtonElement>
   ) => {
     return (
-      <Root>
-        <$Trigger ref={ref} className={className}>
+      <Root {...rest}>
+        <$Trigger ref={ref} className={className} {...triggerOptions}>
           {children}
           <$DropdownIcon aria-hidden="true">
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
@@ -79,6 +94,7 @@ export const DropdownMenu = forwardRefFn(
     );
   }
 );
+
 const $Separator = styled(Separator)`
   border-bottom: solid var(--border-width) var(--color-border);
   margin: 0.25rem 1rem;

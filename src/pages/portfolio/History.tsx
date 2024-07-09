@@ -11,6 +11,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { ExportHistoryDropdown } from '@/views/ExportHistoryDropdown';
 
 export const History = () => {
   const stringGetter = useStringGetter();
@@ -21,6 +22,7 @@ export const History = () => {
       {isNotTablet && (
         <$NavigationMenu
           orientation="horizontal"
+          slotAfter={<$ExportButton />}
           items={[
             {
               group: 'navigation',
@@ -52,6 +54,11 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
+
+const $ExportButton = styled(ExportHistoryDropdown)`
+  margin-left: auto;
+`;
+
 const $NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
 

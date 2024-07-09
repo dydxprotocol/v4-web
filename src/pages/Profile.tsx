@@ -36,12 +36,11 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
-import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
-import { GovernancePanel } from './token/rewards/GovernancePanel';
-import { MigratePanel } from './token/rewards/MigratePanel';
-import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
-import { StakingPanel } from './token/staking/StakingPanel';
-import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
+import { GovernancePanel } from './token/GovernancePanel';
+import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
+import { MigratePanel } from './token/MigratePanel';
+import { NewMarketsPanel } from './token/NewMarketsPanel';
+import { StakingPanel } from './token/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -190,7 +189,7 @@ const Profile = () => {
 
       <$MigratePanel />
 
-      <$DYDXBalancePanel />
+      <$StakingPanel />
 
       <$RewardsPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
@@ -242,13 +241,12 @@ const Profile = () => {
             FillsTableColumnKey.AmountTag,
           ]}
           withInnerBorders={false}
+          initialPageSize={5}
         />
       </$HistoryPanel>
-
+      <$LaunchIncentivesPanel />
       <$GovernancePanel />
       <$NewMarketsPanel />
-      <$StakingPanel />
-      <$StrideStakingPanel />
     </$MobileProfileLayout>
   );
 };
@@ -269,11 +267,11 @@ const $MobileProfileLayout = styled.div`
     'actions actions'
     'settings help'
     'migrate migrate'
-    'balance balance'
+    'staking staking'
     'rewards fees'
     'history history'
     'governance newMarkets'
-    'keplr stride';
+    'incentives incentives';
 
   @media ${breakpoints.mobile} {
     grid-template-areas:
@@ -281,13 +279,12 @@ const $MobileProfileLayout = styled.div`
       'actions actions'
       'settings help'
       'migrate migrate'
-      'balance balance'
+      'staking staking'
       'rewards fees'
       'history history'
       'governance governance'
       'newMarkets newMarkets'
-      'keplr keplr'
-      'stride stride';
+      'incentives incentives';
   }
 `;
 
@@ -399,15 +396,14 @@ const $HistoryPanel = styled(Panel)`
   --panel-content-paddingX: 0;
 
   > div > div {
-    margin-top: 0.5rem;
-    --scrollArea-height: 10rem;
+    margin-top: 1px;
     border-radius: 0.875rem;
   }
 
   table {
-    max-height: 10rem;
     --tableCell-padding: 0.25rem 1rem;
     --tableRow-backgroundColor: var(--color-layer-3);
+    --tableStickyRow-backgroundColor: var(--color-layer-3);
     background-color: var(--color-layer-3);
     thead {
       color: var(--color-text-0);
@@ -446,24 +442,20 @@ const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
 `;
 
-const $DYDXBalancePanel = styled(DYDXBalancePanel)`
-  grid-area: balance;
+const $StakingPanel = styled(StakingPanel)`
+  grid-area: staking;
 `;
 
 const $GovernancePanel = styled(GovernancePanel)`
   grid-area: governance;
 `;
 
-const $StakingPanel = styled(StakingPanel)`
-  grid-area: keplr;
+const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
+  grid-area: incentives;
 `;
 
 const $NewMarketsPanel = styled(NewMarketsPanel)`
   grid-area: newMarkets;
-`;
-
-const $StrideStakingPanel = styled(StrideStakingPanel)`
-  grid-area: stride;
 `;
 
 const $AssetIcon = styled(AssetIcon)`

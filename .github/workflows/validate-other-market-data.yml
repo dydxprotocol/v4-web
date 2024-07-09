@@ -12,9 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Set up pnpm
-        uses: dydxprotocol/setup-pnpm@v1
+        uses: dydxprotocol/setup-pnpm@v2.0.0
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -27,7 +27,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           pnpm install --loglevel warn
-      
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -47,6 +47,7 @@ jobs:
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
+<<<<<<< HEAD
           DOCKER_BUILDKIT=1 make localnet-init
           DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
 
@@ -54,8 +55,15 @@ jobs:
         run: |
           git fetch origin
           git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
+=======
+          DOCKER_BUILDKIT=1 make localnet-startd
+>>>>>>> origin/main
       
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: 'main'
+          path: 'v4-web-main-other-market-validation'
+
       - name: Validate other market data
-        env:
-          DIFF: otherMarketDiff.txt
         run: pnpx tsx scripts/validate-other-market-data.ts
