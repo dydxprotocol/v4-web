@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import { AbacusOrderStatus, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
@@ -17,6 +17,7 @@ import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStringGetter } from '../useStringGetter';
@@ -209,9 +210,7 @@ export const useChartLines = ({
         });
         const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
-        const shouldShow =
-          !cancelReason &&
-          (status === AbacusOrderStatus.Open || status === AbacusOrderStatus.Untriggered);
+        const shouldShow = !cancelReason && isOrderStatusOpen(status);
 
         const maybeOrderLine = chartLinesRef.current[key]?.line;
         const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();

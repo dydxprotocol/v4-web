@@ -19,6 +19,7 @@ import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import {
   getHydratedTradingData,
   isOrderStatusClearable,
+  isOrderStatusOpen,
   isStopLossOrder,
   isTakeProfitOrder,
 } from '@/lib/orders';
@@ -211,14 +212,7 @@ export const getOpenIsolatedOrders = createAppSelector(
   [getSubaccountOrders, getPerpetualMarkets],
   (allOrders, allMarkets) =>
     (allOrders ?? [])
-      .filter(
-        (o) =>
-          (o.status === AbacusOrderStatus.Open ||
-            o.status === AbacusOrderStatus.Pending ||
-            o.status === AbacusOrderStatus.PartiallyFilled ||
-            o.status === AbacusOrderStatus.Untriggered) &&
-          o.marginMode === AbacusMarginMode.Isolated
-      )
+      .filter((o) => isOrderStatusOpen(o.status) && o.marginMode === AbacusMarginMode.Isolated)
       // eslint-disable-next-line prefer-object-spread
       .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }))
 );
