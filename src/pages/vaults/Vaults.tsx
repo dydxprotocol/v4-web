@@ -10,12 +10,9 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
-import { PnlChart } from '@/views/charts/PnlChart';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { VaultHeader, VaultPositionsSection, YourVaultDetailsCards } from './VaultInfoSections';
+import { VaultPnlChart } from './VaultPnlChart';
 import { VaultTransactionsCard } from './VaultTransactions';
 
 const Vaults = () => {
@@ -24,7 +21,6 @@ const Vaults = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
 
   const { isTablet } = useBreakpoints();
-  const selectedLocale = useAppSelector(getSelectedLocale);
   if (isTablet) {
     // one column, reordered, static positioned deposit buttons
     return (
@@ -37,7 +33,7 @@ const Vaults = () => {
               <VaultTransactionsCard />
             </$VaultTransactionsCardContainer>
             <$PnlRow>
-              <$PnlChart selectedLocale={selectedLocale} />
+              <$PnlChart />
             </$PnlRow>
             <$VaultPositionsSection scroll />
           </$VaultDetailsColumn>
@@ -53,7 +49,7 @@ const Vaults = () => {
           <$VaultHeader />
           <$HorizontalSeparatorFiller />
           <$PnlRow>
-            <$PnlChart selectedLocale={selectedLocale} />
+            <$PnlChart />
           </$PnlRow>
           <$HorizontalSeparatorFiller />
           <$VaultPositionsSection />
@@ -140,7 +136,7 @@ const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
 const $PnlRow = styled.div`
   height: 30rem;
 `;
-const $PnlChart = styled(PnlChart)`
+const $PnlChart = styled(VaultPnlChart)`
   height: 30rem;
   background-color: var(--color-layer-2);
 
