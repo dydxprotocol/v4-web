@@ -54,6 +54,21 @@ export const useChartLines = ({
     shallowEqual
   );
 
+  const runOnChartReady = useCallback(
+    (callback: () => void) => {
+      if (tvWidget) {
+        tvWidget.onChartReady(() => {
+          tvWidget.headerReady().then(() => {
+            tvWidget.chart().dataReady(() => {
+              callback();
+            });
+          });
+        });
+      }
+    },
+    [tvWidget]
+  );
+
   const setLineColors = useCallback(
     ({ chartLine }: { chartLine: ChartLine }) => {
       const { line, chartLineType } = chartLine;
@@ -243,23 +258,14 @@ export const useChartLines = ({
     chartLinesRef.current = {};
   }, []);
 
-  const drawChartLines = useCallback(
-    (widget: TvWidget) => {
-      widget.onChartReady(() => {
-        widget.headerReady().then(() => {
-          widget.chart().dataReady(() => {
-            if (showOrderLines) {
-              updateOrderLines();
-              updatePositionLines();
-            } else {
-              clearChartLines();
-            }
-          });
-        });
-      });
-    },
-    [updatePositionLines, updateOrderLines, clearChartLines, showOrderLines]
-  );
+  const drawChartLines = useCallback(() => {
+    if (showOrderLines) {
+      updateOrderLines();
+      updatePositionLines();
+    } else {
+      clearChartLines();
+    }
+  }, [updatePositionLines, updateOrderLines, clearChartLines, showOrderLines]);
 
   // Effects
 
@@ -274,7 +280,7 @@ export const useChartLines = ({
     if (isChartReady && tvWidget && currentMarketPositionData) {
       // Manual call to draw chart lines on initial render of chart
       if (!initialWidget) {
-        drawChartLines(tvWidget);
+        runOnChartReady(drawChartLines);
         setInitialWidget(tvWidget);
         setLastMarket(currentMarketId);
       } else if (currentMarketId && lastMarket !== currentMarketId) {
@@ -285,7 +291,7 @@ export const useChartLines = ({
           .subscribe(
             null,
             () => {
-              drawChartLines(tvWidget);
+              runOnChartReady(drawChartLines);
             },
             true
           );
@@ -300,29 +306,32 @@ export const useChartLines = ({
     lastMarket,
     currentMarketPositionData,
     drawChartLines,
+    runOnChartReady,
   ]);
 
   useEffect(
-    // Update chart lines on toggle
+    // Update chart lines on toggle, or when orders/position has changed
     () => {
-      if (showOrderLines) {
-        displayButton?.classList?.add('order-lines-active');
-        updateOrderLines();
-        if (lastMarket === currentMarketId) {
-          // We only want to update the position lines if the market has not changed (the changed market
-          // scenario is handled in the effect above; if we trigger it here, it'll run before the onSubscribe
-          // callback with the incorrect tick precision)
-          updatePositionLines();
+      runOnChartReady(() => {
+        if (showOrderLines) {
+          displayButton?.classList?.add('order-lines-active');
+          updateOrderLines();
+          if (lastMarket === currentMarketId) {
+            // We only want to update the position lines if the market has not changed (the changed market
+            // scenario is handled in the effect above; if we trigger it here, it'll run before the onSubscribe
+            // callback with the incorrect tick precision)
+            updatePositionLines();
+          }
+        } else {
+          displayButton?.classList?.remove('order-lines-active');
+          clearChartLines();
         }
-      } else {
-        displayButton?.classList?.remove('order-lines-active');
-        clearChartLines();
-      }
+      });
     },
     // We intentionally can avoid calling this hook when currentMarketId/lastMarket/market position deps change since
     // these scenarios are handled in the above hooks
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showOrderLines, displayButton?.classList, updateOrderLines, clearChartLines]
+    [showOrderLines, displayButton?.classList, updateOrderLines, clearChartLines, runOnChartReady]
   );
 
   useEffect(() => {
