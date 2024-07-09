@@ -20,6 +20,7 @@ import { openDialog } from '@/state/dialogs';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -79,7 +80,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
           label: stringGetter({ key: STRING_KEYS.VAULTS }),
           onSelect: () => navigate(AppRoute.Vaults),
         },
-      ].filter((x) => !!x),
+      ].filter(isTruthy),
     },
     {
       group: 'other',
