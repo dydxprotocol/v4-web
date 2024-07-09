@@ -1,11 +1,48 @@
 import cctpTokens from '../../public/configs/cctp.json';
+import { TransferType, TransferTypeType } from './abacus';
 
-const CCTP_MAINNET_CHAINS = cctpTokens.filter((token) => !token.isTestnet);
-const CCTP_MAINNET_CHAINS_NAMES_LOWER_CASE = CCTP_MAINNET_CHAINS.map((token) =>
-  token.name.toLowerCase()
-);
+export type CctpTokenInfo = {
+  chainId: string;
+  tokenAddress: string;
+  name: string;
+};
 
-// TODO: make a general capitalize util fn
-export const CCTP_MAINNET_CHAIN_NAMES_CAPITALIZED = CCTP_MAINNET_CHAINS_NAMES_LOWER_CASE.map(
-  (tokenName) => tokenName[0].toUpperCase() + tokenName.slice(1)
-);
+type NullableTransferType = TransferTypeType | undefined | null;
+
+const mainnetChains = cctpTokens.filter((token) => !token.isTestnet);
+
+// Ethereum is a high fee chain for withdrawals but not deposits
+const getLowestFeeChains = (type: NullableTransferType) =>
+  type === TransferType.deposit
+    ? mainnetChains
+    : mainnetChains.filter(({ chainId }) => chainId !== '1');
+
+// move this out if we need it in another module
+const capitalizeNames = (str: string) => str[0].toUpperCase() + str.slice(1);
+
+export const getLowestFeeChainNames = (type: NullableTransferType) =>
+  getLowestFeeChains(type).map((token) => capitalizeNames(token.name.toLowerCase()));
+
+export const getMapOfLowestFeeTokensByDenom = (type: NullableTransferType) =>
+  getLowestFeeChains(type).reduce(
+    (acc, token) => {
+      if (!acc[token.tokenAddress]) {
+        acc[token.tokenAddress] = [];
+      }
+      acc[token.tokenAddress].push(token);
+      return acc;
+    },
+    {} as Record<string, CctpTokenInfo[]>
+  );
+
+export const getMapOfLowestFeeTokensByChainId = (type: NullableTransferType) =>
+  getLowestFeeChains(type).reduce(
+    (acc, token) => {
+      if (!acc[token.chainId]) {
+        acc[token.chainId] = [];
+      }
+      acc[token.chainId].push(token);
+      return acc;
+    },
+    {} as Record<string, CctpTokenInfo[]>
+  );

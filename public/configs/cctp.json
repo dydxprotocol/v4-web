@@ -5,9 +5,9 @@
     "name": "Ethereum"
   },
   {
-    "chainId": "5",
-    "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    "name": "Ethereum Goerli",
+    "chainId": "1155511",
+    "tokenAddress": "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+    "name": "Ethereum Sepolia",
     "isTestnet": true
   },
   {
@@ -24,5 +24,15 @@
     "chainId": "42161",
     "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     "name": "arbitrum"
+  },
+  {
+    "chainId": "8453",
+    "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "name": "Base"
+  },
+  {
+    "chainId": "137",
+    "tokenAddress": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
+    "name": "Polygon"
   }
 ]

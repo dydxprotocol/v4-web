@@ -27,7 +27,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["./scripts/*.js", "./__tests__/**/*.ts", "./src/lib/__test__/**/*.ts"]
+        "devDependencies": ["./scripts/*.js", "./__tests__/**/*.ts", "./src/**/__test__/**/*.ts"]
       }
     ],
     "import/no-named-as-default": "off",
