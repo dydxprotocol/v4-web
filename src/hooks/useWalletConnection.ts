@@ -34,7 +34,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { getNobleChainId } from '@/lib/squid';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { resolveWagmiConnector } from '@/lib/wagmi';
@@ -62,7 +62,6 @@ export const useWalletConnection = () => {
   }, [evmAddressWagmi]);
 
   // Cosmos wallet connection
-  const nobleChainId = getNobleChainId();
   const [dydxAddress, saveDydxAddress] = useLocalStorage<DydxAddress | undefined>({
     key: LocalStorageKey.DydxAddress,
     defaultValue: undefined,
@@ -159,7 +158,7 @@ export const useWalletConnection = () => {
 
           if (!isConnectedGraz) {
             await connectGraz({
-              chainId: [selectedDydxChainId, nobleChainId],
+              chainId: SUPPORTED_COSMOS_CHAINS,
               walletType: cosmosWalletType,
             });
           }

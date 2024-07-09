@@ -23,11 +23,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { isTruthy } from '@/lib/isTruthy';
-import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
@@ -47,6 +48,7 @@ export const SourceSelectMenu = ({
 }: ElementProps) => {
   const { walletType } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -56,7 +58,7 @@ export const SourceSelectMenu = ({
   const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
   const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-  const chains = (options?.chains?.toArray() ?? EMPTY_ARR) as ChainOption[];
+  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
 
   const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
@@ -81,9 +83,6 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
-  const osmosisChainId = getOsmosisChainId();
-  const nobleChainId = getNobleChainId();
-  const supportedCosmosChains = [osmosisChainId, nobleChainId];
 
   const chainItems = Object.values(chains)
     .map((chain) => ({
@@ -97,7 +96,7 @@ export const SourceSelectMenu = ({
     }))
     .filter((chain) => {
       if (!isNotKeplrWallet) {
-        return supportedCosmosChains.includes(chain.value);
+        return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {

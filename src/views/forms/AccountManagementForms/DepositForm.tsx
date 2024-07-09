@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 
 import { GasPrice } from '@cosmjs/stargate';
 import { NobleClient } from '@dydxprotocol/v4-client-js';
+import { useAccount as useAccountGraz } from 'graz';
 import Long from 'long';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -19,6 +20,7 @@ import {
   DEFAULT_TRANSACTION_MEMO,
 } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -64,11 +66,13 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   NATIVE_TOKEN_ADDRESS,
   fetchSkipRoute,
   getNobleChainId,
+  getOsmosisChainId,
   isTransferOperation,
 } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -130,6 +134,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // eslint-disable-next-line radix
   const chainId = chainIdStr && !isKeplrWallet ? parseInt(chainIdStr) : chainIdStr ?? undefined;
   const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
 
   // User inputs
   const sourceToken = useMemo(
@@ -148,14 +153,27 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { usdcLabel, usdcDecimals, usdcGasDenom, usdcDenom } = useTokenConfigs();
   const { nobleValidator, skip } = useEndpointsConfig();
+
+  const { data: accounts } = useAccountGraz({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+  const cosmosAddress = (() => {
+    if (chainId === osmosisChainId) {
+      return accounts?.[osmosisChainId]?.bech32Address;
+    }
+    if (chainId === nobleChainId) {
+      return accounts?.[nobleChainId]?.bech32Address;
+    }
+    return undefined;
+  })();
+
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
     isCosmosChain: isKeplrWallet,
-    cosmosAddress: isKeplrWallet ? nobleAddress : undefined,
-    rpc: isKeplrWallet ? nobleValidator : undefined,
-    decimals: isKeplrWallet ? usdcDecimals : undefined,
+    cosmosAddress,
   });
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
@@ -216,23 +234,32 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [nobleAddress, nobleChainId, walletType]);
 
-  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
-    if (name) {
-      abacusStateManager.clearTransferInputValues();
-      setFromAmount('');
-      if (type === 'chain') {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.chain,
-          value: name,
-        });
-      } else {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.exchange,
-          value: name,
-        });
+  const onSelectNetwork = useCallback(
+    (name: string, type: 'chain' | 'exchange') => {
+      if (name) {
+        abacusStateManager.clearTransferInputValues();
+        setFromAmount('');
+        if (type === 'chain') {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.chain,
+            value: name,
+          });
+          if (name === osmosisChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: OSMO_USDC_IBC_DENOM,
+            });
+          }
+        } else {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.exchange,
+            value: name,
+          });
+        }
       }
-    }
-  }, []);
+    },
+    [osmosisChainId]
+  );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
     if (selectedToken) {

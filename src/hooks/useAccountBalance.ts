@@ -12,19 +12,19 @@ import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { useAccounts } from './useAccounts';
+import { useEndpointsConfig } from './useEndpointsConfig';
 import { useEnvConfig } from './useEnvConfig';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type UseAccountBalanceProps = {
   // Token Items
   addressOrDenom?: string;
-  decimals?: number;
 
   // Chain Items
   chainId?: string | number;
-  rpc?: string;
 
   isCosmosChain?: boolean;
   cosmosAddress?: string;
@@ -39,17 +39,16 @@ export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeee
 export const useAccountBalance = ({
   addressOrDenom,
   chainId,
-  decimals = 0,
-  rpc,
   isCosmosChain,
   cosmosAddress,
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
-  const { chainTokenDenom, usdcDenom } = useTokenConfigs();
+  const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
+  const { nobleValidator, osmosisValidator } = useEndpointsConfig();
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
@@ -86,18 +85,40 @@ export const useAccountBalance = ({
   });
 
   const cosmosQueryFn = useCallback(async () => {
-    if (dydxAddress && cosmosAddress && rpc && addressOrDenom) {
+    if (dydxAddress && cosmosAddress && addressOrDenom) {
+      const nobleChainId = getNobleChainId();
+      const osmosisChainId = getOsmosisChainId();
+      const rpc = (() => {
+        if (chainId === nobleChainId) {
+          return nobleValidator;
+        }
+        if (chainId === osmosisChainId) {
+          return osmosisValidator;
+        }
+        return undefined;
+      })();
+
+      if (!rpc) return undefined;
+
       const client = await StargateClient.connect(rpc);
       const balanceAsCoin = await client.getBalance(cosmosAddress, addressOrDenom);
       await client.disconnect();
 
-      return formatUnits(BigInt(balanceAsCoin.amount), decimals);
+      return formatUnits(BigInt(balanceAsCoin.amount), usdcDecimals);
     }
     return undefined;
-  }, [addressOrDenom, cosmosAddress, decimals, dydxAddress, rpc]);
+  }, [
+    dydxAddress,
+    cosmosAddress,
+    addressOrDenom,
+    usdcDecimals,
+    chainId,
+    nobleValidator,
+    osmosisValidator,
+  ]);
 
   const cosmosQuery = useQuery({
-    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && rpc && addressOrDenom),
+    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && addressOrDenom),
     queryKey: ['accountBalances', chainId, cosmosAddress, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,

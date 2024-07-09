@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
@@ -24,6 +25,8 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
@@ -34,8 +37,13 @@ type ElementProps = {
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type, depositOptions, withdrawalOptions, resources } =
-    useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const {
+    type,
+    depositOptions,
+    withdrawalOptions,
+    resources,
+    chain: chainIdStr,
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { walletType } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
@@ -49,13 +57,11 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
     EMPTY_ARR;
   const isKeplrWallet = walletType === WalletType.Keplr;
-
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
       label: token.stringKey,
       onSelect: () => {
-        console.log('d', resources?.tokenResources);
         const newSelectedToken = resources?.tokenResources?.get(token.type);
         if (newSelectedToken) {
           onSelectToken(newSelectedToken);
@@ -71,7 +77,12 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     .filter((token) => {
       // only show USDC for Keplr wallets
       if (isKeplrWallet) {
-        return token.label === 'USDC';
+        if (chainIdStr === getNobleChainId()) {
+          return true;
+        }
+        if (chainIdStr === getOsmosisChainId()) {
+          return token.value === OSMO_USDC_IBC_DENOM;
+        }
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
