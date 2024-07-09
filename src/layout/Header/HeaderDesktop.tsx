@@ -1,4 +1,3 @@
-import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -32,6 +31,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
