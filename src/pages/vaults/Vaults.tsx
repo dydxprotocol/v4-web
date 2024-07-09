@@ -1,102 +1,89 @@
-import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
-import styled from 'styled-components';
-
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { EMPTY_ARR } from '@/constants/objects';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
-import { Icon, IconName } from '@/components/Icon';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { PnlChart } from '@/views/charts/PnlChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getUserVault } from '@/state/vaultSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { FullVaultInfo, VaultTransactionsTable, YourVaultDetailsCards } from './FullVaultInfo';
+import { VaultHeader, VaultPositionsSection, YourVaultDetailsCards } from './VaultInfoSections';
+import { VaultTransactionsCard } from './VaultTransactions';
 
 const Vaults = () => {
   const stringGetter = useStringGetter();
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
 
-  const [showHistory, setShowHistory] = useState(false);
-  const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
+  const { isTablet } = useBreakpoints();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  if (isTablet) {
+    // one column, reordered, static positioned deposit buttons
+    return (
+      <$Page>
+        <$OneColumnContainer>
+          <$VaultDetailsColumn>
+            <$VaultHeader />
+            <$YourVaultDetailsCards />
+            <$VaultTransactionsCardContainer>
+              <VaultTransactionsCard />
+            </$VaultTransactionsCardContainer>
+            <$PnlRow>
+              <$PnlChart selectedLocale={selectedLocale} />
+            </$PnlRow>
+            <$VaultPositionsSection scroll />
+          </$VaultDetailsColumn>
+          {/* Todo: static buttons */}
+        </$OneColumnContainer>
+      </$Page>
+    );
+  }
   return (
     <$Page>
-      <$Container>
-        <$TwoColumnContainer>
-          <$VaultDetailsColumn>
-            <FullVaultInfo />
-          </$VaultDetailsColumn>
-          <$VaultDepositWithdrawFormColumn>
-            <$YourVaultDetailsCards />
+      <$TwoColumnContainer>
+        <$VaultDetailsColumn>
+          <$VaultHeader />
+          <$HorizontalSeparatorFiller />
+          <$PnlRow>
+            <$PnlChart selectedLocale={selectedLocale} />
+          </$PnlRow>
+          <$HorizontalSeparatorFiller />
+          <$VaultPositionsSection />
+        </$VaultDetailsColumn>
+        <$VaultDepositWithdrawFormColumn>
+          <$YourVaultDetailsCards />
+          <$DepositFormContainer>
             <$PlaceholderBox />
-            <$HistoryCard>
-              {transactions.length > 0 ? (
-                <>
-                  <$HistoryTitle>
-                    <$HistoryTitleText>
-                      {stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}
-                      <$HistoryCount>{transactions.length}</$HistoryCount>
-                    </$HistoryTitleText>
-                    <$ShowHideHistoryButton
-                      size={ButtonSize.XSmall}
-                      shape={ButtonShape.Pill}
-                      onClick={() => setShowHistory((o) => !o)}
-                    >
-                      {showHistory
-                        ? stringGetter({ key: STRING_KEYS.HIDE })
-                        : stringGetter({ key: STRING_KEYS.VIEW })}
-                    </$ShowHideHistoryButton>
-                  </$HistoryTitle>
-                  {showHistory && <VaultTransactionsTable />}
-                </>
-              ) : (
-                <$Empty>
-                  <div>
-                    <$Icon iconName={IconName.OrderPending} />
-                  </div>
-                  <div>You have no vault deposits.</div>
-                </$Empty>
-              )}
-            </$HistoryCard>
-          </$VaultDepositWithdrawFormColumn>
-        </$TwoColumnContainer>
-      </$Container>
+          </$DepositFormContainer>
+          <$VaultTransactionsCardContainer>
+            <VaultTransactionsCard />
+          </$VaultTransactionsCardContainer>
+        </$VaultDepositWithdrawFormColumn>
+      </$TwoColumnContainer>
     </$Page>
   );
 };
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 `;
 
-const $YourVaultDetailsCards = styled(YourVaultDetailsCards)``;
-
-const $Empty = styled.div`
-  ${layoutMixins.column}
-  padding: 1rem;
-  color: var(--color-text-0);
-  justify-items: center;
-  align-content: center;
-`;
-
-const $Icon = styled(Icon)`
-  width: 2rem;
-  height: 2rem;
-  margin-bottom: 0.75rem;
-`;
-
-const $Container = styled.div`
-  padding: 1rem;
-`;
 const VAULT_FORM_WIDTH_REM = 25;
 const VAULT_DETAILS_WIDTH_REM = 30;
+const $OneColumnContainer = styled.div`
+  ${layoutMixins.contentSectionDetached}
+  ${layoutMixins.column}
+`;
 const $TwoColumnContainer = styled.div`
   ${layoutMixins.contentSectionDetached}
   --vault-form-width: ${VAULT_FORM_WIDTH_REM}rem;
@@ -109,35 +96,61 @@ const $TwoColumnContainer = styled.div`
     grid-template-columns: 1fr;
   }
 `;
-const $VaultDetailsColumn = styled.div``;
+const $VaultDetailsColumn = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 1.25rem;
+`;
 const $VaultDepositWithdrawFormColumn = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.25rem;
 `;
+
+const xPaddingWhenSmall = css`
+  @media (${breakpoints.desktopSmall}) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+`;
+const $VaultPositionsSection = styled(VaultPositionsSection)`
+  > :first-child {
+    ${xPaddingWhenSmall}
+  }
+`;
+const $YourVaultDetailsCards = styled(YourVaultDetailsCards)`
+  ${xPaddingWhenSmall}
+`;
+const $VaultTransactionsCardContainer = styled.div`
+  ${xPaddingWhenSmall}
+`;
+const $DepositFormContainer = styled.div`
+  ${xPaddingWhenSmall}
+`;
+
 const $PlaceholderBox = styled.div`
-  width: 25rem;
   height: 22rem;
   border-radius: 0.7rem;
   background-color: var(--color-layer-3);
 `;
-const $HistoryCard = styled.div`
-  border-radius: 0.7rem;
-  border: 1px solid var(--color-border);
-`;
-const $HistoryCount = styled.span`
-  margin-left: 0.5rem;
-  color: var(--color-text-0);
-`;
-const $ShowHideHistoryButton = styled(Button)``;
 
-const $HistoryTitle = styled.div`
+const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
   display: flex;
-  justify-content: space-between;
-  padding: 0.625rem 1rem;
+  min-height: 1px;
 `;
-const $HistoryTitleText = styled.h3`
-  font: var(--font-base-medium);
-  line-height: 1.75rem;
+
+const $PnlRow = styled.div`
+  height: 30rem;
+`;
+const $PnlChart = styled(PnlChart)`
+  height: 30rem;
+  background-color: var(--color-layer-2);
+
+  // todo remember to grab colors
+  --pnl-line-color: var(--color-positive);
+`;
+
+const $VaultHeader = styled(VaultHeader)`
+  margin-bottom: 0.625rem;
+  ${xPaddingWhenSmall}
 `;
 
 export default Vaults;

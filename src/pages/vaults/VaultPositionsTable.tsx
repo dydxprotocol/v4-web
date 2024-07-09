@@ -28,7 +28,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
-export const VaultsTable = ({ className }: { className?: string }) => {
+export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 

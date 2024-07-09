@@ -54,7 +54,7 @@ const initialState: VaultsState = {
         marketId: 'PEPE-USD',
         marginUsdc: 10_000,
         currentLeverageMultiple: 1.2,
-        currentPosition: { asset: 17341235412, usdc: 423.67 },
+        currentPosition: { asset: 1734112, usdc: 423.67 },
         thirtyDayPnl: {
           percent: 0.123,
           absolute: 1123,
