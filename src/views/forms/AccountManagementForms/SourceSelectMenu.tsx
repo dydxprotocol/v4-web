@@ -27,6 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
@@ -80,6 +81,9 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
+  const osmosisChainId = getOsmosisChainId();
+  const nobleChainId = getNobleChainId();
+  const supportedCosmosChains = [osmosisChainId, nobleChainId];
 
   const chainItems = Object.values(chains)
     .map((chain) => ({
@@ -92,7 +96,9 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
-      if (!isNotKeplrWallet) return true;
+      if (!isNotKeplrWallet) {
+        return supportedCosmosChains.includes(chain.value);
+      }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];

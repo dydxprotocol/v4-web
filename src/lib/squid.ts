@@ -74,6 +74,10 @@ export const getNobleChainId = () => {
   return isMainnet ? 'noble-1' : 'grand-1';
 };
 
+export const getOsmosisChainId = () => {
+  return isMainnet ? 'osmosis-1' : 'osmo-test-5';
+};
+
 type SkipStatusParams = {
   transactionHash: string;
   chainId: string | undefined;

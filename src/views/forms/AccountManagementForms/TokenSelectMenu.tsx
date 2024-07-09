@@ -48,12 +48,14 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
     EMPTY_ARR;
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
       label: token.stringKey,
       onSelect: () => {
+        console.log('d', resources?.tokenResources);
         const newSelectedToken = resources?.tokenResources?.get(token.type);
         if (newSelectedToken) {
           onSelectToken(newSelectedToken);
@@ -67,7 +69,10 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
-      if (walletType === WalletType.Keplr) return true;
+      // only show USDC for Keplr wallets
+      if (isKeplrWallet) {
+        return token.label === 'USDC';
+      }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByDenom[token.value];
