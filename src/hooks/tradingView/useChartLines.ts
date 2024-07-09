@@ -258,10 +258,14 @@ export const useChartLines = ({
   useEffect(() => {
     if (showOrderLines) {
       displayButton?.classList?.add('order-lines-active');
+      if (tvWidget) {
+        drawChartLines(tvWidget);
+      }
     } else {
       displayButton?.classList?.remove('order-lines-active');
+      deleteChartLines();
     }
-  }, [showOrderLines, displayButton?.classList]);
+  }, [showOrderLines, displayButton?.classList, tvWidget, drawChartLines]);
 
   useEffect(() => {
     // Clear lines when switching markets
