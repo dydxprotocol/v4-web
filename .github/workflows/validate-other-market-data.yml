@@ -47,7 +47,6 @@ jobs:
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
-<<<<<<< HEAD
           DOCKER_BUILDKIT=1 make localnet-init
           DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
 
@@ -55,9 +54,6 @@ jobs:
         run: |
           git fetch origin
           git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
-=======
-          DOCKER_BUILDKIT=1 make localnet-startd
->>>>>>> origin/main
       
       - name: Checkout main branch
         uses: actions/checkout@v3
