@@ -41,7 +41,11 @@ export const localizationSlice = createSlice({
       const newLocale = action.payload.locale;
 
       // regulatory: track manual switching to EU language and whether it's their browser language / switching from English
-      if (!action.payload.isAutoDetect && EU_LOCALES.includes(newLocale)) {
+      if (
+        newLocale !== previousLocale &&
+        !action.payload.isAutoDetect &&
+        EU_LOCALES.includes(newLocale)
+      ) {
         track(
           AnalyticsEvents.SwitchedLanguageToEULanguage({
             previousLocale,
