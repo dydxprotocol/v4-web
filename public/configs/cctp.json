@@ -5,6 +5,12 @@
     "name": "Ethereum"
   },
   {
+    "chainId": "1155511",
+    "tokenAddress": "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+    "name": "Ethereum Sepolia",
+    "isTestnet": true
+  },
+  {
     "chainId": "43114",
     "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
     "name": "Avalanche"

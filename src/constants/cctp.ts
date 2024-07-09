@@ -9,9 +9,13 @@ export type CctpTokenInfo = {
 
 type NullableTransferType = TransferTypeType | undefined | null;
 
+const mainnetChains = cctpTokens.filter((token) => !token.isTestnet);
+
 // Ethereum is a high fee chain for withdrawals but not deposits
 const getLowestFeeChains = (type: NullableTransferType) =>
-  type === TransferType.deposit ? cctpTokens : cctpTokens.filter(({ chainId }) => chainId !== '1');
+  type === TransferType.deposit
+    ? mainnetChains
+    : mainnetChains.filter(({ chainId }) => chainId !== '1');
 
 // move this out if we need it in another module
 const capitalizeNames = (str: string) => str[0].toUpperCase() + str.slice(1);
