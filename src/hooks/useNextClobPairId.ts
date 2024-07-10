@@ -143,7 +143,10 @@ export const useNextClobPairId = () => {
 
   const fetchNextClobPairId = useCallback(async () => {
     try {
-      const [governanceProposals, markets] = await Promise.all([requestAllGovernanceProposals(), requestAllPerpetualMarkets()]);
+      const [governanceProposals, markets] = await Promise.all([
+        requestAllGovernanceProposals(),
+        requestAllPerpetualMarkets(),
+      ]);
       return getNextClobPairIdAndTickers({ governanceProposals, markets });
     } catch (error) {
       log('useNextClobPairId/fetchNextClobPairId', error);
