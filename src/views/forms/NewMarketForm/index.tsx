@@ -28,7 +28,7 @@ export const NewMarketForm = () => {
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const { nextAvailableClobPairId, tickersFromProposals } = useNextClobPairId();
+  const { tickersFromProposals } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const tickSizeDecimals = useMemo(() => {
@@ -37,7 +37,7 @@ export const NewMarketForm = () => {
     return Math.abs(p - 3);
   }, [assetToAdd]);
 
-  if (!hasPotentialMarketsData || !nextAvailableClobPairId) {
+  if (!hasPotentialMarketsData) {
     return <$LoadingSpace id="new-market-form" />;
   }
 
@@ -46,11 +46,10 @@ export const NewMarketForm = () => {
   }
 
   if (NewMarketFormStep.PREVIEW === step) {
-    if (assetToAdd && liquidityTier && nextAvailableClobPairId) {
+    if (assetToAdd && liquidityTier) {
       return (
         <NewMarketPreviewStep
           assetData={assetToAdd}
-          clobPairId={nextAvailableClobPairId}
           liquidityTier={liquidityTier}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
           onSuccess={(hash: string) => {
@@ -65,9 +64,10 @@ export const NewMarketForm = () => {
 
   return (
     <NewMarketSelectionStep
-      onConfirmMarket={() => setStep(NewMarketFormStep.PREVIEW)}
+      onConfirmMarket={() => {
+        setStep(NewMarketFormStep.PREVIEW);
+      }}
       assetToAdd={assetToAdd}
-      clobPairId={nextAvailableClobPairId}
       setAssetToAdd={setAssetToAdd}
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}
