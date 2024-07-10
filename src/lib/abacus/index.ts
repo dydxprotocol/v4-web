@@ -42,13 +42,16 @@ import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
-import { CLEARED_TRIGGER_LIMIT_INPUTS, CLEARED_TRIGGER_ORDER_INPUTS } from '@/constants/triggers';
+import {
+  CLEARED_TRIGGER_LIMIT_INPUTS,
+  CLEARED_TRIGGER_ORDER_INPUTS,
+  TriggerFields,
+} from '@/constants/triggers';
 
 import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
-import { TriggerFields } from '../../constants/triggers';
 import { LocaleSeparators } from '../numbers';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
