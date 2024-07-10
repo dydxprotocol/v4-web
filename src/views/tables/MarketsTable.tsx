@@ -19,6 +19,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { AssetTableCell } from '@/components/Table/AssetTableCell';
@@ -116,7 +117,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'priceChange24HChart',
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
               renderCell: ({ line, priceChange24HPercent }) => (
-                <div style={{ width: 50, height: 50 }}>
+                <$SparklineChartContainer>
                   <SparklineChart
                     data={(line?.toArray() ?? []).map((datum, index) => ({
                       x: index + 1,
@@ -126,7 +127,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     yAccessor={(datum) => datum.y}
                     positive={MustBigNumber(priceChange24HPercent).gt(0)}
                   />
-                </div>
+                </$SparklineChartContainer>
               ),
               allowsSorting: false,
             },
@@ -240,16 +241,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                   <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
                 )}
               </>
-            ) : (
+            ) : searchFilter ? (
               <>
                 <h2>
                   {stringGetter({
                     key: STRING_KEYS.QUERY_NOT_FOUND,
-                    params: { QUERY: searchFilter ?? '' },
+                    params: { QUERY: searchFilter },
                   })}
                 </h2>
                 <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
               </>
+            ) : (
+              <LoadingSpace id="markets-table" />
             )}
 
             {hasPotentialMarketsData && (
@@ -287,6 +290,9 @@ const $Toolbar = styled(Toolbar)`
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
+  tbody {
+    --tableCell-padding: 1rem 0;
+  }
 
   @media ${breakpoints.tablet} {
     table {
@@ -335,4 +341,9 @@ const $MarketNotFound = styled.div`
     font: var(--font-medium-book);
     font-weight: 500;
   }
+`;
+
+const $SparklineChartContainer = styled.div`
+  width: 3rem;
+  height: 2rem;
 `;
