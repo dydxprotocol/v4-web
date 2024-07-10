@@ -32,6 +32,7 @@ const Vaults = () => {
             <$VaultTransactionsCardContainer>
               <VaultTransactionsCard />
             </$VaultTransactionsCardContainer>
+            <$HorizontalSeparatorFiller />
             <$PnlRow>
               <$PnlChart />
             </$PnlRow>

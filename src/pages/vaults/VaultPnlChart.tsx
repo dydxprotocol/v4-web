@@ -75,7 +75,6 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     if (inRangeData.length === 0) {
       // do something
     }
-    console.log(inRangeData[0].index, inRangeData[inRangeData.length - 1].index);
   }, []);
 
   return (
