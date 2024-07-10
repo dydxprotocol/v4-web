@@ -126,7 +126,7 @@ export const useNextClobPairId = () => {
           Number((perpetualMarket as PerpetualMarketResponse).clobPairId)
         );
 
-        const newNextAvailableClobPairId = Math.max(...[...clobPairIds, ...idsFromProposals]) + 1;
+        const newNextAvailableClobPairId = Math.max(...clobPairIds, ...idsFromProposals) + 1;
         return {
           nextAvailableClobPairId: newNextAvailableClobPairId,
           tickersFromProposals: newTickersFromProposals,
