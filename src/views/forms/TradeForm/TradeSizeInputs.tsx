@@ -9,7 +9,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TradeSizeInput } from '@/constants/trade';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -41,7 +40,6 @@ export const TradeSizeInputs = () => {
   const [showUSDCInputOnTablet, setShowUSDCInputOnTablet] = useState(false);
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const { isTablet } = useBreakpoints();
 
   const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
@@ -113,7 +111,6 @@ export const TradeSizeInputs = () => {
       shape={ButtonShape.Square}
     >
       <Icon iconName={IconName.Trade} />
-      {showUSDCInputOnTablet ? 'USD' : id}
     </$ToggleButton>
   );
 
@@ -128,9 +125,12 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           {id && <Tag>{id}</Tag>}
+          {usdAmountInput && (<>
+            ≈ ${usdAmountInput}
+          </>)}
         </>
       }
-      slotRight={isTablet && inputToggleButton}
+      slotRight={inputToggleButton}
       type={InputType.Number}
       value={amountInput || ''}
     />
@@ -149,26 +149,24 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           <Tag>USD</Tag>
+          {amountInput && id && (<>
+            ≈ {amountInput} <Tag>{id}</Tag>
+          </>)}
         </>
       }
-      slotRight={isTablet && inputToggleButton}
+      slotRight={inputToggleButton}
     />
   );
 
   return (
     <$Column>
-      {isTablet ? (
+      {
         showUSDCInputOnTablet ? (
           usdcInput
         ) : (
           sizeInput
         )
-      ) : (
-        <$Row>
-          {sizeInput}
-          {usdcInput}
-        </$Row>
-      )}
+      }
 
       {needsLeverage && (
         <MarketLeverageInput
