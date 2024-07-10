@@ -161,7 +161,6 @@ export const TradeSizeInputs = () => {
   return (
     <$Column>
       {showUSDCInputOnTablet ? usdcInput : sizeInput}
-
       {needsLeverage && (
         <MarketLeverageInput
           leverageInputValue={leverageInput}
@@ -175,11 +174,6 @@ export const TradeSizeInputs = () => {
 };
 const $Column = styled.div`
   ${layoutMixins.flexColumn}
-  gap: var(--form-input-gap);
-`;
-
-const $Row = styled.div`
-  ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;
 
