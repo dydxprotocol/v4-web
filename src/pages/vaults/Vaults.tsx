@@ -133,16 +133,8 @@ const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
   min-height: 1px;
 `;
 
-const $PnlRow = styled.div`
-  height: 30rem;
-`;
-const $PnlChart = styled(VaultPnlChart)`
-  height: 30rem;
-  background-color: var(--color-layer-2);
-
-  // todo remember to grab colors
-  --pnl-line-color: var(--color-positive);
-`;
+const $PnlRow = styled.div``;
+const $PnlChart = styled(VaultPnlChart)``;
 
 const $VaultHeader = styled(VaultHeader)`
   margin-bottom: 0.625rem;

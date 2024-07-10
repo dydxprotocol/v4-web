@@ -1,5 +1,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
+export interface VaultsState {
+  vaultDetails: VaultDetails;
+  vaultHistory: VaultHistory;
+  userVault: VaultOwnership | undefined;
+}
 type VaultDetails = {
   totalValue: number;
   allTimePnl: {
@@ -7,27 +12,22 @@ type VaultDetails = {
     absolute: number;
   };
   thirtyDayReturnPercent: number;
-  positions: Array<{
-    asset: { id: string; name: string };
-    marketId: string;
-    marginUsdc: number;
-    currentLeverageMultiple: number;
-    currentPosition: {
-      asset: number;
-      usdc: number;
-    };
-    thirtyDayPnl: {
-      percent: number;
-      absolute: number;
-      sparklinePoints: number[];
-    };
-  }>;
+  positions: Array<VaultPosition>;
 };
-export type VaultTransaction = {
-  timestampMs: number;
-  amountUsdc: number;
-  type: 'withdrawal' | 'deposit';
-  id: string;
+type VaultPosition = {
+  asset: { id: string; name: string };
+  marketId: string;
+  marginUsdc: number;
+  currentLeverageMultiple: number;
+  currentPosition: {
+    asset: number;
+    usdc: number;
+  };
+  thirtyDayPnl: {
+    percent: number;
+    absolute: number;
+    sparklinePoints: number[];
+  };
 };
 type VaultOwnership = {
   userBalance: number;
@@ -37,11 +37,15 @@ type VaultOwnership = {
   };
   transactionHistory: VaultTransaction[];
 };
-
-export interface VaultsState {
-  vaultDetails: VaultDetails;
-  userVault: VaultOwnership | undefined;
-}
+export type VaultTransaction = {
+  timestampMs: number;
+  amountUsdc: number;
+  type: 'withdrawal' | 'deposit';
+  id: string;
+};
+type VaultHistory = {
+  pnlAndEquityDataPoints: Array<{ date: number; equity: number; totalPnl: number }>;
+};
 
 const initialState: VaultsState = {
   vaultDetails: {
@@ -60,6 +64,45 @@ const initialState: VaultsState = {
           absolute: 1123,
           sparklinePoints: [1, 2, 3, 2, 1, 4, 3, 1, 3, 1, 2],
         },
+      },
+    ],
+  },
+  vaultHistory: {
+    pnlAndEquityDataPoints: [
+      {
+        date: new Date('6/1/2024').valueOf(),
+        equity: 1000,
+        totalPnl: 100,
+      },
+      {
+        date: new Date('6/2/2024').valueOf(),
+        equity: 1500,
+        totalPnl: 600,
+      },
+      {
+        date: new Date('6/3/2024').valueOf(),
+        equity: 1700,
+        totalPnl: 800,
+      },
+      {
+        date: new Date('6/4/2024').valueOf(),
+        equity: 1600,
+        totalPnl: 800,
+      },
+      {
+        date: new Date('6/5/2024').valueOf(),
+        equity: 2000,
+        totalPnl: 1000,
+      },
+      {
+        date: new Date('6/6/2024').valueOf(),
+        equity: 2300,
+        totalPnl: 1300,
+      },
+      {
+        date: new Date('6/7/2024').valueOf(),
+        equity: 2800,
+        totalPnl: 2000,
       },
     ],
   },

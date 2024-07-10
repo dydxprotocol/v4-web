@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -33,7 +32,7 @@ interface ExportHistoryDropdownProps {
 }
 
 export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const subaccountNumber = useAppSelector(getSubaccountId);
   const { dydxAddress } = useAccounts();
