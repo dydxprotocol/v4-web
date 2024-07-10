@@ -2,25 +2,27 @@ import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Asset, PerpetualMarket } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
 import { TradeLayouts } from '@/constants/layout';
+import { STRING_KEYS } from '@/constants/localization';
 import { type MenuConfig } from '@/constants/menus';
 import { AppRoute } from '@/constants/routes';
 
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
 import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
-import {
-  AppColorMode,
-  AppTheme,
-  AppThemeSystemSetting,
-  setAppColorMode,
-  setAppThemeSetting,
-} from '@/state/configs';
+import { openDialog } from '@/state/dialogs';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { safeAssign } from '@/lib/objectHelpers';
+import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 enum LayoutItems {
@@ -29,13 +31,12 @@ enum LayoutItems {
   setAlternativeLayout = 'SetAlternativeLayout',
 }
 
-enum NavItems {
-  NavigateToMarket = 'NavigateToMarket',
-}
-
 export const useGlobalCommands = (): MenuConfig<string, string> => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
+  const showVaults = testFlags.enableVaults;
 
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
@@ -46,83 +47,62 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
 
   return [
     {
-      group: 'themes',
-      groupLabel: 'Themes',
+      group: 'view',
+      groupLabel: stringGetter({ key: STRING_KEYS.VIEW }),
       items: [
         {
-          value: AppTheme.Classic,
-          label: 'Set Classic Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Classic));
-          },
+          value: 'trade',
+          slotBefore: <Icon iconName={IconName.Trade} />,
+          label: stringGetter({ key: STRING_KEYS.TRADE }),
+          onSelect: () => navigate(AppRoute.Trade),
         },
         {
-          value: AppThemeSystemSetting.System,
-          label: 'Set System Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppThemeSystemSetting.System));
-          },
+          value: 'portfolio',
+          slotBefore: <Icon iconName={IconName.PriceChart} />,
+          label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
+          onSelect: () => navigate(AppRoute.Portfolio),
         },
         {
-          value: AppTheme.Light,
-          label: 'Set Light Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Light));
-          },
+          value: 'markets',
+          slotBefore: <Icon iconName={IconName.Markets} />,
+          label: stringGetter({ key: STRING_KEYS.MARKETS }),
+          onSelect: () => navigate(AppRoute.Markets),
         },
         {
-          value: AppTheme.Dark,
-          label: 'Set Dark Theme',
-          onSelect: () => {
-            dispatch(setAppThemeSetting(AppTheme.Dark));
-          },
+          value: 'token',
+          slotBefore: <Icon iconName={IconName.Coins} />,
+          label: chainTokenLabel,
+          onSelect: () => navigate(`/${chainTokenLabel}`),
         },
-      ],
+        showVaults && {
+          value: 'vaults',
+          slotBefore: <Icon iconName={IconName.Governance} />,
+          label: stringGetter({ key: STRING_KEYS.VAULTS }),
+          onSelect: () => navigate(AppRoute.Vaults),
+        },
+      ].filter(isTruthy),
     },
     {
-      group: 'colorPreferences',
-      groupLabel: 'Color Preferences',
+      group: 'other',
+      groupLabel: stringGetter({ key: STRING_KEYS.OTHER }),
       items: [
         {
-          value: AppColorMode.GreenUp,
-          label: 'Set Green is Up',
-          onSelect: () => {
-            dispatch(setAppColorMode(AppColorMode.GreenUp));
-          },
+          value: 'help',
+          slotBefore: <Icon iconName={IconName.HelpCircle} />,
+          label: stringGetter({ key: STRING_KEYS.HELP }),
+          onSelect: () => dispatch(openDialog(DialogTypes.Help())),
         },
         {
-          value: AppColorMode.RedUp,
-          label: 'Set Red is Up',
-          onSelect: () => {
-            dispatch(setAppColorMode(AppColorMode.RedUp));
-          },
-        },
-      ],
-    },
-    {
-      group: 'layout',
-      groupLabel: 'Layout',
-      items: [
-        {
-          value: LayoutItems.setDefaultLayout,
-          label: 'Set Default Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Default));
-          },
+          value: 'preferences',
+          slotBefore: <Icon iconName={IconName.Gear} />,
+          label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
+          onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
         },
         {
-          value: LayoutItems.setReverseLayout,
-          label: 'Set Reverse Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Reverse));
-          },
-        },
-        {
-          value: LayoutItems.setAlternativeLayout,
-          label: 'Set Alternative Layout',
-          onSelect: () => {
-            dispatch(setSelectedTradeLayout(TradeLayouts.Alternative));
-          },
+          value: 'display',
+          slotBefore: <Icon iconName={IconName.Moon} />,
+          label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
+          onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
         },
       ],
     },
@@ -148,19 +128,35 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
     //   ],
     // },
     {
-      group: 'navigation',
-      groupLabel: 'Navigation',
+      group: 'markets',
+      groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
+      items: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
+        value: market ?? '',
+        slotBefore: <AssetIcon symbol={id} />,
+        label: name ?? '',
+        tag: id,
+        onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
+      })),
+    },
+    {
+      // TODO: Remove this group when available under display settings
+      group: 'layout',
+      groupLabel: 'Layout', // TODO: i18n
       items: [
         {
-          value: NavItems.NavigateToMarket,
-          label: 'Navigate to Market',
-          subitems: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
-            value: market ?? '',
-            slotBefore: <AssetIcon symbol={id} />,
-            label: name ?? '',
-            tag: id,
-            onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
-          })),
+          value: LayoutItems.setDefaultLayout,
+          label: stringGetter({ key: STRING_KEYS.SET_DEFAULT_LAYOUT }),
+          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Default)),
+        },
+        {
+          value: LayoutItems.setReverseLayout,
+          label: stringGetter({ key: STRING_KEYS.SET_REVERSE_LAYOUT }),
+          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Reverse)),
+        },
+        {
+          value: LayoutItems.setAlternativeLayout,
+          label: stringGetter({ key: STRING_KEYS.SET_ALTERNATIVE_LAYOUT }),
+          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Alternative)),
         },
       ],
     },

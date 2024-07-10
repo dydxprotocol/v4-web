@@ -84,6 +84,9 @@ export const DepositButtonAndReceipt = ({
   } = useMatchingEvmNetwork({
     chainId,
     onError: setError,
+    onSuccess: () => {
+      setError?.(null);
+    },
   });
 
   const { current: equity, postOrder: newEquity } =

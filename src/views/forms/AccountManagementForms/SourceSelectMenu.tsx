@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
+import { getMapOfLowestFeeTokensByChainId } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
@@ -19,7 +22,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import cctpTokens from '../../../../public/configs/cctp.json';
+import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
   label?: string;
@@ -27,23 +30,6 @@ type ElementProps = {
   selectedChain?: string;
   onSelect: (name: string, type: 'chain' | 'exchange') => void;
 };
-
-export type TokenInfo = {
-  chainId: string;
-  tokenAddress: string;
-  name: string;
-};
-
-const cctpTokensByChainId = cctpTokens.reduce(
-  (acc, token) => {
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = [];
-    }
-    acc[token.chainId].push(token);
-    return acc;
-  },
-  {} as Record<string, TokenInfo[]>
-);
 
 export const SourceSelectMenu = ({
   label,
@@ -65,6 +51,8 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
     EMPTY_ARR;
 
+  const cctpTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
+
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
   const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
@@ -77,20 +65,7 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
-      [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
-        <$Text>
-          {stringGetter({
-            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
-            params: {
-              LOWEST_FEES_HIGHLIGHT_TEXT: (
-                <$GreenHighlight>
-                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
-                </$GreenHighlight>
-              ),
-            },
-          })}
-        </$Text>
-      ),
+      [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && <LowestFeesDecoratorText />,
     }))
     .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
@@ -112,6 +87,7 @@ export const SourceSelectMenu = ({
       onSelect(exchange.type, 'exchange');
     },
     slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
+    [lowestFeesDecoratorProp]: <LowestFeesDecoratorText />,
   }));
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
@@ -166,13 +142,4 @@ const $ChainRow = styled.div`
   gap: 0.5rem;
   color: var(--color-text-2);
   font: var(--font-base-book);
-`;
-
-const $Text = styled.div`
-  font: var(--font-small-regular);
-  color: var(--color-text-0);
-`;
-
-const $GreenHighlight = styled.span`
-  color: var(--color-green);
 `;

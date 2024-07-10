@@ -127,6 +127,11 @@ class AbacusStateManager {
     this.stateManager.trade(null, null);
   };
 
+  restart = ({ network }: { network?: DydxNetwork } = {}) => {
+    this.stateManager.readyToConnect = false;
+    this.start({ network });
+  };
+
   // ------ Breakdown ------ //
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;

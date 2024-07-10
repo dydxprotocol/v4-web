@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { useSignTypedData } from 'wagmi';
 
 import { getSignTypedData } from '@/constants/wallets';
@@ -13,12 +15,18 @@ export default function useSignForWalletDerivation() {
   const chainId = Number(ethereumChainId);
 
   const signTypedData = getSignTypedData(selectedDydxChainId);
-  const { signTypedDataAsync } = useSignTypedData({
-    ...signTypedData,
-    domain: {
-      ...signTypedData.domain,
-      chainId,
-    },
-  });
-  return signTypedDataAsync;
+  const { signTypedDataAsync } = useSignTypedData();
+
+  const callSignTypedData = useCallback(
+    () =>
+      signTypedDataAsync({
+        ...signTypedData,
+        domain: {
+          ...signTypedData.domain,
+          chainId,
+        },
+      }),
+    [signTypedData, signTypedDataAsync, chainId]
+  );
+  return callSignTypedData;
 }
