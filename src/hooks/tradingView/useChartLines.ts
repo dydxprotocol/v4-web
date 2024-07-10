@@ -211,10 +211,8 @@ export const useChartLines = ({
         const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
         const shouldShow = !cancelReason && isOrderStatusOpen(status);
-
         const maybeOrderLine = chartLinesRef.current[key]?.line;
         const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
-
         if (!shouldShow) {
           if (maybeOrderLine) {
             maybeOrderLine.remove();
@@ -225,6 +223,7 @@ export const useChartLines = ({
             if (maybeOrderLine.getPrice() !== formattedPrice) {
               maybeOrderLine.setPrice(formattedPrice);
             }
+
             if (maybeOrderLine.getQuantity() !== quantity) {
               maybeOrderLine.setQuantity(quantity);
             }
@@ -235,7 +234,6 @@ export const useChartLines = ({
               .setPrice(formattedPrice)
               .setQuantity(quantity)
               .setText(orderString);
-
             if (orderLine) {
               const chartLine: ChartLine = {
                 line: orderLine,
@@ -275,62 +273,58 @@ export const useChartLines = ({
     }
   }, [isChartReady, displayButton]);
 
-  useEffect(() => {
-    if (isChartReady && tvWidget && currentMarketPositionData) {
-      // Manual call to draw chart lines on initial render of chart
-      if (!initialWidget) {
-        runOnChartReady(drawChartLines);
-        setInitialWidget(tvWidget);
-        setLastMarket(currentMarketId);
-      } else if (currentMarketId && lastMarket !== currentMarketId) {
-        // Subscribe to update chart lines whenever market (symbol) has changed
-        tvWidget
-          .activeChart()
-          .onSymbolChanged()
-          .subscribe(
-            null,
-            () => {
-              runOnChartReady(drawChartLines);
-            },
-            true
-          );
-        setLastMarket(currentMarketId);
+  useEffect(
+    // Update display button on toggle
+    () => {
+      if (showOrderLines) {
+        displayButton?.classList?.add('order-lines-active');
+      } else {
+        displayButton?.classList?.remove('order-lines-active');
       }
-    }
-  }, [
-    initialWidget,
-    tvWidget,
-    isChartReady,
-    currentMarketId,
-    lastMarket,
-    currentMarketPositionData,
-    drawChartLines,
-    runOnChartReady,
-  ]);
+    },
+    [showOrderLines, displayButton?.classList]
+  );
 
   useEffect(
-    // Update chart lines on toggle, or when orders/position has changed
     () => {
-      runOnChartReady(() => {
-        if (showOrderLines) {
-          displayButton?.classList?.add('order-lines-active');
-          updateOrderLines();
-          if (lastMarket === currentMarketId) {
-            // We only want to update the position lines if the market has not changed (the changed market
-            // scenario is handled in the effect above; if we trigger it here, it'll run before the onSubscribe
-            // callback with the incorrect tick precision)
-            updatePositionLines();
-          }
+      if (isChartReady && tvWidget) {
+        // Manual call to draw chart lines on initial render of chart
+        if (!initialWidget) {
+          runOnChartReady(drawChartLines);
+          setInitialWidget(tvWidget);
+          setLastMarket(currentMarketId);
+        } else if (currentMarketId && lastMarket !== currentMarketId) {
+          // Subscribe to update chart lines whenever market (symbol) has changed
+          tvWidget
+            .activeChart()
+            .onSymbolChanged()
+            .subscribe(
+              null,
+              () => {
+                runOnChartReady(drawChartLines);
+              },
+              true
+            );
+          setLastMarket(currentMarketId);
         } else {
-          displayButton?.classList?.remove('order-lines-active');
-          clearChartLines();
+          // Update chart lines if market has not changed. If the market has changed, we want the chart lines to be handled by the subscribe so
+          // that it is guaranteed to run after the tick size of the market has been updated.
+          runOnChartReady(drawChartLines);
         }
-      });
+      }
     },
-    // We intentionally can avoid calling this hook when currentMarketId/lastMarket/market position deps change since
-    // these scenarios are handled in the above hooks
+    // We intentionally do not want the hook to re-run when lastMarket is updated since it is set in the subscribe condition; only the
+    // subscribe condition OR else condition should run (otherwise the else will run before the subscribe, resulting in an incorrect tick size)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showOrderLines, displayButton?.classList, updateOrderLines, clearChartLines, runOnChartReady]
+    [
+      initialWidget,
+      tvWidget,
+      isChartReady,
+      currentMarketId,
+      // lastMarket,
+      drawChartLines,
+      runOnChartReady,
+    ]
   );
 
   useEffect(() => {
