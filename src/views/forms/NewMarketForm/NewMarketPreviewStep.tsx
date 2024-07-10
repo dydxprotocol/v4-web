@@ -16,6 +16,7 @@ import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -44,7 +45,6 @@ import { log } from '@/lib/telemetry';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;
-  clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
   onSuccess: (hash: string) => void;
@@ -53,7 +53,6 @@ type NewMarketPreviewStepProps = {
 
 export const NewMarketPreviewStep = ({
   assetData,
-  clobPairId,
   liquidityTier,
   onBack,
   onSuccess,
@@ -68,6 +67,7 @@ export const NewMarketPreviewStep = ({
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
   const { newMarketProposalLearnMore } = useURLConfigs();
+  const { fetchNextClobPairId, nextAvailableClobPairId } = useNextClobPairId();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
     Number(`1e${chainTokenDecimals}`)
   );
@@ -136,6 +136,12 @@ export const NewMarketPreviewStep = ({
           setErrorMessage(undefined);
 
           try {
+            const { nextAvailableClobPairId: clobPairId } = await fetchNextClobPairId();
+
+            if (!clobPairId) {
+              throw new Error('Failed to calculate next available clobPairId');
+            }
+
             const tx = await submitNewMarketProposal({
               id: clobPairId,
               ticker,
@@ -259,7 +265,11 @@ export const NewMarketPreviewStep = ({
                 onClick={() =>
                   dispatch(
                     openDialog(
-                      DialogTypes.NewMarketMessageDetails({ assetData, clobPairId, liquidityTier })
+                      DialogTypes.NewMarketMessageDetails({
+                        assetData,
+                        clobPairId: nextAvailableClobPairId,
+                        liquidityTier,
+                      })
                     )
                   )
                 }
