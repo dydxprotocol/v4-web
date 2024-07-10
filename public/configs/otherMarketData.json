@@ -15837,6 +15837,12 @@
                     "ticker": "IQ-USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
+                },
+                {
+                    "exchangeName": "Gate",
+                    "ticker": "IQ_USDT",
+                    "adjustByMarket": "USDT-USD",
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
