@@ -125,9 +125,7 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           {id && <Tag>{id}</Tag>}
-          {usdAmountInput && (<>
-            ≈ ${usdAmountInput}
-          </>)}
+          {usdAmountInput && <>≈ ${usdAmountInput}</>}
         </>
       }
       slotRight={inputToggleButton}
@@ -149,9 +147,11 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           <Tag>USD</Tag>
-          {amountInput && id && (<>
-            ≈ {amountInput} <Tag>{id}</Tag>
-          </>)}
+          {amountInput && id && (
+            <>
+              ≈ {amountInput} <Tag>{id}</Tag>
+            </>
+          )}
         </>
       }
       slotRight={inputToggleButton}
@@ -160,13 +160,7 @@ export const TradeSizeInputs = () => {
 
   return (
     <$Column>
-      {
-        showUSDCInputOnTablet ? (
-          usdcInput
-        ) : (
-          sizeInput
-        )
-      }
+      {showUSDCInputOnTablet ? usdcInput : sizeInput}
 
       {needsLeverage && (
         <MarketLeverageInput
