@@ -125,6 +125,9 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
         <$Form>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_1 })}</p>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_2 })}</p>
+          <p>
+            <strong>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_3 })}</strong>
+          </p>
           <Button action={ButtonAction.Primary} onClick={() => setShowForm(true)}>
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>

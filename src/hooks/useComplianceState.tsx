@@ -5,6 +5,7 @@ import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { Link } from '@/components/Link';
 import { OutputType, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
@@ -20,6 +21,7 @@ import { useURLConfigs } from './useURLConfigs';
 
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
+  const { help } = useURLConfigs();
   const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
@@ -28,8 +30,6 @@ export const useComplianceState = () => {
 
   const updatedAtDate = complianceUpdatedAt ? new Date(complianceUpdatedAt) : undefined;
   updatedAtDate?.setDate(updatedAtDate.getDate() + CLOSE_ONLY_GRACE_PERIOD);
-
-  const { complianceSupportEmail } = useURLConfigs();
 
   let complianceState = ComplianceStates.FULL_ACCESS;
 
@@ -59,13 +59,23 @@ export const useComplianceState = () => {
               selectedLocale,
             })
           : undefined,
-        EMAIL: complianceSupportEmail,
+        HELP_LINK: (
+          <Link href={help} isInline>
+            {stringGetter({ key: STRING_KEYS.HELP_CENTER })}
+          </Link>
+        ),
       },
     });
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE,
-      params: { EMAIL: complianceSupportEmail },
+      params: {
+        HELP_LINK: (
+          <Link href={help} isInline>
+            {stringGetter({ key: STRING_KEYS.HELP_CENTER })}
+          </Link>
+        ),
+      },
     });
   } else if (geo && isBlockedGeo(geo)) {
     complianceMessage = stringGetter({
