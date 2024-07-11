@@ -147,11 +147,11 @@ const getOrdersTableColumnDef = ({
           </TableColumnHeader>
         ),
         tag: symbol,
-        renderCell: ({ remainingSize, size, totalFilled, stepSizeDecimals }) => (
+        renderCell: ({ size, totalFilled, stepSizeDecimals }) => (
           <TableCell stacked>
             <Output
               type={OutputType.Asset}
-              value={remainingSize ?? size}
+              value={size}
               fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
             <Output

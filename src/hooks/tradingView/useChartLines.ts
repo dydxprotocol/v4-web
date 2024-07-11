@@ -189,20 +189,9 @@ export const useChartLines = ({
     if (!currentMarketOrders) return;
 
     currentMarketOrders.forEach(
-      ({
-        id,
-        type,
-        status,
-        side,
-        cancelReason,
-        remainingSize,
-        size,
-        triggerPrice,
-        price,
-        trailingPercent,
-      }) => {
+      ({ id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent }) => {
         const key = id;
-        const quantity = (remainingSize ?? size).toString();
+        const quantity = size.toString();
 
         const orderType = type.rawValue as OrderType;
         const orderLabel = stringGetter({
