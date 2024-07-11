@@ -40,14 +40,10 @@ export const Overview = () => {
   }, [navigate]);
 
   const handleViewVault = useCallback(() => {
-    navigate(`${AppRoute.Vaults}`, {
+    navigate(`${AppRoute.Vault}`, {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
-  const handleViewVaults = useCallback(
-    () => navigate(AppRoute.Vaults, { state: { from: AppRoute.Portfolio } }),
-    [navigate]
-  );
 
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
@@ -110,7 +106,7 @@ export const Overview = () => {
               title={stringGetter({ key: STRING_KEYS.VAULT })}
               slotRight={
                 isTablet && (
-                  <$Link onClick={handleViewVaults} isAccent>
+                  <$Link onClick={handleViewVault} isAccent>
                     {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}{' '}
                     <Icon iconName={IconName.Arrow} />
                   </$Link>

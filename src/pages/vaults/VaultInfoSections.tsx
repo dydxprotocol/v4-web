@@ -31,10 +31,11 @@ const $EmptyValue = styled.span`
 `;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
   const myVaultMetadata = useAppSelector(getUserVault);
+  const stringGetter = useStringGetter();
   const items = [
     {
       key: 'balance',
-      label: 'Your Vault Balance',
+      label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
       value:
         myVaultMetadata == null || myVaultMetadata.userBalance === 0 ? (
           <EmptyValue />
@@ -44,7 +45,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     },
     {
       key: 'pnl',
-      label: 'Your All-time P&L',
+      label: stringGetter({ key: STRING_KEYS.YOUR_ALL_TIME_PNL }),
       value:
         myVaultMetadata == null || myVaultMetadata?.userReturn.absolute === 0 ? (
           <EmptyValue />
@@ -169,7 +170,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
     },
     {
       key: 'balance',
-      label: 'TVL',
+      label: stringGetter({ key: STRING_KEYS.TVL }),
       value: <Output value={totalValue} type={OutputType.Fiat} fractionDigits={0} />,
     },
   ];

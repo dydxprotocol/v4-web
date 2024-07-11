@@ -76,7 +76,7 @@ export const VaultPositionCard = ({ onViewVault, vault }: VaultPositionCardProps
     <PortfolioCard
       assetName={stringGetter({ key: STRING_KEYS.VAULT })}
       assetIcon={<$VaultImg src="/dydx-chain.png" />}
-      detailLabel={stringGetter({ key: STRING_KEYS.YOUR_LP_VAULT_BALANCE })}
+      detailLabel={stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE })}
       detailValue={<Output type={OutputType.Fiat} value={vault?.userBalance} />}
       actionSlot={
         <$Link onClick={onViewVault} isAccent>

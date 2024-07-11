@@ -80,7 +80,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         {
           columnKey: 'pnl',
           getCellValue: (row) => row.thirtyDayPnl.absolute,
-          label: stringGetter({ key: STRING_KEYS.PNL }),
+          label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
           renderCell: ({ thirtyDayPnl }) => (
             <TableCell
               stacked
@@ -133,9 +133,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       withOuterBorder
       data={vaultsData}
       getRowKey={(row) => row.marketId}
-      label={stringGetter({ key: STRING_KEYS.VAULTS })}
+      label={stringGetter({ key: STRING_KEYS.VAULT })}
       onRowAction={(marketId: Key) =>
-        navigate(`${AppRoute.Vaults}/${marketId}`, { state: { from: AppRoute.Vaults } })
+        navigate(`${AppRoute.Vault}/${marketId}`, { state: { from: AppRoute.Vault } })
       }
       defaultSortDescriptor={{
         column: 'size',

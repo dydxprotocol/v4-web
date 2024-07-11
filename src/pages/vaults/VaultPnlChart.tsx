@@ -170,8 +170,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         <ToggleGroup
           size={ButtonSize.Small}
           items={[
-            { value: 'pnl', label: 'Vault P&L' },
-            { value: 'equity', label: 'Vault Equity' },
+            { value: 'pnl', label: stringGetter({ key: STRING_KEYS.VAULT_PNL }) },
+            { value: 'equity', label: stringGetter({ key: STRING_KEYS.VAULT_EQUITY }) },
           ]}
           value={selectedChart}
           onValueChange={setSelectedChart}

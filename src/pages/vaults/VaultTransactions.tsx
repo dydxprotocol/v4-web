@@ -31,7 +31,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
         <>
           <$HistoryTitle>
             <$HistoryTitleText>
-              {stringGetter({ key: STRING_KEYS.DEPOSITS_AND_WITHDRAWALS })}
+              {stringGetter({ key: STRING_KEYS.YOUR_DEPOSITS_AND_WITHDRAWALS })}
               <$HistoryCount>{transactions.length}</$HistoryCount>
             </$HistoryTitleText>
             <$ShowHideHistoryButton
@@ -51,7 +51,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
           <div>
             <$Icon iconName={IconName.OrderPending} />
           </div>
-          <div>You have no vault deposits.</div>
+          <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
         </$Empty>
       )}
     </$HistoryCard>
@@ -144,7 +144,7 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
       withInnerBorders
       data={transactions}
       getRowKey={(row) => row.id}
-      label={stringGetter({ key: STRING_KEYS.VAULTS })}
+      label={stringGetter({ key: STRING_KEYS.VAULT })}
       defaultSortDescriptor={{
         column: 'time',
         direction: 'descending',

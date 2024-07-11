@@ -63,14 +63,14 @@ export const HeaderDesktop = () => {
           href: AppRoute.Markets,
         },
         showVaults && {
-          value: 'VAULTS',
+          value: 'VAULT',
           label: (
             <>
-              {stringGetter({ key: STRING_KEYS.VAULTS })}{' '}
+              {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
               <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
             </>
           ),
-          href: AppRoute.Vaults,
+          href: AppRoute.Vault,
         },
         {
           value: chainTokenLabel,
