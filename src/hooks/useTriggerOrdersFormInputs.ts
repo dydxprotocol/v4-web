@@ -60,12 +60,12 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.stopLossPrice,
-          value: MustBigNumber(stopLossOrder.triggerPrice).toString(),
+          value: stopLossOrder.triggerPrice,
           hasFormInput: true,
         },
         isLimitOrderType(stopLossOrder.type) && {
           field: TriggerOrdersInputField.stopLossLimitPrice,
-          value: MustBigNumber(stopLossOrder.price).toString(),
+          value: stopLossOrder.price,
           hasFormInput: true,
         },
       ]
@@ -75,7 +75,7 @@ export const useTriggerOrdersFormInputs = ({
           if (hasFormInput) {
             dispatch(
               setTriggerFormInputs({
-                [field.rawValue]: value,
+                [field.rawValue]: value?.toString(),
               })
             );
           }
@@ -107,12 +107,12 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.takeProfitPrice,
-          value: MustBigNumber(takeProfitOrder.triggerPrice).toString(),
+          value: takeProfitOrder.triggerPrice,
           hasFormInput: true,
         },
         isLimitOrderType(takeProfitOrder.type) && {
           field: TriggerOrdersInputField.takeProfitLimitPrice,
-          value: MustBigNumber(takeProfitOrder.price).toString(),
+          value: takeProfitOrder.price,
           hasFormInput: true,
         },
       ]
@@ -122,7 +122,7 @@ export const useTriggerOrdersFormInputs = ({
           if (hasFormInput) {
             dispatch(
               setTriggerFormInputs({
-                [field.rawValue]: value,
+                [field.rawValue]: value?.toString(),
               })
             );
           }
