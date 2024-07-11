@@ -46,36 +46,39 @@ export const useTriggerOrdersFormInputs = ({
         {
           field: TriggerOrdersInputField.stopLossOrderId,
           value: stopLossOrder.id,
+          hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.stopLossOrderSize,
           value: stopLossOrder.size,
+          hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.stopLossOrderType,
           value: stopLossOrder.type.rawValue,
+          hasFormInput: false,
         },
-      ].map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
-
-      // Fields which use form inputs
-      [
         {
           field: TriggerOrdersInputField.stopLossPrice,
           value: MustBigNumber(stopLossOrder.triggerPrice).toString(),
+          hasFormInput: true,
         },
         isLimitOrderType(stopLossOrder.type) && {
           field: TriggerOrdersInputField.stopLossLimitPrice,
           value: MustBigNumber(stopLossOrder.price).toString(),
+          hasFormInput: true,
         },
       ]
         .filter(isTruthy)
-        .forEach(({ field, value }) => {
-          dispatch(
-            setTriggerFormInputs({
-              [field.rawValue]: value,
-            })
-          );
+        .forEach(({ field, value, hasFormInput }) => {
           abacusStateManager.setTriggerOrdersValue({ field, value });
+          if (hasFormInput) {
+            dispatch(
+              setTriggerFormInputs({
+                [field.rawValue]: value,
+              })
+            );
+          }
         });
     } else {
       abacusStateManager.setTriggerOrdersValue({
@@ -90,36 +93,39 @@ export const useTriggerOrdersFormInputs = ({
         {
           field: TriggerOrdersInputField.takeProfitOrderId,
           value: takeProfitOrder.id,
+          hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.takeProfitOrderSize,
           value: takeProfitOrder.size,
+          hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.takeProfitOrderType,
           value: takeProfitOrder.type.rawValue,
+          hasFormInput: false,
         },
-      ].map(({ field, value }) => abacusStateManager.setTriggerOrdersValue({ field, value }));
-
-      // Fields which also use form inputs
-      [
         {
           field: TriggerOrdersInputField.takeProfitPrice,
           value: MustBigNumber(takeProfitOrder.triggerPrice).toString(),
+          hasFormInput: true,
         },
         isLimitOrderType(takeProfitOrder.type) && {
           field: TriggerOrdersInputField.takeProfitLimitPrice,
           value: MustBigNumber(takeProfitOrder.price).toString(),
+          hasFormInput: true,
         },
       ]
         .filter(isTruthy)
-        .forEach(({ field, value }) => {
-          dispatch(
-            setTriggerFormInputs({
-              [field.rawValue]: value,
-            })
-          );
+        .forEach(({ field, value, hasFormInput }) => {
           abacusStateManager.setTriggerOrdersValue({ field, value });
+          if (hasFormInput) {
+            dispatch(
+              setTriggerFormInputs({
+                [field.rawValue]: value,
+              })
+            );
+          }
         });
     } else {
       abacusStateManager.setTriggerOrdersValue({
