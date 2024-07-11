@@ -56,6 +56,7 @@ export const TradeBoxOrderView = () => {
             <TradeForm />
           </$Container>
         }
+        withUnderline
       />
     </$TradeBoxOrderViewContainer>
   );

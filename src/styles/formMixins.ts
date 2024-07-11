@@ -37,6 +37,7 @@ export const formMixins = {
 
     height: var(--input-height);
     min-height: var(--input-height);
+    max-height: var(--input-height);
 
     background-color: var(--input-backgroundColor);
     border: var(--border-width) solid var(--input-borderColor);
@@ -158,11 +159,11 @@ export const formMixins = {
 
   transfersForm: css`
     ${() => inputsColumn}
-    --form-input-gap: 1.25rem;
+    --form-input-gap: 1rem;
     --form-input-height: 3.5rem;
     --form-input-height-mobile: 4rem;
     --form-input-paddingY: 0.5rem;
-    --form-input-paddingX: 1rem;
+    --form-input-paddingX: 0.75rem;
 
     height: 100%;
 
@@ -177,11 +178,11 @@ export const formMixins = {
 
   stakingForm: css`
     ${() => inputsColumn}
-    --form-input-gap: 1.25rem;
+    --form-input-gap: 1rem;
     --form-input-height: 3.5rem;
     --form-input-height-mobile: 4rem;
     --form-input-paddingY: 0.5rem;
-    --form-input-paddingX: 1rem;
+    --form-input-paddingX: 0.75rem;
 
     --withReceipt-backgroundColor: var(--color-layer-2);
 
