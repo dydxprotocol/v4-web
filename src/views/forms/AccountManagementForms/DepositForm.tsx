@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { GasPrice } from '@cosmjs/stargate';
-import { NobleClient } from '@dydxprotocol/v4-client-js';
 import { useAccount as useAccountGraz } from 'graz';
-import Long from 'long';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -14,11 +11,7 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import {
-  AnalyticsEventPayloads,
-  AnalyticsEvents,
-  DEFAULT_TRANSACTION_MEMO,
-} from '@/constants/analytics';
+import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
@@ -39,7 +32,7 @@ import { WalletType, type EvmAddress } from '@/constants/wallets';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
+import { useIbcTransfer } from '@/hooks/useIbcTransfer';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -68,13 +61,7 @@ import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import {
-  NATIVE_TOKEN_ADDRESS,
-  fetchSkipRoute,
-  getNobleChainId,
-  getOsmosisChainId,
-  isTransferOperation,
-} from '@/lib/squid';
+import { NATIVE_TOKEN_ADDRESS, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -111,7 +98,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     publicClientWagmi,
     nobleAddress,
     saveHasAcknowledgedTerms,
-    localNobleWallet,
     walletType,
   } = useAccounts();
 
@@ -151,13 +137,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
-  const { usdcLabel, usdcDecimals, usdcGasDenom, usdcDenom } = useTokenConfigs();
-  const { nobleValidator, skip } = useEndpointsConfig();
+  const { usdcLabel, usdcDenom } = useTokenConfigs();
 
+  const { sendIbcToken } = useIbcTransfer();
   const { data: accounts } = useAccountGraz({
     chainId: SUPPORTED_COSMOS_CHAINS,
     multiChain: true,
   });
+
   const cosmosAddress = (() => {
     if (chainId === osmosisChainId) {
       return accounts?.[osmosisChainId]?.bech32Address;
@@ -339,94 +326,36 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [signerWagmi, publicClientWagmi, sourceToken, requestPayload, evmAddress, debouncedAmount]);
 
-  const sendNobleIBC = useCallback(async () => {
-    const nobleClient = new NobleClient(nobleValidator);
-    if (!localNobleWallet) {
-      throw new Error('Missing local noble wallet');
-    }
-    await nobleClient.connect(localNobleWallet);
-
-    const amount = summary?.toAmount ?? 0;
-    const parsedAmount = parseUnits(amount.toString(), usdcDecimals).toString();
-
-    const ibcTransfer = (sourceChannel: string) => {
-      return {
-        typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-        value: {
-          sourcePort: 'transfer',
-          sourceChannel,
-          sender: nobleAddress,
-          receiver: dydxAddress,
-          token: {
-            denom: usdcGasDenom,
-            amount: parsedAmount,
-          },
-          timeoutTimestamp: Long.fromNumber(Math.floor(Date.now() / 1000) * 1e9 + 10 * 60 * 1e9),
-        },
-      };
-    };
-    const nobleGasPrice = GasPrice.fromString('0.1uusdc');
-    const memo = `${DEFAULT_TRANSACTION_MEMO} | ${nobleAddress}`;
-
-    if (isMainnet) {
-      try {
-        const route = await fetchSkipRoute({
-          baseUrl: skip,
-          routeRequestGivenIn: {
-            amount_in: parsedAmount,
-            source_asset_chain_id: nobleChainId,
-            source_asset_denom: usdcGasDenom,
-            dest_asset_chain_id: selectedDydxChainId,
-            dest_asset_denom: usdcDenom,
-          },
-        });
-
-        const transferOperation = route?.operations.find(isTransferOperation);
-        const transferChannel = transferOperation?.transfer.channel;
-
-        if (!transferChannel) {
-          throw new Error('Failed to get transfer channel');
-        }
-
-        const tx = ibcTransfer(transferChannel);
-        const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
-        return txResult;
-      } catch (e) {
-        throw new Error('Failed to send IBC transfer');
-      }
-    } else {
-      const tx = ibcTransfer('channel-21');
-      const txResult = await nobleClient.send([tx], nobleGasPrice, memo);
-      return txResult;
-    }
-  }, [
-    dydxAddress,
-    localNobleWallet,
-    nobleAddress,
-    nobleChainId,
-    nobleValidator,
-    selectedDydxChainId,
-    skip,
-    summary?.toAmount,
-    usdcDecimals,
-    usdcDenom,
-    usdcGasDenom,
-  ]);
-
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
         e.preventDefault();
 
-        if (chainIdStr === nobleChainId) {
+        if (chainIdStr && SUPPORTED_COSMOS_CHAINS.includes(chainIdStr)) {
           setIsLoading(true);
-          const txResult = await sendNobleIBC();
+          const amount = summary?.toAmount;
+          const tokenDecimals = sourceToken?.decimals;
+          const tokenDenom = sourceToken?.address;
 
-          const nobleTxHash = txResult.transactionHash;
+          if (!amount || !tokenDecimals || !tokenDenom) {
+            throw new Error('Missing token data');
+          }
 
-          if (nobleTxHash) {
+          const parsedAmount = parseUnits(amount.toString(), tokenDecimals).toString();
+
+          const txResult = await sendIbcToken({
+            amount_in: parsedAmount,
+            source_asset_chain_id: chainIdStr,
+            source_asset_denom: tokenDenom,
+            dest_asset_chain_id: selectedDydxChainId,
+            dest_asset_denom: usdcDenom,
+          });
+
+          const txHash = txResult.transactionHash;
+
+          if (txHash) {
             addTransferNotification({
-              txHash: nobleTxHash,
+              txHash,
               toChainId: selectedDydxChainId,
               fromChainId: chainIdStr || undefined,
               toAmount: summary?.usdcSize ?? undefined,
@@ -444,7 +373,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
                   toChainId: selectedDydxChainId,
                   fromChainId: chainIdStr ?? undefined,
                   toAmount: summary?.toAmount ?? undefined,
-                  txHash: nobleTxHash,
+                  txHash,
                 })
               )
             );
@@ -515,7 +444,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId, sendNobleIBC]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId, sendIbcToken]
   );
 
   const amountInputReceipt = [

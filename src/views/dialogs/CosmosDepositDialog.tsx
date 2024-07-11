@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
+import { AMOUNT_RESERVED_FOR_GAS_NOBLE } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -42,7 +43,11 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash }: ElementProp
   const depositToSubaccount = useCallback(async () => {
     try {
       if (toAmount && dydxAddress && txHash) {
-        const tx = await deposit(toAmount);
+        const amount =
+          toAmount > AMOUNT_RESERVED_FOR_GAS_NOBLE
+            ? toAmount - AMOUNT_RESERVED_FOR_GAS_NOBLE
+            : toAmount;
+        const tx = await deposit(amount);
 
         if (tx !== undefined) {
           const depositTxHash = Buffer.from(tx.hash).toString('hex');

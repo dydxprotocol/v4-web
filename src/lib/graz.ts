@@ -20,12 +20,6 @@ const nobleChainId = getNobleChainId();
 export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId];
 
 export const config: ConfigureGrazArgs = {
-  // walletDefaultOptions: {
-  // sign: {
-  //   preferNoSetFee: true,
-  //   preferNoSetMemo: true,
-  // },
-  // },
   chains: [
     // dYdX
     {

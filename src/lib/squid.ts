@@ -2,13 +2,13 @@ import { GetStatus, StatusResponse } from '@0xsquid/sdk';
 import {
   AxelarTransferInfoJSON,
   CCTPTransferInfoJSON,
-  OperationJSON,
-  RouteRequestGivenInJSON,
-  RouteResponseJSON,
+  MsgJSON,
+  MsgsDirectRequestJSON,
+  MsgsDirectResponseJSON,
+  MultiChainMsgJSON,
   TrackTxResponseJSON,
   TransferEventJSON,
   TransferInfoJSON,
-  TransferJSON,
   TransferStatusJSON,
   TxStatusResponseJSON,
 } from '@skip-router/core';
@@ -84,8 +84,8 @@ type SkipStatusParams = {
   baseUrl: string | undefined;
 };
 
-type SkipRouteParams = {
-  routeRequestGivenIn: RouteRequestGivenInJSON;
+type SkipMsgsDirectParams = {
+  msgsDirectRequest: Omit<MsgsDirectRequestJSON, 'amount_out'>;
   baseUrl: string | undefined;
 };
 
@@ -130,24 +130,21 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
   return formSkipStatusResponse(statusResponse);
 };
 
-export const fetchSkipRoute = async ({
-  routeRequestGivenIn,
+export const requestSkipMsgsDirect = async ({
   baseUrl,
-}: SkipRouteParams): Promise<RouteResponseJSON | undefined> => {
-  const response = await fetch(`${baseUrl ?? DEFAULT_SKIP_URL}/v2/fungible/route`, {
+  msgsDirectRequest,
+}: SkipMsgsDirectParams): Promise<MsgsDirectResponseJSON | undefined> => {
+  const response = await fetch(`${baseUrl ?? DEFAULT_SKIP_URL}/v2/fungible/msgs_direct`, {
     method: 'POST',
-    body: JSON.stringify(routeRequestGivenIn),
+    body: JSON.stringify(msgsDirectRequest),
   });
   return response.json();
 };
 
-export function isTransferOperation(operation: OperationJSON): operation is {
-  transfer: TransferJSON;
-  tx_index: number;
-  amount_in: string;
-  amount_out: string;
+export function isMultiChainMsg(msg: MsgJSON): msg is {
+  multi_chain_msg: MultiChainMsgJSON;
 } {
-  return (operation as { transfer: TransferJSON }).transfer !== undefined;
+  return 'multi_chain_msg' in msg;
 }
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
