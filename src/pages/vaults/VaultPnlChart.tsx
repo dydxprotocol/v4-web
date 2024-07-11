@@ -5,12 +5,14 @@ import { TooltipContextType } from '@visx/xychart';
 import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -33,12 +35,13 @@ type VaultPnlDatum = NonNullable<ReturnType<typeof getVaultPnlHistory>>[number] 
 type EquityOrPnl = 'equity' | 'pnl';
 
 const TIME_RANGES = [
-  { value: '7d', labelKey: '7d', time: 7 * timeUnits.day },
-  { value: '30d', labelKey: '30d', time: 30 * timeUnits.day },
-  { value: '90d', labelKey: '90d', time: 90 * timeUnits.day },
+  { value: '7d', labelNumDays: '7', time: 7 * timeUnits.day },
+  { value: '30d', labelNumDays: '30', time: 30 * timeUnits.day },
+  { value: '90d', labelNumDays: '90', time: 90 * timeUnits.day },
 ] as const;
 
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
+  const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const vaultPnl = useAppSelector(getVaultPnlHistory) ?? EMPTY_ARR;
 
@@ -57,9 +60,9 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     const dataRange = data.length > 1 ? data[data.length - 1].date - data[0].date : 0;
     return TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3).map((t) => ({
       value: t.value,
-      label: t.labelKey,
+      label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
     }));
-  }, [data]);
+  }, [data, stringGetter]);
 
   const [selectedTimeRange, setSelectedTimeRange] = useState<
     (typeof TIME_RANGES)[number]['value'] | undefined
@@ -175,7 +178,6 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         />
         <ToggleGroup
           size={ButtonSize.Small}
-          // todo i81n
           items={timeUnitsToRender}
           value={selectedTimeRange ?? ''}
           onValueChange={handleTimeRangeSelect}
