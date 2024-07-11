@@ -124,7 +124,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [stringGetter]
+    [marketsData, stringGetter]
   );
 
   return (

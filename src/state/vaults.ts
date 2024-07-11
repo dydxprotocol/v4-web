@@ -1,16 +1,15 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { range } from 'lodash';
+
+import { timeUnits } from '@/constants/time';
 
 export interface VaultsState {
   vaultDetails: VaultDetails;
-  vaultHistory: VaultHistory;
+  vaultHistory: VaultHistory | undefined;
   userVault: VaultOwnership | undefined;
 }
 type VaultDetails = {
   totalValue: number;
-  allTimePnl: {
-    percent: number;
-    absolute: number;
-  };
   thirtyDayReturnPercent: number;
   positions: Array<VaultPosition>;
 };
@@ -50,7 +49,6 @@ type VaultHistory = {
 const initialState: VaultsState = {
   vaultDetails: {
     totalValue: 30_425,
-    allTimePnl: { absolute: 4_125, percent: 0.1252 },
     thirtyDayReturnPercent: 0.1474,
     positions: [
       {
@@ -69,41 +67,11 @@ const initialState: VaultsState = {
   },
   vaultHistory: {
     pnlAndEquityDataPoints: [
-      {
-        date: new Date('6/1/2024').valueOf(),
-        equity: 1000,
-        totalPnl: 100,
-      },
-      {
-        date: new Date('6/2/2024').valueOf(),
-        equity: 1500,
-        totalPnl: 600,
-      },
-      {
-        date: new Date('6/3/2024').valueOf(),
-        equity: 1700,
-        totalPnl: 800,
-      },
-      {
-        date: new Date('6/4/2024').valueOf(),
-        equity: 1600,
-        totalPnl: 800,
-      },
-      {
-        date: new Date('6/5/2024').valueOf(),
-        equity: 2000,
-        totalPnl: 1000,
-      },
-      {
-        date: new Date('6/6/2024').valueOf(),
-        equity: 2300,
-        totalPnl: 1300,
-      },
-      {
-        date: new Date('6/7/2024').valueOf(),
-        equity: 2800,
-        totalPnl: 2000,
-      },
+      ...range(50).map((i) => ({
+        date: new Date('6/1/2024').valueOf() + timeUnits.day * i,
+        equity: 1000 + Math.random() * 1000,
+        totalPnl: 100 + Math.random() * 5000,
+      })),
     ],
   },
   userVault: {

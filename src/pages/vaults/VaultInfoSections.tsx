@@ -100,6 +100,7 @@ const $OutputRow = styled.div`
 `;
 const $CardValue = styled.div`
   font: var(--font-medium-book);
+  color: var(--color-text-2);
   line-height: 1.2rem;
 `;
 
@@ -142,6 +143,7 @@ const $PositionsContainer = styled.div<{ $scroll?: boolean }>`
 
 const $SectionTitle = styled.div`
   font: var(--font-large-medium);
+  color: var(--color-text-2);
   margin-bottom: 1rem;
   ${layoutMixins.row}
   gap: 0.5rem;
@@ -207,6 +209,7 @@ const $BackContainer = styled.div`
 `;
 
 const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
+  display: flex;
   ${({ $sign }) =>
     $sign &&
     {
@@ -257,8 +260,8 @@ const $VerticalSeparator = styled(VerticalSeparator)`
 const $DetailItem = styled.div`
   ${layoutMixins.flexColumn}
   font: var(--font-base-book);
-  padding: 0 0.5rem;
-  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  gap: 0.375rem;
 `;
 
 const $DetailLabel = styled.div`
@@ -267,4 +270,5 @@ const $DetailLabel = styled.div`
 
 const $DetailValue = styled.div`
   font: var(--font-medium-book);
+  display: flex;
 `;
