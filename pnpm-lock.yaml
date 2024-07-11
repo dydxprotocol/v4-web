@@ -3203,13 +3203,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-<<<<<<< HEAD
-  /@dydxprotocol/v4-abacus@1.8.33:
-    resolution: {integrity: sha512-cfAm61ysIOMoAlAkKbqSgeYmqZytNlgThnxRpPuwP69OPmPFdgiX6DNIzWnNDloPPw0kMiM3JnJJUKKydheFrw==}
-=======
   /@dydxprotocol/v4-abacus@1.8.34:
     resolution: {integrity: sha512-VUAT+eWuH9Wxi27FWLn0MpszypSWCsfoomultECbybKlhpM/UDMjO3vpKMhJiw1Q2iIQa/JNK6d91KhAAQjOsg==}
->>>>>>> 453cd2f9 (bump packages)
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
