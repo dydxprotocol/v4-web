@@ -12,6 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -63,7 +64,7 @@ import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId } from '@/lib/squid';
+import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -157,7 +158,9 @@ export const WithdrawForm = () => {
   }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
-  const { dydxAddress, nobleAddress } = useAccounts();
+  const { dydxAddress } = useAccounts();
+  const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -334,14 +337,10 @@ export const WithdrawForm = () => {
       }
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
-        value: getNobleChainId(),
-      });
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.address,
-        value: nobleAddress,
+        value: nobleChainId,
       });
     }
-  }, [walletType, nobleAddress, dydxAddress]);
+  }, [walletType, dydxAddress]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
@@ -351,6 +350,12 @@ export const WithdrawForm = () => {
           field: TransferInputField.chain,
           value: name,
         });
+        if (name === osmosisChainId) {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.token,
+            value: OSMO_USDC_IBC_DENOM,
+          });
+        }
       } else {
         abacusStateManager.setTransferValue({
           field: TransferInputField.exchange,
