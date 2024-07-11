@@ -43,6 +43,7 @@ type StyleProps = {
   side?: 'top' | 'bottom';
   withBorders?: boolean;
   withTransitions?: boolean;
+  withUnderline?: boolean;
   className?: string;
 };
 
@@ -59,6 +60,7 @@ export const Tabs = <TabItemsValue extends string>({
   fullWidthTabs,
   side = 'top',
   withBorders = true,
+  withUnderline = false,
   withTransitions = true,
   disabled = false,
   className,
@@ -75,6 +77,7 @@ export const Tabs = <TabItemsValue extends string>({
                 key={item.value}
                 value={item.value}
                 $withBorders={withBorders}
+                $withUnderline={withUnderline}
                 disabled={disabled}
               >
                 {item.label}
@@ -90,7 +93,9 @@ export const Tabs = <TabItemsValue extends string>({
               onValueChange={onValueChange}
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
-              slotTrigger={<$DropdownTabTrigger value={value ?? ''} />}
+              slotTrigger={
+                <$DropdownTabTrigger value={value ?? ''} $withUnderline={withUnderline} />
+              }
               disabled={disabled}
             >
               {item.label}
@@ -149,11 +154,16 @@ const tabTriggerStyle = css`
   font: var(--trigger-font, var(--font-base-book));
   color: var(--trigger-textColor);
   background-color: var(--trigger-backgroundColor);
-  box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
 
   &[data-state='active'] {
     color: var(--trigger-active-textColor);
     background-color: var(--trigger-active-backgroundColor);
+  }
+`;
+
+const tabTriggerUnderlineStyle = css`
+  box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
+  &[data-state='active'] {
     box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
       var(--trigger-active-textColor);
   }
@@ -248,14 +258,20 @@ const $List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>
         `}
 `;
 
-const $Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
+const $Trigger = styled(Trigger)<{ $withBorders?: boolean; $withUnderline?: boolean }>`
+  ${tabTriggerStyle}
+
   ${({ $withBorders }) =>
     $withBorders &&
     css`
       ${layoutMixins.withOuterBorder}
     `}
 
-  ${tabTriggerStyle}
+  ${({ $withUnderline }) =>
+    $withUnderline &&
+    css`
+      ${tabTriggerUnderlineStyle}
+    `}
 `;
 
 const $Stack = styled.div`
@@ -308,12 +324,18 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
   }
 `;
 
-const $DropdownTabTrigger = styled(Trigger)`
+const $DropdownTabTrigger = styled(Trigger)<{ $withUnderline?: boolean }>`
   ${tabTriggerStyle}
   gap: 1ch;
 
   height: 100%;
   width: 100%;
+
+  ${({ $withUnderline }) =>
+    $withUnderline &&
+    css`
+      ${tabTriggerUnderlineStyle}
+    `}
 `;
 
 const dropdownSelectMenuType = getSimpleStyledOutputType(
