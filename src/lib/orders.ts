@@ -68,6 +68,14 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
   }
 };
 
+export const isOrderStatusOpen = (status: OrderStatus) =>
+  [
+    AbacusOrderStatus.Open,
+    AbacusOrderStatus.Pending,
+    AbacusOrderStatus.PartiallyFilled,
+    AbacusOrderStatus.Untriggered,
+  ].some((orderStatus) => status === orderStatus);
+
 export const isOrderStatusClearable = (status: OrderStatus) =>
   status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
 

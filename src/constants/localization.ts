@@ -4,6 +4,7 @@ import {
   LOCALE_DATA,
   NOTIFICATIONS,
   NOTIFICATIONS_STRING_KEYS,
+  SupportedLocale,
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
@@ -87,6 +88,13 @@ export const SUPPORTED_LOCALE_BASE_TAGS = {
   [SupportedLocales.ES]: 'es',
   [SupportedLocales.DE]: 'de',
 };
+
+export const EU_LOCALES: SupportedLocale[] = [
+  SupportedLocales.DE,
+  SupportedLocales.PT,
+  SupportedLocales.ES,
+  SupportedLocales.FR,
+];
 
 export const SUPPORTED_BASE_TAGS_LOCALE_MAPPING = Object.fromEntries(
   Object.entries(SUPPORTED_LOCALE_BASE_TAGS).map(([locale, baseTag]) => [baseTag, locale])

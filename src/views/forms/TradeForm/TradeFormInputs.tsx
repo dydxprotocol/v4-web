@@ -2,13 +2,18 @@ import { Ref } from 'react';
 
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { formMixins } from '@/styles/formMixins';
+
+import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
@@ -17,7 +22,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketMidMarketPrice,
+} from '@/state/perpetualsSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
@@ -28,6 +38,7 @@ type TradeBoxInputConfig = {
   validationConfig?: InputErrorData;
   value: string | number;
   decimals?: number;
+  slotRight?: React.ReactNode;
 };
 
 export const TradeFormInputs = () => {
@@ -38,6 +49,22 @@ export const TradeFormInputs = () => {
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+
+  const onMidMarketPriceClick = () => {
+    if (!midMarketPrice) return;
+    dispatch(
+      setTradeFormInputs({
+        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+      })
+    );
+  };
+
+  const midMarketPriceButton = (
+    <$MidPriceButton onClick={onMidMarketPriceClick} size={ButtonSize.XSmall}>
+      {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
+    </$MidPriceButton>
+  );
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
   if (needsTriggerPrice) {
@@ -77,6 +104,7 @@ export const TradeFormInputs = () => {
       },
       value: limitPriceInput,
       decimals: tickSizeDecimals ?? USD_DECIMALS,
+      slotRight: midMarketPrice ? midMarketPriceButton : undefined,
     });
   }
 
@@ -97,7 +125,7 @@ export const TradeFormInputs = () => {
   }
 
   return tradeFormInputs.map(
-    ({ key, inputType, label, onChange, validationConfig, value, decimals }) => (
+    ({ key, inputType, label, onChange, validationConfig, value, decimals, slotRight }) => (
       <FormInput
         key={key}
         id={key}
@@ -107,7 +135,12 @@ export const TradeFormInputs = () => {
         validationConfig={validationConfig}
         value={value}
         decimals={decimals}
+        slotRight={slotRight}
       />
     )
   );
 };
+
+const $MidPriceButton = styled(Button)`
+  ${formMixins.inputInnerButton}
+`;

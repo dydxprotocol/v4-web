@@ -155,6 +155,7 @@ const $Description = styled.div`
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
+  --form-input-paddingY: 0.33rem;
 
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
 
@@ -168,8 +169,6 @@ const $WithLabel = styled(WithLabel)`
 `;
 
 const $LeverageSlider = styled(Slider)`
-  margin-top: 0.25rem;
-
   --slider-track-background: linear-gradient(
     90deg,
     var(--color-layer-7) 0%,
