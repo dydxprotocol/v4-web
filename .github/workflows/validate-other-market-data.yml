@@ -36,8 +36,8 @@ jobs:
       - name: Checkout v4-chain repo
         uses: actions/checkout@v3
         with:
-          repository: 'skip-mev/v4-chain'
-          ref: '86b361becee776c36dd9c8ee4b96ada17b913109'
+          repository: 'dydxprotocol/v4-chain'
+          ref: '8b32fdbaed02f93f4a88f16e692b282ee675a7d5'
           path: 'v4-chain'
 
       - name: Start v4 localnet
@@ -47,7 +47,13 @@ jobs:
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
-          DOCKER_BUILDKIT=1 make localnet-startd
+          DOCKER_BUILDKIT=1 make localnet-init
+          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
+
+      - name: Get diff of otherMarketData.json
+        run: |
+          git fetch origin
+          git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
       
       - name: Checkout main branch
         uses: actions/checkout@v3

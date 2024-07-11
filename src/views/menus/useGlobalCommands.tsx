@@ -31,7 +31,7 @@ enum LayoutItems {
   setAlternativeLayout = 'SetAlternativeLayout',
 }
 
-export const useGlobalCommands = (): MenuConfig<string, string> => {
+export const useGlobalCommands = (): MenuConfig<string | number, string | number> => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const stringGetter = useStringGetter();

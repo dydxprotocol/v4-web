@@ -19,6 +19,7 @@ import {
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -46,7 +47,6 @@ import { MustBigNumber } from '@/lib/numbers';
 
 type NewMarketSelectionStepProps = {
   assetToAdd?: NewMarketProposal;
-  clobPairId?: number;
   setAssetToAdd: (assetToAdd?: NewMarketProposal) => void;
   onConfirmMarket: () => void;
   liquidityTier?: number;
@@ -57,7 +57,6 @@ type NewMarketSelectionStepProps = {
 
 export const NewMarketSelectionStep = ({
   assetToAdd,
-  clobPairId,
   setAssetToAdd,
   onConfirmMarket,
   liquidityTier,
@@ -75,6 +74,7 @@ export const NewMarketSelectionStep = ({
   const { potentialMarkets, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
+  const { nextAvailableClobPairId } = useNextClobPairId();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
     Number(`1e${chainTokenDecimals}`)
   );
@@ -273,7 +273,7 @@ export const NewMarketSelectionStep = ({
                         openDialog(
                           DialogTypes.NewMarketMessageDetails({
                             assetData: assetToAdd,
-                            clobPairId,
+                            clobPairId: nextAvailableClobPairId,
                             liquidityTier,
                           })
                         )
@@ -319,7 +319,7 @@ export const NewMarketSelectionStep = ({
         ) : (
           <Button
             type={ButtonType.Submit}
-            state={{ isDisabled: !assetToAdd || !liquidityTier === undefined || !clobPairId }}
+            state={{ isDisabled: !assetToAdd || !liquidityTier === undefined }}
             action={ButtonAction.Primary}
           >
             {stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
