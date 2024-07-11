@@ -159,7 +159,7 @@ const providers = [
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
-  wrapProvider(WagmiProvider, { config }),
+  wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),

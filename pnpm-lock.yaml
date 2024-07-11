@@ -225,7 +225,7 @@ dependencies:
     specifier: ^1.2.3
     version: 1.2.3
   graz:
-    specifier: ^0.1.18
+    specifier: ^0.1.19
     version: 0.1.19(@cosmjs/amino@0.32.2)(@cosmjs/cosmwasm-stargate@0.32.3)(@cosmjs/launchpad@0.27.1)(@cosmjs/proto-signing@0.32.2)(@cosmjs/stargate@0.32.2)(@cosmjs/tendermint-rpc@0.32.2)(@leapwallet/cosmos-social-login-capsule-provider@0.0.39)(@types/react@18.3.3)(axios@1.6.7)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)
   jsdom:
     specifier: ^24.1.0
