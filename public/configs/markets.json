@@ -130,7 +130,8 @@
         "tags": [
             "Defi"
         ],
-        "websiteLink": "https://aerodrome.finance/"
+        "websiteLink": "https://aerodrome.finance/",
+        "whitepaperLink": null
     },
     "AEVO-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aevo/", 
@@ -779,7 +780,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/beercoin/", 
         "name": "BEERCOIN", 
         "tags": [], 
-        "websiteLink": "https://beercoin.wtf/"
+        "websiteLink": "https://beercoin.wtf/",
+        "whitepaperLink": null
     }, 
     "BEL-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bella-protocol/", 
@@ -797,7 +799,8 @@
             "Gaming", 
             "Meme"
         ], 
-        "websiteLink": "https://benthedog.io"
+        "websiteLink": "https://benthedog.io",
+        "whitepaperLink": null
     }, 
     "BETA-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/beta-finance/", 
@@ -945,7 +948,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://llwapirxnupqu7xw2fspfidormcfar7ek2yp65nu7k5opjwhdywq.arweave.net/WuwHojdtHwp-9tFk8qBuiwRQR-RWsP91tPq656bHHi0"
+        "websiteLink": "https://llwapirxnupqu7xw2fspfidormcfar7ek2yp65nu7k5opjwhdywq.arweave.net/WuwHojdtHwp-9tFk8qBuiwRQR-RWsP91tPq656bHHi0",
+        "whitepaperLink": null
     }, 
     "BOND-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/barnbridge/", 
@@ -998,7 +1002,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://www.basedbrett.com/"
+        "websiteLink": "https://www.basedbrett.com/",
+        "whitepaperLink": null
     }, 
     "BRISE-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitrise-token/", 
@@ -1900,7 +1905,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://dukocoin.com/"
+        "websiteLink": "https://dukocoin.com/",
+        "whitepaperLink": null
     }, 
     "DUSK-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dusk/", 
@@ -1919,7 +1925,8 @@
             "Layer 1", 
             "Defi"
         ], 
-        "websiteLink": "https://dydx.exchange/"
+        "websiteLink": "https://dydx.exchange/",
+        "whitepaperLink": null
     }, 
     "DYM-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dymension/", 
@@ -2114,8 +2121,6 @@
     }, 
     "ETH-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ethereum/", 
-        "displayStepSize": "0.001", 
-        "displayTickSize": "0.1", 
         "name": "Ethereum", 
         "tags": [
             "Layer 1"
@@ -2590,7 +2595,8 @@
             "Gaming", 
             "Meme"
         ], 
-        "websiteLink": "https://wallstsucks.lol/"
+        "websiteLink": "https://wallstsucks.lol/", 
+        "whitepaperLink": null
     }, 
     "GMEE-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gamee/", 
@@ -2627,7 +2633,7 @@
             "Gaming"
         ], 
         "websiteLink": "https://stepn.com/", 
-        "whitepaperLink/": "https://whitepaper.stepn.com/"
+        "whitepaperLink": "https://whitepaper.stepn.com/"
     }, 
     "GMX-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gmx/", 
@@ -2680,7 +2686,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/golazo/", 
         "name": "Golazo", 
         "tags": [], 
-        "websiteLink": "https://golazo.world"
+        "websiteLink": "https://golazo.world", 
+        "whitepaperLink": null
     }, 
     "GQ-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/outer-ring-mmo-gq/", 
@@ -2703,7 +2710,7 @@
         "name": "The Graph", 
         "tags": [], 
         "websiteLink": "https://thegraph.com/", 
-        "whitepaperLink/": "https://github.com/graphprotocol/research/blob/master/papers/whitepaper/the-graph-whitepaper.pdf"
+        "whitepaperLink": "https://github.com/graphprotocol/research/blob/master/papers/whitepaper/the-graph-whitepaper.pdf"
     }, 
     "GRV-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/grove3/", 
@@ -2748,7 +2755,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://gummyonsol.com/"
+        "websiteLink": "https://gummyonsol.com/", 
+        "whitepaperLink": null
     }, 
     "GUSD-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gemini-dollar/", 
@@ -2824,7 +2832,7 @@
         "name": "Hedera", 
         "tags": [], 
         "websiteLink": "https://hedera.com/", 
-        "whitepaperLink/": "https://files.hedera.com/hh_whitepaper_v2.2-20230918.pdf"
+        "whitepaperLink": "https://files.hedera.com/hh_whitepaper_v2.2-20230918.pdf"
     }, 
     "HBB-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/hubble-protocol/", 
@@ -3285,7 +3293,8 @@
         "tags": [
             "Gaming"
         ], 
-        "websiteLink": "https://www.karratcoin.com/"
+        "websiteLink": "https://www.karratcoin.com/", 
+        "whitepaperLink": null
     }, 
     "KAS-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/kaspa/", 
@@ -3790,7 +3799,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://manekineko.world"
+        "websiteLink": "https://manekineko.world", 
+        "whitepaperLink": null
     }, 
     "MANTA-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/manta-network/", 
@@ -3995,7 +4005,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://michisolana.org/"
+        "websiteLink": "https://michisolana.org/", 
+        "whitepaperLink": null
     }, 
     "MILO-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/milo-inu/", 
@@ -4138,7 +4149,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://x.com/IGGYAZALEA"
+        "websiteLink": "https://x.com/IGGYAZALEA", 
+        "whitepaperLink": null
     }, 
     "MOUTAI-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/moutai/", 
@@ -4241,7 +4253,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://www.mumu.ing"
+        "websiteLink": "https://www.mumu.ing", 
+        "whitepaperLink": null
     }, 
     "MUSK-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/musk-dao/", 
@@ -4494,7 +4507,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/nubcat/", 
         "name": "nubcat", 
         "tags": [], 
-        "websiteLink": "https://nubcat.xyz"
+        "websiteLink": "https://nubcat.xyz", 
+        "whitepaperLink": null
     }, 
     "NULS-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/nuls/", 
@@ -4906,7 +4920,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://pengsol.xyz/"
+        "websiteLink": "https://pengsol.xyz/", 
+        "whitepaperLink": null
     }, 
     "PEOPLE-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/constitutiondao/", 
@@ -4921,7 +4936,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://www.pepe.vip/"
+        "websiteLink": "https://www.pepe.vip/", 
+        "whitepaperLink": null
     }, 
     "PERP-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/perpetual-protocol/", 
@@ -5498,7 +5514,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://www.university.com/"
+        "websiteLink": "https://www.university.com/", 
+        "whitepaperLink": null
     }, 
     "ROCO-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/roco-finance/", 
@@ -5635,7 +5652,8 @@
         "tags": [
             "Defi"
         ], 
-        "websiteLink": "https://www.saros.xyz/"
+        "websiteLink": "https://www.saros.xyz/", 
+        "whitepaperLink": null
     }, 
     "SATS-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/sats-ordinals/", 
@@ -6916,7 +6934,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "wafflesj15.com"
+        "websiteLink": "wafflesj15.com", 
+        "whitepaperLink": null
     }, 
     "WAN-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wanchain/", 
@@ -7004,7 +7023,8 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://dogwifcoin.org/"
+        "websiteLink": "https://dogwifcoin.org/", 
+        "whitepaperLink": null
     }, 
     "WIFI-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wifi-map/", 
@@ -7092,13 +7112,15 @@
         "tags": [
             "Meme"
         ], 
-        "websiteLink": "https://wallstmemes.com/en/"
+        "websiteLink": "https://wallstmemes.com/en/", 
+        "whitepaperLink": null
     }, 
     "WSTETH-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/lido-finance-wsteth/", 
         "name": "Lido wstETH", 
         "tags": [], 
-        "websiteLink": "https://www.lido.fi"
+        "websiteLink": "https://www.lido.fi", 
+        "whitepaperLink": null
     }, 
     "WUF-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wuffi/", 
@@ -7390,7 +7412,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zack-morris/", 
         "name": "Zack Morris", 
         "tags": [], 
-        "websiteLink": "https://zackmorris.lol/"
+        "websiteLink": "https://zackmorris.lol/", 
+        "whitepaperLink": null
     }, 
     "ZAM-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zamio/", 
