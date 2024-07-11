@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TradeSizeInput } from '@/constants/trade';
 
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -17,6 +18,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
+import { OutputType, formatNumberOutput } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -29,6 +31,7 @@ import {
   getInputTradeSizeData,
   getTradeFormInputs,
 } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -37,13 +40,15 @@ import { MustBigNumber } from '@/lib/numbers';
 import { MarketLeverageInput } from './MarketLeverageInput';
 
 export const TradeSizeInputs = () => {
-  const [showUSDCInputOnTablet, setShowUSDCInputOnTablet] = useState(false);
+  const [showUSDCInput, setShowUSDCInput] = useState(false);
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
@@ -104,14 +109,30 @@ export const TradeSizeInputs = () => {
   };
 
   const inputToggleButton = (
-    <$ToggleButton
-      isPressed={showUSDCInputOnTablet}
-      onPressedChange={setShowUSDCInputOnTablet}
-      size={ButtonSize.XSmall}
-      shape={ButtonShape.Square}
+    <WithTooltip
+      slotTooltip={
+        <$Tooltip>
+          {!showUSDCInput && usdAmountInput ? (
+            `≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`
+          ) : showUSDCInput && amountInput && id ? (
+            <>
+              ≈ {amountInput} <Tag>{id}</Tag>
+            </>
+          ) : undefined}
+        </$Tooltip>
+      }
+      side="left"
+      align="center"
     >
-      <Icon iconName={IconName.Trade} />
-    </$ToggleButton>
+      <$ToggleButton
+        isPressed={showUSDCInput}
+        onPressedChange={setShowUSDCInput}
+        size={ButtonSize.XSmall}
+        shape={ButtonShape.Square}
+      >
+        <Icon iconName={IconName.Trade} />
+      </$ToggleButton>
+    </WithTooltip>
   );
 
   const sizeInput = (
@@ -125,7 +146,6 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           {id && <Tag>{id}</Tag>}
-          {usdAmountInput && <>≈ ${usdAmountInput}</>}
         </>
       }
       slotRight={inputToggleButton}
@@ -147,11 +167,6 @@ export const TradeSizeInputs = () => {
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           <Tag>USD</Tag>
-          {amountInput && id && (
-            <>
-              ≈ {amountInput} <Tag>{id}</Tag>
-            </>
-          )}
         </>
       }
       slotRight={inputToggleButton}
@@ -160,7 +175,7 @@ export const TradeSizeInputs = () => {
 
   return (
     <$Column>
-      {showUSDCInputOnTablet ? usdcInput : sizeInput}
+      {showUSDCInput ? usdcInput : sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
           leverageInputValue={leverageInput}
@@ -172,6 +187,7 @@ export const TradeSizeInputs = () => {
     </$Column>
   );
 };
+
 const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: var(--form-input-gap);
@@ -189,4 +205,8 @@ const $ToggleButton = styled(ToggleButton)`
     rotate: 0.25turn;
     margin-top: 2px;
   }
+`;
+
+const $Tooltip = styled.div`
+  display: inline-flex;
 `;
