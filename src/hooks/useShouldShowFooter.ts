@@ -16,7 +16,7 @@ export const useShouldShowFooter = () => {
     !isTablet ||
     !(
       !!(matchPath(TRADE_ROUTE, pathname) && canAccountTrade) ||
-      !!matchPath(AppRoute.Vault, pathname)
+      !!(matchPath(AppRoute.Vault, pathname) && canAccountTrade)
     )
   );
 };
