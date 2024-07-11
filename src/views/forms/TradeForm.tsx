@@ -237,8 +237,8 @@ export const TradeForm = ({
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
       {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
       <$InputsColumn>
-        <TradeSizeInputs />
         <TradeFormInputs />
+        <TradeSizeInputs />
         <AdvancedTradeOptions />
 
         {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
