@@ -51,7 +51,7 @@ export const useComplianceState = () => {
     complianceMessage = `${stringGetter({ key: STRING_KEYS.CLICK_TO_VIEW })} →`;
   } else if (complianceStatus === ComplianceStatus.CLOSE_ONLY) {
     complianceMessage = stringGetter({
-      key: STRING_KEYS.CLOSE_ONLY_MESSAGE,
+      key: STRING_KEYS.CLOSE_ONLY_MESSAGE_WITH_HELP,
       params: {
         DATE: updatedAtDate
           ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, {
@@ -68,7 +68,7 @@ export const useComplianceState = () => {
     });
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     complianceMessage = stringGetter({
-      key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE,
+      key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE_WITH_HELP,
       params: {
         HELP_LINK: (
           <Link href={help} isInline>
