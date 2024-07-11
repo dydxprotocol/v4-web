@@ -58,8 +58,8 @@ export const SourceSelectMenu = ({
   const isNotKeplrWallet = walletType !== WalletType.Keplr;
 
   const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
 
+  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
   const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
 
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
@@ -109,8 +109,7 @@ export const SourceSelectMenu = ({
       return true;
     })
     // we want lowest fee tokens first followed by non-lowest fee cctp tokens
-    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1))
-    .sort((chain) => (lowestFeeTokensByChainId[chain.value] ? -1 : 1));
+    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
