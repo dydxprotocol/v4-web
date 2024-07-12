@@ -60,15 +60,15 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const rows = currentMarketLiveTrades
-    .map(({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
+  const rows = currentMarketLiveTrades.map(
+    ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
       key: idx,
       createdAtMilliseconds,
       price,
       side: getSelectedOrderSide(side),
       size,
-    }))
-    .slice(0, 1);
+    })
+  );
 
   const columns = useMemo(() => {
     const timeColumn = {
