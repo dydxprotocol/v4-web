@@ -9,6 +9,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -30,7 +31,6 @@ import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
   calculateShouldRenderActionsInPositionsTable,
-  calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 import {
   getCurrentMarketTradeInfoNumbers,
@@ -90,7 +90,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
   );

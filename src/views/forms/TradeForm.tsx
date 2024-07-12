@@ -243,7 +243,7 @@ export const TradeForm = ({
 
         {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
           <AlertMessage type={AlertType.Error}>
-            <$Message>{complianceMessage}</$Message>
+            <span>{complianceMessage}</span>
           </AlertMessage>
         )}
 

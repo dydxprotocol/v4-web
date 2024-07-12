@@ -6,7 +6,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { MobilePlaceOrderSteps } from '@/constants/trade';
+import { MobilePlaceOrderSteps, TradeTypes } from '@/constants/trade';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -36,6 +36,8 @@ import {
   getTradeStateWithDoubleValuesHasDiff,
 } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
+
+import { useTradeTypeOptions } from './useTradeTypeOptions';
 
 type ConfirmButtonConfig = {
   stringKey: string;
@@ -67,6 +69,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const { chainTokenLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
   const { complianceState } = useComplianceState();
+  const { selectedTradeType } = useTradeTypeOptions();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
@@ -81,6 +84,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const hasMissingData = subaccountNumber === undefined;
 
   const tradingUnavailable =
+    (complianceState === ComplianceStates.CLOSE_ONLY && selectedTradeType !== TradeTypes.MARKET) ||
     complianceState === ComplianceStates.READ_ONLY ||
     connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
 
