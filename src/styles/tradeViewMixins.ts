@@ -7,7 +7,7 @@ import {
 
 export const tradeViewMixins = {
   horizontalTable: css`
-    --tableCell-padding: 0.25rem 0.25rem;
+    --tableCell-padding: 0.25rem;
     --tableStickyRow-backgroundColor: var(--color-layer-2);
     --tableRow-backgroundColor: var(--color-layer-2);
     font: var(--font-mini-book);
