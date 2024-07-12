@@ -135,7 +135,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       getRowKey={(row) => row.marketId}
       label={stringGetter({ key: STRING_KEYS.VAULT })}
       onRowAction={(marketId: Key) =>
-        navigate(`${AppRoute.Vault}/${marketId}`, { state: { from: AppRoute.Vault } })
+        navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
       }
       defaultSortDescriptor={{
         column: 'size',

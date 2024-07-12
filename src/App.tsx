@@ -56,7 +56,7 @@ const TradePage = lazy(() => import('@/pages/trade/Trade'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
-const VaultsPage = lazy(() => import('@/pages/vaults/Vaults'));
+const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
 
 const queryClient = new QueryClient();
 
@@ -114,7 +114,7 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Vault}>
-                <Route path={AppRoute.Vault} element={<VaultsPage />} />
+                <Route path={AppRoute.Vault} element={<VaultPage />} />
               </Route>
 
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />

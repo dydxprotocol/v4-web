@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -192,13 +194,13 @@ export const VaultHeader = ({ className }: { className?: string }) => {
         </div>
       </$MarketTitle>
       {detailItems.map((item) => (
-        <>
+        <React.Fragment key={item.key}>
           <$VerticalSeparator />
           <$DetailItem key={item.key}>
             <$DetailLabel>{item.label}</$DetailLabel>
             <$DetailValue>{item.value}</$DetailValue>
           </$DetailItem>
-        </>
+        </React.Fragment>
       ))}
     </$HeaderRow>
   );

@@ -225,7 +225,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           padding={{
             left: 0.01,
             right: 0.01,
-            top: 0,
+            top: 0.05,
             bottom: 0,
           }}
           tickFormatY={tickFormatY}
