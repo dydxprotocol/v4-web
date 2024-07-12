@@ -1,7 +1,10 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { EN_LOCALE_DATA, LocaleData, SupportedLocales } from '@/constants/localization';
+import { AnalyticsEvents } from '@/constants/analytics';
+import { EN_LOCALE_DATA, EU_LOCALES, LocaleData, SupportedLocales } from '@/constants/localization';
+
+import { track } from '@/lib/analytics';
 
 export interface LocalizationState {
   isLocaleLoaded: boolean;
@@ -33,10 +36,30 @@ export const localizationSlice = createSlice({
     setSelectedLocale: (
       state,
       action: PayloadAction<{ locale: SupportedLocales; isAutoDetect?: boolean }>
-    ) => ({
-      ...state,
-      selectedLocale: action.payload.locale,
-    }),
+    ) => {
+      const previousLocale = state.selectedLocale;
+      const newLocale = action.payload.locale;
+
+      // regulatory: track manual switching to EU language and whether it's their browser language / switching from English
+      if (
+        newLocale !== previousLocale &&
+        !action.payload.isAutoDetect &&
+        EU_LOCALES.includes(newLocale)
+      ) {
+        track(
+          AnalyticsEvents.SwitchedLanguageToEULanguage({
+            previousLocale,
+            newLocale,
+            browserLanguage: globalThis.navigator?.language,
+          })
+        );
+      }
+
+      return {
+        ...state,
+        selectedLocale: newLocale,
+      };
+    },
   },
 });
 

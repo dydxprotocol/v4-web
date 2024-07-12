@@ -8,6 +8,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
+  EU_LOCALES,
   SUPPORTED_BASE_TAGS_LOCALE_MAPPING,
   SupportedLocales,
   type LocaleData,
@@ -57,12 +58,15 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
       } else if (globalThis.navigator?.language) {
         const browserLanguageBaseTag = globalThis.navigator.language.split('-')[0].toLowerCase();
 
-        const locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
-          SUPPORTED_BASE_TAGS_LOCALE_MAPPING[SupportedLocales.EN]) as SupportedLocales;
+        let locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
+          SupportedLocales.EN) as SupportedLocales;
 
-        if (locale) {
-          store.dispatch(setSelectedLocale({ locale, isAutoDetect: true }));
+        // regulatory: do not default to browser language if it's an EU language, default to English instead
+        if (EU_LOCALES.includes(locale)) {
+          locale = SupportedLocales.EN;
         }
+
+        store.dispatch(setSelectedLocale({ locale, isAutoDetect: true }));
       }
       break;
     }

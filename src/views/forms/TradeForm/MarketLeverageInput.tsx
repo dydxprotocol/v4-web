@@ -143,7 +143,7 @@ export const MarketLeverageInput = ({
             </>
           }
         >
-          <$LeverageSlider
+          <LeverageSlider
             leverage={currentLeverage}
             leverageInputValue={getSignedLeverage(leverageInputValue)}
             maxLeverage={maxLeverage}
@@ -188,10 +188,6 @@ const $InputContainer = styled.div`
 
 const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
-`;
-
-const $LeverageSlider = styled(LeverageSlider)`
-  margin-top: 0.25rem;
 `;
 
 const $InnerInputContainer = styled.div`

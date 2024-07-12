@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { TriggerFields } from '@/constants/triggers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -22,7 +23,8 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
+import { setTriggerFormInputs } from '@/state/inputs';
+import { getTriggerFormInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -45,10 +47,10 @@ export const LimitPriceInputs = ({
   tickSizeDecimals,
   className,
 }: ElementProps & StyleProps) => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
-  const { stopLossOrder, takeProfitOrder } =
-    useAppSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
+  const triggerFormInputValues = useAppSelector(getTriggerFormInputs, shallowEqual);
 
   const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(existsLimitOrder);
 
@@ -61,17 +63,10 @@ export const LimitPriceInputs = ({
         field: TriggerOrdersInputField.takeProfitOrderType,
       });
       abacusStateManager.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.takeProfitLimitPrice,
-      });
-      abacusStateManager.setTriggerOrdersValue({
         value: AbacusOrderType.StopMarket.rawValue,
         field: TriggerOrdersInputField.stopLossOrderType,
       });
-      abacusStateManager.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.stopLossLimitPrice,
-      });
+      abacusStateManager.clearTriggerOrdersInputValues({ field: TriggerFields.Limit });
     }
     setShouldShowLimitPrice(isLimitChecked);
   };
@@ -79,8 +74,12 @@ export const LimitPriceInputs = ({
   const onLimitInput =
     (field: TriggerOrdersInputFields) =>
     ({ floatValue, formattedValue }: { floatValue?: number; formattedValue: string }) => {
+      dispatch(
+        setTriggerFormInputs({
+          [field.rawValue]: formattedValue,
+        })
+      );
       const newLimitPrice = MustBigNumber(floatValue).toFixed(decimals);
-
       abacusStateManager.setTriggerOrdersValue({
         value: formattedValue === '' || newLimitPrice === 'NaN' ? null : newLimitPrice,
         field,
@@ -105,7 +104,7 @@ export const LimitPriceInputs = ({
           <FormInput
             id="TP-limit"
             decimals={decimals}
-            value={takeProfitOrder?.price?.limitPrice}
+            value={triggerFormInputValues[TriggerOrdersInputField.takeProfitLimitPrice.rawValue]}
             label={
               <>
                 {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
@@ -119,7 +118,7 @@ export const LimitPriceInputs = ({
           <FormInput
             id="SL-limit"
             decimals={decimals}
-            value={stopLossOrder?.price?.limitPrice}
+            value={triggerFormInputValues[TriggerOrdersInputField.stopLossLimitPrice.rawValue]}
             label={
               <>
                 {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
