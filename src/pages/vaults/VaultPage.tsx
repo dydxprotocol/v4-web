@@ -11,6 +11,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { VaultDepositWithdrawForm } from './VaultDepositWithdrawForm';
 import { VaultHeader, VaultPositionsSection, YourVaultDetailsCards } from './VaultInfoSections';
 import { VaultPnlChart } from './VaultPnlChart';
 import { VaultTransactionsCard } from './VaultTransactions';
@@ -58,7 +59,9 @@ const Vaults = () => {
         <$VaultDepositWithdrawFormColumn>
           <$YourVaultDetailsCards />
           <$DepositFormContainer>
-            <$PlaceholderBox />
+            <$PlaceholderBox>
+              <VaultDepositWithdrawForm />
+            </$PlaceholderBox>
           </$DepositFormContainer>
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
@@ -124,7 +127,6 @@ const $DepositFormContainer = styled.div`
 `;
 
 const $PlaceholderBox = styled.div`
-  height: 22rem;
   border-radius: 0.7rem;
   background-color: var(--color-layer-3);
 `;
