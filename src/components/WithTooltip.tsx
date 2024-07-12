@@ -96,6 +96,7 @@ export const WithTooltip = ({
     </Provider>
   );
 };
+
 const $Abbr = styled.abbr`
   ${layoutMixins.inlineRow}
 
@@ -108,7 +109,6 @@ const $Abbr = styled.abbr`
 `;
 
 const $Content = styled(Content)`
-  --tooltip-backgroundColor: var(--color-layer-4);
   --tooltip-backgroundColor: ${({ theme }) => theme.tooltipBackground};
 
   ${popoverMixins.popover}
