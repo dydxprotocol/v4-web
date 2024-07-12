@@ -60,15 +60,15 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const rows = currentMarketLiveTrades.map(
-    ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
+  const rows = currentMarketLiveTrades
+    .map(({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
       key: idx,
       createdAtMilliseconds,
       price,
       side: getSelectedOrderSide(side),
       size,
-    })
-  );
+    }))
+    .slice(0, 1);
 
   const columns = useMemo(() => {
     const timeColumn = {
@@ -177,9 +177,10 @@ const $SizeOutput = styled(Output)<StyleProps>`
 
 const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
+  background: var(--color-layer-2);
+
   tr {
     --histogram-bucket-size: 1;
-    background-color: var(--color-layer-2);
 
     &[data-side=${OrderSide.BUY}] {
       --accent-color: var(--color-positive);

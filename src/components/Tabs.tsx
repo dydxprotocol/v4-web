@@ -289,6 +289,10 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
     pointer-events: none;
   }
 
+  &[data-state='active'] {
+    z-index: 1;
+  }
+
   ${({ $hide }) =>
     $hide &&
     css`
