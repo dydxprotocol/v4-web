@@ -366,7 +366,7 @@ const $Arrow = styled.div`
     opacity: 0.5;
   }
   > :last-child {
-    left: -0.2re;
+    left: -0.2rem;
     position: relative;
   }
 `;
