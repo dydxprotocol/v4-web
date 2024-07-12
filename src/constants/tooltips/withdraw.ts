@@ -33,7 +33,7 @@ export const withdrawTooltips: TooltipStrings = {
       params: {
         LOWEST_FEE_TOKEN_NAMES: getLowestFeeChainNames(
           TransferType.withdrawal,
-          featureFlags[StatSigFlags.ffSkipMigration] ?? false
+          featureFlags?.[StatSigFlags.ffSkipMigration] ?? false
         ).join(', '),
       },
     }),

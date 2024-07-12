@@ -111,7 +111,7 @@ export type TooltipStrings = {
     stringGetter: StringGetterFunction;
     stringParams?: any;
     urlConfigs?: LinksConfigs;
-    featureFlags: StatsigConfigType;
+    featureFlags?: StatsigConfigType;
   }) => {
     title?: React.ReactNode;
     body: React.ReactNode;
