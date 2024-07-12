@@ -78,6 +78,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
+  const { dydxAddress, walletType } = useAccounts();
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -120,6 +121,10 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
+    if (walletType === WalletType.Keplr && dydxAddress) {
+      abacusStateManager.setTransfersSourceAddress(dydxAddress);
+    }
+
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
       value: TransferType.withdrawal.rawValue,
@@ -128,7 +133,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, []);
+  }, [dydxAddress, walletType]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -158,7 +163,6 @@ export const WithdrawForm = () => {
   }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
-  const { dydxAddress } = useAccounts();
   const nobleChainId = getNobleChainId();
   const osmosisChainId = getOsmosisChainId();
 
@@ -322,8 +326,6 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
-  const { walletType } = useAccounts();
-
   useEffect(() => {
     if (walletType === WalletType.Privy) {
       abacusStateManager.setTransferValue({
@@ -332,38 +334,38 @@ export const WithdrawForm = () => {
       });
     }
     if (walletType === WalletType.Keplr) {
-      if (dydxAddress) {
-        abacusStateManager.setTransfersSourceAddress(dydxAddress);
-      }
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: nobleChainId,
       });
     }
-  }, [walletType, dydxAddress]);
+  }, [walletType]);
 
-  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
-    if (name) {
-      setWithdrawAmount('');
-      if (type === 'chain') {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.chain,
-          value: name,
-        });
-        if (name === osmosisChainId) {
+  const onSelectNetwork = useCallback(
+    (name: string, type: 'chain' | 'exchange') => {
+      if (name) {
+        setWithdrawAmount('');
+        if (type === 'chain') {
           abacusStateManager.setTransferValue({
-            field: TransferInputField.token,
-            value: OSMO_USDC_IBC_DENOM,
+            field: TransferInputField.chain,
+            value: name,
+          });
+          if (name === osmosisChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: OSMO_USDC_IBC_DENOM,
+            });
+          }
+        } else {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.exchange,
+            value: name,
           });
         }
-      } else {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.exchange,
-          value: name,
-        });
       }
-    }
-  }, []);
+    },
+    [osmosisChainId]
+  );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
     if (selectedToken) {
