@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -11,6 +12,7 @@ import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -51,7 +53,12 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
     EMPTY_ARR;
 
-  const cctpTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
+  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+
+  const cctpTokensByChainId = useMemo(
+    () => getMapOfLowestFeeTokensByChainId(type, skipEnabled),
+    [type, skipEnabled]
+  );
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter

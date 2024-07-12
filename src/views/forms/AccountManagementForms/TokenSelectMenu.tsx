@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -9,6 +10,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -33,8 +35,12 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const { type, depositOptions, withdrawalOptions, resources } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const cctpTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
+  const cctpTokensByDenom = useMemo(
+    () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
+    [type, skipEnabled]
+  );
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??

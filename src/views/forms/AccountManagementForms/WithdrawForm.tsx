@@ -2,6 +2,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -30,6 +31,7 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -496,12 +498,15 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     isInvalidNobleAddress;
+  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   return (
     <$Form onSubmit={onSubmit}>
       <$Subheader>
         {stringGetter({
-          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          key: skipEnabled
+            ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
+            : STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
               <WithTooltip tooltip="lowest-fees">
