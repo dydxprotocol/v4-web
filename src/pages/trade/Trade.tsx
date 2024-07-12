@@ -9,7 +9,6 @@ import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
 import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
@@ -97,7 +96,7 @@ const $TradeLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
 }>`
-  --horizontalPanel-height: 20.625rem;
+  --horizontalPanel-height: 18rem;
 
   // Constants
   /* prettier-ignore */
@@ -108,38 +107,10 @@ const $TradeLayout = styled.article<{
     / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
 
   /* prettier-ignore */
-  --layout-default-desktopMedium:
-    'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
-  --layout-default-desktopLarge:
-    'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Vertical Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
   --layout-alternative:
     'Top Top Top' auto
     'Vertical Inner Side' minmax(0, 1fr)
     'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  /* prettier-ignore */
-  --layout-alternative-desktopMedium:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  /* prettier-ignore */
-  --layout-alternative-desktopLarge:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Vertical Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
 
   // Props/defaults
@@ -148,27 +119,11 @@ const $TradeLayout = styled.article<{
 
   // Variants
 
-  @media ${breakpoints.desktopMedium} {
-    --layout: var(--layout-default-desktopMedium);
-  }
-
-  @media ${breakpoints.desktopLarge} {
-    --horizontalPanel-height: 23.75rem;
-    --layout: var(--layout-default-desktopLarge);
-  }
-
   ${({ tradeLayout }) =>
     ({
       [TradeLayouts.Default]: null,
       [TradeLayouts.Alternative]: css`
         --layout: var(--layout-alternative);
-
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-        @media ${breakpoints.desktopLarge} {
-          --layout: var(--layout-alternative-desktopLarge);
-        }
       `,
       [TradeLayouts.Reverse]: css`
         direction: rtl;
