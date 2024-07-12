@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -73,7 +73,7 @@ export const TradeSizeInputs = () => {
     if (lastEditedInput !== TradeSizeInput.Leverage || leverage == null) {
       dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
     }
-  }, [size, usdcSize, leverage, lastEditedInput]);
+  }, [size, usdcSize, leverage, lastEditedInput, dispatch]);
 
   const onSizeInput = ({
     floatValue,
@@ -108,32 +108,43 @@ export const TradeSizeInputs = () => {
     });
   };
 
-  const inputToggleButton = (
-    <WithTooltip
-      slotTooltip={
+  const onUsdcToggle = useCallback((isPressed: boolean) => {
+    setShowUSDCInput(isPressed);
+    abacusStateManager.setTradeValue({
+      field: TradeInputField.lastInput,
+      value: isPressed ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
+    });
+  }, []);
+
+  const inputToggleButton = () => {
+    const slotTooltip =
+      !showUSDCInput && usdAmountInput ? (
+        <$Tooltip>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Tooltip>
+      ) : showUSDCInput && amountInput ? (
         <$Tooltip>
-          {!showUSDCInput && usdAmountInput ? (
-            `≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`
-          ) : showUSDCInput && amountInput && id ? (
-            <>
-              ≈ {amountInput} <Tag>{id}</Tag>
-            </>
-          ) : undefined}
+          ≈ {amountInput} {id && <Tag>{id}</Tag>}
         </$Tooltip>
-      }
-      side="left"
-      align="center"
-    >
+      ) : undefined;
+
+    const toggleButton = (
       <$ToggleButton
         isPressed={showUSDCInput}
-        onPressedChange={setShowUSDCInput}
+        onPressedChange={onUsdcToggle}
         size={ButtonSize.XSmall}
         shape={ButtonShape.Square}
       >
         <Icon iconName={IconName.Trade} />
       </$ToggleButton>
-    </WithTooltip>
-  );
+    );
+
+    return slotTooltip ? (
+      <WithTooltip slotTooltip={slotTooltip} side="left" align="center">
+        {toggleButton}
+      </WithTooltip>
+    ) : (
+      toggleButton
+    );
+  };
 
   const sizeInput = (
     <FormInput
@@ -148,7 +159,7 @@ export const TradeSizeInputs = () => {
           {id && <Tag>{id}</Tag>}
         </>
       }
-      slotRight={inputToggleButton}
+      slotRight={inputToggleButton()}
       type={InputType.Number}
       value={amountInput || ''}
     />
@@ -169,7 +180,7 @@ export const TradeSizeInputs = () => {
           <Tag>USD</Tag>
         </>
       }
-      slotRight={inputToggleButton}
+      slotRight={inputToggleButton()}
     />
   );
 
