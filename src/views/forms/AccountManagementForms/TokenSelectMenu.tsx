@@ -5,7 +5,7 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
@@ -37,7 +37,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const cctpTokensByDenom = useMemo(
+  const lowestFeeTokensByDenom = useMemo(
     () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
     [type, skipEnabled]
   );
@@ -60,7 +60,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         // the curve dao token svg causes the web app to lag when rendered
         <$Img src={token.iconUrl ?? undefined} alt="" />
       ),
-      slotAfter: !!cctpTokensByDenom[token.type] && <LowestFeesDecoratorText />,
+      slotAfter: !!lowestFeeTokensByDenom[token.type] && <LowestFeesDecoratorText />,
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
@@ -74,7 +74,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       }
       return true;
     })
-    .sort((token) => (cctpTokensByDenom[token.value] ? -1 : 1));
+    // we want lowest fee tokens first followed by non-lowest fee cctp tokens
+    .sort((token) => (cctpTokensByDenom[token.value] ? -1 : 1))
+    .sort((token) => (lowestFeeTokensByDenom[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu

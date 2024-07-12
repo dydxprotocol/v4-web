@@ -49,3 +49,25 @@ export const getMapOfLowestFeeTokensByChainId = (
     },
     {} as Record<string, CctpTokenInfo[]>
   );
+
+export const cctpTokensByDenom = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.tokenAddress]) {
+      acc[token.tokenAddress] = [];
+    }
+    acc[token.tokenAddress].push(token);
+    return acc;
+  },
+  {} as Record<string, CctpTokenInfo[]>
+);
+
+export const cctpTokensByChainId = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  },
+  {} as Record<string, CctpTokenInfo[]>
+);
