@@ -77,8 +77,8 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
         showVaults && {
           value: 'vaults',
           slotBefore: <Icon iconName={IconName.Governance} />,
-          label: stringGetter({ key: STRING_KEYS.VAULTS }),
-          onSelect: () => navigate(AppRoute.Vaults),
+          label: stringGetter({ key: STRING_KEYS.VAULT }),
+          onSelect: () => navigate(AppRoute.Vault),
         },
       ].filter(isTruthy),
     },

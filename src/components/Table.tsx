@@ -209,14 +209,16 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     getKey: internalGetRowKey,
     load: async ({ sortDescriptor }) => ({
       items: sortDescriptor?.column
-        ? data.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
+        ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
         : data,
     }),
 
     initialSortDescriptor: defaultSortDescriptor,
 
     sort: async ({ items, sortDescriptor }) => ({
-      items: items.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction)),
+      items: [...items].sort((a, b) =>
+        sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction)
+      ),
     }),
   });
 

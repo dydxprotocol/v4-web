@@ -15,86 +15,82 @@ import { Output, OutputType } from '@/components/Output';
 import { PortfolioCard } from '@/components/PortfolioCard';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getAllVaultsWithUserBalance } from '@/state/vaultSelectors';
+import { getUserVault } from '@/state/vaultSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
 type MaybeVaultPositionsPanelProps = {
-  onViewVault: (marketId: string) => void;
+  onViewVault: () => void;
   className?: string;
   header: ReactNode;
 };
 
-type UserVault = ReturnType<typeof getAllVaultsWithUserBalance>[number];
+type UserVault = ReturnType<typeof getUserVault>;
 
 export const MaybeVaultPositionsPanel = ({
   onViewVault,
   header,
   className,
 }: MaybeVaultPositionsPanelProps) => {
-  const userVaults = useAppSelector(getAllVaultsWithUserBalance);
+  const userVault = useAppSelector(getUserVault);
   const { isTablet } = useBreakpoints();
   if (!testFlags.enableVaults) return null;
-  if (!userVaults.length && !isTablet) {
+  if (userVault == null && !isTablet) {
     return null;
   }
 
   return (
     <div className={className}>
       {header}
-      <VaultPositionsCards onViewVault={onViewVault} userVaults={userVaults} />
+      <VaultPositionsCards onViewVault={onViewVault} userVault={userVault} />
     </div>
   );
 };
 
 type VaultPositionsCardsProps = {
-  onViewVault: (marketId: string) => void;
-  userVaults: UserVault[];
+  onViewVault: () => void;
+  userVault: UserVault;
 };
 
-const VaultPositionsCards = ({ onViewVault, userVaults }: VaultPositionsCardsProps) => {
+const VaultPositionsCards = ({ onViewVault, userVault }: VaultPositionsCardsProps) => {
   const stringGetter = useStringGetter();
-  if (userVaults.length === 0) {
+  if (userVault == null) {
     return <$Empty>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</$Empty>;
   }
   return (
     <$Cards>
-      {userVaults.map((vault) => (
-        <VaultPositionCard
-          key={vault.marketId}
-          marketId={vault.marketId}
-          vault={vault}
-          onViewVault={onViewVault}
-        />
-      ))}
+      <VaultPositionCard vault={userVault} onViewVault={onViewVault} />
     </$Cards>
   );
 };
 
 type VaultPositionCardProps = {
-  marketId: string;
-  onViewVault: (marketId: string) => void;
+  onViewVault: () => void;
   vault: UserVault;
 };
 
-export const VaultPositionCard = ({ marketId, onViewVault, vault }: VaultPositionCardProps) => {
+export const VaultPositionCard = ({ onViewVault, vault }: VaultPositionCardProps) => {
   const stringGetter = useStringGetter();
-  const { asset, userInfo } = vault;
 
   return (
     <PortfolioCard
-      assetName={asset?.name ?? ''}
-      assetId={asset?.id ?? ''}
-      detailLabel={stringGetter({ key: STRING_KEYS.YOUR_LP_VAULT_BALANCE })}
-      detailValue={<Output type={OutputType.Fiat} value={userInfo?.userBalance} />}
+      assetName={stringGetter({ key: STRING_KEYS.VAULT })}
+      assetIcon={<$VaultImg src="/dydx-chain.png" />}
+      detailLabel={stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE })}
+      detailValue={<Output type={OutputType.Fiat} value={vault?.userBalance} />}
       actionSlot={
-        <$Link onClick={() => onViewVault(marketId)} isAccent>
+        <$Link onClick={onViewVault} isAccent>
           {stringGetter({ key: STRING_KEYS.VIEW_VAULT })} <Icon iconName={IconName.Arrow} />
         </$Link>
       }
     />
   );
 };
+
+const $VaultImg = styled.img`
+  width: 1.5rem;
+  height: 1.5rem;
+`;
 
 const $Link = styled(Link)`
   font: var(--font-small-book);

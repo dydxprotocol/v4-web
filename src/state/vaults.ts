@@ -1,42 +1,96 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { range } from 'lodash';
 
-type VaultMetadata = { totalValue: number };
+import { timeUnits } from '@/constants/time';
 
+export interface VaultsState {
+  vaultDetails: VaultDetails;
+  vaultHistory: VaultHistory | undefined;
+  userVault: VaultOwnership | undefined;
+}
 type VaultDetails = {
-  allTimePnl: {
-    percent: number;
-    absolute: number;
-  };
+  totalValue: number;
   thirtyDayReturnPercent: number;
+  positions: Array<VaultPosition>;
+};
+type VaultPosition = {
+  asset: { id: string; name: string };
+  marketId: string;
+  marginUsdc: number;
   currentLeverageMultiple: number;
   currentPosition: {
     asset: number;
     usdc: number;
   };
+  thirtyDayPnl: {
+    percent: number;
+    absolute: number;
+    sparklinePoints: number[];
+  };
 };
-
 type VaultOwnership = {
   userBalance: number;
+  userReturn: {
+    absolute: number;
+    percent: number;
+  };
+  transactionHistory: VaultTransaction[];
+};
+export type VaultTransaction = {
+  timestampMs: number;
+  amountUsdc: number;
+  type: 'withdrawal' | 'deposit';
+  id: string;
+};
+type VaultHistory = {
+  pnlAndEquityDataPoints: Array<{ date: number; equity: number; totalPnl: number }>;
 };
 
-export interface VaultsState {
-  vaults: Record<string, VaultMetadata>;
-  vaultDetails: Record<string, VaultDetails | undefined>;
-  userVaults: Record<string, VaultOwnership | undefined>;
-}
-
 const initialState: VaultsState = {
-  vaults: { 'PEPE-USD': { totalValue: 30_425 } },
   vaultDetails: {
-    'PEPE-USD': {
-      allTimePnl: { absolute: 4_125, percent: 0.1252 },
-      currentLeverageMultiple: 1.2,
-      currentPosition: { asset: 17341235412, usdc: 423.67 },
-      thirtyDayReturnPercent: 0.1474,
-    },
+    totalValue: 30_425,
+    thirtyDayReturnPercent: 0.1474,
+    positions: [
+      {
+        asset: { id: 'PEPE', name: 'Pepe' },
+        marketId: 'PEPE-USD',
+        marginUsdc: 10_000,
+        currentLeverageMultiple: 1.2,
+        currentPosition: { asset: 1734112, usdc: 423.67 },
+        thirtyDayPnl: {
+          percent: 0.123,
+          absolute: 1123,
+          sparklinePoints: [1, 2, 3, 2, 1, 4, 3, 1, 3, 1, 2],
+        },
+      },
+    ],
   },
-  userVaults: {
-    'PEPE-USD': { userBalance: 10 },
+  vaultHistory: {
+    pnlAndEquityDataPoints: [
+      ...range(50).map((i) => ({
+        date: new Date('6/1/2024').valueOf() + timeUnits.day * i,
+        equity: 1000 + Math.random() * 1000,
+        totalPnl: 100 + Math.random() * 5000,
+      })),
+    ],
+  },
+  userVault: {
+    userBalance: 10430,
+    userReturn: { absolute: 1923.61, percent: 0.1243 },
+    transactionHistory: [
+      {
+        timestampMs: new Date('8/1/24 1:23 PM').valueOf(),
+        amountUsdc: 100,
+        type: 'deposit',
+        id: '1',
+      },
+      {
+        timestampMs: new Date('8/8/24 5:27 AM').valueOf(),
+        amountUsdc: 150,
+        type: 'withdrawal',
+        id: '2',
+      },
+    ],
   },
 };
 
@@ -44,10 +98,10 @@ export const vaultsSlice = createSlice({
   name: 'Vaults',
   initialState,
   reducers: {
-    setVaults: (state: VaultsState, action: PayloadAction<Record<string, VaultMetadata>>) => {
-      state.vaults = action.payload;
+    setVault: (state: VaultsState, action: PayloadAction<VaultDetails>) => {
+      state.vaultDetails = action.payload;
     },
   },
 });
 
-export const { setVaults } = vaultsSlice.actions;
+export const { setVault } = vaultsSlice.actions;

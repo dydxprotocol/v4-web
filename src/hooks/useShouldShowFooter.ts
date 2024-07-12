@@ -1,6 +1,6 @@
 import { matchPath, useLocation } from 'react-router-dom';
 
-import { TRADE_ROUTE } from '@/constants/routes';
+import { AppRoute, TRADE_ROUTE } from '@/constants/routes';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
@@ -12,5 +12,11 @@ export const useShouldShowFooter = () => {
   const { pathname } = useLocation();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  return !isTablet || !(matchPath(TRADE_ROUTE, pathname) && canAccountTrade);
+  return (
+    !isTablet ||
+    !(
+      !!(matchPath(TRADE_ROUTE, pathname) && canAccountTrade) ||
+      !!(matchPath(AppRoute.Vault, pathname) && canAccountTrade)
+    )
+  );
 };
