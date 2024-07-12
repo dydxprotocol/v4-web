@@ -206,7 +206,7 @@ const $Column = styled.div`
 
 const $ToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
-  --button-font: var(--font-tiny-book);
+  --button-font: var(--font-base-book);
   --button-height: 2.25rem;
 
   ${layoutMixins.flexColumn}
