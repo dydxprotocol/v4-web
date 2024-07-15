@@ -70,6 +70,8 @@ const $Details = styled(Details)`
 `;
 
 const $Notification = styled(Notification)`
+  --relativeTime-backgroundColor: transparent;
+
   background-image: url('/dots-background-2.svg');
   background-size: cover;
 
