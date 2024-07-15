@@ -404,7 +404,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxAddress } = useAccounts();
       const { data, status } = useQueryChaosLabsIncentives({
         dydxAddress,
-        season: 3,
+        season: REWARD_DISTRIBUTION_SEASON_NUMBER,
       });
 
       const { dydxRewards } = data ?? {};
