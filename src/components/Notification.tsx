@@ -99,6 +99,7 @@ const $Container = styled.div<{ isToast?: boolean }>`
   // Params
   --toast-icon-size: 1.75em;
   --relativeTime-backgroundColor: var(--color-layer-2);
+  --action-marginTop: 0.5rem;
 
   // Rules
   ${popoverMixins.popover}
@@ -159,7 +160,7 @@ const $Description = styled.div`
 `;
 
 const $Action = styled.div`
-  margin-top: 0.5rem;
+  margin-top: var(--action-marginTop);
   font: var(--font-small-book);
 `;
 

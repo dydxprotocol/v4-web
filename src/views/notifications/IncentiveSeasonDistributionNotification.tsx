@@ -1,13 +1,14 @@
 import styled from 'styled-components';
 
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { REWARD_DISTRIBUTION_SEASON_NUMBER } from '@/constants/notifications';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
@@ -52,7 +53,11 @@ export const IncentiveSeasonDistributionNotification = ({
           ]}
         />
       }
-      slotAction={<Link isAccent>{stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →</Link>}
+      slotAction={
+        <$Button action={ButtonAction.Primary} size={ButtonSize.Small}>
+          {stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →
+        </$Button>
+      }
     />
   );
 };
@@ -67,6 +72,8 @@ const $Details = styled(Details)`
 const $Notification = styled(Notification)`
   background-image: url('/dots-background-2.svg');
   background-size: cover;
+
+  --action-marginTop: 0.75rem;
 `;
 
 const $Output = styled(Output)`
@@ -75,4 +82,8 @@ const $Output = styled(Output)`
     color: var(--color-success);
     margin-right: 0.5ch;
   }
+`;
+
+const $Button = styled(Button)`
+  width: 100%;
 `;
