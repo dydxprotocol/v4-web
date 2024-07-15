@@ -1,1102 +1,1382 @@
 {
   "1": {
     "name": "Ethereum",
-    "rpc": "https://cloudflare-eth.com"
+    "fallbackRpcUrl": "https://cloudflare-eth.com",
+    "alchemyRpcUrl": "https://eth-mainnet.g.alchemy.com/v2"
   },
   "5": {
     "name": "Goerli",
-    "rpc": "https://rpc.ankr.com/eth_goerli"
+    "fallbackRpcUrl": "https://rpc.ankr.com/eth_goerli",
+    "alchemyRpcUrl": null
   },
   "7": {
     "name": "ThaiChain",
-    "rpc": "https://rpc.thaichain.org"
+    "fallbackRpcUrl": "https://rpc.thaichain.org",
+    "alchemyRpcUrl": null
   },
   "10": {
     "name": "OP Mainnet",
-    "rpc": "https://mainnet.optimism.io"
+    "fallbackRpcUrl": "https://mainnet.optimism.io",
+    "alchemyRpcUrl": "https://opt-mainnet.g.alchemy.com/v2"
   },
   "14": {
     "name": "Flare Mainnet",
-    "rpc": "https://flare-api.flare.network/ext/C/rpc"
+    "fallbackRpcUrl": "https://flare-api.flare.network/ext/C/rpc",
+    "alchemyRpcUrl": null
   },
   "16": {
     "name": "Coston",
-    "rpc": "https://coston-api.flare.network/ext/C/rpc"
+    "fallbackRpcUrl": "https://coston-api.flare.network/ext/C/rpc",
+    "alchemyRpcUrl": null
   },
   "19": {
     "name": "Songbird Mainnet",
-    "rpc": "https://songbird-api.flare.network/ext/C/rpc"
+    "fallbackRpcUrl": "https://songbird-api.flare.network/ext/C/rpc",
+    "alchemyRpcUrl": null
   },
   "25": {
     "name": "Cronos Mainnet",
-    "rpc": "https://evm.cronos.org"
+    "fallbackRpcUrl": "https://evm.cronos.org",
+    "alchemyRpcUrl": null
   },
   "30": {
     "name": "Rootstock Mainnet",
-    "rpc": "https://public-node.rsk.co"
+    "fallbackRpcUrl": "https://public-node.rsk.co",
+    "alchemyRpcUrl": null
   },
   "31": {
     "name": "Rootstock Testnet",
-    "rpc": "https://public-node.testnet.rsk.co"
+    "fallbackRpcUrl": "https://public-node.testnet.rsk.co",
+    "alchemyRpcUrl": null
   },
   "40": {
     "name": "Telos",
-    "rpc": "https://mainnet.telos.net/evm"
+    "fallbackRpcUrl": "https://mainnet.telos.net/evm",
+    "alchemyRpcUrl": null
   },
   "41": {
     "name": "Telos",
-    "rpc": "https://testnet.telos.net/evm"
+    "fallbackRpcUrl": "https://testnet.telos.net/evm",
+    "alchemyRpcUrl": null
   },
   "42": {
     "name": "LUKSO",
-    "rpc": "https://rpc.mainnet.lukso.network"
+    "fallbackRpcUrl": "https://rpc.mainnet.lukso.network",
+    "alchemyRpcUrl": null
   },
   "44": {
     "name": "Crab Network",
-    "rpc": "https://crab-rpc.darwinia.network"
+    "fallbackRpcUrl": "https://crab-rpc.darwinia.network",
+    "alchemyRpcUrl": null
   },
   "46": {
     "name": "Darwinia Network",
-    "rpc": "https://rpc.darwinia.network"
+    "fallbackRpcUrl": "https://rpc.darwinia.network",
+    "alchemyRpcUrl": null
   },
   "50": {
     "name": "XinFin Network",
-    "rpc": "https://rpc.xinfin.network"
+    "fallbackRpcUrl": "https://rpc.xinfin.network",
+    "alchemyRpcUrl": null
   },
   "51": {
     "name": "Apothem Network",
-    "rpc": "https://erpc.apothem.network"
+    "fallbackRpcUrl": "https://erpc.apothem.network",
+    "alchemyRpcUrl": null
   },
   "56": {
     "name": "BNB Smart Chain",
-    "rpc": "https://rpc.ankr.com/bsc"
+    "fallbackRpcUrl": "https://rpc.ankr.com/bsc",
+    "alchemyRpcUrl": null
   },
   "57": {
     "name": "Syscoin Mainnet",
-    "rpc": "https://rpc.syscoin.org"
+    "fallbackRpcUrl": "https://rpc.syscoin.org",
+    "alchemyRpcUrl": null
   },
   "61": {
     "name": "Ethereum Classic",
-    "rpc": "https://etc.rivet.link"
+    "fallbackRpcUrl": "https://etc.rivet.link",
+    "alchemyRpcUrl": null
   },
   "66": {
     "name": "OKC",
-    "rpc": "https://exchainrpc.okex.org"
+    "fallbackRpcUrl": "https://exchainrpc.okex.org",
+    "alchemyRpcUrl": null
   },
   "71": {
     "name": "Conflux eSpace Testnet",
-    "rpc": "https://evmtestnet.confluxrpc.com"
+    "fallbackRpcUrl": "https://evmtestnet.confluxrpc.com",
+    "alchemyRpcUrl": null
   },
   "82": {
     "name": "Meter",
-    "rpc": "https://rpc.meter.io"
+    "fallbackRpcUrl": "https://rpc.meter.io",
+    "alchemyRpcUrl": null
   },
   "83": {
     "name": "Meter Testnet",
-    "rpc": "https://rpctest.meter.io"
+    "fallbackRpcUrl": "https://rpctest.meter.io",
+    "alchemyRpcUrl": null
   },
   "96": {
     "name": "Bitkub",
-    "rpc": "https://rpc.bitkubchain.io"
+    "fallbackRpcUrl": "https://rpc.bitkubchain.io",
+    "alchemyRpcUrl": null
   },
   "97": {
     "name": "Binance Smart Chain Testnet",
-    "rpc": "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
+    "fallbackRpcUrl": "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+    "alchemyRpcUrl": null
   },
   "100": {
     "name": "Gnosis",
-    "rpc": "https://rpc.gnosischain.com"
+    "fallbackRpcUrl": "https://rpc.gnosischain.com",
+    "alchemyRpcUrl": null
   },
   "109": {
     "name": "Shibarium",
-    "rpc": "https://rpc.shibrpc.com"
+    "fallbackRpcUrl": "https://rpc.shibrpc.com",
+    "alchemyRpcUrl": null
   },
   "114": {
     "name": "Coston2",
-    "rpc": "https://coston2-api.flare.network/ext/C/rpc"
+    "fallbackRpcUrl": "https://coston2-api.flare.network/ext/C/rpc",
+    "alchemyRpcUrl": null
   },
   "122": {
     "name": "Fuse",
-    "rpc": "https://rpc.fuse.io"
+    "fallbackRpcUrl": "https://rpc.fuse.io",
+    "alchemyRpcUrl": null
   },
   "123": {
     "name": "Fuse Sparknet",
-    "rpc": "https://rpc.fusespark.io"
+    "fallbackRpcUrl": "https://rpc.fusespark.io",
+    "alchemyRpcUrl": null
   },
   "137": {
     "name": "Polygon",
-    "rpc": "https://polygon-rpc.com"
+    "fallbackRpcUrl": "https://polygon-rpc.com",
+    "alchemyRpcUrl": "https://polygon-mainnet.g.alchemy.com/v2"
   },
   "148": {
     "name": "Shimmer",
-    "rpc": "https://json-rpc.evm.shimmer.network"
+    "fallbackRpcUrl": "https://json-rpc.evm.shimmer.network",
+    "alchemyRpcUrl": null
   },
   "153": {
     "name": "Redbelly Network Testnet",
-    "rpc": "https://governors.testnet.redbelly.network"
+    "fallbackRpcUrl": "https://governors.testnet.redbelly.network",
+    "alchemyRpcUrl": null
   },
   "157": {
     "name": "Puppynet Shibarium",
-    "rpc": "https://puppynet.shibrpc.com"
+    "fallbackRpcUrl": "https://puppynet.shibrpc.com",
+    "alchemyRpcUrl": null
   },
   "169": {
     "name": "Manta Pacific Mainnet",
-    "rpc": "https://pacific-rpc.manta.network/http"
+    "fallbackRpcUrl": "https://pacific-rpc.manta.network/http",
+    "alchemyRpcUrl": null
   },
   "195": {
     "name": "X1 Testnet",
-    "rpc": "https://xlayertestrpc.okx.com"
+    "fallbackRpcUrl": "https://xlayertestrpc.okx.com",
+    "alchemyRpcUrl": null
   },
   "196": {
     "name": "X Layer Mainnet",
-    "rpc": "https://rpc.xlayer.tech"
+    "fallbackRpcUrl": "https://rpc.xlayer.tech",
+    "alchemyRpcUrl": null
   },
   "199": {
     "name": "BitTorrent",
-    "rpc": "https://rpc.bittorrentchain.io"
+    "fallbackRpcUrl": "https://rpc.bittorrentchain.io",
+    "alchemyRpcUrl": null
   },
   "202": {
     "name": "Edgeless Testnet",
-    "rpc": "https://edgeless-testnet.rpc.caldera.xyz/http"
+    "fallbackRpcUrl": "https://edgeless-testnet.rpc.caldera.xyz/http",
+    "alchemyRpcUrl": null
   },
   "204": {
     "name": "opBNB",
-    "rpc": "https://opbnb-mainnet-rpc.bnbchain.org"
+    "fallbackRpcUrl": "https://opbnb-mainnet-rpc.bnbchain.org",
+    "alchemyRpcUrl": null
   },
   "240": {
     "name": "Nexilix Smart Chain",
-    "rpc": "https://rpcurl.pos.nexilix.com"
+    "fallbackRpcUrl": "https://rpcurl.pos.nexilix.com",
+    "alchemyRpcUrl": null
   },
   "242": {
     "name": "Plinga",
-    "rpc": "https://rpcurl.mainnet.plgchain.com"
+    "fallbackRpcUrl": "https://rpcurl.mainnet.plgchain.com",
+    "alchemyRpcUrl": null
   },
   "248": {
     "name": "Oasys",
-    "rpc": "https://rpc.mainnet.oasys.games"
+    "fallbackRpcUrl": "https://rpc.mainnet.oasys.games",
+    "alchemyRpcUrl": null
   },
   "250": {
     "name": "Fantom",
-    "rpc": "https://rpc.ankr.com/fantom"
+    "fallbackRpcUrl": "https://rpc.ankr.com/fantom",
+    "alchemyRpcUrl": null
   },
   "252": {
     "name": "Fraxtal",
-    "rpc": "https://rpc.frax.com"
+    "fallbackRpcUrl": "https://rpc.frax.com",
+    "alchemyRpcUrl": null
   },
   "255": {
     "name": "Kroma",
-    "rpc": "https://api.kroma.network"
+    "fallbackRpcUrl": "https://api.kroma.network",
+    "alchemyRpcUrl": null
   },
   "260": {
     "name": "zkSync InMemory Node",
-    "rpc": "http://localhost:8011"
+    "fallbackRpcUrl": "http://localhost:8011",
+    "alchemyRpcUrl": null
   },
   "270": {
     "name": "zkSync CLI Local Node",
-    "rpc": "http://localhost:3050"
+    "fallbackRpcUrl": "http://localhost:3050",
+    "alchemyRpcUrl": null
   },
   "280": {
     "name": "zkSync Era Testnet",
-    "rpc": "https://testnet.era.zksync.dev"
+    "fallbackRpcUrl": "https://testnet.era.zksync.dev",
+    "alchemyRpcUrl": null
   },
   "288": {
     "name": "Boba Network",
-    "rpc": "https://mainnet.boba.network"
+    "fallbackRpcUrl": "https://mainnet.boba.network",
+    "alchemyRpcUrl": null
   },
   "295": {
     "name": "Hedera Mainnet",
-    "rpc": "https://mainnet.hashio.io/api"
+    "fallbackRpcUrl": "https://mainnet.hashio.io/api",
+    "alchemyRpcUrl": null
   },
   "296": {
     "name": "Hedera Testnet",
-    "rpc": "https://testnet.hashio.io/api"
+    "fallbackRpcUrl": "https://testnet.hashio.io/api",
+    "alchemyRpcUrl": null
   },
   "297": {
     "name": "Hedera Previewnet",
-    "rpc": "https://previewnet.hashio.io/api"
+    "fallbackRpcUrl": "https://previewnet.hashio.io/api",
+    "alchemyRpcUrl": null
   },
   "300": {
     "name": "zkSync Sepolia Testnet",
-    "rpc": "https://sepolia.era.zksync.dev"
+    "fallbackRpcUrl": "https://sepolia.era.zksync.dev",
+    "alchemyRpcUrl": null
   },
   "314": {
     "name": "Filecoin Mainnet",
-    "rpc": "https://api.node.glif.io/rpc/v1"
+    "fallbackRpcUrl": "https://api.node.glif.io/rpc/v1",
+    "alchemyRpcUrl": null
   },
   "321": {
     "name": "KCC Mainnet",
-    "rpc": "https://kcc-rpc.com"
+    "fallbackRpcUrl": "https://kcc-rpc.com",
+    "alchemyRpcUrl": null
   },
   "324": {
     "name": "zkSync Era",
-    "rpc": "https://mainnet.era.zksync.io"
+    "fallbackRpcUrl": "https://mainnet.era.zksync.io",
+    "alchemyRpcUrl": null
   },
   "338": {
     "name": "Cronos Testnet",
-    "rpc": "https://evm-t3.cronos.org"
+    "fallbackRpcUrl": "https://evm-t3.cronos.org",
+    "alchemyRpcUrl": null
   },
   "369": {
     "name": "PulseChain",
-    "rpc": "https://rpc.pulsechain.com"
+    "fallbackRpcUrl": "https://rpc.pulsechain.com",
+    "alchemyRpcUrl": null
   },
   "420": {
     "name": "Optimism Goerli",
-    "rpc": "https://goerli.optimism.io"
+    "fallbackRpcUrl": "https://goerli.optimism.io",
+    "alchemyRpcUrl": null
   },
   "424": {
     "name": "PGN",
-    "rpc": "https://rpc.publicgoods.network"
+    "fallbackRpcUrl": "https://rpc.publicgoods.network",
+    "alchemyRpcUrl": null
   },
   "462": {
     "name": "Areon Network Testnet",
-    "rpc": "https://testnet-rpc.areon.network"
+    "fallbackRpcUrl": "https://testnet-rpc.areon.network",
+    "alchemyRpcUrl": null
   },
   "463": {
     "name": "Areon Network",
-    "rpc": "https://mainnet-rpc.areon.network"
+    "fallbackRpcUrl": "https://mainnet-rpc.areon.network",
+    "alchemyRpcUrl": null
   },
   "545": {
     "name": "FlowEVM Testnet",
-    "rpc": "https://testnet.evm.nodes.onflow.org"
+    "fallbackRpcUrl": "https://testnet.evm.nodes.onflow.org",
+    "alchemyRpcUrl": null
   },
   "570": {
     "name": "Rollux Mainnet",
-    "rpc": "https://rpc.rollux.com"
+    "fallbackRpcUrl": "https://rpc.rollux.com",
+    "alchemyRpcUrl": null
   },
   "571": {
     "name": "MetaChain Mainnet",
-    "rpc": "https://rpc.metatime.com"
+    "fallbackRpcUrl": "https://rpc.metatime.com",
+    "alchemyRpcUrl": null
   },
   "592": {
     "name": "Astar",
-    "rpc": "https://astar.api.onfinality.io/public"
+    "fallbackRpcUrl": "https://astar.api.onfinality.io/public",
+    "alchemyRpcUrl": null
   },
   "595": {
     "name": "Mandala TC9",
-    "rpc": "https://eth-rpc-tc9.aca-staging.network"
+    "fallbackRpcUrl": "https://eth-rpc-tc9.aca-staging.network",
+    "alchemyRpcUrl": null
   },
   "599": {
     "name": "Metis Goerli",
-    "rpc": "https://goerli.gateway.metisdevops.link"
+    "fallbackRpcUrl": "https://goerli.gateway.metisdevops.link",
+    "alchemyRpcUrl": null
   },
   "646": {
     "name": "FlowEVM Previewnet",
-    "rpc": "https://previewnet.evm.nodes.onflow.org"
+    "fallbackRpcUrl": "https://previewnet.evm.nodes.onflow.org",
+    "alchemyRpcUrl": null
   },
   "686": {
     "name": "Karura",
-    "rpc": "https://eth-rpc-karura.aca-api.network"
+    "fallbackRpcUrl": "https://eth-rpc-karura.aca-api.network",
+    "alchemyRpcUrl": null
   },
   "690": {
     "name": "Redstone",
-    "rpc": "https://rpc.redstonechain.com"
+    "fallbackRpcUrl": "https://rpc.redstonechain.com",
+    "alchemyRpcUrl": null
   },
   "701": {
     "name": "Koi Network",
-    "rpc": "https://koi-rpc.darwinia.network"
+    "fallbackRpcUrl": "https://koi-rpc.darwinia.network",
+    "alchemyRpcUrl": null
   },
   "747": {
     "name": "FlowEVM Mainnet",
-    "rpc": "https://mainnet.evm.nodes.onflow.org"
+    "fallbackRpcUrl": "https://mainnet.evm.nodes.onflow.org",
+    "alchemyRpcUrl": null
   },
   "787": {
     "name": "Acala",
-    "rpc": "https://eth-rpc-acala.aca-api.network"
+    "fallbackRpcUrl": "https://eth-rpc-acala.aca-api.network",
+    "alchemyRpcUrl": null
   },
   "841": {
     "name": "Taraxa Mainnet",
-    "rpc": "https://rpc.mainnet.taraxa.io"
+    "fallbackRpcUrl": "https://rpc.mainnet.taraxa.io",
+    "alchemyRpcUrl": null
   },
   "842": {
     "name": "Taraxa Testnet",
-    "rpc": "https://rpc.testnet.taraxa.io"
+    "fallbackRpcUrl": "https://rpc.testnet.taraxa.io",
+    "alchemyRpcUrl": null
   },
   "919": {
     "name": "Mode Testnet",
-    "rpc": "https://sepolia.mode.network"
+    "fallbackRpcUrl": "https://sepolia.mode.network",
+    "alchemyRpcUrl": null
   },
   "943": {
     "name": "PulseChain V4",
-    "rpc": "https://rpc.v4.testnet.pulsechain.com"
+    "fallbackRpcUrl": "https://rpc.v4.testnet.pulsechain.com",
+    "alchemyRpcUrl": null
   },
   "957": {
     "name": "Lyra Chain",
-    "rpc": "https://rpc.lyra.finance"
+    "fallbackRpcUrl": "https://rpc.lyra.finance",
+    "alchemyRpcUrl": null
   },
   "997": {
     "name": "5ireChain Thunder Testnet",
-    "rpc": "https://rpc-testnet.5ire.network"
+    "fallbackRpcUrl": "https://rpc-testnet.5ire.network",
+    "alchemyRpcUrl": null
   },
   "999": {
     "name": "Zora Goerli Testnet",
-    "rpc": "https://testnet.rpc.zora.energy"
+    "fallbackRpcUrl": "https://testnet.rpc.zora.energy",
+    "alchemyRpcUrl": null
   },
   "1001": {
     "name": "Klaytn Baobab Testnet",
-    "rpc": "https://public-en-baobab.klaytn.net"
+    "fallbackRpcUrl": "https://public-en-baobab.klaytn.net",
+    "alchemyRpcUrl": null
   },
   "1004": {
     "name": "Ekta Testnet",
-    "rpc": "https://test.ekta.io:8545"
+    "fallbackRpcUrl": "https://test.ekta.io:8545",
+    "alchemyRpcUrl": null
   },
   "1017": {
     "name": "BNB Greenfield Chain",
-    "rpc": "https://greenfield-chain.bnbchain.org"
+    "fallbackRpcUrl": "https://greenfield-chain.bnbchain.org",
+    "alchemyRpcUrl": null
   },
   "1028": {
     "name": "BitTorrent Chain Testnet",
-    "rpc": "https://testrpc.bittorrentchain.io"
+    "fallbackRpcUrl": "https://testrpc.bittorrentchain.io",
+    "alchemyRpcUrl": null
   },
   "1030": {
     "name": "Conflux eSpace",
-    "rpc": "https://evm.confluxrpc.com"
+    "fallbackRpcUrl": "https://evm.confluxrpc.com",
+    "alchemyRpcUrl": null
   },
   "1038": {
     "name": "Bronos Testnet",
-    "rpc": "https://evm-testnet.bronos.org"
+    "fallbackRpcUrl": "https://evm-testnet.bronos.org",
+    "alchemyRpcUrl": null
   },
   "1039": {
     "name": "Bronos",
-    "rpc": "https://evm.bronos.org"
+    "fallbackRpcUrl": "https://evm.bronos.org",
+    "alchemyRpcUrl": null
   },
   "1073": {
     "name": "Shimmer Testnet",
-    "rpc": "https://json-rpc.evm.testnet.shimmer.network"
+    "fallbackRpcUrl": "https://json-rpc.evm.testnet.shimmer.network",
+    "alchemyRpcUrl": null
   },
   "1088": {
     "name": "Metis",
-    "rpc": "https://andromeda.metis.io/?owner=1088"
+    "fallbackRpcUrl": "https://andromeda.metis.io/?owner=1088",
+    "alchemyRpcUrl": null
   },
   "1101": {
     "name": "Polygon zkEVM",
-    "rpc": "https://zkevm-rpc.com"
+    "fallbackRpcUrl": "https://zkevm-rpc.com",
+    "alchemyRpcUrl": null
   },
   "1111": {
     "name": "WEMIX",
-    "rpc": "https://api.wemix.com"
+    "fallbackRpcUrl": "https://api.wemix.com",
+    "alchemyRpcUrl": null
   },
   "1112": {
     "name": "WEMIX Testnet",
-    "rpc": "https://api.test.wemix.com"
+    "fallbackRpcUrl": "https://api.test.wemix.com",
+    "alchemyRpcUrl": null
   },
   "1116": {
     "name": "Core Dao",
-    "rpc": "https://rpc.coredao.org"
+    "fallbackRpcUrl": "https://rpc.coredao.org",
+    "alchemyRpcUrl": null
   },
   "1130": {
     "name": "DeFiChain EVM Mainnet",
-    "rpc": "https://eth.mainnet.ocean.jellyfishsdk.com"
+    "fallbackRpcUrl": "https://eth.mainnet.ocean.jellyfishsdk.com",
+    "alchemyRpcUrl": null
   },
   "1131": {
     "name": "DeFiChain EVM Testnet",
-    "rpc": "https://eth.testnet.ocean.jellyfishsdk.com"
+    "fallbackRpcUrl": "https://eth.testnet.ocean.jellyfishsdk.com",
+    "alchemyRpcUrl": null
   },
   "1135": {
     "name": "Lisk",
-    "rpc": "https://rpc.api.lisk.com"
+    "fallbackRpcUrl": "https://rpc.api.lisk.com",
+    "alchemyRpcUrl": null
   },
   "1281": {
     "name": "Moonbeam Development Node",
-    "rpc": "http://127.0.0.1:9944"
+    "fallbackRpcUrl": "http://127.0.0.1:9944",
+    "alchemyRpcUrl": null
   },
   "1284": {
     "name": "Moonbeam",
-    "rpc": "https://moonbeam.public.blastapi.io"
+    "fallbackRpcUrl": "https://moonbeam.public.blastapi.io",
+    "alchemyRpcUrl": null
   },
   "1285": {
     "name": "Moonriver",
-    "rpc": "https://moonriver.public.blastapi.io"
+    "fallbackRpcUrl": "https://moonriver.public.blastapi.io",
+    "alchemyRpcUrl": null
   },
   "1287": {
     "name": "Moonbase Alpha",
-    "rpc": "https://rpc.api.moonbase.moonbeam.network"
+    "fallbackRpcUrl": "https://rpc.api.moonbase.moonbeam.network",
+    "alchemyRpcUrl": null
   },
   "1328": {
     "name": "Sei Testnet",
-    "rpc": "https://evm-rpc-testnet.sei-apis.com"
+    "fallbackRpcUrl": "https://evm-rpc-testnet.sei-apis.com",
+    "alchemyRpcUrl": null
   },
   "1329": {
     "name": "Sei Network",
-    "rpc": "https://evm-rpc.sei-apis.com/"
+    "fallbackRpcUrl": "https://evm-rpc.sei-apis.com/",
+    "alchemyRpcUrl": null
   },
   "1337": {
     "name": "Localhost",
-    "rpc": "http://127.0.0.1:8545"
+    "fallbackRpcUrl": "http://127.0.0.1:8545",
+    "alchemyRpcUrl": null
   },
   "1442": {
     "name": "Polygon zkEVM Testnet",
-    "rpc": "https://rpc.public.zkevm-test.net"
+    "fallbackRpcUrl": "https://rpc.public.zkevm-test.net",
+    "alchemyRpcUrl": null
   },
   "1453": {
     "name": "MetaChain Istanbul",
-    "rpc": "https://istanbul-rpc.metachain.dev"
+    "fallbackRpcUrl": "https://istanbul-rpc.metachain.dev",
+    "alchemyRpcUrl": null
   },
   "1559": {
     "name": "Tenet",
-    "rpc": "https://rpc.tenet.org"
+    "fallbackRpcUrl": "https://rpc.tenet.org",
+    "alchemyRpcUrl": null
   },
   "1663": {
     "name": "Horizen Gobi Testnet",
-    "rpc": "https://gobi-testnet.horizenlabs.io/ethv1"
+    "fallbackRpcUrl": "https://gobi-testnet.horizenlabs.io/ethv1",
+    "alchemyRpcUrl": null
   },
   "1686": {
     "name": "Mint Sepolia Testnet",
-    "rpc": "https://testnet-rpc.mintchain.io"
+    "fallbackRpcUrl": "https://testnet-rpc.mintchain.io",
+    "alchemyRpcUrl": null
   },
   "1729": {
     "name": "Reya Network",
-    "rpc": "https://rpc.reya.network"
+    "fallbackRpcUrl": "https://rpc.reya.network",
+    "alchemyRpcUrl": null
   },
   "1750": {
     "name": "Metal L2",
-    "rpc": "https://rpc.metall2.com"
+    "fallbackRpcUrl": "https://rpc.metall2.com",
+    "alchemyRpcUrl": null
   },
   "1890": {
     "name": "LightLink Phoenix Mainnet",
-    "rpc": "https://replicator.phoenix.lightlink.io/rpc/v1"
+    "fallbackRpcUrl": "https://replicator.phoenix.lightlink.io/rpc/v1",
+    "alchemyRpcUrl": null
   },
   "1891": {
     "name": "LightLink Pegasus Testnet",
-    "rpc": "https://replicator.pegasus.lightlink.io/rpc/v1"
+    "fallbackRpcUrl": "https://replicator.pegasus.lightlink.io/rpc/v1",
+    "alchemyRpcUrl": null
   },
   "1994": {
     "name": "Ekta",
-    "rpc": "https://main.ekta.io"
+    "fallbackRpcUrl": "https://main.ekta.io",
+    "alchemyRpcUrl": null
   },
   "2000": {
     "name": "Dogechain",
-    "rpc": "https://rpc.dogechain.dog"
+    "fallbackRpcUrl": "https://rpc.dogechain.dog",
+    "alchemyRpcUrl": null
   },
   "2017": {
     "name": "Telcoin Adiri Testnet",
-    "rpc": "https://rpc.telcoin.network"
+    "fallbackRpcUrl": "https://rpc.telcoin.network",
+    "alchemyRpcUrl": null
   },
   "2020": {
     "name": "Ronin",
-    "rpc": "https://api.roninchain.com/rpc"
+    "fallbackRpcUrl": "https://api.roninchain.com/rpc",
+    "alchemyRpcUrl": null
   },
   "2021": {
     "name": "Saigon Testnet",
-    "rpc": "https://saigon-testnet.roninchain.com/rpc"
+    "fallbackRpcUrl": "https://saigon-testnet.roninchain.com/rpc",
+    "alchemyRpcUrl": null
   },
   "2022": {
     "name": "Beresheet BereEVM Testnet",
-    "rpc": "https://beresheet-evm.jelliedowl.net"
+    "fallbackRpcUrl": "https://beresheet-evm.jelliedowl.net",
+    "alchemyRpcUrl": null
   },
   "2026": {
     "name": "Edgeless Network",
-    "rpc": "https://rpc.edgeless.network/http"
+    "fallbackRpcUrl": "https://rpc.edgeless.network/http",
+    "alchemyRpcUrl": null
   },
   "2221": {
     "name": "Kava EVM Testnet",
-    "rpc": "https://evm.testnet.kava.io"
+    "fallbackRpcUrl": "https://evm.testnet.kava.io",
+    "alchemyRpcUrl": null
   },
   "2222": {
     "name": "Kava EVM",
-    "rpc": "https://evm.kava.io"
+    "fallbackRpcUrl": "https://evm.kava.io",
+    "alchemyRpcUrl": null
   },
   "2331": {
     "name": "RSS3 VSL Sepolia Testnet",
-    "rpc": "https://rpc.testnet.rss3.io"
+    "fallbackRpcUrl": "https://rpc.testnet.rss3.io",
+    "alchemyRpcUrl": null
   },
   "2358": {
     "name": "Kroma Sepolia",
-    "rpc": "https://api.sepolia.kroma.network"
+    "fallbackRpcUrl": "https://api.sepolia.kroma.network",
+    "alchemyRpcUrl": null
   },
   "2442": {
     "name": "Polygon zkEVM Cardona",
-    "rpc": "https://rpc.cardona.zkevm-rpc.com"
+    "fallbackRpcUrl": "https://rpc.cardona.zkevm-rpc.com",
+    "alchemyRpcUrl": null
   },
   "2522": {
     "name": "Fraxtal Testnet",
-    "rpc": "https://rpc.testnet.frax.com"
+    "fallbackRpcUrl": "https://rpc.testnet.frax.com",
+    "alchemyRpcUrl": null
   },
   "2525": {
     "name": "inEVM Mainnet",
-    "rpc": "https://mainnet.rpc.inevm.com/http"
+    "fallbackRpcUrl": "https://mainnet.rpc.inevm.com/http",
+    "alchemyRpcUrl": null
   },
   "2710": {
     "name": "Morph Sepolia",
-    "rpc": "https://rpc-testnet.morphl2.io"
+    "fallbackRpcUrl": "https://rpc-testnet.morphl2.io",
+    "alchemyRpcUrl": null
   },
   "2730": {
     "name": "XR Sepolia",
-    "rpc": "https://xr-sepolia-testnet.rpc.caldera.xyz/http"
+    "fallbackRpcUrl": "https://xr-sepolia-testnet.rpc.caldera.xyz/http",
+    "alchemyRpcUrl": null
   },
   "2810": {
     "name": "Morph Holesky",
-    "rpc": "https://rpc-quicknode-holesky.morphl2.io"
+    "fallbackRpcUrl": "https://rpc-quicknode-holesky.morphl2.io",
+    "alchemyRpcUrl": null
   },
   "3109": {
     "name": "SatoshiVM Alpha Mainnet",
-    "rpc": "https://alpha-rpc-node-http.svmscan.io"
+    "fallbackRpcUrl": "https://alpha-rpc-node-http.svmscan.io",
+    "alchemyRpcUrl": null
   },
   "3110": {
     "name": "SatoshiVM Testnet",
-    "rpc": "https://test-rpc-node-http.svmscan.io"
+    "fallbackRpcUrl": "https://test-rpc-node-http.svmscan.io",
+    "alchemyRpcUrl": null
   },
   "3141": {
     "name": "Filecoin Hyperspace",
-    "rpc": "https://api.hyperspace.node.glif.io/rpc/v1"
+    "fallbackRpcUrl": "https://api.hyperspace.node.glif.io/rpc/v1",
+    "alchemyRpcUrl": null
   },
   "3737": {
     "name": "Crossbell",
-    "rpc": "https://rpc.crossbell.io"
+    "fallbackRpcUrl": "https://rpc.crossbell.io",
+    "alchemyRpcUrl": null
   },
   "3776": {
     "name": "Astar zkEVM",
-    "rpc": "https://rpc.startale.com/astar-zkevm"
+    "fallbackRpcUrl": "https://rpc.startale.com/astar-zkevm",
+    "alchemyRpcUrl": null
   },
   "3993": {
     "name": "APEX Testnet",
-    "rpc": "https://rpc-testnet.apexlayer.xyz"
+    "fallbackRpcUrl": "https://rpc-testnet.apexlayer.xyz",
+    "alchemyRpcUrl": null
   },
   "4002": {
     "name": "Fantom Testnet",
-    "rpc": "https://rpc.testnet.fantom.network"
+    "fallbackRpcUrl": "https://rpc.testnet.fantom.network",
+    "alchemyRpcUrl": null
   },
   "4090": {
     "name": "Oasis Testnet",
-    "rpc": "https://rpc1.oasis.bahamutchain.com"
+    "fallbackRpcUrl": "https://rpc1.oasis.bahamutchain.com",
+    "alchemyRpcUrl": null
   },
   "4200": {
     "name": "Merlin",
-    "rpc": "https://rpc.merlinchain.io"
+    "fallbackRpcUrl": "https://rpc.merlinchain.io",
+    "alchemyRpcUrl": null
   },
   "4201": {
     "name": "LUKSO Testnet",
-    "rpc": "https://rpc.testnet.lukso.network"
+    "fallbackRpcUrl": "https://rpc.testnet.lukso.network",
+    "alchemyRpcUrl": null
   },
   "4202": {
     "name": "Lisk Sepolia",
-    "rpc": "https://rpc.sepolia-api.lisk.com"
+    "fallbackRpcUrl": "https://rpc.sepolia-api.lisk.com",
+    "alchemyRpcUrl": null
   },
   "4242": {
     "name": "Nexi",
-    "rpc": "https://rpc.chain.nexi.technology"
+    "fallbackRpcUrl": "https://rpc.chain.nexi.technology",
+    "alchemyRpcUrl": null
   },
   "4337": {
     "name": "Beam",
-    "rpc": "https://build.onbeam.com/rpc"
+    "fallbackRpcUrl": "https://build.onbeam.com/rpc",
+    "alchemyRpcUrl": null
   },
   "4689": {
     "name": "IoTeX",
-    "rpc": "https://babel-api.mainnet.iotex.io"
+    "fallbackRpcUrl": "https://babel-api.mainnet.iotex.io",
+    "alchemyRpcUrl": null
   },
   "4690": {
     "name": "IoTeX Testnet",
-    "rpc": "https://babel-api.testnet.iotex.io"
+    "fallbackRpcUrl": "https://babel-api.testnet.iotex.io",
+    "alchemyRpcUrl": null
   },
   "4759": {
     "name": "MEVerse Chain Testnet",
-    "rpc": "https://rpc.meversetestnet.io"
+    "fallbackRpcUrl": "https://rpc.meversetestnet.io",
+    "alchemyRpcUrl": null
   },
   "4777": {
     "name": "BlackFort Exchange Network Testnet",
-    "rpc": "https://testnet.blackfort.network/rpc"
+    "fallbackRpcUrl": "https://testnet.blackfort.network/rpc",
+    "alchemyRpcUrl": null
   },
   "4999": {
     "name": "BlackFort Exchange Network",
-    "rpc": "https://mainnet.blackfort.network/rpc"
+    "fallbackRpcUrl": "https://mainnet.blackfort.network/rpc",
+    "alchemyRpcUrl": null
   },
   "5000": {
     "name": "Mantle",
-    "rpc": "https://rpc.mantle.xyz"
+    "fallbackRpcUrl": "https://rpc.mantle.xyz",
+    "alchemyRpcUrl": null
   },
   "5001": {
     "name": "Mantle Testnet",
-    "rpc": "https://rpc.testnet.mantle.xyz"
+    "fallbackRpcUrl": "https://rpc.testnet.mantle.xyz",
+    "alchemyRpcUrl": null
   },
   "5003": {
     "name": "Mantle Sepolia Testnet",
-    "rpc": "https://rpc.sepolia.mantle.xyz"
+    "fallbackRpcUrl": "https://rpc.sepolia.mantle.xyz",
+    "alchemyRpcUrl": null
   },
   "5112": {
     "name": "Ham",
-    "rpc": "https://rpc.ham.fun"
+    "fallbackRpcUrl": "https://rpc.ham.fun",
+    "alchemyRpcUrl": null
   },
   "5611": {
     "name": "opBNB Testnet",
-    "rpc": "https://opbnb-testnet-rpc.bnbchain.org"
+    "fallbackRpcUrl": "https://opbnb-testnet-rpc.bnbchain.org",
+    "alchemyRpcUrl": null
   },
   "5700": {
     "name": "Syscoin Tanenbaum Testnet",
-    "rpc": "https://rpc.tanenbaum.io"
+    "fallbackRpcUrl": "https://rpc.tanenbaum.io",
+    "alchemyRpcUrl": null
   },
   "7000": {
     "name": "ZetaChain",
-    "rpc": "https://zetachain-evm.blockpi.network/v1/rpc/public"
+    "fallbackRpcUrl": "https://zetachain-evm.blockpi.network/v1/rpc/public",
+    "alchemyRpcUrl": null
   },
   "7001": {
     "name": "ZetaChain Athens Testnet",
-    "rpc": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+    "fallbackRpcUrl": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+    "alchemyRpcUrl": null
   },
   "7332": {
     "name": "Horizen EON",
-    "rpc": "https://eon-rpc.horizenlabs.io/ethv1"
+    "fallbackRpcUrl": "https://eon-rpc.horizenlabs.io/ethv1",
+    "alchemyRpcUrl": null
   },
   "7518": {
     "name": "MEVerse Chain Mainnet",
-    "rpc": "https://rpc.meversemainnet.io"
+    "fallbackRpcUrl": "https://rpc.meversemainnet.io",
+    "alchemyRpcUrl": null
   },
   "7560": {
     "name": "Cyber",
-    "rpc": "https://cyber.alt.technology"
+    "fallbackRpcUrl": "https://cyber.alt.technology",
+    "alchemyRpcUrl": null
   },
   "7700": {
     "name": "Canto",
-    "rpc": "https://canto.gravitychain.io"
+    "fallbackRpcUrl": "https://canto.gravitychain.io",
+    "alchemyRpcUrl": null
   },
   "8082": {
     "name": "Shardeum Sphinx",
-    "rpc": "https://sphinx.shardeum.org"
+    "fallbackRpcUrl": "https://sphinx.shardeum.org",
+    "alchemyRpcUrl": null
   },
   "8217": {
     "name": "Klaytn",
-    "rpc": "https://public-en-cypress.klaytn.net"
+    "fallbackRpcUrl": "https://public-en-cypress.klaytn.net",
+    "alchemyRpcUrl": null
   },
   "8453": {
     "name": "Base",
-    "rpc": "https://mainnet.base.org"
+    "fallbackRpcUrl": "https://mainnet.base.org",
+    "alchemyRpcUrl": "https://base-mainnet.g.alchemy.com/v2"
   },
   "8899": {
     "name": "JIBCHAIN L1",
-    "rpc": "https://rpc-l1.jibchain.net"
+    "fallbackRpcUrl": "https://rpc-l1.jibchain.net",
+    "alchemyRpcUrl": null
   },
   "9000": {
     "name": "Evmos Testnet",
-    "rpc": "https://eth.bd.evmos.dev:8545"
+    "fallbackRpcUrl": "https://eth.bd.evmos.dev:8545",
+    "alchemyRpcUrl": null
   },
   "9001": {
     "name": "Evmos",
-    "rpc": "https://eth.bd.evmos.org:8545"
+    "fallbackRpcUrl": "https://eth.bd.evmos.org:8545",
+    "alchemyRpcUrl": null
   },
   "9700": {
     "name": "OORT MainnetDev",
-    "rpc": "https://dev-rpc.oortech.com"
+    "fallbackRpcUrl": "https://dev-rpc.oortech.com",
+    "alchemyRpcUrl": null
   },
   "10200": {
     "name": "Gnosis Chiado",
-    "rpc": "https://rpc.chiadochain.net"
+    "fallbackRpcUrl": "https://rpc.chiadochain.net",
+    "alchemyRpcUrl": null
   },
   "11235": {
     "name": "HAQQ Mainnet",
-    "rpc": "https://rpc.eth.haqq.network"
+    "fallbackRpcUrl": "https://rpc.eth.haqq.network",
+    "alchemyRpcUrl": null
   },
   "11501": {
     "name": "BEVM Mainnet",
-    "rpc": "https://rpc-mainnet-1.bevm.io"
+    "fallbackRpcUrl": "https://rpc-mainnet-1.bevm.io",
+    "alchemyRpcUrl": null
   },
   "11822": {
     "name": "Artela Testnet",
-    "rpc": "https://betanet-rpc1.artela.network"
+    "fallbackRpcUrl": "https://betanet-rpc1.artela.network",
+    "alchemyRpcUrl": null
   },
   "12306": {
     "name": "Fibo Chain",
-    "rpc": "https://network.hzroc.art"
+    "fallbackRpcUrl": "https://network.hzroc.art",
+    "alchemyRpcUrl": null
   },
   "12324": {
     "name": "L3X Protocol",
-    "rpc": "https://rpc-mainnet.l3x.com"
+    "fallbackRpcUrl": "https://rpc-mainnet.l3x.com",
+    "alchemyRpcUrl": null
   },
   "12325": {
     "name": "L3X Protocol Testnet",
-    "rpc": "https://rpc-testnet.l3x.com"
+    "fallbackRpcUrl": "https://rpc-testnet.l3x.com",
+    "alchemyRpcUrl": null
   },
   "12553": {
     "name": "RSS3 VSL Mainnet",
-    "rpc": "https://rpc.rss3.io"
+    "fallbackRpcUrl": "https://rpc.rss3.io",
+    "alchemyRpcUrl": null
   },
   "13337": {
     "name": "Beam Testnet",
-    "rpc": "https://build.onbeam.com/rpc/testnet"
+    "fallbackRpcUrl": "https://build.onbeam.com/rpc/testnet",
+    "alchemyRpcUrl": null
   },
   "13371": {
     "name": "Immutable zkEVM",
-    "rpc": "https://rpc.immutable.com"
+    "fallbackRpcUrl": "https://rpc.immutable.com",
+    "alchemyRpcUrl": null
   },
   "13381": {
     "name": "Phoenix Blockchain",
-    "rpc": "https://rpc.phoenixplorer.com"
+    "fallbackRpcUrl": "https://rpc.phoenixplorer.com",
+    "alchemyRpcUrl": null
   },
   "13473": {
     "name": "Immutable zkEVM Testnet",
-    "rpc": "https://rpc.testnet.immutable.com"
+    "fallbackRpcUrl": "https://rpc.testnet.immutable.com",
+    "alchemyRpcUrl": null
   },
   "15557": {
     "name": "EOS EVM Testnet",
-    "rpc": "https://api.testnet.evm.eosnetwork.com"
+    "fallbackRpcUrl": "https://api.testnet.evm.eosnetwork.com",
+    "alchemyRpcUrl": null
   },
   "17000": {
     "name": "Holesky",
-    "rpc": "https://ethereum-holesky-rpc.publicnode.com"
+    "fallbackRpcUrl": "https://ethereum-holesky-rpc.publicnode.com",
+    "alchemyRpcUrl": null
   },
   "17777": {
     "name": "EOS EVM",
-    "rpc": "https://api.evm.eosnetwork.com"
+    "fallbackRpcUrl": "https://api.evm.eosnetwork.com",
+    "alchemyRpcUrl": null
   },
   "18233": {
     "name": "Unreal",
-    "rpc": "https://rpc.unreal-orbit.gelato.digital"
+    "fallbackRpcUrl": "https://rpc.unreal-orbit.gelato.digital",
+    "alchemyRpcUrl": null
   },
   "22222": {
     "name": "Nautilus Mainnet",
-    "rpc": "https://api.nautilus.nautchain.xyz"
+    "fallbackRpcUrl": "https://api.nautilus.nautchain.xyz",
+    "alchemyRpcUrl": null
   },
   "23294": {
     "name": "Oasis Sapphire",
-    "rpc": "https://sapphire.oasis.io"
+    "fallbackRpcUrl": "https://sapphire.oasis.io",
+    "alchemyRpcUrl": null
   },
   "23295": {
     "name": "Oasis Sapphire Testnet",
-    "rpc": "https://testnet.sapphire.oasis.dev"
+    "fallbackRpcUrl": "https://testnet.sapphire.oasis.dev",
+    "alchemyRpcUrl": null
   },
   "23451": {
     "name": "DreyerX Mainnet",
-    "rpc": "https://rpc.dreyerx.com"
+    "fallbackRpcUrl": "https://rpc.dreyerx.com",
+    "alchemyRpcUrl": null
+  },
+  "23452": {
+    "name": "DreyerX Testnet",
+    "fallbackRpcUrl": "http://testnet-rpc.dreyerx.com",
+    "alchemyRpcUrl": null
   },
   "25925": {
     "name": "Bitkub Testnet",
-    "rpc": "https://rpc-testnet.bitkubchain.io"
+    "fallbackRpcUrl": "https://rpc-testnet.bitkubchain.io",
+    "alchemyRpcUrl": null
   },
   "31337": {
     "name": "Hardhat",
-    "rpc": "http://127.0.0.1:8545"
+    "fallbackRpcUrl": "http://127.0.0.1:8545",
+    "alchemyRpcUrl": null
   },
   "32769": {
     "name": "Zilliqa",
-    "rpc": "https://api.zilliqa.com"
+    "fallbackRpcUrl": "https://api.zilliqa.com",
+    "alchemyRpcUrl": null
   },
   "33101": {
     "name": "Zilliqa Testnet",
-    "rpc": "https://dev-api.zilliqa.com"
+    "fallbackRpcUrl": "https://dev-api.zilliqa.com",
+    "alchemyRpcUrl": null
   },
   "34443": {
     "name": "Mode Mainnet",
-    "rpc": "https://mainnet.mode.network"
+    "fallbackRpcUrl": "https://mainnet.mode.network",
+    "alchemyRpcUrl": null
   },
   "35441": {
     "name": "Q Mainnet",
-    "rpc": "https://rpc.q.org"
+    "fallbackRpcUrl": "https://rpc.q.org",
+    "alchemyRpcUrl": null
   },
   "35443": {
     "name": "Q Testnet",
-    "rpc": "https://rpc.qtestnet.org"
+    "fallbackRpcUrl": "https://rpc.qtestnet.org",
+    "alchemyRpcUrl": null
   },
   "42161": {
     "name": "Arbitrum One",
-    "rpc": "https://arb1.arbitrum.io/rpc"
+    "fallbackRpcUrl": "https://arb1.arbitrum.io/rpc",
+    "alchemyRpcUrl": "https://arb-mainnet.g.alchemy.com/v2"
   },
   "42170": {
     "name": "Arbitrum Nova",
-    "rpc": "https://nova.arbitrum.io/rpc"
+    "fallbackRpcUrl": "https://nova.arbitrum.io/rpc",
+    "alchemyRpcUrl": null
   },
   "42220": {
     "name": "Celo",
-    "rpc": "https://forno.celo.org"
+    "fallbackRpcUrl": "https://forno.celo.org",
+    "alchemyRpcUrl": null
   },
   "42766": {
     "name": "ZKFair Mainnet",
-    "rpc": "https://rpc.zkfair.io"
+    "fallbackRpcUrl": "https://rpc.zkfair.io",
+    "alchemyRpcUrl": null
   },
   "42793": {
     "name": "Etherlink",
-    "rpc": "https://node.mainnet.etherlink.com"
+    "fallbackRpcUrl": "https://node.mainnet.etherlink.com",
+    "alchemyRpcUrl": null
   },
   "43113": {
     "name": "Avalanche Fuji",
-    "rpc": "https://api.avax-test.network/ext/bc/C/rpc"
+    "fallbackRpcUrl": "https://api.avax-test.network/ext/bc/C/rpc",
+    "alchemyRpcUrl": null
   },
   "43114": {
     "name": "Avalanche",
-    "rpc": "https://api.avax.network/ext/bc/C/rpc"
+    "fallbackRpcUrl": "https://api.avax.network/ext/bc/C/rpc",
+    "alchemyRpcUrl": null
   },
   "43851": {
     "name": "ZKFair Testnet",
-    "rpc": "https://testnet-rpc.zkfair.io"
+    "fallbackRpcUrl": "https://testnet-rpc.zkfair.io",
+    "alchemyRpcUrl": null
   },
   "44787": {
     "name": "Alfajores",
-    "rpc": "https://alfajores-forno.celo-testnet.org"
+    "fallbackRpcUrl": "https://alfajores-forno.celo-testnet.org",
+    "alchemyRpcUrl": null
   },
   "48899": {
     "name": "Zircuit Testnet",
-    "rpc": "https://zircuit1.p2pify.com"
+    "fallbackRpcUrl": "https://zircuit1.p2pify.com",
+    "alchemyRpcUrl": null
   },
   "50005": {
     "name": "Yooldo Verse",
-    "rpc": "https://rpc.yooldo-verse.xyz"
+    "fallbackRpcUrl": "https://rpc.yooldo-verse.xyz",
+    "alchemyRpcUrl": null
   },
   "50006": {
     "name": "Yooldo Verse Testnet",
-    "rpc": "https://rpc.testnet.yooldo-verse.xyz"
+    "fallbackRpcUrl": "https://rpc.testnet.yooldo-verse.xyz",
+    "alchemyRpcUrl": null
   },
   "53457": {
     "name": "DODOchain Testnet",
-    "rpc": "https://dodochain-testnet.alt.technology"
+    "fallbackRpcUrl": "https://dodochain-testnet.alt.technology",
+    "alchemyRpcUrl": null
   },
   "53935": {
     "name": "DFK Chain",
-    "rpc": "https://subnets.avax.network/defi-kingdoms/dfk-chain/rpc"
+    "fallbackRpcUrl": "https://subnets.avax.network/defi-kingdoms/dfk-chain/rpc",
+    "alchemyRpcUrl": null
   },
   "54211": {
     "name": "HAQQ Testedge 2",
-    "rpc": "https://rpc.eth.testedge2.haqq.network"
+    "fallbackRpcUrl": "https://rpc.eth.testedge2.haqq.network",
+    "alchemyRpcUrl": null
   },
   "57000": {
     "name": "Rollux Testnet",
-    "rpc": "https://rpc-tanenbaum.rollux.com/"
+    "fallbackRpcUrl": "https://rpc-tanenbaum.rollux.com/",
+    "alchemyRpcUrl": null
   },
   "58008": {
     "name": "PGN ",
-    "rpc": "https://sepolia.publicgoods.network"
+    "fallbackRpcUrl": "https://sepolia.publicgoods.network",
+    "alchemyRpcUrl": null
   },
   "59140": {
     "name": "Linea Goerli Testnet",
-    "rpc": "https://rpc.goerli.linea.build"
+    "fallbackRpcUrl": "https://rpc.goerli.linea.build",
+    "alchemyRpcUrl": null
   },
   "59141": {
     "name": "Linea Sepolia Testnet",
-    "rpc": "https://rpc.sepolia.linea.build"
+    "fallbackRpcUrl": "https://rpc.sepolia.linea.build",
+    "alchemyRpcUrl": null
   },
   "59144": {
     "name": "Linea Mainnet",
-    "rpc": "https://rpc.linea.build"
+    "fallbackRpcUrl": "https://rpc.linea.build",
+    "alchemyRpcUrl": null
   },
   "60808": {
     "name": "BOB",
-    "rpc": "https://rpc.gobob.xyz"
+    "fallbackRpcUrl": "https://rpc.gobob.xyz",
+    "alchemyRpcUrl": null
   },
   "64240": {
     "name": "Fantom Sonic Open Testnet",
-    "rpc": "https://rpcapi.sonic.fantom.network"
+    "fallbackRpcUrl": "https://rpcapi.sonic.fantom.network",
+    "alchemyRpcUrl": null
   },
   "80001": {
     "name": "Polygon Mumbai",
-    "rpc": "https://rpc.ankr.com/polygon_mumbai"
+    "fallbackRpcUrl": "https://rpc.ankr.com/polygon_mumbai",
+    "alchemyRpcUrl": null
   },
   "80002": {
     "name": "Polygon Amoy",
-    "rpc": "https://rpc-amoy.polygon.technology"
+    "fallbackRpcUrl": "https://rpc-amoy.polygon.technology",
+    "alchemyRpcUrl": "https://polygon-mumbai.g.alchemy.com/v2"
   },
   "80084": {
     "name": "Berachain bArtio",
-    "rpc": "https://bartio.rpc.berachain.com"
+    "fallbackRpcUrl": "https://bartio.rpc.berachain.com",
+    "alchemyRpcUrl": null
   },
   "80085": {
     "name": "Berachain Artio",
-    "rpc": "https://artio.rpc.berachain.com"
+    "fallbackRpcUrl": "https://artio.rpc.berachain.com",
+    "alchemyRpcUrl": null
   },
   "81457": {
     "name": "Blast",
-    "rpc": "https://rpc.blast.io"
+    "fallbackRpcUrl": "https://rpc.blast.io",
+    "alchemyRpcUrl": null
   },
   "84531": {
     "name": "Base Goerli",
-    "rpc": "https://goerli.base.org"
+    "fallbackRpcUrl": "https://goerli.base.org",
+    "alchemyRpcUrl": null
   },
   "84532": {
     "name": "Base Sepolia",
-    "rpc": "https://sepolia.base.org"
+    "fallbackRpcUrl": "https://sepolia.base.org",
+    "alchemyRpcUrl": "https://base-sepolia.g.alchemy.com/v2"
   },
   "88991": {
     "name": "Jibchain Testnet",
-    "rpc": "https://rpc.testnet.jibchain.net"
+    "fallbackRpcUrl": "https://rpc.testnet.jibchain.net",
+    "alchemyRpcUrl": null
   },
   "100009": {
     "name": "Vechain",
-    "rpc": "https://mainnet.vechain.org"
+    "fallbackRpcUrl": "https://mainnet.vechain.org",
+    "alchemyRpcUrl": null
   },
   "105105": {
     "name": "Stratis Mainnet",
-    "rpc": "https://rpc.stratisevm.com"
+    "fallbackRpcUrl": "https://rpc.stratisevm.com",
+    "alchemyRpcUrl": null
   },
   "111188": {
     "name": "re.al",
-    "rpc": "https://real.drpc.org"
+    "fallbackRpcUrl": "https://real.drpc.org",
+    "alchemyRpcUrl": null
   },
   "128123": {
     "name": "Etherlink Testnet",
-    "rpc": "https://node.ghostnet.etherlink.com"
+    "fallbackRpcUrl": "https://node.ghostnet.etherlink.com",
+    "alchemyRpcUrl": null
   },
   "167000": {
     "name": "Taiko Mainnet",
-    "rpc": "https://rpc.mainnet.taiko.xyz"
+    "fallbackRpcUrl": "https://rpc.mainnet.taiko.xyz",
+    "alchemyRpcUrl": null
   },
   "167005": {
     "name": "Taiko (Alpha-3 Testnet)",
-    "rpc": "https://rpc.test.taiko.xyz"
+    "fallbackRpcUrl": "https://rpc.test.taiko.xyz",
+    "alchemyRpcUrl": null
   },
   "167007": {
     "name": "Taiko Jolnir (Alpha-5 Testnet)",
-    "rpc": "https://rpc.jolnir.taiko.xyz"
+    "fallbackRpcUrl": "https://rpc.jolnir.taiko.xyz",
+    "alchemyRpcUrl": null
   },
   "167008": {
     "name": "Taiko Katla (Alpha-6 Testnet)",
-    "rpc": "https://rpc.katla.taiko.xyz"
+    "fallbackRpcUrl": "https://rpc.katla.taiko.xyz",
+    "alchemyRpcUrl": null
   },
   "167009": {
     "name": "Taiko Hekla L2",
-    "rpc": "https://rpc.hekla.taiko.xyz"
+    "fallbackRpcUrl": "https://rpc.hekla.taiko.xyz",
+    "alchemyRpcUrl": null
   },
   "200810": {
     "name": "Bitlayer Testnet",
-    "rpc": "https://testnet-rpc.bitlayer.org"
+    "fallbackRpcUrl": "https://testnet-rpc.bitlayer.org",
+    "alchemyRpcUrl": null
   },
   "205205": {
     "name": "Auroria Testnet",
-    "rpc": "https://auroria.rpc.stratisevm.com"
+    "fallbackRpcUrl": "https://auroria.rpc.stratisevm.com",
+    "alchemyRpcUrl": null
   },
   "314159": {
     "name": "Filecoin Calibration",
-    "rpc": "https://api.calibration.node.glif.io/rpc/v1"
+    "fallbackRpcUrl": "https://api.calibration.node.glif.io/rpc/v1",
+    "alchemyRpcUrl": null
   },
   "421613": {
     "name": "Arbitrum Goerli",
-    "rpc": "https://goerli-rollup.arbitrum.io/rpc"
+    "fallbackRpcUrl": "https://goerli-rollup.arbitrum.io/rpc",
+    "alchemyRpcUrl": null
   },
   "421614": {
     "name": "Arbitrum Sepolia",
-    "rpc": "https://sepolia-rollup.arbitrum.io/rpc"
+    "fallbackRpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
+    "alchemyRpcUrl": "https://arb-sepolia.g.alchemy.com/v2"
   },
   "534351": {
     "name": "Scroll Sepolia",
-    "rpc": "https://sepolia-rpc.scroll.io"
+    "fallbackRpcUrl": "https://sepolia-rpc.scroll.io",
+    "alchemyRpcUrl": null
   },
   "534352": {
     "name": "Scroll",
-    "rpc": "https://rpc.scroll.io"
+    "fallbackRpcUrl": "https://rpc.scroll.io",
+    "alchemyRpcUrl": null
   },
   "641230": {
     "name": "Bear Network Chain Mainnet",
-    "rpc": "https://brnkc-mainnet.bearnetwork.net"
+    "fallbackRpcUrl": "https://brnkc-mainnet.bearnetwork.net",
+    "alchemyRpcUrl": null
   },
   "660279": {
     "name": "Xai Mainnet",
-    "rpc": "https://xai-chain.net/rpc"
+    "fallbackRpcUrl": "https://xai-chain.net/rpc",
+    "alchemyRpcUrl": null
   },
   "713715": {
     "name": "Sei Devnet",
-    "rpc": "https://evm-rpc-arctic-1.sei-apis.com"
+    "fallbackRpcUrl": "https://evm-rpc-arctic-1.sei-apis.com",
+    "alchemyRpcUrl": null
   },
   "751230": {
     "name": "Bear Network Chain Testnet",
-    "rpc": "https://brnkc-test.bearnetwork.net"
+    "fallbackRpcUrl": "https://brnkc-test.bearnetwork.net",
+    "alchemyRpcUrl": null
   },
   "810180": {
     "name": "zkLink Nova",
-    "rpc": "https://rpc.zklink.io"
+    "fallbackRpcUrl": "https://rpc.zklink.io",
+    "alchemyRpcUrl": null
   },
   "810181": {
     "name": "zkLink Nova Sepolia Testnet",
-    "rpc": "https://sepolia.rpc.zklink.io"
+    "fallbackRpcUrl": "https://sepolia.rpc.zklink.io",
+    "alchemyRpcUrl": null
   },
   "1337803": {
     "name": "Zhejiang",
-    "rpc": "https://rpc.zhejiang.ethpandaops.io"
+    "fallbackRpcUrl": "https://rpc.zhejiang.ethpandaops.io",
+    "alchemyRpcUrl": null
   },
   "1612127": {
     "name": "PlayFi Albireo Testnet",
-    "rpc": "https://albireo-rpc.playfi.ai"
+    "fallbackRpcUrl": "https://albireo-rpc.playfi.ai",
+    "alchemyRpcUrl": null
   },
   "3397901": {
     "name": "Funki Sepolia Sandbox",
-    "rpc": "https://funki-testnet.alt.technology"
+    "fallbackRpcUrl": "https://funki-testnet.alt.technology",
+    "alchemyRpcUrl": null
   },
   "3441005": {
     "name": "Manta Pacific Testnet",
-    "rpc": "https://manta-testnet.calderachain.xyz/http"
+    "fallbackRpcUrl": "https://manta-testnet.calderachain.xyz/http",
+    "alchemyRpcUrl": null
   },
   "3441006": {
     "name": "Manta Pacific Sepolia Testnet",
-    "rpc": "https://pacific-rpc.sepolia-testnet.manta.network/http"
+    "fallbackRpcUrl": "https://pacific-rpc.sepolia-testnet.manta.network/http",
+    "alchemyRpcUrl": null
   },
   "6038361": {
     "name": "Astar zkEVM Testnet zKyoto",
-    "rpc": "https://rpc.startale.com/zkyoto"
+    "fallbackRpcUrl": "https://rpc.startale.com/zkyoto",
+    "alchemyRpcUrl": null
   },
   "7777777": {
     "name": "Zora",
-    "rpc": "https://rpc.zora.energy"
+    "fallbackRpcUrl": "https://rpc.zora.energy",
+    "alchemyRpcUrl": null
   },
   "11155111": {
     "name": "Sepolia",
-    "rpc": "https://rpc.sepolia.org"
+    "fallbackRpcUrl": "https://rpc.sepolia.org",
+    "alchemyRpcUrl": "https://eth-sepolia.g.alchemy.com/v2"
   },
   "11155420": {
     "name": "OP Sepolia",
-    "rpc": "https://sepolia.optimism.io"
+    "fallbackRpcUrl": "https://sepolia.optimism.io",
+    "alchemyRpcUrl": "https://opt-sepolia.g.alchemy.com/v2"
   },
   "28122024": {
     "name": "Ancient8 Testnet",
-    "rpc": "https://rpcv2-testnet.ancient8.gg"
+    "fallbackRpcUrl": "https://rpcv2-testnet.ancient8.gg",
+    "alchemyRpcUrl": null
   },
   "41144114": {
     "name": "Otim Devnet",
-    "rpc": "http://devnet.otim.xyz"
+    "fallbackRpcUrl": "http://devnet.otim.xyz",
+    "alchemyRpcUrl": null
   },
   "111557560": {
     "name": "Cyber Testnet",
-    "rpc": "https://cyber-testnet.alt.technology"
+    "fallbackRpcUrl": "https://cyber-testnet.alt.technology",
+    "alchemyRpcUrl": null
   },
   "161221135": {
     "name": "Plume Testnet",
-    "rpc": "https://testnet-rpc.plumenetwork.xyz/http"
+    "fallbackRpcUrl": "https://testnet-rpc.plumenetwork.xyz/http",
+    "alchemyRpcUrl": null
   },
   "168587773": {
     "name": "Blast Sepolia",
-    "rpc": "https://sepolia.blast.io"
+    "fallbackRpcUrl": "https://sepolia.blast.io",
+    "alchemyRpcUrl": null
   },
   "245022926": {
     "name": "Neon EVM DevNet",
-    "rpc": "https://devnet.neonevm.org"
+    "fallbackRpcUrl": "https://devnet.neonevm.org",
+    "alchemyRpcUrl": null
   },
   "245022934": {
     "name": "Neon EVM MainNet",
-    "rpc": "https://neon-proxy-mainnet.solana.p2p.org"
+    "fallbackRpcUrl": "https://neon-proxy-mainnet.solana.p2p.org",
+    "alchemyRpcUrl": null
   },
   "666666666": {
     "name": "Degen",
-    "rpc": "https://rpc.degen.tips"
+    "fallbackRpcUrl": "https://rpc.degen.tips",
+    "alchemyRpcUrl": null
   },
   "888888888": {
     "name": "Ancient8",
-    "rpc": "https://rpc.ancient8.gg"
+    "fallbackRpcUrl": "https://rpc.ancient8.gg",
+    "alchemyRpcUrl": null
   },
   "999999999": {
     "name": "Zora Sepolia",
-    "rpc": "https://sepolia.rpc.zora.energy"
+    "fallbackRpcUrl": "https://sepolia.rpc.zora.energy",
+    "alchemyRpcUrl": null
   },
   "1313161554": {
     "name": "Aurora",
-    "rpc": "https://mainnet.aurora.dev"
+    "fallbackRpcUrl": "https://mainnet.aurora.dev",
+    "alchemyRpcUrl": null
   },
   "1313161555": {
     "name": "Aurora Testnet",
-    "rpc": "https://testnet.aurora.dev"
+    "fallbackRpcUrl": "https://testnet.aurora.dev",
+    "alchemyRpcUrl": null
   },
   "1666600000": {
     "name": "Harmony One",
-    "rpc": "https://rpc.ankr.com/harmony"
+    "fallbackRpcUrl": "https://rpc.ankr.com/harmony",
+    "alchemyRpcUrl": null
   },
   "1802203764": {
     "name": "Kakarot Sepolia",
-    "rpc": "https://sepolia-rpc.kakarot.org"
+    "fallbackRpcUrl": "https://sepolia-rpc.kakarot.org",
+    "alchemyRpcUrl": null
   },
   "2716446429837000": {
     "name": "Dchain",
-    "rpc": "https://dchain-2716446429837000-1.jsonrpc.sagarpc.io"
+    "fallbackRpcUrl": "https://dchain-2716446429837000-1.jsonrpc.sagarpc.io",
+    "alchemyRpcUrl": null
   },
   "11297108109": {
     "name": "Palm",
-    "rpc": "https://palm-mainnet.public.blastapi.io"
+    "fallbackRpcUrl": "https://palm-mainnet.public.blastapi.io",
+    "alchemyRpcUrl": null
   },
   "11297108099": {
     "name": "Palm Testnet",
-    "rpc": "https://palm-mainnet.public.blastapi.io"
+    "fallbackRpcUrl": "https://palm-mainnet.public.blastapi.io",
+    "alchemyRpcUrl": null
   },
   "37714555429": {
     "name": "Xai Testnet",
-    "rpc": "https://testnet-v2.xai-chain.net/rpc"
+    "fallbackRpcUrl": "https://testnet-v2.xai-chain.net/rpc",
+    "alchemyRpcUrl": null
   }
 }

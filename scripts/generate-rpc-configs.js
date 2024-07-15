@@ -6,7 +6,47 @@ const GITHUB_API_URL = 'https://api.github.com/repos/wevm/viem/contents/src/chai
 const GITHUB_RAW_BASE_URL =
   'https://raw.githubusercontent.com/wevm/viem/main/src/chains/definitions';
 const OUTPUT_FILE = path.join(process.cwd(), '../public/configs/rpc.json');
-const GITHUB_TOKEN = ''; // Add your GitHub token here if necessary
+
+// see https://github.com/dydxprotocol/v4-web/blob/main/src/lib/wagmi.ts#L111-L136
+const ChainId = {
+  ETH_MAINNET: '1',
+  ETH_SEPOLIA: '11155111',
+  POLYGON_MAINNET: '137',
+  POLYGON_MUMBAI: '80002',
+  OPT_MAINNET: '10',
+  OPT_SEPOLIA: '11155420',
+  ARB_MAINNET: '42161',
+  ARB_SEPOLIA: '421614',
+  BASE_MAINNET: '8453',
+  BASE_SEPOLIA: '84532',
+};
+
+const getAlchemyRPCUrls = (chainId) => {
+  switch (chainId) {
+    case ChainId.ETH_MAINNET:
+      return `https://eth-mainnet.g.alchemy.com/v2`;
+    case ChainId.ETH_SEPOLIA:
+      return `https://eth-sepolia.g.alchemy.com/v2`;
+    case ChainId.POLYGON_MAINNET:
+      return `https://polygon-mainnet.g.alchemy.com/v2`;
+    case ChainId.POLYGON_MUMBAI:
+      return `https://polygon-mumbai.g.alchemy.com/v2`;
+    case ChainId.OPT_MAINNET:
+      return `https://opt-mainnet.g.alchemy.com/v2`;
+    case ChainId.OPT_SEPOLIA:
+      return `https://opt-sepolia.g.alchemy.com/v2`;
+    case ChainId.ARB_MAINNET:
+      return `https://arb-mainnet.g.alchemy.com/v2`;
+    case ChainId.ARB_SEPOLIA:
+      return `https://arb-sepolia.g.alchemy.com/v2`;
+    case ChainId.BASE_MAINNET:
+      return `https://base-mainnet.g.alchemy.com/v2`;
+    case ChainId.BASE_SEPOLIA:
+      return `https://base-sepolia.g.alchemy.com/v2`;
+    default:
+      return undefined;
+  }
+};
 
 async function fetchFile(fileUrl) {
   console.log(`Fetching file: ${fileUrl}`);
@@ -33,12 +73,16 @@ function parseTsFile(fileContent) {
     const chainRpc = rpcRegex.exec(chainMatch);
     if (chainId && chainName && chainRpc) {
       const cleanedId = chainId[1].replace(/_/g, '');
+      const alchemyRpcUrl = getAlchemyRPCUrls(cleanedId);
       const chain = {
         id: cleanedId,
         name: chainName[1],
-        rpc: chainRpc[1],
+        fallbackRpcUrl: chainRpc[1],
+        alchemyRpcUrl: alchemyRpcUrl,
       };
-      console.log(`Found chain: ${chain.name} with ID ${chain.id} and RPC URL ${chain.rpc}`);
+      console.log(
+        `Found chain: ${chain.name} with ID ${chain.id} and alchemyRpcUrl ${chain.alchemyRpcUrl} and fallbackRpcUrl ${chain.fallbackRpcUrl}`
+      );
       chains.push(chain);
     }
   }
@@ -47,7 +91,7 @@ function parseTsFile(fileContent) {
 
 async function fetchFileList() {
   console.log('Fetching list of .ts files from GitHub repository...');
-  const headers = GITHUB_TOKEN ? { Authorization: `token ${GITHUB_TOKEN}` } : {};
+  const headers = {};
   const response = await fetch(GITHUB_API_URL, { headers });
   if (!response.ok) {
     throw new Error(`Failed to fetch file list: ${response.statusText}`);
@@ -72,7 +116,8 @@ async function main() {
         chains.forEach((chain) => {
           chainsMap[chain.id] = {
             name: chain.name,
-            rpc: chain.rpc,
+            fallbackRpcUrl: chain.fallbackRpcUrl,
+            alchemyRpcUrl: chain.alchemyRpcUrl || null,
           };
         });
       } catch (error) {
