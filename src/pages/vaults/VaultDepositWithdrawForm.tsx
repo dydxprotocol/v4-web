@@ -59,6 +59,7 @@ type VaultFormError = {
   short?: string;
   long?: React.ReactNode;
 };
+
 const SLIPPAGE_PERCENT_WARN = 0.01;
 const SLIPPAGE_PERCENT_ACK = 0.01;
 
@@ -398,7 +399,7 @@ export const VaultDepositWithdrawForm = () => {
         items={[...inputFormConfig.inputReceiptItems, ...inputFormConfig.receiptItems]}
       />
 
-      {slippagePercent >= SLIPPAGE_PERCENT_ACK && (
+      {slippagePercent >= SLIPPAGE_PERCENT_ACK && selectedType === 'withdraw' && (
         <Checkbox
           checked={slippageAck}
           onCheckedChange={setSlippageAck}
@@ -411,6 +412,7 @@ export const VaultDepositWithdrawForm = () => {
           }
         />
       )}
+
       <$ConfirmButtonGroup>
         <$EditButton
           type={ButtonType.Button}
