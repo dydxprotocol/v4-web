@@ -275,8 +275,7 @@ const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
 `;
 
 const $Header = styled(OrderbookRow)`
-  height: 2rem;
-  border-bottom: var(--border);
+  height: 1.75rem;
   color: var(--color-text-0);
 `;
 

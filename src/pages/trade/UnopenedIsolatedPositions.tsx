@@ -46,7 +46,7 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
       <$Button onClick={() => setIsOpen(!isOpen)}>
         {stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
-        <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
+        <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
       </$Button>
 
       {isOpen && (
@@ -123,7 +123,7 @@ const $UnopenedIsolatedPositionsDrawerContainer = styled.div<{ isOpen?: boolean 
 const $Button = styled(Button)`
   position: sticky;
   top: 0;
-  gap: 1rem;
+  gap: 0.75rem;
   backdrop-filter: blur(4px) contrast(1.01);
   background-color: transparent;
   border: none;
@@ -136,4 +136,8 @@ const $Cards = styled.div`
 `;
 const $CardsContainer = styled.div`
   padding: 0 1rem 1rem;
+`;
+
+const $DropdownIcon = styled(DropdownIcon)`
+  font-size: 0.5em;
 `;

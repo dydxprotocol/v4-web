@@ -9,6 +9,7 @@ import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
 import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
@@ -107,8 +108,22 @@ const $TradeLayout = styled.article<{
     / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
 
   /* prettier-ignore */
+  --layout-default-desktopMedium:
+    'Side Vertical Top' auto
+    'Side Vertical Inner' minmax(0, 1fr)
+    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
+
+  /* prettier-ignore */
   --layout-alternative:
     'Top Top Top' auto
+    'Vertical Inner Side' minmax(0, 1fr)
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
+
+  /* prettier-ignore */
+  --layout-alternative-desktopMedium:
+    'Top Inner Side' auto
     'Vertical Inner Side' minmax(0, 1fr)
     'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
@@ -118,12 +133,18 @@ const $TradeLayout = styled.article<{
   --layout: var(--layout-default);
 
   // Variants
+  @media ${breakpoints.desktopMedium} {
+    --layout: var(--layout-default-desktopMedium);
+  }
 
   ${({ tradeLayout }) =>
     ({
       [TradeLayouts.Default]: null,
       [TradeLayouts.Alternative]: css`
         --layout: var(--layout-alternative);
+        @media ${breakpoints.desktopMedium} {
+          --layout: var(--layout-alternative-desktopMedium);
+        }
       `,
       [TradeLayouts.Reverse]: css`
         direction: rtl;

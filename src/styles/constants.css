@@ -3,9 +3,9 @@
   --default-border-width: 1px;
 
   /* Header + footer constants */
-  --page-header-height: 2.9rem;
+  --page-header-height: 2.75rem;
   --page-header-height-mobile: 4rem;
-  --page-footer-height: 2.25rem;
+  --page-footer-height: 2rem;
   --page-footer-height-mobile: 4.5rem;
 
   /* Sidebar constants */
@@ -16,7 +16,7 @@
   --default-page-content-max-width: 80rem;
 
   /* Trade constants */
-  --market-info-row-height: 3rem;
+  --market-info-row-height: 2.675rem;
   --market-info-row-height-mobile: 4.5rem;
 
   --tabs-height: 2.675rem;

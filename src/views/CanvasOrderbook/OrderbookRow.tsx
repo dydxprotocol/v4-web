@@ -73,7 +73,7 @@ export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & Elemen
   }
 );
 const $OrderbookMiddleRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
-  height: 2rem;
+  height: 1.75rem;
   border-top: var(--border);
   border-bottom: var(--border);
 
