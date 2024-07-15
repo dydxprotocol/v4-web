@@ -177,9 +177,10 @@ const $SizeOutput = styled(Output)<StyleProps>`
 
 const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
+  background: var(--color-layer-2);
+
   tr {
     --histogram-bucket-size: 1;
-    background-color: var(--color-layer-2);
 
     &[data-side=${OrderSide.BUY}] {
       --accent-color: var(--color-positive);

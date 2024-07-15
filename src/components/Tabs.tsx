@@ -195,6 +195,9 @@ const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean
   --stickyArea0-background: var(--color-layer-2);
   --stickyArea0-topGap: var(--border-width);
 
+  --activeTab-zIndex: 1;
+  --stickyHeader-zIndex: calc(var(--activeTab-zIndex) + 1);
+
   ${layoutMixins.contentContainer}
 
   ${({ $side }) =>
@@ -236,6 +239,7 @@ const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
 
   ${layoutMixins.row}
   justify-content: space-between;
+  z-index: var(--stickyHeader-zIndex);
 `;
 
 const $List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>`
@@ -287,6 +291,10 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
 
   &[data-state='inactive'] {
     pointer-events: none;
+  }
+
+  &[data-state='active'] {
+    z-index: var(--activeTab-zIndex);
   }
 
   ${({ $hide }) =>
