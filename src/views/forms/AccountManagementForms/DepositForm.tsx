@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { useAccount as useAccountGraz } from 'graz';
+import { calculateFee, GasPrice, MsgTransferEncodeObject } from '@cosmjs/stargate';
+import { GAS_MULTIPLIER } from '@dydxprotocol/v4-client-js';
+import { useAccount as useAccountGraz, useStargateSigningClient } from 'graz';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -11,7 +13,11 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
+import {
+  AnalyticsEventPayloads,
+  AnalyticsEvents,
+  DEFAULT_TRANSACTION_MEMO,
+} from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
@@ -20,7 +26,6 @@ import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   DEFAULT_GAS_LIMIT,
-  DEFAULT_NOBLE_GAS_FEE,
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
   MIN_CCTP_TRANSFER_AMOUNT,
@@ -32,7 +37,6 @@ import { WalletType, type EvmAddress } from '@/constants/wallets';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useIbcTransfer } from '@/hooks/useIbcTransfer';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -61,7 +65,7 @@ import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import { getNobleChainId, getOsmosisChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -137,30 +141,22 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
-  const { usdcLabel, usdcDenom } = useTokenConfigs();
+  const { usdcLabel } = useTokenConfigs();
 
-  const { sendIbcToken } = useIbcTransfer();
   const { data: accounts } = useAccountGraz({
     chainId: SUPPORTED_COSMOS_CHAINS,
     multiChain: true,
   });
-
-  const cosmosAddress = (() => {
-    if (chainId === osmosisChainId) {
-      return accounts?.[osmosisChainId]?.bech32Address;
-    }
-    if (chainId === nobleChainId) {
-      return accounts?.[nobleChainId]?.bech32Address;
-    }
-    return undefined;
-  })();
+  const { data: signingClient } = useStargateSigningClient({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
 
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
     isCosmosChain: isKeplrWallet,
-    cosmosAddress,
   });
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
@@ -276,13 +272,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const onClickMax = useCallback(() => {
     if (balance) {
-      if (chainIdStr === nobleChainId) {
-        setFromAmount(balanceBN.minus(DEFAULT_NOBLE_GAS_FEE).toString());
-        return;
-      }
       setFromAmount(balanceBN.toString());
     }
-  }, [balance, balanceBN, chainIdStr, nobleChainId]);
+  }, [balance, balanceBN]);
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
@@ -333,25 +325,56 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         if (chainIdStr && SUPPORTED_COSMOS_CHAINS.includes(chainIdStr)) {
           setIsLoading(true);
-          const amount = summary?.toAmount;
-          const tokenDecimals = sourceToken?.decimals;
-          const tokenDenom = sourceToken?.address;
 
-          if (!amount || !tokenDecimals || !tokenDenom) {
-            throw new Error('Missing token data');
+          if (!requestPayload?.data) {
+            throw new Error('Missing request payload');
           }
 
-          const parsedAmount = parseUnits(amount.toString(), tokenDecimals).toString();
+          const transaction = JSON.parse(requestPayload.data);
 
-          const txResult = await sendIbcToken({
-            amount_in: parsedAmount,
-            source_asset_chain_id: chainIdStr,
-            source_asset_denom: tokenDenom,
-            dest_asset_chain_id: selectedDydxChainId,
-            dest_asset_denom: usdcDenom,
-          });
+          const transferMsg: MsgTransferEncodeObject = {
+            typeUrl: transaction.typeUrl,
+            value: transaction.value,
+          };
 
-          const txHash = txResult.transactionHash;
+          const account = accounts?.[chainIdStr];
+          const signerAddress = account?.bech32Address;
+
+          if (!signerAddress) {
+            throw new Error('Missing signer address');
+          }
+
+          const memo = `${DEFAULT_TRANSACTION_MEMO} | ${signerAddress}`;
+
+          const gasEstimate = await signingClient?.[chainIdStr]?.simulate(
+            signerAddress,
+            [transferMsg],
+            memo
+          );
+
+          const gasPrice = (() => {
+            if (nobleChainId === chainIdStr) {
+              return GasPrice.fromString('0.1uusdc');
+            }
+            if (osmosisChainId === chainIdStr) {
+              return GasPrice.fromString('0.025uosmo');
+            }
+            return undefined;
+          })();
+
+          if (!gasEstimate || !gasPrice) {
+            throw new Error('Failed to estimate gas');
+          }
+
+          const fee = calculateFee(Math.floor(gasEstimate * GAS_MULTIPLIER), gasPrice);
+          const tx = await signingClient?.[chainIdStr]?.signAndBroadcast(
+            signerAddress,
+            [transferMsg],
+            fee,
+            memo
+          );
+
+          const txHash = tx?.transactionHash;
 
           if (txHash) {
             addTransferNotification({
@@ -365,6 +388,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               depositSubaccount: {
                 needToDeposit: true,
               },
+            });
+            abacusStateManager.clearTransferInputValues();
+            setFromAmount('');
+
+            onDeposit?.({
+              chainId: chainIdStr || undefined,
+              tokenAddress: sourceToken?.address || undefined,
+              tokenSymbol: sourceToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
             });
             dispatch(closeDialog());
             dispatch(
@@ -444,7 +482,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId, sendIbcToken]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId]
   );
 
   const amountInputReceipt = [

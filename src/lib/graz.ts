@@ -24,13 +24,22 @@ export const config: ConfigureGrazArgs = {
     // dYdX
     {
       chainId: dydxChainId,
+      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.validators[0],
       bech32Config: {
         bech32PrefixAccAddr: BECH32_PREFIX,
       },
     },
     // Noble
-    { chainId: nobleChainId, bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX } },
+    {
+      chainId: nobleChainId,
+      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
+      bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
+    },
     // Osmosis
-    { chainId: osmosisChainId, bech32Config: { bech32PrefixAccAddr: 'osmo' } },
+    {
+      chainId: osmosisChainId,
+      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.osmosisValidator,
+      bech32Config: { bech32PrefixAccAddr: 'osmo' },
+    },
   ] as ConfigureGrazArgs['chains'],
 };

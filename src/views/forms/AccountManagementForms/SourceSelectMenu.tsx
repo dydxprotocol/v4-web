@@ -109,7 +109,8 @@ export const SourceSelectMenu = ({
       return true;
     })
     // we want lowest fee tokens first followed by non-lowest fee cctp tokens
-    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1));
+    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1))
+    .sort((chain) => (lowestFeeTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,

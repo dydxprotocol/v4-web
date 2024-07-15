@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
+import { useAccount as useAccountGraz } from 'graz';
 import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
@@ -11,6 +12,7 @@ import { EvmAddress } from '@/constants/wallets';
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
@@ -27,7 +29,6 @@ type UseAccountBalanceProps = {
   chainId?: string | number;
 
   isCosmosChain?: boolean;
-  cosmosAddress?: string;
 };
 
 /**
@@ -40,7 +41,6 @@ export const useAccountBalance = ({
   addressOrDenom,
   chainId,
   isCosmosChain,
-  cosmosAddress,
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
@@ -83,6 +83,23 @@ export const useAccountBalance = ({
       ),
     },
   });
+
+  const { data: accounts } = useAccountGraz({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+
+  const cosmosAddress = useMemo(() => {
+    const nobleChainId = getNobleChainId();
+    const osmosisChainId = getOsmosisChainId();
+    if (chainId === osmosisChainId) {
+      return accounts?.[osmosisChainId]?.bech32Address;
+    }
+    if (chainId === nobleChainId) {
+      return accounts?.[nobleChainId]?.bech32Address;
+    }
+    return undefined;
+  }, [accounts, chainId]);
 
   const cosmosQueryFn = useCallback(async () => {
     if (dydxAddress && cosmosAddress && addressOrDenom) {
