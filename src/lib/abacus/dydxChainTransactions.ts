@@ -1,5 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import type { IndexedTx } from '@cosmjs/stargate';
+import { type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
@@ -23,13 +23,12 @@ import Long from 'long';
 import {
   QueryType,
   TransactionType,
+  TransactionTypes,
   type AbacusDYDXChainTransactionsProtocol,
   type HumanReadableCancelOrderPayload,
   type HumanReadablePlaceOrderPayload,
   type HumanReadableTransferPayload,
   type HumanReadableWithdrawPayload,
-  type QueryTypes,
-  type TransactionTypes,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
@@ -526,6 +525,44 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async cctpMultiMsgWithdraw(messages: { typeUrl: string; value: any }[]): Promise<string> {
+    if (!this.nobleClient?.isConnected) {
+      throw new Error('Missing nobleClient or localWallet');
+    }
+
+    try {
+      const ibcMsgs = messages.map(({ typeUrl, value }) => ({
+        typeUrl, // '/circle.cctp.v1.MsgDepositForBurnWithCaller', '/cosmos.bank.v1beta1.MsgSend'
+        value,
+      }));
+
+      const fee = await this.nobleClient.simulateTransaction(ibcMsgs);
+
+      // take out fee from amount before sweeping
+      const amount =
+        parseInt(ibcMsgs[0].value.amount, 10) -
+        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+
+      if (amount <= 0) {
+        throw new Error('noble balance does not cover fees');
+      }
+
+      ibcMsgs[0].value.amount = amount.toString();
+
+      const tx = await this.nobleClient.send(ibcMsgs);
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/cctpWithdraw', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async signCompliancePayload(params: {
     message: string;
     action: string;
@@ -638,6 +675,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
         case TransactionType.CctpWithdraw: {
           const result = await this.cctpWithdraw(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.CctpMultiMsgWithdraw: {
+          const result = await this.cctpMultiMsgWithdraw(params);
           callback(result);
           break;
         }
