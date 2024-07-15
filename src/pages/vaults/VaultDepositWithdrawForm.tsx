@@ -225,7 +225,6 @@ export const VaultDepositWithdrawForm = () => {
       marginUsage?.current !== marginUsageUpdated,
   });
 
-  // todo errors, disable buttons
   // todo i18n
   const inputFormConfig =
     selectedType === 'deposit'
