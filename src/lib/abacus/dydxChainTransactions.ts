@@ -555,7 +555,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       return JSON.stringify(parsedTx);
     } catch (error) {
-      log('DydxChainTransactions/cctpWithdraw', error);
+      log('DydxChainTransactions/cctpMultiMsgWithdraw', error);
 
       return JSON.stringify({
         error,
