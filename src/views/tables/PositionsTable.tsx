@@ -19,6 +19,7 @@ import { PositionSide } from '@/constants/trade';
 
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -34,10 +35,7 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
-import {
-  calculateIsAccountViewOnly,
-  calculateShouldRenderTriggersInPositionsTable,
-} from '@/state/accountCalculators';
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
@@ -430,7 +428,7 @@ export const PositionsTable = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
-  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderTriggers = useShouldShowTriggers();
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {

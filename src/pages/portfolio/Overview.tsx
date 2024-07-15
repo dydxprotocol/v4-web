@@ -8,6 +8,7 @@ import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
@@ -16,11 +17,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import {
-  calculateShouldRenderActionsInPositionsTable,
-  calculateShouldRenderTriggersInPositionsTable,
-} from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -45,7 +42,7 @@ export const Overview = () => {
     });
   }, [navigate]);
 
-  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
   );
