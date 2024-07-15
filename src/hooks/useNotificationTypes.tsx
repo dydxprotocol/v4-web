@@ -404,13 +404,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxAddress } = useAccounts();
       const { data, status } = useQueryChaosLabsIncentives({
         dydxAddress,
-        season: 3,
+        season: REWARD_DISTRIBUTION_SEASON_NUMBER,
       });
 
       const { dydxRewards } = data ?? {};
 
       useEffect(() => {
-        if (dydxAddress && status === 'success') {
+        console.log("xcxc", dydxRewards)
+        const rewards = dydxRewards ?? 0;
+        if (dydxAddress && status === 'success' && rewards > 0) {
           trigger(
             INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
             {
@@ -423,7 +425,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.BODY',
                 params: {
                   SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER,
-                  DYDX_AMOUNT: dydxRewards ?? 0,
+                  DYDX_AMOUNT: rewards,
                 },
               }),
               renderCustomBody({ isToast, notification }) {
@@ -432,7 +434,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     isToast={isToast}
                     notification={notification}
                     data={{
-                      points: dydxRewards ?? 0,
+                      points: rewards,
                       chainTokenLabel,
                     }}
                   />
