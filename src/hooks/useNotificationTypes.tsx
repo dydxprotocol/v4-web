@@ -410,7 +410,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxRewards } = data ?? {};
 
       useEffect(() => {
-        console.log("xcxc", dydxRewards)
         const rewards = dydxRewards ?? 0;
         if (dydxAddress && status === 'success' && rewards > 0) {
           trigger(

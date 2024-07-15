@@ -7,6 +7,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
@@ -51,6 +52,7 @@ export const IncentiveSeasonDistributionNotification = ({
           ]}
         />
       }
+      slotAction={<Link isAccent>{stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →</Link>}
     />
   );
 };
