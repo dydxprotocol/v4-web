@@ -1,36 +1,38 @@
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
 import styled, { css } from 'styled-components';
 
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-} from '@/constants/buttons';
+import { AlertType } from '@/constants/alerts';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { calculateCanViewAccount, calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getUserVault } from '@/state/vaultSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 const renderDiffOutput = ({
   type,
@@ -51,23 +53,142 @@ const renderDiffOutput = ({
   />
 );
 
+type VaultFormError = {
+  type: AlertType;
+  key: string;
+  short?: string;
+  long?: React.ReactNode;
+};
+const SLIPPAGE_PERCENT_WARN = 0.01;
+const SLIPPAGE_PERCENT_ACK = 0.01;
+
 export const VaultDepositWithdrawForm = () => {
   const stringGetter = useStringGetter();
+  const { vaultsLearnMore } = useURLConfigs();
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
 
   const { userBalance } = useAppSelector(getUserVault) ?? {};
-  const { freeCollateral } = useAppSelector(getSubaccount) ?? {};
+  const { freeCollateral, marginUsage } = useAppSelector(getSubaccount) ?? {};
 
   const [selectedType, setSelectedType] = useState<'deposit' | 'withdraw'>('deposit');
   const [amount, setAmountState] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
   const [currentForm, setCurrentForm] = useState<'input' | 'confirm'>('input');
+  const [slippageAck, setSlippageAck] = useState(false);
 
-  const setAmount = ({ floatValue }: NumberFormatValues) => {};
+  const slippagePercent = 0.05;
+  const estimatedWithdrawalAmount = MustBigNumber(amount).times(1 - slippagePercent);
+  const freeCollateralUpdated =
+    selectedType === 'deposit'
+      ? MustBigNumber(freeCollateral?.current).minus(amount).toNumber()
+      : MustBigNumber(freeCollateral?.current).plus(estimatedWithdrawalAmount).toNumber();
+  const marginUsageUpdated =
+    selectedType === 'deposit'
+      ? MustBigNumber(marginUsage?.current).minus(0.05).toNumber()
+      : MustBigNumber(marginUsage?.current).plus(0.05).toNumber();
+  const userBalanceUpdated =
+    selectedType === 'deposit'
+      ? MustBigNumber(userBalance).plus(amount).toNumber()
+      : MustBigNumber(userBalance).minus(amount).toNumber();
+
+  const setAmount = (change: NumberFormatValues) => {
+    setAmountState(change.value);
+  };
+
+  const errors = useMemo((): VaultFormError[] => {
+    if (!canViewAccount) {
+      return [
+        {
+          type: AlertType.Error,
+          key: 'disconnected',
+          short: stringGetter({ key: STRING_KEYS.CONNECT_WALLET }),
+        },
+      ];
+    }
+    if (isAccountViewOnly) {
+      return [
+        {
+          type: AlertType.Error,
+          key: 'view-only',
+          short: stringGetter({ key: STRING_KEYS.NOT_ALLOWED }),
+        },
+      ];
+    }
+    if (MustBigNumber(amount).eq(0)) {
+      return [
+        {
+          type: AlertType.Error,
+          key: 'amount-empty',
+          short:
+            selectedType === 'deposit' ? 'Enter amount to deposit' : 'Enter amount to withdraw',
+        },
+      ];
+    }
+    const allErrors: VaultFormError[] = [];
+    if (selectedType === 'deposit') {
+      if (freeCollateralUpdated == null || freeCollateralUpdated < 0) {
+        allErrors.push({
+          type: AlertType.Error,
+          key: 'deposit-high',
+          long: 'You cannot deposit more than your free collateral.',
+          short: 'Modify amount',
+        });
+      }
+    } else {
+      if (userBalanceUpdated == null || userBalanceUpdated < 0) {
+        allErrors.push({
+          type: AlertType.Error,
+          key: 'withdraw-high',
+          long: 'You cannot withdraw more than your vault balance.',
+          short: 'Modify amount',
+        });
+      }
+      if (slippagePercent >= SLIPPAGE_PERCENT_WARN) {
+        allErrors.push({
+          type: AlertType.Warning,
+          key: 'slippage-high',
+          long: (
+            <span>
+              This withdrawal would result in{' '}
+              <$InlineOutput value={slippagePercent} type={OutputType.Percent} /> slippage. Slippage
+              may be reduced if you withdraw at a later time. For more information, see{' '}
+              <Link href={vaultsLearnMore} withIcon isInline>
+                Vault FAQs
+              </Link>
+            </span>
+          ),
+        });
+        if (slippagePercent >= SLIPPAGE_PERCENT_ACK && !slippageAck && currentForm === 'confirm') {
+          allErrors.push({
+            type: AlertType.Error,
+            key: 'slippage-acked',
+            short: 'Acknowledge High Slippage',
+          });
+        }
+      }
+    }
+
+    return allErrors;
+  }, [
+    amount,
+    canViewAccount,
+    currentForm,
+    freeCollateralUpdated,
+    isAccountViewOnly,
+    selectedType,
+    slippageAck,
+    stringGetter,
+    userBalanceUpdated,
+    vaultsLearnMore,
+  ]);
 
   const onSubmitInputForm = useCallback(() => {
     setCurrentForm('confirm');
   }, []);
+
   const onSubmitConfirmForm = useCallback(() => {}, []);
+
   const onClickMax = useCallback(() => {
     if (selectedType === 'deposit') {
       setAmountState(`${freeCollateral ?? ''}`);
@@ -75,6 +196,34 @@ export const VaultDepositWithdrawForm = () => {
       setAmountState(`${userBalance ?? ''}`);
     }
   }, [freeCollateral, selectedType, userBalance]);
+
+  const freeCollateralDiff = renderDiffOutput({
+    type: OutputType.Fiat,
+    value: freeCollateral?.current,
+    newValue: freeCollateralUpdated,
+    withDiff:
+      MustBigNumber(amount).gt(0) &&
+      freeCollateralUpdated != null &&
+      freeCollateral?.current !== freeCollateralUpdated,
+  });
+  const vaultDiff = renderDiffOutput({
+    type: OutputType.Fiat,
+    value: userBalance,
+    newValue: userBalanceUpdated,
+    withDiff:
+      MustBigNumber(amount).gt(0) &&
+      userBalanceUpdated != null &&
+      userBalanceUpdated !== userBalance,
+  });
+  const marginUsageDiff = renderDiffOutput({
+    type: OutputType.Percent,
+    value: marginUsage?.current,
+    newValue: marginUsageUpdated,
+    withDiff:
+      MustBigNumber(amount).gt(0) &&
+      marginUsageUpdated != null &&
+      marginUsage?.current !== marginUsageUpdated,
+  });
 
   // todo errors, disable buttons
   // todo i18n
@@ -87,19 +236,19 @@ export const VaultDepositWithdrawForm = () => {
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-              value: <div />,
+              value: freeCollateralDiff,
             },
           ],
           receiptItems: [
             {
               key: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-              value: <div />,
+              value: marginUsageDiff,
             },
             {
               key: 'vault-balance',
               label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-              value: <div />,
+              value: vaultDiff,
             },
           ],
           transactionTarget: {
@@ -114,24 +263,24 @@ export const VaultDepositWithdrawForm = () => {
             {
               key: 'vault-balance',
               label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-              value: <div />,
+              value: vaultDiff,
             },
           ],
           receiptItems: [
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-              value: <div />,
+              value: freeCollateralDiff,
             },
             {
               key: 'slippage',
               label: 'Est. slippage',
-              value: <div />,
+              value: <Output type={OutputType.Percent} value={slippagePercent} />,
             },
             {
               key: 'est amount',
               label: 'Expected Amount Received',
-              value: <div />,
+              value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
             },
           ],
           transactionTarget: {
@@ -139,6 +288,17 @@ export const VaultDepositWithdrawForm = () => {
             icon: 'cross' as const,
           },
         };
+
+  const errorErrors = errors.filter((e) => e.type === AlertType.Error);
+  const hasInputErrors = errorErrors.length > 0;
+
+  const renderedErrors = errors
+    .filter((e) => e.long != null)
+    .map((alertMessage) => (
+      <AlertMessage key={alertMessage.key} type={alertMessage.type}>
+        {alertMessage.long}
+      </AlertMessage>
+    ));
 
   const inputForm = (
     <$Form
@@ -174,6 +334,7 @@ export const VaultDepositWithdrawForm = () => {
           label={inputFormConfig.formLabel}
           value={amount}
           onChange={setAmount}
+          disabled={isAccountViewOnly || !canViewAccount}
           slotRight={
             <FormMaxInputToggleButton
               size={ButtonSize.XSmall}
@@ -187,14 +348,19 @@ export const VaultDepositWithdrawForm = () => {
         />
       </WithDetailsReceipt>
 
+      {renderedErrors}
+
       <WithDetailsReceipt detailItems={inputFormConfig.receiptItems}>
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
-          disabled={isSubmitting}
-          state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+          state={{
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isLoading: isSubmitting,
+          }}
+          slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
         >
-          {inputFormConfig.buttonLabel}
+          {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
         </Button>
       </WithDetailsReceipt>
     </$Form>
@@ -226,9 +392,26 @@ export const VaultDepositWithdrawForm = () => {
           <div>{inputFormConfig.transactionTarget.label}</div>
         </$TargetBox>
       </$GridContainer>
+
+      {renderedErrors}
+
       <$FloatingDetails
         items={[...inputFormConfig.inputReceiptItems, ...inputFormConfig.receiptItems]}
       />
+
+      {slippagePercent >= SLIPPAGE_PERCENT_ACK && (
+        <Checkbox
+          checked={slippageAck}
+          onCheckedChange={setSlippageAck}
+          id="slippage-ack"
+          label={
+            <span>
+              I understand that withdrawing now will result in{' '}
+              <$InlineOutput type={OutputType.Percent} value={slippagePercent} /> slippage
+            </span>
+          }
+        />
+      )}
       <$ConfirmButtonGroup>
         <$EditButton
           type={ButtonType.Button}
@@ -240,10 +423,13 @@ export const VaultDepositWithdrawForm = () => {
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
-          disabled={isSubmitting}
-          state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+          state={{
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isLoading: isSubmitting,
+          }}
+          slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
         >
-          {inputFormConfig.buttonLabel}
+          {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
         </Button>
       </$ConfirmButtonGroup>
     </$Form>
@@ -389,4 +575,12 @@ const $CrossIcon = styled.div`
   justify-content: center;
   border-radius: 1rem;
   background-color: var(--color-layer-6);
+`;
+
+const $WarningIcon = styled(Icon)`
+  color: var(--color-warning);
+`;
+
+const $InlineOutput = styled(Output)`
+  display: inline;
 `;
