@@ -19,6 +19,7 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
   INCENTIVES_SEASON_NOTIFICATION_ID,
+  MEDIAN_REWARDS_AMOUNT,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
@@ -276,7 +277,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
 
-      const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
+      const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
       const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
       const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
@@ -300,8 +301,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
                   PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
-                  DYDX_AMOUNT: '52',
-                  USDC_AMOUNT: '100',
+                  DYDX_AMOUNT: MEDIAN_REWARDS_AMOUNT.DYDX,
+                  USDC_AMOUNT: MEDIAN_REWARDS_AMOUNT.USDC,
                 },
               }),
               toastSensitivity: 'foreground',
@@ -403,7 +404,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxAddress } = useAccounts();
       const { data, status } = useQueryChaosLabsIncentives({
         dydxAddress,
-        season: 3,
+        season: REWARD_DISTRIBUTION_SEASON_NUMBER,
       });
 
       const { dydxRewards } = data ?? {};

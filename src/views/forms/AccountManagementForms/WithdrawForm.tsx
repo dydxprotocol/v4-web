@@ -2,6 +2,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -30,6 +31,7 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -59,6 +61,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
+import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -401,20 +404,25 @@ export const WithdrawForm = () => {
       };
 
     if (routeErrors) {
+      const routeErrorMessageOverride = getRouteErrorMessageOverride(
+        routeErrors,
+        routeErrorMessage
+      );
+
       track(
         AnalyticsEvents.RouteError({
           transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessage ?? undefined,
+          errorMessage: routeErrorMessageOverride ?? undefined,
           amount: debouncedAmount,
           chainId: chainIdStr ?? undefined,
           assetId: toToken?.toString(),
         })
       );
       return {
-        errorMessage: routeErrorMessage
+        errorMessage: routeErrorMessageOverride
           ? stringGetter({
               key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-              params: { ERROR_MESSAGE: routeErrorMessage },
+              params: { ERROR_MESSAGE: routeErrorMessageOverride },
             })
           : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
       };
@@ -496,12 +504,15 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     isInvalidNobleAddress;
+  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   return (
     <$Form onSubmit={onSubmit}>
       <$Subheader>
         {stringGetter({
-          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          key: skipEnabled
+            ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
+            : STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
               <WithTooltip tooltip="lowest-fees">

@@ -20,7 +20,6 @@ const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
       // first capture group grabs all the numbers with normal separator, then we grab any groups of whitespace+numbers
       // this is so we know which languages keep whitespace before the suffix
       .map((b) => b.replace(/(^[\d,.]+){1}(\s\d+)*/, ''))
-      .map((b) => b.toLowerCase())
 );
 
 const zipObjectFn = <T extends string, K>(arr: T[], valueGenerator: (val: T) => K) =>
