@@ -179,9 +179,7 @@ export function formatNumberOutput(
         style: 'decimal',
         notation: 'compact',
         maximumSignificantDigits: 3,
-      })
-        .format(Math.abs(value))
-        .toLowerCase();
+      }).format(Math.abs(value));
     },
     [OutputType.Number]: () => getFormattedVal(valueBN, 0),
     [OutputType.Fiat]: () => getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' }),
@@ -196,9 +194,7 @@ export function formatNumberOutput(
         currency: 'USD',
         notation: 'compact',
         maximumSignificantDigits: 3,
-      })
-        .format(Math.abs(value))
-        .toLowerCase();
+      }).format(Math.abs(value));
     },
     [OutputType.Asset]: () => getFormattedVal(valueBN, TOKEN_DECIMALS),
     [OutputType.Percent]: () =>

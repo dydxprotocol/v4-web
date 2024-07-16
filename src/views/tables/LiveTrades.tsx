@@ -6,7 +6,6 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -23,7 +22,6 @@ import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
-import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide } from '@/lib/tradeData';
@@ -101,14 +99,8 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         tag: id,
         renderCell: (row: RowData) => (
           <$SizeOutput
-            type={OutputType.Text}
-            value={getConsistentAssetSizeString(row.size, {
-              decimalSeparator,
-              groupSeparator,
-              selectedLocale,
-              stepSize: stepSize ?? 10 ** (-1 * TOKEN_DECIMALS),
-              stepSizeDecimals: stepSizeDecimals ?? TOKEN_DECIMALS,
-            })}
+            type={OutputType.CompactNumber}
+            value={row.size}
             histogramSide={histogramSide}
           />
         ),

@@ -20,7 +20,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
-import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
 import {
   getHistogramXValues,
   getRektFromIdx,
@@ -251,12 +250,10 @@ export const useDrawOrderbook = ({
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
         displayUnit === 'asset'
-          ? getConsistentAssetSizeString(displaySize, {
+          ? formatNumberOutput(displaySize, OutputType.CompactNumber, {
               decimalSeparator,
               groupSeparator,
               selectedLocale,
-              stepSize,
-              stepSizeDecimals,
             })
           : getSizeInFiatString(displaySize),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
@@ -270,12 +267,10 @@ export const useDrawOrderbook = ({
       ctx.fillStyle = textColor;
       ctx.fillText(
         displayUnit === 'asset'
-          ? getConsistentAssetSizeString(displayDepth, {
+          ? formatNumberOutput(displayDepth, OutputType.CompactNumber, {
               decimalSeparator,
               groupSeparator,
               selectedLocale,
-              stepSize,
-              stepSizeDecimals,
             })
           : getSizeInFiatString(displayDepth),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
