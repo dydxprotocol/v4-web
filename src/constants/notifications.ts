@@ -217,7 +217,7 @@ export enum ReleaseUpdateNotificationIds {
 // Incentives Season
 export const CURRENT_SEASON_NUMBER = 6;
 export const REWARD_DISTRIBUTION_SEASON_NUMBER = 5;
-export const REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
+export const MEDIAN_REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
 export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6;
 export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
   ReleaseUpdateNotificationIds.IncentivesDistributedS5;

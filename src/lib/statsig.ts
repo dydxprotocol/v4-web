@@ -64,6 +64,6 @@ export const getStatsigConfigAsync = async (): Promise<StatsigConfigType> => {
     return statsigConfig;
   } catch (err) {
     log('statsig/statsigConfigPromise', err);
-    return {};
+    return {} as StatsigConfigType;
   }
 };
