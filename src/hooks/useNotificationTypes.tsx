@@ -23,7 +23,6 @@ import {
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  REWARDS_AMOUNT,
   REWARD_DISTRIBUTION_SEASON_NUMBER,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
