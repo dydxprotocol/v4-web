@@ -1,7 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
+import { AbacusInputTypes, AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -83,8 +83,13 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
+  const closeOnlyTradingUnavailable =
+    complianceState === ComplianceStates.CLOSE_ONLY &&
+    selectedTradeType !== TradeTypes.MARKET &&
+    currentInput !== AbacusInputTypes.ClosePosition;
+
   const tradingUnavailable =
-    (complianceState === ComplianceStates.CLOSE_ONLY && selectedTradeType !== TradeTypes.MARKET) ||
+    closeOnlyTradingUnavailable ||
     complianceState === ComplianceStates.READ_ONLY ||
     connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
 
@@ -92,7 +97,7 @@ export const PlaceOrderButtonAndReceipt = ({
     canAccountTrade &&
     !hasMissingData &&
     !hasValidationErrors &&
-    currentInput !== 'transfer' &&
+    currentInput !== AbacusInputTypes.Transfer &&
     !tradingUnavailable;
 
   const { fee, price: expectedPrice, reward } = summary ?? {};

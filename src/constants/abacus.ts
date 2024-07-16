@@ -370,3 +370,11 @@ export type PerpetualMarketOrderbookLevel = OrderbookLine & {
   mine: number | undefined;
   key: string;
 };
+
+export enum AbacusInputTypes {
+  AdjustIsolatedMargin = 'adjustIsolatedMargin',
+  ClosePosition = 'closePosition',
+  Transfer = 'transfer',
+  Trade = 'trade',
+  TriggerOrders = 'triggerOrders',
+}
