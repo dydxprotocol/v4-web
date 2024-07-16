@@ -66,7 +66,6 @@ export const useDrawOrderbook = ({
   const marketConfig = orEmptyObj(useAppSelector(getCurrentMarketConfig));
   const stepSizeDecimals = marketConfig.stepSizeDecimals ?? TOKEN_DECIMALS;
   const tickSizeDecimals = marketConfig.tickSizeDecimals ?? SMALL_USD_DECIMALS;
-  const stepSize = marketConfig.stepSize ?? 10 ** (-1 * TOKEN_DECIMALS);
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 

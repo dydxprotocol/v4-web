@@ -9,7 +9,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -19,7 +18,6 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
@@ -54,9 +52,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     useAppSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
 
   const { id = '' } = currentMarketAssetData ?? {};
-  const { stepSizeDecimals, tickSizeDecimals, stepSize } = currentMarketConfig ?? {};
-  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
-  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig ?? {};
 
   const rows = currentMarketLiveTrades.map(
     ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
