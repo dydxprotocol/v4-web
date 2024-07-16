@@ -295,7 +295,7 @@ export const VaultDepositWithdrawForm = ({
             },
             {
               key: 'est amount',
-              label: 'Expected Amount Received',
+              label: stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED }),
               value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
             },
           ],
@@ -429,6 +429,7 @@ export const VaultDepositWithdrawForm = ({
           onCheckedChange={setSlippageAck}
           id="slippage-ack"
           label={
+            // todo
             <span>
               I understand that withdrawing now will result in{' '}
               <$InlineOutput type={OutputType.Percent} value={slippagePercent} /> slippage

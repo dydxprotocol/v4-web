@@ -19,7 +19,12 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { VaultDepositWithdrawForm } from './VaultDepositWithdrawForm';
-import { VaultHeader, VaultPositionsSection, YourVaultDetailsCards } from './VaultInfoSections';
+import {
+  VaultDescription,
+  VaultHeader,
+  VaultPositionsSection,
+  YourVaultDetailsCards,
+} from './VaultInfoSections';
 import { VaultPnlChart } from './VaultPnlChart';
 import { VaultTransactionsCard } from './VaultTransactions';
 
@@ -45,6 +50,7 @@ const VaultPage = () => {
             <$PnlRow>
               <$PnlChart />
             </$PnlRow>
+            <$VaultDescription />
             <$VaultPositionsSection scroll />
           </$VaultDetailsColumn>
         </$OneColumnContainer>
@@ -84,6 +90,7 @@ const VaultPage = () => {
             <$PnlChart />
           </$PnlRow>
           <$HorizontalSeparatorFiller />
+          <$VaultDescription />
           <$VaultPositionsSection />
         </$VaultDetailsColumn>
         <$VaultDepositWithdrawFormColumn>
@@ -166,6 +173,9 @@ const $VaultTransactionsCardContainer = styled.div`
 const $DepositFormContainer = styled.div`
   ${xPaddingWhenSmall}
 `;
+const $VaultDescription = styled(VaultDescription)`
+  ${xPaddingWhenSmall}
+`;
 
 const $PlaceholderBox = styled.div`
   border-radius: 0.7rem;
@@ -182,7 +192,6 @@ const $PnlRow = styled.div``;
 const $PnlChart = styled(VaultPnlChart)``;
 
 const $VaultHeader = styled(VaultHeader)`
-  margin-bottom: 0.625rem;
   ${xPaddingWhenSmall}
 `;
 const $VaultHeaderMobile = styled(VaultHeader)`

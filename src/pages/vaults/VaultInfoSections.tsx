@@ -9,13 +9,11 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
-import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
@@ -107,6 +105,20 @@ const $CardValue = styled.div`
   line-height: 1.2rem;
 `;
 
+export const VaultDescription = ({ className }: { className?: string }) => {
+  return (
+    <$DescriptionContainer className={className}>
+      This vault provides automated liquidity on all dYdX markets and gets share of fee revenue.
+      Vaults aim for a market-neutral position by quoting both sides of the book. P&L will vary
+      based on market conditions and theres a risk of losing some or all of the USDC deposited.
+    </$DescriptionContainer>
+  );
+};
+const $DescriptionContainer = styled.div`
+  font: var(--font-small-medium);
+  color: var(--color-text-0);
+`;
+
 export const VaultPositionsSection = ({
   className,
   scroll,
@@ -154,7 +166,6 @@ const $SectionTitle = styled.div`
 
 export const VaultHeader = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const { vaultsLearnMore } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
@@ -188,9 +199,6 @@ export const VaultHeader = ({ className }: { className?: string }) => {
         <$VaultImg src="/dydx-chain.png" />
         <div>
           <$MarketTitleText>{stringGetter({ key: STRING_KEYS.VAULT })}</$MarketTitleText>
-          <$LearnMoreLink href={vaultsLearnMore} withIcon>
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-          </$LearnMoreLink>
         </div>
       </$MarketTitle>
       {detailItems.map((item) => (
@@ -244,11 +252,6 @@ const $MarketTitle = styled.div`
   gap: 1.25rem;
 `;
 
-const $LearnMoreLink = styled(Link)`
-  font: var(--font-small-book);
-  color: var(--color-text-1);
-`;
-
 const $VaultImg = styled.img`
   width: 3.5rem;
   height: 3.5rem;
@@ -272,6 +275,7 @@ const $DetailLabel = styled.div`
 `;
 
 const $DetailValue = styled.div`
-  font: var(--font-medium-book);
+  font: var(--font-extra-book);
+  font-size: 1.563rem; // we need an in-beween for large and extra
   display: flex;
 `;
