@@ -66,7 +66,15 @@ const lightErrorKeys = new Set(['disconnected', 'view-only', 'amount-empty']);
 const SLIPPAGE_PERCENT_WARN = 0.01;
 const SLIPPAGE_PERCENT_ACK = 0.01;
 
-export const VaultDepositWithdrawForm = () => {
+type VaultDepositWithdrawFormProps = {
+  initialType?: 'deposit' | 'withdraw';
+  onSuccess?: () => void;
+};
+
+export const VaultDepositWithdrawForm = ({
+  initialType,
+  onSuccess,
+}: VaultDepositWithdrawFormProps) => {
   const stringGetter = useStringGetter();
   const { vaultsLearnMore } = useURLConfigs();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -75,7 +83,9 @@ export const VaultDepositWithdrawForm = () => {
   const { userBalance } = useAppSelector(getUserVault) ?? {};
   const { freeCollateral, marginUsage } = useAppSelector(getSubaccount) ?? {};
 
-  const [selectedType, setSelectedType] = useState<'deposit' | 'withdraw'>('deposit');
+  const [selectedType, setSelectedType] = useState<'deposit' | 'withdraw'>(
+    initialType ?? 'deposit'
+  );
   const [amount, setAmountState] = useState('');
   const [isSubmitting] = useState(false);
   const [currentForm, setCurrentForm] = useState<'input' | 'confirm'>('input');
@@ -85,7 +95,7 @@ export const VaultDepositWithdrawForm = () => {
   const estimatedWithdrawalAmount = MustBigNumber(amount).times(1 - slippagePercent);
   const freeCollateralUpdated =
     selectedType === 'deposit'
-      ? MustBigNumber(freeCollateral?.current).minus(amount).toNumber()
+      ? MustBigNumber(MustBigNumber(freeCollateral?.current).minus(amount).toFixed(2)).toNumber()
       : MustBigNumber(freeCollateral?.current).plus(estimatedWithdrawalAmount).toNumber();
   const marginUsageUpdated =
     selectedType === 'deposit'
@@ -191,7 +201,10 @@ export const VaultDepositWithdrawForm = () => {
     setCurrentForm('confirm');
   }, []);
 
-  const onSubmitConfirmForm = useCallback(() => {}, []);
+  const onSubmitConfirmForm = useCallback(() => {
+    // TODO tell abacus and respond
+    onSuccess?.();
+  }, [onSuccess]);
 
   const onClickMax = useCallback(() => {
     if (selectedType === 'deposit') {
@@ -353,6 +366,8 @@ export const VaultDepositWithdrawForm = () => {
 
       {renderedErrors}
 
+      <$FlexFill />
+
       <WithDetailsReceipt detailItems={inputFormConfig.receiptItems}>
         <Button
           type={ButtonType.Submit}
@@ -401,6 +416,8 @@ export const VaultDepositWithdrawForm = () => {
       </$GridContainer>
 
       {renderedErrors}
+
+      <$FlexFill />
 
       <$FloatingDetails
         items={[...inputFormConfig.inputReceiptItems, ...inputFormConfig.receiptItems]}
@@ -595,4 +612,9 @@ const $WarningIcon = styled(Icon)`
 
 const $InlineOutput = styled(Output)`
   display: inline;
+`;
+
+const $FlexFill = styled.div`
+  flex: 1;
+  margin-top: calc(var(--form-input-gap) * -1);
 `;
