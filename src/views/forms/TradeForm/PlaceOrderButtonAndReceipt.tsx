@@ -286,7 +286,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const submitButton = (
     <$Button
-      state={buttonState}
+      state={{}}
       type={ButtonType.Submit}
       action={buttonAction}
       slotLeft={showValidatorErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}

@@ -20,8 +20,8 @@ import {
   type Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
+import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { STRING_KEYS } from '@/constants/localization';
 import {
   CancelOrderStatuses,
   PlaceOrderStatuses,
@@ -321,13 +321,13 @@ export const accountSlice = createSlice({
     },
     placeOrderFailed: (
       state,
-      action: PayloadAction<{ clientId: number; errorStringKey: string }>
+      action: PayloadAction<{ clientId: number; errorParams: ErrorParams }>
     ) => {
       state.localPlaceOrders = state.localPlaceOrders.map((order) =>
         order.clientId === action.payload.clientId
           ? {
               ...order,
-              errorStringKey: action.payload.errorStringKey,
+              errorParams: action.payload.errorParams,
             }
           : order
       );
@@ -339,7 +339,7 @@ export const accountSlice = createSlice({
       if (state.uncommittedOrderClientIds.includes(action.payload)) {
         placeOrderFailed({
           clientId: action.payload,
-          errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG,
+          errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
         });
       }
     },
@@ -358,11 +358,11 @@ export const accountSlice = createSlice({
     },
     cancelOrderFailed: (
       state,
-      action: PayloadAction<{ orderId: string; errorStringKey: string }>
+      action: PayloadAction<{ orderId: string; errorParams: ErrorParams }>
     ) => {
       state.localCancelOrders.map((order) =>
         order.orderId === action.payload.orderId
-          ? { ...order, errorStringKey: action.payload.errorStringKey }
+          ? { ...order, errorParams: action.payload.errorParams }
           : order
       );
     },

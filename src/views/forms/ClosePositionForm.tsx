@@ -12,6 +12,7 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -200,9 +201,12 @@ export const ClosePositionForm = ({
     setClosePositionError(undefined);
 
     closePosition({
-      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
+      onError: (errorParams: ErrorParams) => {
         setClosePositionError(
-          stringGetter({ key: errorParams?.errorStringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG })
+          stringGetter({
+            key: errorParams.errorStringKey,
+            fallback: errorParams.errorMessage ?? '',
+          })
         );
         setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },

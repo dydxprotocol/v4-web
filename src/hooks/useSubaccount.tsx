@@ -23,7 +23,7 @@ import type {
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
-import { STRING_KEYS } from '@/constants/localization';
+import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
@@ -41,6 +41,7 @@ import { getBalances } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { getValidParsingErrorParams } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
@@ -362,7 +363,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onError,
       onSuccess,
     }: {
-      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams: ErrorParams) => void;
       onSuccess?: (
         subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
       ) => void;
@@ -375,7 +376,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (success) {
           onSuccess?.(data);
         } else {
-          onError?.({ errorStringKey: parsingError?.stringKey });
+          onError?.(getValidParsingErrorParams(parsingError));
         }
       };
 
@@ -408,7 +409,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onSuccess,
     }: {
       isClosePosition?: boolean;
-      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams: ErrorParams) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => {
       const callback = (
@@ -419,13 +420,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (success) {
           onSuccess?.(data);
         } else {
-          onError?.({ errorStringKey: parsingError?.stringKey });
+          const errorParams = getValidParsingErrorParams(parsingError);
+          onError?.(errorParams);
 
           if (data?.clientId !== undefined) {
             dispatch(
               placeOrderFailed({
                 clientId: data.clientId,
-                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                errorParams,
               })
             );
           }
@@ -460,7 +462,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError: (onErrorParams: ErrorParams) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
@@ -473,7 +475,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onSuccess,
     }: {
       orderId: string;
-      onError?: ({ errorStringKey }?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams: ErrorParams) => void;
       onSuccess?: () => void;
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
@@ -481,13 +483,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
+          const errorParams = getValidParsingErrorParams(parsingError);
           dispatch(
             cancelOrderFailed({
               orderId,
-              errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              errorParams,
             })
           );
-          onError?.({ errorStringKey: parsingError?.stringKey });
+          onError?.(errorParams);
         }
       };
 
@@ -503,7 +506,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onError,
       onSuccess,
     }: {
-      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams: ErrorParams) => void;
       onSuccess?: () => void;
     } = {}) => {
       const callback = (
@@ -521,13 +524,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             dispatch(cancelOrderConfirmed(payload.orderId));
           });
         } else {
-          onError?.({ errorStringKey: parsingError?.stringKey });
+          const errorParams = getValidParsingErrorParams(parsingError);
+          onError?.(errorParams);
 
           placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
             dispatch(
               placeOrderFailed({
                 clientId: payload.clientId,
-                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                errorParams,
               })
             );
           });
@@ -536,7 +540,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             dispatch(
               cancelOrderFailed({
                 orderId: payload.orderId,
-                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                errorParams,
               })
             );
           });

@@ -97,13 +97,13 @@ export const OrderStatusNotification = ({
       }
       break;
     case PlaceOrderStatuses.Submitted:
-      if (localOrder.errorStringKey) {
+      if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
         customContent = (
           <span>
             {stringGetter({
-              key: localOrder.errorStringKey,
+              key: localOrder.errorParams.errorStringKey,
               params: {
                 EQUITY_TIER_LEARN_MORE: (
                   <Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()} isInline>
@@ -111,6 +111,7 @@ export const OrderStatusNotification = ({
                   </Link>
                 ),
               },
+              fallback: localOrder.errorParams.errorMessage ?? '',
             })}
           </span>
         );

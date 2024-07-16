@@ -1,3 +1,7 @@
+import { Nullable, ParsingError } from '@/constants/abacus';
+import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
+import { STRING_KEY_VALUES } from '@/constants/localization';
+
 import { log } from './telemetry';
 
 /**
@@ -34,4 +38,24 @@ export const getRouteErrorMessageOverride = (
     log('getRouteErrorMessageOverride', err);
     return routeErrorMessage;
   }
+};
+
+const getUntranslatedErrorMessageOrDefaultErrorParams = (errorMessage?: string): ErrorParams => {
+  if (errorMessage && errorMessage !== '') return { errorMessage };
+  return DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS;
+};
+
+export const getValidParsingErrorParams = (error?: Nullable<ParsingError>): ErrorParams => {
+  const { stringKey: errorStringKey, message: errorMessage } = error ?? {};
+  const defaultErrorParams = getUntranslatedErrorMessageOrDefaultErrorParams(errorMessage);
+  if (!errorStringKey) return defaultErrorParams;
+
+  const validErrorStringKey = STRING_KEY_VALUES[errorStringKey];
+  if (!validErrorStringKey) {
+    const err = new Error(`Missing error translation for ${errorStringKey}`);
+    log('errors/MissingParsingErrorTranslation', err, { parsingError: error });
+    return defaultErrorParams;
+  }
+
+  return { errorStringKey: validErrorStringKey };
 };

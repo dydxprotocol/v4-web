@@ -128,9 +128,12 @@ export const AdjustIsolatedMarginForm = ({
     adjustIsolatedMarginOfPosition({
       onError: (errorParams) => {
         setIsSubmitting(false);
-        if (errorParams?.errorStringKey) {
-          setErrorMessage(stringGetter({ key: errorParams.errorStringKey }));
-        }
+        setErrorMessage(
+          stringGetter({
+            key: errorParams.errorStringKey,
+            fallback: errorParams.errorMessage ?? '',
+          })
+        );
       },
       onSuccess: () => {
         setIsSubmitting(false);

@@ -612,7 +612,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localPlace.submissionStatus, localPlace.errorStringKey],
+            [localPlace.submissionStatus, localPlace.errorParams],
             true
           );
         }
@@ -645,7 +645,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localCancel.submissionStatus, localCancel.errorStringKey],
+            [localCancel.submissionStatus, localCancel.errorParams],
             true
           );
         }

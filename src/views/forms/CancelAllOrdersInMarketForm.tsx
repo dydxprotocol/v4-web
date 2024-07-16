@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
+import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -35,7 +36,7 @@ type CancelAllOrdersInMarketFormProps = {
 type OrderCancelStatus =
   | { type: 'pending' }
   | { type: 'success' }
-  | { type: 'error'; errorKey?: string };
+  | { type: 'error'; errorParams?: ErrorParams };
 
 export const CancelAllOrdersInMarketForm = ({
   marketId,
@@ -75,10 +76,10 @@ export const CancelAllOrdersInMarketForm = ({
         onSuccess: () => {
           setCancellingStatus((old) => ({ ...old, [p.id]: { type: 'success' } }));
         },
-        onError: (errorInfo) => {
+        onError: (errorParams) => {
           setCancellingStatus((old) => ({
             ...old,
-            [p.id]: { type: 'error', errorKey: errorInfo?.errorStringKey ?? undefined },
+            [p.id]: { type: 'error', errorParams },
           }));
         },
       })

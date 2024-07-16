@@ -1,4 +1,5 @@
 import { StatsigConfigType } from '@/types/statsig';
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
@@ -52,13 +53,21 @@ export type LocaleData = typeof EN_LOCALE_DATA;
 
 export type StringGetterParams = Record<string, any>;
 
-export type StringGetterFunction = <T extends StringGetterParams>({
-  key,
-  params,
-}: {
-  key: string;
-  params?: T;
-}) => T extends {
+export type StringGetterProps<T extends StringGetterParams> =
+  | {
+      key: string;
+      params?: T;
+      fallback?: string;
+    }
+  | {
+      key?: Nullable<string>;
+      params?: T;
+      fallback: string;
+    };
+
+export type StringGetterFunction = <T extends StringGetterParams>(
+  props: StringGetterProps<T>
+) => T extends {
   [K in keyof T]: T[K] extends string | number ? any : T[K] extends JSX.Element ? any : never;
 }
   ? string
