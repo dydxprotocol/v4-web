@@ -1,3 +1,5 @@
+import { DEFAULT_MARKETID } from './markets';
+
 export enum AppRoute {
   Markets = '/markets',
   Vault = '/vault',
@@ -37,4 +39,5 @@ export enum MobileSettingsRoute {
 
 export const BASE_ROUTE = import.meta.env.VITE_ROUTER_TYPE === 'hash' ? '/#' : '';
 export const TRADE_ROUTE = `${AppRoute.Trade}/:market`;
+export const DEFAULT_TRADE_ROUTE = `${AppRoute.Trade}/${DEFAULT_MARKETID}`;
 export const DEFAULT_DOCUMENT_TITLE = 'dYdX';
