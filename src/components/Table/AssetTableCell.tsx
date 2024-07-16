@@ -1,28 +1,49 @@
 import styled from 'styled-components';
 
-import type { Asset } from '@/constants/abacus';
+import type { Asset, MarketConfigs } from '@/constants/abacus';
 
 import breakpoints from '@/styles/breakpoints';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
 
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
+import { orEmptyObjType } from '@/lib/typeUtils';
+
+import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';
 
 interface AssetTableCellProps {
   asset?: Pick<Asset, 'name' | 'id'>;
+  configs:
+    | Pick<MarketConfigs, 'effectiveInitialMarginFraction' | 'initialMarginFraction'>
+    | null
+    | undefined;
   className?: string;
   stacked?: boolean;
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
-  const { asset, stacked, className } = props;
+  const { asset, stacked, configs, className } = props;
+  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObjType(configs);
 
+  const maxLeverage =
+    configs != null ? (
+      <Output
+        type={OutputType.Multiple}
+        value={calculateMarketMaxLeverage({
+          effectiveInitialMarginFraction,
+          initialMarginFraction,
+        })}
+        fractionDigits={0}
+      />
+    ) : undefined;
   return (
     <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={asset?.id} />}>
       <$TableCellContent stacked={stacked}>
         <$Asset stacked={stacked}>{asset?.name}</$Asset>
-        {stacked ? <$AssetID>{asset?.id}</$AssetID> : <Tag>{asset?.id}</Tag>}
+        {maxLeverage != null &&
+          (stacked ? <$AssetID>{maxLeverage}</$AssetID> : <Tag>{maxLeverage}</Tag>)}
       </$TableCellContent>
     </TableCell>
   );
