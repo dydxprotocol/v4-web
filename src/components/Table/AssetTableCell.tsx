@@ -8,7 +8,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { orEmptyObjType } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';
@@ -25,7 +25,7 @@ interface AssetTableCellProps {
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const { asset, stacked, configs, className } = props;
-  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObjType(configs);
+  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyRecord(configs);
 
   const maxLeverage =
     configs != null ? (
