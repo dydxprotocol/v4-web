@@ -61,6 +61,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
+import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -403,20 +404,25 @@ export const WithdrawForm = () => {
       };
 
     if (routeErrors) {
+      const routeErrorMessageOverride = getRouteErrorMessageOverride(
+        routeErrors,
+        routeErrorMessage
+      );
+
       track(
         AnalyticsEvents.RouteError({
           transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessage ?? undefined,
+          errorMessage: routeErrorMessageOverride ?? undefined,
           amount: debouncedAmount,
           chainId: chainIdStr ?? undefined,
           assetId: toToken?.toString(),
         })
       );
       return {
-        errorMessage: routeErrorMessage
+        errorMessage: routeErrorMessageOverride
           ? stringGetter({
               key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-              params: { ERROR_MESSAGE: routeErrorMessage },
+              params: { ERROR_MESSAGE: routeErrorMessageOverride },
             })
           : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
       };
