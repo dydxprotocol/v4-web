@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
-import { getMapOfLowestFeeTokensByChainId } from '@/constants/cctp';
+import { cctpTokensByChainId, getMapOfLowestFeeTokensByChainId } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -51,7 +53,12 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
     EMPTY_ARR;
 
-  const cctpTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
+  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+
+  const lowestFeeTokensByChainId = useMemo(
+    () => getMapOfLowestFeeTokensByChainId(type, skipEnabled),
+    [type, skipEnabled]
+  );
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -65,7 +72,9 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
-      [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && <LowestFeesDecoratorText />,
+      [lowestFeesDecoratorProp]: !!lowestFeeTokensByChainId[chain.type] && (
+        <LowestFeesDecoratorText />
+      ),
     }))
     .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
@@ -78,7 +87,9 @@ export const SourceSelectMenu = ({
       }
       return true;
     })
-    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1));
+    // we want lowest fee tokens first followed by non-lowest fee cctp tokens
+    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1))
+    .sort((chain) => (lowestFeeTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,

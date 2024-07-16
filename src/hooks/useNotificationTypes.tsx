@@ -19,10 +19,10 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
   INCENTIVES_SEASON_NOTIFICATION_ID,
+  MEDIAN_REWARDS_AMOUNT,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  REWARDS_AMOUNT,
   REWARD_DISTRIBUTION_SEASON_NUMBER,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
@@ -301,8 +301,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
                   PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
-                  DYDX_AMOUNT: REWARDS_AMOUNT.DYDX,
-                  USDC_AMOUNT: REWARDS_AMOUNT.USDC,
+                  DYDX_AMOUNT: MEDIAN_REWARDS_AMOUNT.DYDX,
+                  USDC_AMOUNT: MEDIAN_REWARDS_AMOUNT.USDC,
                 },
               }),
               toastSensitivity: 'foreground',

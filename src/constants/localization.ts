@@ -1,3 +1,4 @@
+import { StatsigConfigType } from '@/types/statsig';
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
@@ -105,10 +106,12 @@ export type TooltipStrings = {
     stringGetter,
     stringParams,
     urlConfigs,
+    featureFlags,
   }: {
     stringGetter: StringGetterFunction;
     stringParams?: any;
     urlConfigs?: LinksConfigs;
+    featureFlags?: StatsigConfigType;
   }) => {
     title?: React.ReactNode;
     body: React.ReactNode;
