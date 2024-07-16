@@ -60,6 +60,9 @@ type VaultFormError = {
   long?: React.ReactNode;
 };
 
+// errors we don't want to show aggressive visual cues about, just disable submit
+const lightErrorKeys = new Set(['disconnected', 'view-only', 'amount-empty']);
+
 const SLIPPAGE_PERCENT_WARN = 0.01;
 const SLIPPAGE_PERCENT_ACK = 0.01;
 
@@ -358,7 +361,11 @@ export const VaultDepositWithdrawForm = () => {
             isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
             isLoading: isSubmitting,
           }}
-          slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+          slotLeft={
+            errorErrors.find((f) => !lightErrorKeys.has(f.key)) != null ? (
+              <$WarningIcon iconName={IconName.Warning} />
+            ) : undefined
+          }
         >
           {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
         </Button>
@@ -428,7 +435,11 @@ export const VaultDepositWithdrawForm = () => {
             isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
             isLoading: isSubmitting,
           }}
-          slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+          slotLeft={
+            errorErrors.find((f) => !lightErrorKeys.has(f.key)) != null ? (
+              <$WarningIcon iconName={IconName.Warning} />
+            ) : undefined
+          }
         >
           {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
         </Button>
