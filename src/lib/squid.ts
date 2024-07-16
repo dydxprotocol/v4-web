@@ -2,10 +2,6 @@ import { GetStatus, StatusResponse } from '@0xsquid/sdk';
 import {
   AxelarTransferInfoJSON,
   CCTPTransferInfoJSON,
-  MsgJSON,
-  MsgsDirectRequestJSON,
-  MsgsDirectResponseJSON,
-  MultiChainMsgJSON,
   TrackTxResponseJSON,
   TransferEventJSON,
   TransferInfoJSON,
@@ -84,11 +80,6 @@ type SkipStatusParams = {
   baseUrl: string | undefined;
 };
 
-type SkipMsgsDirectParams = {
-  msgsDirectRequest: Omit<MsgsDirectRequestJSON, 'amount_out'>;
-  baseUrl: string | undefined;
-};
-
 const DEFAULT_SKIP_URL = 'https://api.skip.money';
 
 export const trackSkipTx = async ({
@@ -129,23 +120,6 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
   const statusResponse = await response.json();
   return formSkipStatusResponse(statusResponse);
 };
-
-export const requestSkipMsgsDirect = async ({
-  baseUrl,
-  msgsDirectRequest,
-}: SkipMsgsDirectParams): Promise<MsgsDirectResponseJSON | undefined> => {
-  const response = await fetch(`${baseUrl ?? DEFAULT_SKIP_URL}/v2/fungible/msgs_direct`, {
-    method: 'POST',
-    body: JSON.stringify(msgsDirectRequest),
-  });
-  return response.json();
-};
-
-export function isMultiChainMsg(msg: MsgJSON): msg is {
-  multi_chain_msg: MultiChainMsgJSON;
-} {
-  return 'multi_chain_msg' in msg;
-}
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
   return skipStatusResponse.transfers[0];

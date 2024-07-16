@@ -51,8 +51,7 @@ export const TransferStatusNotification = ({
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const dispatch = useAppDispatch();
-  const { status, toAmount, isExchange, toChainId, fromChainId, txHash, depositSubaccount } =
-    transfer;
+  const { status, toAmount, isExchange, fromChainId, txHash, depositSubaccount } = transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -130,7 +129,6 @@ export const TransferStatusNotification = ({
                   dispatch(
                     openDialog(
                       DialogTypes.CosmosDeposit({
-                        toChainId,
                         fromChainId,
                         toAmount,
                         txHash,

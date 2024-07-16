@@ -53,14 +53,13 @@ export const SourceSelectMenu = ({
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const chains =
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
+    EMPTY_ARR;
 
-  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
-  const isNotKeplrWallet = walletType !== WalletType.Keplr;
-
-  const options = type === TransferType.deposit ? depositOptions : withdrawalOptions;
-
-  const chains = options?.chains?.toArray() ?? EMPTY_ARR;
-  const exchanges = options?.exchanges?.toArray() ?? EMPTY_ARR;
+  const exchanges =
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
+    EMPTY_ARR;
 
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -73,6 +72,7 @@ export const SourceSelectMenu = ({
     () => getMapOfHighestFeeTokensByChainId(type, skipEnabled),
     [type, skipEnabled]
   );
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -95,7 +95,7 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
-      if (!isNotKeplrWallet) {
+      if (isKeplrWallet) {
         return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
@@ -124,11 +124,12 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
       items={[
-        isNotKeplrWallet &&
+        !isKeplrWallet &&
           exchangeItems.length > 0 && {
             group: 'exchanges',
             groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),

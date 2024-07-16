@@ -24,6 +24,7 @@ export const useMatchingEvmNetwork = ({
   const { wallets } = useWallets();
 
   const isMatchingNetwork = useMemo(() => {
+    // In the Keplr wallet, the network will always match
     if (walletConnectionType === WalletConnectionType.CosmosSigner) {
       return true;
     }

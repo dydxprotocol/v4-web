@@ -408,8 +408,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             dispatch(
               openDialog(
                 DialogTypes.CosmosDeposit({
-                  toChainId: selectedDydxChainId,
-                  fromChainId: chainIdStr ?? undefined,
+                  fromChainId: chainIdStr,
                   toAmount: summary?.toAmount ?? undefined,
                   txHash,
                 })

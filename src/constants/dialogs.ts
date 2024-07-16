@@ -20,10 +20,9 @@ export type ClosePositionDialogProps = {};
 export type CancelPendingOrdersDialogProps = { marketId: string };
 export type ComplianceConfigDialogProps = {};
 export type CosmosDepositDialogProps = {
-  toChainId?: string;
   fromChainId?: string;
   toAmount?: number;
-  txHash?: string;
+  txHash: string;
 };
 export type DepositDialogProps = {};
 export type DisconnectWalletDialogProps = {};

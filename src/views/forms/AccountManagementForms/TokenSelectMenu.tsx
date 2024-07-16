@@ -52,11 +52,12 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
     [type, skipEnabled]
   );
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
     EMPTY_ARR;
-  const isKeplrWallet = walletType === WalletType.Keplr;
+
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
@@ -75,7 +76,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
-      // only show USDC for Keplr wallets
       if (isKeplrWallet) {
         if (chainIdStr === getNobleChainId()) {
           return true;

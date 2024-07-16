@@ -398,7 +398,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             : undefined,
         },
       };
-
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
       // take out fee from amount before sweeping
@@ -482,7 +481,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         typeUrl: params.typeUrl, // '/circle.cctp.v1.MsgDepositForBurn',
         value: params.value,
       };
-
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
       // take out fee from amount before sweeping
