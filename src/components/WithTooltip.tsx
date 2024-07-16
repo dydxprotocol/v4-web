@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 
+import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -43,6 +44,7 @@ export const WithTooltip = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
+  const featureFlags = useAllStatsigGateValues();
 
   const getTooltipStrings = tooltip && tooltipStrings[tooltip];
   if (!getTooltipStrings && !tooltipString && !slotTooltip) return children;
@@ -56,6 +58,7 @@ export const WithTooltip = ({
       stringGetter,
       stringParams,
       urlConfigs,
+      featureFlags,
     });
     tooltipTitle = title;
     tooltipBody = body;
