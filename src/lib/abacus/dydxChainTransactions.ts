@@ -22,6 +22,7 @@ import Long from 'long';
 
 import {
   QueryType,
+  QueryTypes,
   TransactionType,
   TransactionTypes,
   type AbacusDYDXChainTransactionsProtocol,
