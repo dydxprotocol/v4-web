@@ -106,11 +106,10 @@ const $CardValue = styled.div`
 `;
 
 export const VaultDescription = ({ className }: { className?: string }) => {
+  const stringGetter = useStringGetter();
   return (
     <$DescriptionContainer className={className}>
-      This vault provides automated liquidity on all dYdX markets and gets share of fee revenue.
-      Vaults aim for a market-neutral position by quoting both sides of the book. P&L will vary
-      based on market conditions and theres a risk of losing some or all of the USDC deposited.
+      {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}
     </$DescriptionContainer>
   );
 };

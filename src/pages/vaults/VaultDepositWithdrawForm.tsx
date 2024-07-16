@@ -135,7 +135,9 @@ export const VaultDepositWithdrawForm = ({
           type: AlertType.Error,
           key: 'amount-empty',
           short:
-            selectedType === 'deposit' ? 'Enter amount to deposit' : 'Enter amount to withdraw',
+            selectedType === 'deposit'
+              ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_DEPOSIT })
+              : stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_WITHDRAW }),
         },
       ];
     }
@@ -145,7 +147,7 @@ export const VaultDepositWithdrawForm = ({
         allErrors.push({
           type: AlertType.Error,
           key: 'deposit-high',
-          long: 'You cannot deposit more than your free collateral.',
+          long: stringGetter({ key: STRING_KEYS.DEPOSIT_TOO_HIGH }),
           short: 'Modify amount',
         });
       }
@@ -154,7 +156,7 @@ export const VaultDepositWithdrawForm = ({
         allErrors.push({
           type: AlertType.Error,
           key: 'withdraw-high',
-          long: 'You cannot withdraw more than your vault balance.',
+          long: stringGetter({ key: STRING_KEYS.WITHDRAW_TOO_HIGH }),
           short: 'Modify amount',
         });
       }
@@ -164,12 +166,17 @@ export const VaultDepositWithdrawForm = ({
           key: 'slippage-high',
           long: (
             <span>
-              This withdrawal would result in{' '}
-              <$InlineOutput value={slippagePercent} type={OutputType.Percent} /> slippage. Slippage
-              may be reduced if you withdraw at a later time. For more information, see{' '}
-              <Link href={vaultsLearnMore} withIcon isInline>
-                Vault FAQs
-              </Link>
+              {stringGetter({
+                key: STRING_KEYS.SLIPPAGE_WARNING,
+                params: {
+                  AMOUNT: <$InlineOutput value={slippagePercent} type={OutputType.Percent} />,
+                  LINK: (
+                    <Link href={vaultsLearnMore} withIcon isInline>
+                      {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
+                    </Link>
+                  ),
+                },
+              })}
             </span>
           ),
         });
@@ -177,7 +184,7 @@ export const VaultDepositWithdrawForm = ({
           allErrors.push({
             type: AlertType.Error,
             key: 'slippage-acked',
-            short: 'Acknowledge High Slippage',
+            short: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_HIGH_SLIPPAGE }),
           });
         }
       }
@@ -246,8 +253,11 @@ export const VaultDepositWithdrawForm = ({
   const inputFormConfig =
     selectedType === 'deposit'
       ? {
-          formLabel: 'Amount to Deposit',
-          buttonLabel: currentForm === 'confirm' ? 'Confirm Deposit' : 'Preview Deposit',
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT }),
+          buttonLabel:
+            currentForm === 'confirm'
+              ? stringGetter({ key: STRING_KEYS.CONFIRM_DEPOSIT })
+              : stringGetter({ key: STRING_KEYS.PREVIEW_DEPOSIT }),
           inputReceiptItems: [
             {
               key: 'cross-free-collateral',
@@ -268,13 +278,16 @@ export const VaultDepositWithdrawForm = ({
             },
           ],
           transactionTarget: {
-            label: 'dYdX Protocol Vault',
+            label: stringGetter({ key: STRING_KEYS.PROTOCOL_VAULT }),
             icon: 'vault' as const,
           },
         }
       : {
-          formLabel: 'Amount to Withdraw',
-          buttonLabel: currentForm === 'confirm' ? 'Confirm Withdrawal' : 'Preview Withdrawal',
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_WITHDRAW }),
+          buttonLabel:
+            currentForm === 'confirm'
+              ? stringGetter({ key: STRING_KEYS.CONFIRM_WITHDRAW })
+              : stringGetter({ key: STRING_KEYS.PREVIEW_WITHDRAW }),
           inputReceiptItems: [
             {
               key: 'vault-balance',
@@ -290,7 +303,7 @@ export const VaultDepositWithdrawForm = ({
             },
             {
               key: 'slippage',
-              label: 'Est. slippage',
+              label: stringGetter({ key: STRING_KEYS.EST_SLIPPAGE }),
               value: <Output type={OutputType.Percent} value={slippagePercent} />,
             },
             {
@@ -300,7 +313,7 @@ export const VaultDepositWithdrawForm = ({
             },
           ],
           transactionTarget: {
-            label: 'Cross Account',
+            label: stringGetter({ key: STRING_KEYS.CROSS_ACCOUNT }),
             icon: 'cross' as const,
           },
         };
@@ -429,10 +442,13 @@ export const VaultDepositWithdrawForm = ({
           onCheckedChange={setSlippageAck}
           id="slippage-ack"
           label={
-            // todo
             <span>
-              I understand that withdrawing now will result in{' '}
-              <$InlineOutput type={OutputType.Percent} value={slippagePercent} /> slippage
+              {stringGetter({
+                key: STRING_KEYS.SLIPPAGE_ACK,
+                params: {
+                  AMOUNT: <$InlineOutput type={OutputType.Percent} value={slippagePercent} />,
+                },
+              })}
             </span>
           }
         />
