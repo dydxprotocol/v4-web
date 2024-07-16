@@ -3,7 +3,7 @@ import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import { AbacusInputTypes, Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
@@ -118,7 +118,7 @@ export const CanvasOrderbook = forwardRef(
     const dispatch = useAppDispatch();
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
-        if (currentInput === 'trade' && price) {
+        if (currentInput === AbacusInputTypes.Trade && price) {
           // avoid scientific notation for when converting small number to string
           dispatch(
             setTradeFormInputs({
