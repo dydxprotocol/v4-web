@@ -99,7 +99,11 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
         </$RevealControls>
         <WithReceipt
           slotReceipt={
-            <$WordList isShowing={isShowing} onClick={() => setIsShowing(!isShowing)}>
+            <$WordList
+              data-hj-suppress
+              isShowing={isShowing}
+              onClick={() => setIsShowing(!isShowing)}
+            >
               <$List>
                 {mnemonic?.split(' ').map((word: string, i: number) => (
                   // eslint-disable-next-line react/no-array-index-key
