@@ -48,7 +48,7 @@ export const SharePNLAnalyticsDialog = ({
   leverage,
   oraclePrice,
   entryPrice,
-  unrealizedPnlPercent,
+  unrealizedPnl,
   setIsOpen,
 }: DialogProps<SharePNLAnalyticsDialogProps>) => {
   const stringGetter = useStringGetter();
@@ -89,7 +89,7 @@ export const SharePNLAnalyticsDialog = ({
     }
   }, [side]);
 
-  const unrealizedPnlIsNegative = MustBigNumber(unrealizedPnlPercent).isNegative();
+  const unrealizedPnlIsNegative = MustBigNumber(unrealizedPnl).isNegative();
 
   const [assetLeft, assetRight] = marketId.split('-');
 
@@ -116,8 +116,8 @@ export const SharePNLAnalyticsDialog = ({
 
           <$HighlightOutput
             isNegative={unrealizedPnlIsNegative}
-            type={OutputType.Percent}
-            value={unrealizedPnlPercent}
+            type={OutputType.Fiat}
+            value={unrealizedPnl}
             showSign={ShowSign.None}
             slotLeft={
               <DiffArrow
