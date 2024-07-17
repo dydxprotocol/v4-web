@@ -123,7 +123,7 @@ const $TradeLayout = styled.article<{
 
   /* prettier-ignore */
   --layout-alternative-desktopMedium:
-    'Top Inner Side' auto
+    'Vertical Top Side' auto
     'Vertical Inner Side' minmax(0, 1fr)
     'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
