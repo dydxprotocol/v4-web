@@ -80,6 +80,7 @@ const VaultPage = () => {
       </$MobilePage>
     );
   }
+
   return (
     <$Page>
       <$TwoColumnContainer>
