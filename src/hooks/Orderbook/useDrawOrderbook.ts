@@ -45,7 +45,6 @@ type StyleProps = {
 
 enum OrderbookRowAnimationType {
   REMOVE,
-  NEW,
   NONE,
 }
 
@@ -198,29 +197,15 @@ export const useDrawOrderbook = ({
     rekt: Rekt;
   }) => {
     const { y1 } = rekt;
-
     const { text: y } = getYForElements({ y: y1, rowHeight });
 
-    let textColor: string;
-    let updatedTextColor: string | undefined;
-
-    switch (animationType) {
-      case OrderbookRowAnimationType.REMOVE: {
-        textColor = theme.textTertiary;
-        break;
-      }
-
-      case OrderbookRowAnimationType.NEW: {
-        updatedTextColor = side === 'bid' ? theme.positive : theme.negative;
-        textColor = theme.textPrimary;
-        break;
-      }
-
-      default: {
-        textColor = theme.textPrimary;
-        break;
-      }
-    }
+    const textColor = theme.textPrimary;
+    const updatedTextColor =
+      animationType === OrderbookRowAnimationType.REMOVE
+        ? side === 'bid'
+          ? theme.positive
+          : theme.negative
+        : undefined;
 
     // Price text
     if (price != null) {
@@ -356,20 +341,17 @@ export const useDrawOrderbook = ({
     // Clear canvas before redraw
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    // Animate row removal and update
+    // Animate row removal (do not animate update)
     const mapOfOrderbookPriceLevels =
       side && currentOrderbookMap?.[side === 'ask' ? 'asks' : 'bids'];
 
     prevData.current.forEach((row, idx) => {
       if (!row) return;
 
-      let animationType = OrderbookRowAnimationType.NEW;
-
-      if (mapOfOrderbookPriceLevels?.[row.price] === 0) {
-        animationType = OrderbookRowAnimationType.REMOVE;
-      } else if (mapOfOrderbookPriceLevels?.[row.price] === row.size) {
-        animationType = OrderbookRowAnimationType.NONE;
-      }
+      const animationType =
+        mapOfOrderbookPriceLevels?.[row.price] === 0
+          ? OrderbookRowAnimationType.REMOVE
+          : OrderbookRowAnimationType.NONE;
 
       drawOrderbookRow({ ctx, idx, rowToRender: row, animationType });
     });
