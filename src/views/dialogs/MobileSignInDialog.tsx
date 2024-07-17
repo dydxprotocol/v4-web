@@ -57,7 +57,7 @@ const MobileQrCode = ({
   const encryptedData = AES.encrypt(JSON.stringify(data), encryptionKey).toString();
 
   return (
-    <$QrCodeContainer isShowing={isShowing} onClick={onClick}>
+    <$QrCodeContainer data-hj-suppress isShowing={isShowing} onClick={onClick}>
       <QrCode hasLogo size={432} value={encryptedData} />
       <span>{stringGetter({ key: STRING_KEYS.CLICK_TO_SHOW })}</span>
     </$QrCodeContainer>
@@ -108,7 +108,7 @@ export const MobileSignInDialog = ({ setIsOpen }: DialogProps<MobileSignInDialog
             },
           })}
         </p>
-        <span>
+        <span data-hj-suppress>
           Encryption Key: <strong>{encryptionKey}</strong>
         </span>
         <MobileQrCode
