@@ -7,7 +7,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -18,7 +17,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
-import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
@@ -118,13 +116,7 @@ export const SharePNLAnalyticsDialog = ({
             isNegative={unrealizedPnlIsNegative}
             type={OutputType.Fiat}
             value={unrealizedPnl}
-            showSign={ShowSign.None}
-            slotLeft={
-              <DiffArrow
-                direction={unrealizedPnlIsNegative ? 'down' : 'up'}
-                sign={unrealizedPnlIsNegative ? NumberSign.Negative : NumberSign.Positive}
-              />
-            }
+            showSign={ShowSign.Both}
           />
 
           <$Logo />
