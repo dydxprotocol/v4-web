@@ -48,12 +48,12 @@ type VaultHistory = {
 
 const initialState: VaultsState = {
   vaultDetails: {
-    totalValue: 30_425,
+    totalValue: 930_425_857,
     thirtyDayReturnPercent: 0.1474,
     positions: [
-      {
+      ...range(1).map((a) => ({
         asset: { id: 'PEPE', name: 'Pepe' },
-        marketId: 'PEPE-USD',
+        marketId: `PEPE-USD${a}`,
         marginUsdc: 10_000,
         currentLeverageMultiple: 1.2,
         currentPosition: { asset: 1734112, usdc: 423.67 },
@@ -62,7 +62,7 @@ const initialState: VaultsState = {
           absolute: 1123,
           sparklinePoints: [1, 2, 3, 2, 1, 4, 3, 1, 3, 1, 2],
         },
-      },
+      })),
     ],
   },
   vaultHistory: {

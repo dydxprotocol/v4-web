@@ -118,13 +118,7 @@ const $DescriptionContainer = styled.div`
   color: var(--color-text-0);
 `;
 
-export const VaultPositionsSection = ({
-  className,
-  scroll,
-}: {
-  className?: string;
-  scroll?: boolean;
-}) => {
+export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
 
@@ -136,24 +130,10 @@ export const VaultPositionsSection = ({
           {numPositions}
         </Tag>
       </$SectionTitle>
-      <$PositionsContainer $scroll={scroll}>
-        <div>
-          <VaultPositionsTable />
-        </div>
-      </$PositionsContainer>
+      <VaultPositionsTable />
     </div>
   );
 };
-
-const $PositionsContainer = styled.div<{ $scroll?: boolean }>`
-  ${({ $scroll }) =>
-    $scroll
-      ? css`
-          max-height: 20rem;
-          overflow-y: scroll;
-        `
-      : ''}
-`;
 
 const $SectionTitle = styled.div`
   font: var(--font-large-medium);
@@ -200,19 +180,28 @@ export const VaultHeader = ({ className }: { className?: string }) => {
           <$MarketTitleText>{stringGetter({ key: STRING_KEYS.VAULT })}</$MarketTitleText>
         </div>
       </$MarketTitle>
-      {detailItems.map((item) => (
-        <React.Fragment key={item.key}>
-          <$VerticalSeparator />
-          <$DetailItem key={item.key}>
-            <$DetailLabel>{item.label}</$DetailLabel>
-            <$DetailValue>{item.value}</$DetailValue>
-          </$DetailItem>
-        </React.Fragment>
-      ))}
+      <$DetailItems>
+        {detailItems.map((item) => (
+          <React.Fragment key={item.key}>
+            <$VerticalSeparator />
+            <$DetailItem key={item.key}>
+              <$DetailLabel>{item.label}</$DetailLabel>
+              <$DetailValue>{item.value}</$DetailValue>
+            </$DetailItem>
+          </React.Fragment>
+        ))}
+      </$DetailItems>
     </$HeaderRow>
   );
 };
 
+const $DetailItems = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  @media (${breakpoints.tablet}) {
+    gap: 0.75rem;
+  }
+`;
 const $BackContainer = styled.div`
   display: flex;
   align-items: center;

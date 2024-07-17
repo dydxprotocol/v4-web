@@ -51,7 +51,7 @@ const VaultPage = () => {
               <$PnlChart />
             </$PnlRow>
             <$VaultDescription />
-            <$VaultPositionsSection scroll />
+            <$VaultPositionsSection />
           </$VaultDetailsColumn>
         </$OneColumnContainer>
 

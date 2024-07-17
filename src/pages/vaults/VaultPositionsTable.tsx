@@ -28,6 +28,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
+const VAULT_PAGE_SIZE = 50 as const;
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
@@ -142,7 +143,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         direction: 'descending',
       }}
       columns={columns}
-      paginationBehavior="showAll"
+      paginationBehavior={vaultsData.length <= VAULT_PAGE_SIZE ? 'showAll' : 'paginate'}
+      initialPageSize={VAULT_PAGE_SIZE}
       className={className}
     />
   );

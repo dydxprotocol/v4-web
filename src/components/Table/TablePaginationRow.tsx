@@ -15,7 +15,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-export const PAGE_SIZES = [5, 10, 15, 20] as const;
+export const PAGE_SIZES = [5, 10, 15, 20, 50] as const;
 export type PageSize = (typeof PAGE_SIZES)[number];
 
 type ElementProps = {
