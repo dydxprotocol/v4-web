@@ -43,7 +43,7 @@ import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
 import { signComplianceSignature } from '../compliance';
-import { StatefulOrderError } from '../errors';
+import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
@@ -282,10 +282,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       if (error?.name !== 'BroadcastError') {
         log('DydxChainTransactions/placeOrderTransaction', error);
       }
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -318,10 +315,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return encodedTx;
     } catch (error) {
       log('DydxChainTransactions/cancelOrderTransaction', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -350,10 +344,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/simulateWithdrawTransaction', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -387,10 +378,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/simulateTransferNativeTokenTransaction', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -433,10 +421,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/sendNobleIBC', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -482,10 +467,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       });
     } catch (error) {
       log('DydxChainTransactions/withdrawToNobleIBC', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -519,10 +501,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/cctpWithdraw', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -588,10 +567,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       });
     } catch (error) {
       log('DydxChainTransactions/signComplianceMessage', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -623,10 +599,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/subaccountTransfer', error);
-
-      return JSON.stringify({
-        error,
-      });
+      return stringifyTransactionError(error);
     }
   }
 
@@ -695,7 +668,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }
     } catch (error) {
       try {
-        const serializedError = JSON.stringify(error);
+        const serializedError = stringifyTransactionError(error);
         callback(serializedError);
       } catch (parseError) {
         log('DydxChainTransactions/transaction', parseError);
