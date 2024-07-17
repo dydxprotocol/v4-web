@@ -364,7 +364,7 @@ const getPositionsTableColumnDef = ({
           oraclePrice,
           entryPrice,
           takeProfitOrders,
-          unrealizedPnlPercent,
+          unrealizedPnl,
           resources,
         }) => (
           <PositionsActionsCell
@@ -374,7 +374,7 @@ const getPositionsTableColumnDef = ({
             leverage={leverage.current}
             oraclePrice={oraclePrice}
             entryPrice={entryPrice.current}
-            unrealizedPnlPercent={unrealizedPnlPercent?.current}
+            unrealizedPnl={unrealizedPnl?.current}
             sideLabel={
               resources.sideStringKey?.current &&
               stringGetter({ key: resources.sideStringKey?.current })
