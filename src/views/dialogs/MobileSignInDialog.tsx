@@ -98,7 +98,7 @@ export const MobileSignInDialog = ({ setIsOpen }: DialogProps<MobileSignInDialog
     ),
     [MobileSignInState.Scanning]: (
       <>
-        <p>
+        <p data-hj-suppress>
           {stringGetter({
             key: STRING_KEYS.WHILE_ONBOARDING,
             params: {
