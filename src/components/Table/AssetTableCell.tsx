@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import type { Asset, MarketConfigs } from '@/constants/abacus';
 
 import breakpoints from '@/styles/breakpoints';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
@@ -41,18 +42,26 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={asset?.id} />}>
       <$TableCellContent stacked={stacked}>
-        <$Asset stacked={stacked}>{asset?.name}</$Asset>
-        {maxLeverage != null &&
-          (stacked ? <$AssetID>{maxLeverage}</$AssetID> : <Tag>{maxLeverage}</Tag>)}
+        <$AssetAndTag>
+          <$Asset stacked={stacked}>{asset?.name}</$Asset>
+          <Tag>{maxLeverage}</Tag>
+        </$AssetAndTag>
+        {stacked ? <$AssetID>{asset?.id}</$AssetID> : undefined}
       </$TableCellContent>
     </TableCell>
   );
 };
+
 const $TableCellContent = styled.div<{ stacked?: boolean }>`
   gap: ${({ stacked }) => (stacked ? '0.125rem' : '0.75rem')};
   display: flex;
   flex-direction: ${({ stacked }) => (stacked ? 'column' : 'row')};
   align-items: ${({ stacked }) => (stacked ? 'flex-start' : 'center')};
+`;
+
+const $AssetAndTag = styled.div`
+  ${layoutMixins.row}
+  gap: 0.5rem;
 `;
 
 const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
