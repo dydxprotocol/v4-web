@@ -213,6 +213,7 @@ const $ToggleButton = styled(ToggleButton)`
   gap: 1px;
 
   svg {
+    color: var(--color-text-1);
     rotate: 0.25turn;
     margin-top: 2px;
   }

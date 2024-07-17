@@ -115,7 +115,6 @@ const $OrderbookUnitControl = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  border-bottom: var(--border);
 `;
 
 const $MinusSymbolCenter = styled.span`

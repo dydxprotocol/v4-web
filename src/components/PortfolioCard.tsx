@@ -45,7 +45,7 @@ const $PortfolioCard = styled.div`
   min-width: 14rem;
   background-color: var(--color-layer-3);
   overflow: hidden;
-  padding: 0.75rem 0;
+  padding: 0.625rem 0;
   padding-bottom: 0.5rem;
   border-radius: 0.625rem;
 `;
@@ -64,7 +64,7 @@ const $MarketRow = styled.div`
 const $MarginRow = styled.div`
   ${layoutMixins.spacedRow}
   padding: 0 0.625rem;
-  margin-top: 0.625rem;
+  margin-top: 0.5rem;
 `;
 
 const $MarginLabel = styled.span`
