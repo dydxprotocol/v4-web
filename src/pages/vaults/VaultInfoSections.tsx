@@ -29,6 +29,7 @@ const EmptyValue = () => <$EmptyValue>—</$EmptyValue>;
 const $EmptyValue = styled.span`
   color: var(--color-text-0);
 `;
+
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const stringGetter = useStringGetter();
