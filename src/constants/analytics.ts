@@ -11,13 +11,10 @@ import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
-type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventPayloads[T] & {
-  referrer: string;
-};
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
     eventType: T;
-    eventData: AnalyticsEventDataWithReferrer<T>;
+    eventData: AnalyticsEventPayloads[T];
   };
 };
 export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
@@ -78,6 +75,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   Breakpoint: 'breakpoint',
   Version: 'version',
   StatsigFlags: 'statsigFlags',
+  CustomDomainReferrer: 'customDomainReferrer',
   Network: 'network',
   WalletType: 'walletType',
   WalletConnectionType: 'walletConnectionType',
