@@ -46,6 +46,8 @@ export const customTrackEvent = <T extends AnalyticsEventTypes>(
 // User properties
 export const AnalyticsUserProperties = unionize(
   {
+    // Referrer
+    CustomDomainReferrer: ofType<string | null>(),
     // Environment
     Locale: ofType<SupportedLocales>(),
     Breakpoint: ofType<
