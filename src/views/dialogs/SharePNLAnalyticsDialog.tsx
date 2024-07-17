@@ -114,7 +114,7 @@ export const SharePNLAnalyticsDialog = ({
 
           <$HighlightOutput
             isNegative={unrealizedPnlIsNegative}
-            type={OutputType.Fiat}
+            type={OutputType.CompactFiat}
             value={unrealizedPnl}
             showSign={ShowSign.Both}
           />
