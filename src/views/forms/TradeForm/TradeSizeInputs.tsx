@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -35,6 +36,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
@@ -108,13 +110,24 @@ export const TradeSizeInputs = () => {
     });
   };
 
-  const onUsdcToggle = useCallback((isPressed: boolean) => {
-    setShowUSDCInput(isPressed);
-    abacusStateManager.setTradeValue({
-      field: TradeInputField.lastInput,
-      value: isPressed ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
-    });
-  }, []);
+  const onUsdcToggle = useCallback(
+    (isPressed: boolean) => {
+      setShowUSDCInput(isPressed);
+      abacusStateManager.setTradeValue({
+        field: TradeInputField.lastInput,
+        value: isPressed ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
+      });
+
+      // AnalyticsEvent.TradeAmountToggleClick
+      track(
+        AnalyticsEvents.TradeAmountToggleClick({
+          newInput: isPressed ? TradeSizeInput.Usdc : TradeSizeInput.Size,
+          market: id ?? '',
+        })
+      );
+    },
+    [id]
+  );
 
   const inputToggleButton = () => {
     const slotTooltip =
