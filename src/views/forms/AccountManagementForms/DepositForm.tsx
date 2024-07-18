@@ -517,12 +517,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
                 {stringGetter({
                   key: STRING_KEYS.DEPOSIT_ACKNOWLEDGEMENT,
                   params: {
-                    TERMS: (
+                    TERMS_LINK: (
                       <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
                         {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
                       </Link>
                     ),
-                    POLICY: (
+                    POLICY_LINK: (
                       <Link href={`${BASE_ROUTE}${AppRoute.Privacy}`} isInline>
                         {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
                       </Link>
