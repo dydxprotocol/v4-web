@@ -436,11 +436,11 @@ export const AdjustIsolatedMarginForm = ({
           state={
             isSubmitting
               ? ButtonState.Loading
-              : hasCtaErrorAction
+              : ctaErrorAction
                 ? ButtonState.Disabled
                 : ButtonState.Default
           }
-          slotLeft={hasCtaErrorAction ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+          slotLeft={ctaErrorAction ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
         >
           {ctaErrorAction ?? formConfig.buttonLabel}
         </Button>
