@@ -12,16 +12,14 @@ import { createAppSelector } from '@/state/appTypes';
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
   (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
-    const { hasAcknowledgedTerms, hasPreviousTransactions } = onboardingGuards;
+    const { hasPreviousTransactions } = onboardingGuards;
 
     return {
       [OnboardingState.Disconnected]: OnboardingSteps.ChooseWallet,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
-      [OnboardingState.AccountConnected]: !hasAcknowledgedTerms
-        ? OnboardingSteps.AcknowledgeTerms
-        : !hasPreviousTransactions
-          ? OnboardingSteps.DepositFunds
-          : undefined,
+      [OnboardingState.AccountConnected]: !hasPreviousTransactions
+        ? OnboardingSteps.DepositFunds
+        : undefined,
     }[onboardingState];
   }
 );

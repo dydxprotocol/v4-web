@@ -12,6 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -22,6 +23,7 @@ import {
   MIN_CCTP_TRANSFER_AMOUNT,
   NumberSign,
 } from '@/constants/numbers';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
@@ -38,14 +40,17 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getOnboardingGuards } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { forceOpenDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -67,12 +72,21 @@ type DepositFormProps = {
 
 export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
 
-  const { dydxAddress, evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
+  const {
+    dydxAddress,
+    evmAddress,
+    signerWagmi,
+    publicClientWagmi,
+    nobleAddress,
+    saveHasAcknowledgedTerms,
+  } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
@@ -272,6 +286,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         setIsLoading(true);
+
+        if (!hasAcknowledgedTerms) {
+          saveHasAcknowledgedTerms(true);
+        }
 
         await validateTokenApproval();
 
@@ -494,6 +512,35 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               setRequireUserActionInWallet={setRequireUserActionInWallet}
               setError={setError}
             />
+            {!hasAcknowledgedTerms && (
+              <$Terms>
+                {stringGetter({
+                  key: STRING_KEYS.DEPOSIT_ACKNOWLEDGEMENT,
+                  params: {
+                    TERMS: (
+                      <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
+                        {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+                      </Link>
+                    ),
+                    POLICY: (
+                      <Link href={`${BASE_ROUTE}${AppRoute.Privacy}`} isInline>
+                        {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
+                      </Link>
+                    ),
+                    VIEW_MORE_LINK: (
+                      <Link
+                        isInline
+                        onClick={() => {
+                          dispatch(forceOpenDialog(DialogTypes.AcknowledgeTerms()));
+                        }}
+                      >
+                        {stringGetter({ key: STRING_KEYS.VIEW_MORE })} →
+                      </Link>
+                    ),
+                  },
+                })}
+              </$Terms>
+            )}
           </$Footer>
         </>
       )}
@@ -515,4 +562,10 @@ const $Footer = styled.footer`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
+`;
+
+const $Terms = styled.div`
+  margin-top: 1rem;
+  color: var(--color-text-0);
+  font: var(--font-small-book);
 `;

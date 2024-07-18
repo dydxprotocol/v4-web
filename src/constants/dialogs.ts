@@ -11,6 +11,7 @@ import { DydxChainAsset } from './wallets';
 type SharedDialogProps = { setIsOpen: (open: boolean) => void };
 export type DialogProps<T> = T & SharedDialogProps;
 
+export type AcknowledgeTermsDialogProps = {};
 export type AdjustIsolatedMarginDialogProps = {
   positionId: SubaccountPosition['id'];
 };
@@ -85,6 +86,7 @@ export type WithdrawalGatedDialogProps = {
 
 export const DialogTypes = unionize(
   {
+    AcknowledgeTerms: ofType<AcknowledgeTermsDialogProps>(),
     AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
     AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),

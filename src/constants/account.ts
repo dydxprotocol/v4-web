@@ -3,7 +3,6 @@ import type { DydxAddress, EvmAddress } from './wallets';
 export enum OnboardingSteps {
   ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
-  AcknowledgeTerms = 'AcknowledgeTerms',
   DepositFunds = 'DepositFunds',
 }
 

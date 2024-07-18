@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
 
+import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
@@ -56,6 +57,7 @@ export const DialogManager = () => {
   };
 
   return DialogTypes.match(activeDialog, {
+    AcknowledgeTerms: (args) => <AcknowledgeTermsDialog {...args} {...modalProps} />,
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
