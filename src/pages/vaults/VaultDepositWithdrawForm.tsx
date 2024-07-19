@@ -34,25 +34,6 @@ import { getUserVault } from '@/state/vaultSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-const renderDiffOutput = ({
-  type,
-  value,
-  newValue,
-  showSign,
-  withDiff,
-}: Pick<
-  Parameters<typeof DiffOutput>[0],
-  'type' | 'value' | 'newValue' | 'withDiff' | 'showSign'
->) => (
-  <DiffOutput
-    type={type}
-    value={value}
-    newValue={newValue}
-    showSign={showSign}
-    withDiff={withDiff}
-  />
-);
-
 type VaultFormError = {
   type: AlertType;
   key: string;
@@ -221,33 +202,42 @@ export const VaultDepositWithdrawForm = ({
     }
   }, [freeCollateral, selectedType, userBalance]);
 
-  const freeCollateralDiff = renderDiffOutput({
-    type: OutputType.Fiat,
-    value: freeCollateral?.current,
-    newValue: freeCollateralUpdated,
-    withDiff:
-      MustBigNumber(amount).gt(0) &&
-      freeCollateralUpdated != null &&
-      freeCollateral?.current !== freeCollateralUpdated,
-  });
-  const vaultDiff = renderDiffOutput({
-    type: OutputType.Fiat,
-    value: userBalance,
-    newValue: userBalanceUpdated,
-    withDiff:
-      MustBigNumber(amount).gt(0) &&
-      userBalanceUpdated != null &&
-      userBalanceUpdated !== userBalance,
-  });
-  const marginUsageDiff = renderDiffOutput({
-    type: OutputType.Percent,
-    value: marginUsage?.current,
-    newValue: marginUsageUpdated,
-    withDiff:
-      MustBigNumber(amount).gt(0) &&
-      marginUsageUpdated != null &&
-      marginUsage?.current !== marginUsageUpdated,
-  });
+  const freeCollateralDiff = (
+    <DiffOutput
+      type={OutputType.Fiat}
+      value={freeCollateral?.current}
+      newValue={freeCollateralUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        freeCollateralUpdated != null &&
+        freeCollateral?.current !== freeCollateralUpdated
+      }
+    />
+  );
+  const vaultDiff = (
+    <DiffOutput
+      type={OutputType.Fiat}
+      value={userBalance}
+      newValue={userBalanceUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        userBalanceUpdated != null &&
+        userBalanceUpdated !== userBalance
+      }
+    />
+  );
+  const marginUsageDiff = (
+    <DiffOutput
+      type={OutputType.Percent}
+      value={marginUsage?.current}
+      newValue={marginUsageUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        marginUsageUpdated != null &&
+        marginUsage?.current !== marginUsageUpdated
+      }
+    />
+  );
 
   // todo i18n
   const inputFormConfig =
@@ -318,8 +308,8 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorErrors = errors.filter((e) => e.type === AlertType.Error);
-  const hasInputErrors = errorErrors.length > 0;
+  const errorsPreventingSubmit = errors.filter((e) => e.type === AlertType.Error);
+  const hasInputErrors = errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
     .filter((e) => e.long != null)
@@ -390,12 +380,12 @@ export const VaultDepositWithdrawForm = ({
             isLoading: isSubmitting,
           }}
           slotLeft={
-            errorErrors.find((f) => !lightErrorKeys.has(f.key)) != null ? (
+            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.key)) != null ? (
               <$WarningIcon iconName={IconName.Warning} />
             ) : undefined
           }
         >
-          {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
+          {hasInputErrors ? errorsPreventingSubmit[0]?.short : inputFormConfig.buttonLabel}
         </Button>
       </WithDetailsReceipt>
     </$Form>
@@ -470,12 +460,12 @@ export const VaultDepositWithdrawForm = ({
             isLoading: isSubmitting,
           }}
           slotLeft={
-            errorErrors.find((f) => !lightErrorKeys.has(f.key)) != null ? (
+            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.key)) != null ? (
               <$WarningIcon iconName={IconName.Warning} />
             ) : undefined
           }
         >
-          {hasInputErrors ? errorErrors[0]?.short : inputFormConfig.buttonLabel}
+          {hasInputErrors ? errorsPreventingSubmit[0]?.short : inputFormConfig.buttonLabel}
         </Button>
       </$ConfirmButtonGroup>
     </$Form>
