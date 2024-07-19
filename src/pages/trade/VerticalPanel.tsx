@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
+import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,6 +24,22 @@ const HISTOGRAM_SIDES_BY_LAYOUT = {
 export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Orderbook);
+  const [maxNumRowsToShow, setMaxNumRowsToShow] = useState(ORDERBOOK_MAX_ROWS_PER_SIDE);
+
+  useEffect(() => {
+    const calculateNumRows = () => {
+      const viewportHeight = window.innerHeight;
+      const verticalPanelHeight = Math.floor(viewportHeight / 3);
+      setMaxNumRowsToShow(
+        Math.floor((verticalPanelHeight - 2 * ORDERBOOK_ROW_HEIGHT) / (2 * ORDERBOOK_ROW_HEIGHT))
+      );
+    };
+
+    calculateNumRows();
+    window.addEventListener('resize', calculateNumRows);
+
+    return () => window.removeEventListener('resize', calculateNumRows);
+  }, []);
 
   return (
     <Tabs
@@ -34,7 +51,12 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
       items={[
         {
           asChild: true,
-          content: <CanvasOrderbook histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]} />,
+          content: (
+            <CanvasOrderbook
+              maxRowsPerSide={maxNumRowsToShow}
+              histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]}
+            />
+          ),
           label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),
           value: Tab.Orderbook,
           forceMount: true,
