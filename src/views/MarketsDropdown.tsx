@@ -24,6 +24,7 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
@@ -43,12 +44,27 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           columnKey: 'market',
           getCellValue: (row) => row.market,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ assetId, id, isNew }) => (
+          renderCell: ({
+            assetId,
+            id,
+            isNew,
+            effectiveInitialMarginFraction,
+            initialMarginFraction,
+          }) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
               <h2>{id}</h2>
-              <Tag>{assetId}</Tag>
+              <Tag>
+                <Output
+                  type={OutputType.Multiple}
+                  value={calculateMarketMaxLeverage({
+                    effectiveInitialMarginFraction,
+                    initialMarginFraction,
+                  })}
+                  fractionDigits={0}
+                />
+              </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
           ),

@@ -40,7 +40,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <$Section>
         <$SectionHeader>
           <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>
-          <Tag>{stringGetter({ key: STRING_KEYS._24H })}</Tag>
+          <$NewTag>{stringGetter({ key: STRING_KEYS._24H })}</$NewTag>
 
           <$ToggleGroupContainer>
             <ToggleGroup
@@ -93,7 +93,6 @@ const $RecentlyListed = styled.h4`
 const $NewTag = styled(Tag)`
   background-color: var(--color-accent-faded);
   color: var(--color-accent);
-  text-transform: uppercase;
 `;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
