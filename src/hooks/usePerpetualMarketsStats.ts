@@ -5,12 +5,12 @@ import { shallowEqual } from 'react-redux';
 import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { isPresent, orEmptyObj } from '@/lib/typeUtils';
+import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 const FEE_ESTIMATION_MULTIPLIER = 0.0002; // 2bps
 
 export const usePerpetualMarketsStats = () => {
-  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
 
   const markets = useMemo(
     () => Object.values(perpetualMarkets).filter(isPresent),

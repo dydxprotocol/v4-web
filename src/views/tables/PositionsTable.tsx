@@ -44,7 +44,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -426,8 +426,8 @@ export const PositionsTable = ({
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const shouldRenderTriggers = useShouldShowTriggers();
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;

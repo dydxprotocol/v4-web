@@ -20,6 +20,7 @@ import {
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -174,7 +175,7 @@ export const AdjustIsolatedMarginForm = ({
   /**
    * TODO: Handle by adding AdjustIsolatedMarginValidator within Abacus
    */
-  const marketMaxLeverage = useAppSelector((s) => getMarketMaxLeverage(s, marketId));
+  const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, marketId);
 
   const alertMessage = useMemo(() => {
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {

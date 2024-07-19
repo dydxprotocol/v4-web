@@ -12,12 +12,12 @@ import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
-  const subaccountOrderSizeBySideAndPrice = orEmptyObj(
+  const subaccountOrderSizeBySideAndPrice = orEmptyRecord(
     useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual)
   );
 
