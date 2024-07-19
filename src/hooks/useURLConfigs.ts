@@ -33,12 +33,12 @@ export interface LinksConfigs {
   walletLearnMore?: string;
   withdrawalGateLearnMore?: string;
   exchangeStats?: string;
-  fetAgixMarketWindDownProposal?: string;
   contractLossMechanismLearnMore?: string;
   mintscanValidatorsLearnMore?: string;
   protocolStaking: string;
   stakingAndClaimingRewardsLearnMore?: string;
   vaultsLearnMore: string;
+  rndrParamProposal?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -73,7 +73,6 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
-    fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
     mintscanValidatorsLearnMore: linksConfigs.mintscanValidatorsLearnMore,
     protocolStaking: linksConfigs.protocolStaking,
@@ -81,5 +80,6 @@ export const useURLConfigs = (): LinksConfigs => {
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
     // todo add to the link configs objects
     vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
+    rndrParamProposal: linksConfigs.rndrParamProposal,
   };
 };
