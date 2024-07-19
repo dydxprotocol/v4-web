@@ -33,7 +33,6 @@ export interface LinksConfigs {
   walletLearnMore?: string;
   withdrawalGateLearnMore?: string;
   exchangeStats?: string;
-  fetAgixMarketWindDownProposal?: string;
   contractLossMechanismLearnMore?: string;
   mintscanValidatorsLearnMore?: string;
   protocolStaking: string;
@@ -74,7 +73,6 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
-    fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
     mintscanValidatorsLearnMore: linksConfigs.mintscanValidatorsLearnMore,
     protocolStaking: linksConfigs.protocolStaking,
