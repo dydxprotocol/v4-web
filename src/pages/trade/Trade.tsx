@@ -77,17 +77,19 @@ const TradePage = () => {
         <TradeBox />
       </$SideSection>
 
-      <$GridSection gridArea="Vertical">
-        <VerticalPanel tradeLayout={tradeLayout} />
-      </$GridSection>
+      <$MainSection gridArea="Main">
+        <$TradeSection>
+          <VerticalPanel tradeLayout={tradeLayout} />
+        </$TradeSection>
 
-      <$GridSection gridArea="Inner">
-        <InnerPanel />
-      </$GridSection>
+        <$InnerSection>
+          <InnerPanel />
+        </$InnerSection>
 
-      <$GridSection gridArea="Horizontal">
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
-      </$GridSection>
+        <$HorizontalSection>
+          <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+        </$HorizontalSection>
+      </$MainSection>
     </$TradeLayout>
   );
 };
@@ -130,7 +132,7 @@ const $TradeLayout = styled.article<{
 
   // Props/defaults
 
-  --layout: var(--layout-default);
+  // --layout: var(--layout-default);
 
   // Variants
   @media ${breakpoints.desktopMedium} {
@@ -168,21 +170,21 @@ const $TradeLayout = styled.article<{
   min-height: 100%;
 
   display: grid;
-  grid-template: var(--layout);
+  grid-template-areas:
+    'Top Top'
+    'Side Main';
 
-  ${layoutMixins.withOuterAndInnerBorders}
+  ${layoutMixins.withOuterAndInnerBorders}; // @media (prefers-reduced-motion: no-preference) {
+  //   transition: grid-template 0.2s var(--ease-out-expo);
+  // }
 
-  @media (prefers-reduced-motion: no-preference) {
-    transition: grid-template 0.2s var(--ease-out-expo);
-  }
+  // > * {
+  //   display: grid;
+  // }
 
-  > * {
-    display: grid;
-  }
-
-  > section {
-    contain: strict;
-  }
+  // > section {
+  //   contain: strict;
+  // }
 `;
 
 const $TradeLayoutMobile = styled.article`
@@ -209,8 +211,26 @@ const $Top = styled.header`
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+  overflow: auto;
 `;
 
 const $SideSection = styled($GridSection)`
   grid-template-rows: auto minmax(0, 1fr);
+`;
+
+const $MainSection = styled($GridSection)`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const $TradeSection = styled.div`
+  width: var(--orderbook-trades-width);
+`;
+
+const $InnerSection = styled.div`
+  flex: 1;
+`;
+
+const $HorizontalSection = styled.div`
+  width: 100%;
 `;
