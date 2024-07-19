@@ -7,23 +7,17 @@
 /* eslint-disable no-restricted-syntax */
 
 /* eslint-disable no-await-in-loop */
-import { EncodeObject } from '@cosmjs/proto-signing';
-import { Account, StdFee } from '@cosmjs/stargate';
-import { Method } from '@cosmjs/tendermint-rpc';
-import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
+import { StdFee } from '@cosmjs/stargate';
 import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
-  ProposalStatus,
-  TransactionOptions,
-  VoteOption,
+  ProposalStatus
 } from '@dydxprotocol/v4-client-js';
 import {
   Perpetual,
   PerpetualMarketType,
 } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
-import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
@@ -31,6 +25,8 @@ import axios from 'axios';
 import { readFileSync } from 'fs';
 import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
+
+import { Exchange, ExchangeName, Proposal, retry, sleep, voteOnProposals } from './help';
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
@@ -71,53 +67,6 @@ const MNEMONICS = [
   // Consensus Address: dydxvalcons1stjspktkshgcsv8sneqk2vs2ws0nw2wr272vtt
   'switch boring kiss cash lizard coconut romance hurry sniff bus accident zone chest height merit elevator furnace eagle fetch quit toward steak mystery nest',
 ];
-
-interface Exchange {
-  exchangeName: ExchangeName;
-  ticker: string;
-  adjustByMarket?: string;
-}
-
-interface Params {
-  id: number;
-  ticker: string;
-  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
-  priceExponent: number;
-  minPriceChange: number;
-  minExchanges: number;
-  exchangeConfigJson: Exchange[];
-  liquidityTier: number;
-  atomicResolution: number;
-  quantumConversionExponent: number;
-  defaultFundingPpm: number;
-  stepBaseQuantums: number;
-  subticksPerTick: number;
-  delayBlocks: number;
-}
-
-interface Proposal {
-  id: Long.Long;
-  title: string;
-  summary: string;
-  params: Params;
-}
-
-enum ExchangeName {
-  Binance = 'Binance',
-  BinanceUS = 'BinanceUS',
-  Bitfinex = 'Bitfinex',
-  Bitstamp = 'Bitstamp',
-  Bybit = 'Bybit',
-  CoinbasePro = 'CoinbasePro',
-  CryptoCom = 'CryptoCom',
-  Gate = 'Gate',
-  Huobi = 'Huobi',
-  Kraken = 'Kraken',
-  Kucoin = 'Kucoin',
-  Mexc = 'Mexc',
-  Okx = 'Okx',
-  Raydium = 'Raydium',
-}
 
 interface PrometheusTimeSeries {
   // value of the time serie
@@ -348,47 +297,6 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
       throw new Error(`Ticker ${exchange.ticker} not found for exchange ${exchange.exchangeName}`);
     }
     console.log(`Validated ticker ${exchange.ticker} for exchange ${exchange.exchangeName}`);
-  }
-}
-
-// Vote YES on all `proposalIds` from `wallet`.
-async function voteOnProposals(
-  proposalIds: number[],
-  client: CompositeClient,
-  wallet: LocalWalletType
-): Promise<void> {
-  // Construct Tx.
-  const encodedVotes: EncodeObject[] = proposalIds.map((proposalId) => {
-    return {
-      typeUrl: '/cosmos.gov.v1.MsgVote',
-      value: {
-        proposalId: Long.fromNumber(proposalId),
-        voter: wallet.address!,
-        option: VoteOption.VOTE_OPTION_YES,
-        metadata: '',
-      } as MsgVote,
-    } as EncodeObject;
-  });
-  const account: Account = await client.validatorClient.get.getAccount(wallet.address!);
-  const signedTx = await wallet.signTransaction(
-    encodedVotes,
-    {
-      sequence: account.sequence,
-      accountNumber: account.accountNumber,
-      chainId: client.network.validatorConfig.chainId,
-    } as TransactionOptions,
-    VOTE_FEE
-  );
-
-  // Broadcast Tx.
-  const resp = await client.validatorClient.get.tendermintClient.broadcastTransaction(
-    signedTx,
-    Method.BroadcastTxSync
-  );
-  if ((resp as BroadcastTxSyncResponse).code) {
-    throw new Error(`Failed to vote on proposals ${proposalIds}`);
-  } else {
-    console.log(`Voted on proposals ${proposalIds} with wallet ${wallet.address}`);
   }
 }
 
@@ -727,29 +635,6 @@ function validateParamsSchema(proposal: Proposal): void {
   if (validateParams.errors) {
     console.error(validateParams.errors);
     throw new Error(`Json schema validation failed for proposal ${proposal.params.ticker}`);
-  }
-}
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-async function retry<T>(
-  fn: () => Promise<T>,
-  retries: number = 5,
-  delay: number = 2000
-): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    console.error(`Function ${fn.name} failed: ${error}. Retrying in ${delay}ms...`);
-    if (retries <= 0) {
-      throw error;
-    }
-    await sleep(delay);
-    return retry(fn, retries - 1, delay);
   }
 }
 
