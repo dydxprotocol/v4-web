@@ -39,6 +39,7 @@ export interface LinksConfigs {
   protocolStaking: string;
   stakingAndClaimingRewardsLearnMore?: string;
   vaultsLearnMore: string;
+  rndrParamProposal?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -81,5 +82,6 @@ export const useURLConfigs = (): LinksConfigs => {
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
     // todo add to the link configs objects
     vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
+    rndrParamProposal: linksConfigs.rndrParamProposal,
   };
 };
