@@ -52,7 +52,7 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
@@ -355,8 +355,8 @@ export const OrdersTable = ({
     [allOrders, currentMarket, marketOrders, marketTypeFilter]
   );
 
-  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
