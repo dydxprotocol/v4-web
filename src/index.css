@@ -2,6 +2,10 @@
 @import 'styles/text.css';
 @import 'styles/animations.css';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   height: 100%;
   color: var(--color-text-1);
