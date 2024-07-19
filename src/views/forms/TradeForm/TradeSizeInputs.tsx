@@ -118,7 +118,6 @@ export const TradeSizeInputs = () => {
         value: isPressed ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
       });
 
-      // AnalyticsEvent.TradeAmountToggleClick
       track(
         AnalyticsEvents.TradeAmountToggleClick({
           newInput: isPressed ? TradeSizeInput.Usdc : TradeSizeInput.Size,
