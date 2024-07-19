@@ -51,6 +51,10 @@ export const useAnalytics = () => {
             : 'UNSUPPORTED';
 
   useEffect(() => {
+    identify(AnalyticsUserProperties.CustomDomainReferrer(document.referrer));
+  }, []);
+
+  useEffect(() => {
     identify(AnalyticsUserProperties.Breakpoint(breakpoint));
   }, [breakpoint]);
 

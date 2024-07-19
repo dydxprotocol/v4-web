@@ -24,7 +24,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { getVaultDetails } from '@/state/vaultSelectors';
 
 import { getNumberSign } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
@@ -34,7 +34,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const navigate = useNavigate();
 
   const vaultsData = useAppSelector(getVaultDetails)?.positions;
-  const marketsData = orEmptyObj(useAppSelector(getPerpetualMarkets));
+  const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
     () =>

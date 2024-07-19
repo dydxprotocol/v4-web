@@ -58,7 +58,7 @@ export type SharePNLAnalyticsDialogProps = {
   leverage: Nullable<number>;
   oraclePrice: Nullable<number>;
   entryPrice: Nullable<number>;
-  unrealizedPnlPercent: Nullable<number>;
+  unrealizedPnl: Nullable<number>;
   side: Nullable<AbacusPositionSides>;
   sideLabel: Nullable<string>;
 };

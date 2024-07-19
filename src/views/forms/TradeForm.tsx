@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
+  AbacusInputTypes,
   ComplianceStatus,
   ErrorType,
   TradeInputErrorAction,
@@ -112,7 +113,7 @@ export const TradeForm = ({
 
   const hasInputErrors =
     !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
-    currentInput !== 'trade';
+    currentInput !== AbacusInputTypes.Trade;
 
   const { getNotificationPreferenceForType } = useNotifications();
 

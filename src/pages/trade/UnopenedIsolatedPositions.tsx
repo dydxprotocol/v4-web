@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { SubaccountPendingPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -46,7 +46,7 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
       <$Button onClick={() => setIsOpen(!isOpen)}>
         {stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
-        <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
+        <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
       </$Button>
 
       {isOpen && (
@@ -112,12 +112,18 @@ const UnopenedIsolatedPositionsCards = ({
 const $UnopenedIsolatedPositionsDrawerContainer = styled.div<{ isOpen?: boolean }>`
   overflow: auto;
   border-top: var(--border);
-  ${({ isOpen }) => isOpen && 'height: 100%;'}
+
+  ${({ isOpen }) =>
+    isOpen &&
+    css`
+      min-height: 10rem;
+      height: 100%;
+    `}
 `;
 const $Button = styled(Button)`
   position: sticky;
   top: 0;
-  gap: 1rem;
+  gap: 0.75rem;
   backdrop-filter: blur(4px) contrast(1.01);
   background-color: transparent;
   border: none;
@@ -130,4 +136,8 @@ const $Cards = styled.div`
 `;
 const $CardsContainer = styled.div`
   padding: 0 1rem 1rem;
+`;
+
+const $DropdownIcon = styled(DropdownIcon)`
+  font-size: 0.5em;
 `;

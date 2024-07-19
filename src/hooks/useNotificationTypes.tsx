@@ -581,7 +581,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             id: NotificationType.ApiError,
           });
         }
-      }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title]);
+      }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title, hideNotification]);
     },
     useNotificationAction: () => {
       return () => {};

@@ -2,7 +2,7 @@ import { Nullable } from '@/constants/abacus';
 import { Candle, TradingViewBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { mapCandle } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -197,19 +197,12 @@ export const getCurrentMarketNextFundingRate = createAppSelector(
 /**
  * @returns Specified market's max leverage
  */
-export const getMarketMaxLeverage = createAppSelector(
-  [(state: RootState, marketId: string) => getMarketConfig(state, marketId)],
-  (marketConfig) => {
-    const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
+export const getMarketMaxLeverage = () =>
+  createAppSelector(
+    [(state: RootState, marketId: string) => getMarketConfig(state, marketId)],
+    (marketConfig) => {
+      const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
 
-    if (effectiveInitialMarginFraction) {
-      return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
+      return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
     }
-
-    if (initialMarginFraction) {
-      return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
-    }
-
-    return 10; // safe default
-  }
-);
+  );

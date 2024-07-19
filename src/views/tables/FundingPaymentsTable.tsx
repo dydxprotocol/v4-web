@@ -26,7 +26,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 type ElementProps = {
   currentMarket?: string;
@@ -56,8 +56,8 @@ export const FundingPaymentsTable = ({
     useAppSelector(getSubaccountFundingPayments, shallowEqual) ?? EMPTY_ARR;
   const fundingPayments = currentMarket ? marketFundingPayments : allFundingPayments;
 
-  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
   const fundingPaymentsData = fundingPayments.map(
     (fundingPayment: SubaccountFundingPayment): FundingPaymentTableRow =>

@@ -50,7 +50,13 @@ export const MarketsCompactTable = ({
           columnKey: 'market',
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ asset }) => <AssetTableCell stacked asset={asset} />,
+          renderCell: ({ asset, effectiveInitialMarginFraction, initialMarginFraction }) => (
+            <AssetTableCell
+              stacked
+              asset={asset}
+              configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+            />
+          ),
         },
         {
           columnKey: 'oraclePrice',

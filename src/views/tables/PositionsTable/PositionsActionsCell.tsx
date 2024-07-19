@@ -29,7 +29,7 @@ type ElementProps = {
   leverage: Nullable<number>;
   oraclePrice: Nullable<number>;
   entryPrice: Nullable<number>;
-  unrealizedPnlPercent: Nullable<number>;
+  unrealizedPnl: Nullable<number>;
   side: Nullable<AbacusPositionSides>;
   sideLabel: Nullable<string>;
   stopLossOrders: SubaccountOrder[];
@@ -45,7 +45,7 @@ export const PositionsActionsCell = ({
   leverage,
   oraclePrice,
   entryPrice,
-  unrealizedPnlPercent,
+  unrealizedPnl,
   side,
   sideLabel,
   stopLossOrders,
@@ -101,7 +101,7 @@ export const PositionsActionsCell = ({
           leverage,
           oraclePrice,
           entryPrice,
-          unrealizedPnlPercent,
+          unrealizedPnl,
           side,
           sideLabel,
         })

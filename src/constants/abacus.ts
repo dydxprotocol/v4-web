@@ -83,6 +83,7 @@ export type MarketOrderbookGrouping = Abacus.exchange.dydx.abacus.output.MarketO
 export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
+export type MarketConfigs = Abacus.exchange.dydx.abacus.output.MarketConfigs;
 export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketHistoricalFunding;
 export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualMarketType;
 
@@ -370,3 +371,11 @@ export type PerpetualMarketOrderbookLevel = OrderbookLine & {
   mine: number | undefined;
   key: string;
 };
+
+export enum AbacusInputTypes {
+  AdjustIsolatedMargin = 'adjustIsolatedMargin',
+  ClosePosition = 'closePosition',
+  Transfer = 'transfer',
+  Trade = 'trade',
+  TriggerOrders = 'triggerOrders',
+}
