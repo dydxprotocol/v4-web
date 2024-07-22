@@ -33,3 +33,4 @@ const wrapNative = (nativeName: keyof JSX.IntrinsicElements) => (boundClassName:
   );
 
 twClassed.div = wrapNative('div');
+twClassed.span = wrapNative('span');
