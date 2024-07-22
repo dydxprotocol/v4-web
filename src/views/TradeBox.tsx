@@ -19,7 +19,7 @@ import abacusStateManager from '@/lib/abacus';
 
 import { TradeBoxOrderView } from './TradeBoxOrderView';
 
-export const TradeBox = () => {
+export const TradeBox = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
@@ -49,7 +49,7 @@ export const TradeBox = () => {
     );
 
   return (
-    <$TradeBox>
+    <$TradeBox className={className}>
       <TradeBoxOrderView />
 
       <$Dialog

@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -261,7 +261,7 @@ export const CanvasOrderbook = forwardRef(
 
 const $OrderbookContainer = styled.div`
   display: flex;
-  flex: 1 1 0%;
+  // flex: 1 1 0%;
   flex-direction: column;
   overflow: hidden;
 `;

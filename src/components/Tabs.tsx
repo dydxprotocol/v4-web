@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { Ref, type ReactNode } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
@@ -25,6 +25,7 @@ export type TabItem<TabItemsValue> = {
   subitems?: TabItem<TabItemsValue>[];
   customTrigger?: ReactNode;
   asChild?: boolean;
+  ref?: Ref<HTMLDivElement>;
 };
 
 type ElementProps<TabItemsValue> = {
@@ -126,8 +127,9 @@ export const Tabs = <TabItemsValue extends string>({
 
       {sharedContent ?? (
         <$Stack>
-          {items.map(({ asChild, value: childValue, content, forceMount }) => (
+          {items.map(({ asChild, value: childValue, content, forceMount, ref }) => (
             <$Content
+              ref={ref}
               key={childValue}
               asChild={asChild}
               value={childValue}
@@ -143,6 +145,7 @@ export const Tabs = <TabItemsValue extends string>({
     </$Root>
   );
 };
+
 const tabTriggerStyle = css`
   ${layoutMixins.row}
   justify-content: center;

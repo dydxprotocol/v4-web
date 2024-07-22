@@ -36,11 +36,87 @@ const TradePage = () => {
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const { isDesktopMedium } = useBreakpoints();
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
   useTradeFormInputs();
+
+  const desktopLayout = () => {
+    const top = (
+      <$Top>
+        <MarketSelectorAndStats />
+      </$Top>
+    );
+    const sidebar = (
+      <$SideSection gridArea="Side">
+        <AccountInfo />
+        <$TradeBox />
+      </$SideSection>
+    );
+    const orderbookTradePanel = (
+      <$TradeSection>
+        <VerticalPanel tradeLayout={tradeLayout} />
+      </$TradeSection>
+    );
+    const tradingChart = (
+      <$InnerSection>
+        {isDesktopMedium && top}
+        <InnerPanel />
+      </$InnerSection>
+    );
+    const horizontalPane = (
+      <$HorizontalSection>
+        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+      </$HorizontalSection>
+    );
+    switch (tradeLayout) {
+      case TradeLayouts.Alternative:
+        return (
+          <>
+            {!isDesktopMedium && top}
+            <$MainSection gridArea="Main">
+              <$TestSection>
+                {orderbookTradePanel}
+                {tradingChart}
+              </$TestSection>
+              {horizontalPane}
+            </$MainSection>
+            {sidebar}
+          </>
+        );
+      case TradeLayouts.Reverse:
+        return (
+          <>
+            {!isDesktopMedium && top}
+            <$MainSection gridArea="Main">
+              <$TestSection>
+                {tradingChart}
+                {orderbookTradePanel}
+              </$TestSection>
+              {horizontalPane}
+            </$MainSection>
+            {sidebar}
+          </>
+        );
+      case TradeLayouts.Default:
+      default:
+        return (
+          <>
+            {!isDesktopMedium && top}
+            {sidebar}
+            <$MainSection gridArea="Main">
+              <$TestSection>
+                {orderbookTradePanel}
+                {tradingChart}
+              </$TestSection>
+              {horizontalPane}
+            </$MainSection>
+          </>
+        );
+    }
+  };
 
   return isTablet ? (
     <$TradeLayoutMobile>
@@ -63,40 +139,14 @@ const TradePage = () => {
       {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
-    <$TradeLayout
-      ref={tradePageRef}
-      tradeLayout={tradeLayout}
-      isHorizontalPanelOpen={isHorizontalPanelOpen}
-    >
-      <$Top>
-        <MarketSelectorAndStats />
-      </$Top>
-
-      <$SideSection gridArea="Side">
-        <AccountInfo />
-        <TradeBox />
-      </$SideSection>
-
-      <$MainSection gridArea="Main">
-        <$TradeSection>
-          <VerticalPanel tradeLayout={tradeLayout} />
-        </$TradeSection>
-
-        <$InnerSection>
-          <InnerPanel />
-        </$InnerSection>
-
-        <$HorizontalSection>
-          <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
-        </$HorizontalSection>
-      </$MainSection>
+    <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
+      {desktopLayout()}
     </$TradeLayout>
   );
 };
 
 export default TradePage;
 const $TradeLayout = styled.article<{
-  tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
 }>`
   --horizontalPanel-height: 18rem;
@@ -139,24 +189,6 @@ const $TradeLayout = styled.article<{
     --layout: var(--layout-default-desktopMedium);
   }
 
-  ${({ tradeLayout }) =>
-    ({
-      [TradeLayouts.Default]: null,
-      [TradeLayouts.Alternative]: css`
-        --layout: var(--layout-alternative);
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-      `,
-      [TradeLayouts.Reverse]: css`
-        direction: rtl;
-
-        > * {
-          direction: initial;
-        }
-      `,
-    })[tradeLayout]}
-
   ${({ isHorizontalPanelOpen }) =>
     !isHorizontalPanelOpen &&
     css`
@@ -169,10 +201,8 @@ const $TradeLayout = styled.article<{
   height: 0;
   min-height: 100%;
 
-  display: grid;
-  grid-template-areas:
-    'Top Top'
-    'Side Main';
+  display: flex;
+  flex-wrap: wrap;
 
   ${layoutMixins.withOuterAndInnerBorders}; // @media (prefers-reduced-motion: no-preference) {
   //   transition: grid-template 0.2s var(--ease-out-expo);
@@ -211,16 +241,29 @@ const $Top = styled.header`
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
-  overflow: auto;
 `;
 
 const $SideSection = styled($GridSection)`
   grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
 `;
 
 const $MainSection = styled($GridSection)`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  // flex-wrap: wrap;
+  height: 100%;
+  // gap: var(--border-width);
+
+  ${layoutMixins.withOuterAndInnerBorders};
+
+  flex: 1 1 1px;
+`;
+
+const $TestSection = styled.div`
+  display: flex;
+  flex-grow: 1;
+  ${layoutMixins.withOuterAndInnerBorders};
 `;
 
 const $TradeSection = styled.div`
@@ -232,5 +275,17 @@ const $InnerSection = styled.div`
 `;
 
 const $HorizontalSection = styled.div`
+  overflow: hidden;
   width: 100%;
+  height: calc(100% - var(--stickyArea-bottomHeight));
+`;
+
+const $TradeBox = styled(TradeBox)`
+  height: calc(100% - var(--account-info-section-height) - var(--market-info-row-height));
+
+  @media ${breakpoints.desktopMedium} {
+    height: calc(100% - var(--account-info-section-height));
+  }
+
+  overflow-y: auto;
 `;
