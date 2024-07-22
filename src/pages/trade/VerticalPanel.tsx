@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
+import {
+  ORDERBOOK_MAX_ROWS_PER_SIDE,
+  ORDERBOOK_MIN_ROWS_PER_SIDE,
+  ORDERBOOK_PAGE_HEIGHT_RATIO,
+  ORDERBOOK_ROW_HEIGHT,
+} from '@/constants/orderbook';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -21,46 +26,50 @@ const HISTOGRAM_SIDES_BY_LAYOUT = {
   [TradeLayouts.Reverse]: 'right',
 } as const;
 
-// xcxc
-const MIN_NUMBER_ROWS = 2;
-const MAX_NUMBER_ROWS = 30;
-
 export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Orderbook);
-  const [maxNumRowsToShow, setMaxNumRowsToShow] = useState(ORDERBOOK_MAX_ROWS_PER_SIDE);
+  const [numRowsToShow, setNumRowsToShow] = useState(ORDERBOOK_MAX_ROWS_PER_SIDE);
   const [prevHeight, setPrevHeight] = useState<number | undefined>(undefined);
 
   const canvasOrderbookRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const calculateNumRows = () => {
+      // Calculates the number of rows the orderbook should render on each side
       const viewportHeight = window.innerHeight;
-      const verticalPanelHeight = Math.floor((viewportHeight / 51) * 19);
-      const numRows = Math.floor(
-        (verticalPanelHeight - 2 * ORDERBOOK_ROW_HEIGHT) / (2 * ORDERBOOK_ROW_HEIGHT)
+
+      // The initial calculation calculates the number of rows we should render based on the current window height.
+      const verticalPanelHeight = Math.floor(viewportHeight * ORDERBOOK_PAGE_HEIGHT_RATIO);
+      const minNumRowsToRender = Math.floor(
+        (verticalPanelHeight - ORDERBOOK_ROW_HEIGHT) / (2 * ORDERBOOK_ROW_HEIGHT)
       );
 
-      let secondRowsCalculation = numRows;
-
-      if (canvasOrderbookRef.current && canvasOrderbookRef.current.clientHeight - 66 > 0) {
-        secondRowsCalculation = Math.floor(
-          (canvasOrderbookRef.current.clientHeight - 66 - ORDERBOOK_ROW_HEIGHT) /
-            (2 * ORDERBOOK_ROW_HEIGHT)
+      // The second calculation checks if there is extra vertical space (relevant to large windows) that is not being
+      // otherwise used (the parent will flex-grow to fill the space); if so, it calculates the updated number of rows we
+      // can now render
+      let maxNumRowsToRender = minNumRowsToRender;
+      if (canvasOrderbookRef.current) {
+        maxNumRowsToRender = Math.max(
+          Math.floor(
+            (canvasOrderbookRef.current.clientHeight - 66 - ORDERBOOK_ROW_HEIGHT) /
+              (2 * ORDERBOOK_ROW_HEIGHT)
+          ),
+          maxNumRowsToRender
         );
       }
 
-      const newRows = Math.max(
+      const numRows = Math.max(
         Math.min(
           prevHeight && viewportHeight >= prevHeight
-            ? Math.max(numRows, secondRowsCalculation)
-            : Math.min(numRows, secondRowsCalculation),
-          MAX_NUMBER_ROWS
+            ? Math.max(minNumRowsToRender, maxNumRowsToRender)
+            : Math.min(minNumRowsToRender, maxNumRowsToRender),
+          ORDERBOOK_MAX_ROWS_PER_SIDE
         ),
-        MIN_NUMBER_ROWS
+        ORDERBOOK_MIN_ROWS_PER_SIDE
       );
 
-      setMaxNumRowsToShow(newRows);
+      setNumRowsToShow(numRows);
       setPrevHeight(viewportHeight);
     };
 
@@ -68,7 +77,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     window.addEventListener('resize', calculateNumRows);
 
     return () => window.removeEventListener('resize', calculateNumRows);
-  }, [canvasOrderbookRef, prevHeight]);
+  }, [canvasOrderbookRef, prevHeight, canvasOrderbookRef.current?.clientHeight]);
 
   return (
     <Tabs
@@ -82,7 +91,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
           asChild: true,
           content: (
             <CanvasOrderbook
-              maxRowsPerSide={maxNumRowsToShow}
+              rowsPerSide={numRowsToShow}
               histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]}
             />
           ),

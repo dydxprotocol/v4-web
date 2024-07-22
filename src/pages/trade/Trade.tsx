@@ -43,77 +43,80 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
+  const header = (
+    <$Header>
+      <MarketSelectorAndStats />
+    </$Header>
+  );
+
+  // Depending on the screensize, we either render the market selector header as a header across the whole page, or just as a header to the markets chart
+  const maybePageHeader = !isDesktopMedium && header;
+  const maybeChartSectionHeader = isDesktopMedium && header;
+
+  const sidebar = (
+    <$ParentSection>
+      <AccountInfo />
+      <$TradeBox />
+    </$ParentSection>
+  );
+  const tradeSection = (
+    <$TradeSection>
+      <VerticalPanel tradeLayout={tradeLayout} />
+    </$TradeSection>
+  );
+  const chartSection = (
+    <$ChartSection>
+      {maybeChartSectionHeader}
+      <InnerPanel />
+    </$ChartSection>
+  );
+  const horizontalSection = (
+    <$HorizontalSection>
+      <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+    </$HorizontalSection>
+  );
+
   const desktopLayout = () => {
-    const top = (
-      <$Top>
-        <MarketSelectorAndStats />
-      </$Top>
-    );
-    const sidebar = (
-      <$SideSection gridArea="Side">
-        <AccountInfo />
-        <$TradeBox />
-      </$SideSection>
-    );
-    const orderbookTradePanel = (
-      <$TradeSection>
-        <VerticalPanel tradeLayout={tradeLayout} />
-      </$TradeSection>
-    );
-    const tradingChart = (
-      <$InnerSection>
-        {isDesktopMedium && top}
-        <InnerPanel />
-      </$InnerSection>
-    );
-    const horizontalPane = (
-      <$HorizontalSection>
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
-      </$HorizontalSection>
-    );
     switch (tradeLayout) {
       case TradeLayouts.Alternative:
         return (
-          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
-            {!isDesktopMedium && top}
-            <$MainSection gridArea="Main">
-              <$TestSection>
-                {orderbookTradePanel}
-                {tradingChart}
-              </$TestSection>
-              {horizontalPane}
+          <>
+            <$MainSection>
+              <$BorderedContainer>
+                {tradeSection}
+                {chartSection}
+              </$BorderedContainer>
+              {horizontalSection}
             </$MainSection>
             {sidebar}
-          </$TradeLayout>
+          </>
         );
       case TradeLayouts.Reverse:
         return (
-          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
-            {!isDesktopMedium && top}
-            <$MainSection gridArea="Main">
-              <$TestSection>
-                {tradingChart}
-                {orderbookTradePanel}
-              </$TestSection>
-              {horizontalPane}
+          <>
+            <$MainSection>
+              <$BorderedContainer>
+                {chartSection}
+                {tradeSection}
+              </$BorderedContainer>
+              {horizontalSection}
             </$MainSection>
             {sidebar}
-          </$TradeLayout>
+          </>
         );
       case TradeLayouts.Default:
       default:
         return (
-          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
-            {!isDesktopMedium && top}
+          <>
             {sidebar}
-            <$MainSection gridArea="Main">
-              <$TestSection>
-                {orderbookTradePanel}
-                {tradingChart}
-              </$TestSection>
-              {horizontalPane}
+            <$MainSection>
+              <$BorderedContainer>
+                {tradeSection}
+                {chartSection}
+              </$BorderedContainer>
+              {horizontalSection}
             </$MainSection>
-          </$TradeLayout>
+          </>
         );
     }
   };
@@ -139,27 +142,15 @@ const TradePage = () => {
       {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
-    desktopLayout()
+    <$TradeLayoutDesktop ref={tradePageRef}>
+      <>
+        {maybePageHeader} {desktopLayout()}
+      </>
+    </$TradeLayoutDesktop>
   );
-  // <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
-  /* </$TradeLayout> */
 };
 
 export default TradePage;
-const $TradeLayout = styled.article<{
-  isHorizontalPanelOpen: boolean;
-}>`
-  // Rules
-  width: 0;
-  min-width: 100%;
-  height: 0;
-  min-height: 100%;
-
-  display: flex;
-  flex-wrap: wrap;
-
-  ${layoutMixins.withOuterAndInnerBorders};
-`;
 
 const $TradeLayoutMobile = styled.article`
   ${layoutMixins.contentContainerPage}
@@ -179,17 +170,23 @@ const $TradeLayoutMobile = styled.article`
   }
 `;
 
-const $Top = styled.header`
+const $TradeLayoutDesktop = styled.article`
+  width: 0;
+  min-width: 100%;
+  height: 0;
+  min-height: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  ${layoutMixins.withOuterAndInnerBorders};
+`;
+
+const $Header = styled.header`
   box-shadow: none;
 `;
 
-const $GridSection = styled.section<{ gridArea: string }>`
-  grid-area: ${({ gridArea }) => gridArea};
-`;
-
-const $SideSection = styled($GridSection)`
-  grid-template-rows: auto minmax(0, 1fr);
-  height: 100%;
+const $ParentSection = styled.section`
   display: flex;
   flex-direction: column;
 
@@ -200,44 +197,35 @@ const $SideSection = styled($GridSection)`
   }
 `;
 
-const $MainSection = styled($GridSection)`
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - var(--market-info-row-height));
-
-  @media ${breakpoints.desktopMedium} {
-    height: 100%;
-  }
-
-  ${layoutMixins.withOuterAndInnerBorders};
-
+const $MainSection = styled($ParentSection)`
   flex: 1 1 1px;
-`;
 
-const $TestSection = styled.div`
-  display: flex;
-  flex-grow: 1;
   ${layoutMixins.withOuterAndInnerBorders};
 `;
 
-const $TradeSection = styled.div`
+const $TradeSection = styled.section`
   width: var(--orderbook-trades-width);
 `;
 
-const $InnerSection = styled.div`
-  flex: 1;
+const $ChartSection = styled.section`
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
 `;
 
-const $HorizontalSection = styled.div`
-  overflow: hidden;
-  width: 100%;
-  display: grid;
+const $HorizontalSection = styled.section`
+  overflow: auto;
+`;
+
+const $BorderedContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+
+  ${layoutMixins.withOuterAndInnerBorders};
 `;
 
 const $TradeBox = styled(TradeBox)`
-  overflow-y: auto;
   height: 100%;
+  overflow-y: auto;
   padding-top: var(--border-width);
 `;

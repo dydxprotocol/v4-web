@@ -1,7 +1,9 @@
 /**
  * @description Orderbook display constants
  */
+export const ORDERBOOK_MIN_ROWS_PER_SIDE = 2;
 export const ORDERBOOK_MAX_ROWS_PER_SIDE = 30;
+export const ORDERBOOK_PAGE_HEIGHT_RATIO = 11 / 25;
 export const ORDERBOOK_ANIMATION_DURATION = 100;
 
 /**

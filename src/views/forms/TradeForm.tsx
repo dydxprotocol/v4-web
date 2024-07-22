@@ -236,7 +236,7 @@ export const TradeForm = ({
 
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
-      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
+      {isTablet && showOrderbook && <$Orderbook rowsPerSide={5} hideHeader />}
       <$InputsColumn>
         <TradeFormInputs />
         <TradeSizeInputs />
