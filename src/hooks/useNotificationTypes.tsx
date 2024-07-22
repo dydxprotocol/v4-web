@@ -36,7 +36,6 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
@@ -466,77 +465,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
 
-      const { fetAgixMarketWindDownProposal, contractLossMechanismLearnMore } = useURLConfigs();
+      const { rndrParamProposal } = useURLConfigs();
 
-      const marketWindDownProposalExpirationDate = '2024-06-11T16:53:00';
-      const marketWindDownDate = marketWindDownProposalExpirationDate;
-      const marketWindDownExpirationDate = '2024-07-11T16:53:00'; // 30 days after wind down
       const currentDate = new Date();
 
-      const outputDate = <$Output type={OutputType.DateTime} value={marketWindDownDate} />;
+      const RNDNProposalTriggerDate = new Date('2024-07-20T22:00:00.000Z');
+      const RNDNProposalExpireDate = new Date('2024-08-20T22:00:00.000Z');
 
-      const firstMarket = 'FET-USD';
-      const secondMarket = 'AGIX-USD';
-
-      useEffect(() => {
-        if (currentDate <= new Date(marketWindDownProposalExpirationDate)) {
-          trigger(MarketWindDownNotificationIds.MarketWindDownProposalFetAgix, {
-            title: stringGetter({
-              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.TITLE',
-              params: {
-                MARKET_1: firstMarket,
-                MARKET_2: secondMarket,
-              },
-            }),
-            body: stringGetter({
-              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.BODY',
-              params: {
-                MARKET_1: firstMarket,
-                MARKET_2: secondMarket,
-                DATE: outputDate,
-                HERE_LINK: (
-                  <Link href={fetAgixMarketWindDownProposal} isAccent isInline>
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </Link>
-                ),
-              },
-            }),
-            toastSensitivity: 'foreground',
-            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalFetAgix,
-          });
-        }
-      }, [stringGetter]);
+      const RNDRMarket = 'RNDR-USD';
 
       useEffect(() => {
         if (
-          currentDate >= new Date(marketWindDownDate) &&
-          currentDate <= new Date(marketWindDownExpirationDate)
+          rndrParamProposal &&
+          currentDate >= RNDNProposalTriggerDate &&
+          currentDate <= RNDNProposalExpireDate
         ) {
           trigger(
-            MarketWindDownNotificationIds.MarketWindDownFetAgix,
+            MarketWindDownNotificationIds.MarketUpdateProposalRndr,
             {
               title: stringGetter({
-                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.TITLE',
+                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.TITLE',
                 params: {
-                  MARKET_1: firstMarket,
-                  MARKET_2: secondMarket,
+                  MARKET: RNDRMarket,
                 },
               }),
               body: stringGetter({
-                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.BODY',
+                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.BODY',
                 params: {
-                  MARKET_1: firstMarket,
-                  MARKET_2: secondMarket,
-                  DATE: outputDate,
+                  MARKET: RNDRMarket,
                   HERE_LINK: (
-                    <Link href={contractLossMechanismLearnMore} isAccent isInline>
+                    <Link href={rndrParamProposal} isAccent isInline>
                       {stringGetter({ key: STRING_KEYS.HERE })}
                     </Link>
                   ),
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: MarketWindDownNotificationIds.MarketWindDownFetAgix,
+              groupKey: MarketWindDownNotificationIds.MarketUpdateProposalRndr,
             },
             []
           );
@@ -707,8 +672,4 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
 `;

@@ -28,7 +28,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { track } from '@/lib/analytics';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
-import { AcknowledgeTerms } from './OnboardingDialog/AcknowledgeTerms';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 
@@ -38,18 +37,15 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { selectWalletType, disconnect, walletType } = useAccounts();
+  const { selectWalletType, walletType } = useAccounts();
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen?.(false);
-  }, [currentOnboardingStep]);
+  }, [currentOnboardingStep, setIsOpen]);
 
   const setIsOpenFromDialog = (open: boolean) => {
-    if (!open && currentOnboardingStep === OnboardingSteps.AcknowledgeTerms) {
-      disconnect();
-    }
     setIsOpen?.(open);
   };
 
@@ -92,15 +88,6 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
               </$Content>
             ),
             width: '23rem',
-          },
-          [OnboardingSteps.AcknowledgeTerms]: {
-            title: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS }),
-            children: (
-              <$Content>
-                <AcknowledgeTerms onClose={() => setIsOpenFromDialog?.(false)} />
-              </$Content>
-            ),
-            width: '30rem',
           },
           [OnboardingSteps.DepositFunds]: {
             title: stringGetter({ key: STRING_KEYS.DEPOSIT }),

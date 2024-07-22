@@ -119,6 +119,8 @@ export enum TradeSizeInput {
   Usdc = 'size.usdcSize',
 }
 
+export type TradeToggleSizeInput = TradeSizeInput.Size | TradeSizeInput.Usdc;
+
 export enum TradeBoxKeys {
   LimitPrice = 'price.limitPrice',
   TrailingPercent = 'price.trailingPercent',
