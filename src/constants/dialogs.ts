@@ -77,6 +77,7 @@ export type TriggersDialogProps = {
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };
 export type UnstakeDialogProps = {};
+export type VaultDepositWithdrawDialogProps = { initialType?: 'deposit' | 'withdraw' };
 export type WithdrawDialogProps = {};
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
@@ -87,19 +88,19 @@ export const DialogTypes = unionize(
   {
     AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
     AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
-    ClosePosition: ofType<ClosePositionDialogProps>(),
     CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
+    ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
     ExternalLink: ofType<ExternalLinkDialogProps>(),
+    ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
     ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
     FillDetails: ofType<FillDetailsDialogProps>(),
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     Help: ofType<HelpDialogProps>(),
-    ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
     ManageFunds: ofType<ManageFundsDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
@@ -117,9 +118,10 @@ export const DialogTypes = unionize(
     Stake: ofType<StakeDialogProps>(),
     StakingReward: ofType<StakingRewardDialogProps>(),
     Trade: ofType<TradeDialogProps>(),
-    Triggers: ofType<TriggersDialogProps>(),
     Transfer: ofType<TransferDialogProps>(),
+    Triggers: ofType<TriggersDialogProps>(),
     Unstake: ofType<UnstakeDialogProps>(),
+    VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw: ofType<WithdrawDialogProps>(),
     WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
   },
