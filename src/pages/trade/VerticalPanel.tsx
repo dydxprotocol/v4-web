@@ -36,12 +36,12 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   useEffect(() => {
     const calculateNumRows = () => {
       const viewportHeight = window.innerHeight;
-      const verticalPanelHeight = Math.floor((viewportHeight / 12) * 5);
+      const verticalPanelHeight = Math.floor((viewportHeight / 51) * 19);
       const numRows = Math.floor(
         (verticalPanelHeight - 2 * ORDERBOOK_ROW_HEIGHT) / (2 * ORDERBOOK_ROW_HEIGHT)
       );
 
-      let secondRowsCalculation = 0;
+      let secondRowsCalculation = numRows;
 
       if (canvasOrderbookRef.current && canvasOrderbookRef.current.clientHeight - 66 > 0) {
         secondRowsCalculation = Math.floor(
@@ -54,7 +54,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
         Math.min(
           prevHeight && viewportHeight >= prevHeight
             ? Math.max(numRows, secondRowsCalculation)
-            : numRows,
+            : Math.min(numRows, secondRowsCalculation),
           MAX_NUMBER_ROWS
         ),
         MIN_NUMBER_ROWS

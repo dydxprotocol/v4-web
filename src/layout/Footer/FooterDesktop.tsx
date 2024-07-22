@@ -123,7 +123,6 @@ const $Row = styled.div`
   width: var(--sidebar-width);
 
   padding: 0 0.5rem;
-  border-right: 1px solid var(--color-border);
 `;
 
 const $StatusDot = styled.div<{ exchangeStatus?: ExchangeStatus }>`

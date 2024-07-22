@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
 
@@ -74,7 +74,7 @@ const TradePage = () => {
     switch (tradeLayout) {
       case TradeLayouts.Alternative:
         return (
-          <>
+          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
             {!isDesktopMedium && top}
             <$MainSection gridArea="Main">
               <$TestSection>
@@ -84,11 +84,11 @@ const TradePage = () => {
               {horizontalPane}
             </$MainSection>
             {sidebar}
-          </>
+          </$TradeLayout>
         );
       case TradeLayouts.Reverse:
         return (
-          <>
+          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
             {!isDesktopMedium && top}
             <$MainSection gridArea="Main">
               <$TestSection>
@@ -98,12 +98,12 @@ const TradePage = () => {
               {horizontalPane}
             </$MainSection>
             {sidebar}
-          </>
+          </$TradeLayout>
         );
       case TradeLayouts.Default:
       default:
         return (
-          <>
+          <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
             {!isDesktopMedium && top}
             {sidebar}
             <$MainSection gridArea="Main">
@@ -113,7 +113,7 @@ const TradePage = () => {
               </$TestSection>
               {horizontalPane}
             </$MainSection>
-          </>
+          </$TradeLayout>
         );
     }
   };
@@ -139,62 +139,16 @@ const TradePage = () => {
       {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
-    <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
-      {desktopLayout()}
-    </$TradeLayout>
+    desktopLayout()
   );
+  // <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
+  /* </$TradeLayout> */
 };
 
 export default TradePage;
 const $TradeLayout = styled.article<{
   isHorizontalPanelOpen: boolean;
 }>`
-  --horizontalPanel-height: 18rem;
-
-  // Constants
-  /* prettier-ignore */
-  --layout-default:
-    'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
-  --layout-default-desktopMedium:
-    'Side Vertical Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
-  --layout-alternative:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  /* prettier-ignore */
-  --layout-alternative-desktopMedium:
-    'Vertical Top Side' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  // Props/defaults
-
-  // --layout: var(--layout-default);
-
-  // Variants
-  @media ${breakpoints.desktopMedium} {
-    --layout: var(--layout-default-desktopMedium);
-  }
-
-  ${({ isHorizontalPanelOpen }) =>
-    !isHorizontalPanelOpen &&
-    css`
-      --horizontalPanel-height: auto !important;
-    `}
-
   // Rules
   width: 0;
   min-width: 100%;
@@ -204,17 +158,7 @@ const $TradeLayout = styled.article<{
   display: flex;
   flex-wrap: wrap;
 
-  ${layoutMixins.withOuterAndInnerBorders}; // @media (prefers-reduced-motion: no-preference) {
-  //   transition: grid-template 0.2s var(--ease-out-expo);
-  // }
-
-  // > * {
-  //   display: grid;
-  // }
-
-  // > section {
-  //   contain: strict;
-  // }
+  ${layoutMixins.withOuterAndInnerBorders};
 `;
 
 const $TradeLayoutMobile = styled.article`
@@ -236,7 +180,7 @@ const $TradeLayoutMobile = styled.article`
 `;
 
 const $Top = styled.header`
-  grid-area: Top;
+  box-shadow: none;
 `;
 
 const $GridSection = styled.section<{ gridArea: string }>`
@@ -246,14 +190,24 @@ const $GridSection = styled.section<{ gridArea: string }>`
 const $SideSection = styled($GridSection)`
   grid-template-rows: auto minmax(0, 1fr);
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  height: calc(100% - var(--market-info-row-height));
+
+  @media ${breakpoints.desktopMedium} {
+    height: 100%;
+  }
 `;
 
 const $MainSection = styled($GridSection)`
   display: flex;
   flex-direction: column;
-  // flex-wrap: wrap;
-  height: 100%;
-  // gap: var(--border-width);
+  height: calc(100% - var(--market-info-row-height));
+
+  @media ${breakpoints.desktopMedium} {
+    height: 100%;
+  }
 
   ${layoutMixins.withOuterAndInnerBorders};
 
@@ -272,20 +226,18 @@ const $TradeSection = styled.div`
 
 const $InnerSection = styled.div`
   flex: 1;
+  display: flex;
+  flex-direction: column;
 `;
 
 const $HorizontalSection = styled.div`
   overflow: hidden;
   width: 100%;
-  height: calc(100% - var(--stickyArea-bottomHeight));
+  display: grid;
 `;
 
 const $TradeBox = styled(TradeBox)`
-  height: calc(100% - var(--account-info-section-height) - var(--market-info-row-height));
-
-  @media ${breakpoints.desktopMedium} {
-    height: calc(100% - var(--account-info-section-height));
-  }
-
   overflow-y: auto;
+  height: 100%;
+  padding-top: var(--border-width);
 `;
