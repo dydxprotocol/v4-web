@@ -29,7 +29,11 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
+import {
+  getOnboardingGuards,
+  getSubaccountBuyingPower,
+  getSubaccountEquity,
+} from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -63,6 +67,7 @@ export const DepositButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
   const { connectionError } = useApiState();
@@ -273,7 +278,11 @@ export const DepositButtonAndReceipt = ({
             isLoading: (isFormValid && !requestPayload) || isLoading,
           }}
         >
-          {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+          {stringGetter({
+            key: hasAcknowledgedTerms
+              ? STRING_KEYS.DEPOSIT_FUNDS
+              : STRING_KEYS.ACKNOWLEDGE_TERMS_AND_DEPOSIT,
+          })}
         </Button>
       )}
     </$WithReceipt>
