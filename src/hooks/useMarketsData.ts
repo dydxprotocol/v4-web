@@ -16,7 +16,7 @@ import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetu
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 const filterFunctions = {
   [MarketFilters.ALL]: () => true,
@@ -60,9 +60,11 @@ export const useMarketsData = (
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
 } => {
-  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allPerpetualClobIds = orEmptyObj(useAppSelector(getPerpetualMarketsClobIds, shallowEqual));
-  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allPerpetualClobIds = orEmptyRecord(
+    useAppSelector(getPerpetualMarketsClobIds, shallowEqual)
+  );
+  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {

@@ -23,7 +23,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 enum LayoutItems {
   setDefaultLayout = 'SetDefaultLayout',
@@ -38,8 +38,8 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
   const { chainTokenLabel } = useTokenConfigs();
   const showVaults = testFlags.enableVaults;
 
-  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
     (market): PerpetualMarket & Asset => safeAssign({}, market, allAssets[market?.assetId] ?? {})

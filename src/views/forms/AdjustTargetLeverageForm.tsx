@@ -30,7 +30,8 @@ import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
+import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AdjustTargetLeverageForm = ({
@@ -50,15 +51,7 @@ export const AdjustTargetLeverageForm = ({
   const leverageBN = MustBigNumber(leverage);
 
   const maxLeverage = useMemo(() => {
-    if (effectiveInitialMarginFraction) {
-      return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
-    }
-
-    if (initialMarginFraction) {
-      return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
-    }
-
-    return 10; // default
+    return calculateMarketMaxLeverage({ initialMarginFraction, effectiveInitialMarginFraction });
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   return (

@@ -20,6 +20,7 @@ import {
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -31,6 +32,7 @@ import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { GradientCard } from '@/components/GradientCard';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -173,7 +175,7 @@ export const AdjustIsolatedMarginForm = ({
   /**
    * TODO: Handle by adding AdjustIsolatedMarginValidator within Abacus
    */
-  const marketMaxLeverage = useAppSelector((s) => getMarketMaxLeverage(s, marketId));
+  const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, marketId);
 
   const alertMessage = useMemo(() => {
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
@@ -225,6 +227,12 @@ export const AdjustIsolatedMarginForm = ({
     positionLeverageUpdated,
     stringGetter,
   ]);
+
+  // currently the only action that trader can take to fix the errors/validations is modify the amount
+  const ctaErrorAction =
+    alertMessage?.type === AlertType.Error
+      ? stringGetter({ key: STRING_KEYS.MODIFY_MARGIN_AMOUNT })
+      : undefined;
 
   const {
     freeCollateralDiffOutput,
@@ -425,10 +433,17 @@ export const AdjustIsolatedMarginForm = ({
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
-          disabled={isSubmitting}
-          state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+          disabled={isSubmitting || ctaErrorAction !== undefined}
+          state={
+            isSubmitting
+              ? ButtonState.Loading
+              : ctaErrorAction
+                ? ButtonState.Disabled
+                : ButtonState.Default
+          }
+          slotLeft={ctaErrorAction ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
         >
-          {formConfig.buttonLabel}
+          {ctaErrorAction ?? formConfig.buttonLabel}
         </Button>
       </WithDetailsReceipt>
     </$Form>
@@ -459,4 +474,8 @@ const $Column = styled.div`
 `;
 const $TertiarySpan = styled.span`
   color: var(--color-text-0);
+`;
+
+const $WarningIcon = styled(Icon)`
+  color: var(--color-warning);
 `;

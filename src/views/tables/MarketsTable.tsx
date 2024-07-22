@@ -54,7 +54,12 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
+              renderCell: ({ asset, effectiveInitialMarginFraction, initialMarginFraction }) => (
+                <AssetTableCell
+                  asset={asset}
+                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                />
+              ),
             },
             {
               columnKey: 'price',
@@ -99,7 +104,12 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
+              renderCell: ({ asset, effectiveInitialMarginFraction, initialMarginFraction }) => (
+                <AssetTableCell
+                  asset={asset}
+                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                />
+              ),
             },
             {
               columnKey: 'oraclePrice',
