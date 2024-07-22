@@ -36,7 +36,7 @@ dependencies:
     specifier: ^1.1.27
     version: 1.1.27
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.159
+    specifier: ^1.1.160
     version: 1.1.160
   '@ethersproject/providers':
     specifier: ^5.7.2
