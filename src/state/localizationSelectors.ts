@@ -42,12 +42,18 @@ export const getStringGetterForLocaleData = (
 ): StringGetterFunction => {
   // @ts-expect-error TODO: formatString return doesn't match StringGetterFunction
   return (props) => {
-    // Fallback to english whenever a key doesn't exist for other languages
     if (isLocaleLoaded) {
-      const formattedString: string =
-        localeData || EN_LOCALE_DATA
-          ? get(localeData, props.key) || get(EN_LOCALE_DATA, props.key)
-          : '';
+      let formattedString = props.fallback ?? '';
+
+      if (localeData || EN_LOCALE_DATA) {
+        if (props.key) {
+          const localeString = get(localeData, props.key);
+          const englishString = get(EN_LOCALE_DATA, props.key);
+
+          // Fallback to english whenever a key doesn't exist for other languages
+          formattedString = localeString || englishString;
+        }
+      }
 
       return formatString(formattedString, props?.params);
     }
