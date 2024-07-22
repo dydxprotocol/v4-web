@@ -61,6 +61,7 @@
     "react/jsx-wrap-multilines": "off",
     "react/jsx-indent": "off",
     "react/no-danger": "off",
+    "react/no-unknown-property": ["error", { "ignore": ["tw"] }],
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
     "react/sort-comp": "off",

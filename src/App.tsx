@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { GlobalStyles as BaseStyles } from 'twin.macro';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
@@ -82,6 +83,7 @@ const Content = () => {
 
   return (
     <>
+      <BaseStyles />
       <GlobalStyle />
       <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
         {isNotTablet && <HeaderDesktop />}
