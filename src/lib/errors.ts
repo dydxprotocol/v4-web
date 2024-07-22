@@ -45,7 +45,9 @@ const getUntranslatedErrorMessageOrDefaultErrorParams = (errorMessage?: string):
   return DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS;
 };
 
-export const getValidParsingErrorParams = (error?: Nullable<ParsingError>): ErrorParams => {
+export const getValidErrorParamsFromParsingError = (
+  error?: Nullable<ParsingError>
+): ErrorParams => {
   const { stringKey: errorStringKey, message: errorMessage } = error ?? {};
   const defaultErrorParams = getUntranslatedErrorMessageOrDefaultErrorParams(errorMessage);
   if (!errorStringKey) return defaultErrorParams;

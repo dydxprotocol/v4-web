@@ -41,7 +41,7 @@ import { getBalances } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
-import { getValidParsingErrorParams } from '@/lib/errors';
+import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
@@ -376,7 +376,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (success) {
           onSuccess?.(data);
         } else {
-          onError?.(getValidParsingErrorParams(parsingError));
+          onError?.(getValidErrorParamsFromParsingError(parsingError));
         }
       };
 
@@ -420,7 +420,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (success) {
           onSuccess?.(data);
         } else {
-          const errorParams = getValidParsingErrorParams(parsingError);
+          const errorParams = getValidErrorParamsFromParsingError(parsingError);
           onError?.(errorParams);
 
           if (data?.clientId !== undefined) {
@@ -483,7 +483,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
-          const errorParams = getValidParsingErrorParams(parsingError);
+          const errorParams = getValidErrorParamsFromParsingError(parsingError);
           dispatch(
             cancelOrderFailed({
               orderId,
@@ -524,7 +524,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             dispatch(cancelOrderConfirmed(payload.orderId));
           });
         } else {
-          const errorParams = getValidParsingErrorParams(parsingError);
+          const errorParams = getValidErrorParamsFromParsingError(parsingError);
           onError?.(errorParams);
 
           placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
