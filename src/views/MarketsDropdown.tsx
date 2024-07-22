@@ -9,6 +9,7 @@ import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,6 +24,8 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
+
+import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
@@ -188,6 +191,14 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
+    const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
+
+    const leverageTag =
+      currentMarketId != null ? (
+        <Tag>
+          <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
+        </Tag>
+      ) : undefined;
 
     return (
       <$Popover
@@ -202,6 +213,7 @@ export const MarketsDropdown = memo(
               <div>
                 <AssetIcon symbol={symbol} />
                 <h2>{currentMarketId}</h2>
+                {leverageTag}
               </div>
             )}
             <p>

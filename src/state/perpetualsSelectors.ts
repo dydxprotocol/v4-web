@@ -199,7 +199,10 @@ export const getCurrentMarketNextFundingRate = createAppSelector(
  */
 export const getMarketMaxLeverage = () =>
   createAppSelector(
-    [(state: RootState, marketId: string) => getMarketConfig(state, marketId)],
+    [
+      (state: RootState, marketId?: string) =>
+        marketId != null ? getMarketConfig(state, marketId) : undefined,
+    ],
     (marketConfig) => {
       const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
 
