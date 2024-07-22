@@ -121,6 +121,9 @@ export default {
       20: '20rem',
       24: '24rem',
     },
+    borderRadius: ({ theme }) => ({
+      ...theme('spacing'),
+    }),
     extend: {},
   },
   plugins: [

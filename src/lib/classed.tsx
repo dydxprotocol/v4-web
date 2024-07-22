@@ -24,3 +24,12 @@ export const twClassed = <TargetProps extends { className?: string; children?: R
     );
   };
 };
+
+const wrapNative = (nativeName: keyof JSX.IntrinsicElements) => (boundClassName: string) =>
+  twClassed(
+    ({ children, ...others }: JSX.IntrinsicElements[typeof nativeName]) =>
+      React.createElement(nativeName, { ...others }, children),
+    boundClassName
+  );
+
+twClassed.div = wrapNative('div');
