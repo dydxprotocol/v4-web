@@ -5,12 +5,18 @@ import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 
-import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
+import {
+  EvmDerivedAddresses,
+  OnboardingGuard,
+  OnboardingState,
+  SolDerivedAddresses,
+} from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   DydxAddress,
   EvmAddress,
   PrivateInformation,
+  SolAddress,
   TEST_WALLET_EVM_ADDRESS,
   WalletConnectionType,
   WalletType,
@@ -56,6 +62,7 @@ const useAccountsContext = () => {
     selectedWalletType,
     selectedWalletError,
     evmAddress,
+    solAddress,
     signerWagmi,
     publicClientWagmi,
     dydxAddress: connectedDydxAddress,
@@ -66,8 +73,64 @@ const useAccountsContext = () => {
   const [previousEvmAddress, setPreviousEvmAddress] = useState(evmAddress);
   const hasSubAccount = useAppSelector(getHasSubaccount);
 
+  const { ready, authenticated } = usePrivy();
+
+  const [previousSolAddress, setPreviousSolAddress] = useState(solAddress);
+
+  // EVM → dYdX account derivation
+  const [evmDerivedAddresses, saveEvmDerivedAddresses] = useLocalStorage({
+    key: LocalStorageKey.EvmDerivedAddresses,
+    defaultValue: { version: 'v2' } as EvmDerivedAddresses,
+  });
+
   useEffect(() => {
-    // Wallet accounts switched
+    // Clear data stored with deprecated LocalStorageKey
+    if (evmDerivedAddresses.version !== LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses])
+      saveEvmDerivedAddresses({
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses],
+      });
+  }, [evmDerivedAddresses.version, saveEvmDerivedAddresses]);
+
+  const saveEvmDerivedAccount = useCallback(
+    ({
+      evmAddressInner,
+      dydxAddress,
+    }: {
+      evmAddressInner: EvmAddress;
+      dydxAddress?: DydxAddress;
+    }) => {
+      saveEvmDerivedAddresses({
+        ...evmDerivedAddresses,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses],
+        [evmAddressInner]: {
+          ...(evmDerivedAddresses as any)[evmAddressInner],
+          dydxAddress,
+        },
+      });
+    },
+    [evmDerivedAddresses, saveEvmDerivedAddresses]
+  );
+
+  const saveEvmSignature = useCallback(
+    (encryptedSignature: string) => {
+      evmDerivedAddresses[evmAddress!].encryptedSignature = encryptedSignature;
+      saveEvmDerivedAddresses(evmDerivedAddresses);
+    },
+    [evmDerivedAddresses, evmAddress, saveEvmDerivedAddresses]
+  );
+
+  const forgetEvmSignature = useCallback(
+    (_evmAddress = evmAddress) => {
+      if (_evmAddress) {
+        delete evmDerivedAddresses[_evmAddress]?.encryptedSignature;
+        saveEvmDerivedAddresses(evmDerivedAddresses);
+      }
+    },
+    [evmAddress, evmDerivedAddresses, saveEvmDerivedAddresses]
+  );
+
+  useEffect(() => {
+    // EVM Wallet accounts switched
     if (previousEvmAddress && evmAddress && evmAddress !== previousEvmAddress) {
       // Disconnect local wallet
       disconnectLocalDydxWallet();
@@ -81,57 +144,68 @@ const useAccountsContext = () => {
     }
 
     setPreviousEvmAddress(evmAddress);
-  }, [evmAddress, hasSubAccount]);
+  }, [evmAddress, forgetEvmSignature, hasSubAccount, previousEvmAddress]);
 
-  const { ready, authenticated } = usePrivy();
-
-  // EVM → dYdX account derivation
-
-  const [evmDerivedAddresses, saveEvmDerivedAddresses] = useLocalStorage({
-    key: LocalStorageKey.EvmDerivedAddresses,
-    defaultValue: {} as EvmDerivedAddresses,
+  // SOL → dYdX account derivation
+  const [solDerivedAddresses, saveSolDerivedAddresses] = useLocalStorage({
+    key: LocalStorageKey.SolDerivedAddresses,
+    defaultValue: {} as SolDerivedAddresses,
   });
 
-  useEffect(() => {
-    // Clear data stored with deprecated LocalStorageKey
-    if (evmDerivedAddresses.version !== LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses])
-      saveEvmDerivedAddresses({});
-  }, []);
-
-  const saveEvmDerivedAccount = ({
-    evmAddressInner,
-    dydxAddress,
-  }: {
-    evmAddressInner: EvmAddress;
-    dydxAddress?: DydxAddress;
-  }) => {
-    saveEvmDerivedAddresses({
-      ...evmDerivedAddresses,
-      version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses],
-      [evmAddressInner]: {
-        ...evmDerivedAddresses[evmAddressInner],
-        dydxAddress,
-      },
-    });
-  };
-
-  const saveEvmSignature = useCallback(
-    (encryptedSignature: string) => {
-      evmDerivedAddresses[evmAddress!].encryptedSignature = encryptedSignature;
-      saveEvmDerivedAddresses(evmDerivedAddresses);
+  const saveSolDerivedAccount = useCallback(
+    ({
+      solAddressInner,
+      dydxAddress,
+    }: {
+      solAddressInner: SolAddress;
+      dydxAddress?: DydxAddress;
+    }) => {
+      saveSolDerivedAddresses({
+        ...solDerivedAddresses,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.SolDerivedAddresses],
+        [solAddressInner]: {
+          ...solDerivedAddresses[solAddressInner],
+          dydxAddress,
+        },
+      });
     },
-    [evmDerivedAddresses, evmAddress]
+    [saveSolDerivedAddresses, solDerivedAddresses]
   );
 
-  const forgetEvmSignature = useCallback(
-    (_evmAddress = evmAddress) => {
-      if (_evmAddress) {
-        delete evmDerivedAddresses[_evmAddress]?.encryptedSignature;
-        saveEvmDerivedAddresses(evmDerivedAddresses);
+  const saveSolSignature = useCallback(
+    (encryptedSignature: string) => {
+      solDerivedAddresses[solAddress!].encryptedSignature = encryptedSignature;
+      saveSolDerivedAddresses(solDerivedAddresses);
+    },
+    [solDerivedAddresses, solAddress, saveSolDerivedAddresses]
+  );
+
+  const forgetSolSignature = useCallback(
+    (_solAddress = solAddress) => {
+      if (_solAddress) {
+        delete solDerivedAddresses[_solAddress]?.encryptedSignature;
+        saveSolDerivedAddresses(solDerivedAddresses);
       }
     },
-    [evmDerivedAddresses, evmAddress]
+    [solAddress, solDerivedAddresses, saveSolDerivedAddresses]
   );
+
+  useEffect(() => {
+    // SOL Wallet accounts switched
+    if (previousSolAddress && solAddress && solAddress !== previousSolAddress) {
+      // Disconnect local wallet
+      disconnectLocalDydxWallet();
+
+      // Forget SOL signature
+      forgetSolSignature(previousSolAddress);
+    }
+
+    if (solAddress) {
+      abacusStateManager.setTransfersSourceAddress(solAddress);
+    }
+
+    setPreviousSolAddress(solAddress);
+  }, [solAddress, forgetSolSignature, hasSubAccount, previousSolAddress]);
 
   const decryptSignature = (encryptedSignature: string | undefined) => {
     const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
@@ -145,7 +219,7 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
+  const { indexerClient, getWalletFromSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
@@ -178,21 +252,30 @@ const useAccountsContext = () => {
 
   const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
 
-  const setWalletFromEvmSignature = async (signature: string) => {
-    const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromEvmSignature({
-      signature,
-    });
-    setLocalDydxWallet(wallet);
-    setHdKey({ mnemonic, privateKey, publicKey });
-  };
+  const setWalletFromSignature = useCallback(
+    async (signature: string) => {
+      const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
+        signature,
+      });
+      setLocalDydxWallet(wallet);
+      setHdKey({ mnemonic, privateKey, publicKey });
+    },
+    [getWalletFromSignature]
+  );
 
   useEffect(() => {
     if (evmAddress) {
       saveEvmDerivedAccount({ evmAddressInner: evmAddress, dydxAddress });
     }
-  }, [evmAddress, dydxAddress]);
+  }, [evmAddress, dydxAddress, saveEvmDerivedAccount]);
 
-  const signTypedDataAsync = useSignForWalletDerivation();
+  useEffect(() => {
+    if (solAddress) {
+      saveSolDerivedAccount({ solAddressInner: solAddress, dydxAddress });
+    }
+  }, [solAddress, dydxAddress, saveSolDerivedAccount]);
+
+  const signMessageAsync = useSignForWalletDerivation(walletType);
 
   useEffect(() => {
     (async () => {
@@ -234,9 +317,9 @@ const useAccountsContext = () => {
             try {
               // Give Privy a second to finish the auth flow before getting the signature
               await sleep();
-              const signature = await signTypedDataAsync();
+              const signature = await signMessageAsync();
 
-              await setWalletFromEvmSignature(signature);
+              await setWalletFromSignature(signature);
               dispatch(setOnboardingState(OnboardingState.AccountConnected));
             } catch (error) {
               log('useAccounts/decryptSignature', error);
@@ -246,11 +329,29 @@ const useAccountsContext = () => {
             try {
               const signature = decryptSignature(evmDerivedAccount.encryptedSignature);
 
-              await setWalletFromEvmSignature(signature);
+              await setWalletFromSignature(signature);
               dispatch(setOnboardingState(OnboardingState.AccountConnected));
             } catch (error) {
               log('useAccounts/decryptSignature', error);
               forgetEvmSignature();
+            }
+          }
+        } else {
+          dispatch(setOnboardingState(OnboardingState.AccountConnected));
+        }
+      } else if (solAddress) {
+        if (!localDydxWallet) {
+          dispatch(setOnboardingState(OnboardingState.WalletConnected));
+
+          const solDerivedAccount = solDerivedAddresses[solAddress];
+          if (solDerivedAccount?.encryptedSignature) {
+            try {
+              const signature = decryptSignature(solDerivedAccount.encryptedSignature);
+              await setWalletFromSignature(signature);
+              dispatch(setOnboardingState(OnboardingState.AccountConnected));
+            } catch (error) {
+              log('useAccounts/decryptSignature', error);
+              forgetSolSignature();
             }
           }
         } else {
@@ -261,13 +362,32 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [evmAddress, evmDerivedAddresses, signerWagmi, connectedDydxAddress, signerGraz]);
+  }, [
+    evmAddress,
+    evmDerivedAddresses,
+    solAddress,
+    solDerivedAddresses,
+    signerWagmi,
+    connectedDydxAddress,
+    signerGraz,
+    walletType,
+    dispatch,
+    saveEvmDerivedAccount,
+    localDydxWallet,
+    walletConnectionType,
+    authenticated,
+    ready,
+    signMessageAsync,
+    setWalletFromSignature,
+    forgetEvmSignature,
+    forgetSolSignature,
+  ]);
 
   // abacus
   useEffect(() => {
     if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey]);
+  }, [localDydxWallet, hdKey, dydxAddress]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
@@ -345,13 +465,21 @@ const useAccountsContext = () => {
     signerWagmi,
     publicClientWagmi,
 
+    // Wallet connection (sol)
+    solAddress,
+
     // Wallet connection (Cosmos)
     signerGraz,
 
+    setWalletFromSignature,
+
     // EVM → dYdX account derivation
-    setWalletFromEvmSignature,
     saveEvmSignature,
     forgetEvmSignature,
+
+    // SOL → dYdX account derivation
+    saveSolSignature,
+    forgetSolSignature,
 
     // dYdX accounts
     hdKey,

@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -42,7 +42,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const stringGetter = useStringGetter();
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
-  const { setWalletFromEvmSignature, saveEvmSignature } = useAccounts();
+  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, walletType } = useAccounts();
 
   const [error, setError] = useState<string>();
 
@@ -84,7 +84,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   };
 
   // 2. Derive keys from EVM account
-  const { getWalletFromEvmSignature } = useDydxClient();
+  const { getWalletFromSignature } = useDydxClient();
   const { getSubaccounts } = useAccounts();
 
   const isDeriving = ![
@@ -92,7 +92,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signTypedDataAsync = useSignForWalletDerivation();
+  const signMessageAsync = useSignForWalletDerivation(walletType);
 
   const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
 
@@ -103,8 +103,8 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       // 1. First signature
       setStatus(EvmDerivedAccountStatus.Deriving);
 
-      const signature = await signTypedDataAsync();
-      const { wallet: dydxWallet } = await getWalletFromEvmSignature({ signature });
+      const signature = await signMessageAsync();
+      const { wallet: dydxWallet } = await getWalletFromSignature({ signature });
 
       // 2. Ensure signature is deterministic
       // Check if subaccounts exist
@@ -121,7 +121,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           setStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
 
           // Second signature
-          const additionalSignature = await signTypedDataAsync();
+          const additionalSignature = await signMessageAsync();
 
           if (signature !== additionalSignature) {
             throw new Error(
@@ -140,13 +140,17 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         return;
       }
 
-      await setWalletFromEvmSignature(signature);
+      await setWalletFromSignature(signature);
 
       // 3: Remember me (encrypt and store signature)
       if (shouldRememberMe && staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
 
-        saveEvmSignature(encryptedSignature);
+        if (walletType === WalletType.Phantom) {
+          saveSolSignature(encryptedSignature);
+        } else {
+          saveEvmSignature(encryptedSignature);
+        }
       }
 
       // 4. Done
@@ -232,7 +236,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
             </$ReceiptArea>
           }
         >
-          {!isMatchingNetwork ? (
+          {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
             <Button
               action={ButtonAction.Primary}
               onClick={() => switchNetworkAndDeriveKeys().then(onKeysDerived)}
@@ -281,7 +285,6 @@ const $StatusCard = styled.div<{ active?: boolean }>`
     css`
       background-color: var(--color-layer-6);
     `}
-
   > div {
     ${layoutMixins.column}
     gap: 0.25rem;

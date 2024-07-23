@@ -143,6 +143,9 @@ dependencies:
   '@skip-router/core':
     specifier: ^5.1.0
     version: 5.1.0(@types/react@18.3.3)(chain-registry@1.63.9)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)
+  '@solana/web3.js':
+    specifier: ^1.93.0
+    version: 1.93.2
   '@statsig/js-client':
     specifier: 1.4.0
     version: 1.4.0
@@ -224,6 +227,9 @@ dependencies:
   export-to-csv:
     specifier: ^1.2.3
     version: 1.2.3
+  fast-json-stable-stringify:
+    specifier: ^2.1.0
+    version: 2.1.0
   graz:
     specifier: ^0.0.43
     version: 0.0.43(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)
@@ -4405,26 +4411,26 @@ packages:
   /@internationalized/date@3.4.0:
     resolution: {integrity: sha512-QUDSGCsvrEVITVf+kv9VSAraAmCgjQmU5CiXtesUBBhBe374NmnEIIaOFBZ72t29dfGMBP0zF+v6toVnbcc6jg==}
     dependencies:
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
     dev: false
 
   /@internationalized/message@3.1.1:
     resolution: {integrity: sha512-ZgHxf5HAPIaR0th+w0RUD62yF6vxitjlprSxmLJ1tam7FOekqRSDELMg4Cr/DdszG5YLsp5BG3FgHgqquQZbqw==}
     dependencies:
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       intl-messageformat: 10.5.0
     dev: false
 
   /@internationalized/number@3.2.1:
     resolution: {integrity: sha512-hK30sfBlmB1aIe3/OwAPg9Ey0DjjXvHEiGVhNaOiBJl31G0B6wMaX8BN3ibzdlpyRNE9p7X+3EBONmxtJO9Yfg==}
     dependencies:
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
     dev: false
 
   /@internationalized/string@3.1.1:
     resolution: {integrity: sha512-fvSr6YRoVPgONiVIUhgCmIAlifMVCeej/snPZVzbzRPxGpHl3o1GRe+d/qh92D8KhgOciruDUH8I5mjdfdjzfA==}
     dependencies:
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
     dev: false
 
   /@ioredis/commands@1.2.0:
@@ -7129,7 +7135,7 @@ packages:
       '@react-types/checkbox': 3.5.0(react@18.2.0)
       '@react-types/grid': 3.2.0(react@18.2.0)
       '@react-types/shared': 3.19.0(react@18.2.0)
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
@@ -7229,7 +7235,7 @@ packages:
   /@react-aria/live-announcer@3.3.1:
     resolution: {integrity: sha512-hsc77U7S16trM86d+peqJCOCQ7/smO1cybgdpOuzXyiwcHQw8RQ4GrXrS37P4Ux/44E9nMZkOwATQRT2aK8+Ew==}
     dependencies:
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
     dev: false
 
   /@react-aria/menu@3.10.1(react-dom@18.2.0)(react@18.2.0):
@@ -7438,7 +7444,7 @@ packages:
       '@react-aria/utils': 3.19.0(react@18.2.0)
       '@react-types/button': 3.7.4(react@18.2.0)
       '@react-types/shared': 3.19.0(react@18.2.0)
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
@@ -7556,7 +7562,7 @@ packages:
       '@react-types/checkbox': 3.5.0(react@18.2.0)
       '@react-types/shared': 3.19.0(react@18.2.0)
       '@react-types/switch': 3.4.0(react@18.2.0)
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       react: 18.2.0
     dev: false
 
@@ -8129,7 +8135,7 @@ packages:
       '@react-types/grid': 3.2.0(react@18.2.0)
       '@react-types/shared': 3.19.0(react@18.2.0)
       '@react-types/table': 3.8.0(react@18.2.0)
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       react: 18.2.0
     dev: false
 
@@ -8332,7 +8338,7 @@ packages:
     dependencies:
       '@react-aria/utils': 3.19.0(react@18.2.0)
       '@react-types/shared': 3.19.0(react@18.2.0)
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.11
       react: 18.2.0
     dev: false
 
@@ -13484,7 +13490,7 @@ packages:
     resolution: {integrity: sha512-e4a5N8lVvuLgAWgnCrLr2PP0YyDOTHa9H/Rj54dirp61qXnNq46m82bRhNqIA5VccJtWBvPTFRV3TtvHUKPB1g==}
     requiresBuild: true
     dependencies:
-      node-fetch: 2.6.12(encoding@0.1.13)
+      node-fetch: 2.7.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
 
@@ -15430,7 +15436,6 @@ packages:
 
   /fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
-    dev: true
 
   /fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
@@ -16933,7 +16938,7 @@ packages:
       merge-options: 3.0.4
       nanoid: 3.3.7
       native-fetch: 3.0.0(node-fetch@2.6.12)
-      node-fetch: 2.6.12(encoding@0.1.13)
+      node-fetch: 2.6.12
       react-native-fetch-api: 3.0.0
       stream-to-it: 0.2.4
     transitivePeerDependencies:
@@ -17367,7 +17372,7 @@ packages:
   /isomorphic-unfetch@3.1.0(encoding@0.1.13):
     resolution: {integrity: sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==}
     dependencies:
-      node-fetch: 2.6.12(encoding@0.1.13)
+      node-fetch: 2.7.0(encoding@0.1.13)
       unfetch: 4.2.0
     transitivePeerDependencies:
       - encoding
@@ -19622,7 +19627,7 @@ packages:
     peerDependencies:
       node-fetch: '*'
     dependencies:
-      node-fetch: 2.6.12(encoding@0.1.13)
+      node-fetch: 2.6.12
     dev: true
 
   /native-fetch@3.0.0(node-fetch@3.3.2):
@@ -19698,7 +19703,7 @@ packages:
     resolution: {integrity: sha512-IhOigYzAKHd244OC0JIMIUrjzctirCmPkaIfhDeGcEETWof5zKYUW7e7MYvChGWh/4CJeXEgsRyGzuF334rOOQ==}
     dev: false
 
-  /node-fetch@2.6.12(encoding@0.1.13):
+  /node-fetch@2.6.12:
     resolution: {integrity: sha512-C/fGU2E8ToujUivIO0H+tpQ6HWo4eEmchoPIoXtxCrVghxdKq+QOHqEZW7tuP3KlV3bC8FRMO5nMCC7Zm1VP6g==}
     engines: {node: 4.x || >=6.0.0}
     peerDependencies:
@@ -19707,8 +19712,8 @@ packages:
       encoding:
         optional: true
     dependencies:
-      encoding: 0.1.13
       whatwg-url: 5.0.0
+    dev: true
 
   /node-fetch@2.7.0(encoding@0.1.13):
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -19721,7 +19726,6 @@ packages:
     dependencies:
       encoding: 0.1.13
       whatwg-url: 5.0.0
-    dev: false
 
   /node-fetch@3.3.2:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
@@ -20828,7 +20832,7 @@ packages:
       bl: 5.1.0
       debug: 4.3.4(supports-color@5.5.0)
       minimist: 1.2.8
-      node-fetch: 2.6.12(encoding@0.1.13)
+      node-fetch: 2.7.0(encoding@0.1.13)
       readable-stream: 3.6.2
     transitivePeerDependencies:
       - encoding

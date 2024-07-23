@@ -7,6 +7,8 @@ export const useDisplayedWallets = () => {
   const displayedWallets = [
     WalletType.MetaMask,
 
+    WalletType.Phantom,
+
     isDev && WalletType.Keplr,
 
     WalletType.WalletConnect2,

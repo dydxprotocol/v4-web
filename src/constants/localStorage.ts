@@ -1,11 +1,13 @@
 export enum LocalStorageKey {
   // Onboarding / Accounts
   EvmAddress = 'dydx.EvmAddress',
+  SolAddress = 'dydx.SolAddress',
   DydxAddress = 'dydx.DydxAddress',
   OnboardingSelectedWalletType = 'dydx.OnboardingSelectedWalletType',
   WalletConnectionType = 'dydx.WalletConnectionType',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
+  SolDerivedAddresses = 'dydx.SolDerivedAddresses',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
@@ -32,6 +34,7 @@ export enum LocalStorageKey {
 
 export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.EvmDerivedAddresses]: 'v2',
+  [LocalStorageKey.SolDerivedAddresses]: 'v1',
   [LocalStorageKey.NotificationPreferences]: 'v2',
   [LocalStorageKey.TransferNotifications]: 'v1',
   [LocalStorageKey.Notifications]: 'v1',
