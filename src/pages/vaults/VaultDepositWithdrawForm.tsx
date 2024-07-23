@@ -413,6 +413,7 @@ export const VaultDepositWithdrawForm = ({
           {inputFormConfig.transactionTarget.icon === 'cross' ? (
             <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-layer-6">C</div>
           ) : (
+            // eslint-disable-next-line jsx-a11y/alt-text
             <img src="/dydx-chain.png" tw="h-2 w-2" />
           )}
           <div>{inputFormConfig.transactionTarget.label}</div>

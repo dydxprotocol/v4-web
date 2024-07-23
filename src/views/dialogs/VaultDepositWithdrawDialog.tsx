@@ -35,6 +35,7 @@ export const VaultDepositWithdrawDialog = ({
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
       title={
         <$VaultDialogTitle>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img src="/dydx-chain.png" tw="h-2.5 w-2.5" />
           {stringGetter({ key: STRING_KEYS.VAULT })}
         </$VaultDialogTitle>

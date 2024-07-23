@@ -136,7 +136,7 @@ export const MarketLeverageInput = ({
               <WithTooltip tooltip="leverage" side="right">
                 {stringGetter({ key: STRING_KEYS.LEVERAGE })}
               </WithTooltip>
-
+              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
               <div onClick={onLeverageSideToggle} tw="cursor-pointer">
                 <PositionSideTag positionSide={leveragePosition} />
               </div>
