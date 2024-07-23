@@ -48,6 +48,8 @@ enum OrderbookRowAnimationType {
   NONE,
 }
 
+const GRADIENT_MULTIPLIER = 1.3;
+
 export type Rekt = { x1: number; x2: number; y1: number; y2: number };
 
 export const useDrawOrderbook = ({
@@ -105,7 +107,7 @@ export const useDrawOrderbook = ({
   const drawBars = ({
     ctx,
     value,
-    gradientMultiplier = 1.3,
+    gradientMultiplier = GRADIENT_MULTIPLIER,
     histogramAccentColor,
     histogramSide: inHistogramSide,
     rekt,
