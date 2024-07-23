@@ -18,13 +18,20 @@ export default function useSignForWalletDerivation(walletType: WalletType | unde
   const chainId = Number(ethereumChainId);
 
   const signTypedData = getSignTypedData(selectedDydxChainId);
-  const { signTypedDataAsync: signEvmMessage } = useSignTypedData({
-    ...signTypedData,
-    domain: {
-      ...signTypedData.domain,
-      chainId,
-    },
-  });
+
+  const { signTypedDataAsync } = useSignTypedData();
+
+  const signEvmMessage = useCallback(
+    () =>
+      signTypedDataAsync({
+        ...signTypedData,
+        domain: {
+          ...signTypedData.domain,
+          chainId,
+        },
+      }),
+    [signTypedData, signTypedDataAsync, chainId]
+  );
 
   const { signMessage: phantomSignMessage } = usePhantomWallet();
 
