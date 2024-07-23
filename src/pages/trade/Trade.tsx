@@ -215,12 +215,12 @@ const $ChartSection = styled.section`
 
 const $HorizontalSection = styled.section`
   overflow: auto;
+  flex-shrink: 2;
 `;
 
 const $BorderedContainer = styled.div`
   display: flex;
-  flex-grow: 1;
-
+  flex: 1 1 80%; 
   ${layoutMixins.withOuterAndInnerBorders};
 `;
 

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 import {
+  ORDERBOOK_HEADER_HEIGHT,
   ORDERBOOK_MAX_ROWS_PER_SIDE,
   ORDERBOOK_MIN_ROWS_PER_SIDE,
   ORDERBOOK_PAGE_HEIGHT_RATIO,
@@ -38,6 +39,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     const calculateNumRows = () => {
       // Calculates the number of rows the orderbook should render on each side
       const viewportHeight = window.innerHeight;
+      const orderbookHeight = canvasOrderbookRef.current?.clientHeight;
 
       // The initial calculation calculates the number of rows we should render based on the current window height.
       const verticalPanelHeight = Math.floor(viewportHeight * ORDERBOOK_PAGE_HEIGHT_RATIO);
@@ -49,19 +51,20 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
       // otherwise used (the parent will flex-grow to fill the space); if so, it calculates the updated number of rows we
       // can now render
       let maxNumRowsToRender = minNumRowsToRender;
-      if (canvasOrderbookRef.current) {
+      if (orderbookHeight) {
         maxNumRowsToRender = Math.max(
           Math.floor(
-            (canvasOrderbookRef.current.clientHeight - 66 - ORDERBOOK_ROW_HEIGHT) /
+            (orderbookHeight - ORDERBOOK_HEADER_HEIGHT - ORDERBOOK_ROW_HEIGHT) /
               (2 * ORDERBOOK_ROW_HEIGHT)
           ),
           maxNumRowsToRender
         );
       }
 
+      const didWindowSizeIncrease = prevHeight && viewportHeight >= prevHeight;
       const numRows = Math.max(
         Math.min(
-          prevHeight && viewportHeight >= prevHeight
+          didWindowSizeIncrease && orderbookHeight && orderbookHeight < viewportHeight
             ? Math.max(minNumRowsToRender, maxNumRowsToRender)
             : Math.min(minNumRowsToRender, maxNumRowsToRender),
           ORDERBOOK_MAX_ROWS_PER_SIDE
@@ -77,7 +80,10 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     window.addEventListener('resize', calculateNumRows);
 
     return () => window.removeEventListener('resize', calculateNumRows);
-  }, [canvasOrderbookRef, prevHeight, canvasOrderbookRef.current?.clientHeight]);
+
+    // We intentionally want to update the listener only when the canvas orderbook height changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasOrderbookRef.current?.clientHeight]);
 
   return (
     <Tabs
