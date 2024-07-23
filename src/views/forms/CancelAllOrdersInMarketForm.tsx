@@ -150,10 +150,11 @@ export const CancelAllOrdersInMarketForm = ({
 
   const submitButtonWithReceipt = (
     <WithDetailsReceipt detailItems={detailItems}>
-      <$Button
+      <Button
         action={ButtonAction.Destroy}
         onClick={onCancel}
         state={{ isDisabled: isCancelling, isLoading: isCancelling }}
+        tw="w-full"
       >
         {pendingPositionOrders.length !== 1
           ? stringGetter({
@@ -163,12 +164,12 @@ export const CancelAllOrdersInMarketForm = ({
           : stringGetter({
               key: STRING_KEYS.CANCEL_ORDER,
             })}
-      </$Button>
+      </Button>
     </WithDetailsReceipt>
   );
   return (
     <div>
-      <$ConfirmationText>
+      <div tw="mb-1">
         {stringGetter({
           key: STRING_KEYS.CANCEL_ORDERS_CONFIRMATION,
           params: {
@@ -183,15 +184,8 @@ export const CancelAllOrdersInMarketForm = ({
             MARKET: marketId,
           },
         })}
-      </$ConfirmationText>
+      </div>
       {submitButtonWithReceipt}
     </div>
   );
 };
-
-const $ConfirmationText = styled.div`
-  margin-bottom: 1rem;
-`;
-const $Button = styled(Button)`
-  width: 100%;
-`;

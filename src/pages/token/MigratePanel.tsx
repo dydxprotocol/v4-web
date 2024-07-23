@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -48,7 +49,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         <$MigrateAction>
           <div>
             <div>{stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}</div>
-            <$Token type={OutputType.Asset} value={tokenBalance} />
+            <Output type={OutputType.Asset} value={tokenBalance} tw="text-text-2 font-large-book" />
           </div>
           {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
             <Button
@@ -63,12 +64,12 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         </$MigrateAction>
       }
     >
-      <$Description>
+      <div tw="text-text-0">
         {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
-        <$Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} isInline>
+        <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} isInline tw="ml-[0.5ch]">
           {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-        </$Link>
-      </$Description>
+        </Link>
+      </div>
     </$MigratePanel>
   ) : (
     <$MigratePanel
@@ -90,9 +91,9 @@ export const MigratePanel = ({ className }: { className?: string }) => {
       }
     >
       <$Column>
-        <$WithReceipt
+        <WithReceipt
           slotReceipt={
-            <$Details
+            <Details
               items={[
                 {
                   key: 'available-to-migrate',
@@ -105,8 +106,10 @@ export const MigratePanel = ({ className }: { className?: string }) => {
                   value: <Output type={OutputType.Asset} value={tokenBalance} />,
                 },
               ]}
+              tw="px-1 py-0.5"
             />
           }
+          tw="w-full"
         >
           {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
             <Button
@@ -118,7 +121,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
               {stringGetter({ key: STRING_KEYS.MIGRATE_NOW })}
             </Button>
           )}
-        </$WithReceipt>
+        </WithReceipt>
         <$InlineRow>
           {stringGetter({ key: STRING_KEYS.WANT_TO_LEARN })}
           <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} withIcon>
@@ -129,13 +132,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
     </$MigratePanel>
   );
 };
-const $MigratePanel = styled(Panel)`
-  width: 100%;
-
-  background-image: url('/dots-background.svg');
-  background-position: right;
-  background-repeat: no-repeat;
-`;
+const $MigratePanel = tw(Panel)`w-full bg-[url('/dots-background.svg')] bg-right bg-no-repeat `;
 
 const $Title = styled.h3`
   font: var(--font-medium-book);
@@ -157,20 +154,6 @@ const $MigrateAction = styled.div`
   border: solid var(--border-width) var(--color-border);
   border-radius: 0.75rem;
 `;
-
-const $Token = styled(Output)`
-  font: var(--font-large-book);
-  color: var(--color-text-2);
-`;
-
-const $Description = styled.div`
-  color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  margin-left: 0.5ch;
-`;
-
 const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
@@ -213,15 +196,6 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1.5rem;
   }
 `;
-
-const $Details = styled(Details)`
-  padding: 0.5rem 1rem;
-`;
-
-const $WithReceipt = styled(WithReceipt)`
-  width: 100%;
-`;
-
 const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);

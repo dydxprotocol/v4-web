@@ -4,6 +4,7 @@ import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -81,7 +82,7 @@ export const AccountMenu = () => {
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <$WarningIcon iconName={IconName.Warning} />;
+    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-warning" />;
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
     walletType === WalletType.Privy
@@ -107,7 +108,7 @@ export const AccountMenu = () => {
         onboardingState === OnboardingState.AccountConnected && (
           <$AccountInfo>
             <$AddressRow>
-              <$AssetIcon symbol="DYDX" />
+              <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>
                 <WithTooltip
                   slotTooltip={
@@ -141,10 +142,10 @@ export const AccountMenu = () => {
             </$AddressRow>
             {walletType && walletType !== WalletType.Privy && (
               <$AddressRow>
-                <$SourceIcon>
-                  <$ConnectorIcon iconName={IconName.AddressConnector} />
+                <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
+                  <Icon iconName={IconName.AddressConnector} tw="absolute top-[-1.625rem] h-1.75" />
                   <Icon iconComponent={wallets[walletType].icon as ElementType} />
-                </$SourceIcon>
+                </div>
                 <$Column>
                   <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
                   <$Address>{truncateAddress(evmAddress, '0x')}</$Address>
@@ -360,9 +361,10 @@ const AssetActions = memo(
       ]
         .filter(isTruthy)
         .map(({ iconName, tooltipStringKey, dialog }) => (
-          <$WithTooltip
+          <WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
+            tw="[--tooltip-backgroundColor:var(--color-layer-5)]"
           >
             <$IconButton
               key={dialog.type}
@@ -371,7 +373,7 @@ const AssetActions = memo(
               iconName={iconName}
               onClick={() => dispatch(openDialog(dialog))}
             />
-          </$WithTooltip>
+          </WithTooltip>
         ))}
     </$InlineRow>
   )
@@ -401,31 +403,6 @@ const $AddressRow = styled.div`
     margin-right: 0.5rem;
   }
 `;
-
-const $AssetIcon = styled(AssetIcon)`
-  z-index: 2;
-
-  font-size: 1.75rem;
-`;
-
-const $SourceIcon = styled.div`
-  padding: 0.375rem;
-  position: relative;
-  z-index: 1;
-
-  font-size: 1rem;
-
-  line-height: 0;
-  border-radius: 50%;
-  background-color: #303045;
-`;
-
-const $ConnectorIcon = styled(Icon)`
-  position: absolute;
-  top: -1.625rem;
-  height: 1.75rem;
-`;
-
 const $label = styled.div`
   ${layoutMixins.row}
 
@@ -459,9 +436,7 @@ const $Balances = styled.div`
   }
 `;
 
-const $BalanceOutput = styled(Output)`
-  font-size: var(--fontSize-medium);
-`;
+const $BalanceOutput = tw(Output)`text-medium `;
 
 const $DropdownMenu = styled(DropdownMenu)`
   ${headerMixins.dropdownTrigger}
@@ -469,16 +444,7 @@ const $DropdownMenu = styled(DropdownMenu)`
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
 ` as typeof DropdownMenu;
-
-const $WarningIcon = styled(Icon)`
-  font-size: 1.25rem;
-  color: var(--color-warning);
-`;
-
-const $Address = styled.span`
-  font: var(--font-base-book);
-  font-feature-settings: var(--fontFeature-monoNumbers);
-`;
+const $Address = tw.span`font-base-book [font-feature-settings:var(--fontFeature-monoNumbers)]`;
 
 const $ConnectToChain = styled($Column)`
   max-width: 12em;
@@ -506,8 +472,4 @@ const $IconButton = styled(IconButton)`
 const $CopyButton = styled(CopyButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
-`;
-
-const $WithTooltip = styled(WithTooltip)`
-  --tooltip-backgroundColor: var(--color-layer-5);
 `;

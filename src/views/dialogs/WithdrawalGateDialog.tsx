@@ -35,11 +35,11 @@ export const WithdrawalGateDialog = ({
       }
       slotIcon={
         <$IconContainer>
-          <$Icon iconName={IconName.Warning} />
+          <Icon iconName={IconName.Warning} tw="mb-0.125 text-[2.5rem] text-warning" />
         </$IconContainer>
       }
       slotFooter={
-        <$ButtonRow>
+        <div tw="grid grid-cols-[1fr_1fr] gap-1">
           <Button
             type={ButtonType.Link}
             action={ButtonAction.Secondary}
@@ -51,7 +51,7 @@ export const WithdrawalGateDialog = ({
           <Button action={ButtonAction.Primary} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CLOSE })}
           </Button>
-        </$ButtonRow>
+        </div>
       }
     >
       <$Content>
@@ -77,20 +77,7 @@ const $IconContainer = styled.div`
   min-height: 4.5rem;
   background-color: var(--color-gradient-warning);
 `;
-
-const $Icon = styled(Icon)`
-  color: var(--color-warning);
-  font-size: 2.5rem;
-  margin-bottom: 0.125rem;
-`;
-
 const $Content = styled.div`
   ${layoutMixins.column}
-  gap: 1rem;
-`;
-
-const $ButtonRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 `;

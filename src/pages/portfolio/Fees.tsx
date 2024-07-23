@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { FeeTier } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -112,14 +113,14 @@ export const Fees = () => {
                 label: stringGetter({ key: STRING_KEYS.TIER }),
                 allowsSorting: false,
                 renderCell: ({ tier }) => (
-                  <$Tier>
-                    <$Output type={OutputType.Text} value={tier} />
+                  <$TextRow tw="gap-0.5">
+                    <Output type={OutputType.Text} value={tier} tw="text-text-0" />
                     {tier === userFeeTier && (
-                      <$YouTag size={TagSize.Medium}>
+                      <Tag size={TagSize.Medium} tw="text-text-1">
                         {stringGetter({ key: STRING_KEYS.YOU })}
-                      </$YouTag>
+                      </Tag>
                     )}
-                  </$Tier>
+                  </$TextRow>
                 ),
               },
               {
@@ -292,23 +293,6 @@ const $FeeTable = styled(Table)`
     --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
 ` as typeof Table;
+const $Highlighted = tw.strong`text-text-1`;
 
-const $Output = styled(Output)`
-  color: var(--color-text-0);
-`;
-
-const $Highlighted = styled.strong`
-  color: var(--color-text-1);
-`;
-
-const $HighlightOutput = styled(Output)`
-  color: var(--color-text-1);
-`;
-
-const $Tier = styled($TextRow)`
-  gap: 0.5rem;
-`;
-
-const $YouTag = styled(Tag)`
-  color: var(--color-text-1);
-`;
+const $HighlightOutput = tw(Output)`text-text-1 `;

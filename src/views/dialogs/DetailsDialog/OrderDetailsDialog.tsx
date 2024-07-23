@@ -123,9 +123,9 @@ export const OrderDetailsDialog = ({
         value: (
           <$Row>
             <OrderStatusIcon status={status.rawValue} />
-            <$Status>
+            <span tw="font-small-medium">
               {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
-            </$Status>
+            </span>
           </$Row>
         ),
       },
@@ -220,7 +220,7 @@ export const OrderDetailsDialog = ({
 
   return (
     <DetailsDialog
-      slotIcon={<$AssetIcon symbol={asset?.id} />}
+      slotIcon={<AssetIcon symbol={asset?.id} tw="text-[1em]" />}
       title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
       slotFooter={
         isAccountViewOnly ? null : isOrderStatusClearable(status) ? (
@@ -245,12 +245,4 @@ export const OrderDetailsDialog = ({
 };
 const $Row = styled.div`
   ${layoutMixins.inlineRow}
-`;
-
-const $Status = styled.span`
-  font: var(--font-small-medium);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1em;
 `;

@@ -41,11 +41,12 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
     key: STRING_KEYS.ADD_NEW_MARKET_DETAILS,
     params: {
       AMOUNT: (
-        <$Output
+        <Output
           useGrouping
           type={OutputType.Number}
           value={initialDepositAmountBN}
           fractionDigits={initialDepositAmountDecimals}
+          tw="inline-block"
         />
       ),
       NATIVE_TOKEN_DENOM: chainTokenLabel,
@@ -63,7 +64,3 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
     />
   );
 };
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;

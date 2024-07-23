@@ -137,9 +137,9 @@ export const MarketLeverageInput = ({
                 {stringGetter({ key: STRING_KEYS.LEVERAGE })}
               </WithTooltip>
 
-              <$LeverageSide onClick={onLeverageSideToggle}>
+              <div onClick={onLeverageSideToggle} tw="cursor-pointer">
                 <PositionSideTag positionSide={leveragePosition} />
-              </$LeverageSide>
+              </div>
             </>
           }
         >
@@ -208,11 +208,6 @@ const $InnerInputContainer = styled.div`
     --input-height: 2.5rem;
   }
 `;
-
-const $LeverageSide = styled.div`
-  cursor: pointer;
-`;
-
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;

@@ -56,7 +56,12 @@ export const ChooseWallet = ({
             action={ButtonAction.Base}
             key={walletType}
             onClick={() => onChooseWallet(walletType)}
-            slotLeft={<$Icon iconComponent={wallets[walletType].icon as ElementType} />}
+            slotLeft={
+              <Icon
+                iconComponent={wallets[walletType].icon as ElementType}
+                tw="h-[1.5em] w-[1.5em]"
+              />
+            }
             size={ButtonSize.Small}
           >
             {stringGetter({ key: wallets[walletType].stringKey })}
@@ -109,12 +114,6 @@ const $WalletButton = styled(Button)`
     }
   }
 `;
-
-const $Icon = styled(Icon)`
-  width: 1.5em;
-  height: 1.5em;
-`;
-
 const $Footer = styled.footer`
   ${layoutMixins.spacedRow}
   justify-content: center;

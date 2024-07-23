@@ -1,6 +1,7 @@
 import { MouseEvent, useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
@@ -128,7 +129,7 @@ export const TransferStatusNotification = ({
           <$BridgingStatus>
             {content}
             {!isToast && !isComplete && !hasError && (
-              <$TransferStatusSteps status={status} type={type} />
+              <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
             )}
           </$BridgingStatus>
         )
@@ -160,9 +161,9 @@ export const TransferStatusNotification = ({
       side="bottom"
       slotReceipt={
         <Collapsible open={open} onOpenChange={setOpen} label="" withTrigger={false}>
-          <$Receipt>
+          <div tw="px-1 py-0">
             <TransferStatusSteps status={status} type={type} />
-          </$Receipt>
+          </div>
         </Collapsible>
       }
     >
@@ -188,16 +189,7 @@ const $Status = styled.div<{ withMarginBottom?: boolean }>`
     `}
 `;
 
-const $InlineOutput = styled(Output)`
-  display: inline-block;
-
-  color: var(--color-text-1);
-`;
-
-const $TransferStatusSteps = styled(TransferStatusSteps)`
-  padding: 0.5rem 0 0;
-`;
-
+const $InlineOutput = tw(Output)`inline-block text-text-1 `;
 const $Trigger = styled.button<{ isOpen?: boolean }>`
   display: flex;
   align-items: center;
@@ -223,8 +215,4 @@ const $Trigger = styled.button<{ isOpen?: boolean }>`
         rotate: -0.5turn;
       }
     `}
-`;
-
-const $Receipt = styled.div`
-  padding: 0 1rem;
 `;

@@ -95,12 +95,13 @@ export const UnbondingPanels = () => {
             }
           >
             <$Content>
-              <$Balance
+              <Output
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
-                slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+                slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-0.5" />}
+                tw="text-text-2 font-large-book"
               />
-              <$Footer>{availableInText}</$Footer>
+              <div tw="text-text-0">{availableInText}</div>
             </$Content>
           </Panel>
         );
@@ -130,17 +131,4 @@ const $Title = styled.h3`
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
-`;
-
-const $Balance = styled(Output)`
-  font: var(--font-large-book);
-  color: var(--color-text-2);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5rem;
-`;
-
-const $Footer = styled.div`
-  color: var(--color-text-0);
 `;

@@ -254,7 +254,10 @@ export const DepositButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+    <WithReceipt
+      slotReceipt={<$Details items={submitButtonReceipt} />}
+      tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+    >
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : !isConnectedWagmi ? (
@@ -285,18 +288,13 @@ export const DepositButtonAndReceipt = ({
           })}
         </Button>
       )}
-    </$WithReceipt>
+    </WithReceipt>
   );
 };
 const $ExchangeRate = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);

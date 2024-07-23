@@ -12,6 +12,7 @@ import {
   Trigger,
 } from '@radix-ui/react-dialog';
 import styled, { css, keyframes } from 'styled-components';
+import tw from 'twin.macro';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 
@@ -515,21 +516,9 @@ const $BackButton = styled(BackButton)`
   top: var(--dialog-header-paddingTop);
 `;
 
-const $Title = styled(Title)`
-  flex: 1;
+const $Title = tw(Title)`flex-1 font-large-medium text-text-2 overflow-hidden text-ellipsis `;
 
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled(Description)`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-base-book);
-`;
+const $Description = tw(Description)`mt-0.5 text-text-0 font-base-book `;
 
 const $Footer = styled.footer`
   display: grid;

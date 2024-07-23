@@ -33,35 +33,29 @@ export const StakeConfirmationButtonRow = ({
 
   return canAccountTrade ? (
     <$Row>
-      <$EditButton
+      <Button
         action={ButtonAction.Base}
         onClick={() => setStakeFormStep(StakeFormSteps.EditInputs)}
+        tw="grow"
       >
         {stringGetter({ key: STRING_KEYS.EDIT })}
-      </$EditButton>
-      <$SubmitButton action={ButtonAction.Primary} type={ButtonType.Submit} state={{ isLoading }}>
+      </Button>
+      <Button
+        action={ButtonAction.Primary}
+        type={ButtonType.Submit}
+        state={{ isLoading }}
+        tw="grow-[3]"
+      >
         {submitText}
-      </$SubmitButton>
+      </Button>
     </$Row>
   ) : (
-    <$OnboardingTriggerButton size={ButtonSize.Base} />
+    <OnboardingTriggerButton size={ButtonSize.Base} tw="w-full" />
   );
 };
 
 const $Row = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1rem;
-  width: 100%;
-`;
-
-const $EditButton = styled(Button)`
-  flex-grow: 1;
-`;
-
-const $SubmitButton = styled(Button)`
-  flex-grow: 3;
-`;
-
-const $OnboardingTriggerButton = styled(OnboardingTriggerButton)`
   width: 100%;
 `;

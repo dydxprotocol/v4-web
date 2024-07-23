@@ -73,7 +73,7 @@ export const WithTooltip = ({
         <Trigger asChild>
           <$Abbr>
             {children}
-            {withIcon && <$Icon iconName={IconName.HelpCircle} />}
+            {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-text-0" />}
           </$Abbr>
         </Trigger>
 
@@ -151,8 +151,4 @@ const $Arrow = styled(Arrow)`
   polygon {
     fill: var(--tooltip-backgroundColor);
   }
-`;
-
-const $Icon = styled(Icon)`
-  color: var(--color-text-0);
 `;

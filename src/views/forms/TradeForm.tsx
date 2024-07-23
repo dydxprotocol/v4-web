@@ -240,7 +240,9 @@ export const TradeForm = ({
 
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
-      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
+      {isTablet && showOrderbook && (
+        <CanvasOrderbook maxRowsPerSide={5} hideHeader tw="notTablet:(hidden) w-full" />
+      )}
       <$InputsColumn>
         <TradeFormInputs />
         <TradeSizeInputs />
@@ -423,13 +425,6 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
             grid-auto-columns: 1fr;
             gap: 0;
           `}
-  }
-`;
-const $Orderbook = styled(CanvasOrderbook)`
-  width: 100%;
-
-  @media ${breakpoints.notTablet} {
-    display: none;
   }
 `;
 const $ToggleGroup = styled(ToggleGroup)`

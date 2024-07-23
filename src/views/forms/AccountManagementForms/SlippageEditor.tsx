@@ -93,7 +93,7 @@ export const SlippageEditor = ({
   }
 
   return (
-    <$WithConfirmationPopover
+    <WithConfirmationPopover
       open={editorState !== EditorState.Viewing}
       onOpenChange={onOpenChange}
       align="end"
@@ -107,6 +107,7 @@ export const SlippageEditor = ({
           <Icon iconName={IconName.Pencil} />
         </$SlippageOutput>
       }
+      tw="w-10 text-[0.625rem]"
     >
       {
         {
@@ -138,7 +139,7 @@ export const SlippageEditor = ({
           ),
         }[editorState]
       }
-    </$WithConfirmationPopover>
+    </WithConfirmationPopover>
   );
 };
 const $SlippageOutput = styled.button`
@@ -146,12 +147,6 @@ const $SlippageOutput = styled.button`
   text-decoration: underline;
   gap: 0.5ch;
 `;
-
-const $WithConfirmationPopover = styled(WithConfirmationPopover)`
-  font-size: 0.625rem;
-  width: 10rem;
-`;
-
 const $SlippageInput = styled.div`
   ${layoutMixins.inlineRow}
 

@@ -38,7 +38,7 @@ export const NewMarketForm = () => {
   }, [assetToAdd]);
 
   if (!hasPotentialMarketsData) {
-    return <$LoadingSpace id="new-market-form" />;
+    return <LoadingSpace id="new-market-form" tw="min-h-[18.75rem]" />;
   }
 
   if (NewMarketFormStep.SUCCESS === step && proposalTxHash) {
@@ -76,6 +76,3 @@ export const NewMarketForm = () => {
     />
   );
 };
-const $LoadingSpace = styled(LoadingSpace)`
-  min-height: 18.75rem;
-`;

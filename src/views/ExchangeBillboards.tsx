@@ -72,12 +72,13 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                 </$BillboardLink>
               ) : null}
             </$BillboardTitle>
-            <$Output
+            <Output
               useGrouping
               withBaseFont
               fractionDigits={fractionDigits}
               type={type}
               value={value}
+              tw="tablet:(font-base-book) text-text-2 font-extra-book"
             />
           </$BillboardStat>
         </$BillboardContainer>
@@ -124,13 +125,5 @@ const $BillboardStat = styled.div`
   output {
     color: var(--color-text-1);
     font: var(--font-large-medium);
-  }
-`;
-const $Output = styled(Output)`
-  font: var(--font-extra-book);
-  color: var(--color-text-2);
-
-  @media ${breakpoints.tablet} {
-    font: var(--font-base-book);
   }
 `;

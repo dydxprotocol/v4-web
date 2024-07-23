@@ -83,13 +83,10 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
 
   return (
     <DetailsDialog
-      slotIcon={<$AssetIcon symbol={asset?.id} />}
+      slotIcon={<AssetIcon symbol={asset?.id} tw="text-[1em]" />}
       title={resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
       items={detailItems}
       setIsOpen={setIsOpen}
     />
   );
 };
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1em;
-`;

@@ -131,7 +131,7 @@ const Content = () => {
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <$NotificationsToastArea />
+        <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
 
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
@@ -243,12 +243,6 @@ const $Main = styled.main`
 
   position: relative;
 `;
-
-const $NotificationsToastArea = styled(NotificationsToastArea)`
-  grid-area: Main;
-  z-index: 2;
-`;
-
 const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;

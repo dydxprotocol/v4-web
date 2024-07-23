@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 import { useEnsName } from 'wagmi';
 
 import { TransferType } from '@/constants/abacus';
@@ -137,7 +138,9 @@ const Profile = () => {
       <$Header>
         <$ProfileIcon />
         <div>
-          <$Address>{isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}</$Address>
+          <h1 tw="font-extra-medium">
+            {isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}
+          </h1>
           {isConnected && walletType ? (
             <$SubHeader>
               <$ConnectedIcon />
@@ -168,7 +171,7 @@ const Profile = () => {
         })}
       </$Actions>
 
-      <$SettingsButton
+      <$PanelButton
         slotHeader={
           <$InlineRow>
             <Icon iconName={IconName.Gear} />
@@ -176,8 +179,9 @@ const Profile = () => {
           </$InlineRow>
         }
         onClick={() => navigate(AppRoute.Settings)}
+        tw="[grid-area:settings]"
       />
-      <$HelpButton
+      <$PanelButton
         slotHeader={
           <$InlineRow>
             <Icon iconName={IconName.HelpCircle} />
@@ -185,11 +189,12 @@ const Profile = () => {
           </$InlineRow>
         }
         onClick={() => dispatch(openDialog(DialogTypes.Help()))}
+        tw="[grid-area:help]"
       />
 
-      <$MigratePanel />
+      <MigratePanel tw="[grid-area:migrate]" />
 
-      <$StakingPanel />
+      <StakingPanel tw="[grid-area:staking]" />
 
       <$RewardsPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
@@ -203,7 +208,7 @@ const Profile = () => {
               label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
               value: (
                 <Output
-                  slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+                  slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
                   type={OutputType.Asset}
                   value={currentWeekTradingReward?.amount}
                 />
@@ -213,10 +218,11 @@ const Profile = () => {
           layout="grid"
         />
       </$RewardsPanel>
-      <$FeesPanel
+      <Panel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
         hasSeparator
+        tw="[grid-area:fees]"
       >
         <$Details
           items={[
@@ -226,7 +232,7 @@ const Profile = () => {
           ]}
           layout="grid"
         />
-      </$FeesPanel>
+      </Panel>
 
       <$HistoryPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.HISTORY })}
@@ -244,9 +250,9 @@ const Profile = () => {
           initialPageSize={5}
         />
       </$HistoryPanel>
-      <$LaunchIncentivesPanel />
-      <$GovernancePanel />
-      <$NewMarketsPanel />
+      <LaunchIncentivesPanel tw="[grid-area:incentives]" />
+      <GovernancePanel tw="[grid-area:governance]" />
+      <NewMarketsPanel tw="[grid-area:newMarkets]" />
     </$MobileProfileLayout>
   );
 };
@@ -329,11 +335,6 @@ const $ConnectedIcon = styled.div`
   border-radius: 50%;
   box-shadow: 0 0 0 0.2rem var(--color-gradient-success);
 `;
-
-const $Address = styled.h1`
-  font: var(--font-extra-medium);
-`;
-
 const $Actions = styled(Toolbar)`
   ${layoutMixins.spacedRow}
   --stickyArea-topHeight: 5rem;
@@ -368,10 +369,7 @@ const $ActionButton = styled(IconButton)<{ iconName?: IconName }>`
         `}
 `;
 
-const $Details = styled(Details)`
-  font: var(--font-small-book);
-  --details-value-font: var(--font-medium-book);
-`;
+const $Details = tw(Details)`font-small-book [--details-value-font:var(--font-medium-book)] `;
 
 const $RewardsPanel = styled(Panel)`
   grid-area: rewards;
@@ -385,11 +383,6 @@ const $RewardsPanel = styled(Panel)`
     --details-grid-numColumns: 1;
   }
 `;
-
-const $FeesPanel = styled(Panel)`
-  grid-area: fees;
-`;
-
 const $HistoryPanel = styled(Panel)`
   grid-area: history;
   --panel-content-paddingY: 0;
@@ -428,36 +421,4 @@ const $InlineRow = styled.div`
 
 const $PanelButton = styled(Panel)`
   --panel-paddingY: 0 --panel-paddingX: 0;
-`;
-
-const $SettingsButton = styled($PanelButton)`
-  grid-area: settings;
-`;
-
-const $HelpButton = styled($PanelButton)`
-  grid-area: help;
-`;
-
-const $MigratePanel = styled(MigratePanel)`
-  grid-area: migrate;
-`;
-
-const $StakingPanel = styled(StakingPanel)`
-  grid-area: staking;
-`;
-
-const $GovernancePanel = styled(GovernancePanel)`
-  grid-area: governance;
-`;
-
-const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
-  grid-area: incentives;
-`;
-
-const $NewMarketsPanel = styled(NewMarketsPanel)`
-  grid-area: newMarkets;
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5ch;
 `;

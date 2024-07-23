@@ -19,16 +19,12 @@ export const RateLimitDialog = ({ preventClose, setIsOpen }: DialogProps<RateLim
       preventClose={preventClose}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_TITLE })}
-      slotIcon={<$Icon iconName={IconName.Warning} />}
+      slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
     >
       <$Content>{stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE })}</$Content>
     </Dialog>
   );
 };
-const $Icon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;

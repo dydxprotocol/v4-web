@@ -67,7 +67,7 @@ export const HeaderDesktop = () => {
           label: (
             <>
               {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
-              <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+              <Tag tw="bg-accent-faded text-accent">{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
             </>
           ),
           href: AppRoute.Vault,
@@ -76,7 +76,9 @@ export const HeaderDesktop = () => {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
-          slotAfter: !hasSeenLaunchIncentives && <$UnreadIndicator />,
+          slotAfter: !hasSeenLaunchIncentives && (
+            <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-accent" />
+          ),
         },
         {
           value: 'MORE',
@@ -266,15 +268,4 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
   --button-border: none;
   --button-icon-size: 1rem;
   --button-padding: 0 0.5em;
-`;
-
-const $UnreadIndicator = styled.div`
-  width: 0.4375rem;
-  height: 0.4375rem;
-  border-radius: 50%;
-  background-color: var(--color-accent);
-`;
-const $NewTag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
 `;

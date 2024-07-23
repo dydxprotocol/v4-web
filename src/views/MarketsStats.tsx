@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketSorting } from '@/constants/markets';
@@ -30,10 +31,10 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <ExchangeBillboards />
       <$Section>
         <$SectionHeader>
-          <$RecentlyListed>
+          <h4 tw="flex items-center gap-0.375">
             {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
             <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
-          </$RecentlyListed>
+          </h4>
         </$SectionHeader>
         <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
       </$Section>
@@ -79,21 +80,8 @@ const $MarketsStats = styled.section`
     ${layoutMixins.column}
   }
 `;
-const $Section = styled.div`
-  background: var(--color-layer-3);
-  border-radius: 0.625rem;
-  display: grid;
-  grid-template-rows: auto 1fr;
-`;
-const $RecentlyListed = styled.h4`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-`;
-const $NewTag = styled(Tag)`
-  background-color: var(--color-accent-faded);
-  color: var(--color-accent);
-`;
+const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-layer-3`;
+const $NewTag = tw(Tag)`bg-accent-faded text-accent `;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;

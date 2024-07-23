@@ -15,13 +15,9 @@ export const GeoblockedPanel = () => {
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_UNAVAILABLE_IN_US,
         params: {
-          TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
+          TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
         },
       })}
     </Panel>
   );
 };
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  text-decoration: underline;
-`;

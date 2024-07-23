@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -128,14 +129,17 @@ export const StakeRewardButtonAndReceipt = ({
   return (
     <>
       {errorToDisplay && (
-        <$AlertMessage type={errorToDisplay.type}> {errorToDisplay.message} </$AlertMessage>
+        <AlertMessage type={errorToDisplay.type} tw="w-full">
+          {' '}
+          {errorToDisplay.message}{' '}
+        </AlertMessage>
       )}
       <$WithDetailsReceipt detailItems={detailItems} isForm={isForm} className={className}>
         <WithTooltip
           tooltipString={shouldDisplayErrorAsWarning() ? errorToDisplay?.message : undefined}
         >
           {!canAccountTrade ? (
-            <$OnboardingTriggerButton size={buttonSize} />
+            <OnboardingTriggerButton size={buttonSize} tw="w-full" />
           ) : (
             errorToDisplay?.slotButton ?? (
               <$Button
@@ -145,7 +149,7 @@ export const StakeRewardButtonAndReceipt = ({
                 onClick={onClick}
                 slotLeft={
                   shouldDisplayErrorAsWarning() ? (
-                    <$WarningIcon iconName={IconName.Warning} />
+                    <Icon iconName={IconName.Warning} tw="text-warning" />
                   ) : undefined
                 }
                 state={{
@@ -162,11 +166,6 @@ export const StakeRewardButtonAndReceipt = ({
     </>
   );
 };
-
-const $AlertMessage = styled(AlertMessage)`
-  width: 100%;
-`;
-
 const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
   --withReceipt-backgroundColor: var(--color-layer-2);
   width: 100%;
@@ -179,15 +178,4 @@ const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
       }
     `}
 `;
-
-const $OnboardingTriggerButton = styled(OnboardingTriggerButton)`
-  width: 100%;
-`;
-
-const $Button = styled(Button)`
-  width: 100%;
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
+const $Button = tw(Button)`w-full `;

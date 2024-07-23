@@ -12,11 +12,13 @@ export const TransferDialog = ({ selectedAsset, setIsOpen }: DialogProps<Transfe
   const stringGetter = useStringGetter();
 
   return (
-    <$Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.TRANSFER })}>
+    <Dialog
+      isOpen
+      setIsOpen={setIsOpen}
+      title={stringGetter({ key: STRING_KEYS.TRANSFER })}
+      tw="[--dialog-content-paddingTop:var(--default-border-width)]"
+    >
       <TransferForm selectedAsset={selectedAsset} onDone={() => setIsOpen?.(false)} />
-    </$Dialog>
+    </Dialog>
   );
 };
-const $Dialog = styled(Dialog)`
-  --dialog-content-paddingTop: var(--default-border-width);
-`;

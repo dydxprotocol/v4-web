@@ -21,7 +21,7 @@ export const PageMenuNavigationItem = <
       <div>{label}</div>
       <$RightRow>
         {labelRight && <span>{labelRight}</span>}
-        <$Icon iconName={IconName.ChevronRight} />
+        <Icon iconName={IconName.ChevronRight} tw="text-text-0" />
       </$RightRow>
     </$MenuItem>
   </Link>
@@ -40,9 +40,5 @@ const $RightRow = styled.div`
   gap: 1rem;
 
   font: var(--font-base-book);
-  color: var(--color-text-0);
-`;
-
-const $Icon = styled(Icon)`
   color: var(--color-text-0);
 `;

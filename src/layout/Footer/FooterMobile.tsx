@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -154,9 +155,7 @@ const $NavigationMenu = styled(NavigationMenu)`
   }
 `;
 
-const $Icon = styled(Icon)`
-  font-size: 1.5rem;
-`;
+const $Icon = tw(Icon)`text-[1.5rem] `;
 
 const $StartIcon = styled.div`
   display: inline-flex;

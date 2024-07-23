@@ -57,7 +57,7 @@ export const PositionTile = ({
       showNarrowVariation={showNarrowVariation}
     >
       <div>
-        {showNarrowVariation && <$AssetIcon symbol={symbol} />}
+        {showNarrowVariation && <AssetIcon symbol={symbol} tw="text-[2.25rem]" />}
         <$PositionTags>
           <PositionSideTag positionSide={currentPositionSide} size={TagSize.Medium} />
           {hasSizeDiff && newPositionSide && currentPositionSide !== newPositionSide && (
@@ -109,7 +109,7 @@ export const PositionTile = ({
           )}
         </$PositionSizes>
       )}
-      {isLoading && <$LoadingSpinner />}
+      {isLoading && <LoadingSpinner tw="text-text-0" />}
     </$PositionTile>
   );
 };
@@ -228,12 +228,4 @@ const $PositionTile = styled.div<{
 
 const $PostOrderSizeRow = styled.div`
   ${layoutMixins.inlineRow}
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 2.25rem;
-`;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  color: var(--color-text-0);
 `;

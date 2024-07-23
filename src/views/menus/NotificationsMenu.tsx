@@ -122,7 +122,9 @@ export const NotificationsMenu = ({
       slotTrigger={
         <$TriggerContainer>
           {slotTrigger}
-          {hasUnreadNotifications && <$TriggerUnreadIndicator />}
+          {hasUnreadNotifications && (
+            <$UnreadIndicator tw="relative right-[-0.2rem] top-[-0.325rem] place-self-center" />
+          )}
         </$TriggerContainer>
       }
       slotFooter={
@@ -180,15 +182,6 @@ const $UnreadIndicator = styled.div`
 const $TriggerContainer = styled.div`
   ${layoutMixins.stack}
 `;
-
-const $TriggerUnreadIndicator = styled($UnreadIndicator)`
-  place-self: center;
-
-  position: relative;
-  right: -0.2rem;
-  top: -0.325rem;
-`;
-
 const $FooterToolbar = styled(Toolbar)`
   display: flex;
   flex-wrap: wrap;

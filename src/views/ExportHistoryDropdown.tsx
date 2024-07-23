@@ -281,16 +281,17 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         },
         {
           label: (
-            <$Button
+            <Button
               state={{
                 isDisabled: !checkedTrades && !checkedTransfers,
                 isLoading: isPendingExportTrades || isPendingExportTransfers,
               }}
               action={ButtonAction.Primary}
               size={ButtonSize.XSmall}
+              tw="w-full"
             >
               {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
-            </$Button>
+            </Button>
           ),
           value: 'download',
           onSelect: exportData,
@@ -306,7 +307,3 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     </DropdownMenu>
   );
 };
-
-const $Button = styled(Button)`
-  width: 100%;
-`;

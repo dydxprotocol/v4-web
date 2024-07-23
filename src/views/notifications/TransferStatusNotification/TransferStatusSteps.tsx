@@ -130,7 +130,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
           <$row>
             {step.step === currentStep ? (
               <$Icon>
-                <$Spinner />
+                <LoadingSpinner tw="text-accent [--spinner-width:1.25rem]" />
               </$Icon>
             ) : step.step < currentStep ? (
               <$Icon state="complete">
@@ -195,13 +195,6 @@ const $Icon = styled.div<{ state?: 'complete' | 'default' }>`
           `,
         }[state]}
 `;
-
-const $Spinner = styled(LoadingSpinner)`
-  --spinner-width: 1.25rem;
-
-  color: var(--color-accent);
-`;
-
 const $Label = styled($row)<{ highlighted?: boolean }>`
   ${({ highlighted }) =>
     highlighted

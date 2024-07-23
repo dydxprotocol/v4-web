@@ -32,7 +32,7 @@ export const MarketTableCell = ({
     slotLeft={
       <>
         {showFavorite && <Icon iconName={IconName.Star} />}
-        <$AssetIcon symbol={asset?.id} />
+        <AssetIcon symbol={asset?.id} tw="tablet:(text-[2.25rem]) text-[1.25rem]" />
       </>
     }
   >
@@ -43,22 +43,9 @@ export const MarketTableCell = ({
       </>
     ) : (
       <>
-        <$Asset>{asset?.name}</$Asset>
+        <span tw="tablet:(text-text-2)">{asset?.name}</span>
         <span>{marketId}</span>
       </>
     )}
   </TableCell>
 );
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1.25rem;
-
-  @media ${breakpoints.tablet} {
-    font-size: 2.25rem;
-  }
-`;
-
-const $Asset = styled.span`
-  @media ${breakpoints.tablet} {
-    color: var(--color-text-2);
-  }
-`;

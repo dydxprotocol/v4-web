@@ -26,14 +26,14 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
   const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
 
   return (
-    <$HistoryCard className={className}>
+    <div className={className} tw="rounded-[0.7rem] border border-solid border-border">
       {transactions.length > 0 ? (
         <>
-          <$HistoryTitle>
-            <$HistoryTitleText>
+          <div tw="flex justify-between px-1 py-0.625">
+            <h3 tw="leading-7 font-base-medium">
               {stringGetter({ key: STRING_KEYS.YOUR_DEPOSITS_AND_WITHDRAWALS })}
-              <$HistoryCount>{transactions.length}</$HistoryCount>
-            </$HistoryTitleText>
+              <span tw="ml-0.5 text-text-0">{transactions.length}</span>
+            </h3>
             <$ShowHideHistoryButton
               size={ButtonSize.XSmall}
               shape={ButtonShape.Pill}
@@ -43,18 +43,18 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
                 ? stringGetter({ key: STRING_KEYS.HIDE })
                 : stringGetter({ key: STRING_KEYS.VIEW })}
             </$ShowHideHistoryButton>
-          </$HistoryTitle>
+          </div>
           {showHistory && <VaultTransactionsTable />}
         </>
       ) : (
         <$Empty>
           <div>
-            <$Icon iconName={IconName.OrderPending} />
+            <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
           </div>
           <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
         </$Empty>
       )}
-    </$HistoryCard>
+    </div>
   );
 };
 
@@ -65,32 +65,7 @@ const $Empty = styled.div`
   justify-items: center;
   align-content: center;
 `;
-
-const $Icon = styled(Icon)`
-  width: 2rem;
-  height: 2rem;
-  margin-bottom: 0.75rem;
-`;
-const $HistoryCard = styled.div`
-  border-radius: 0.7rem;
-  border: 1px solid var(--color-border);
-`;
-const $HistoryCount = styled.span`
-  margin-left: 0.5rem;
-  color: var(--color-text-0);
-`;
 const $ShowHideHistoryButton = styled(Button)``;
-
-const $HistoryTitle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 0.625rem 1rem;
-`;
-const $HistoryTitleText = styled.h3`
-  font: var(--font-base-medium);
-  line-height: 1.75rem;
-`;
-
 const VaultTransactionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
@@ -109,9 +84,9 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
                 type={OutputType.Date}
                 dateOptions={{ format: 'medium' }}
               />
-              <$TimeText>
+              <div tw="text-[0.75rem] leading-[0.7rem] text-text-0">
                 <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
-              </$TimeText>
+              </div>
             </$Stack>
           ),
         },
@@ -164,10 +139,4 @@ const $Table = styled(Table)`
 
 const $Stack = styled.div`
   ${layoutMixins.column}
-`;
-
-const $TimeText = styled.div`
-  font-size: 0.75rem;
-  line-height: 0.7rem;
-  color: var(--color-text-0);
 `;

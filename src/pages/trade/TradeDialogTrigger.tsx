@@ -49,12 +49,18 @@ export const TradeDialogTrigger = () => {
                 </span>
                 <OrderSideTag size={TagSize.Medium} orderSide={selectedOrderSide} />
               </$TradeType>
-              <$Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />
+              <Output
+                type={OutputType.Fiat}
+                value={total}
+                showSign={ShowSign.None}
+                useGrouping
+                tw="text-text-2 font-large-book"
+              />
             </$TradeSummary>
           ) : (
             stringGetter({ key: STRING_KEYS.TAP_TO_TRADE })
           )}
-          <$Icon iconName={IconName.Caret} />
+          <Icon iconName={IconName.Caret} tw="h-1.5 w-1.5 [rotate:0.5turn]" />
         </$TradeDialogTrigger>
       }
     />
@@ -82,15 +88,4 @@ const $TradeSummary = styled.div`
 
 const $TradeType = styled.div`
   ${layoutMixins.inlineRow}
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-2);
-  font: var(--font-large-book);
-`;
-
-const $Icon = styled(Icon)`
-  rotate: 0.5turn;
-  width: 1.5rem;
-  height: 1.5rem;
 `;

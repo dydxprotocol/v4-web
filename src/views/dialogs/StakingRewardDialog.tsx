@@ -142,23 +142,31 @@ export const StakingRewardDialog = ({
   }, [validators, withdrawReward, setIsOpen, usdcRewards]);
 
   return (
-    <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
+    <Dialog
+      isOpen
+      setIsOpen={setIsOpen}
+      hasHeaderBlur={false}
+      tw="[--dialog-header-paddingBottom:0rem] [--dialog-width:25rem]"
+    >
       <$Container backgroundImagePath={chartDotsBackground}>
-        <$AssetContainer>
+        <div tw="relative flex flex-col items-center">
           <$Pill>
-            <$PositiveOutput
+            <Output
               type={OutputType.Asset}
               value={usdcRewards}
               showSign={ShowSign.Both}
               minimumFractionDigits={SMALL_USD_DECIMALS}
+              tw="[--output-sign-color:var(--color-positive)]"
             />
             {usdcLabel}
           </$Pill>
-          <$AssetIcon symbol="USDC" />
-        </$AssetContainer>
-        <$Heading>{stringGetter({ key: STRING_KEYS.YOU_EARNED })}</$Heading>
+          <AssetIcon symbol="USDC" tw="text-[5rem]" />
+        </div>
+        <h3 tw="z-[1] text-text-2 font-extra-bold">
+          {stringGetter({ key: STRING_KEYS.YOU_EARNED })}
+        </h3>
 
-        <$StakeRewardButtonAndReceipt
+        <StakeRewardButtonAndReceipt
           detailItems={detailItems}
           alert={error}
           buttonText={
@@ -167,11 +175,12 @@ export const StakingRewardDialog = ({
                 key: STRING_KEYS.CLAIM_USDC_AMOUNT,
                 params: {
                   USDC_AMOUNT: (
-                    <$AmountOutput
+                    <Output
                       type={OutputType.Asset}
                       value={usdcRewards}
                       showSign={ShowSign.None}
                       minimumFractionDigits={SMALL_USD_DECIMALS}
+                      tw="inline"
                     />
                   ),
                 },
@@ -183,17 +192,12 @@ export const StakingRewardDialog = ({
           isLoading={isLoading}
           isForm={false}
           onClick={claimRewards}
+          tw="z-[1]"
         />
       </$Container>
-    </$Dialog>
+    </Dialog>
   );
 };
-
-const $Dialog = styled(Dialog)`
-  --dialog-header-paddingBottom: 0rem;
-  --dialog-width: 25rem;
-`;
-
 const $Container = styled.div<{ backgroundImagePath: string }>`
   display: flex;
   flex-direction: column;
@@ -219,14 +223,6 @@ const $Container = styled.div<{ backgroundImagePath: string }>`
 const $RowItem = styled.div`
   ${layoutMixins.inlineRow};
 `;
-
-const $AssetContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-`;
-
 const $Pill = styled.div`
   border-radius: 1rem;
   display: inline-flex;
@@ -238,26 +234,4 @@ const $Pill = styled.div`
 
   margin-bottom: -0.5rem;
   z-index: 1;
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 5rem;
-`;
-
-const $Heading = styled.h3`
-  font: var(--font-extra-bold);
-  color: var(--color-text-2);
-  z-index: 1;
-`;
-
-const $StakeRewardButtonAndReceipt = styled(StakeRewardButtonAndReceipt)`
-  z-index: 1;
-`;
-
-const $AmountOutput = styled(Output)`
-  display: inline;
-`;
-
-const $PositiveOutput = styled(Output)`
-  --output-sign-color: var(--color-positive);
 `;

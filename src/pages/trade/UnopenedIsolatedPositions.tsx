@@ -46,16 +46,16 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
       <$Button onClick={() => setIsOpen(!isOpen)}>
         {stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
-        <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
+        <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} tw="text-[0.5em]" />
       </$Button>
 
       {isOpen && (
-        <$CardsContainer>
+        <div tw="px-1 pb-1 pt-0">
           <UnopenedIsolatedPositionsCards
             onViewOrders={onViewOrders}
             pendingPositions={pendingPositions}
           />
-        </$CardsContainer>
+        </div>
       )}
     </$UnopenedIsolatedPositionsDrawerContainer>
   );
@@ -133,11 +133,4 @@ const $Cards = styled.div`
   ${layoutMixins.flexWrap}
   gap: 1rem;
   scroll-snap-align: none;
-`;
-const $CardsContainer = styled.div`
-  padding: 0 1rem 1rem;
-`;
-
-const $DropdownIcon = styled(DropdownIcon)`
-  font-size: 0.5em;
 `;

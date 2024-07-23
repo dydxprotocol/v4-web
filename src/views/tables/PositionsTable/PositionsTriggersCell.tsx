@@ -100,7 +100,7 @@ export const PositionsTriggersCell = ({
       disabled={isDisabled}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-      <$ArrowIcon iconName={IconName.Arrow} />
+      <Icon iconName={IconName.Arrow} tw="stroke-2" />
     </$ActionButton>
   );
 
@@ -293,11 +293,6 @@ const $ActionButton = styled(Button)`
   --button-backgroundColor: transparent;
   --button-border: none;
 `;
-
-const $ArrowIcon = styled(Icon)`
-  stroke-width: 2;
-`;
-
 const $PartialFillIcon = styled.span`
   svg {
     display: block;

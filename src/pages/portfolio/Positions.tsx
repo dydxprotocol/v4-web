@@ -48,7 +48,7 @@ export const Positions = () => {
 
   return (
     <>
-      <$AttachedExpandingSection>
+      <AttachedExpandingSection tw="mb-1">
         {isNotTablet && (
           <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.POSITIONS })} />
         )}
@@ -83,7 +83,7 @@ export const Positions = () => {
             })
           }
         />
-      </$AttachedExpandingSection>
+      </AttachedExpandingSection>
 
       <DetachedSection>
         <$MaybeUnopenedIsolatedPositionsPanel
@@ -102,10 +102,10 @@ export const Positions = () => {
               title={stringGetter({ key: STRING_KEYS.VAULT })}
               slotRight={
                 isTablet && (
-                  <$Link onClick={handleViewVault} isAccent>
+                  <Link onClick={handleViewVault} isAccent tw="font-small-book">
                     {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}{' '}
                     <Icon iconName={IconName.Arrow} />
-                  </$Link>
+                  </Link>
                 )
               }
             />
@@ -116,11 +116,6 @@ export const Positions = () => {
     </>
   );
 };
-
-const $AttachedExpandingSection = styled(AttachedExpandingSection)`
-  margin-bottom: 1rem;
-`;
-
 const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -137,8 +132,4 @@ const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
   > div {
     padding-left: 1rem;
   }
-`;
-
-const $Link = styled(Link)`
-  font: var(--font-small-book);
 `;

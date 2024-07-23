@@ -220,5 +220,11 @@
       "preset": "styled-components",
       "includeClassNames": true
     }
+  },
+  "optionalDependencies": {
+    "css-to-tailwindcss": "^1.0.5",
+    "postcss-safe-parser": "^7.0.0",
+    "postcss-styled": "^0.34.0",
+    "postcss-styled-syntax": "^0.6.4"
   }
 }

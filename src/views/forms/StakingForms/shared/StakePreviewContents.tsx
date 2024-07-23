@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { StakeFormSteps } from '@/constants/stakingForms';
 
@@ -32,17 +33,17 @@ export const StakePreviewContents = ({
 }: ElementProps) => {
   return (
     <>
-      <$Rows>
+      <div tw="grid gap-0.5">
         <$Row>
           <$Heading>{slotLeftHeading} </$Heading>
           <$Heading>{slotRightHeading} </$Heading>
         </$Row>
         <$Row>
           <$StakeBox> {slotLeft} </$StakeBox>
-          <$ArrowIcon iconName={IconName.FastForward} />
+          <Icon iconName={IconName.FastForward} tw="h-2.25 w-2.25" />
           <$StakeBox> {slotRight} </$StakeBox>
         </$Row>
-      </$Rows>
+      </div>
       <$Details items={detailItems} />
       <StakeConfirmationButtonRow
         setStakeFormStep={setCurrentStep}
@@ -52,26 +53,9 @@ export const StakePreviewContents = ({
     </>
   );
 };
+const $Row = tw.div`flex items-center justify-between gap-0.5 text-center`;
 
-const $Rows = styled.div`
-  display: grid;
-  gap: 0.5rem;
-`;
-
-const $Row = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
-`;
-
-const $Heading = styled.h3`
-  color: var(--color-text-0);
-  font: var(--font-small-medium);
-
-  flex-basis: 50%;
-`;
+const $Heading = tw.h3`basis-6/12 text-text-0 font-small-medium`;
 
 const $StakeBox = styled.div`
   background-color: var(--color-layer-4);
@@ -89,12 +73,6 @@ const $StakeBox = styled.div`
   gap: 0.5rem;
   padding: 1rem 0.5rem;
 `;
-
-const $ArrowIcon = styled(Icon)`
-  width: 2.25rem;
-  height: 2.25rem;
-`;
-
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
 

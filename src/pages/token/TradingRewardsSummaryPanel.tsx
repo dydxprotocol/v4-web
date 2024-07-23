@@ -54,7 +54,7 @@ export const TradingRewardsSummaryPanel = () => {
               value: (
                 <$Column>
                   <Output
-                    slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+                    slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
                     type={OutputType.Asset}
                     value={currentWeekTradingReward.amount}
                   />
@@ -134,8 +134,4 @@ const $TimePeriod = styled.div`
 const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.33rem;
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5ch;
 `;

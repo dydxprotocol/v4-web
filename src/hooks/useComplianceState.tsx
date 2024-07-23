@@ -81,7 +81,7 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
+        TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
       },
     });
   }
@@ -93,7 +93,3 @@ export const useComplianceState = () => {
     complianceMessage,
   };
 };
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  text-decoration: underline;
-`;

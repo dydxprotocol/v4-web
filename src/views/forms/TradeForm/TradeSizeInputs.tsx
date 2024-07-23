@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TradeInputField } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -231,6 +232,4 @@ const $ToggleButton = styled(ToggleButton)`
   }
 `;
 
-const $Tooltip = styled.div`
-  display: inline-flex;
-`;
+const $Tooltip = tw.div`inline-flex`;

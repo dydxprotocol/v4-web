@@ -284,7 +284,7 @@ export const PnlChart = ({
         tickSpacingX={210}
         tickSpacingY={75}
       >
-        <$PeriodToggle>
+        <div tw="isolate m-1 [place-self:start_end]">
           <ToggleGroup
             items={periodOptions.map((period) => ({
               value: period.name,
@@ -298,7 +298,7 @@ export const PnlChart = ({
             onValueChange={onSelectPeriod}
             onInteraction={onToggleInteract}
           />
-        </$PeriodToggle>
+        </div>
       </TimeSeriesChart>
     </$Container>
   );
@@ -307,11 +307,4 @@ export const PnlChart = ({
 const $Container = styled.div<{ chartBackground: string }>`
   position: relative;
   background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
-`;
-
-const $PeriodToggle = styled.div`
-  place-self: start end;
-  isolation: isolate;
-
-  margin: 1rem;
 `;

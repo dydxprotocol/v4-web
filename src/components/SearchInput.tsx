@@ -21,7 +21,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
   return (
     <$Search>
       <$Icon iconName={IconName.Search} />
-      <$Input
+      <Input
         autoFocus
         ref={inputRef}
         value={value}
@@ -31,6 +31,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
           onTextChange?.(e.target.value);
         }}
         placeholder={placeholder}
+        tw="max-w-full rounded-0"
       />
       {value.length > 0 && (
         <$IconButton
@@ -55,12 +56,6 @@ const $Search = styled.div`
   gap: 0.375rem;
   justify-content: end;
 `;
-
-const $Input = styled(Input)`
-  max-width: 100%;
-  border-radius: 0;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
   --button-border: none;

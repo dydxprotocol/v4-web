@@ -86,7 +86,7 @@ export const DepthChartTooltipContent = ({
             }[nearestDatum.key]}
       </h4>
 
-      <$Details
+      <Details
         layout="column"
         items={
           isEditingOrder
@@ -214,11 +214,8 @@ export const DepthChartTooltipContent = ({
                   },
                 ]
         }
+        tw="[--details-item-vertical-padding:0.2rem]"
       />
     </TooltipContent>
   );
 };
-
-const $Details = styled(Details)`
-  --details-item-vertical-padding: 0.2rem;
-`;

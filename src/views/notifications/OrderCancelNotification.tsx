@@ -43,7 +43,7 @@ export const OrderCancelNotification = ({
   const cancelStatus = localCancel.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.CANCELING;
-  let orderStatusIcon = <$LoadingSpinner />;
+  let orderStatusIcon = <LoadingSpinner tw="text-accent [--spinner-width:0.9375rem]" />;
   let customContent = null;
 
   // show Canceled if either canceled confirmation happens (node / indexer)
@@ -56,12 +56,17 @@ export const OrderCancelNotification = ({
     orderStatusStringKey = isPartiallyCanceled
       ? STRING_KEYS.PARTIALLY_FILLED
       : STRING_KEYS.CANCELED;
-    orderStatusIcon = <$OrderStatusIcon status={AbacusOrderStatus.Canceled.rawValue} />;
+    orderStatusIcon = (
+      <OrderStatusIcon
+        status={AbacusOrderStatus.Canceled.rawValue}
+        tw="h-[0.9375rem] w-[0.9375rem]"
+      />
+    );
   }
 
   if (localCancel.errorParams) {
     orderStatusStringKey = STRING_KEYS.ERROR;
-    orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
+    orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-warning" />;
     customContent = (
       <span>
         {stringGetter({
@@ -79,10 +84,10 @@ export const OrderCancelNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={orderTypeKey && stringGetter({ key: orderTypeKey })}
       slotTitleRight={
-        <$OrderStatus>
+        <$Label tw="text-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </$OrderStatus>
+        </$Label>
       }
       slotCustomContent={customContent}
     />
@@ -91,23 +96,4 @@ export const OrderCancelNotification = ({
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
-`;
-
-const $OrderStatus = styled($Label)`
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-`;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  --spinner-width: 0.9375rem;
-  color: var(--color-accent);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
-const $OrderStatusIcon = styled(OrderStatusIcon)`
-  width: 0.9375rem;
-  height: 0.9375rem;
 `;

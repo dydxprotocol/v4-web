@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -63,10 +64,12 @@ const LaunchIncentivesTitle = () => {
       {stringGetter({
         key: STRING_KEYS.LAUNCH_INCENTIVES_TITLE,
         params: {
-          FOR_V4: <$ForV4>{stringGetter({ key: STRING_KEYS.FOR_V4 })}</$ForV4>,
+          FOR_V4: <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
         },
       })}
-      <$NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+      <Tag size={TagSize.Medium} tw="bg-accent-faded text-accent">
+        {stringGetter({ key: STRING_KEYS.NEW })}
+      </Tag>
     </$Title>
   );
 };
@@ -113,12 +116,12 @@ const EstimatedRewards = () => {
         <div>
           <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
           {seasonNumber !== undefined && (
-            <$Season>
+            <span tw="text-text-1 font-small-book">
               {stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
                 params: { SEASON_NUMBER: seasonNumber },
               })}
-            </$Season>
+            </span>
           )}
         </div>
 
@@ -133,7 +136,7 @@ const EstimatedRewards = () => {
         </$Points>
       </$EstimatedRewardsCardContent>
 
-      <$Image src="/rewards-stars.svg" />
+      <img src="/rewards-stars.svg" tw="relative float-right h-auto w-[5.25rem]" />
     </$EstimatedRewardsCard>
   );
 };
@@ -144,14 +147,14 @@ const LaunchIncentivesContent = () => {
 
   return (
     <$Column>
-      <$Description>
+      <div tw="text-text-0">
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
-      </$Description>
-      <$ChaosLabsLogo>
+      </div>
+      <span tw="flex items-center gap-[0.5em] font-tiny-medium">
         {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
-      </$ChaosLabsLogo>
+      </span>
       <$ButtonRow>
-        <$AboutButton
+        <$Button
           action={ButtonAction.Secondary}
           onClick={() => {
             dispatch(
@@ -161,10 +164,11 @@ const LaunchIncentivesContent = () => {
             );
           }}
           slotRight={<Icon iconName={IconName.LinkOut} />}
+          tw="grow"
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
-        </$AboutButton>
-        <$LeaderboardButton
+        </$Button>
+        <$Button
           action={ButtonAction.Secondary}
           onClick={() => {
             dispatch(
@@ -177,22 +181,15 @@ const LaunchIncentivesContent = () => {
           }}
           slotRight={<Icon iconName={IconName.LinkOut} />}
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
+          tw="grow-[2]"
         >
           {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-        </$LeaderboardButton>
+        </$Button>
       </$ButtonRow>
     </$Column>
   );
 };
-const $Panel = styled(Panel)`
-  background-color: var(--color-layer-3);
-  width: 100%;
-`;
-
-const $ForV4 = styled.span`
-  color: var(--color-text-0);
-`;
-
+const $Panel = tw(Panel)`bg-layer-3 w-full `;
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
@@ -202,11 +199,6 @@ const $Title = styled.h3`
     padding: var(--panel-paddingY) var(--panel-paddingX) 0;
   }
 `;
-
-const $Description = styled.div`
-  color: var(--color-text-0);
-`;
-
 const $ButtonRow = styled.div`
   ${layoutMixins.inlineRow}
   gap: 0.75rem;
@@ -224,15 +216,6 @@ const $Button = styled(Button)`
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
 `;
-
-const $AboutButton = styled($Button)`
-  flex-grow: 1;
-`;
-
-const $LeaderboardButton = styled($Button)`
-  flex-grow: 2;
-`;
-
 const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.5rem;
@@ -274,12 +257,6 @@ const $EstimatedRewardsCardContent = styled.div`
     }
   }
 `;
-
-const $Season = styled.span`
-  font: var(--font-small-book);
-  color: var(--color-text-1);
-`;
-
 const $Points = styled.span`
   ${layoutMixins.inlineRow}
   gap: 0.25rem;
@@ -289,24 +266,4 @@ const $Points = styled.span`
   output {
     color: var(--color-text-2);
   }
-`;
-
-const $Image = styled.img`
-  position: relative;
-  float: right;
-
-  width: 5.25rem;
-  height: auto;
-`;
-
-const $ChaosLabsLogo = styled.span`
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  font: var(--font-tiny-medium);
-`;
-
-const $NewTag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
 `;

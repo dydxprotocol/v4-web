@@ -115,9 +115,9 @@ export const AccountInfoConnectedState = () => {
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
           >
-            <$CircleContainer>
+            <div tw="inline-flex items-center rounded-[50%] bg-layer-3 p-[0.5em]">
               <Icon iconName={IconName.Transfer} />
-            </$CircleContainer>
+            </div>
           </$CornerButton>
         )}
         <$Details
@@ -166,7 +166,11 @@ export const AccountInfoConnectedState = () => {
                 <WithTooltip tooltip={tooltip}>
                   <$WithUsage>
                     {label}
-                    {hasError ? <$CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
+                    {hasError ? (
+                      <Icon iconName={IconName.CautionCircle} tw="text-error" />
+                    ) : (
+                      slotRight
+                    )}
                   </$WithUsage>
                 </WithTooltip>
               ),
@@ -208,20 +212,6 @@ const $CornerButton = styled(Button)`
     display: none;
   }
 `;
-
-const $CircleContainer = styled.div`
-  display: inline-flex;
-  align-items: center;
-
-  background-color: var(--color-layer-3);
-  padding: 0.5em;
-  border-radius: 50%;
-`;
-
-const $CautionIcon = styled(Icon)`
-  color: var(--color-error);
-`;
-
 const $WithUsage = styled.div`
   ${layoutMixins.row}
 

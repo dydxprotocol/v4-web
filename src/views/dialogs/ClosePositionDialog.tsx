@@ -59,17 +59,17 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     [MobilePlaceOrderSteps.PlacingOrder]: {
       title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
       description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-      slotIcon: <$Ring withAnimation value={0.25} />,
+      slotIcon: <Ring withAnimation value={0.25} tw="[--ring-color:var(--color-accent)]" />,
     },
     [MobilePlaceOrderSteps.PlaceOrderFailed]: {
       title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
       description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
-      slotIcon: <$WarningIcon iconName={IconName.Warning} />,
+      slotIcon: <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-warning" />,
     },
     [MobilePlaceOrderSteps.Confirmation]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
       description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
-      slotIcon: <$GreenCheckCircle />,
+      slotIcon: <GreenCheckCircle tw="[--icon-size:2rem]" />,
     },
   };
 
@@ -130,15 +130,6 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
       --dialog-icon-size: 2.5rem;
     `}
 `;
-
-const $Ring = styled(Ring)`
-  --ring-color: var(--color-accent);
-`;
-
-const $GreenCheckCircle = styled(GreenCheckCircle)`
-  --icon-size: 2rem;
-`;
-
 const $CloseOrderHeader = styled.div`
   ${layoutMixins.spacedRow}
 `;
@@ -169,9 +160,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
 const $PreviewTitle = styled.div`
   ${layoutMixins.inlineRow}
   height: var(--dialog-icon-size);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-  font-size: 1.5rem;
 `;

@@ -12,16 +12,10 @@ export const SwitchStory: Story<Parameters<typeof Switch>[0]> = (args) => {
   return (
     <StoryWrapper>
       <Switch {...args} checked={checked} onCheckedChange={setChecked} />
-      <StyledSwitch {...args} checked={checked} onCheckedChange={setChecked} />
+      <Switch {...args} checked={checked} onCheckedChange={setChecked} tw="ml-[1em] text-[2em]" />
     </StoryWrapper>
   );
 };
-
-const StyledSwitch = styled(Switch)`
-  font-size: 2em;
-  margin-left: 1em;
-`;
-
 SwitchStory.args = {
   disabled: false,
 };

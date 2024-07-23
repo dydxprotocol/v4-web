@@ -59,16 +59,21 @@ export const Notification = ({
     <$Container className={className} isToast={isToast} onClick={onClick}>
       <$Header>
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
-        <$Title>{slotTitle}</$Title>
+        <div tw="flex-1 overflow-hidden text-ellipsis text-text-2 font-base-medium">
+          {slotTitle}
+        </div>
         {slotTitleRight}
         {withClose && !isToast && (
           <$ActionItems>
-            <$Output
+            <Output
               type={OutputType.RelativeTime}
               value={notification.timestamps[NotificationStatus.Triggered]}
+              tw="text-text-0"
             />
 
-            {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
+            {notification.status < NotificationStatus.Seen ? (
+              <div tw="h-0.5 w-0.5 rounded-[50%] border border-solid border-layer-2 bg-accent" />
+            ) : null}
 
             {notification.status < NotificationStatus.Cleared ? (
               <$IconButton
@@ -89,8 +94,12 @@ export const Notification = ({
           </$ActionItems>
         )}
       </$Header>
-      {slotContentOrDescription && <$Description>{slotContentOrDescription}</$Description>}
-      {slotAction && <$Action>{slotAction}</$Action>}
+      {slotContentOrDescription && (
+        <div tw="mt-0.5 text-text-0 font-small-book [white-space:break-spaces]">
+          {slotContentOrDescription}
+        </div>
+      )}
+      {slotAction && <div tw="mt-0.5 font-small-book">{slotAction}</div>}
     </$Container>
   );
 };
@@ -140,29 +149,6 @@ const $Icon = styled.div`
     height: 1.5rem;
   }
 `;
-
-const $Title = styled.div`
-  flex: 1;
-
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled.div`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-  white-space: break-spaces;
-`;
-
-const $Action = styled.div`
-  margin-top: 0.5rem;
-  font: var(--font-small-book);
-`;
-
 const $ActionItems = styled.div`
   min-width: fit-content;
   padding-left: 0.5rem;
@@ -185,19 +171,6 @@ const $ActionItems = styled.div`
     display: flex;
   }
 `;
-
-const $UnreadIndicator = styled.div`
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-layer-2);
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-0);
-`;
-
 const $IconButton = styled(IconButton)`
   --button-border: none;
   --button-textColor: var(--color-text-0);

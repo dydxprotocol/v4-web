@@ -46,7 +46,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
           <$Asset stacked={stacked}>{asset?.name}</$Asset>
           <Tag>{maxLeverage}</Tag>
         </$AssetAndTag>
-        {stacked ? <$AssetID>{asset?.id}</$AssetID> : undefined}
+        {stacked ? <span tw="text-text-0 font-mini-medium">{asset?.id}</span> : undefined}
       </$TableCellContent>
     </TableCell>
   );
@@ -71,12 +71,6 @@ const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
     font-size: ${({ stacked }) => (stacked ? '1.5rem' : '2.25rem')};
   }
 `;
-
-const $AssetID = styled.span`
-  color: var(--color-text-0);
-  font: var(--font-mini-medium);
-`;
-
 const $Asset = styled.span<{ stacked?: boolean }>`
   color: var(--color-text-1);
   font: ${({ stacked }) => (stacked ? 'var(--font-small-medium)' : 'var(--font-medium-medium)')};

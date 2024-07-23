@@ -24,11 +24,11 @@ export const SearchSelectMenuStory: Story<Parameters<typeof SearchSelectMenu>[0]
 
   return (
     <StoryWrapper>
-      <Container>
+      <div tw="w-[400px]">
         <SearchSelectMenu {...args} items={exampleItems}>
           {!selectedItem ? <span>Search and Select</span> : <span>{selectedItem}</span>}
         </SearchSelectMenu>
-      </Container>
+      </div>
     </StoryWrapper>
   );
 };
@@ -38,7 +38,3 @@ SearchSelectMenuStory.args = {
 };
 
 SearchSelectMenuStory.argTypes = {};
-
-const Container = styled.div`
-  width: 400px;
-`;

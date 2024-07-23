@@ -114,16 +114,17 @@ const getOrdersTableColumnDef = ({
         renderCell: ({ status, resources }) => {
           return (
             <TableCell>
-              <$WithTooltip
+              <WithTooltip
                 tooltipString={
                   resources.statusStringKey
                     ? stringGetter({ key: resources.statusStringKey })
                     : undefined
                 }
                 side="right"
+                tw="[--tooltip-backgroundColor:var(--color-layer-5)]"
               >
                 <OrderStatusIcon status={status.rawValue} />
-              </$WithTooltip>
+              </WithTooltip>
               {resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
             </TableCell>
           );
@@ -243,10 +244,11 @@ const getOrdersTableColumnDef = ({
               stacked
               slotLeft={
                 <>
-                  <$TimeOutput
+                  <Output
                     type={OutputType.RelativeTime}
                     relativeTimeOptions={{ format: 'singleCharacter' }}
                     value={createdAtMilliseconds}
+                    tw="text-text-0"
                   />
                   <$AssetIconWithStatus>
                     <$AssetIcon symbol={asset?.id} />
@@ -291,7 +293,7 @@ const getOrdersTableColumnDef = ({
               <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
-              <$SecondaryColor>@</$SecondaryColor>
+              <span tw="text-text-0">@</span>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
             </$InlineRow>
             <span>
@@ -404,7 +406,7 @@ export const OrdersTable = ({
       )}
       slotEmpty={
         <>
-          <$EmptyIcon iconName={IconName.OrderPending} />
+          <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
           <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
         </>
       }
@@ -438,15 +440,6 @@ const $AssetIcon = styled(AssetIcon)`
     font-size: 2.25rem;
   }
 `;
-
-const $TimeOutput = styled(Output)`
-  color: var(--color-text-0);
-`;
-
-const $SecondaryColor = styled.span`
-  color: var(--color-text-0);
-`;
-
 const $Side = styled.span<{ side?: OrderSide | null }>`
   ${({ side }) =>
     side &&
@@ -459,11 +452,6 @@ const $Side = styled.span<{ side?: OrderSide | null }>`
       `,
     }[side]};
 `;
-
-const $EmptyIcon = styled(Icon)`
-  font-size: 3em;
-`;
-
 const $AssetIconWithStatus = styled.div`
   ${layoutMixins.stack}
 
@@ -480,8 +468,4 @@ const $StatusDot = styled.div<{ color: string }>`
   border: 2px solid var(--tableRow-currentBackgroundColor);
 
   background-color: ${({ color }) => color};
-`;
-
-const $WithTooltip = styled(WithTooltip)`
-  --tooltip-backgroundColor: var(--color-layer-5);
 `;

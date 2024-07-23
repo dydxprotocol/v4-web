@@ -56,7 +56,11 @@ export const UnstakeFormPreviewContents = ({
       })}
       slotLeft={
         <>
-          <$ValidatorIcons numToShow={3} validators={unstakingValidators} />
+          <ValidatorIcons
+            numToShow={3}
+            validators={unstakingValidators}
+            tw="[--border-color:var(--color-layer-4)] [--icon-size:2.25rem]"
+          />
           <$ValidatorsLabel>
             {unstakingValidators.map((validator) => validator.description?.moniker).join(', ')}
           </$ValidatorsLabel>
@@ -64,7 +68,10 @@ export const UnstakeFormPreviewContents = ({
       }
       slotRight={
         <>
-          <$AssetIcon symbol={chainTokenLabel} />
+          <AssetIcon
+            symbol={chainTokenLabel}
+            tw="text-[length:var(--icon-size)] [--icon-size:2.25rem]"
+          />
           <Output
             value={delegationsToUnstake.reduce(
               (sum, delegation) => sum + (amounts[delegation.validator] ?? 0),
@@ -80,17 +87,6 @@ export const UnstakeFormPreviewContents = ({
     />
   );
 };
-
-const $ValidatorIcons = styled(ValidatorIcons)`
-  --icon-size: 2.25rem;
-  --border-color: var(--color-layer-4);
-`;
-
 const $ValidatorsLabel = styled.div`
   ${layoutMixins.textLineClamp}
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  --icon-size: 2.25rem;
-  font-size: var(--icon-size);
 `;

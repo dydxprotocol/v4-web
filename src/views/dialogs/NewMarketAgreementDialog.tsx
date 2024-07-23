@@ -26,10 +26,11 @@ export const NewMarketAgreementDialog = ({
   const stringGetter = useStringGetter();
 
   return (
-    <$Dialog
+    <Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ACKNOWLEDGEMENT })}
+      tw="notMobile:([--dialog-width:30rem])"
     >
       <$Content>
         <p>
@@ -57,7 +58,7 @@ export const NewMarketAgreementDialog = ({
           id="acknowledgement-checkbox"
           label={stringGetter({ key: STRING_KEYS.I_HAVE_READ_AND_AGREE })}
         />
-        <$ButtonRow>
+        <div tw="grid grid-cols-[1fr_2fr] gap-1">
           <Button action={ButtonAction.Base} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CANCEL })}
           </Button>
@@ -71,17 +72,11 @@ export const NewMarketAgreementDialog = ({
           >
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>
-        </$ButtonRow>
+        </div>
       </$Content>
-    </$Dialog>
+    </Dialog>
   );
 };
-const $Dialog = styled(Dialog)`
-  @media ${breakpoints.notMobile} {
-    --dialog-width: 30rem;
-  }
-`;
-
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
@@ -91,10 +86,4 @@ const $Content = styled.div`
     padding: 1rem;
     background-color: var(--color-layer-1);
   }
-`;
-
-const $ButtonRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1rem;
 `;

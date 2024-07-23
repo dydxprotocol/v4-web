@@ -50,7 +50,7 @@ const getTradingRewardHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
-            <$Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</$Rewarded>
+            <span tw="text-text-2">{stringGetter({ key: STRING_KEYS.REWARDED })}</span>
             <$TimePeriod>
               {stringGetter({
                 key: STRING_KEYS.FOR_TRADING,
@@ -81,11 +81,12 @@ const getTradingRewardHistoryTableColumnDef = ({
         getCellValue: (row) => row.amount,
         label: stringGetter({ key: STRING_KEYS.EARNED }),
         renderCell: ({ amount }) => (
-          <$PositiveOutput
+          <Output
             type={OutputType.Asset}
             value={amount}
             showSign={ShowSign.Both}
             slotRight={<AssetIcon symbol={chainTokenLabel} />}
+            tw="gap-[0.5ch] [--output-sign-color:var(--color-positive)]"
           />
         ),
       },
@@ -139,10 +140,10 @@ export const TradingRewardHistoryTable = ({
       getRowKey={getRowKey}
       columns={columns}
       slotEmpty={
-        <$Column>
-          <$EmptyIcon iconName={IconName.OrderPending} />
+        <div tw="flex flex-col items-center gap-1">
+          <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
           {stringGetter({ key: STRING_KEYS.TRADING_REWARD_TABLE_EMPTY_STATE })}
-        </$Column>
+        </div>
       }
       selectionBehavior="replace"
       withOuterBorder={isNotTablet || rewardsData.length === 0}
@@ -162,11 +163,6 @@ const $Table = styled(Table)`
     font: var(--font-small-book);
   }
 ` as typeof Table;
-
-const $Rewarded = styled.span`
-  color: var(--color-text-2);
-`;
-
 const $TimePeriod = styled.div`
   ${layoutMixins.inlineRow}
 
@@ -179,20 +175,4 @@ const $TimePeriod = styled.div`
     color: var(--color-text-1);
     font: var(--font-base-book);
   }
-`;
-
-const $Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const $EmptyIcon = styled(Icon)`
-  font-size: 3em;
-`;
-
-const $PositiveOutput = styled(Output)`
-  --output-sign-color: var(--color-positive);
-  gap: 0.5ch;
 `;

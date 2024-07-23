@@ -31,8 +31,8 @@ export const PortfolioCard = ({
         {assetName}
       </$MarketRow>
       <$MarginRow>
-        <$MarginLabel>{detailLabel}</$MarginLabel>
-        <$MarginValue>{detailValue}</$MarginValue>
+        <span tw="text-text-0 font-mini-book">{detailLabel}</span>
+        <span tw="font-small-book">{detailValue}</span>
       </$MarginRow>
       <$ActionRow>{actionSlot}</$ActionRow>
     </$PortfolioCard>
@@ -66,16 +66,6 @@ const $MarginRow = styled.div`
   padding: 0 0.625rem;
   margin-top: 0.5rem;
 `;
-
-const $MarginLabel = styled.span`
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
-`;
-
-const $MarginValue = styled.span`
-  font: var(--font-small-book);
-`;
-
 const $ActionRow = styled.div`
   ${layoutMixins.spacedRow}
   border-top: var(--border);

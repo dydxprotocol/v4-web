@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Item, Root } from '@radix-ui/react-radio-group';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -140,7 +141,7 @@ export const NewMarketSelectionStep = ({
             type={OutputType.Number}
             value={nativeTokenBalance}
             fractionDigits={TOKEN_DECIMALS}
-            slotRight={<$Tag>{chainTokenLabel}</$Tag>}
+            slotRight={<Tag tw="ml-[0.5ch]">{chainTokenLabel}</Tag>}
           />
         </$Balance>
       </h2>
@@ -166,9 +167,9 @@ export const NewMarketSelectionStep = ({
         label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
-          <$SelectedAsset>
+          <span tw="text-text-2">
             {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
-          </$SelectedAsset>
+          </span>
         ) : (
           `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
         )}
@@ -247,7 +248,7 @@ export const NewMarketSelectionStep = ({
       )}
       <WithReceipt
         slotReceipt={
-          <$ReceiptDetails
+          <Details
             items={[
               assetToAdd && {
                 key: 'reference-price',
@@ -265,7 +266,7 @@ export const NewMarketSelectionStep = ({
                 key: 'message-details',
                 label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
                 value: (
-                  <$Button
+                  <Button
                     action={ButtonAction.Navigation}
                     size={ButtonSize.Small}
                     onClick={() =>
@@ -279,9 +280,10 @@ export const NewMarketSelectionStep = ({
                         )
                       )
                     }
+                    tw="[--button-height:auto] [--button-padding:0]"
                   >
                     {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-                  </$Button>
+                  </Button>
                 ),
               },
               {
@@ -293,24 +295,26 @@ export const NewMarketSelectionStep = ({
                   </span>
                 ),
                 value: (
-                  <$Disclaimer>
+                  <div tw="ml-[0.5ch] text-text-0">
                     {stringGetter({
                       key: STRING_KEYS.OR_MORE,
                       params: {
                         NUMBER: (
-                          <$Output
+                          <Output
                             useGrouping
                             type={OutputType.Number}
                             value={initialDepositAmountBN}
                             fractionDigits={initialDepositAmountDecimals}
+                            tw="inline-block"
                           />
                         ),
                       },
                     })}
-                  </$Disclaimer>
+                  </div>
                 ),
               },
             ].filter(isTruthy)}
+            tw="px-0.75 pb-0.25 pt-0.375"
           />
         }
       >
@@ -352,28 +356,7 @@ const $Balance = styled.span`
     margin-left: 0.5ch;
   }
 `;
-
-const $Tag = styled(Tag)`
-  margin-left: 0.5ch;
-`;
-
-const $SelectedAsset = styled.span`
-  color: var(--color-text-2);
-`;
-
-const $Disclaimer = styled.div`
-  color: var(--color-text-0);
-  margin-left: 0.5ch;
-`;
-
-const $Header = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  color: var(--color-text-2);
-  font: var(--font-base-medium);
-  justify-content: space-between;
-`;
+const $Header = tw.div`flex flex-1 items-center justify-between text-text-2 font-base-medium`;
 
 const $Root = styled(Root)`
   display: flex;
@@ -415,17 +398,4 @@ const $Details = styled(Details)`
       margin-bottom: 0.5rem;
     }
   }
-`;
-
-const $ReceiptDetails = styled(Details)`
-  padding: 0.375rem 0.75rem 0.25rem;
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;
-
-const $Button = styled(Button)`
-  --button-padding: 0;
-  --button-height: auto;
 `;

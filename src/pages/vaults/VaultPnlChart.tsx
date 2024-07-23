@@ -187,12 +187,12 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         <$ChartBackground chartBackground={chartDotsBackground} />
         <$NumbersContainer>
           {hoveredTime != null && (
-            <$Time>
+            <div tw="text-text-0 font-small-book">
               <Output value={hoveredTime} type={OutputType.Date} />
-            </$Time>
+            </div>
           )}
           <$PnlNumbers>
-            <$MainOutput value={pnlAbsolute} type={OutputType.Fiat} />
+            <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
               <$DiffNumbers>
                 <TriangleIndicator value={MustBigNumber(pnlDiff)} />
@@ -273,14 +273,6 @@ const $ChartBackground = styled.div<{ chartBackground: string }>`
   background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
   mask-image: radial-gradient(ellipse closest-side, black 40%, transparent 100%);
   pointer-events: none;
-`;
-
-const $Time = styled.div`
-  font: var(--font-small-book);
-  color: var(--color-text-0);
-`;
-const $MainOutput = styled(Output)`
-  font: var(--font-medium-medium);
 `;
 const $PnlNumbers = styled.div`
   ${layoutMixins.row}

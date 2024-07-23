@@ -1,6 +1,7 @@
 import { FormEvent } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -133,11 +134,14 @@ export const TriggersForm = ({
             tickSizeDecimals={tickSizeDecimals}
           />
           <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
-            <$Button
+            <Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
               state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
-              slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+              slotLeft={
+                hasInputErrors ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+              }
+              tw="w-full"
             >
               {hasInputErrors
                 ? stringGetter({
@@ -146,7 +150,7 @@ export const TriggersForm = ({
                 : !!existingStopLossOrder || !!existingTakeProfitOrder
                   ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                   : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-            </$Button>
+            </Button>
           </WithTooltip>
         </>
       )}
@@ -172,18 +176,6 @@ const $PriceRow = styled.div`
   ${layoutMixins.spacedRow};
 `;
 
-const $PriceLabel = styled.h3`
-  color: var(--color-text-0);
-`;
+const $PriceLabel = tw.h3`text-text-0`;
 
-const $Price = styled(Output)`
-  color: var(--color-text-2);
-`;
-
-const $Button = styled(Button)`
-  width: 100%;
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
+const $Price = tw(Output)`text-text-2 `;

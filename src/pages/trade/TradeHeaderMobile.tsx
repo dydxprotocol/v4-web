@@ -28,7 +28,7 @@ export const TradeHeaderMobile = () => {
     <$Header>
       <BackButton onClick={() => navigate(AppRoute.Markets)} />
       <$MarketName>
-        <$AssetIcon symbol={id} />
+        <AssetIcon symbol={id} tw="text-[2.5rem]" />
         <$Name>
           <h3>{name}</h3>
           <span>{market}</span>
@@ -66,11 +66,6 @@ const $MarketName = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1ch;
 `;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 2.5rem;
-`;
-
 const $Name = styled.div`
   ${layoutMixins.rowColumn}
 
