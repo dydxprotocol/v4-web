@@ -419,6 +419,4 @@ const $InlineRow = styled.div`
   gap: 0.5rem;
 `;
 
-const $PanelButton = styled(Panel)`
-  --panel-paddingY: 0 --panel-paddingX: 0;
-`;
+const $PanelButton = tw(Panel)`[--panel-paddingY:0] [--panel-paddingX:0] `;

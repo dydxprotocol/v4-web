@@ -123,7 +123,7 @@ export const NotificationsMenu = ({
         <$TriggerContainer>
           {slotTrigger}
           {hasUnreadNotifications && (
-            <$UnreadIndicator tw="relative right-[-0.2rem] top-[-0.325rem] place-self-center" />
+            <div tw="relative right-[-0.2rem] top-[-0.325rem] h-0.5 w-0.5 place-self-center rounded-[50%] border border-solid border-layer-2 bg-accent" />
           )}
         </$TriggerContainer>
       }
@@ -170,15 +170,6 @@ const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
     box-shadow: none;
   }
 `;
-
-const $UnreadIndicator = styled.div`
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-layer-2);
-`;
-
 const $TriggerContainer = styled.div`
   ${layoutMixins.stack}
 `;
