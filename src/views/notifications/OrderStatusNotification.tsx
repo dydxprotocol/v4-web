@@ -61,7 +61,7 @@ export const OrderStatusNotification = ({
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
-  let orderStatusIcon = <$LoadingSpinner />;
+  let orderStatusIcon = <LoadingSpinner tw="text-accent [--spinner-width:0.9375rem]" />;
   let customContent = null;
 
   switch (submissionStatus) {
@@ -73,7 +73,9 @@ export const OrderStatusNotification = ({
         if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
 
         orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
-        orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
+        orderStatusIcon = (
+          <OrderStatusIcon status={indexedOrderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
+        );
 
         if (order && fill) {
           customContent = (
@@ -99,7 +101,7 @@ export const OrderStatusNotification = ({
     case PlaceOrderStatuses.Submitted:
       if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
-        orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
+        orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-warning" />;
         customContent = (
           <span>
             {stringGetter({
@@ -128,10 +130,10 @@ export const OrderStatusNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <$OrderStatus>
+        <$Label tw="text-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </$OrderStatus>
+        </$Label>
       }
       slotCustomContent={customContent}
     />
@@ -141,23 +143,4 @@ export const OrderStatusNotification = ({
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
-`;
-
-const $OrderStatus = styled($Label)`
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-`;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  --spinner-width: 0.9375rem;
-  color: var(--color-accent);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
-const $OrderStatusIcon = styled(OrderStatusIcon)`
-  width: 0.9375rem;
-  height: 0.9375rem;
 `;

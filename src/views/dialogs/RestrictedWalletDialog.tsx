@@ -24,7 +24,7 @@ export const RestrictedWalletDialog = ({
       preventClose={preventClose}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
-      slotIcon={<$Icon iconName={IconName.Warning} />}
+      slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
     >
       <$Content>
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
@@ -33,10 +33,6 @@ export const RestrictedWalletDialog = ({
     </Dialog>
   );
 };
-const $Icon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;

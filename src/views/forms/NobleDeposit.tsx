@@ -43,9 +43,9 @@ export const NobleDeposit = () => {
         />
       </WithDetailsReceipt>
 
-      <$WithReceipt
+      <WithReceipt
         slotReceipt={
-          <$CheckboxContainer>
+          <div tw="p-1 text-text-0">
             <Checkbox
               checked={hasAcknowledged}
               onCheckedChange={setHasAcknowledged}
@@ -54,8 +54,9 @@ export const NobleDeposit = () => {
                 key: STRING_KEYS.NOBLE_ACKNOWLEDGEMENT,
               })}
             />
-          </$CheckboxContainer>
+          </div>
         }
+        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
       >
         <TimeoutButton
           timeoutInSeconds={8}
@@ -66,15 +67,10 @@ export const NobleDeposit = () => {
             </CopyButton>
           }
         />
-      </$WithReceipt>
+      </WithReceipt>
     </>
   );
 };
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $QrCode = styled(QrCode)<{ blurred: boolean }>`
   border-radius: 0.5em;
 
@@ -83,9 +79,4 @@ const $QrCode = styled(QrCode)<{ blurred: boolean }>`
     css`
       filter: blur(8px);
     `}
-`;
-
-const $CheckboxContainer = styled.div`
-  padding: 1rem;
-  color: var(--color-text-0);
 `;

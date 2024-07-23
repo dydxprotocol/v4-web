@@ -236,11 +236,11 @@ export const TradingRewardsChart = ({
     <>
       {rewardsData.length === 0 ? undefined : (
         <$TitleContainer>
-          <$Title>
+          <span tw="h-min text-text-1">
             {stringGetter({
               key: STRING_KEYS.TRADING_REWARDS,
             })}
-          </$Title>
+          </span>
 
           <ToggleGroup
             items={toggleGroupItems}
@@ -289,12 +289,6 @@ const $TitleContainer = styled.div`
 
   font: var(--font-medium-book);
 `;
-
-const $Title = styled.span`
-  color: var(--color-text-1);
-  height: min-content;
-`;
-
 const $Value = styled.div`
   place-self: start;
   isolation: isolate;

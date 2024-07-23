@@ -7,7 +7,6 @@ import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -72,12 +71,13 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                 </$BillboardLink>
               ) : null}
             </$BillboardTitle>
-            <$Output
+            <Output
               useGrouping
               withBaseFont
               fractionDigits={fractionDigits}
               type={type}
               value={value}
+              tw="text-text-2 font-extra-book tablet:font-base-book"
             />
           </$BillboardStat>
         </$BillboardContainer>
@@ -124,13 +124,5 @@ const $BillboardStat = styled.div`
   output {
     color: var(--color-text-1);
     font: var(--font-large-medium);
-  }
-`;
-const $Output = styled(Output)`
-  font: var(--font-extra-book);
-  color: var(--color-text-2);
-
-  @media ${breakpoints.tablet} {
-    font: var(--font-base-book);
   }
 `;

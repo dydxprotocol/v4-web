@@ -140,7 +140,7 @@ const PortfolioPage = () => {
       sidebar={
         isTablet ? null : (
           <$SideBar>
-            <$NavigationMenu
+            <NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -224,6 +224,7 @@ const PortfolioPage = () => {
                   ],
                 },
               ]}
+              tw="p-0.5 pt-0"
             />
             {onboardingState === OnboardingState.AccountConnected && (
               <$Footer>
@@ -289,12 +290,6 @@ const $Footer = styled.div`
     flex-grow: 1;
   }
 `;
-
-const $NavigationMenu = styled(NavigationMenu)`
-  padding: 0.5rem;
-  padding-top: 0;
-`;
-
 const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;

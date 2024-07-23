@@ -49,7 +49,7 @@ export const AdvancedTriggersOptions = ({
         {stringGetter({ key: STRING_KEYS.ADVANCED })}
         <HorizontalSeparatorFiller />
       </$Header>
-      <$Content>
+      <div tw="grid gap-[0.5em]">
         <OrderSizeInput
           className={className}
           differingOrderSizes={differingOrderSizes}
@@ -67,7 +67,7 @@ export const AdvancedTriggersOptions = ({
             tickSizeDecimals={tickSizeDecimals}
           />
         )}
-      </$Content>
+      </div>
     </$Container>
   );
 };
@@ -81,9 +81,4 @@ const $Header = styled.h3`
   color: var(--color-text-0);
 
   margin-bottom: 0.5rem;
-`;
-
-const $Content = styled.div`
-  display: grid;
-  gap: 0.5em;
 `;

@@ -77,13 +77,14 @@ export const TablePaginationRow = ({
         key: STRING_KEYS.SHOW,
         params: {
           NUMBER: (
-            <$DropdownSelectMenu
+            <DropdownSelectMenu
               value={String(pageSize)}
               items={PAGE_SIZES.map((size) => ({
                 label: String(size),
                 value: String(size),
               }))}
               onValueChange={(value: String) => setPageSize(Number(value) as PageSize)}
+              tw="[--dropdownSelectMenu-item-font-size:var(--fontSize-mini)]"
             />
           ),
         },
@@ -121,8 +122,4 @@ const $ToggleGroup = styled(ToggleGroup)`
     border: none;
     background-color: transparent;
   }
-`;
-
-const $DropdownSelectMenu = styled(DropdownSelectMenu)`
-  --dropdownSelectMenu-item-font-size: var(--fontSize-mini);
 `;

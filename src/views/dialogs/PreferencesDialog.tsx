@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
-import styled from 'styled-components';
 
 import { DialogProps, PreferencesDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { MenuConfig } from '@/constants/menus';
 import { isDev } from '@/constants/networks';
 import { NotificationCategoryPreferences } from '@/constants/notifications';
 
@@ -21,7 +21,10 @@ import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSel
 
 import { isTruthy } from '@/lib/isTruthy';
 
-const usePreferenceMenu = () => {
+const usePreferenceMenu = (): MenuConfig<
+  OtherPreference | NotificationCategoryPreferences,
+  'Other' | 'Notifications'
+> => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
@@ -63,7 +66,7 @@ const usePreferenceMenu = () => {
 
   const notificationSection = useMemo(
     () => ({
-      group: 'Notifications',
+      group: 'Notifications' as const,
       groupLabel: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
       items: [
         {
@@ -89,7 +92,7 @@ const usePreferenceMenu = () => {
 
   const otherSection = useMemo(
     () => ({
-      group: 'Other',
+      group: 'Other' as const,
       groupLabel: stringGetter({ key: STRING_KEYS.OTHER }),
       items: [
         {
@@ -137,14 +140,12 @@ export const PreferencesDialog = ({ setIsOpen }: DialogProps<PreferencesDialogPr
   const preferenceItems = usePreferenceMenu();
 
   return (
-    <$ComboboxDialogMenu
+    <ComboboxDialogMenu
       isOpen
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
       setIsOpen={setIsOpen}
+      tw="[--dialog-content-paddingBottom:0.5rem]"
     />
   );
 };
-const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
-  --dialog-content-paddingBottom: 0.5rem;
-`;

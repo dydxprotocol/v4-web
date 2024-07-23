@@ -163,7 +163,7 @@ export const MarketDetails: React.FC = () => {
             <AssetIcon symbol={id} />
             {name}
           </$MarketTitle>
-          {isTablet && <$MarketLinks />}
+          {isTablet && <MarketLinks tw="[place-self:start_end]" />}
         </$WrapRow>
 
         <$MarketDescription>
@@ -212,7 +212,7 @@ export const MarketDetails: React.FC = () => {
         )}
       </$Header>
 
-      <$Details items={items} withSeparators />
+      <Details items={items} withSeparators tw="font-mini-book" />
     </$MarketDetails>
   );
 };
@@ -257,9 +257,6 @@ const $MarketTitle = styled.h3`
     height: 2.25rem;
   }
 `;
-const $MarketLinks = styled(MarketLinks)`
-  place-self: start end;
-`;
 const $MarketDescription = styled.div`
   ${layoutMixins.column}
   gap: 0.5em;
@@ -278,7 +275,4 @@ const $Buttons = styled.div`
   gap: 0.5rem;
 
   overflow-x: auto;
-`;
-const $Details = styled(Details)`
-  font: var(--font-mini-book);
 `;

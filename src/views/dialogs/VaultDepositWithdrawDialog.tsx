@@ -35,7 +35,7 @@ export const VaultDepositWithdrawDialog = ({
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
       title={
         <$VaultDialogTitle>
-          <$VaultImg src="/dydx-chain.png" />
+          <img src="/dydx-chain.png" tw="h-2.5 w-2.5" />
           {stringGetter({ key: STRING_KEYS.VAULT })}
         </$VaultDialogTitle>
       }
@@ -51,12 +51,6 @@ const $Dialog = styled(Dialog)`
   --dialog-content-paddingBottom: 0;
   --dialog-content-paddingLeft: 0;
 `;
-
-const $VaultImg = styled.img`
-  width: 2.5rem;
-  height: 2.5rem;
-`;
-
 const $VaultDialogTitle = styled.div`
   ${layoutMixins.row}
   gap: 1rem;

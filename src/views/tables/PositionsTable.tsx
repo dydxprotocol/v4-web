@@ -115,7 +115,7 @@ const getPositionsTableColumnDef = ({
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
               </$PositionSide>
-              <$SecondaryColor>@</$SecondaryColor>
+              <span tw="text-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}
@@ -514,7 +514,7 @@ export const PositionsTable = ({
       })}
       slotEmpty={
         <>
-          <$Icon iconName={IconName.Positions} />
+          <Icon iconName={IconName.Positions} tw="text-[3em]" />
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
@@ -562,11 +562,6 @@ const $AssetIcon = styled(AssetIcon)`
   min-width: unset;
   font-size: 2.25rem;
 `;
-
-const $SecondaryColor = styled.span`
-  color: var(--color-text-0);
-`;
-
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -591,8 +586,4 @@ const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
-`;
-
-const $Icon = styled(Icon)`
-  font-size: 3em;
 `;

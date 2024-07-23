@@ -47,15 +47,15 @@ export const OrderbookControls = ({
 
   return (
     <$OrderbookControlsContainer className={className}>
-      <$OrderbookUnitControl>
-        <$ZoomControls>
+      <div tw="flex justify-between gap-0.5">
+        <div tw="flex gap-0.5">
           <$ButtonGroup>
             <Button
               size={ButtonSize.XSmall}
               shape={ButtonShape.Square}
               onClick={() => modifyScale(-1)}
             >
-              <$MinusSymbolCenter>-</$MinusSymbolCenter>
+              <span tw="-mt-0.125">-</span>
             </Button>
             <Button
               size={ButtonSize.XSmall}
@@ -70,7 +70,7 @@ export const OrderbookControls = ({
             type={OutputType.Fiat}
             fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
           />
-        </$ZoomControls>
+        </div>
         <ToggleGroup
           items={[
             { label: assetName ?? '', value: 'asset' as const },
@@ -80,7 +80,7 @@ export const OrderbookControls = ({
           value={selectedUnit}
           onValueChange={setSelectedUnit}
         />
-      </$OrderbookUnitControl>
+      </div>
     </$OrderbookControlsContainer>
   );
 };
@@ -98,25 +98,10 @@ const $OrderbookControlsContainer = styled.div`
     padding-bottom: 0.3rem;
   }
 `;
-const $ZoomControls = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
 const $ButtonGroup = styled.div`
   display: flex;
   gap: 0.25rem;
   > button {
     --button-font: var(--font-medium-book);
   }
-`;
-
-const $OrderbookUnitControl = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-`;
-
-const $MinusSymbolCenter = styled.span`
-  margin-top: -0.125rem;
 `;

@@ -59,22 +59,24 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
       }
       slotRight={
         canAccountTrade && (
-          <$Button
+          <Button
             action={ButtonAction.Primary}
             size={ButtonSize.Base}
             onClick={openStakingRewardDialog}
+            tw="z-[1] mr-[var(--panel-paddingX)]"
           >
             {stringGetter({ key: STRING_KEYS.CLAIM })}
-          </$Button>
+          </Button>
         )
       }
     >
       <$InlineRow>
-        <$PositiveOutput
+        <Output
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
           minimumFractionDigits={SMALL_USD_DECIMALS}
+          tw="text-text-2 font-large-book [--output-sign-color:var(--color-positive)]"
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>
@@ -111,12 +113,6 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
     mask-image: linear-gradient(270deg, transparent, var(--gradient-start-color) 60%);
   }
 `;
-
-const $Button = styled(Button)`
-  margin-right: var(--panel-paddingX);
-  z-index: 1;
-`;
-
 const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
 
@@ -125,11 +121,4 @@ const $InlineRow = styled.span`
   img {
     font-size: 1.3rem;
   }
-`;
-
-const $PositiveOutput = styled(Output)`
-  --output-sign-color: var(--color-positive);
-
-  color: var(--color-text-2);
-  font: var(--font-large-book);
 `;

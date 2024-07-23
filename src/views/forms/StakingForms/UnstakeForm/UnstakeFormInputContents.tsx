@@ -97,7 +97,7 @@ export const UnstakeFormInputContents = ({
   return (
     <>
       {currentDelegations?.length === 1 ? (
-        <$WithDetailsReceipt
+        <WithDetailsReceipt
           side="bottom"
           detailItems={[
             {
@@ -129,6 +129,7 @@ export const UnstakeFormInputContents = ({
               ),
             },
           ]}
+          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
         >
           <FormInput
             id="unstakeAmount"
@@ -153,9 +154,9 @@ export const UnstakeFormInputContents = ({
               />
             }
           />
-        </$WithDetailsReceipt>
+        </WithDetailsReceipt>
       ) : (currentDelegations?.length ?? 0) > 1 ? (
-        <$GridLayout>
+        <div tw="grid grid-cols-[1fr_1fr] gap-1">
           <div>
             {stringGetter({
               key: STRING_KEYS.VALIDATOR,
@@ -170,9 +171,12 @@ export const UnstakeFormInputContents = ({
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
               </$Button>
             ) : (
-              <$AllButton onClick={setAllUnstakeAmountsToMax}>
+              <$Button
+                onClick={setAllUnstakeAmountsToMax}
+                tw="[--button-textColor:var(--color-accent)]"
+              >
                 {stringGetter({ key: STRING_KEYS.ALL })}
-              </$AllButton>
+              </$Button>
             )}
           </$SpacedRow>
           {stakingValidators &&
@@ -203,7 +207,7 @@ export const UnstakeFormInputContents = ({
                 </React.Fragment>
               );
             })}
-        </$GridLayout>
+        </div>
       ) : null}
       <StakeRewardButtonAndReceipt
         detailItems={detailItems}
@@ -219,17 +223,6 @@ export const UnstakeFormInputContents = ({
     </>
   );
 };
-
-const $GridLayout = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
 `;
@@ -243,8 +236,4 @@ const $Button = styled(Button)`
   --button-padding: 0;
   --button-height: auto;
   --button-hover-filter: none;
-`;
-
-const $AllButton = styled($Button)`
-  --button-textColor: var(--color-accent);
 `;

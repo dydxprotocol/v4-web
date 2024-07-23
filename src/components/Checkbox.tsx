@@ -34,9 +34,9 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       onCheckedChange={onCheckedChange}
       id={id}
     >
-      <$Indicator>
+      <Indicator tw="flex items-center justify-center text-text-button">
         <CheckIcon />
-      </$Indicator>
+      </Indicator>
     </$Root>
     {label && (
       <$Label disabled={disabled} htmlFor={id}>
@@ -71,15 +71,6 @@ const $Root = styled(Root)`
     --checkbox-backgroundColor: var(--color-layer-1);
   }
 `;
-
-const $Indicator = styled(Indicator)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--color-text-button);
-`;
-
 const $Label = styled.label<{ disabled?: boolean }>`
   cursor: pointer;
   color: var(--color-text-2);

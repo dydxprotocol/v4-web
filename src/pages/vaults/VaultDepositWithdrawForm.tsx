@@ -2,6 +2,7 @@ import { FormEvent, useCallback, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -397,11 +398,11 @@ export const VaultDepositWithdrawForm = ({
         onSubmitConfirmForm();
       }}
     >
-      <$GridContainer>
+      <div tw="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto_auto] gap-x-0.25 gap-y-0.5">
         <$SourceLabel>{inputFormConfig.formLabel}</$SourceLabel>
         <$TargetLabel>{stringGetter({ key: STRING_KEYS.DESTINATION })}</$TargetLabel>
         <$SourceBox>
-          <$AssetIcon symbol="USDC" />
+          <AssetIcon symbol="USDC" tw="h-2 w-2" />
           <Output value={amount} type={OutputType.Fiat} />
         </$SourceBox>
         <$Arrow>
@@ -410,13 +411,13 @@ export const VaultDepositWithdrawForm = ({
         </$Arrow>
         <$TargetBox>
           {inputFormConfig.transactionTarget.icon === 'cross' ? (
-            <$CrossIcon>C</$CrossIcon>
+            <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-layer-6">C</div>
           ) : (
-            <$VaultImg src="/dydx-chain.png" />
+            <img src="/dydx-chain.png" tw="h-2 w-2" />
           )}
           <div>{inputFormConfig.transactionTarget.label}</div>
         </$TargetBox>
-      </$GridContainer>
+      </div>
 
       {renderedErrors}
 
@@ -444,14 +445,15 @@ export const VaultDepositWithdrawForm = ({
         />
       )}
 
-      <$ConfirmButtonGroup>
-        <$EditButton
+      <div tw="grid grid-cols-[min-content_1fr] gap-1">
+        <Button
           type={ButtonType.Button}
           action={ButtonAction.Secondary}
           onClick={() => setCurrentForm('input')}
+          tw="pl-1 pr-1"
         >
           {stringGetter({ key: STRING_KEYS.EDIT })}
-        </$EditButton>
+        </Button>
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
@@ -467,16 +469,11 @@ export const VaultDepositWithdrawForm = ({
         >
           {hasInputErrors ? errorsPreventingSubmit[0]?.short : inputFormConfig.buttonLabel}
         </Button>
-      </$ConfirmButtonGroup>
+      </div>
     </$Form>
   );
-  return <$Container>{currentForm === 'input' ? inputForm : confirmForm}</$Container>;
+  return <div tw="p-1.5">{currentForm === 'input' ? inputForm : confirmForm}</div>;
 };
-
-const $Container = styled.div`
-  padding: 1.5rem;
-`;
-
 const $HeaderRow = styled.div`
   ${layoutMixins.row}
   gap: .5rem;
@@ -511,34 +508,7 @@ const $FloatingDetails = styled(Details)`
 
   font-size: var(--details-item-fontSize, 0.8125em);
 `;
-
-const $ConfirmButtonGroup = styled.div`
-  grid-template-columns: min-content 1fr;
-  display: grid;
-  gap: 1rem;
-`;
-
-const $EditButton = styled(Button)`
-  padding-left: 1rem;
-  padding-right: 1rem;
-`;
-
-const $Icon = styled(Icon)`
-  color: var(--color-text-0);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  width: 2rem;
-  height: 2rem;
-`;
-const $GridContainer = styled.div`
-  display: grid;
-  grid-template-rows: auto auto;
-  grid-template-columns: 1fr auto 1fr;
-  row-gap: 0.5rem;
-  column-gap: 0.25rem;
-`;
-
+const $Icon = tw(Icon)`text-text-0 `;
 const labels = css`
   font: var(--font-small-book);
   color: var(--color-text-0);
@@ -597,31 +567,8 @@ const $TargetBox = styled.div`
   ${boxes}
   grid-area: 2 / 3;
 `;
+const $WarningIcon = tw(Icon)`text-warning `;
 
-const $VaultImg = styled.img`
-  width: 2rem;
-  height: 2rem;
-`;
+const $InlineOutput = tw(Output)`inline `;
 
-const $CrossIcon = styled.div`
-  width: 2rem;
-  height: 2rem;
-  display: grid;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1rem;
-  background-color: var(--color-layer-6);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
-const $InlineOutput = styled(Output)`
-  display: inline;
-`;
-
-const $FlexFill = styled.div`
-  flex: 1;
-  margin-top: calc(var(--form-input-gap) * -1);
-`;
+const $FlexFill = tw.div`mt-[calc(var(--form-input-gap)_*_-1)] flex-1`;

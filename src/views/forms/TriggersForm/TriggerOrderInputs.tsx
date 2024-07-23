@@ -244,10 +244,10 @@ export const TriggerOrderInputs = ({
   const multipleOrdersButton = () => (
     <$MultipleOrdersContainer>
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
-      <$ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
+      <Button action={ButtonAction.Navigation} onClick={onViewOrdersClick} tw="text-accent">
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        <$ArrowIcon iconName={IconName.Arrow} />
-      </$ViewAllButton>
+        <Icon iconName={IconName.Arrow} tw="stroke-2" />
+      </Button>
     </$MultipleOrdersContainer>
   );
 
@@ -363,12 +363,4 @@ const $MultipleOrdersContainer = styled.div`
   border-radius: 0.5em;
 
   color: var(--color-text-2);
-`;
-
-const $ViewAllButton = styled(Button)`
-  color: var(--color-accent);
-`;
-
-const $ArrowIcon = styled(Icon)`
-  stroke-width: 2;
 `;

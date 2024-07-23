@@ -25,11 +25,7 @@ import { getNumberSign } from '@/lib/numbers';
 
 import { VaultPositionsTable } from './VaultPositionsTable';
 
-const EmptyValue = () => <$EmptyValue>—</$EmptyValue>;
-const $EmptyValue = styled.span`
-  color: var(--color-text-0);
-`;
-
+const EmptyValue = () => <span tw="text-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const stringGetter = useStringGetter();
@@ -72,8 +68,8 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     <$CardsContainer className={className}>
       {items.map((item) => (
         <$DetailCard key={item.key}>
-          <$CardHeader>{item.label}</$CardHeader>
-          <$CardValue>{item.value}</$CardValue>
+          <div tw="text-text-0">{item.label}</div>
+          <div tw="leading-[1.2rem] text-text-2 font-medium-book">{item.value}</div>
         </$DetailCard>
       ))}
     </$CardsContainer>
@@ -93,32 +89,18 @@ const $DetailCard = styled.div`
 
   ${layoutMixins.column};
 `;
-const $CardHeader = styled.div`
-  color: var(--color-text-0);
-`;
 const $OutputRow = styled.div`
   ${layoutMixins.row}
   gap: .5rem;
 `;
-const $CardValue = styled.div`
-  font: var(--font-medium-book);
-  color: var(--color-text-2);
-  line-height: 1.2rem;
-`;
-
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   return (
-    <$DescriptionContainer className={className}>
+    <div className={className} tw="text-text-0 font-small-medium">
       {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}
-    </$DescriptionContainer>
+    </div>
   );
 };
-const $DescriptionContainer = styled.div`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-`;
-
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
@@ -171,14 +153,14 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   return (
     <$HeaderRow className={className}>
       {isTablet && (
-        <$BackContainer>
+        <div tw="flex items-center">
           <BackButton onClick={() => navigate(AppRoute.Portfolio)} />
-        </$BackContainer>
+        </div>
       )}
       <$MarketTitle>
-        <$VaultImg src="/dydx-chain.png" />
+        <img src="/dydx-chain.png" tw="h-3.5 w-3.5" />
         <div>
-          <$MarketTitleText>{stringGetter({ key: STRING_KEYS.VAULT })}</$MarketTitleText>
+          <h3 tw="text-text-2 font-extra-medium">{stringGetter({ key: STRING_KEYS.VAULT })}</h3>
         </div>
       </$MarketTitle>
       <$DetailItems>
@@ -186,7 +168,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
           <React.Fragment key={item.key}>
             <$VerticalSeparator />
             <$DetailItem key={item.key}>
-              <$DetailLabel>{item.label}</$DetailLabel>
+              <div tw="text-text-0">{item.label}</div>
               <$DetailValue>{item.value}</$DetailValue>
             </$DetailItem>
           </React.Fragment>
@@ -203,11 +185,6 @@ const $DetailItems = styled.div`
     gap: 0.75rem;
   }
 `;
-const $BackContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const $ColoredReturn = styled.div<{ $sign: NumberSign }>`
   display: flex;
   ${({ $sign }) =>
@@ -230,22 +207,10 @@ const $HeaderRow = styled.div`
     gap: 0.75rem;
   }
 `;
-
-const $MarketTitleText = styled.h3`
-  font: var(--font-extra-medium);
-  color: var(--color-text-2);
-`;
-
 const $MarketTitle = styled.div`
   ${layoutMixins.row}
   gap: 1.25rem;
 `;
-
-const $VaultImg = styled.img`
-  width: 3.5rem;
-  height: 3.5rem;
-`;
-
 const $VerticalSeparator = styled(VerticalSeparator)`
   &&& {
     height: 2rem;
@@ -258,11 +223,6 @@ const $DetailItem = styled.div`
   padding: 0.25rem 0.5rem;
   gap: 0.375rem;
 `;
-
-const $DetailLabel = styled.div`
-  color: var(--color-text-0);
-`;
-
 const $DetailValue = styled.div`
   font: var(--font-extra-book);
   font-size: 1.563rem; // we need an in-beween for large and extra

@@ -175,7 +175,7 @@ export const WithdrawButtonAndReceipt = ({
       key: 'leverage',
       label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
       value: (
-        <$DiffOutput
+        <DiffOutput
           type={OutputType.Multiple}
           value={leverage?.current}
           newValue={leverage?.postOrder}
@@ -183,6 +183,7 @@ export const WithdrawButtonAndReceipt = ({
           withDiff={Boolean(
             leverage?.current && leverage?.postOrder && leverage.current !== leverage?.postOrder
           )}
+          tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />
       ),
     },
@@ -192,7 +193,10 @@ export const WithdrawButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+    <WithReceipt
+      slotReceipt={<$Details items={submitButtonReceipt} />}
+      tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+    >
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -207,22 +211,13 @@ export const WithdrawButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.WITHDRAW })}
         </Button>
       )}
-    </$WithReceipt>
+    </WithReceipt>
   );
 };
-const $DiffOutput = styled(DiffOutput)`
-  --diffOutput-valueWithDiff-fontSize: 1em;
-`;
-
 const $RowWithGap = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);

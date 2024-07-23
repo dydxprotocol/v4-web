@@ -42,28 +42,34 @@ export const RewardsNavPanel = ({
       className={className}
       slotHeaderContent={
         <$Title>
-          {title} {titleTag && <$Tag>{titleTag}</$Tag>}
+          {title} {titleTag && <Tag tw="bg-accent-faded text-accent">{titleTag}</Tag>}
         </$Title>
       }
       slotRight={
-        <$Arrow>
-          <$IconButton
+        <div tw="pr-1.5">
+          <IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
+            tw="text-text-0 [--color-border:var(--color-layer-6)]"
           />
-        </$Arrow>
+        </div>
       }
       onClick={onNav}
     >
-      <$Description>
+      <div tw="text-text-0">
         {description}
         {learnMore && (
-          <$Link href={learnMore} isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+          <Link
+            href={learnMore}
+            isInline
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            tw="ml-[0.5ch]"
+          >
             {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-          </$Link>
+          </Link>
         )}
-      </$Description>
+      </div>
     </Panel>
   );
 };
@@ -73,26 +79,4 @@ const $Title = styled.h3`
   font: var(--font-medium-book);
   margin-bottom: -1.5rem;
   color: var(--color-text-1);
-`;
-
-const $Tag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
-`;
-
-const $Arrow = styled.div`
-  padding-right: 1.5rem;
-`;
-
-const $IconButton = styled(IconButton)`
-  --color-border: var(--color-layer-6);
-  color: var(--color-text-0);
-`;
-
-const $Description = styled.div`
-  color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  margin-left: 0.5ch;
 `;

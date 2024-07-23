@@ -233,7 +233,7 @@ export const ClosePositionForm = ({
 
   const inputs = (
     <$InputsColumn>
-      <$FormInput
+      <FormInput
         id="close-position-amount"
         label={
           <>
@@ -246,6 +246,7 @@ export const ClosePositionForm = ({
         type={InputType.Number}
         value={size ?? ''}
         max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
+        tw="w-full"
       />
 
       <$ToggleGroup
@@ -274,7 +275,7 @@ export const ClosePositionForm = ({
       ) : (
         <$MobileLayout>
           <$OrderbookContainer>
-            <$Orderbook hideHeader />
+            <CanvasOrderbook hideHeader tw="min-h-full" />
           </$OrderbookContainer>
 
           <$Right>
@@ -369,11 +370,6 @@ const $OrderbookContainer = styled.div`
   padding-top: var(--dialog-content-paddingTop);
   padding-bottom: var(--form-rowGap);
 `;
-
-const $Orderbook = styled(CanvasOrderbook)`
-  min-height: 100%;
-`;
-
 const $Right = styled.div`
   height: 0;
   min-height: 100%;
@@ -386,11 +382,6 @@ const $Right = styled.div`
   padding-bottom: var(--form-rowGap);
   gap: 1rem;
 `;
-
-const $FormInput = styled(FormInput)`
-  width: 100%;
-`;
-
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 

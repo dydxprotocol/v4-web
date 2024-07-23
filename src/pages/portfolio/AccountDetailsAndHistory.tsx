@@ -147,14 +147,14 @@ export const AccountDetailsAndHistory = () => {
     <$AccountDetailsAndHistory>
       <$AccountValue>
         <$WithLabel label={accountValueLabel}>
-          <$AccountEquity>
+          <div tw="text-text-2 font-extra-book">
             <Output
               type={OutputType.Fiat}
               value={accountEquity}
               roundingMode={BigNumber.ROUND_FLOOR}
               withBaseFont
             />
-          </$AccountEquity>
+          </div>
           <$PnlDiff isPositive={MustBigNumber(pnlDiff).gte(0)}>
             {pnlDiff && <TriangleIndicator value={MustBigNumber(pnlDiff)} />}
             <Output type={OutputType.Fiat} showSign={ShowSign.None} value={pnlDiff} />
@@ -179,13 +179,13 @@ export const AccountDetailsAndHistory = () => {
         onVisibleDataChange={setVisibleData}
         selectedLocale={selectedLocale}
         slotEmpty={
-          <$EmptyChart>
+          <div tw="grid cursor-default">
             {complianceState === ComplianceStates.READ_ONLY ? (
               <$Card>
                 {stringGetter({
                   key: STRING_KEYS.BLOCKED_MESSAGE,
                   params: {
-                    TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
+                    TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
                   },
                 })}
               </$Card>
@@ -202,7 +202,7 @@ export const AccountDetailsAndHistory = () => {
                 <OnboardingTriggerButton />
               </$EmptyCard>
             ) : null}
-          </$EmptyChart>
+          </div>
         }
       />
     </$AccountDetailsAndHistory>
@@ -247,12 +247,6 @@ const $AccountValue = styled.div`
     margin-bottom: 0.875rem;
   }
 `;
-
-const $AccountEquity = styled.div`
-  font: var(--font-extra-book);
-  color: var(--color-text-2);
-`;
-
 const $PnlDiff = styled.div<{ isPositive: boolean }>`
   color: var(--color-negative);
   display: flex;
@@ -295,12 +289,6 @@ const $PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
       [NumberSign.Neutral]: 'var(--color-text-1)',
     })[pnlDiffSign]};
 `;
-
-const $EmptyChart = styled.div`
-  display: grid;
-  cursor: default;
-`;
-
 const $Card = styled.div`
   padding: 1.25rem;
   margin: auto;
@@ -320,8 +308,4 @@ const $EmptyCard = styled($Card)`
   button {
     width: fit-content;
   }
-`;
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  text-decoration: underline;
 `;

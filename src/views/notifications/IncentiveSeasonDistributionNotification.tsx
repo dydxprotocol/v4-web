@@ -29,7 +29,7 @@ export const IncentiveSeasonDistributionNotification = ({
   const { chainTokenLabel, points } = data;
 
   return (
-    <$Notification
+    <Notification
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
@@ -51,6 +51,7 @@ export const IncentiveSeasonDistributionNotification = ({
           ]}
         />
       }
+      tw="bg-[url('/dots-background-2.svg')] bg-cover"
     />
   );
 };
@@ -61,12 +62,6 @@ const $Details = styled(Details)`
     color: var(--color-text-2);
   }
 `;
-
-const $Notification = styled(Notification)`
-  background-image: url('/dots-background-2.svg');
-  background-size: cover;
-`;
-
 const $Output = styled(Output)`
   &:before {
     content: '+';

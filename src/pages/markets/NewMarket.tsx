@@ -34,13 +34,13 @@ const StepItem = ({
   subtitle: React.ReactNode;
   title: string;
 }) => (
-  <$StepItem>
+  <div tw="mb-1 flex flex-row items-center gap-1">
     <$StepNumber>{step}</$StepNumber>
-    <$Column>
-      <$Title>{title}</$Title>
-      <$Subtitle>{subtitle}</$Subtitle>
-    </$Column>
-  </$StepItem>
+    <div tw="flex flex-col">
+      <span tw="text-text-2 font-medium-book">{title}</span>
+      <span tw="text-text-0">{subtitle}</span>
+    </div>
+  </div>
 );
 
 const NewMarket = () => {
@@ -104,7 +104,9 @@ const NewMarket = () => {
       <$Content>
         <div>
           <Button
-            slotLeft={<$Icon iconName={displaySteps ? IconName.Hide : IconName.HelpCircle} />}
+            slotLeft={
+              <Icon iconName={displaySteps ? IconName.Hide : IconName.HelpCircle} tw="mr-[0.5ch]" />
+            }
             onClick={() => setDisplaySteps(!displaySteps)}
           >
             {displaySteps
@@ -113,7 +115,9 @@ const NewMarket = () => {
           </Button>
           {displaySteps && (
             <>
-              <$StepsTitle>{stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}</$StepsTitle>
+              <h2 tw="m-1 text-text-2 font-large-medium tablet:mx-0 tablet:my-1">
+                {stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}
+              </h2>
               {steps.map((item) => (
                 <StepItem
                   key={item.step}
@@ -190,29 +194,6 @@ const $Content = styled.div`
     margin: 0 auto;
   }
 `;
-
-const $StepsTitle = styled.h2`
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-  margin: 1rem;
-
-  @media ${breakpoints.tablet} {
-    margin: 1rem 0;
-  }
-`;
-
-const $Icon = styled(Icon)`
-  margin-right: 0.5ch;
-`;
-
-const $StepItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
 const $StepNumber = styled.div`
   width: 2.5rem;
   height: 2.5rem;
@@ -225,21 +206,6 @@ const $StepNumber = styled.div`
   justify-content: center;
   color: var(--color-text-2);
 `;
-
-const $Column = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const $Title = styled.span`
-  color: var(--color-text-2);
-  font: var(--font-medium-book);
-`;
-
-const $Subtitle = styled.span`
-  color: var(--color-text-0);
-`;
-
 const $FormContainer = styled.div`
   min-width: 31.25rem;
   height: fit-content;

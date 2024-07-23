@@ -45,13 +45,13 @@ export const Collapsible = ({
   withTrigger = true,
 }: CollapsibleProps) => {
   const trigger = slotTrigger ? (
-    <$TriggerSlot>
+    <div tw="flex items-center gap-[0.5em]">
       {triggerIconSide === 'right' && label}
       <Trigger className={className} disabled={disabled} asChild>
         {slotTrigger}
       </Trigger>
       {triggerIconSide === 'left' && label}
-    </$TriggerSlot>
+    </div>
   ) : (
     <$Trigger className={className} disabled={disabled}>
       {triggerIconSide === 'right' && (
@@ -93,13 +93,6 @@ const $Trigger = styled(Trigger)`
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
 `;
-
-const $TriggerSlot = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-`;
-
 const $TriggerIcon = styled.span`
   width: var(--trigger-icon-width);
 

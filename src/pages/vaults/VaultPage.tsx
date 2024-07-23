@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -97,9 +98,9 @@ const VaultPage = () => {
         <$VaultDepositWithdrawFormColumn>
           <$YourVaultDetailsCards />
           <$DepositFormContainer>
-            <$PlaceholderBox>
+            <div tw="rounded-[0.7rem] bg-layer-3">
               <VaultDepositWithdrawForm />
-            </$PlaceholderBox>
+            </div>
           </$DepositFormContainer>
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
@@ -177,17 +178,7 @@ const $DepositFormContainer = styled.div`
 const $VaultDescription = styled(VaultDescription)`
   ${xPaddingWhenSmall}
 `;
-
-const $PlaceholderBox = styled.div`
-  border-radius: 0.7rem;
-  background-color: var(--color-layer-3);
-`;
-
-const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
-  display: flex;
-  min-height: 1px;
-  max-height: 1px;
-`;
+const $HorizontalSeparatorFiller = tw(HorizontalSeparatorFiller)`flex min-h-px max-h-px `;
 
 const $PnlRow = styled.div``;
 const $PnlChart = styled(VaultPnlChart)``;

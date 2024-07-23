@@ -1,5 +1,4 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { AbacusInputTypes, AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -285,11 +284,14 @@ export const PlaceOrderButtonAndReceipt = ({
     hasValidationErrors && (!currentStep || buttonStatesPerStep[currentStep].showValidatorError);
 
   const submitButton = (
-    <$Button
+    <Button
       state={buttonState}
       type={ButtonType.Submit}
       action={buttonAction}
-      slotLeft={showValidatorErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+      slotLeft={
+        showValidatorErrors ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+      }
+      tw="w-full"
     >
       {stringGetter({
         key: buttonTextStringKey,
@@ -299,7 +301,7 @@ export const PlaceOrderButtonAndReceipt = ({
           }),
         },
       })}
-    </$Button>
+    </Button>
   );
 
   return (
@@ -316,10 +318,3 @@ export const PlaceOrderButtonAndReceipt = ({
     </WithDetailsReceipt>
   );
 };
-const $Button = styled(Button)`
-  width: 100%;
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;

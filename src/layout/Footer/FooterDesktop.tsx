@@ -100,7 +100,12 @@ export const FooterDesktop = () => {
                   key: FooterItems.IndexerHeight.toString(),
                   label: 'Indexer Block Height',
                   value: (
-                    <$WarningOutput useGrouping type={OutputType.Number} value={indexerHeight} />
+                    <Output
+                      useGrouping
+                      type={OutputType.Number}
+                      value={indexerHeight}
+                      tw="text-warning"
+                    />
                   ),
                 }
               : undefined,
@@ -157,11 +162,6 @@ const $FooterButton = styled(Button)`
     cursor: default;
   }
 `;
-
-const $WarningOutput = styled(Output)`
-  color: var(--color-warning);
-`;
-
 const $Details = styled(Details)`
   ${layoutMixins.scrollArea}
   font: var(--font-tiny-book);

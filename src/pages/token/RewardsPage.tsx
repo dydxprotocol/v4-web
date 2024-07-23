@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 import { formatUnits } from 'viem';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -17,7 +18,6 @@ import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
@@ -84,14 +84,14 @@ const RewardsPage = () => {
     />
   );
   const legalDisclaimer = (
-    <$LegalDisclaimer>
+    <div tw="text-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
         params: {
           TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
         },
       })}
-    </$LegalDisclaimer>
+    </div>
   );
 
   useEffect(() => {
@@ -124,7 +124,7 @@ const RewardsPage = () => {
       ) : (
         <$DetachedSection>
           {showMigratePanel && <MigratePanel />}
-          <$DoubleColumnView>
+          <div tw="flex gap-1.5">
             <$LeftColumn>
               <TradingRewardsChartPanel />
               <LaunchIncentivesPanel />
@@ -140,7 +140,7 @@ const RewardsPage = () => {
               <RewardsHelpPanel />
               {legalDisclaimer}
             </$RightColumn>
-          </$DoubleColumnView>
+          </div>
         </$DetachedSection>
       )}
       ;
@@ -154,23 +154,7 @@ const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
 `;
 
-const $DetachedSection = styled(DetachedSection)`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem;
-  max-width: 80rem;
-
-  @media ${breakpoints.tablet} {
-    width: 100vw;
-  }
-`;
-
-const $DoubleColumnView = styled.div`
-  display: flex;
-  gap: 1.5rem;
-`;
-
+const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;
 const $LeftColumn = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
@@ -181,9 +165,4 @@ const $RightColumn = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
   flex: 1;
-`;
-
-const $LegalDisclaimer = styled.div`
-  font: var(--font-mini-book);
-  color: var(--color-text-0);
 `;

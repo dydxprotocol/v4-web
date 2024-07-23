@@ -1,13 +1,9 @@
-import styled from 'styled-components';
-
 import { Icon, IconName } from '@/components/Icon';
 
 export const GreenCheckCircle = ({ className }: { className?: string }) => (
-  <$Icon className={className} iconName={IconName.CheckCircle} />
+  <Icon
+    className={className}
+    iconName={IconName.CheckCircle}
+    tw="h-[var(--icon-size)] w-[var(--icon-size)] [--icon-size:1.25rem]"
+  />
 );
-const $Icon = styled(Icon)`
-  --icon-size: 1.25rem;
-
-  width: var(--icon-size);
-  height: var(--icon-size);
-`;

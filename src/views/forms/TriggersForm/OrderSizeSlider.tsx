@@ -52,7 +52,7 @@ export const OrderSizeSlider = ({
   };
 
   return (
-    <$SliderContainer className={className}>
+    <div className={className} tw="h-[1.375rem]">
       <$Slider
         label="PositionSize"
         min={0}
@@ -62,12 +62,9 @@ export const OrderSizeSlider = ({
         onValueCommit={onValueCommit}
         value={Math.min(currSize, maxSize)}
       />
-    </$SliderContainer>
+    </div>
   );
 };
-const $SliderContainer = styled.div`
-  height: 1.375rem;
-`;
 const $Slider = styled(Slider)`
   --slider-track-backgroundColor: var(--color-layer-4);
   --slider-track-background: linear-gradient(

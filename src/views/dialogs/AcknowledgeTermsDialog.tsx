@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction } from '@/constants/buttons';
 import { AcknowledgeTermsDialogProps, DialogProps } from '@/constants/dialogs';
@@ -93,6 +94,4 @@ const $Footer = styled.div`
   gap: 1rem;
 `;
 
-const $Button = styled(Button)`
-  flex-grow: 1;
-`;
+const $Button = tw(Button)`grow `;

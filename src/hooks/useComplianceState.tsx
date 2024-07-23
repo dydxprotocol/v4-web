@@ -1,5 +1,4 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
@@ -81,7 +80,7 @@ export const useComplianceState = () => {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
       params: {
-        TERMS_OF_USE_LINK: <$TermsOfUseLink isInline />,
+        TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
       },
     });
   }
@@ -93,7 +92,3 @@ export const useComplianceState = () => {
     complianceMessage,
   };
 };
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  text-decoration: underline;
-`;

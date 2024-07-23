@@ -61,7 +61,9 @@ export const StakingPanel = ({ className }: { className?: string }) => {
 
   const aprText = stringGetter({
     key: STRING_KEYS.EST_APR,
-    params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+    params: {
+      PERCENTAGE: <Output type={OutputType.Percent} value={stakingApr} tw="inline-block" />,
+    },
   });
 
   return (
@@ -126,7 +128,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.STAKED,
                 })}
               </WithTooltip>
-              {stakingApr && <$Tag sign={TagSign.Positive}>{aprText}</$Tag>}
+              {stakingApr && (
+                <Tag sign={TagSign.Positive} tw="inline-block">
+                  {aprText}
+                </Tag>
+              )}
             </$Label>
             <$BalanceOutput
               type={OutputType.Asset}
@@ -196,15 +202,6 @@ const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
 `;
-
-const $Tag = styled(Tag)`
-  display: inline-block;
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;
-
 const $TotalBalance = styled(Details)`
   div {
     --scrollArea-height: auto;

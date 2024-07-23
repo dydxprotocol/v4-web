@@ -41,7 +41,7 @@ export const Panel = ({
           {slotHeader ?? (
             <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
               {slotHeaderContent}
-              <$Icon iconName={IconName.ChevronRight} />
+              <Icon iconName={IconName.ChevronRight} tw="text-[0.625rem] text-text-0" />
             </$Header>
           )}
         </Link>
@@ -106,12 +106,6 @@ const $Header = styled.header<{ hasSeparator?: boolean }>`
       box-shadow: 0 var(--border-width) var(--border-color);
     `}
 `;
-
-const $Icon = styled(Icon)`
-  color: var(--color-text-0);
-  font-size: 0.625rem;
-`;
-
 const $Content = styled.div`
   ${layoutMixins.scrollArea}
   ${layoutMixins.stickyArea0}

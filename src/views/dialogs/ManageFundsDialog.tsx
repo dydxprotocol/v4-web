@@ -49,7 +49,7 @@ export const ManageFundsDialog = ({
   };
 
   return (
-    <$Dialog
+    <Dialog
       isOpen
       setIsOpen={setIsOpen}
       placement={DialogPlacement.FullScreen}
@@ -67,15 +67,12 @@ export const ManageFundsDialog = ({
         />
       }
       hasHeaderBorder
+      tw="[--dialog-content-paddingTop:1.5rem]"
     >
       {transferTypeConfig[currentType].component}
-    </$Dialog>
+    </Dialog>
   );
 };
-const $Dialog = styled(Dialog)`
-  --dialog-content-paddingTop: 1.5rem;
-`;
-
 const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
 

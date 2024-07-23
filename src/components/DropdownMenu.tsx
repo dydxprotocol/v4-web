@@ -84,7 +84,7 @@ export const DropdownMenu = forwardRefFn(
                   {item.icon}
                   {item.label}
                 </$Item>
-                {item.separator && <$Separator />}
+                {item.separator && <Separator tw="mx-1 my-0.25 border-b-[solid] border-b-border" />}
               </Fragment>
             ))}
             {slotBottomContent}
@@ -94,12 +94,6 @@ export const DropdownMenu = forwardRefFn(
     );
   }
 );
-
-const $Separator = styled(Separator)`
-  border-bottom: solid var(--border-width) var(--color-border);
-  margin: 0.25rem 1rem;
-`;
-
 const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }>`
   ${popoverMixins.item}
   --item-font-size: var(--dropdownMenu-item-font-size);

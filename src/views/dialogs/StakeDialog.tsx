@@ -59,12 +59,16 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
         <$Title>
           {dialogProps[currentStep].title}
           {stakingApr && (
-            <$Tag sign={TagSign.Positive}>
+            <Tag sign={TagSign.Positive} tw="inline-block">
               {stringGetter({
                 key: STRING_KEYS.EST_APR,
-                params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+                params: {
+                  PERCENTAGE: (
+                    <Output type={OutputType.Percent} value={stakingApr} tw="inline-block" />
+                  ),
+                },
               })}
-            </$Tag>
+            </Tag>
           )}
         </$Title>
       }
@@ -83,7 +87,7 @@ const LegalDisclaimer = () => {
   const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
 
   return (
-    <$LegalDisclaimer>
+    <div tw="text-center text-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
         params: {
@@ -99,7 +103,7 @@ const LegalDisclaimer = () => {
           ),
         },
       })}
-    </$LegalDisclaimer>
+    </div>
   );
 };
 
@@ -110,18 +114,4 @@ const $Dialog = styled(Dialog)`
 
 const $Title = styled.span`
   ${layoutMixins.inlineRow}
-`;
-
-const $Tag = styled(Tag)`
-  display: inline-block;
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;
-
-const $LegalDisclaimer = styled.div`
-  text-align: center;
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
 `;

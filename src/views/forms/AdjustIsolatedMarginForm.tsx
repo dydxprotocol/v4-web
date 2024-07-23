@@ -365,7 +365,7 @@ export const AdjustIsolatedMarginForm = ({
   ) : (
     <$GradientCard fromColor="neutral" toColor={gradientToColor}>
       <$Column>
-        <$TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</$TertiarySpan>
+        <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
       </$Column>
       <div>
@@ -444,7 +444,9 @@ export const AdjustIsolatedMarginForm = ({
                 ? ButtonState.Disabled
                 : ButtonState.Default
           }
-          slotLeft={ctaErrorAction ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+          slotLeft={
+            ctaErrorAction ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+          }
         >
           {ctaErrorAction ?? formConfig.buttonLabel}
         </Button>
@@ -474,11 +476,4 @@ const $GradientCard = styled(GradientCard)`
 const $Column = styled.div`
   ${layoutMixins.column}
   font: var(--font-small-medium);
-`;
-const $TertiarySpan = styled.span`
-  color: var(--color-text-0);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
 `;

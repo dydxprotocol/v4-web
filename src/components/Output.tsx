@@ -445,10 +445,10 @@ export const Output = ({
           withBaseFont={withBaseFont}
         >
           {slotLeft}
-          {sign && <$Sign>{sign}</$Sign>}
+          {sign && <span tw="text-[color:var(--output-sign-color)]">{sign}</span>}
           {hasValue && renderedNumber}
           {slotRight}
-          {tag && <$Tag>{tag}</$Tag>}
+          {tag && <Tag tw="ml-[0.5ch]">{tag}</Tag>}
         </$Number>
       );
     }
@@ -489,15 +489,6 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
       --output-afterString: ')';
     `}
 `;
-
-const $Tag = styled(Tag)`
-  margin-left: 0.5ch;
-`;
-
-const $Sign = styled.span`
-  color: var(--output-sign-color);
-`;
-
 const $Number = styled($Text)<{ withBaseFont?: boolean }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&

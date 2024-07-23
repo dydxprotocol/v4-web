@@ -34,7 +34,14 @@ export const RadioButtonCards = <MenuItemValue extends string>({
         <$RadioButtonCard key={item.value} value={item.value} disabled={item.disabled}>
           <$CardHeader>
             {item.label}
-            {value === item.value ? <$CheckIcon iconName={IconName.Check} /> : <$EmptyIcon />}
+            {value === item.value ? (
+              <Icon
+                iconName={IconName.Check}
+                tw="h-1 w-1 rounded-[50%] bg-accent p-0.25 text-text-1"
+              />
+            ) : (
+              <$EmptyIcon />
+            )}
           </$CardHeader>
           {item.body}
         </$RadioButtonCard>
@@ -89,18 +96,6 @@ const $CardHeader = styled.div`
   justify-content: space-between;
   gap: 1rem;
 `;
-
-const $CheckIcon = styled(Icon)`
-  width: 1rem;
-  height: 1rem;
-  padding: 0.25rem;
-
-  border-radius: 50%;
-
-  color: var(--color-text-1);
-  background-color: var(--color-accent);
-`;
-
 const $EmptyIcon = styled.div`
   width: 1rem;
   height: 1rem;

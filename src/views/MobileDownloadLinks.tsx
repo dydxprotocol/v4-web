@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -37,7 +38,7 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
 
   return (
     <>
-      <$DownloadLinks>
+      <div tw="flex flex-row items-center gap-0.5">
         <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
         {googlePlayStoreUrl && (
           <$AppLink
@@ -55,7 +56,7 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
             iconName={IconName.Apple}
           />
         )}
-      </$DownloadLinks>
+      </div>
 
       <VerticalSeparator />
     </>
@@ -77,19 +78,7 @@ const $DownloadLinksInDropdown = styled.div`
     width: 7.5rem;
   }
 `;
-
-const $DownloadLinks = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const $Download = styled.span`
-  grid-area: label;
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-`;
+const $Download = tw.span`text-text-0 font-small-medium [grid-area:label]`;
 
 const $AppLink = styled(IconButton)`
   --button-icon-size: 1rem;

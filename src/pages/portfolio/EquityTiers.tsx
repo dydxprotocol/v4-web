@@ -1,5 +1,6 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { EquityTier } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -71,7 +72,7 @@ export const EquityTiers = () => {
 
                     {requiredTotalNetCollateralUSD > 0 &&
                       nextLevelRequiredTotalNetCollateralUSD && (
-                        <$AndText>{stringGetter({ key: STRING_KEYS.AND })}</$AndText>
+                        <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.AND })}</span>
                       )}
 
                     {nextLevelRequiredTotalNetCollateralUSD && (
@@ -128,18 +129,11 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $HighlightOutput = styled(Output)`
-  color: var(--color-text-1);
-`;
+const $HighlightOutput = tw(Output)`text-text-1 `;
 
 const $NetCollateralValue = styled.span`
   ${layoutMixins.inlineRow}
 `;
-
-const $AndText = styled.span`
-  color: var(--color-text-0);
-`;
-
 const $Description = styled.div`
   color: var(--color-text-0);
   padding: 0 1rem;

@@ -61,10 +61,10 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <$OrderStatus>
+        <$Label tw="text-text-0 font-small-book">
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
-          <$OrderStatusIcon status={orderStatus} />
-        </$OrderStatus>
+          <OrderStatusIcon status={orderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
+        </$Label>
       }
       slotCustomContent={
         <FillDetails
@@ -82,14 +82,4 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
 const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
-`;
-
-const $OrderStatus = styled($Label)`
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-`;
-
-const $OrderStatusIcon = styled(OrderStatusIcon)`
-  width: 0.9375rem;
-  height: 0.9375rem;
 `;

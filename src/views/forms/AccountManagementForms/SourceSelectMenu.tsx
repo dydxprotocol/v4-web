@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TransferType } from '@/constants/abacus';
 import { cctpTokensByChainId, getMapOfLowestFeeTokensByChainId } from '@/constants/cctp';
@@ -142,11 +143,7 @@ export const SourceSelectMenu = ({
   );
 };
 
-const $Img = styled.img`
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-`;
+const $Img = tw.img`h-1.25 w-1.25 rounded-[50%]`;
 
 const $ChainRow = styled.div`
   ${layoutMixins.row}

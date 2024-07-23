@@ -28,11 +28,12 @@ export const AdjustIsolatedMarginDialog = ({
   const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
 
   return (
-    <$Dialog
+    <Dialog
       isOpen
       setIsOpen={setIsOpen}
       slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
+      tw="[--dialog-width:25rem]"
     >
       <$Content>
         <AdjustIsolatedMarginForm
@@ -40,13 +41,9 @@ export const AdjustIsolatedMarginDialog = ({
           onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
         />
       </$Content>
-    </$Dialog>
+    </Dialog>
   );
 };
-
-const $Dialog = styled(Dialog)`
-  --dialog-width: 25rem;
-`;
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;

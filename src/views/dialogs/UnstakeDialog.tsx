@@ -46,8 +46,9 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
                 key: STRING_KEYS.CURRENTLY_STAKING_WITH,
                 params: {
                   VALIDATOR: (
-                    <$ValidatorName
+                    <ValidatorName
                       validator={stakingValidators?.[currentDelegations[0].validator]?.[0]}
+                      tw="inline-flex"
                     />
                   ),
                 },
@@ -74,22 +75,18 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
   };
 
   return (
-    <$Dialog
+    <Dialog
       isOpen
       setIsOpen={setIsOpen}
       slotIcon={dialogProps[currentStep].slotIcon}
       title={dialogProps[currentStep].title}
       description={dialogProps[currentStep].description}
+      tw="[--dialog-content-paddingTop:var(--default-border-width)]"
     >
       <UnstakeForm currentStep={currentStep} setCurrentStep={setCurrentStep} onDone={closeDialog} />
-    </$Dialog>
+    </Dialog>
   );
 };
-
-const $Dialog = styled(Dialog)`
-  --dialog-content-paddingTop: var(--default-border-width);
-`;
-
 const $Description = styled.div`
   ${layoutMixins.inlineRow}
 `;
@@ -97,8 +94,4 @@ const $Description = styled.div`
 const $StakedAmount = styled.span`
   ${layoutMixins.inlineRow}
   color: var(--color-text-1);
-`;
-
-const $ValidatorName = styled(ValidatorName)`
-  display: inline-flex;
 `;
