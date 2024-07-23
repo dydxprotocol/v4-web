@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
+import { sleep } from '@/lib/timeUtils';
 
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
@@ -38,12 +39,6 @@ export const AccountsProvider = ({ ...props }) => (
 );
 
 export const useAccounts = () => useContext(AccountsContext)!;
-
-async function sleep(ms = 1000) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(null), ms);
-  });
-}
 
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();

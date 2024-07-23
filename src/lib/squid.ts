@@ -20,6 +20,7 @@ import {
 
 import abacusStateManager from './abacus';
 import { isTruthy } from './isTruthy';
+import { sleep } from './timeUtils';
 
 export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
@@ -91,6 +92,21 @@ export const trackSkipTx = async ({
     }),
   });
   return response.json();
+};
+
+const MAX_TRACK_TX_ATTEMPTS = 5;
+const TRACK_TX_INTERVAL = 1000;
+
+export const trackSkipTxWithTenacity = async ({
+  attemptNumber = 1,
+  ...skipParams
+}: SkipStatusParams & { attemptNumber?: number }) => {
+  if (attemptNumber === MAX_TRACK_TX_ATTEMPTS) return;
+  const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
+  if (!trackedTxHash) {
+    sleep(TRACK_TX_INTERVAL);
+    trackSkipTxWithTenacity({ ...skipParams, attemptNumber: attemptNumber + 1 });
+  }
 };
 
 export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: SkipStatusParams) => {

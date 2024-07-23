@@ -84,3 +84,9 @@ export const formatSeconds = (seconds: number) => {
   const remainingSeconds = seconds % 60;
   return `${getTimeString(minutes)}:${getTimeString(remainingSeconds)}`;
 };
+
+export async function sleep(ms = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(null), ms);
+  });
+}
