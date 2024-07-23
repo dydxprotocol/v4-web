@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -100,237 +100,274 @@ export const useDrawOrderbook = ({
     window.addEventListener('resize', scaleCanvas);
 
     return () => window.removeEventListener('resize', scaleCanvas);
-  }, [canvas]);
+  }, [canvas, canvas?.offsetHeight, canvas?.height, canvas?.offsetWidth, canvas?.width]);
 
-  const drawBars = ({
-    barType,
-    ctx,
-    depthOrSizeValue,
-    gradientMultiplier,
-    histogramAccentColor,
-    histogramSide: inHistogramSide,
-    rekt,
-  }: {
-    barType: 'depth' | 'size';
-    ctx: CanvasRenderingContext2D;
-    depthOrSizeValue: number;
-    gradientMultiplier: number;
-    histogramAccentColor: string;
-    histogramSide: 'left' | 'right';
-    rekt: Rekt;
-  }) => {
-    const { x1, x2, y1, y2 } = rekt;
-
-    // X values
-    const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
-    const barWidth = depthOrSizeValue
-      ? Math.min((depthOrSizeValue / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
-      : 0;
-
-    const { gradient, bar } = getHistogramXValues({
-      barWidth,
-      canvasWidth,
+  const drawBars = useCallback(
+    ({
+      barType,
+      ctx,
+      depthOrSizeValue,
       gradientMultiplier,
+      histogramAccentColor,
       histogramSide: inHistogramSide,
-    });
+      rekt,
+    }: {
+      barType: 'depth' | 'size';
+      ctx: CanvasRenderingContext2D;
+      depthOrSizeValue: number;
+      gradientMultiplier: number;
+      histogramAccentColor: string;
+      histogramSide: 'left' | 'right';
+      rekt: Rekt;
+    }) => {
+      const { x1, x2, y1, y2 } = rekt;
 
-    // Gradient
-    let linearGradient;
+      // X values
+      const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
+      const barWidth = depthOrSizeValue
+        ? Math.min((depthOrSizeValue / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
+        : 0;
 
-    try {
-      linearGradient = ctx.createLinearGradient(gradient.x1, y1, gradient.x2, y2);
-      linearGradient.addColorStop(0, histogramAccentColor);
-      linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = linearGradient;
-    } catch (err) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-    }
+      const { gradient, bar } = getHistogramXValues({
+        barWidth,
+        canvasWidth,
+        gradientMultiplier,
+        histogramSide: inHistogramSide,
+      });
 
-    ctx.beginPath();
+      // Gradient
+      let linearGradient;
 
-    // Bar
-    const { bar: y } = getYForElements({ y: y1, rowHeight });
+      try {
+        linearGradient = ctx.createLinearGradient(gradient.x1, y1, gradient.x2, y2);
+        linearGradient.addColorStop(0, histogramAccentColor);
+        linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = linearGradient;
+      } catch (err) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+      }
 
-    if (ctx.roundRect) {
-      ctx.roundRect(
-        bar.x1,
-        y,
-        bar.x2,
-        rowHeight - 2,
-        inHistogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
-      );
-    } else {
-      ctx.rect(bar.x1, y, bar.x2, rowHeight - 2);
-    }
+      ctx.beginPath();
 
-    ctx.fill();
-  };
+      // Bar
+      const { bar: y } = getYForElements({ y: y1, rowHeight });
 
-  const drawMineCircle = ({ ctx, rekt }: { ctx: CanvasRenderingContext2D; rekt: Rekt }) => {
-    const padding = 15;
-    ctx.beginPath();
-    ctx.arc(rekt.x1 + padding, (rekt.y1 + rekt.y2) / 2, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = theme.accent;
-    ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = generateFadedColorVariant(theme.accent, '73');
-    ctx.stroke();
-  };
+      if (ctx.roundRect) {
+        ctx.roundRect(
+          bar.x1,
+          y,
+          bar.x2,
+          rowHeight - 2,
+          inHistogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
+        );
+      } else {
+        ctx.rect(bar.x1, y, bar.x2, rowHeight - 2);
+      }
 
-  const drawText = ({
-    animationType = OrderbookRowAnimationType.NONE,
-    ctx,
-    depth,
-    depthCost,
-    price,
-    size,
-    sizeCost,
-    rekt,
-  }: {
-    animationType?: OrderbookRowAnimationType;
-    ctx: CanvasRenderingContext2D;
-    depth?: number;
-    depthCost?: number;
-    price?: number;
-    size?: number;
-    sizeCost?: number;
-    rekt: Rekt;
-  }) => {
-    const { y1 } = rekt;
-    const { text: y } = getYForElements({ y: y1, rowHeight });
+      ctx.fill();
+    },
+    [canvasWidth, histogramRange, rowHeight]
+  );
 
-    const textColor = theme.textPrimary;
-    const updatedTextColor =
-      animationType === OrderbookRowAnimationType.REMOVE
-        ? side === 'bid'
-          ? theme.positive
-          : theme.negative
-        : undefined;
+  const drawMineCircle = useCallback(
+    ({ ctx, rekt }: { ctx: CanvasRenderingContext2D; rekt: Rekt }) => {
+      const padding = 15;
+      ctx.beginPath();
+      ctx.arc(rekt.x1 + padding, (rekt.y1 + rekt.y2) / 2, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = theme.accent;
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = generateFadedColorVariant(theme.accent, '73');
+      ctx.stroke();
+    },
+    [theme.accent]
+  );
 
-    // Price text
-    if (price != null) {
-      ctx.fillStyle = textColor;
-      ctx.fillText(
-        formatNumberOutput(price, OutputType.Number, {
+  const drawText = useCallback(
+    ({
+      animationType = OrderbookRowAnimationType.NONE,
+      ctx,
+      depth,
+      depthCost,
+      price,
+      size,
+      sizeCost,
+      rekt,
+    }: {
+      animationType?: OrderbookRowAnimationType;
+      ctx: CanvasRenderingContext2D;
+      depth?: number;
+      depthCost?: number;
+      price?: number;
+      size?: number;
+      sizeCost?: number;
+      rekt: Rekt;
+    }) => {
+      const { y1 } = rekt;
+      const { text: y } = getYForElements({ y: y1, rowHeight });
+
+      const textColor = theme.textPrimary;
+      const updatedTextColor =
+        animationType === OrderbookRowAnimationType.REMOVE
+          ? side === 'bid'
+            ? theme.positive
+            : theme.negative
+          : undefined;
+
+      // Price text
+      if (price != null) {
+        ctx.fillStyle = textColor;
+        ctx.fillText(
+          formatNumberOutput(price, OutputType.Number, {
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
+            fractionDigits: tickSizeDecimals,
+          }),
+          getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
+          y
+        );
+      }
+
+      const getSizeInFiatString = (sizeToRender: number) =>
+        formatNumberOutput(sizeToRender, OutputType.Number, {
           decimalSeparator,
           groupSeparator,
           selectedLocale,
-          fractionDigits: tickSizeDecimals,
-        }),
-        getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
-        y
-      );
-    }
+          fractionDigits: 0,
+        });
 
-    const getSizeInFiatString = (sizeToRender: number) =>
-      formatNumberOutput(sizeToRender, OutputType.Number, {
-        decimalSeparator,
-        groupSeparator,
-        selectedLocale,
-        fractionDigits: 0,
+      // Size text
+      const displaySize = displayUnit === 'asset' ? size : sizeCost;
+      if (displaySize != null) {
+        ctx.fillStyle = updatedTextColor ?? textColor;
+        ctx.fillText(
+          displayUnit === 'asset'
+            ? getConsistentAssetSizeString(displaySize, {
+                decimalSeparator,
+                groupSeparator,
+                selectedLocale,
+                stepSize,
+                stepSizeDecimals,
+              })
+            : getSizeInFiatString(displaySize),
+          getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
+          y
+        );
+      }
+
+      // Depth text
+      const displayDepth = displayUnit === 'asset' ? depth : depthCost;
+      if (displayDepth != null) {
+        ctx.fillStyle = textColor;
+        ctx.fillText(
+          displayUnit === 'asset'
+            ? getConsistentAssetSizeString(displayDepth, {
+                decimalSeparator,
+                groupSeparator,
+                selectedLocale,
+                stepSize,
+                stepSizeDecimals,
+              })
+            : getSizeInFiatString(displayDepth),
+          getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
+          y
+        );
+      }
+    },
+    [
+      canvasWidth,
+      decimalSeparator,
+      displayUnit,
+      groupSeparator,
+      rowHeight,
+      selectedLocale,
+      side,
+      stepSize,
+      stepSizeDecimals,
+      theme.negative,
+      theme.positive,
+      theme.textPrimary,
+      tickSizeDecimals,
+    ]
+  );
+
+  const drawOrderbookRow = useCallback(
+    ({
+      ctx,
+      idx,
+      rowToRender,
+      animationType = OrderbookRowAnimationType.NONE,
+    }: {
+      ctx: CanvasRenderingContext2D;
+      idx: number;
+      rowToRender?: PerpetualMarketOrderbookLevel;
+      animationType?: OrderbookRowAnimationType;
+    }) => {
+      if (!rowToRender) return;
+      const { depth, mine, price, size, depthCost, sizeCost } = rowToRender;
+      const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
+      const rekt = getRektFromIdx({
+        idx,
+        rowHeight,
+        canvasWidth,
+        canvasHeight,
+        side,
       });
 
-    // Size text
-    const displaySize = displayUnit === 'asset' ? size : sizeCost;
-    if (displaySize != null) {
-      ctx.fillStyle = updatedTextColor ?? textColor;
-      ctx.fillText(
-        displayUnit === 'asset'
-          ? getConsistentAssetSizeString(displaySize, {
-              decimalSeparator,
-              groupSeparator,
-              selectedLocale,
-              stepSize,
-              stepSizeDecimals,
-            })
-          : getSizeInFiatString(displaySize),
-        getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
-        y
-      );
-    }
+      // Depth Bar
+      if (depth) {
+        drawBars({
+          barType: 'depth',
+          ctx,
+          depthOrSizeValue: depth,
+          gradientMultiplier: 1.3,
+          histogramAccentColor,
+          histogramSide,
+          rekt,
+        });
+      }
 
-    // Depth text
-    const displayDepth = displayUnit === 'asset' ? depth : depthCost;
-    if (displayDepth != null) {
-      ctx.fillStyle = textColor;
-      ctx.fillText(
-        displayUnit === 'asset'
-          ? getConsistentAssetSizeString(displayDepth, {
-              decimalSeparator,
-              groupSeparator,
-              selectedLocale,
-              stepSize,
-              stepSizeDecimals,
-            })
-          : getSizeInFiatString(displayDepth),
-        getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
-        y
-      );
-    }
-  };
-
-  const drawOrderbookRow = ({
-    ctx,
-    idx,
-    rowToRender,
-    animationType = OrderbookRowAnimationType.NONE,
-  }: {
-    ctx: CanvasRenderingContext2D;
-    idx: number;
-    rowToRender?: PerpetualMarketOrderbookLevel;
-    animationType?: OrderbookRowAnimationType;
-  }) => {
-    if (!rowToRender) return;
-    const { depth, mine, price, size, depthCost, sizeCost } = rowToRender;
-    const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
-    const rekt = getRektFromIdx({
-      idx,
-      rowHeight,
-      canvasWidth,
-      canvasHeight,
-      side,
-    });
-
-    // Depth Bar
-    if (depth) {
+      // Size Bar
       drawBars({
-        barType: 'depth',
+        barType: 'size',
         ctx,
-        depthOrSizeValue: depth,
-        gradientMultiplier: 1.3,
+        depthOrSizeValue: size,
+        gradientMultiplier: 5,
         histogramAccentColor,
         histogramSide,
         rekt,
       });
-    }
 
-    // Size Bar
-    drawBars({
-      barType: 'size',
-      ctx,
-      depthOrSizeValue: size,
-      gradientMultiplier: 5,
-      histogramAccentColor,
+      if (mine && mine > 0) {
+        drawMineCircle({ ctx, rekt });
+      }
+
+      // Size, Price, Mine
+      drawText({
+        animationType,
+        ctx,
+        depth: depth ?? undefined,
+        depthCost,
+        sizeCost,
+        price,
+        size,
+        rekt,
+      });
+    },
+    [
+      canvasHeight,
+      canvasWidth,
+      rowHeight,
+      drawText,
+      side,
+      theme.negativeFaded,
+      theme.positiveFaded,
+      drawBars,
+      drawMineCircle,
       histogramSide,
-      rekt,
-    });
-
-    if (mine && mine > 0) {
-      drawMineCircle({ ctx, rekt });
-    }
-
-    // Size, Price, Mine
-    drawText({
-      animationType,
-      ctx,
-      depth: depth ?? undefined,
-      depthCost,
-      sizeCost,
-      price,
-      size,
-      rekt,
-    });
-  };
+    ]
+  );
 
   // Update histograms and row contents on data change
   useEffect(() => {
@@ -375,6 +412,7 @@ export const useDrawOrderbook = ({
     currentOrderbookMap,
     displayUnit,
     canvas,
+    drawOrderbookRow,
   ]);
 
   return { canvasRef };

@@ -207,7 +207,6 @@ export const TradeForm = ({
             fallback: errorParams.errorMessage ?? '',
           })
         );
-        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
@@ -240,7 +239,7 @@ export const TradeForm = ({
 
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
-      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
+      {isTablet && showOrderbook && <$Orderbook rowsPerSide={5} hideHeader />}
       <$InputsColumn>
         <TradeFormInputs />
         <TradeSizeInputs />
@@ -330,7 +329,7 @@ const $TradeForm = styled.form`
 
   /* Rules */
   --orderbox-column-width: 180px;
-  --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
+  --orderbox-gap: 1rem;
 
   min-height: 100%;
   isolation: isolate;
@@ -370,7 +369,7 @@ const $TopActionsRow = styled.div`
 
   @media ${breakpoints.tablet} {
     grid-auto-columns: var(--orderbox-column-width) 1fr;
-    gap: var(--form-input-gap);
+    gap: var(--orderbox-gap);
   }
 `;
 const $OrderbookButtons = styled.div`
@@ -415,9 +414,8 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
     ${({ showOrderbook }) =>
       showOrderbook
         ? css`
-            grid-auto-columns: var(--orderbook-width) 1fr;
-            gap: var(--form-input-gap);
-            margin-left: calc(-1 * var(--tradeBox-content-paddingLeft));
+            grid-auto-columns: var(--orderbox-column-width) 1fr;
+            gap: var(--orderbox-gap);
           `
         : css`
             grid-auto-columns: 1fr;
@@ -426,8 +424,6 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
   }
 `;
 const $Orderbook = styled(CanvasOrderbook)`
-  width: 100%;
-
   @media ${breakpoints.notTablet} {
     display: none;
   }

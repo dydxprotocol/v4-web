@@ -14,7 +14,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
-export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
+export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number }) => {
   const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice = orEmptyRecord(
@@ -37,7 +37,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             row
           )
       )
-      .slice(0, maxRowsPerSide);
+      .slice(0, rowsPerSide);
 
     const bids: Array<PerpetualMarketOrderbookLevel | undefined> = (
       orderbook?.bids?.toArray() ?? []
@@ -54,7 +54,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             row
           )
       )
-      .slice(0, maxRowsPerSide);
+      .slice(0, rowsPerSide);
 
     const spread = orderbook?.spread;
     const spreadPercent = orderbook?.spreadPercent;
@@ -73,7 +73,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       hasOrderbook: !!orderbook,
       currentGrouping: orderbook?.grouping,
     };
-  }, [maxRowsPerSide, orderbook, subaccountOrderSizeBySideAndPrice]);
+  }, [rowsPerSide, orderbook, subaccountOrderSizeBySideAndPrice]);
 };
 
 export const useOrderbookValuesForDepthChart = () => {

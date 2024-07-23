@@ -33,7 +33,7 @@ import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
-  maxRowsPerSide?: number;
+  rowsPerSide?: number;
   layout?: 'vertical' | 'horizontal';
 };
 
@@ -48,13 +48,13 @@ export const CanvasOrderbook = forwardRef(
       histogramSide = 'right',
       hideHeader = false,
       layout = 'vertical',
-      maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
+      rowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
     const { asks, bids, hasOrderbook, histogramRange, currentGrouping } = useCalculateOrderbookData(
       {
-        maxRowsPerSide,
+        rowsPerSide,
       }
     );
 
@@ -66,12 +66,12 @@ export const CanvasOrderbook = forwardRef(
     const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
     /**
-     * Slice asks and bids to maxRowsPerSide using empty rows
+     * Slice asks and bids to rowsPerSide using empty rows
      */
     const { asksSlice, bidsSlice } = useMemo(() => {
       const emptyAskRows =
-        asks.length < maxRowsPerSide
-          ? new Array<undefined>(maxRowsPerSide - asks.length).fill(undefined)
+        asks.length < rowsPerSide
+          ? new Array<undefined>(rowsPerSide - asks.length).fill(undefined)
           : [];
 
       const newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
@@ -80,8 +80,8 @@ export const CanvasOrderbook = forwardRef(
       ];
 
       const emptyBidRows =
-        bids.length < maxRowsPerSide
-          ? new Array<undefined>(maxRowsPerSide - bids.length).fill(undefined)
+        bids.length < rowsPerSide
+          ? new Array<undefined>(rowsPerSide - bids.length).fill(undefined)
           : [];
       const newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
         ...bids,
@@ -92,7 +92,7 @@ export const CanvasOrderbook = forwardRef(
         asksSlice: layout === 'horizontal' ? newAsksSlice : newAsksSlice.reverse(),
         bidsSlice: newBidsSlice,
       };
-    }, [asks, bids, layout, maxRowsPerSide]);
+    }, [asks, bids, layout, rowsPerSide]);
 
     const orderbookRef = useRef<HTMLDivElement>(null);
     useCenterOrderbook({
@@ -151,7 +151,7 @@ export const CanvasOrderbook = forwardRef(
     const usdTag = <Tag>USD</Tag>;
     const assetTag = id ? <Tag>{id}</Tag> : undefined;
     const asksOrderbook = (
-      <$OrderbookSideContainer $side="asks" $rows={maxRowsPerSide}>
+      <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
           {[...asksSlice].reverse().map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
             row ? (
@@ -173,7 +173,7 @@ export const CanvasOrderbook = forwardRef(
       </$OrderbookSideContainer>
     );
     const bidsOrderbook = (
-      <$OrderbookSideContainer $side="bids" $rows={maxRowsPerSide}>
+      <$OrderbookSideContainer $side="bids" $rows={rowsPerSide}>
         <$HoverRows>
           {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
             row ? (
