@@ -28,6 +28,8 @@ import { getFeeTiers } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+const MARKET_SHARE_PERCENTAGE_FRACTION_DIGITS = 1;
+
 const EQUALITY_SYMBOL_MAP = {
   '>=': '≥',
   '<=': '≤',
@@ -62,7 +64,11 @@ export const Fees = () => {
               {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
               {stringGetter({ key: STRING_KEYS.EXCHANGE_MARKET_SHARE })}{' '}
               <$Highlighted>{'>'}</$Highlighted>{' '}
-              <$HighlightOutput type={OutputType.Percent} value={totalShare} fractionDigits={0} />
+              <$HighlightOutput
+                type={OutputType.Percent}
+                value={totalShare}
+                fractionDigits={MARKET_SHARE_PERCENTAGE_FRACTION_DIGITS}
+              />
             </$AdditionalConditionsText>
           )}
           {!!makerShare && (
@@ -70,7 +76,11 @@ export const Fees = () => {
               {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
               {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
               <$Highlighted>{'>'}</$Highlighted>{' '}
-              <$HighlightOutput type={OutputType.Percent} value={makerShare} fractionDigits={0} />
+              <$HighlightOutput
+                type={OutputType.Percent}
+                value={makerShare}
+                fractionDigits={MARKET_SHARE_PERCENTAGE_FRACTION_DIGITS}
+              />
             </$AdditionalConditionsText>
           )}
         </$AdditionalConditions>

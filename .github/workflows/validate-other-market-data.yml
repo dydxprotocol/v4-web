@@ -62,4 +62,4 @@ jobs:
           path: 'v4-web-main-other-market-validation'
 
       - name: Validate other market data
-        run: pnpx tsx scripts/validate-other-market-data.ts
+        run: pnpx tsx scripts/markets/validate-other-market-data.ts
