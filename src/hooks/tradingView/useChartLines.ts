@@ -28,14 +28,15 @@ import { useStringGetter } from '../useStringGetter';
 
 export const useChartLines = ({
   tvWidget,
-  displayButton,
+  orderLineToggle,
   isChartReady,
 }: {
   tvWidget: TvWidget | null;
-  displayButton: HTMLElement | null;
+  orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
+
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
@@ -256,22 +257,22 @@ export const useChartLines = ({
   // Effects
 
   useEffect(() => {
-    // Initialize onClick for chart line toggle
-    if (isChartReady && displayButton) {
-      displayButton.onclick = () => setShowOrderLines((prev) => !prev);
+    // Initialize onClick for order line toggle
+    if (isChartReady && orderLineToggle) {
+      orderLineToggle.onclick = () => setShowOrderLines((prev) => !prev);
     }
-  }, [isChartReady, displayButton]);
+  }, [isChartReady, orderLineToggle]);
 
   useEffect(
     // Update display button on toggle
     () => {
       if (showOrderLines) {
-        displayButton?.classList?.add('order-lines-active');
+        orderLineToggle?.classList?.add('order-lines-active');
       } else {
-        displayButton?.classList?.remove('order-lines-active');
+        orderLineToggle?.classList?.remove('order-lines-active');
       }
     },
-    [showOrderLines, displayButton?.classList]
+    [showOrderLines, orderLineToggle?.classList]
   );
 
   useEffect(

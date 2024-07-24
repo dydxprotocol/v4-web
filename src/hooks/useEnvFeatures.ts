@@ -11,6 +11,7 @@ export interface EnvironmentFeatures {
   CCTPDepositOnly: boolean;
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
+  isOhlcEnabled: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {
