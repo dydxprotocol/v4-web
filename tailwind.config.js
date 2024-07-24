@@ -189,7 +189,7 @@ export default {
         },
         '.stack ': {
           display: 'grid',
-          gridTemplateAreas: 'stack',
+          gridTemplateAreas: `'stack'`,
           '> *, &:before, &:after': {
             gridArea: 'stack',
           },
