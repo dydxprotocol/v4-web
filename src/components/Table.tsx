@@ -674,6 +674,7 @@ const $TableWrapper = styled.div<{
   --tableStickyRow-textColor: var(--color-text-0, inherit);
   --tableStickyRow-backgroundColor: inherit;
   --table-header-height: 2rem;
+  --table-footer-height: 2.75rem;
 
   --tableRow-hover-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: ;
@@ -729,7 +730,7 @@ const $Table = styled.table<StyledTableStyleProps>`
   ${layoutMixins.stickyArea1}
   --stickyArea1-background: var(--color-layer-2);
   --stickyArea1-topHeight: var(--table-header-height);
-  --stickyArea1-bottomHeight: var(--table-header-height);
+  --stickyArea1-bottomHeight: var(--table-footer-height);
 
   ${({ hideHeader }) =>
     hideHeader &&

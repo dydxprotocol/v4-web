@@ -59,10 +59,17 @@ export const OrderCancelNotification = ({
     orderStatusIcon = <$OrderStatusIcon status={AbacusOrderStatus.Canceled.rawValue} />;
   }
 
-  if (localCancel.errorStringKey) {
+  if (localCancel.errorParams) {
     orderStatusStringKey = STRING_KEYS.ERROR;
     orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
-    customContent = <span>{stringGetter({ key: localCancel.errorStringKey })}</span>;
+    customContent = (
+      <span>
+        {stringGetter({
+          key: localCancel.errorParams.errorStringKey,
+          fallback: localCancel.errorParams.errorMessage ?? '',
+        })}
+      </span>
+    );
   }
 
   return (

@@ -2,6 +2,8 @@ import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeUnitShort } from '@/constants/time';
 
+import { ErrorParams } from './errors';
+
 export enum TradeTypes {
   MARKET = 'MARKET',
   LIMIT = 'LIMIT',
@@ -119,6 +121,8 @@ export enum TradeSizeInput {
   Usdc = 'size.usdcSize',
 }
 
+export type TradeToggleSizeInput = TradeSizeInput.Size | TradeSizeInput.Usdc;
+
 export enum TradeBoxKeys {
   LimitPrice = 'price.limitPrice',
   TrailingPercent = 'price.trailingPercent',
@@ -169,11 +173,11 @@ export type LocalPlaceOrderData = {
   orderId?: string;
   orderType: TradeTypes;
   submissionStatus: PlaceOrderStatuses;
-  errorStringKey?: string;
+  errorParams?: ErrorParams;
 };
 
 export type LocalCancelOrderData = {
   orderId: string;
   submissionStatus: CancelOrderStatuses;
-  errorStringKey?: string;
+  errorParams?: ErrorParams;
 };

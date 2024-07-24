@@ -48,7 +48,7 @@ type VaultHistory = {
 
 const initialState: VaultsState = {
   vaultDetails: {
-    totalValue: 30_425,
+    totalValue: 930_425_857,
     thirtyDayReturnPercent: 0.1474,
     positions: [
       {

@@ -9,6 +9,7 @@ import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -24,6 +25,9 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
+
+import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
@@ -43,12 +47,27 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           columnKey: 'market',
           getCellValue: (row) => row.market,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ assetId, id, isNew }) => (
+          renderCell: ({
+            assetId,
+            id,
+            isNew,
+            effectiveInitialMarginFraction,
+            initialMarginFraction,
+          }) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
               <h2>{id}</h2>
-              <Tag>{assetId}</Tag>
+              <Tag>
+                <Output
+                  type={OutputType.Multiple}
+                  value={calculateMarketMaxLeverage({
+                    effectiveInitialMarginFraction,
+                    initialMarginFraction,
+                  })}
+                  fractionDigits={0}
+                />
+              </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
           ),
@@ -172,6 +191,14 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
+    const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
+
+    const leverageTag =
+      currentMarketId != null ? (
+        <Tag>
+          <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
+        </Tag>
+      ) : undefined;
 
     return (
       <$Popover
@@ -186,6 +213,7 @@ export const MarketsDropdown = memo(
               <div>
                 <AssetIcon symbol={symbol} />
                 <h2>{currentMarketId}</h2>
+                {leverageTag}
               </div>
             )}
             <p>

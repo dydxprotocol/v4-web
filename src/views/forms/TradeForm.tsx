@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
+  AbacusInputTypes,
   ComplianceStatus,
   ErrorType,
   TradeInputErrorAction,
@@ -15,6 +16,7 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
@@ -112,7 +114,7 @@ export const TradeForm = ({
 
   const hasInputErrors =
     !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
-    currentInput !== 'trade';
+    currentInput !== AbacusInputTypes.Trade;
 
   const { getNotificationPreferenceForType } = useNotifications();
 
@@ -198,9 +200,12 @@ export const TradeForm = ({
     setPlaceOrderError(undefined);
 
     placeOrder({
-      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
+      onError: (errorParams: ErrorParams) => {
         setPlaceOrderError(
-          stringGetter({ key: errorParams?.errorStringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG })
+          stringGetter({
+            key: errorParams.errorStringKey,
+            fallback: errorParams.errorMessage ?? '',
+          })
         );
         setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },

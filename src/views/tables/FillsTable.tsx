@@ -37,7 +37,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -315,8 +315,8 @@ export const FillsTable = ({
   const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
   useEffect(() => {
     // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)

@@ -24,16 +24,17 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { getVaultDetails } from '@/state/vaultSelectors';
 
 import { getNumberSign } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
 
+const VAULT_PAGE_SIZE = 50 as const;
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
   const vaultsData = useAppSelector(getVaultDetails)?.positions;
-  const marketsData = orEmptyObj(useAppSelector(getPerpetualMarkets));
+  const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
     () =>
@@ -142,7 +143,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         direction: 'descending',
       }}
       columns={columns}
-      paginationBehavior="showAll"
+      paginationBehavior={vaultsData.length <= VAULT_PAGE_SIZE ? 'showAll' : 'paginate'}
+      initialPageSize={VAULT_PAGE_SIZE}
       className={className}
     />
   );

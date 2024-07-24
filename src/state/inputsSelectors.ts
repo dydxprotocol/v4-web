@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
+import { AbacusInputTypes } from '@/constants/abacus';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { type RootState } from './_store';
@@ -60,7 +61,7 @@ export const getCurrentInput = (state: RootState) => state.inputs.current;
  */
 export const getTradeInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'trade' ? getInputErrors(state) : EMPTY_ARR;
+  return currentInput === AbacusInputTypes.Trade ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -69,7 +70,7 @@ export const getTradeInputErrors = (state: RootState) => {
  */
 export const getClosePositionInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'closePosition' ? getInputErrors(state) : EMPTY_ARR;
+  return currentInput === AbacusInputTypes.ClosePosition ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -90,7 +91,7 @@ export const getTransferInputs = (state: RootState) => state.inputs.transferInpu
  */
 export const getTriggerOrdersInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'triggerOrders' ? getInputErrors(state) : EMPTY_ARR;
+  return currentInput === AbacusInputTypes.TriggerOrders ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**

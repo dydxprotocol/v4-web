@@ -9,13 +9,11 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
-import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
@@ -31,6 +29,7 @@ const EmptyValue = () => <$EmptyValue>—</$EmptyValue>;
 const $EmptyValue = styled.span`
   color: var(--color-text-0);
 `;
+
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const stringGetter = useStringGetter();
@@ -107,13 +106,20 @@ const $CardValue = styled.div`
   line-height: 1.2rem;
 `;
 
-export const VaultPositionsSection = ({
-  className,
-  scroll,
-}: {
-  className?: string;
-  scroll?: boolean;
-}) => {
+export const VaultDescription = ({ className }: { className?: string }) => {
+  const stringGetter = useStringGetter();
+  return (
+    <$DescriptionContainer className={className}>
+      {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}
+    </$DescriptionContainer>
+  );
+};
+const $DescriptionContainer = styled.div`
+  font: var(--font-small-medium);
+  color: var(--color-text-0);
+`;
+
+export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
 
@@ -125,24 +131,10 @@ export const VaultPositionsSection = ({
           {numPositions}
         </Tag>
       </$SectionTitle>
-      <$PositionsContainer $scroll={scroll}>
-        <div>
-          <VaultPositionsTable />
-        </div>
-      </$PositionsContainer>
+      <VaultPositionsTable />
     </div>
   );
 };
-
-const $PositionsContainer = styled.div<{ $scroll?: boolean }>`
-  ${({ $scroll }) =>
-    $scroll
-      ? css`
-          max-height: 20rem;
-          overflow-y: scroll;
-        `
-      : ''}
-`;
 
 const $SectionTitle = styled.div`
   font: var(--font-large-medium);
@@ -154,7 +146,6 @@ const $SectionTitle = styled.div`
 
 export const VaultHeader = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const { vaultsLearnMore } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
@@ -188,24 +179,30 @@ export const VaultHeader = ({ className }: { className?: string }) => {
         <$VaultImg src="/dydx-chain.png" />
         <div>
           <$MarketTitleText>{stringGetter({ key: STRING_KEYS.VAULT })}</$MarketTitleText>
-          <$LearnMoreLink href={vaultsLearnMore} withIcon>
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-          </$LearnMoreLink>
         </div>
       </$MarketTitle>
-      {detailItems.map((item) => (
-        <React.Fragment key={item.key}>
-          <$VerticalSeparator />
-          <$DetailItem key={item.key}>
-            <$DetailLabel>{item.label}</$DetailLabel>
-            <$DetailValue>{item.value}</$DetailValue>
-          </$DetailItem>
-        </React.Fragment>
-      ))}
+      <$DetailItems>
+        {detailItems.map((item) => (
+          <React.Fragment key={item.key}>
+            <$VerticalSeparator />
+            <$DetailItem key={item.key}>
+              <$DetailLabel>{item.label}</$DetailLabel>
+              <$DetailValue>{item.value}</$DetailValue>
+            </$DetailItem>
+          </React.Fragment>
+        ))}
+      </$DetailItems>
     </$HeaderRow>
   );
 };
 
+const $DetailItems = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  @media (${breakpoints.tablet}) {
+    gap: 0.75rem;
+  }
+`;
 const $BackContainer = styled.div`
   display: flex;
   align-items: center;
@@ -244,11 +241,6 @@ const $MarketTitle = styled.div`
   gap: 1.25rem;
 `;
 
-const $LearnMoreLink = styled(Link)`
-  font: var(--font-small-book);
-  color: var(--color-text-1);
-`;
-
 const $VaultImg = styled.img`
   width: 3.5rem;
   height: 3.5rem;
@@ -272,6 +264,7 @@ const $DetailLabel = styled.div`
 `;
 
 const $DetailValue = styled.div`
-  font: var(--font-medium-book);
+  font: var(--font-extra-book);
+  font-size: 1.563rem; // we need an in-beween for large and extra
   display: flex;
 `;

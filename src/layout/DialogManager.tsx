@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
 
+import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
@@ -36,6 +37,7 @@ import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
+import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
@@ -56,6 +58,7 @@ export const DialogManager = () => {
   };
 
   return DialogTypes.match(activeDialog, {
+    AcknowledgeTerms: (args) => <AcknowledgeTermsDialog {...args} {...modalProps} />,
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
@@ -91,6 +94,7 @@ export const DialogManager = () => {
     Triggers: (args) => <TriggersDialog {...args} {...modalProps} />,
     Transfer: (args) => <TransferDialog {...args} {...modalProps} />,
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
+    VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
   });

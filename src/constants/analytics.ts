@@ -9,15 +9,13 @@ import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
+import { TradeToggleSizeInput } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
-type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventPayloads[T] & {
-  referrer: string;
-};
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
     eventType: T;
-    eventData: AnalyticsEventDataWithReferrer<T>;
+    eventData: AnalyticsEventPayloads[T];
   };
 };
 export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
@@ -46,6 +44,8 @@ export const customTrackEvent = <T extends AnalyticsEventTypes>(
 // User properties
 export const AnalyticsUserProperties = unionize(
   {
+    // Referrer
+    CustomDomainReferrer: ofType<string | null>(),
     // Environment
     Locale: ofType<SupportedLocales>(),
     Breakpoint: ofType<
@@ -76,6 +76,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   Breakpoint: 'breakpoint',
   Version: 'version',
   StatsigFlags: 'statsigFlags',
+  CustomDomainReferrer: 'customDomainReferrer',
   Network: 'network',
   WalletType: 'walletType',
   WalletConnectionType: 'walletConnectionType',
@@ -196,6 +197,10 @@ export const AnalyticsEvents = unionize(
     // Trading
     TradeOrderTypeSelected: ofType<{
       type: TradeTypes;
+    }>(),
+    TradeAmountToggleClick: ofType<{
+      newInput: TradeToggleSizeInput;
+      market: string;
     }>(),
     TradePlaceOrder: ofType<
       HumanReadablePlaceOrderPayload & {

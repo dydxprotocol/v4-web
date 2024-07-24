@@ -7,7 +7,7 @@ import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -121,7 +121,7 @@ const Content = () => {
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
                 path="*"
-                element={<Navigate to={pathFromHash || AppRoute.Markets} replace />}
+                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
               />
             </Routes>
           </Suspense>
