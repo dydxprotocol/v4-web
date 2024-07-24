@@ -667,4 +667,4 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
 const $Icon = tw.img`h-1.5 w-1.5`;
 
-const $WarningIcon = tw(Icon)`text-warning `;
+const $WarningIcon = tw(Icon)`text-warning`;

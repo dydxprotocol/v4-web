@@ -85,7 +85,6 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               <$AppThemeHeader textcolor={textColor}>
                 {stringGetter({ key: label })}
               </$AppThemeHeader>
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <img src="/chart-bars.svg" tw="z-[1] h-auto w-full" />
               <$CheckIndicator>
                 <Icon iconName={IconName.Check} tw="h-[var(--icon-size)] w-[var(--icon-size)]" />

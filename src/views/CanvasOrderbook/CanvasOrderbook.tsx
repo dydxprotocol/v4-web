@@ -309,4 +309,4 @@ const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-const $OrderbookMiddleRow = tw(OrderbookMiddleRow)`absolute `;
+const $OrderbookMiddleRow = tw(OrderbookMiddleRow)`absolute`;

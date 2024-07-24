@@ -69,7 +69,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   );
 };
 const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-layer-3`;
-const $NewTag = tw(Tag)`bg-accent-faded text-accent `;
+const $NewTag = tw(Tag)`bg-accent-faded text-accent`;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;

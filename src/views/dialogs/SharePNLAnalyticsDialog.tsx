@@ -193,7 +193,7 @@ export const SharePNLAnalyticsDialog = ({
     </Dialog>
   );
 };
-const $Action = tw(Button)`flex-1 `;
+const $Action = tw(Button)`flex-1`;
 
 const $ShareableCard = styled.div`
   ${layoutMixins.row}
@@ -212,7 +212,7 @@ const $ShareableCardTitle = styled.div`
 `;
 const $ShareableCardStatLabel = tw.div`text-right text-text-0 font-base-bold`;
 
-const $ShareableCardStatOutput = tw(Output)`font-base-bold text-text-2 `;
+const $ShareableCardStatOutput = tw(Output)`font-base-bold text-text-2`;
 const $QrCode = styled(QrCode)`
   width: 5.25rem;
   height: 5.25rem;

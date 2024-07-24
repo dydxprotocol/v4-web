@@ -400,7 +400,7 @@ const $Icon = styled(Icon)<{ $hasError?: boolean }>`
   ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
 `;
 
-const $WithDetailsReceipt = tw(WithDetailsReceipt)`[--details-item-fontSize:1rem] `;
+const $WithDetailsReceipt = tw(WithDetailsReceipt)`[--details-item-fontSize:1rem]`;
 const $Disclaimer = styled.div<{ textAlign?: string }>`
   font: var(--font-small-book);
   color: var(--color-text-0);

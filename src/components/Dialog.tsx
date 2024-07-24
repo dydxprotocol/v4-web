@@ -503,9 +503,9 @@ const $BackButton = styled(BackButton)`
   top: var(--dialog-header-paddingTop);
 `;
 
-const $Title = tw(Title)`flex-1 font-large-medium text-text-2 overflow-hidden text-ellipsis `;
+const $Title = tw(Title)`flex-1 font-large-medium text-text-2 overflow-hidden text-ellipsis`;
 
-const $Description = tw(Description)`mt-0.5 text-text-0 font-base-book `;
+const $Description = tw(Description)`mt-0.5 text-text-0 font-base-book`;
 
 const $Footer = styled.footer`
   display: grid;

@@ -173,4 +173,4 @@ const $PriceRow = styled.div`
 
 const $PriceLabel = tw.h3`text-text-0`;
 
-const $Price = tw(Output)`text-text-2 `;
+const $Price = tw(Output)`text-text-2`;

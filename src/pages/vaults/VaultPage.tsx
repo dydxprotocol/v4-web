@@ -170,7 +170,7 @@ const $DepositFormContainer = styled.div`
 const $VaultDescription = styled(VaultDescription)`
   ${xPaddingWhenSmall}
 `;
-const $HorizontalSeparatorFiller = tw(HorizontalSeparatorFiller)`flex min-h-px max-h-px `;
+const $HorizontalSeparatorFiller = tw(HorizontalSeparatorFiller)`flex min-h-px max-h-px`;
 
 const $PnlRow = styled.div``;
 const $PnlChart = styled(VaultPnlChart)``;

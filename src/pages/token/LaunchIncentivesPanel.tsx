@@ -136,7 +136,6 @@ const EstimatedRewards = () => {
         </$Points>
       </$EstimatedRewardsCardContent>
 
-      {/* eslint-disable-next-line jsx-a11y/alt-text */}
       <img src="/rewards-stars.svg" tw="relative float-right h-auto w-[5.25rem]" />
     </$EstimatedRewardsCard>
   );
@@ -190,7 +189,7 @@ const LaunchIncentivesContent = () => {
     </$Column>
   );
 };
-const $Panel = tw(Panel)`bg-layer-3 w-full `;
+const $Panel = tw(Panel)`bg-layer-3 w-full`;
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);

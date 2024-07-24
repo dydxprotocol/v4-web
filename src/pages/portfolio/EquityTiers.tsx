@@ -122,7 +122,7 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $HighlightOutput = tw(Output)`text-text-1 `;
+const $HighlightOutput = tw(Output)`text-text-1`;
 const $Description = styled.div`
   color: var(--color-text-0);
   padding: 0 1rem;

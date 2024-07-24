@@ -132,7 +132,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
     </$MigratePanel>
   );
 };
-const $MigratePanel = tw(Panel)`w-full bg-[url('/dots-background.svg')] bg-right bg-no-repeat `;
+const $MigratePanel = tw(Panel)`w-full bg-[url('/dots-background.svg')] bg-right bg-no-repeat`;
 
 const $Title = styled.h3`
   font: var(--font-medium-book);

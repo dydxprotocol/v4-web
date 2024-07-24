@@ -423,7 +423,7 @@ const $Balances = styled.div`
   }
 `;
 
-const $BalanceOutput = tw(Output)`text-medium `;
+const $BalanceOutput = tw(Output)`text-medium`;
 
 const $DropdownMenu = styled(DropdownMenu)`
   ${headerMixins.dropdownTrigger}

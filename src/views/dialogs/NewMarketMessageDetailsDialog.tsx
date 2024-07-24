@@ -341,7 +341,7 @@ const $Tabs = styled(ToggleGroup)`
   overflow-x: auto;
 ` as typeof ToggleGroup;
 
-const $Details = tw(Details)`[--details-item-height:1.5rem] `;
+const $Details = tw(Details)`[--details-item-height:1.5rem]`;
 const $Code = styled.div`
   height: 16.25rem;
   overflow: auto;

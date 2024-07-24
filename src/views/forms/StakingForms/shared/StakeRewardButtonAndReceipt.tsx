@@ -178,4 +178,4 @@ const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
       }
     `}
 `;
-const $Button = tw(Button)`w-full `;
+const $Button = tw(Button)`w-full`;

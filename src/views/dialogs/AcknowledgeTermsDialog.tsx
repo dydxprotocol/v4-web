@@ -88,4 +88,4 @@ const $Footer = styled.div`
   gap: 1rem;
 `;
 
-const $Button = tw(Button)`grow `;
+const $Button = tw(Button)`grow`;

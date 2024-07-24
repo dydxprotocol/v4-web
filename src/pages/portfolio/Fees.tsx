@@ -299,4 +299,4 @@ const $FeeTable = styled(Table)`
 ` as typeof Table;
 const $Highlighted = tw.strong`text-text-1`;
 
-const $HighlightOutput = tw(Output)`text-text-1 `;
+const $HighlightOutput = tw(Output)`text-text-1`;

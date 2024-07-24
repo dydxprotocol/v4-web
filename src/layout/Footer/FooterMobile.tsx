@@ -155,7 +155,7 @@ const $NavigationMenu = styled(NavigationMenu)`
   }
 `;
 
-const $Icon = tw(Icon)`text-[1.5rem] `;
+const $Icon = tw(Icon)`text-[1.5rem]`;
 
 const $StartIcon = styled.div`
   display: inline-flex;
