@@ -2,8 +2,8 @@ import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { REWARD_DISTRIBUTION_SEASON_NUMBER } from '@/constants/notifications';
 
+import { useIncentivesSeason } from '@/hooks/useIncentivesSeason';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -28,6 +28,8 @@ export const IncentiveSeasonDistributionNotification = ({
   notification,
 }: IncentiveSeasonDistributionNotificationProps) => {
   const stringGetter = useStringGetter();
+  const { rewardDistributionSeasonNumber } = useIncentivesSeason();
+
   const { chainTokenLabel, points } = data;
 
   return (
@@ -37,7 +39,7 @@ export const IncentiveSeasonDistributionNotification = ({
       slotIcon={<Icon iconName={IconName.RewardStar} />}
       slotTitle={stringGetter({
         key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-        params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+        params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
       })}
       slotCustomContent={
         <$Details
@@ -46,7 +48,7 @@ export const IncentiveSeasonDistributionNotification = ({
               key: 'season_distribution',
               label: stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_REWARDS,
-                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+                params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
               }),
               value: <$Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },
