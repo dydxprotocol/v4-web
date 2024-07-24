@@ -7,6 +7,7 @@ import type { TvWidget } from '@/constants/tvchart';
 
 import { useChartLines } from '@/hooks/tradingView/useChartLines';
 import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
+import { useOhlcCandles } from '@/hooks/tradingView/useOhlcCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 
@@ -37,7 +38,8 @@ export const TvChart = () => {
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
-  const { chartLines } = useChartLines({ tvWidget, orderLineToggle, ohlcToggle, isChartReady });
+  const { chartLines } = useChartLines({ tvWidget, orderLineToggle, isChartReady });
+  useOhlcCandles({ ohlcToggle, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
