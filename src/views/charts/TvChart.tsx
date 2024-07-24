@@ -23,14 +23,21 @@ export const TvChart = () => {
 
   const displayButtonRef = useRef<HTMLElement | null>(null);
   const displayButton = displayButtonRef.current;
+  const ohlcButtonRef = useRef<HTMLElement | null>(null);
+  const ohlcButton = ohlcButtonRef.current;
 
-  const { savedResolution } = useTradingView({ tvWidgetRef, displayButtonRef, setIsChartReady });
+  const { savedResolution } = useTradingView({
+    tvWidgetRef,
+    displayButtonRef,
+    ohlcButtonRef,
+    setIsChartReady,
+  });
   useChartMarketAndResolution({
     tvWidget,
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
-  const { chartLines } = useChartLines({ tvWidget, displayButton, isChartReady });
+  const { chartLines } = useChartLines({ tvWidget, displayButton, ohlcButton, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (

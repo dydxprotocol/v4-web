@@ -29,13 +29,17 @@ import { useStringGetter } from '../useStringGetter';
 export const useChartLines = ({
   tvWidget,
   displayButton,
+  ohlcButton,
   isChartReady,
 }: {
   tvWidget: TvWidget | null;
   displayButton: HTMLElement | null;
+  ohlcButton: HTMLElement | null;
   isChartReady: boolean;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
+  const [useOhlc, setUseOhlc] = useState(true);
+
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
@@ -256,11 +260,16 @@ export const useChartLines = ({
   // Effects
 
   useEffect(() => {
-    // Initialize onClick for chart line toggle
-    if (isChartReady && displayButton) {
-      displayButton.onclick = () => setShowOrderLines((prev) => !prev);
+    // Initialize onClick for toggles
+    if (isChartReady) {
+      if (displayButton) {
+        displayButton.onclick = () => setShowOrderLines((prev) => !prev);
+      }
+      if (ohlcButton) {
+        ohlcButton.onclick = () => setUseOhlc((prev) => !prev);
+      }
     }
-  }, [isChartReady, displayButton]);
+  }, [isChartReady, displayButton, ohlcButton]);
 
   useEffect(
     // Update display button on toggle
@@ -272,6 +281,18 @@ export const useChartLines = ({
       }
     },
     [showOrderLines, displayButton?.classList]
+  );
+
+  useEffect(
+    // Update ohlc button on toggle
+    () => {
+      if (useOhlc) {
+        ohlcButton?.classList?.add('ohlc-active');
+      } else {
+        ohlcButton?.classList?.remove('ohlc-active');
+      }
+    },
+    [useOhlc, ohlcButton?.classList]
   );
 
   useEffect(

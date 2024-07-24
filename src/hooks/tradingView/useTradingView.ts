@@ -12,6 +12,7 @@ import { shallowEqual } from 'react-redux';
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
+import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
@@ -26,7 +27,10 @@ import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/
 
 import { useDydxClient } from '../useDydxClient';
 import { useLocalStorage } from '../useLocalStorage';
+import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
+import { useURLConfigs } from '../useURLConfigs';
+import { useEnvFeatures } from '../useEnvFeatures';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -34,13 +38,18 @@ import { useStringGetter } from '../useStringGetter';
 export const useTradingView = ({
   tvWidgetRef,
   displayButtonRef,
+  ohlcButtonRef,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   displayButtonRef: React.MutableRefObject<HTMLElement | null>;
+  ohlcButtonRef: React.MutableRefObject<HTMLElement | null>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
+  const urlConfigs = useURLConfigs();
+  const featureFlags = useAllStatsigGateValues();
+  const { isOhlcEnabled } = useEnvFeatures();
 
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -92,20 +101,35 @@ export const useTradingView = ({
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
+      const getTooltipStrings = tooltipStrings.ohlc;
+      const { title: ohlcTitle, body: ohlcBody } = getTooltipStrings({
+        stringGetter,
+        stringParams: {},
+        urlConfigs,
+        featureFlags,
+      });
+
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
-          if (displayButtonRef && tvWidgetRef.current) {
-            displayButtonRef.current = tvWidgetRef.current.createButton();
-            displayButtonRef.current.innerHTML = `<span>${stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            })}</span> <div class="displayOrdersButton-toggle"></div>`;
-            displayButtonRef.current.setAttribute(
-              'title',
-              stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
-            );
+          if (tvWidgetRef.current) {
+            if (displayButtonRef) {
+              displayButtonRef.current = tvWidgetRef.current.createButton();
+              displayButtonRef.current.innerHTML = `<span>${stringGetter({
+                key: STRING_KEYS.ORDER_LINES,
+              })}</span> <div class="displayOrdersButton-toggle"></div>`;
+              displayButtonRef.current.setAttribute(
+                'title',
+                stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+              );
+            }
+            if (isOhlcEnabled && ohlcButtonRef) {
+              ohlcButtonRef.current = tvWidgetRef.current.createButton();
+              ohlcButtonRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
+              ohlcButtonRef.current.setAttribute('title', ohlcBody as string);
+            }
           }
         });
 
