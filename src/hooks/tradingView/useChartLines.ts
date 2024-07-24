@@ -28,13 +28,13 @@ import { useStringGetter } from '../useStringGetter';
 
 export const useChartLines = ({
   tvWidget,
-  displayButton,
-  ohlcButton,
+  orderLineToggle,
+  ohlcToggle,
   isChartReady,
 }: {
   tvWidget: TvWidget | null;
-  displayButton: HTMLElement | null;
-  ohlcButton: HTMLElement | null;
+  orderLineToggle: HTMLElement | null;
+  ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
@@ -262,37 +262,37 @@ export const useChartLines = ({
   useEffect(() => {
     // Initialize onClick for toggles
     if (isChartReady) {
-      if (displayButton) {
-        displayButton.onclick = () => setShowOrderLines((prev) => !prev);
+      if (orderLineToggle) {
+        orderLineToggle.onclick = () => setShowOrderLines((prev) => !prev);
       }
-      if (ohlcButton) {
-        ohlcButton.onclick = () => setUseOhlc((prev) => !prev);
+      if (ohlcToggle) {
+        ohlcToggle.onclick = () => setUseOhlc((prev) => !prev);
       }
     }
-  }, [isChartReady, displayButton, ohlcButton]);
+  }, [isChartReady, orderLineToggle, ohlcToggle]);
 
   useEffect(
     // Update display button on toggle
     () => {
       if (showOrderLines) {
-        displayButton?.classList?.add('order-lines-active');
+        orderLineToggle?.classList?.add('order-lines-active');
       } else {
-        displayButton?.classList?.remove('order-lines-active');
+        orderLineToggle?.classList?.remove('order-lines-active');
       }
     },
-    [showOrderLines, displayButton?.classList]
+    [showOrderLines, orderLineToggle?.classList]
   );
 
   useEffect(
     // Update ohlc button on toggle
     () => {
       if (useOhlc) {
-        ohlcButton?.classList?.add('ohlc-active');
+        ohlcToggle?.classList?.add('ohlc-active');
       } else {
-        ohlcButton?.classList?.remove('ohlc-active');
+        ohlcToggle?.classList?.remove('ohlc-active');
       }
     },
-    [useOhlc, ohlcButton?.classList]
+    [useOhlc, ohlcToggle?.classList]
   );
 
   useEffect(

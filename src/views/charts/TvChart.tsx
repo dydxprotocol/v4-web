@@ -21,15 +21,15 @@ export const TvChart = () => {
   const tvWidget = tvWidgetRef.current;
   const isWidgetReady = tvWidget?._ready;
 
-  const displayButtonRef = useRef<HTMLElement | null>(null);
-  const displayButton = displayButtonRef.current;
-  const ohlcButtonRef = useRef<HTMLElement | null>(null);
-  const ohlcButton = ohlcButtonRef.current;
+  const orderLineToggleRef = useRef<HTMLElement | null>(null);
+  const orderLineToggle = orderLineToggleRef.current;
+  const ohlcToggleRef = useRef<HTMLElement | null>(null);
+  const ohlcToggle = ohlcToggleRef.current;
 
   const { savedResolution } = useTradingView({
     tvWidgetRef,
-    displayButtonRef,
-    ohlcButtonRef,
+    orderLineToggleRef,
+    ohlcToggleRef,
     setIsChartReady,
   });
   useChartMarketAndResolution({
@@ -37,7 +37,7 @@ export const TvChart = () => {
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
-  const { chartLines } = useChartLines({ tvWidget, displayButton, ohlcButton, isChartReady });
+  const { chartLines } = useChartLines({ tvWidget, orderLineToggle, ohlcToggle, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (

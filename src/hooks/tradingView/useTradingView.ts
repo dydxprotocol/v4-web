@@ -26,24 +26,24 @@ import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 import { useDydxClient } from '../useDydxClient';
+import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
-import { useEnvFeatures } from '../useEnvFeatures';
 
 /**
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingView = ({
   tvWidgetRef,
-  displayButtonRef,
-  ohlcButtonRef,
+  orderLineToggleRef,
+  ohlcToggleRef,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
-  displayButtonRef: React.MutableRefObject<HTMLElement | null>;
-  ohlcButtonRef: React.MutableRefObject<HTMLElement | null>;
+  orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
+  ohlcToggleRef: React.MutableRefObject<HTMLElement | null>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -85,7 +85,7 @@ export const useTradingView = ({
         setInitialPriceScale(priceScale.toNumber());
       }
     })();
-  }, [marketId, hasPriceScaleInfo]);
+  }, [marketId, hasPriceScaleInfo, getMarketTickSize]);
 
   useEffect(() => {
     if (marketId && hasPriceScaleInfo) {
@@ -101,34 +101,34 @@ export const useTradingView = ({
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
-      const getTooltipStrings = tooltipStrings.ohlc;
-      const { title: ohlcTitle, body: ohlcBody } = getTooltipStrings({
-        stringGetter,
-        stringParams: {},
-        urlConfigs,
-        featureFlags,
-      });
-
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
-            if (displayButtonRef) {
-              displayButtonRef.current = tvWidgetRef.current.createButton();
-              displayButtonRef.current.innerHTML = `<span>${stringGetter({
+            if (orderLineToggleRef) {
+              orderLineToggleRef.current = tvWidgetRef.current.createButton();
+              orderLineToggleRef.current.innerHTML = `<span>${stringGetter({
                 key: STRING_KEYS.ORDER_LINES,
               })}</span> <div class="displayOrdersButton-toggle"></div>`;
-              displayButtonRef.current.setAttribute(
+              orderLineToggleRef.current.setAttribute(
                 'title',
                 stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
               );
             }
-            if (isOhlcEnabled && ohlcButtonRef) {
-              ohlcButtonRef.current = tvWidgetRef.current.createButton();
-              ohlcButtonRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
-              ohlcButtonRef.current.setAttribute('title', ohlcBody as string);
+            if (isOhlcEnabled && ohlcToggleRef) {
+              const getOhlcTooltipString = tooltipStrings.ohlc;
+              const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
+                stringGetter,
+                stringParams: {},
+                urlConfigs,
+                featureFlags,
+              });
+
+              ohlcToggleRef.current = tvWidgetRef.current.createButton();
+              ohlcToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
+              ohlcToggleRef.current.setAttribute('title', ohlcBody as string);
             }
           }
         });
@@ -142,8 +142,10 @@ export const useTradingView = ({
     }
 
     return () => {
-      displayButtonRef.current?.remove();
-      displayButtonRef.current = null;
+      orderLineToggleRef.current?.remove();
+      orderLineToggleRef.current = null;
+      ohlcToggleRef.current?.remove();
+      ohlcToggleRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
       setIsChartReady(false);
