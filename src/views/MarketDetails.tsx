@@ -157,8 +157,8 @@ export const MarketDetails: React.FC = () => {
 
   return (
     <$MarketDetails>
-      <header tw="gap-1.25 column">
-        <div tw="flex-wrap gap-0.5 row">
+      <header tw="column gap-1.25">
+        <div tw="row flex-wrap gap-0.5">
           <$MarketTitle>
             <AssetIcon symbol={id} />
             {name}
@@ -174,7 +174,7 @@ export const MarketDetails: React.FC = () => {
         </$MarketDescription>
 
         {!isTablet && (
-          <div tw="flex-wrap gap-0.5 overflow-x-auto row">
+          <div tw="row flex-wrap gap-0.5 overflow-x-auto">
             {whitepaperLink && (
               <Button
                 type={ButtonType.Link}

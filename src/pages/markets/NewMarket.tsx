@@ -92,7 +92,7 @@ const NewMarket = () => {
 
   return (
     <$Page>
-      <section tw="tablet:mb-0.5 tablet:gap-1 tablet:flexColumn">
+      <section tw="tablet:flexColumn tablet:mb-0.5 tablet:gap-1">
         <$ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.LIST_A_NEW_MARKET })}
           slotRight={

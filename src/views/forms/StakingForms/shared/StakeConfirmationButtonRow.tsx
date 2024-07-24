@@ -29,7 +29,7 @@ export const StakeConfirmationButtonRow = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
   return canAccountTrade ? (
-    <div tw="w-full gap-1 inlineRow">
+    <div tw="inlineRow w-full gap-1">
       <Button
         action={ButtonAction.Base}
         onClick={() => setStakeFormStep(StakeFormSteps.EditInputs)}

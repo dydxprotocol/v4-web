@@ -57,7 +57,7 @@ export const Notification = ({
 
   return (
     <$Container className={className} isToast={isToast} onClick={onClick}>
-      <header tw="relative gap-0.5 row">
+      <header tw="row relative gap-0.5">
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
         <div tw="flex-1 overflow-hidden text-ellipsis text-text-2 font-base-medium">
           {slotTitle}

@@ -265,7 +265,7 @@ export const TriggerOrderInputs = ({
     <$TriggerRow key={tooltipId}>
       <$Heading>
         {headerTooltip()}
-        <div tw="gap-[0.5em] text-text-0 font-base-book row">
+        <div tw="row gap-[0.5em] text-text-0 font-base-book">
           {stringGetter({ key: stringKeys.headerDiff })}
           {signedOutput()}
           <$VerticalSeparator />
@@ -334,7 +334,7 @@ const $ClearButton = styled(Button)`
   --button-padding: 0;
 `;
 
-const $TriggerRow = tw.div`gap-[1ch] column`;
+const $TriggerRow = tw.div`column gap-[1ch]`;
 
 const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}

@@ -58,7 +58,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <span tw="gap-[0.5ch] text-text-0 font-small-book row">
+        <span tw="row gap-[0.5ch] text-text-0 font-small-book">
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
           <OrderStatusIcon status={orderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
         </span>

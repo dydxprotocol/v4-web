@@ -44,7 +44,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
   const content = {
     [MnemonicExportStep.AcknowledgeRisk]: (
       <>
-        <span tw="gap-1 text-text-1 row">
+        <span tw="row gap-1 text-text-1">
           <$CautionIconContainer>
             <Icon iconName={IconName.CautionCircleStroked} />
           </$CautionIconContainer>
@@ -130,7 +130,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
       description={stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE_DESCRIPTION })}
       tw="notMobile:[--dialog-width:30rem]"
     >
-      <div tw="gap-1 column">{content}</div>
+      <div tw="column gap-1">{content}</div>
     </Dialog>
   );
 };

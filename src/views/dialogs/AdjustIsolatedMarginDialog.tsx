@@ -32,7 +32,7 @@ export const AdjustIsolatedMarginDialog = ({
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
       tw="[--dialog-width:25rem]"
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         <AdjustIsolatedMarginForm
           marketId={positionId}
           onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}

@@ -31,7 +31,7 @@ export const MarketLinks = () => {
   ].filter(({ href }) => href);
 
   return (
-    <div tw="ml-auto gap-0.5 row">
+    <div tw="row ml-auto gap-0.5">
       {linkItems.map(
         ({ key, href, icon }) =>
           href && <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />

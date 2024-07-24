@@ -135,7 +135,7 @@ const Profile = () => {
 
   return (
     <$MobileProfileLayout>
-      <header tw="px-1 py-0 row [grid-area:header]">
+      <header tw="row px-1 py-0 [grid-area:header]">
         <$ProfileIcon />
         <div>
           <h1 tw="font-extra-medium">
@@ -406,6 +406,6 @@ const $HistoryPanel = styled(Panel)`
   }
 `;
 
-const $InlineRow = tw.div`gap-0.5 p-1 inlineRow`;
+const $InlineRow = tw.div`inlineRow gap-0.5 p-1`;
 
 const $PanelButton = tw(Panel)`[--panel-paddingY:0] [--panel-paddingX:0] `;

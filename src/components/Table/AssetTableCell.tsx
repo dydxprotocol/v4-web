@@ -41,7 +41,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={asset?.id} />}>
       <$TableCellContent stacked={stacked}>
-        <div tw="gap-0.5 row">
+        <div tw="row gap-0.5">
           <$Asset stacked={stacked}>{asset?.name}</$Asset>
           <Tag>{maxLeverage}</Tag>
         </div>

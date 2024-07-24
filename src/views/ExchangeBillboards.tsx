@@ -25,7 +25,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
   } = usePerpetualMarketsStats();
   return (
-    <div tw="gap-0.5 column">
+    <div tw="column gap-0.5">
       {[
         {
           key: 'volume',
@@ -53,9 +53,9 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           link: `${chainTokenLabel}`,
         },
       ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
-        <div key={key} tw="flex-1 justify-between rounded-0.625 bg-layer-3 px-1.25 py-1 row">
+        <div key={key} tw="row flex-1 justify-between rounded-0.625 bg-layer-3 px-1.25 py-1">
           <$BillboardStat>
-            <div tw="gap-0.375 row">
+            <div tw="row gap-0.375">
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label>{stringGetter({ key: labelKey })}</label>
               <Tag>{stringGetter({ key: tagKey })}</Tag>

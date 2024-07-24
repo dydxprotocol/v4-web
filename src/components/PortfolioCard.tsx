@@ -30,11 +30,11 @@ export const PortfolioCard = ({
         {assetIcon ?? <AssetIcon symbol={assetId} />}
         {assetName}
       </$MarketRow>
-      <div tw="mt-0.5 px-0.625 py-0 spacedRow">
+      <div tw="spacedRow mt-0.5 px-0.625 py-0">
         <span tw="text-text-0 font-mini-book">{detailLabel}</span>
         <span tw="font-small-book">{detailValue}</span>
       </div>
-      <div tw="mt-0.5 border-t-[length:var(--border)] px-0.625 py-0 pt-0.5 spacedRow">
+      <div tw="spacedRow mt-0.5 border-t-[length:var(--border)] px-0.625 py-0 pt-0.5">
         {actionSlot}
       </div>
     </$PortfolioCard>

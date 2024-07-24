@@ -127,7 +127,7 @@ export const OrderStatusNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <span tw="gap-[0.5ch] text-text-0 font-small-book row">
+        <span tw="row gap-[0.5ch] text-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
         </span>

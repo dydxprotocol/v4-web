@@ -164,7 +164,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       : undefined;
   return (
     <div className={className}>
-      <div tw="justify-between pl-1 pr-1 row">
+      <div tw="row justify-between pl-1 pr-1">
         <ToggleGroup
           size={ButtonSize.Small}
           items={[
@@ -183,16 +183,16 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       </div>
       <$ChartContainer>
         <$ChartBackground chartBackground={chartDotsBackground} />
-        <div tw="pl-1 pr-1 flexColumn">
+        <div tw="flexColumn pl-1 pr-1">
           {hoveredTime != null && (
             <div tw="text-text-0 font-small-book">
               <Output value={hoveredTime} type={OutputType.Date} />
             </div>
           )}
-          <div tw="gap-0.5 font-base-medium row">
+          <div tw="row gap-0.5 font-base-medium">
             <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
-              <div tw="gap-[0.35rem] row">
+              <div tw="row gap-[0.35rem]">
                 <TriangleIndicator value={MustBigNumber(pnlDiff)} />
                 <$ColoredOutput
                   $sign={getNumberSign(pnlDiff)}

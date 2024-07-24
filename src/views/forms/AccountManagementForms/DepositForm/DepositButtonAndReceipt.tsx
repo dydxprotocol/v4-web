@@ -151,7 +151,7 @@ export const DepositButtonAndReceipt = ({
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: (
-        <span tw="gap-[0.5ch] row">
+        <span tw="row gap-[0.5ch]">
           <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
           =
           <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />

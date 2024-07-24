@@ -77,7 +77,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             {chainTokenLabel}
           </$Title>
           {complianceState === ComplianceStates.FULL_ACCESS && (
-            <Toolbar tw="gap-0.5 p-0 inlineRow [--stickyArea-topHeight:max-content]">
+            <Toolbar tw="inlineRow gap-0.5 p-0 [--stickyArea-topHeight:max-content]">
               {!canAccountTrade ? (
                 <OnboardingTriggerButton size={ButtonSize.Small} />
               ) : (
@@ -94,7 +94,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
         </$Header>
       }
     >
-      <div tw="gap-0.75 flexColumn">
+      <div tw="flexColumn gap-0.75">
         <$BalanceRow>
           <div>
             <$Label>
@@ -210,7 +210,7 @@ const $BalanceRow = styled.div`
   padding: 1rem;
 `;
 
-const $Label = tw.div`gap-0.5 row`;
+const $Label = tw.div`row gap-0.5`;
 
 const $BalanceOutput = styled(Output)<{ isPositive: boolean }>`
   font-size: var(--fontSize-large);

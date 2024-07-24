@@ -139,7 +139,7 @@ const PortfolioPage = () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <div tw="h-full justify-between flexColumn">
+          <div tw="flexColumn h-full justify-between">
             <NavigationMenu
               items={[
                 {

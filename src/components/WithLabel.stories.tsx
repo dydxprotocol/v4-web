@@ -13,7 +13,7 @@ export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => 
 
   return (
     <StoryWrapper>
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         <WithLabel {...args}>
           <Input
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}

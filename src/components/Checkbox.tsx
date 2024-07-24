@@ -24,7 +24,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }: CheckboxProps) => (
-  <div tw="gap-[1ch] font-small-book row">
+  <div tw="row gap-[1ch] font-small-book">
     <$Root
       className={className}
       checked={checked}

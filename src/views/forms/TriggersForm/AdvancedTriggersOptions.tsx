@@ -41,7 +41,7 @@ export const AdvancedTriggersOptions = ({
 
   return (
     <div tw="column">
-      <h3 tw="mb-0.5 text-text-0 font-small-medium inlineRow">
+      <h3 tw="inlineRow mb-0.5 text-text-0 font-small-medium">
         {stringGetter({ key: STRING_KEYS.ADVANCED })}
         <HorizontalSeparatorFiller />
       </h3>

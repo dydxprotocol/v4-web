@@ -25,7 +25,7 @@ export const ExternalLinkDialog = ({
         linkDescription ?? stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DESCRIPTION })
       }
     >
-      <div tw="gap-1 font-base-book flexColumn">
+      <div tw="flexColumn gap-1 font-base-book">
         {slotContent}
         <p>{stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DISCLAIMER })}.</p>
         <Button type={ButtonType.Link} action={ButtonAction.Primary} href={link}>

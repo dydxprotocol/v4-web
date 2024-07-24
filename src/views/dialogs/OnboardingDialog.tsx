@@ -115,7 +115,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     />
   );
 };
-const $Content = tw.div`gap-1 flexColumn`;
+const $Content = tw.div`flexColumn gap-1`;
 
 const $Dialog = styled(Dialog)<{ width?: string }>`
   @media ${breakpoints.notMobile} {

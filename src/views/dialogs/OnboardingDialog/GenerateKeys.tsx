@@ -201,7 +201,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       </div>
 
       <$Footer>
-        <label htmlFor="remember-me" tw="font-base-book spacedRow">
+        <label htmlFor="remember-me" tw="spacedRow font-base-book">
           <WithTooltip withIcon tooltip="remember-me">
             {stringGetter({ key: STRING_KEYS.REMEMBER_ME })}
           </WithTooltip>

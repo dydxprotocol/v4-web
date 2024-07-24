@@ -56,7 +56,7 @@ export const ToggleGroup = forwardRefFn(
         }}
         className={className}
         loop
-        tw="gap-[0.33em] row"
+        tw="row gap-[0.33em]"
       >
         {items.map((item) => (
           <Item key={item.value} value={item.value} disabled={item.disabled} asChild>

@@ -524,7 +524,7 @@ export const WithdrawForm = () => {
           },
         })}
       </div>
-      <div tw="grid-cols-[1fr_1fr] gap-1 spacedRow">
+      <div tw="spacedRow grid-cols-[1fr_1fr] gap-1">
         <FormInput
           type={InputType.Text}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}

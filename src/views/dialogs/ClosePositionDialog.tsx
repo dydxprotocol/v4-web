@@ -52,7 +52,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
-        <div tw="h-[var(--dialog-icon-size)] inlineRow">
+        <div tw="inlineRow h-[var(--dialog-icon-size)]">
           {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
         </div>
       ),
@@ -103,7 +103,7 @@ const CloseOrderHeader = () => {
   return (
     <div tw="spacedRow">
       <h2>{stringGetter({ key: STRING_KEYS.CLOSE })}</h2>
-      <div tw="mr-0.5 gap-1 inlineRow">
+      <div tw="inlineRow mr-0.5 gap-1">
         <$MarketDetails>
           <MidMarketPrice />
           <$PriceChange

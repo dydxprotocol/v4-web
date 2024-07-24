@@ -92,7 +92,7 @@ export const Fees = () => {
   return (
     <AttachedExpandingSection>
       {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.FEES })} />}
-      <div tw="max-w-[100vw] gap-1.5 flexColumn">
+      <div tw="flexColumn max-w-[100vw] gap-1.5">
         <$FeesDetails
           layout="grid"
           items={[

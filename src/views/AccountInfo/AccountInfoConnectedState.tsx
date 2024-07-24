@@ -72,9 +72,9 @@ export const AccountInfoConnectedState = () => {
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
       {!showHeader ? null : (
-        <header tw="px-1.25 py-0 font-small-book spacedRow">
+        <header tw="spacedRow px-1.25 py-0 font-small-book">
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
-          <div tw="gap-1 inlineRow">
+          <div tw="inlineRow gap-1">
             <$Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}

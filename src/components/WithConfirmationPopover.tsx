@@ -71,7 +71,7 @@ export const WithConfirmationPopover = forwardRef(
 
               onConfirm?.(e);
             }}
-            tw="gap-0.25 column"
+            tw="column gap-0.25"
           >
             {children}
             <$ConfirmationButtons>

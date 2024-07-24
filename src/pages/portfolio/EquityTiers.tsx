@@ -31,7 +31,7 @@ export const EquityTiers = () => {
       {isNotTablet && (
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.EQUITY_TIERS })} />
       )}
-      <div tw="max-w-[100vw] gap-1.5 flexColumn">
+      <div tw="flexColumn max-w-[100vw] gap-1.5">
         <$Description>
           <span>
             {stringGetter({

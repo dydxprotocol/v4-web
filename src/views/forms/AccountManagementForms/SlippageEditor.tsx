@@ -103,7 +103,7 @@ export const SlippageEditor = ({
         // eslint-disable-next-line jsx-a11y/control-has-associated-label, react/button-has-type
         <button
           onClick={() => setEditorState(EditorState.Selecting)}
-          tw="gap-[0.5ch] underline row"
+          tw="row gap-[0.5ch] underline"
         >
           <Output type={OutputType.Percent} value={slippage} />
           <Icon iconName={IconName.Pencil} />
@@ -115,7 +115,7 @@ export const SlippageEditor = ({
         {
           [EditorState.Viewing]: undefined,
           [EditorState.Selecting]: (
-            <div tw="justify-center rounded-[0.5em] bg-layer-2 inlineRow">
+            <div tw="inlineRow justify-center rounded-[0.5em] bg-layer-2">
               <ToggleGroup
                 ref={toggleGroupRef}
                 items={[

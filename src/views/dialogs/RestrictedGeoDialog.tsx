@@ -22,7 +22,7 @@ export const RestrictedGeoDialog = ({
       title={stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_TITLE })}
       slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
         {isDev && <NetworkSelectMenu />}
       </div>

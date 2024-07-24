@@ -45,7 +45,7 @@ export const ExchangeOfflineDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         <p>{statusErrorMessage?.body}</p>
         {isDev && <NetworkSelectMenu />}
       </div>

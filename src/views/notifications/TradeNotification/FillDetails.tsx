@@ -35,7 +35,7 @@ export const FillDetails = ({
         {
           key: 'size',
           label: (
-            <span tw="gap-[0.5ch] row">
+            <span tw="row gap-[0.5ch]">
               {stringGetter({ key: STRING_KEYS.SIZE })}
               <OrderSideTag orderSide={orderSide} />
             </span>

@@ -232,7 +232,7 @@ export const TradingRewardsChart = ({
   return (
     <>
       {rewardsData.length === 0 ? undefined : (
-        <div tw="w-full font-medium-book spacedRow">
+        <div tw="spacedRow w-full font-medium-book">
           <span tw="h-min text-text-1">
             {stringGetter({
               key: STRING_KEYS.TRADING_REWARDS,
@@ -267,7 +267,7 @@ export const TradingRewardsChart = ({
         tickSpacingY={50}
       >
         {rewardsData.length > 0 && (
-          <div tw="isolate basis-full place-self-start text-text-2 font-large-book inlineRow">
+          <div tw="inlineRow isolate basis-full place-self-start text-text-2 font-large-book">
             {MustBigNumber(
               tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
                 totalTradingRewards

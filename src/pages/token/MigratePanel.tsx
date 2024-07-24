@@ -90,7 +90,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         </$MobileMigrateHeader>
       }
     >
-      <div tw="items-center gap-1 flexColumn">
+      <div tw="flexColumn items-center gap-1">
         <WithReceipt
           slotReceipt={
             <Details
@@ -190,4 +190,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1.5rem;
   }
 `;
-const $InlineRow = tw.div`text-text-0 inlineRow`;
+const $InlineRow = tw.div`inlineRow text-text-0`;

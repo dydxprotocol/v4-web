@@ -37,7 +37,7 @@ export const RewardsNavPanel = ({
     <Panel
       className={className}
       slotHeaderContent={
-        <h3 tw="-mb-1.5 text-text-1 font-medium-book inlineRow">
+        <h3 tw="inlineRow -mb-1.5 text-text-1 font-medium-book">
           {title} {titleTag && <Tag tw="bg-accent-faded text-accent">{titleTag}</Tag>}
         </h3>
       }

@@ -40,19 +40,19 @@ export const TradingRewardsSummaryPanel = () => {
     <Panel
       slotHeader={<$Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</$Header>}
     >
-      <div tw="gap-0.75 flexColumn">
+      <div tw="flexColumn gap-0.75">
         <$TradingRewardsDetails
           layout="grid"
           items={[
             {
               key: 'week',
               label: (
-                <div tw="text-text-1 font-base-book spacedRow">
+                <div tw="spacedRow text-text-1 font-base-book">
                   <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
                 </div>
               ),
               value: (
-                <div tw="gap-[0.33rem] flexColumn">
+                <div tw="flexColumn gap-[0.33rem]">
                   <Output
                     slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
                     type={OutputType.Asset}

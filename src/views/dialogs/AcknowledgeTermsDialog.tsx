@@ -36,7 +36,7 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
     >
-      <div tw="gap-1 flexColumn">
+      <div tw="flexColumn gap-1">
         <p>
           {stringGetter({
             key: STRING_KEYS.TOS_TITLE,

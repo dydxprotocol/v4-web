@@ -365,9 +365,9 @@ export const AdjustIsolatedMarginForm = ({
     <GradientCard
       fromColor="neutral"
       toColor={gradientToColor}
-      tw="h-4 items-center rounded-0.5 px-1 py-0.75 spacedRow"
+      tw="spacedRow h-4 items-center rounded-0.5 px-1 py-0.75"
     >
-      <div tw="font-small-medium column">
+      <div tw="column font-small-medium">
         <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
       </div>
@@ -412,7 +412,7 @@ export const AdjustIsolatedMarginForm = ({
         ]}
       />
 
-      <div tw="gap-[0.56rem] flexColumn">
+      <div tw="flexColumn gap-[0.56rem]">
         <$ToggleGroup
           items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
             label: key,

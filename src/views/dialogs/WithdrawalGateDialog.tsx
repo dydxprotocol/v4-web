@@ -53,7 +53,7 @@ export const WithdrawalGateDialog = ({
         </div>
       }
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         {stringGetter({
           key: STRING_KEYS.WITHDRAWALS_PAUSED_DESC,
           params: {

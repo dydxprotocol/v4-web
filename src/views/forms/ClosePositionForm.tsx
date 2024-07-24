@@ -268,7 +268,7 @@ export const ClosePositionForm = ({
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <div tw="gap-[var(--form-input-gap)] flexColumn">
+        <div tw="flexColumn gap-[var(--form-input-gap)]">
           <PositionPreview />
           {alertMessage}
         </div>
@@ -287,7 +287,7 @@ export const ClosePositionForm = ({
 
       <$Footer>
         {size != null && (
-          <div tw="justify-self-end px-0 py-0.5 row">
+          <div tw="row justify-self-end px-0 py-0.5">
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}

@@ -46,7 +46,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
           {showHistory && <VaultTransactionsTable />}
         </>
       ) : (
-        <div tw="content-center justify-items-center p-1 text-text-0 column">
+        <div tw="column content-center justify-items-center p-1 text-text-0">
           <div>
             <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
           </div>

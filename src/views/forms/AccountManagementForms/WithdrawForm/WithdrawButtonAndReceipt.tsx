@@ -213,7 +213,7 @@ export const WithdrawButtonAndReceipt = ({
     </WithReceipt>
   );
 };
-const $RowWithGap = tw.span`gap-[0.5ch] row`;
+const $RowWithGap = tw.span`row gap-[0.5ch]`;
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);

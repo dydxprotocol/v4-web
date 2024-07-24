@@ -18,7 +18,7 @@ export const AdjustTargetLeverageDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE })}
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         <AdjustTargetLeverageForm onSetTargetLeverage={() => setIsOpen?.(false)} />
       </div>
     </Dialog>

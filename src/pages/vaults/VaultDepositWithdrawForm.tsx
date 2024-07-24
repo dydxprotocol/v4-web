@@ -327,7 +327,7 @@ export const VaultDepositWithdrawForm = ({
         onSubmitInputForm();
       }}
     >
-      <div tw="gap-0.5 row">
+      <div tw="row gap-0.5">
         <$TypeButton
           shape={ButtonShape.Rectangle}
           size={ButtonSize.Base}

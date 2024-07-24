@@ -45,7 +45,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           renderCell: ({ asset, currentLeverageMultiple, currentPosition }) => (
             <TableCell stacked slotLeft={<AssetIcon symbol={asset.id} tw="h-[2.5em]" />}>
               {asset.name}
-              <div tw="gap-0.25 row">
+              <div tw="row gap-0.25">
                 <$OutputSigned
                   value={
                     currentPosition.asset < 0

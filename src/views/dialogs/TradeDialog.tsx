@@ -54,7 +54,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
           title: (
-            <div tw="h-[var(--dialog-icon-size)] inlineRow">
+            <div tw="inlineRow h-[var(--dialog-icon-size)]">
               {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
             </div>
           ),

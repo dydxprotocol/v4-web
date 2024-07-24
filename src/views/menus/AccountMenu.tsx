@@ -106,7 +106,7 @@ export const AccountMenu = () => {
     <$DropdownMenu
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
-          <div tw="gap-1 px-1 pb-0.5 pt-1 flexColumn">
+          <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
             <$AddressRow>
               <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>

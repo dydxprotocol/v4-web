@@ -127,7 +127,7 @@ export default {
     extend: {},
   },
   plugins: [
-    plugin(function ({ addUtilities }) {
+    plugin(function ({ addUtilities, addComponents }) {
       addUtilities({
         '.font-tiny-regular': { font: 'var(--font-tiny-regular)' },
         '.font-tiny-book': { font: 'var(--font-tiny-book)' },
@@ -159,7 +159,8 @@ export default {
         '.font-extra-book': { font: 'var(--font-extra-book)' },
         '.font-extra-medium': { font: 'var(--font-extra-medium)' },
         '.font-extra-bold': { font: 'var(--font-extra-bold)' },
-
+      });
+      addComponents({
         '.row': {
           display: 'flex',
           flexDirection: 'row',

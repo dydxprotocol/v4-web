@@ -111,7 +111,7 @@ export const TriggersForm = ({
   };
 
   return (
-    <form onSubmit={onSubmit} tw="gap-[1.25ch] column">
+    <form onSubmit={onSubmit} tw="column gap-[1.25ch]">
       {priceInfo}
       <TriggerOrdersInputs
         symbol={symbol}

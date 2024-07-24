@@ -125,7 +125,7 @@ export const Tabs = <TabItemsValue extends string>({
       <$Header $side={side}>{triggers}</$Header>
 
       {sharedContent ?? (
-        <div tw="shadow-none stack">
+        <div tw="stack shadow-none">
           {items.map(({ asChild, value: childValue, content, forceMount }) => (
             <$Content
               key={childValue}

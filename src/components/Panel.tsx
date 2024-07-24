@@ -35,7 +35,7 @@ export const Panel = ({
   className,
 }: PanelProps) => (
   <$Panel onClick={onClick} className={className}>
-    <div tw="w-full flexColumn">
+    <div tw="flexColumn w-full">
       {href ? (
         <Link to={href}>
           {slotHeader ?? (

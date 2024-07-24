@@ -19,7 +19,7 @@ export const PageMenuNavigationItem = <
   <Link to={href ?? ''}>
     <$MenuItem>
       <div>{label}</div>
-      <div tw="gap-1 text-text-0 font-base-book row">
+      <div tw="row gap-1 text-text-0 font-base-book">
         {labelRight && <span>{labelRight}</span>}
         <Icon iconName={IconName.ChevronRight} tw="text-text-0" />
       </div>

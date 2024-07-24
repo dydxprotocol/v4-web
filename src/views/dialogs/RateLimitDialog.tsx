@@ -17,7 +17,7 @@ export const RateLimitDialog = ({ preventClose, setIsOpen }: DialogProps<RateLim
       title={stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_TITLE })}
       slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
     >
-      <div tw="gap-1 column">
+      <div tw="column gap-1">
         {stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE })}
       </div>
     </Dialog>

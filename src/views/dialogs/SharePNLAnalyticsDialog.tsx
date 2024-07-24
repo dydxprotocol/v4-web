@@ -102,7 +102,7 @@ export const SharePNLAnalyticsDialog = ({
           }
         }}
       >
-        <div tw="h-full flexColumn">
+        <div tw="flexColumn h-full">
           <$ShareableCardTitle>
             <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
 

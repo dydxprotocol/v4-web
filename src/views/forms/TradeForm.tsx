@@ -219,7 +219,7 @@ export const TradeForm = ({
 
   const tabletActionsRow = isTablet && (
     <$TopActionsRow>
-      <div tw="justify-between gap-0.25 inlineRow notTablet:hidden">
+      <div tw="inlineRow justify-between gap-0.25 notTablet:hidden">
         <$OrderbookButton
           slotRight={<Icon iconName={IconName.Caret} />}
           onPressedChange={setShowOrderbook}
@@ -256,7 +256,7 @@ export const TradeForm = ({
 
         {alertContent && (
           <AlertMessage type={alertType}>
-            <div tw="gap-0.75 row">
+            <div tw="row gap-0.75">
               {alertContent}
               {shouldPromptUserToPlaceLimitOrder && (
                 <$IconButton
@@ -277,7 +277,7 @@ export const TradeForm = ({
   const tradeFooter = (
     <$Footer>
       {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-        <div tw="justify-self-end px-0 py-0.5 row">
+        <div tw="row justify-self-end px-0 py-0.5">
           <Button
             type={ButtonType.Reset}
             action={ButtonAction.Reset}

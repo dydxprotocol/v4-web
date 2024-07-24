@@ -148,7 +148,7 @@ const $RadioItem = styled(RadioItem)`
   --item-font-size: var(--dropdownSelectMenu-item-font-size);
 `;
 
-const $ItemLabel = tw.span`flex-1 inlineRow`;
+const $ItemLabel = tw.span`inlineRow flex-1`;
 
 const $ItemIndicator = styled(ItemIndicator)`
   margin-left: auto;

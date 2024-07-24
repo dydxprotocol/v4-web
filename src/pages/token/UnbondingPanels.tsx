@@ -30,7 +30,7 @@ export const UnbondingPanels = () => {
   }
 
   return (
-    <div tw="gap-1.5 flexColumn">
+    <div tw="flexColumn gap-1.5">
       {unbondingDelegations.map((delegation) => {
         const completionDate = new Date(delegation.completionTime).getTime();
         const currentDate = new Date().getTime();
@@ -94,7 +94,7 @@ export const UnbondingPanels = () => {
               </$Header>
             }
           >
-            <div tw="gap-1 flexColumn">
+            <div tw="flexColumn gap-1">
               <Output
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}

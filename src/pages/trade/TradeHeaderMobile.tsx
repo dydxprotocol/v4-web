@@ -27,7 +27,7 @@ export const TradeHeaderMobile = () => {
   return (
     <$Header>
       <BackButton onClick={() => navigate(AppRoute.Markets)} />
-      <div tw="gap-[1ch] inlineRow">
+      <div tw="inlineRow gap-[1ch]">
         <AssetIcon symbol={id} tw="text-[2.5rem]" />
         <$Name>
           <h3>{name}</h3>

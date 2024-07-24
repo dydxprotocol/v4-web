@@ -125,12 +125,12 @@ const RewardsPage = () => {
         <$DetachedSection>
           {showMigratePanel && <MigratePanel />}
           <div tw="flex gap-1.5">
-            <div tw="flex-[2] gap-1.5 flexColumn">
+            <div tw="flexColumn flex-[2] gap-1.5">
               <TradingRewardsChartPanel />
               <LaunchIncentivesPanel />
               <RewardHistoryPanel />
             </div>
-            <div tw="flex-1 gap-1.5 flexColumn">
+            <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
               <StakingPanel />

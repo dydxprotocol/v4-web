@@ -85,7 +85,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
           </Toolbar>
         </$Header>
 
-        <CollapsibleContent tw="shadow-none stack">
+        <CollapsibleContent tw="stack shadow-none">
           {tabItems.map(({ asChild, value, content }) => (
             <$TabsContent key={value} asChild={asChild} value={value}>
               {content}

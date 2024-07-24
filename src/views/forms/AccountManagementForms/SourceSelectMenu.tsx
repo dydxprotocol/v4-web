@@ -121,7 +121,7 @@ export const SourceSelectMenu = ({
       ].filter(isTruthy)}
       label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
-      <div tw="gap-0.5 text-text-2 font-base-book row">
+      <div tw="row gap-0.5 text-text-2 font-base-book">
         {selectedChainOption ? (
           <>
             <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
