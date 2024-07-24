@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
@@ -18,6 +18,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
@@ -58,8 +59,12 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { summary, requestPayload, exchange } =
-    useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const {
+    summary,
+    requestPayload,
+    exchange,
+    warning: routeWarning,
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
@@ -75,6 +80,13 @@ export const WithdrawButtonAndReceipt = ({
       X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
+
+  const warningMessage = useMemo(() => {
+    if (routeWarning) {
+      return JSON.parse(routeWarning)?.message;
+    }
+    return null;
+  }, [routeWarning]);
 
   const submitButtonReceipt = [
     {
@@ -191,22 +203,43 @@ export const WithdrawButtonAndReceipt = ({
   const isFormValid =
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
+
+  if (!canAccountTrade) {
+    return (
+      <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+        <OnboardingTriggerButton size={ButtonSize.Base} />
+      </$WithReceipt>
+    );
+  }
+
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
-      {!canAccountTrade ? (
-        <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : (
-        <Button
-          action={ButtonAction.Primary}
-          type={ButtonType.Submit}
-          state={{
-            isDisabled: !isFormValid,
-            isLoading: (isFormValid && !requestPayload) || isLoading,
-          }}
-        >
-          {stringGetter({ key: STRING_KEYS.WITHDRAW })}
-        </Button>
-      )}
+      {warningMessage ? (
+        <$CheckboxContainer>
+          <Checkbox
+            checked={hasAcknowledged}
+            onCheckedChange={setHasAcknowledged}
+            id="acknowledge-secret-phase-risk"
+            label={stringGetter({
+              key: STRING_KEYS.WARNING_MESSAGE,
+              params: {
+                WARNING_MESSAGE: warningMessage,
+              },
+            })}
+          />
+        </$CheckboxContainer>
+      ) : null}
+      <Button
+        action={ButtonAction.Primary}
+        type={ButtonType.Submit}
+        state={{
+          isDisabled: !isFormValid || (warningMessage && !hasAcknowledged),
+          isLoading: (isFormValid && !requestPayload) || isLoading,
+        }}
+      >
+        {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+      </Button>
     </$WithReceipt>
   );
 };
@@ -227,4 +260,9 @@ const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
+`;
+
+const $CheckboxContainer = styled.div`
+  padding: 1rem;
+  color: var(--color-text-0);
 `;
