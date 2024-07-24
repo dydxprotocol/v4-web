@@ -143,7 +143,6 @@ const RewardsPage = () => {
           </div>
         </$DetachedSection>
       )}
-      ;
     </$Page>
   );
 };

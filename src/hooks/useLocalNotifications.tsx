@@ -10,7 +10,12 @@ import type { TransferNotifcation } from '@/constants/notifications';
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { track } from '@/lib/analytics';
-import { STATUS_ERROR_GRACE_PERIOD, fetchTransferStatus, trackSkipTx } from '@/lib/squid';
+import {
+  STATUS_ERROR_GRACE_PERIOD,
+  fetchTransferStatus,
+  trackSkipTx,
+  trackSkipTxWithTenacity,
+} from '@/lib/squid';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
@@ -80,8 +85,13 @@ const useLocalNotificationsContext = () => {
 
   const addTransferNotification = useCallback(
     (notification: TransferNotifcation) => {
-      const { txHash, triggeredAt, toAmount, type } = notification;
+      const { txHash, triggeredAt, toAmount, type, fromChainId } = notification;
       setTransferNotifications([...transferNotifications, notification]);
+      trackSkipTxWithTenacity({
+        transactionHash: txHash,
+        chainId: fromChainId,
+        baseUrl: skip,
+      });
       // track initialized new transfer notification
       track(
         AnalyticsEvents.TransferNotification({
