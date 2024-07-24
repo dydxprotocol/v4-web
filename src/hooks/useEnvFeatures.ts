@@ -12,6 +12,7 @@ export interface EnvironmentFeatures {
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
   seasonFiveIncentivesDistributed: boolean;
+  isOhlcEnabled: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {
