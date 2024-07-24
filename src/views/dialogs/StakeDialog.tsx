@@ -10,8 +10,6 @@ import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
@@ -56,7 +54,7 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
       slotIcon={dialogProps[currentStep].slotIcon}
       slotFooter={<LegalDisclaimer />}
       title={
-        <$Title>
+        <span tw="inlineRow">
           {dialogProps[currentStep].title}
           {stakingApr && (
             <Tag sign={TagSign.Positive} tw="inline-block">
@@ -70,7 +68,7 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
               })}
             </Tag>
           )}
-        </$Title>
+        </span>
       }
       description={dialogProps[currentStep].description}
     >
@@ -110,8 +108,4 @@ const LegalDisclaimer = () => {
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
   --dialog-content-paddingBottom: 1rem;
-`;
-
-const $Title = styled.span`
-  ${layoutMixins.inlineRow}
 `;

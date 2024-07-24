@@ -14,8 +14,6 @@ import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -103,10 +101,10 @@ export const UnstakeFormInputContents = ({
             {
               key: 'amount',
               label: (
-                <$InlineRow>
+                <span tw="inlineRow">
                   {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })}
                   <Tag>{chainTokenLabel}</Tag>
-                </$InlineRow>
+                </span>
               ),
               value: (
                 <DiffOutput
@@ -162,7 +160,7 @@ export const UnstakeFormInputContents = ({
               key: STRING_KEYS.VALIDATOR,
             })}
           </div>
-          <$SpacedRow>
+          <div tw="spacedRow">
             {stringGetter({
               key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
             })}
@@ -178,7 +176,7 @@ export const UnstakeFormInputContents = ({
                 {stringGetter({ key: STRING_KEYS.ALL })}
               </$Button>
             )}
-          </$SpacedRow>
+          </div>
           {stakingValidators &&
             currentDelegations?.map((delegation) => {
               const balance = MustBigNumber(delegation.amount).toNumber();
@@ -223,14 +221,6 @@ export const UnstakeFormInputContents = ({
     </>
   );
 };
-const $InlineRow = styled.span`
-  ${layoutMixins.inlineRow}
-`;
-
-const $SpacedRow = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
 const $Button = styled(Button)`
   --button-border: none;
   --button-padding: 0;

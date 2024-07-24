@@ -92,7 +92,7 @@ export const Fees = () => {
   return (
     <AttachedExpandingSection>
       {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.FEES })} />}
-      <$ContentWrapper>
+      <div tw="max-w-[100vw] gap-1.5 flexColumn">
         <$FeesDetails
           layout="grid"
           items={[
@@ -188,16 +188,10 @@ export const Fees = () => {
           withOuterBorder={isNotTablet}
           withInnerBorders
         />
-      </$ContentWrapper>
+      </div>
     </AttachedExpandingSection>
   );
 };
-const $ContentWrapper = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  max-width: 100vw;
-`;
-
 const $AdditionalConditions = styled.div`
   color: var(--color-text-0);
   font: var(--font-small-book);

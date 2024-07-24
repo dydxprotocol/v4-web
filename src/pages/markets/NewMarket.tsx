@@ -92,7 +92,7 @@ const NewMarket = () => {
 
   return (
     <$Page>
-      <$HeaderSection>
+      <section tw="tablet:mb-0.5 tablet:gap-1 tablet:flexColumn">
         <$ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.LIST_A_NEW_MARKET })}
           slotRight={
@@ -100,7 +100,7 @@ const NewMarket = () => {
           }
           subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.LISTINGS_DESCRIPTION })}
         />
-      </$HeaderSection>
+      </section>
       <$Content>
         <div>
           <Button
@@ -169,18 +169,6 @@ const $ContentSectionHeader = styled(ContentSectionHeader)`
     }
   }
 `;
-
-const $HeaderSection = styled.section`
-  ${layoutMixins.contentSectionDetached}
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.flexColumn}
-    gap: 1rem;
-
-    margin-bottom: 0.5rem;
-  }
-`;
-
 const $Content = styled.div`
   display: flex;
   flex-direction: row;

@@ -201,7 +201,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       </div>
 
       <$Footer>
-        <$RememberMe htmlFor="remember-me">
+        <label htmlFor="remember-me" tw="font-base-book spacedRow">
           <WithTooltip withIcon tooltip="remember-me">
             {stringGetter({ key: STRING_KEYS.REMEMBER_ME })}
           </WithTooltip>
@@ -212,7 +212,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
             checked={shouldRememberMe}
             onCheckedChange={setShouldRememberMe}
           />
-        </$RememberMe>
+        </label>
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
         <WithReceipt
           slotReceipt={
@@ -302,9 +302,4 @@ const $Footer = styled.footer`
 
   display: grid;
   gap: 1rem;
-`;
-
-const $RememberMe = styled.label`
-  ${layoutMixins.spacedRow}
-  font: var(--font-base-book);
 `;

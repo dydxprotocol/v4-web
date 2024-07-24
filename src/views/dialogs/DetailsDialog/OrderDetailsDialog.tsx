@@ -1,6 +1,5 @@
 import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import {
   AbacusMarginMode,
@@ -17,8 +16,6 @@ import { CancelOrderStatuses } from '@/constants/trade';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -121,12 +118,12 @@ export const OrderDetailsDialog = ({
         key: 'status',
         label: stringGetter({ key: STRING_KEYS.STATUS }),
         value: (
-          <$Row>
+          <div tw="inlineRow">
             <OrderStatusIcon status={status.rawValue} />
             <span tw="font-small-medium">
               {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
             </span>
-          </$Row>
+          </div>
         ),
       },
       {
@@ -243,6 +240,3 @@ export const OrderDetailsDialog = ({
     />
   );
 };
-const $Row = styled.div`
-  ${layoutMixins.inlineRow}
-`;

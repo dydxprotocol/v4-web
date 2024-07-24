@@ -25,7 +25,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -363,11 +362,15 @@ export const AdjustIsolatedMarginForm = ({
   ) : errorMessage ? (
     <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
   ) : (
-    <$GradientCard fromColor="neutral" toColor={gradientToColor}>
-      <$Column>
+    <GradientCard
+      fromColor="neutral"
+      toColor={gradientToColor}
+      tw="h-4 items-center rounded-0.5 px-1 py-0.75 spacedRow"
+    >
+      <div tw="font-small-medium column">
         <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
-      </$Column>
+      </div>
       <div>
         <DiffOutput
           withDiff={
@@ -383,7 +386,7 @@ export const AdjustIsolatedMarginForm = ({
           fractionDigits={tickSizeDecimals}
         />
       </div>
-    </$GradientCard>
+    </GradientCard>
   );
 
   return (
@@ -409,7 +412,7 @@ export const AdjustIsolatedMarginForm = ({
         ]}
       />
 
-      <$RelatedInputsGroup>
+      <div tw="gap-[0.56rem] flexColumn">
         <$ToggleGroup
           items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
             label: key,
@@ -428,7 +431,7 @@ export const AdjustIsolatedMarginForm = ({
             onChange={setAmount}
           />
         </WithDetailsReceipt>
-      </$RelatedInputsGroup>
+      </div>
 
       {CenterElement}
 
@@ -458,22 +461,6 @@ export const AdjustIsolatedMarginForm = ({
 const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
-
-const $RelatedInputsGroup = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.56rem;
-`;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
-`;
-const $GradientCard = styled(GradientCard)`
-  ${layoutMixins.spacedRow}
-  height: 4rem;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  align-items: center;
-`;
-const $Column = styled.div`
-  ${layoutMixins.column}
-  font: var(--font-small-medium);
 `;

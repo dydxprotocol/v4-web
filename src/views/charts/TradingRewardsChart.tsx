@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import styled from 'styled-components';
 
 import {
   HistoricalTradingReward,
@@ -25,8 +24,6 @@ import { useNow } from '@/hooks/useNow';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { OutputType, formatNumberOutput } from '@/components/Output';
@@ -235,7 +232,7 @@ export const TradingRewardsChart = ({
   return (
     <>
       {rewardsData.length === 0 ? undefined : (
-        <$TitleContainer>
+        <div tw="w-full font-medium-book spacedRow">
           <span tw="h-min text-text-1">
             {stringGetter({
               key: STRING_KEYS.TRADING_REWARDS,
@@ -248,7 +245,7 @@ export const TradingRewardsChart = ({
             onValueChange={setTradingRewardsPeriod}
             onInteraction={onToggleInteract}
           />
-        </$TitleContainer>
+        </div>
       )}
       <TimeSeriesChart
         className={className}
@@ -270,32 +267,15 @@ export const TradingRewardsChart = ({
         tickSpacingY={50}
       >
         {rewardsData.length > 0 && (
-          <$Value>
+          <div tw="isolate basis-full place-self-start text-text-2 font-large-book inlineRow">
             {MustBigNumber(
               tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
                 totalTradingRewards
             ).toFixed(TOKEN_DECIMALS)}
             <AssetIcon symbol={chainTokenLabel} />
-          </$Value>
+          </div>
         )}
       </TimeSeriesChart>
     </>
   );
 };
-
-const $TitleContainer = styled.div`
-  ${layoutMixins.spacedRow}
-  width: 100%;
-
-  font: var(--font-medium-book);
-`;
-const $Value = styled.div`
-  place-self: start;
-  isolation: isolate;
-
-  color: var(--color-text-2);
-  font: var(--font-large-book);
-
-  ${layoutMixins.inlineRow}
-  flex-basis: 100%;
-`;

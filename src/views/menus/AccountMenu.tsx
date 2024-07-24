@@ -106,7 +106,7 @@ export const AccountMenu = () => {
     <$DropdownMenu
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
-          <$AccountInfo>
+          <div tw="gap-1 px-1 pb-0.5 pt-1 flexColumn">
             <$AddressRow>
               <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>
@@ -215,7 +215,7 @@ export const AccountMenu = () => {
                 />
               </div>
             </$Balances>
-          </$AccountInfo>
+          </div>
         )
       }
       items={[
@@ -338,7 +338,7 @@ const AssetActions = memo(
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
   }) => (
-    <$InlineRow>
+    <div tw="inlineRow">
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
@@ -375,25 +375,12 @@ const AssetActions = memo(
             />
           </WithTooltip>
         ))}
-    </$InlineRow>
+    </div>
   )
 );
-
-const $AccountInfo = styled.div`
-  ${layoutMixins.flexColumn}
-
-  gap: 1rem;
-  padding: 1rem 1rem 0.5rem 1rem;
-`;
-
 const $Column = styled.div`
   ${layoutMixins.column}
 `;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $AddressRow = styled.div`
   ${layoutMixins.row}
 

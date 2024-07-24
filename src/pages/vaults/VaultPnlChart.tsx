@@ -14,8 +14,6 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
@@ -166,7 +164,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       : undefined;
   return (
     <div className={className}>
-      <$TogglesContainer>
+      <div tw="justify-between pl-1 pr-1 row">
         <ToggleGroup
           size={ButtonSize.Small}
           items={[
@@ -182,19 +180,19 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           value={selectedTimeRange ?? ''}
           onValueChange={handleTimeRangeSelect}
         />
-      </$TogglesContainer>
+      </div>
       <$ChartContainer>
         <$ChartBackground chartBackground={chartDotsBackground} />
-        <$NumbersContainer>
+        <div tw="pl-1 pr-1 flexColumn">
           {hoveredTime != null && (
             <div tw="text-text-0 font-small-book">
               <Output value={hoveredTime} type={OutputType.Date} />
             </div>
           )}
-          <$PnlNumbers>
+          <div tw="gap-0.5 font-base-medium row">
             <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
-              <$DiffNumbers>
+              <div tw="gap-[0.35rem] row">
                 <TriangleIndicator value={MustBigNumber(pnlDiff)} />
                 <$ColoredOutput
                   $sign={getNumberSign(pnlDiff)}
@@ -207,10 +205,10 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
                   type={OutputType.Percent}
                   withParentheses
                 />
-              </$DiffNumbers>
+              </div>
             )}
-          </$PnlNumbers>
-        </$NumbersContainer>
+          </div>
+        </div>
         <TimeSeriesChart
           selectedLocale={selectedLocale}
           data={data}
@@ -246,20 +244,6 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     </div>
   );
 };
-
-const $TogglesContainer = styled.div`
-  ${layoutMixins.row}
-  padding-left: 1rem;
-  padding-right: 1rem;
-  justify-content: space-between;
-`;
-
-const $NumbersContainer = styled.div`
-  ${layoutMixins.flexColumn}
-  padding-left: 1rem;
-  padding-right: 1rem;
-`;
-
 const $ChartContainer = styled.div`
   height: 25rem;
   margin-top: 0.5rem;
@@ -274,16 +258,6 @@ const $ChartBackground = styled.div<{ chartBackground: string }>`
   mask-image: radial-gradient(ellipse closest-side, black 40%, transparent 100%);
   pointer-events: none;
 `;
-const $PnlNumbers = styled.div`
-  ${layoutMixins.row}
-  font: var(--font-base-medium);
-  gap: 0.5rem;
-`;
-const $DiffNumbers = styled.div`
-  ${layoutMixins.row}
-  gap: .35rem;
-`;
-
 const $ColoredOutput = styled(Output)<{ $sign: NumberSign }>`
   ${({ $sign }) =>
     $sign &&

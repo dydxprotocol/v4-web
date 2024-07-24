@@ -327,7 +327,7 @@ export const VaultDepositWithdrawForm = ({
         onSubmitInputForm();
       }}
     >
-      <$HeaderRow>
+      <div tw="gap-0.5 row">
         <$TypeButton
           shape={ButtonShape.Rectangle}
           size={ButtonSize.Base}
@@ -346,7 +346,7 @@ export const VaultDepositWithdrawForm = ({
         >
           {stringGetter({ key: STRING_KEYS.WITHDRAW })}
         </$TypeButton>
-      </$HeaderRow>
+      </div>
 
       <WithDetailsReceipt side="bottom" detailItems={inputFormConfig.inputReceiptItems}>
         <FormInput
@@ -475,11 +475,6 @@ export const VaultDepositWithdrawForm = ({
   );
   return <div tw="p-1.5">{currentForm === 'input' ? inputForm : confirmForm}</div>;
 };
-const $HeaderRow = styled.div`
-  ${layoutMixins.row}
-  gap: .5rem;
-`;
-
 const $TypeButton = styled(Button)<{ $active: boolean }>`
   padding: 0.5rem 1.25rem;
   font: var(--font-medium-medium);

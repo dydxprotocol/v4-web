@@ -159,6 +159,41 @@ export default {
         '.font-extra-book': { font: 'var(--font-extra-book)' },
         '.font-extra-medium': { font: 'var(--font-extra-medium)' },
         '.font-extra-bold': { font: 'var(--font-extra-bold)' },
+
+        '.row': {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+        '.column': {
+          display: 'grid',
+          gridAutoFlow: 'row',
+          gridTemplateColumns: 'minmax(0, 1fr)',
+        },
+        '.inlineRow': {
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5ch',
+          minWidth: 'max-content',
+        },
+        '.spacedRow': {
+          display: 'grid',
+          gridAutoFlow: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        },
+        '.flexColumn': {
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: '0',
+        },
+        '.stack ': {
+          display: 'grid',
+          gridTemplateAreas: 'stack',
+          '> *, &:before, &:after': {
+            gridArea: 'stack',
+          },
+        },
       });
     }),
   ],

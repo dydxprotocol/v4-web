@@ -19,10 +19,10 @@ export const PageMenuNavigationItem = <
   <Link to={href ?? ''}>
     <$MenuItem>
       <div>{label}</div>
-      <$RightRow>
+      <div tw="gap-1 text-text-0 font-base-book row">
         {labelRight && <span>{labelRight}</span>}
         <Icon iconName={IconName.ChevronRight} tw="text-text-0" />
-      </$RightRow>
+      </div>
     </$MenuItem>
   </Link>
 );
@@ -33,12 +33,4 @@ const $MenuItem = styled.ul`
   /* --item-border-width: var(--border-width); */
 
   ${layoutMixins.spacedRow}
-`;
-
-const $RightRow = styled.div`
-  ${layoutMixins.row}
-  gap: 1rem;
-
-  font: var(--font-base-book);
-  color: var(--color-text-0);
 `;

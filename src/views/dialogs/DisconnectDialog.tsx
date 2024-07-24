@@ -1,5 +1,4 @@
 import { Close } from '@radix-ui/react-dialog';
-import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, DisconnectWalletDialogProps } from '@/constants/dialogs';
@@ -7,8 +6,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -28,9 +25,9 @@ export const DisconnectDialog = ({ setIsOpen }: DialogProps<DisconnectWalletDial
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.DISCONNECT })}>
-      <$Content>
+      <div tw="gap-1 column">
         <p>{stringGetter({ key: STRING_KEYS.DISCONNECT_CONFIRMATION })}</p>
-        <$ButtonRow>
+        <div tw="gap-0.5 row [justify-content:end]">
           <Close asChild>
             <Button action={ButtonAction.Destroy} onClick={disconnect}>
               {stringGetter({ key: STRING_KEYS.DISCONNECT })}
@@ -39,19 +36,8 @@ export const DisconnectDialog = ({ setIsOpen }: DialogProps<DisconnectWalletDial
           <Close asChild>
             <Button onClick={onCancel}>{stringGetter({ key: STRING_KEYS.CANCEL })}</Button>
           </Close>
-        </$ButtonRow>
-      </$Content>
+        </div>
+      </div>
     </Dialog>
   );
 };
-const $ButtonRow = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.5rem;
-  justify-content: end;
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

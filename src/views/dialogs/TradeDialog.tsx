@@ -9,8 +9,6 @@ import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
@@ -56,7 +54,9 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
           title: (
-            <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
+            <div tw="h-[var(--dialog-icon-size)] inlineRow">
+              {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
+            </div>
           ),
           description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
         },
@@ -115,8 +115,4 @@ const $TradeForm = styled(TradeForm)`
   --tradeBox-content-paddingRight: 1.5rem;
   --tradeBox-content-paddingBottom: 1.5rem;
   --tradeBox-content-paddingLeft: 1.5rem;
-`;
-const $PreviewTitle = styled.div`
-  ${layoutMixins.inlineRow}
-  height: var(--dialog-icon-size);
 `;

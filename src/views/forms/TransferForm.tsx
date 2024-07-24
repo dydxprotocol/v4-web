@@ -337,10 +337,10 @@ export const TransferForm = ({
           id="destination"
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
-            <$DestinationInputLabel>
+            <span tw="inlineRow">
               {stringGetter({ key: STRING_KEYS.DESTINATION })}
               {isAddressValid && <Icon iconName={IconName.Check} tw="text-success" />}
-            </$DestinationInputLabel>
+            </span>
           }
           type={InputType.Text}
           value={recipientAddress ?? ''}
@@ -489,10 +489,6 @@ const $InlineRow = styled.span`
   img {
     font-size: 1.1em;
   }
-`;
-
-const $DestinationInputLabel = styled.span`
-  ${layoutMixins.inlineRow}
 `;
 const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}

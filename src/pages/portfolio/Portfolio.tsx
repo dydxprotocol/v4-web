@@ -139,7 +139,7 @@ const PortfolioPage = () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <$SideBar>
+          <div tw="h-full justify-between flexColumn">
             <NavigationMenu
               items={[
                 {
@@ -255,7 +255,7 @@ const PortfolioPage = () => {
                   )}
               </$Footer>
             )}
-          </$SideBar>
+          </div>
         )
       }
     >
@@ -270,14 +270,6 @@ const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
 `;
-
-const $SideBar = styled.div`
-  ${layoutMixins.flexColumn}
-  justify-content: space-between;
-
-  height: 100%;
-`;
-
 const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;

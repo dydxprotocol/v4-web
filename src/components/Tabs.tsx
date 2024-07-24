@@ -125,7 +125,7 @@ export const Tabs = <TabItemsValue extends string>({
       <$Header $side={side}>{triggers}</$Header>
 
       {sharedContent ?? (
-        <$Stack>
+        <div tw="shadow-none stack">
           {items.map(({ asChild, value: childValue, content, forceMount }) => (
             <$Content
               key={childValue}
@@ -138,7 +138,7 @@ export const Tabs = <TabItemsValue extends string>({
               {content}
             </$Content>
           ))}
-        </$Stack>
+        </div>
       )}
     </$Root>
   );
@@ -277,13 +277,6 @@ const $Trigger = styled(Trigger)<{ $withBorders?: boolean; $withUnderline?: bool
       ${tabTriggerUnderlineStyle}
     `}
 `;
-
-const $Stack = styled.div`
-  ${layoutMixins.stack}
-
-  box-shadow: none;
-`;
-
 const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
   ${layoutMixins.flexColumn}
   outline: none;

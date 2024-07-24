@@ -5,6 +5,7 @@ import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -429,9 +430,7 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
+const $InlineRow = tw.div`inlineRow`;
 
 const $AssetIcon = styled(AssetIcon)`
   font-size: 2rem;

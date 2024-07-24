@@ -72,9 +72,9 @@ export const AccountInfoConnectedState = () => {
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
       {!showHeader ? null : (
-        <$Header>
+        <header tw="px-1.25 py-0 font-small-book spacedRow">
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
-          <$TransferButtons>
+          <div tw="gap-1 inlineRow">
             <$Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
@@ -106,10 +106,10 @@ export const AccountInfoConnectedState = () => {
                 </WithTooltip>
               </>
             )}
-          </$TransferButtons>
-        </$Header>
+          </div>
+        </header>
       )}
-      <$Stack>
+      <div tw="stack">
         {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <$CornerButton
             state={{ isDisabled: !dydxAccounts }}
@@ -189,14 +189,10 @@ export const AccountInfoConnectedState = () => {
           showHeader={showHeader}
           isLoading={isLoading}
         />
-      </$Stack>
+      </div>
     </$ConnectedAccountInfoContainer>
   );
 };
-const $Stack = styled.div`
-  ${layoutMixins.stack}
-`;
-
 const $CornerButton = styled(Button)`
   ${layoutMixins.withOuterBorder}
   z-index: 1;
@@ -247,18 +243,6 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
     }
   }
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.spacedRow}
-  font: var(--font-small-book);
-  padding: 0 1.25rem;
-`;
-
-const $TransferButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-`;
-
 const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
   ${layoutMixins.column}
 

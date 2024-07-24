@@ -1,12 +1,8 @@
-import styled from 'styled-components';
-
 import { DialogProps, RestrictedWalletDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
@@ -26,14 +22,10 @@ export const RestrictedWalletDialog = ({
       title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
       slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
     >
-      <$Content>
+      <div tw="gap-1 column">
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
         {isDev && <NetworkSelectMenu />}
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

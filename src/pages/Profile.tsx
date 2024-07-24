@@ -135,7 +135,7 @@ const Profile = () => {
 
   return (
     <$MobileProfileLayout>
-      <$Header>
+      <header tw="px-1 py-0 row [grid-area:header]">
         <$ProfileIcon />
         <div>
           <h1 tw="font-extra-medium">
@@ -151,7 +151,7 @@ const Profile = () => {
             <span>-</span>
           )}
         </div>
-      </$Header>
+      </header>
       <$Actions withSeparators={false}>
         {actions.map(({ key, label, href, icon, onClick }) => {
           const action = (
@@ -293,13 +293,6 @@ const $MobileProfileLayout = styled.div`
       'incentives incentives';
   }
 `;
-
-const $Header = styled.header`
-  grid-area: header;
-  ${layoutMixins.row}
-  padding: 0 1rem;
-`;
-
 const $ProfileIcon = styled.div`
   width: 4rem;
   height: 4rem;
@@ -413,10 +406,6 @@ const $HistoryPanel = styled(Panel)`
   }
 `;
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-  padding: 1rem;
-  gap: 0.5rem;
-`;
+const $InlineRow = tw.div`gap-0.5 p-1 inlineRow`;
 
 const $PanelButton = tw(Panel)`[--panel-paddingY:0] [--panel-paddingX:0] `;

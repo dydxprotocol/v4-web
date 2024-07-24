@@ -1,7 +1,3 @@
-import styled from 'styled-components';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-
 type ElementProps = {
   label?: React.ReactNode;
   children?: React.ReactNode;
@@ -14,12 +10,9 @@ type StyleProps = {
 
 export const WithLabel = ({ label, inputID, children, className }: ElementProps & StyleProps) => (
   <div className={className} tw="grid gap-0.5 [--label-textColor:var(--color-text-1)]">
-    <$Label htmlFor={inputID}>{label}</$Label>
+    <label htmlFor={inputID} tw="text-[color:var(--label-textColor)] font-mini-book inlineRow">
+      {label}
+    </label>
     {children}
   </div>
 );
-const $Label = styled.label`
-  ${layoutMixins.inlineRow}
-  font: var(--font-mini-book);
-  color: var(--label-textColor);
-`;

@@ -40,19 +40,19 @@ export const TradingRewardsSummaryPanel = () => {
     <Panel
       slotHeader={<$Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</$Header>}
     >
-      <$Content>
+      <div tw="gap-0.75 flexColumn">
         <$TradingRewardsDetails
           layout="grid"
           items={[
             {
               key: 'week',
               label: (
-                <$Label>
+                <div tw="text-text-1 font-base-book spacedRow">
                   <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
-                </$Label>
+                </div>
               ),
               value: (
-                <$Column>
+                <div tw="gap-[0.33rem] flexColumn">
                   <Output
                     slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
                     type={OutputType.Asset}
@@ -71,13 +71,13 @@ export const TradingRewardsSummaryPanel = () => {
                       timeOptions={{ useUTC: true }}
                     />
                   </$TimePeriod>
-                </$Column>
+                </div>
               ),
             },
             // TODO(@aforaleka): add all-time when supported
           ]}
         />
-      </$Content>
+      </div>
     </Panel>
   );
 };
@@ -86,12 +86,6 @@ const $Header = styled.div`
   font: var(--font-medium-book);
   color: var(--color-text-2);
 `;
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.75rem;
-`;
-
 const $TradingRewardsDetails = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
 
@@ -114,14 +108,6 @@ const $TradingRewardsDetails = styled(Details)`
     font: var(--font-large-book);
   }
 `;
-
-const $Label = styled.div`
-  ${layoutMixins.spacedRow}
-
-  font: var(--font-base-book);
-  color: var(--color-text-1);
-`;
-
 const $TimePeriod = styled.div`
   ${layoutMixins.inlineRow}
 
@@ -129,9 +115,4 @@ const $TimePeriod = styled.div`
     color: var(--color-text-0);
     font: var(--font-small-book);
   }
-`;
-
-const $Column = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.33rem;
 `;

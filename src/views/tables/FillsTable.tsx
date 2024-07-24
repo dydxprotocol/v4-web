@@ -5,6 +5,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -14,7 +15,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -379,9 +379,7 @@ export const FillsTable = ({
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
+const $InlineRow = tw.div`inlineRow`;
 const $Side = styled.span<{ side: Nullable<OrderSide> }>`
   ${({ side }) =>
     side &&

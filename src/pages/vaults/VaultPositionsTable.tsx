@@ -10,7 +10,6 @@ import { AppRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -46,7 +45,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           renderCell: ({ asset, currentLeverageMultiple, currentPosition }) => (
             <TableCell stacked slotLeft={<AssetIcon symbol={asset.id} tw="h-[2.5em]" />}>
               {asset.name}
-              <$CellRow>
+              <div tw="gap-0.25 row">
                 <$OutputSigned
                   value={
                     currentPosition.asset < 0
@@ -58,7 +57,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 />
                 @
                 <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
-              </$CellRow>
+              </div>
             </TableCell>
           ),
         },
@@ -167,8 +166,4 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
     })[sign]};
-`;
-const $CellRow = styled.div`
-  ${layoutMixins.row}
-  gap: 0.25rem;
 `;

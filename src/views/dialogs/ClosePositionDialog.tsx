@@ -52,7 +52,9 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
-        <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
+        <div tw="h-[var(--dialog-icon-size)] inlineRow">
+          {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
+        </div>
       ),
       description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
     },
@@ -99,9 +101,9 @@ const CloseOrderHeader = () => {
     useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
-    <$CloseOrderHeader>
+    <div tw="spacedRow">
       <h2>{stringGetter({ key: STRING_KEYS.CLOSE })}</h2>
-      <$Right>
+      <div tw="mr-0.5 gap-1 inlineRow">
         <$MarketDetails>
           <MidMarketPrice />
           <$PriceChange
@@ -111,8 +113,8 @@ const CloseOrderHeader = () => {
           />
         </$MarketDetails>
         <$VerticalSeparator />
-      </$Right>
-    </$CloseOrderHeader>
+      </div>
+    </div>
   );
 };
 const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
@@ -130,16 +132,6 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
       --dialog-icon-size: 2.5rem;
     `}
 `;
-const $CloseOrderHeader = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $Right = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-  margin-right: 0.5rem;
-`;
-
 const $MarketDetails = styled.div`
   ${layoutMixins.rowColumn}
   justify-items: flex-end;
@@ -155,9 +147,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
   && {
     height: 3rem;
   }
-`;
-
-const $PreviewTitle = styled.div`
-  ${layoutMixins.inlineRow}
-  height: var(--dialog-icon-size);
 `;

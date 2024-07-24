@@ -27,7 +27,10 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   return (
-    <$MarketsStats className={className}>
+    <section
+      className={className}
+      tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
+    >
       <ExchangeBillboards />
       <$Section>
         <$SectionHeader>
@@ -62,24 +65,9 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         </$SectionHeader>
         <MarketsCompactTable sorting={sorting} />
       </$Section>
-    </$MarketsStats>
+    </section>
   );
 };
-
-const $MarketsStats = styled.section`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-
-  @media ${breakpoints.desktopSmall} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.column}
-  }
-`;
 const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-layer-3`;
 const $NewTag = tw(Tag)`bg-accent-faded text-accent `;
 const $ToggleGroupContainer = styled.div`

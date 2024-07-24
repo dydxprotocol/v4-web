@@ -1,9 +1,6 @@
 import { useState } from 'react';
 
 import type { Story } from '@ladle/react';
-import styled from 'styled-components';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { WithLabel } from '@/components/WithLabel';
@@ -16,7 +13,7 @@ export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => 
 
   return (
     <StoryWrapper>
-      <$Column>
+      <div tw="gap-1 column">
         <WithLabel {...args}>
           <Input
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
@@ -33,7 +30,7 @@ export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => 
             value={lastName}
           />
         </WithLabel>
-      </$Column>
+      </div>
     </StoryWrapper>
   );
 };
@@ -41,7 +38,3 @@ export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => 
 WithLabelStory.args = {
   label: 'First Name',
 };
-const $Column = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

@@ -8,7 +8,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
@@ -47,24 +46,16 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
           {showHistory && <VaultTransactionsTable />}
         </>
       ) : (
-        <$Empty>
+        <div tw="content-center justify-items-center p-1 text-text-0 column">
           <div>
             <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
           </div>
           <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
-        </$Empty>
+        </div>
       )}
     </div>
   );
 };
-
-const $Empty = styled.div`
-  ${layoutMixins.column}
-  padding: 1rem;
-  color: var(--color-text-0);
-  justify-items: center;
-  align-content: center;
-`;
 const $ShowHideHistoryButton = styled(Button)``;
 const VaultTransactionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -78,7 +69,7 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
           getCellValue: (row) => row.timestampMs,
           label: stringGetter({ key: STRING_KEYS.TIME }),
           renderCell: ({ timestampMs }) => (
-            <$Stack>
+            <div tw="column">
               <Output
                 value={timestampMs}
                 type={OutputType.Date}
@@ -87,7 +78,7 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
               <div tw="text-[0.75rem] leading-[0.7rem] text-text-0">
                 <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
               </div>
-            </$Stack>
+            </div>
           ),
         },
         {
@@ -136,7 +127,3 @@ const $Table = styled(Table)`
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
 ` as typeof Table;
-
-const $Stack = styled.div`
-  ${layoutMixins.column}
-`;

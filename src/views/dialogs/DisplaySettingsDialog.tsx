@@ -33,10 +33,10 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
 
   const sectionHeader = (heading: string) => {
     return (
-      <$Header>
+      <header tw="inlineRow">
         {heading}
         <HorizontalSeparatorFiller />
-      </$Header>
+      </header>
     );
   };
 
@@ -165,11 +165,6 @@ const $Section = styled.div`
   ${gridStyle}
   padding: 1rem 0;
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.inlineRow}
-`;
-
 const $AppThemeRoot = styled(Root)`
   ${gridStyle}
   grid-template-columns: 1fr 1fr;

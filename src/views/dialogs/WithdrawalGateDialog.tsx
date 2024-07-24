@@ -8,7 +8,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LinkOutIcon } from '@/icons';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -54,14 +53,14 @@ export const WithdrawalGateDialog = ({
         </div>
       }
     >
-      <$Content>
+      <div tw="gap-1 column">
         {stringGetter({
           key: STRING_KEYS.WITHDRAWALS_PAUSED_DESC,
           params: {
             ESTIMATED_DURATION: estimatedUnblockTime,
           },
         })}
-      </$Content>
+      </div>
     </Dialog>
   );
 };
@@ -76,8 +75,4 @@ const $IconContainer = styled.div`
   min-width: 4.5rem;
   min-height: 4.5rem;
   background-color: var(--color-gradient-warning);
-`;
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
 `;

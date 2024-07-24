@@ -102,7 +102,7 @@ export const SharePNLAnalyticsDialog = ({
           }
         }}
       >
-        <$ShareableCardSide>
+        <div tw="h-full flexColumn">
           <$ShareableCardTitle>
             <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
 
@@ -121,7 +121,7 @@ export const SharePNLAnalyticsDialog = ({
           />
 
           <LogoIcon tw="mt-auto h-auto w-[5.125rem]" />
-        </$ShareableCardSide>
+        </div>
 
         <div>
           <div tw="grid grid-cols-[repeat(2,1fr)] gap-[1.125rem] gap-y-0.5">
@@ -205,12 +205,6 @@ const $ShareableCard = styled.div`
   padding: 1.75rem 1.25rem 1.25rem 1.25rem;
   border-radius: 0.5rem;
 `;
-
-const $ShareableCardSide = styled.div`
-  ${layoutMixins.flexColumn}
-  height: 100%;
-`;
-
 const $ShareableCardTitle = styled.div`
   ${layoutMixins.row};
   gap: 0.5rem;

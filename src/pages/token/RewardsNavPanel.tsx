@@ -1,13 +1,9 @@
 import React from 'react';
 
-import styled from 'styled-components';
-
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -41,9 +37,9 @@ export const RewardsNavPanel = ({
     <Panel
       className={className}
       slotHeaderContent={
-        <$Title>
+        <h3 tw="-mb-1.5 text-text-1 font-medium-book inlineRow">
           {title} {titleTag && <Tag tw="bg-accent-faded text-accent">{titleTag}</Tag>}
-        </$Title>
+        </h3>
       }
       slotRight={
         <div tw="pr-1.5">
@@ -73,10 +69,3 @@ export const RewardsNavPanel = ({
     </Panel>
   );
 };
-
-const $Title = styled.h3`
-  ${layoutMixins.inlineRow}
-  font: var(--font-medium-book);
-  margin-bottom: -1.5rem;
-  color: var(--color-text-1);
-`;

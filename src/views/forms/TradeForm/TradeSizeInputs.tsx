@@ -198,7 +198,7 @@ export const TradeSizeInputs = () => {
   );
 
   return (
-    <$Column>
+    <div tw="gap-[var(--form-input-gap)] flexColumn">
       {showUSDCInput ? usdcInput : sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
@@ -208,15 +208,9 @@ export const TradeSizeInputs = () => {
           }
         />
       )}
-    </$Column>
+    </div>
   );
 };
-
-const $Column = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: var(--form-input-gap);
-`;
-
 const $ToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
   --button-font: var(--font-base-book);

@@ -43,12 +43,12 @@ export const TradeDialogTrigger = () => {
         <$TradeDialogTrigger hasSummary={hasSummary}>
           {hasSummary ? (
             <$TradeSummary>
-              <$TradeType>
+              <div tw="inlineRow">
                 <span>
                   {stringGetter({ key: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey })}
                 </span>
                 <OrderSideTag size={TagSize.Medium} orderSide={selectedOrderSide} />
-              </$TradeType>
+              </div>
               <Output
                 type={OutputType.Fiat}
                 value={total}
@@ -84,8 +84,4 @@ const $TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
 const $TradeSummary = styled.div`
   ${layoutMixins.rowColumn}
   font: var(--font-medium-book);
-`;
-
-const $TradeType = styled.div`
-  ${layoutMixins.inlineRow}
 `;

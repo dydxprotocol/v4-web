@@ -15,7 +15,6 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
@@ -116,10 +115,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     />
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-`;
+const $Content = tw.div`gap-1 flexColumn`;
 
 const $Dialog = styled(Dialog)<{ width?: string }>`
   @media ${breakpoints.notMobile} {

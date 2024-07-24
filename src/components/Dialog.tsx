@@ -134,10 +134,14 @@ export const Dialog = ({
             </$StackedHeaderTopRow>
           ) : (
             <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
-              <$HeaderTopRow>
+              <div tw="gap-[var(--dialog-title-gap)] row">
                 {onBack && <BackButton onClick={onBack} />}
 
-                {slotIcon && <$Icon>{slotIcon}</$Icon>}
+                {slotIcon && (
+                  <div tw="h-[1em] w-[1em] text-[length:var(--dialog-icon-size)] leading-none row">
+                    {slotIcon}
+                  </div>
+                )}
 
                 {title && <$Title>{title}</$Title>}
 
@@ -146,7 +150,7 @@ export const Dialog = ({
                     <Icon iconName={IconName.Close} />
                   </$Close>
                 )}
-              </$HeaderTopRow>
+              </div>
 
               {description && <$Description>{description}</$Description>}
 
@@ -410,12 +414,6 @@ const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
       --stickyArea-backdropFilter: none;
     `};
 `;
-
-const $HeaderTopRow = styled.div`
-  ${layoutMixins.row}
-  gap: var(--dialog-title-gap);
-`;
-
 const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean; $withBlur: boolean }>`
   ${layoutMixins.flexColumn}
   align-items: center;
@@ -456,17 +454,6 @@ const $Content = styled.div`
 
   isolation: isolate;
 `;
-
-const $Icon = styled.div`
-  ${layoutMixins.row}
-
-  width: 1em;
-  height: 1em;
-
-  font-size: var(--dialog-icon-size); /* 1 line-height */
-  line-height: 1;
-`;
-
 const $Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;

@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import {
   AbacusPositionSide,
@@ -12,8 +13,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
@@ -237,11 +236,7 @@ export const PositionsTriggersCell = ({
     </TableCell>
   );
 };
-const $Row = styled.span`
-  ${layoutMixins.inlineRow}
-
-  --item-height: 1.25rem;
-`;
+const $Row = tw.span`inlineRow [--item-height:1.25rem]`;
 
 const getStylingForTriggerButtonState = (state: TriggerButtonState) => {
   switch (state) {

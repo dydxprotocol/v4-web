@@ -48,7 +48,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
           <EmptyValue />
         ) : (
           <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn.absolute)}>
-            <$OutputRow>
+            <div tw="gap-0.5 row">
               <Output
                 value={myVaultMetadata?.userReturn.absolute}
                 type={OutputType.Fiat}
@@ -59,7 +59,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
                 type={OutputType.Percent}
                 withParentheses
               />
-            </$OutputRow>
+            </div>
           </$ColoredReturn>
         ),
     },
@@ -89,10 +89,6 @@ const $DetailCard = styled.div`
 
   ${layoutMixins.column};
 `;
-const $OutputRow = styled.div`
-  ${layoutMixins.row}
-  gap: .5rem;
-`;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   return (
@@ -107,25 +103,16 @@ export const VaultPositionsSection = ({ className }: { className?: string }) => 
 
   return (
     <div className={className}>
-      <$SectionTitle>
+      <div tw="mb-1 gap-0.5 text-text-2 font-large-medium row">
         {stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
         </Tag>
-      </$SectionTitle>
+      </div>
       <VaultPositionsTable />
     </div>
   );
 };
-
-const $SectionTitle = styled.div`
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-  margin-bottom: 1rem;
-  ${layoutMixins.row}
-  gap: 0.5rem;
-`;
-
 export const VaultHeader = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
@@ -157,21 +144,21 @@ export const VaultHeader = ({ className }: { className?: string }) => {
           <BackButton onClick={() => navigate(AppRoute.Portfolio)} />
         </div>
       )}
-      <$MarketTitle>
+      <div tw="gap-1.25 row">
         {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img src="/dydx-chain.png" tw="h-3.5 w-3.5" />
         <div>
           <h3 tw="text-text-2 font-extra-medium">{stringGetter({ key: STRING_KEYS.VAULT })}</h3>
         </div>
-      </$MarketTitle>
+      </div>
       <$DetailItems>
         {detailItems.map((item) => (
           <React.Fragment key={item.key}>
             <$VerticalSeparator />
-            <$DetailItem key={item.key}>
+            <div key={item.key} tw="gap-0.375 px-0.5 py-0.25 font-base-book flexColumn">
               <div tw="text-text-0">{item.label}</div>
               <$DetailValue>{item.value}</$DetailValue>
-            </$DetailItem>
+            </div>
           </React.Fragment>
         ))}
       </$DetailItems>
@@ -208,21 +195,10 @@ const $HeaderRow = styled.div`
     gap: 0.75rem;
   }
 `;
-const $MarketTitle = styled.div`
-  ${layoutMixins.row}
-  gap: 1.25rem;
-`;
 const $VerticalSeparator = styled(VerticalSeparator)`
   &&& {
     height: 2rem;
   }
-`;
-
-const $DetailItem = styled.div`
-  ${layoutMixins.flexColumn}
-  font: var(--font-base-book);
-  padding: 0.25rem 0.5rem;
-  gap: 0.375rem;
 `;
 const $DetailValue = styled.div`
   font: var(--font-extra-book);

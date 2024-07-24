@@ -22,7 +22,6 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -102,7 +101,10 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+          <TableCell
+            stacked
+            slotLeft={<AssetIcon symbol={asset?.id} tw="min-w-[unset] text-[2.25rem] inlineRow" />}
+          >
             <$HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
@@ -110,7 +112,7 @@ const getPositionsTableColumnDef = ({
               showSign={ShowSign.None}
               tag={asset?.id}
             />
-            <$InlineRow>
+            <div tw="inlineRow">
               <$PositionSide>
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
@@ -121,7 +123,7 @@ const getPositionsTableColumnDef = ({
                 value={leverage?.current}
                 showSign={ShowSign.None}
               />
-            </$InlineRow>
+            </div>
           </TableCell>
         ),
       },
@@ -552,16 +554,6 @@ const $Table = styled(Table)`
     }
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  ${layoutMixins.inlineRow}
-  min-width: unset;
-  font-size: 2.25rem;
-`;
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({

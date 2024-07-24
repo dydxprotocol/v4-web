@@ -64,7 +64,7 @@ export const SearchSelectMenu = ({
   );
 
   return (
-    <$SearchSelectMenu className={className} ref={searchSelectMenuRef}>
+    <div className={className} ref={searchSelectMenuRef} tw="column">
       <$WithDetailsReceipt detailItems={withReceiptItems} side="bottom">
         <$Popover
           open={open}
@@ -83,13 +83,9 @@ export const SearchSelectMenu = ({
           />
         </$Popover>
       </$WithDetailsReceipt>
-    </$SearchSelectMenu>
+    </div>
   );
 };
-const $SearchSelectMenu = styled.div`
-  ${layoutMixins.column}
-`;
-
 const $MenuTrigger = styled.div`
   height: var(--form-input-height);
 

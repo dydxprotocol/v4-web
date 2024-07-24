@@ -11,6 +11,7 @@ import {
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -147,11 +148,7 @@ const $RadioItem = styled(RadioItem)`
   --item-font-size: var(--dropdownSelectMenu-item-font-size);
 `;
 
-const $ItemLabel = styled.span`
-  flex: 1;
-
-  ${layoutMixins.inlineRow}
-`;
+const $ItemLabel = tw.span`flex-1 inlineRow`;
 
 const $ItemIndicator = styled(ItemIndicator)`
   margin-left: auto;

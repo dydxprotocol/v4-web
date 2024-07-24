@@ -64,20 +64,21 @@ export const WithConfirmationPopover = forwardRef(
           align={align}
           onOpenAutoFocus={(e: Event) => e.preventDefault()}
         >
-          <$Form
+          <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
               e.stopPropagation();
 
               onConfirm?.(e);
             }}
+            tw="gap-0.25 column"
           >
             {children}
             <$ConfirmationButtons>
               {onCancel && <$CancelButton iconName={IconName.Close} onClick={onCancel} />}
               {onConfirm && <$ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />}
             </$ConfirmationButtons>
-          </$Form>
+          </form>
         </$Content>
       </Portal>
     </Root>
@@ -90,12 +91,6 @@ const $Content = styled(Content)`
     outline: none;
   }
 `;
-
-const $Form = styled.form`
-  ${layoutMixins.column}
-  gap: 0.25rem;
-`;
-
 const $ConfirmationButtons = styled.div`
   ${layoutMixins.row};
 

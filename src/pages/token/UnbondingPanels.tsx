@@ -30,7 +30,7 @@ export const UnbondingPanels = () => {
   }
 
   return (
-    <$Container>
+    <div tw="gap-1.5 flexColumn">
       {unbondingDelegations.map((delegation) => {
         const completionDate = new Date(delegation.completionTime).getTime();
         const currentDate = new Date().getTime();
@@ -94,7 +94,7 @@ export const UnbondingPanels = () => {
               </$Header>
             }
           >
-            <$Content>
+            <div tw="gap-1 flexColumn">
               <Output
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
@@ -102,19 +102,13 @@ export const UnbondingPanels = () => {
                 tw="text-text-2 font-large-book"
               />
               <div tw="text-text-0">{availableInText}</div>
-            </$Content>
+            </div>
           </Panel>
         );
       })}
-    </$Container>
+    </div>
   );
 };
-
-const $Container = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-`;
-
 const $Header = styled.div`
   ${layoutMixins.spacedRow}
   padding: var(--panel-paddingY) var(--panel-paddingX) 0;
@@ -126,9 +120,4 @@ const $Title = styled.h3`
 
   font: var(--font-medium-book);
   color: var(--color-text-1);
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
 `;

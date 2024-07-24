@@ -125,12 +125,12 @@ const RewardsPage = () => {
         <$DetachedSection>
           {showMigratePanel && <MigratePanel />}
           <div tw="flex gap-1.5">
-            <$LeftColumn>
+            <div tw="flex-[2] gap-1.5 flexColumn">
               <TradingRewardsChartPanel />
               <LaunchIncentivesPanel />
               <RewardHistoryPanel />
-            </$LeftColumn>
-            <$RightColumn>
+            </div>
+            <div tw="flex-1 gap-1.5 flexColumn">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
               <StakingPanel />
@@ -139,7 +139,7 @@ const RewardsPage = () => {
               <GovernancePanel />
               <RewardsHelpPanel />
               {legalDisclaimer}
-            </$RightColumn>
+            </div>
           </div>
         </$DetachedSection>
       )}
@@ -155,14 +155,3 @@ const $Page = styled.div`
 `;
 
 const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;
-const $LeftColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  flex: 2;
-`;
-
-const $RightColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  flex: 1;
-`;

@@ -1,15 +1,12 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -32,7 +29,7 @@ export const StakeConfirmationButtonRow = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
   return canAccountTrade ? (
-    <$Row>
+    <div tw="w-full gap-1 inlineRow">
       <Button
         action={ButtonAction.Base}
         onClick={() => setStakeFormStep(StakeFormSteps.EditInputs)}
@@ -48,14 +45,8 @@ export const StakeConfirmationButtonRow = ({
       >
         {submitText}
       </Button>
-    </$Row>
+    </div>
   ) : (
     <OnboardingTriggerButton size={ButtonSize.Base} tw="w-full" />
   );
 };
-
-const $Row = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-  width: 100%;
-`;

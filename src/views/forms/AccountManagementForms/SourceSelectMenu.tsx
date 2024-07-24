@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { TransferType } from '@/constants/abacus';
@@ -15,8 +14,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
@@ -124,7 +121,7 @@ export const SourceSelectMenu = ({
       ].filter(isTruthy)}
       label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
-      <$ChainRow>
+      <div tw="gap-0.5 text-text-2 font-base-book row">
         {selectedChainOption ? (
           <>
             <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
@@ -138,16 +135,9 @@ export const SourceSelectMenu = ({
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })
         )}
-      </$ChainRow>
+      </div>
     </SearchSelectMenu>
   );
 };
 
 const $Img = tw.img`h-1.25 w-1.25 rounded-[50%]`;
-
-const $ChainRow = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-  color: var(--color-text-2);
-  font: var(--font-base-book);
-`;

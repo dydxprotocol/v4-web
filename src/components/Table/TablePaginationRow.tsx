@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -108,9 +109,7 @@ export const TablePaginationRow = ({
   );
 };
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
+const $InlineRow = tw.div`inlineRow`;
 
 const $PaginationRow = styled.div`
   ${layoutMixins.spacedRow}

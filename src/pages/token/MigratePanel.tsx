@@ -90,7 +90,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         </$MobileMigrateHeader>
       }
     >
-      <$Column>
+      <div tw="items-center gap-1 flexColumn">
         <WithReceipt
           slotReceipt={
             <Details
@@ -128,7 +128,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
             {stringGetter({ key: STRING_KEYS.CLICK_HERE })}
           </Link>
         </$InlineRow>
-      </$Column>
+      </div>
     </$MigratePanel>
   );
 };
@@ -154,12 +154,6 @@ const $MigrateAction = styled.div`
   border: solid var(--border-width) var(--color-border);
   border-radius: 0.75rem;
 `;
-const $Column = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-  align-items: center;
-`;
-
 const $MobileMigrateHeader = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1ch;
@@ -196,7 +190,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1.5rem;
   }
 `;
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-  color: var(--color-text-0);
-`;
+const $InlineRow = tw.div`text-text-0 inlineRow`;

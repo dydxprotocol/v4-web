@@ -111,7 +111,7 @@ export const TriggersForm = ({
   };
 
   return (
-    <$Form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} tw="gap-[1.25ch] column">
       {priceInfo}
       <TriggerOrdersInputs
         symbol={symbol}
@@ -154,14 +154,9 @@ export const TriggersForm = ({
           </WithTooltip>
         </>
       )}
-    </$Form>
+    </form>
   );
 };
-const $Form = styled.form`
-  ${layoutMixins.column}
-  gap: 1.25ch;
-`;
-
 const $PriceBox = styled.div`
   background-color: var(--color-layer-2);
   border-radius: 0.5em;

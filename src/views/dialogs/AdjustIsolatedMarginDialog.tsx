@@ -1,14 +1,11 @@
 import { useCallback } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { AdjustIsolatedMarginDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
@@ -35,16 +32,12 @@ export const AdjustIsolatedMarginDialog = ({
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
       tw="[--dialog-width:25rem]"
     >
-      <$Content>
+      <div tw="gap-1 column">
         <AdjustIsolatedMarginForm
           marketId={positionId}
           onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
         />
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

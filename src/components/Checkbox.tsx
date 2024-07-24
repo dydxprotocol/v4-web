@@ -2,8 +2,6 @@ import { Indicator, Root } from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled, { css } from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 type ElementProps = {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
@@ -26,7 +24,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }: CheckboxProps) => (
-  <$Container>
+  <div tw="gap-[1ch] font-small-book row">
     <$Root
       className={className}
       checked={checked}
@@ -43,14 +41,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         {label}
       </$Label>
     )}
-  </$Container>
+  </div>
 );
-const $Container = styled.div`
-  ${layoutMixins.row}
-  gap: 1ch;
-  font: var(--font-small-book);
-`;
-
 const $Root = styled(Root)`
   --checkbox-backgroundColor: var(--color-layer-0);
   --checkbox-borderColor: var(--color-border);

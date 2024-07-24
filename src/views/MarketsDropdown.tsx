@@ -85,7 +85,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ priceChange24HPercent }) => (
-            <$InlineRow>
+            <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
@@ -95,7 +95,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
               )}
-            </$InlineRow>
+            </div>
           ),
         },
         {
@@ -373,11 +373,6 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);

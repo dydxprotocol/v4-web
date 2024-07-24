@@ -57,7 +57,7 @@ export const Notification = ({
 
   return (
     <$Container className={className} isToast={isToast} onClick={onClick}>
-      <$Header>
+      <header tw="relative gap-0.5 row">
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
         <div tw="flex-1 overflow-hidden text-ellipsis text-text-2 font-base-medium">
           {slotTitle}
@@ -93,7 +93,7 @@ export const Notification = ({
             ) : null}
           </$ActionItems>
         )}
-      </$Header>
+      </header>
       {slotContentOrDescription && (
         <div tw="mt-0.5 text-text-0 font-small-book [white-space:break-spaces]">
           {slotContentOrDescription}
@@ -130,13 +130,6 @@ const $Container = styled.div<{ isToast?: boolean }>`
           backdrop-filter: none;
         `}
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.row}
-  position: relative;
-  gap: 0.5rem;
-`;
-
 const $Icon = styled.div`
   ${layoutMixins.row}
   float: left;

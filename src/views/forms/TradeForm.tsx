@@ -219,7 +219,7 @@ export const TradeForm = ({
 
   const tabletActionsRow = isTablet && (
     <$TopActionsRow>
-      <$OrderbookButtons>
+      <div tw="justify-between gap-0.25 inlineRow notTablet:hidden">
         <$OrderbookButton
           slotRight={<Icon iconName={IconName.Caret} />}
           onPressedChange={setShowOrderbook}
@@ -228,7 +228,7 @@ export const TradeForm = ({
           {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
         </$OrderbookButton>
         {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-      </$OrderbookButtons>
+      </div>
 
       <$ToggleGroup
         items={allTradeTypeItems}
@@ -256,7 +256,7 @@ export const TradeForm = ({
 
         {alertContent && (
           <AlertMessage type={alertType}>
-            <$Message>
+            <div tw="gap-0.75 row">
               {alertContent}
               {shouldPromptUserToPlaceLimitOrder && (
                 <$IconButton
@@ -267,7 +267,7 @@ export const TradeForm = ({
                   onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
                 />
               )}
-            </$Message>
+            </div>
           </AlertMessage>
         )}
       </$InputsColumn>
@@ -277,7 +277,7 @@ export const TradeForm = ({
   const tradeFooter = (
     <$Footer>
       {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-        <$ButtonRow>
+        <div tw="justify-self-end px-0 py-0.5 row">
           <Button
             type={ButtonType.Reset}
             action={ButtonAction.Reset}
@@ -287,7 +287,7 @@ export const TradeForm = ({
           >
             {stringGetter({ key: STRING_KEYS.CLEAR })}
           </Button>
-        </$ButtonRow>
+        </div>
       )}
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
@@ -375,15 +375,6 @@ const $TopActionsRow = styled.div`
     gap: var(--form-input-gap);
   }
 `;
-const $OrderbookButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  justify-content: space-between;
-  gap: 0.25rem;
-
-  @media ${breakpoints.notTablet} {
-    display: none;
-  }
-`;
 const $OrderbookButton = styled(ToggleButton)`
   --button-toggle-off-textColor: var(--color-text-1);
   --button-toggle-off-backgroundColor: transparent;
@@ -438,12 +429,6 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
-
-const $Message = styled.div`
-  ${layoutMixins.row}
-  gap: 0.75rem;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
@@ -457,13 +442,6 @@ const $IconButton = styled(IconButton)`
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
-
-const $ButtonRow = styled.div`
-  ${layoutMixins.row}
-  justify-self: end;
-  padding: 0.5rem 0 0.5rem 0;
-`;
-
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);

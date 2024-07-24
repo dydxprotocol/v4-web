@@ -95,7 +95,7 @@ const VaultPage = () => {
           <$VaultDescription />
           <$VaultPositionsSection />
         </$VaultDetailsColumn>
-        <$VaultDepositWithdrawFormColumn>
+        <div tw="gap-1.25 flexColumn">
           <$YourVaultDetailsCards />
           <$DepositFormContainer>
             <div tw="rounded-[0.7rem] bg-layer-3">
@@ -105,7 +105,7 @@ const VaultPage = () => {
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
           </$VaultTransactionsCardContainer>
-        </$VaultDepositWithdrawFormColumn>
+        </div>
       </$TwoColumnContainer>
     </$Page>
   );
@@ -146,15 +146,7 @@ const $TwoColumnContainer = styled.div`
     grid-template-columns: 1fr;
   }
 `;
-const $VaultDetailsColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-`;
-const $VaultDepositWithdrawFormColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-`;
-
+const $VaultDetailsColumn = tw.div`gap-1.25 flexColumn`;
 const xPaddingWhenSmall = css`
   @media (${breakpoints.desktopSmall}) {
     padding-left: 1rem;

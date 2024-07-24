@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -14,8 +15,6 @@ import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
@@ -214,10 +213,7 @@ export const WithdrawButtonAndReceipt = ({
     </WithReceipt>
   );
 };
-const $RowWithGap = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;
+const $RowWithGap = tw.span`gap-[0.5ch] row`;
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);

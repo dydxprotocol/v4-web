@@ -38,7 +38,6 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -525,7 +524,7 @@ export const WithdrawForm = () => {
           },
         })}
       </div>
-      <$DestinationRow>
+      <div tw="grid-cols-[1fr_1fr] gap-1 spacedRow">
         <FormInput
           type={InputType.Text}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
@@ -545,7 +544,7 @@ export const WithdrawForm = () => {
           selectedChain={chainIdStr || undefined}
           onSelect={onSelectNetwork}
         />
-      </$DestinationRow>
+      </div>
       {isInvalidNobleAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
@@ -603,10 +602,4 @@ const $Form = styled.form`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-`;
-
-const $DestinationRow = styled.div`
-  ${layoutMixins.spacedRow}
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
 `;

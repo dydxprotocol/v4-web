@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import {
   Nullable,
@@ -264,7 +265,7 @@ export const TriggerOrderInputs = ({
     <$TriggerRow key={tooltipId}>
       <$Heading>
         {headerTooltip()}
-        <$HeadingInfo>
+        <div tw="gap-[0.5em] text-text-0 font-base-book row">
           {stringGetter({ key: stringKeys.headerDiff })}
           {signedOutput()}
           <$VerticalSeparator />
@@ -276,7 +277,7 @@ export const TriggerOrderInputs = ({
           >
             {stringGetter({ key: STRING_KEYS.CLEAR })}
           </$ClearButton>
-        </$HeadingInfo>
+        </div>
       </$Heading>
       <$InlineRow>
         <FormInput
@@ -309,17 +310,7 @@ export const TriggerOrderInputs = ({
     </$TriggerRow>
   );
 };
-const $Heading = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $HeadingInfo = styled.div`
-  ${layoutMixins.row}
-  font: var(--font-base-book);
-  gap: 0.5em;
-  color: var(--color-text-0);
-`;
-
+const $Heading = tw.div`spacedRow`;
 const $SignedOutput = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -343,10 +334,7 @@ const $ClearButton = styled(Button)`
   --button-padding: 0;
 `;
 
-const $TriggerRow = styled.div`
-  ${layoutMixins.column}
-  gap: 1ch;
-`;
+const $TriggerRow = tw.div`gap-[1ch] column`;
 
 const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}

@@ -44,13 +44,13 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
   const content = {
     [MnemonicExportStep.AcknowledgeRisk]: (
       <>
-        <$WaitingSpan>
+        <span tw="gap-1 text-text-1 row">
           <$CautionIconContainer>
             <Icon iconName={IconName.CautionCircleStroked} />
           </$CautionIconContainer>
 
           <p>{stringGetter({ key: STRING_KEYS.SECRET_PHRASE_RISK })}</p>
-        </$WaitingSpan>
+        </span>
         <WithReceipt
           slotReceipt={
             <div tw="p-1 text-text-0">
@@ -130,16 +130,10 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
       description={stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE_DESCRIPTION })}
       tw="notMobile:[--dialog-width:30rem]"
     >
-      <$Content>{content}</$Content>
+      <div tw="gap-1 column">{content}</div>
     </Dialog>
   );
 };
-const $WaitingSpan = styled.span`
-  ${layoutMixins.row}
-  gap: 1rem;
-  color: var(--color-text-1);
-`;
-
 const $CautionIconContainer = styled.div`
   ${layoutMixins.stack}
   min-width: 2.5rem;
@@ -228,8 +222,4 @@ const $Word = styled.li`
     text-align: end;
     margin-right: 0.25rem;
   }
-`;
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
 `;

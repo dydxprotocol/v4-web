@@ -35,7 +35,7 @@ export const Panel = ({
   className,
 }: PanelProps) => (
   <$Panel onClick={onClick} className={className}>
-    <$Left>
+    <div tw="w-full flexColumn">
       {href ? (
         <Link to={href}>
           {slotHeader ?? (
@@ -54,7 +54,7 @@ export const Panel = ({
         ))
       )}
       <$Content>{children}</$Content>
-    </$Left>
+    </div>
     {slotRight}
   </$Panel>
 );
@@ -89,12 +89,6 @@ const $Panel = styled.section<{ onClick?: () => void }>`
       }
     `}
 `;
-
-const $Left = styled.div`
-  ${layoutMixins.flexColumn}
-  width: 100%;
-`;
-
 const $Header = styled.header<{ hasSeparator?: boolean }>`
   ${layoutMixins.spacedRow}
   padding: var(--panel-paddingY) var(--panel-paddingX);

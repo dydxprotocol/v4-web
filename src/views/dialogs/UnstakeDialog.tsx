@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import styled from 'styled-components';
-
 import { DialogProps, UnstakeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
@@ -10,8 +8,6 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
@@ -40,7 +36,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
     [StakeFormSteps.EditInputs]: {
       title: stringGetter({ key: STRING_KEYS.UNSTAKE }),
       description: (
-        <$Description>
+        <div tw="inlineRow">
           {currentDelegations?.length === 1
             ? stringGetter({
                 key: STRING_KEYS.CURRENTLY_STAKING_WITH,
@@ -57,14 +53,14 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
                 key: STRING_KEYS.CURRENTLY_STAKING,
                 params: {
                   AMOUNT: (
-                    <$StakedAmount>
+                    <span tw="text-text-1 inlineRow">
                       {nativeStakingBalance}
                       <Tag>{chainTokenLabel} </Tag>
-                    </$StakedAmount>
+                    </span>
                   ),
                 },
               })}
-        </$Description>
+        </div>
       ),
       slotIcon: <AssetIcon symbol={chainTokenLabel} />,
     },
@@ -87,11 +83,3 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
     </Dialog>
   );
 };
-const $Description = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $StakedAmount = styled.span`
-  ${layoutMixins.inlineRow}
-  color: var(--color-text-1);
-`;

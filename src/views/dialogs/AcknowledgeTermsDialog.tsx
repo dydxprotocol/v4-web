@@ -36,7 +36,7 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
     >
-      <$Content>
+      <div tw="gap-1 flexColumn">
         <p>
           {stringGetter({
             key: STRING_KEYS.TOS_TITLE,
@@ -67,16 +67,10 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
             {stringGetter({ key: STRING_KEYS.I_AGREE })}
           </$Button>
         </$Footer>
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-`;
-
 const $TOS = styled.section`
   background-color: var(--color-layer-4);
   padding: 1rem 1rem 1rem 2rem;

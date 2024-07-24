@@ -268,10 +268,10 @@ export const ClosePositionForm = ({
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <$PreviewAndConfirmContent>
+        <div tw="gap-[var(--form-input-gap)] flexColumn">
           <PositionPreview />
           {alertMessage}
-        </$PreviewAndConfirmContent>
+        </div>
       ) : (
         <$MobileLayout>
           <$OrderbookContainer>
@@ -287,7 +287,7 @@ export const ClosePositionForm = ({
 
       <$Footer>
         {size != null && (
-          <$ButtonRow>
+          <div tw="justify-self-end px-0 py-0.5 row">
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}
@@ -297,7 +297,7 @@ export const ClosePositionForm = ({
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
-          </$ButtonRow>
+          </div>
         )}
 
         <PlaceOrderButtonAndReceipt
@@ -346,12 +346,6 @@ const $ClosePositionForm = styled.form`
     }
   }
 `;
-
-const $PreviewAndConfirmContent = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: var(--form-input-gap);
-`;
-
 const $MobileLayout = styled.div`
   height: 0;
   // Apply dialog's top/left/right padding to inner scroll areas
@@ -399,13 +393,6 @@ const $Footer = styled.footer`
 
   ${layoutMixins.column}
 `;
-
-const $ButtonRow = styled.div`
-  ${layoutMixins.row}
-  justify-self: end;
-  padding: 0.5rem 0 0.5rem 0;
-`;
-
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;

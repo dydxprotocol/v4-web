@@ -217,10 +217,7 @@ const $Button = styled(Button)`
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
 `;
-const $Column = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.5rem;
-`;
+const $Column = tw.div`gap-0.5 flexColumn`;
 
 const $EstimatedRewardsCard = styled.div`
   ${layoutMixins.spacedRow}

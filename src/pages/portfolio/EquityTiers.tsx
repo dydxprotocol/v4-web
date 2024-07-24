@@ -10,7 +10,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
@@ -32,7 +31,7 @@ export const EquityTiers = () => {
       {isNotTablet && (
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.EQUITY_TIERS })} />
       )}
-      <$ContentWrapper>
+      <div tw="max-w-[100vw] gap-1.5 flexColumn">
         <$Description>
           <span>
             {stringGetter({
@@ -59,7 +58,7 @@ export const EquityTiers = () => {
                   requiredTotalNetCollateralUSD,
                   nextLevelRequiredTotalNetCollateralUSD,
                 }) => (
-                  <$NetCollateralValue>
+                  <span tw="inlineRow">
                     {requiredTotalNetCollateralUSD > 0 && (
                       <>
                         <span>{`≥ `}</span>
@@ -84,7 +83,7 @@ export const EquityTiers = () => {
                         />
                       </>
                     )}
-                  </$NetCollateralValue>
+                  </span>
                 ),
               },
               {
@@ -102,16 +101,10 @@ export const EquityTiers = () => {
           withOuterBorder={isNotTablet}
           withInnerBorders
         />
-      </$ContentWrapper>
+      </div>
     </AttachedExpandingSection>
   );
 };
-const $ContentWrapper = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  max-width: 100vw;
-`;
-
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
@@ -130,10 +123,6 @@ const $Table = styled(Table)`
 ` as typeof Table;
 
 const $HighlightOutput = tw(Output)`text-text-1 `;
-
-const $NetCollateralValue = styled.span`
-  ${layoutMixins.inlineRow}
-`;
 const $Description = styled.div`
   color: var(--color-text-0);
   padding: 0 1rem;
