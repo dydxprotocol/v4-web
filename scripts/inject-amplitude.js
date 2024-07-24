@@ -10,6 +10,7 @@ const projectRoot = path.dirname(currentPath);
 
  
 
+
 if (AMPLITUDE_API_KEY) {
   try {
     const files = await fs.readdir('entry-points');
