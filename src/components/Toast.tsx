@@ -256,12 +256,12 @@ const $CloseButton = styled(IconButton)`
   border: solid var(--border-width) var(--color-border);
 
   ${$Root}:hover & {
-    display: block;
+    display: inline-flex;
     z-index: 2;
   }
 
   @media ${breakpoints.mobile} {
-    display: block;
+    display: inline-flex;
     z-index: 2;
   }
 `;
