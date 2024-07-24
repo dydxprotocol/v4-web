@@ -8,6 +8,8 @@ const AMPLITUDE_SERVER_URL = process.env.AMPLITUDE_SERVER_URL;
 const currentPath = fileURLToPath(import.meta.url);
 const projectRoot = path.dirname(currentPath);
 
+ 
+
 if (AMPLITUDE_API_KEY) {
   try {
     const files = await fs.readdir('entry-points');
