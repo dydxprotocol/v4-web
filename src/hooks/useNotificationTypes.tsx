@@ -280,7 +280,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
       const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
       const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
-      const stakingLiveExpirationDate = new Date('2024-08-24T23:59:59');
+      const stakingLiveExpirationDate = new Date('2024-07-24T23:59:59');
 
       const { isolatedMarginLearnMore } = useURLConfigs();
 
