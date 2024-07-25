@@ -28,6 +28,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
@@ -73,6 +74,11 @@ export const SourceSelectMenu = ({
   // in the description prop (renders below the item label) instead of in the slotAfter
   const feesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
+  const getFeeDecoratorComponentForChainId = (chainId: string) => {
+    if (lowestFeeTokensByChainId[chainId]) return <LowestFeesDecoratorText />;
+    if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
+    return null;
+  };
   const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,
@@ -81,7 +87,7 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
-      [feesDecoratorProp]: !!lowestFeeTokensByChainId[chain.type] && <LowestFeesDecoratorText />,
+      [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
@@ -105,7 +111,7 @@ export const SourceSelectMenu = ({
       onSelect(exchange.type, 'exchange');
     },
     slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
-    [lowestFeesDecoratorProp]: <LowestFeesDecoratorText />,
+    [feesDecoratorProp]: <LowestFeesDecoratorText />,
   }));
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
