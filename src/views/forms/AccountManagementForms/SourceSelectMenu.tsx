@@ -5,7 +5,11 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
-import { cctpTokensByChainId, getMapOfLowestFeeTokensByChainId } from '@/constants/cctp';
+import {
+  cctpTokensByChainId,
+  getMapOfHighestFeeTokensByChainId,
+  getMapOfLowestFeeTokensByChainId,
+} from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
@@ -60,9 +64,14 @@ export const SourceSelectMenu = ({
     [type, skipEnabled]
   );
 
+  const highestFeeTokensByChainId = useMemo(
+    () => getMapOfHighestFeeTokensByChainId(type, skipEnabled),
+    [type, skipEnabled]
+  );
+
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
-  const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
+  const feesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
   const chainItems = Object.values(chains)
     .map((chain) => ({
@@ -72,9 +81,7 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
-      [lowestFeesDecoratorProp]: !!lowestFeeTokensByChainId[chain.type] && (
-        <LowestFeesDecoratorText />
-      ),
+      [feesDecoratorProp]: !!lowestFeeTokensByChainId[chain.type] && <LowestFeesDecoratorText />,
     }))
     .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens

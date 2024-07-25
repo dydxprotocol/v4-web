@@ -222,7 +222,7 @@ export const WithdrawButtonAndReceipt = ({
             onCheckedChange={setHasAcknowledged}
             id="acknowledge-secret-phase-risk"
             label={stringGetter({
-              key: STRING_KEYS.WARNING_MESSAGE,
+              key: STRING_KEYS.WITHDRAW_ROUTE_WARNING_MESSAGE,
               params: {
                 WARNING_MESSAGE: warningMessage,
               },
