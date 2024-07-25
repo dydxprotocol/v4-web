@@ -196,8 +196,8 @@ export type AbacusOrderSides = Abacus.exchange.dydx.abacus.output.input.OrderSid
 export const AbacusOrderType = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export const AbacusOrderSide = Abacus.exchange.dydx.abacus.output.input.OrderSide;
 
-export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.PositionSide;
-export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.PositionSide;
+export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.account.PositionSide;
+export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.account.PositionSide;
 
 export const AbacusMarginMode = Abacus.exchange.dydx.abacus.output.input.MarginMode;
 
