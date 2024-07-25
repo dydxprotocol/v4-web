@@ -13,6 +13,9 @@ declare module 'react' {
     css?: CSSProp;
     tw?: string;
   }
+  interface Attributes {
+    css?: CSSProp | undefined;
+  }
   // The inline svg css prop
   interface SVGProps<T> extends SVGProps<SVGSVGElement> {
     css?: CSSProp;
