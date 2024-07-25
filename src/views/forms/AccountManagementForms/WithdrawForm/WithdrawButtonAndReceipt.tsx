@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
@@ -18,7 +18,6 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Checkbox } from '@/components/Checkbox';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
@@ -34,6 +33,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { RouteWarningMessage } from '../RouteWarningMessage';
 import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
@@ -80,13 +80,6 @@ export const WithdrawButtonAndReceipt = ({
       X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
-
-  const warningMessage = useMemo(() => {
-    if (routeWarning) {
-      return JSON.parse(routeWarning)?.message;
-    }
-    return null;
-  }, [routeWarning]);
 
   const submitButtonReceipt = [
     {
@@ -200,10 +193,13 @@ export const WithdrawButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
-  const isFormValid =
-    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
-
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
+  const isFormValid =
+    !isDisabled &&
+    !isEditingSlippage &&
+    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
+    !requiresAcknowledgement;
 
   if (!canAccountTrade) {
     return (
@@ -215,26 +211,16 @@ export const WithdrawButtonAndReceipt = ({
 
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
-      {warningMessage ? (
-        <$CheckboxContainer>
-          <Checkbox
-            checked={hasAcknowledged}
-            onCheckedChange={setHasAcknowledged}
-            id="acknowledge-secret-phase-risk"
-            label={stringGetter({
-              key: STRING_KEYS.WITHDRAW_ROUTE_WARNING_MESSAGE,
-              params: {
-                WARNING_MESSAGE: warningMessage,
-              },
-            })}
-          />
-        </$CheckboxContainer>
-      ) : null}
+      <RouteWarningMessage
+        hasAcknowledged={hasAcknowledged}
+        setHasAcknowledged={setHasAcknowledged}
+        routeWarningJSON={routeWarning}
+      />
       <Button
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
         state={{
-          isDisabled: !isFormValid || (warningMessage && !hasAcknowledged),
+          isDisabled: !isFormValid,
           isLoading: (isFormValid && !requestPayload) || isLoading,
         }}
       >
@@ -260,9 +246,4 @@ const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
-`;
-
-const $CheckboxContainer = styled.div`
-  padding: 1rem;
-  color: var(--color-text-0);
 `;

@@ -18,7 +18,7 @@ const getLowestFeeChains = (type: NullableTransferType, skipEnabled: boolean) =>
     ? mainnetChains
     : mainnetChains.filter(({ chainId }) => (skipEnabled ? chainId !== '1' : true));
 
-const getHighFeeChains = (type: NullableTransferType, skipEnabled: boolean) =>
+const getHighestFeeChains = (type: NullableTransferType, skipEnabled: boolean) =>
   type === TransferType.withdrawal
     ? mainnetChains.filter(({ chainId }) => (skipEnabled ? chainId === '1' : false))
     : [];
@@ -61,7 +61,7 @@ export const getMapOfLowestFeeTokensByChainId = (
 export const getMapOfHighestFeeTokensByChainId = (
   type: NullableTransferType,
   skipEnabled: boolean
-) => getMapOfChainsByChainId(getHighFeeChains(type, skipEnabled));
+) => getMapOfChainsByChainId(getHighestFeeChains(type, skipEnabled));
 
 export const cctpTokensByDenom = cctpTokens.reduce(
   (acc, token) => {
