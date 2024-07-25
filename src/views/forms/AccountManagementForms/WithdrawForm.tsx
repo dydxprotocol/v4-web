@@ -211,6 +211,8 @@ export const WithdrawForm = () => {
           };
 
           if (isCctp) {
+            // we want to trigger a dummy notification first since CCTP withdraws can take
+            // up to 30s to generate a txHash
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
@@ -261,6 +263,7 @@ export const WithdrawForm = () => {
           );
         }
         if (isCctp) {
+          // if error update the dummy notification with error
           addOrUpdateTransferNotification({
             id: notificationId,
             txHash: DUMMY_TX_HASH,
