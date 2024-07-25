@@ -210,7 +210,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
-          const { fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
+          const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
           const isFinished =
             (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
@@ -242,7 +242,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
 
           trigger(
-            txHash,
+            id ?? txHash,
             {
               icon,
               title,

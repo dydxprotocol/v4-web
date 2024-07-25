@@ -3,11 +3,15 @@ import styled, { css } from 'styled-components';
 // Types/constants
 export type LoadingDotsProps = {
   size?: number;
+  className?: string;
 };
 
 // Component
-export const LoadingDots: React.FC<LoadingDotsProps> = ({ size = 1 }: LoadingDotsProps) => (
-  <LoadingDotsContainer size={size}>
+export const LoadingDots: React.FC<LoadingDotsProps> = ({
+  size = 1,
+  className,
+}: LoadingDotsProps) => (
+  <LoadingDotsContainer size={size} className={className}>
     <i />
     <i />
     <i />

@@ -29,11 +29,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import {
-  getOnboardingGuards,
-  getSubaccountBuyingPower,
-  getSubaccountEquity,
-} from '@/state/accountSelectors';
+import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -51,6 +47,7 @@ type ElementProps = {
   slippage: number;
   setSlippage: (slippage: number) => void;
   sourceToken?: TransferInputTokenResource;
+  buttonLabel: string;
 };
 
 export const DepositButtonAndReceipt = ({
@@ -62,12 +59,12 @@ export const DepositButtonAndReceipt = ({
   isDisabled,
   isLoading,
   setRequireUserActionInWallet,
+  buttonLabel,
 }: ElementProps) => {
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
-  const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
   const { connectionError } = useApiState();
@@ -277,12 +274,9 @@ export const DepositButtonAndReceipt = ({
             isDisabled: !isFormValid,
             isLoading: (isFormValid && !requestPayload) || isLoading,
           }}
+          withContentOnLoading
         >
-          {stringGetter({
-            key: hasAcknowledgedTerms
-              ? STRING_KEYS.DEPOSIT_FUNDS
-              : STRING_KEYS.ACKNOWLEDGE_TERMS_AND_DEPOSIT,
-          })}
+          {buttonLabel}
         </Button>
       )}
     </$WithReceipt>

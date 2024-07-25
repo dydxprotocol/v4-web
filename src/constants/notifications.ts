@@ -191,6 +191,7 @@ export enum TransferNotificationTypes {
 }
 
 export type TransferNotifcation = {
+  id?: string;
   txHash: string;
   type?: TransferNotificationTypes;
   toChainId?: string;
@@ -203,6 +204,7 @@ export type TransferNotifcation = {
   isExchange?: boolean;
   requestId?: string;
   tracked?: boolean;
+  isDummy?: boolean;
 };
 
 export enum ReleaseUpdateNotificationIds {

@@ -122,16 +122,24 @@ export const TransferStatusNotification = ({
       slotIcon={isToast && slotIcon}
       slotTitle={slotTitle}
       slotCustomContent={
-        !status && !isExchange ? (
-          <LoadingDots size={3} />
-        ) : (
-          <$BridgingStatus>
-            {content}
-            {!isToast && !isComplete && !hasError && (
-              <$TransferStatusSteps status={status} type={type} />
-            )}
-          </$BridgingStatus>
-        )
+        <$BridgingStatus>
+          {!status && !isExchange ? (
+            <>
+              {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
+              <div>
+                <LoadingDots size={3} />
+              </div>
+            </>
+          ) : (
+            <>
+              {content}
+              {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
+              {!isToast && !isComplete && !hasError && (
+                <$TransferStatusSteps status={status} type={type} />
+              )}
+            </>
+          )}
+        </$BridgingStatus>
       }
       slotAction={
         isToast &&
