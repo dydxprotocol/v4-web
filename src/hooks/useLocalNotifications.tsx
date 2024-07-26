@@ -83,6 +83,18 @@ const useLocalNotificationsContext = () => {
     [setAllTransferNotifications, dydxAddress, allTransferNotifications]
   );
 
+  useEffect(() => {
+    // whip out all dummy notifications on startup
+    if (!dydxAddress) return;
+    setAllTransferNotifications((currentAllNotifications) => {
+      const updatedNotifications = { ...currentAllNotifications };
+      updatedNotifications[dydxAddress] = (updatedNotifications[dydxAddress] ?? []).filter(
+        (n) => !n.isDummy
+      );
+      return updatedNotifications;
+    });
+  }, [dydxAddress]);
+
   const addOrUpdateTransferNotification = useCallback(
     (notification: TransferNotifcation) => {
       const { id, txHash, triggeredAt, toAmount, type, fromChainId } = notification;
