@@ -1,6 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/constants/analytics';
-import type { TradingViewBar } from '@/constants/candles';
+import type { Candle, TradingViewBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
 
 import { testFlags } from '@/lib/testFlags';
@@ -125,19 +125,25 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
             if (id && contents) {
               const subscriptionItem = subscriptionsByChannelId.get(id);
-              const updatedCandle = contents[0];
 
-              if (updatedCandle && subscriptionItem) {
-                const bar: TradingViewBar = mapCandle(updatedCandle);
-                subscriptionItem.lastBar = bar;
+              if (Array.isArray(contents)) {
+                // Contents is an array when receiving websocket updates for candles. It is generally one entry long,
+                // with the exception of the start of a new start of a candle resolution: then it is 2 entries long.
+                // - the first entry updates the last candle's close, and
+                // - the second entry reflects the new candle
+                contents.forEach((updatedCandle: Candle) => {
+                  if (updatedCandle && subscriptionItem) {
+                    const bar: TradingViewBar = mapCandle(updatedCandle);
+                    subscriptionItem.lastBar = bar;
 
-                // send data to every subscriber of that symbol
-                Object.values(subscriptionItem.handlers).forEach((handler: any) =>
-                  handler.callback(bar)
-                );
+                    // send data to every subscriber of that symbol
+                    Object.values(subscriptionItem.handlers).forEach((handler: any) =>
+                      handler.callback(bar)
+                    );
+                  }
+                });
               }
             }
-
             break;
           }
           case 'v4_markets': {
