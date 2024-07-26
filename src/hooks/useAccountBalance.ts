@@ -10,6 +10,7 @@ import { useBalance, useReadContracts } from 'wagmi';
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
@@ -48,7 +49,9 @@ export const useAccountBalance = ({
   const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
-  const { nobleValidator, osmosisValidator } = useEndpointsConfig();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+
+  const { nobleValidator, osmosisValidator, validators } = useEndpointsConfig();
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
@@ -98,8 +101,11 @@ export const useAccountBalance = ({
     if (chainId === nobleChainId) {
       return accounts?.[nobleChainId]?.bech32Address;
     }
+    if (chainId === selectedDydxChainId) {
+      return dydxAddress;
+    }
     return undefined;
-  }, [accounts, chainId]);
+  }, [accounts, chainId, dydxAddress, selectedDydxChainId]);
 
   const cosmosQueryFn = useCallback(async () => {
     if (dydxAddress && cosmosAddress && addressOrDenom) {
@@ -111,6 +117,9 @@ export const useAccountBalance = ({
         }
         if (chainId === osmosisChainId) {
           return osmosisValidator;
+        }
+        if (chainId === selectedDydxChainId) {
+          return validators[0];
         }
         return undefined;
       })();
@@ -130,8 +139,10 @@ export const useAccountBalance = ({
     addressOrDenom,
     usdcDecimals,
     chainId,
+    selectedDydxChainId,
     nobleValidator,
     osmosisValidator,
+    validators,
   ]);
 
   const cosmosQuery = useQuery({
@@ -172,5 +183,6 @@ export const useAccountBalance = ({
     usdcBalance,
     queryStatus: isCosmosChain ? cosmosQuery.status : evmNative.status,
     isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmNative.isFetching,
+    refetchQuery: isCosmosChain ? cosmosQuery.refetch : evmNative.refetch,
   };
 };

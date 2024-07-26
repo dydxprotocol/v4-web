@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Description } from '@radix-ui/react-dialog';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AMOUNT_RESERVED_FOR_GAS_NOBLE } from '@/constants/account';
@@ -24,9 +23,6 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getTransferInputs } from '@/state/inputsSelectors';
-
 import { track } from '@/lib/analytics';
 import { getNobleChainId } from '@/lib/squid';
 
@@ -43,7 +39,6 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
   const { deposit } = useSubaccount();
   const { setAllTransferNotifications } = useLocalNotifications();
   const { dydxAddress } = useAccounts();
-  const { depositOptions } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   const [txStatus, setTxStatus] = useState<'success' | 'error' | 'pending'>('pending');
 

@@ -5,7 +5,7 @@ import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { OnboardingState } from '@/constants/account';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -41,6 +41,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
@@ -61,8 +62,15 @@ export const AccountMenu = () => {
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
+  const { usdcDenom } = useTokenConfigs();
+  const { nativeTokenBalance, balance: usdcBalance } = useAccountBalance({
+    chainId: selectedDydxChainId,
+    isCosmosChain: true,
+    addressOrDenom: usdcDenom,
+  });
+
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
@@ -78,6 +86,10 @@ export const AccountMenu = () => {
   };
 
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
+
+  const showConfirmDeposit =
+    walletType === WalletType.Keplr &&
+    MustBigNumber(usdcBalance).toNumber() > AMOUNT_RESERVED_FOR_GAS_USDC;
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
@@ -218,6 +230,27 @@ export const AccountMenu = () => {
                 />
               </div>
             </$Balances>
+            {showConfirmDeposit && (
+              <$ConfirmDeposit>
+                You have a pending deposit
+                <br /> for confirmation
+                <$IconButton
+                  action={ButtonAction.Base}
+                  shape={ButtonShape.Square}
+                  iconName={IconName.Send}
+                  onClick={() =>
+                    dispatch(
+                      openDialog(
+                        DialogTypes.ConfirmDeposit({
+                          usdcBalance:
+                            MustBigNumber(usdcBalance).toNumber() - AMOUNT_RESERVED_FOR_GAS_USDC,
+                        })
+                      )
+                    )
+                  }
+                />
+              </$ConfirmDeposit>
+            )}
           </$AccountInfo>
         )
       }
@@ -461,6 +494,18 @@ const $Balances = styled.div`
       border-radius: 0 0 0.5rem 0.5rem;
     }
   }
+`;
+
+const $ConfirmDeposit = styled.div`
+  ${layoutMixins.row}
+
+  justify-content: space-between;
+  box-shadow: 0 0 0 1px var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+
+  color: var(--color-text-1);
+  font-size: var(--fontSize-small);
 `;
 
 const $BalanceOutput = styled(Output)`
