@@ -99,7 +99,7 @@ export const Notification = ({
           {slotContentOrDescription}
         </div>
       )}
-      {slotAction && <div tw="mt-0.5 font-small-book">{slotAction}</div>}
+      {slotAction && <div tw="mt-[var(--action-marginTop)] font-small-book">{slotAction}</div>}
     </$Container>
   );
 };
@@ -108,6 +108,7 @@ const $Container = styled.div<{ isToast?: boolean }>`
   // Params
   --toast-icon-size: 1.75em;
   --relativeTime-backgroundColor: var(--color-layer-2);
+  --action-marginTop: 0.5rem;
 
   // Rules
   ${popoverMixins.popover}
