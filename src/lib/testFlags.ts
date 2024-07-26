@@ -47,6 +47,10 @@ class TestFlags {
   get referrer() {
     return this.queryParams.utm_source;
   }
+
+  get ohlc() {
+    return !!this.queryParams.ohlc;
+  }
 }
 
 export const testFlags = new TestFlags();
