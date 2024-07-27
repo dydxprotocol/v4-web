@@ -6,7 +6,7 @@ export const objectEntries = <T extends object>(t: T) =>
 // since typescript is structurally typed and objects can contain extra keys and still be valid objects of type T
 export const objectKeys = <T extends object>(t: T) => Object.keys(t) as Array<keyof T>;
 
-// An alias for Object.assign. Our Abacus-generated types contian properties as getter functions which typescript can't be sure
+// An alias for Object.assign. Our Abacus-generated types contain properties as getter functions which typescript can't be sure
 // can be safely splatted like {...someObject}. Object.assign is slightly slower but guarantees all the properties will get copied
 // and the result is typed correctly by the type system
 export const safeAssign = Object.assign;

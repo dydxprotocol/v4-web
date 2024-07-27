@@ -1,4 +1,4 @@
-// implemntation based on https://github.com/stefalda/react-localization/blob/master/src/LocalizedStrings.js
+// implementation based on https://github.com/stefalda/react-localization/blob/master/src/LocalizedStrings.js
 import React from 'react';
 
 const PLACEHOLDER_REGEX = /(\{[\d|\w]+\})/;
