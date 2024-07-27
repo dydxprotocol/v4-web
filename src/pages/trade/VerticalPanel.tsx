@@ -38,19 +38,27 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   }, []);
 
   useEffect(() => {
-    if (canvasOrderbook) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.contentBoxSize[0]) {
-            calculateNumRows(entry.contentBoxSize[0].blockSize);
-          } else {
-            calculateNumRows(entry.contentRect.height);
-          }
-        });
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.contentBoxSize[0]) {
+          calculateNumRows(entry.contentBoxSize[0].blockSize);
+        } else {
+          calculateNumRows(entry.contentRect.height);
+        }
       });
+    });
 
+    if (canvasOrderbook) {
       resizeObserver.observe(canvasOrderbook);
     }
+
+    return () => {
+      if (canvasOrderbook) {
+        resizeObserver.unobserve(canvasOrderbook);
+      } else {
+        resizeObserver.disconnect();
+      }
+    };
   }, [calculateNumRows, canvasOrderbook]);
 
   return (

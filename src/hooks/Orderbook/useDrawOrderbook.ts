@@ -101,18 +101,27 @@ export const useDrawOrderbook = ({
 
   // Handle resize, sync to state
   useEffect(() => {
-    if (canvas) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.contentBoxSize[0]) {
-            scaleCanvas(entry.contentBoxSize[0].inlineSize, entry.contentBoxSize[0].blockSize);
-          } else {
-            scaleCanvas(entry.contentRect.width, entry.contentRect.height);
-          }
-        });
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.contentBoxSize[0]) {
+          scaleCanvas(entry.contentBoxSize[0].inlineSize, entry.contentBoxSize[0].blockSize);
+        } else {
+          scaleCanvas(entry.contentRect.width, entry.contentRect.height);
+        }
       });
+    });
+
+    if (canvas) {
       resizeObserver.observe(canvas);
     }
+
+    return () => {
+      if (canvas) {
+        resizeObserver.unobserve(canvas);
+      } else {
+        resizeObserver.disconnect();
+      }
+    };
   }, [scaleCanvas, canvas]);
 
   const drawBars = useCallback(
