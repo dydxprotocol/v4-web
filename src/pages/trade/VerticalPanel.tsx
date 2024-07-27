@@ -27,29 +27,31 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   const [rowsPerSide, setRowsPerSide] = useState<number | undefined>(undefined);
 
   const canvasOrderbookRef = useRef<HTMLDivElement>(null);
+  const canvasOrderbook = canvasOrderbookRef.current;
 
-  const calculateNumRows = useCallback(() => {
-    const orderbookHeight = canvasOrderbookRef.current?.clientHeight;
-
-    if (orderbookHeight) {
-      const maxNumRowsToRender = Math.floor(
-        (orderbookHeight - ORDERBOOK_HEADER_HEIGHT - ORDERBOOK_ROW_HEIGHT) /
-          (2 * ORDERBOOK_ROW_HEIGHT)
-      );
-      setRowsPerSide(maxNumRowsToRender);
-    }
+  const calculateNumRows = useCallback((orderbookHeight: number) => {
+    const maxNumRowsToRender = Math.floor(
+      (orderbookHeight - ORDERBOOK_HEADER_HEIGHT - ORDERBOOK_ROW_HEIGHT) /
+        (2 * ORDERBOOK_ROW_HEIGHT)
+    );
+    setRowsPerSide(maxNumRowsToRender);
   }, []);
 
   useEffect(() => {
-    // Recalcalculate the number of rows to render on window resize
-    window.addEventListener('resize', calculateNumRows);
-    return () => window.removeEventListener('resize', calculateNumRows);
-  });
+    if (canvasOrderbook) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.contentBoxSize[0]) {
+            calculateNumRows(entry.contentBoxSize[0].blockSize);
+          } else {
+            calculateNumRows(entry.contentRect.height);
+          }
+        });
+      });
 
-  useEffect(() => {
-    // Recalculate the number of rows to render when the orderbook is resized (i.e. user zooms out or in)
-    calculateNumRows();
-  }, [canvasOrderbookRef.current?.clientHeight, calculateNumRows]);
+      resizeObserver.observe(canvasOrderbook);
+    }
+  }, [calculateNumRows, canvasOrderbook]);
 
   return (
     <Tabs

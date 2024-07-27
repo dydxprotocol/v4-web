@@ -77,14 +77,13 @@ export const useDrawOrderbook = ({
   const [canvasWidth, setCanvasWidth] = useState(ORDERBOOK_WIDTH / ratio);
   const [canvasHeight, setCanvasHeight] = useState(ORDERBOOK_HEIGHT / ratio);
 
-  // Handle resize, sync to state
-  useEffect(() => {
-    const scaleCanvas = () => {
+  const scaleCanvas = useCallback(
+    (width: number, height: number) => {
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const currentRatio = window.devicePixelRatio;
-      canvas.width = canvas.offsetWidth * currentRatio;
-      canvas.height = canvas.offsetHeight * currentRatio;
+      canvas.width = width * currentRatio;
+      canvas.height = height * currentRatio;
 
       if (ctx) {
         ctx.scale(currentRatio, currentRatio);
@@ -96,13 +95,25 @@ export const useDrawOrderbook = ({
 
       setCanvasWidth(canvas.width / currentRatio);
       setCanvasHeight(canvas.height / currentRatio);
-    };
+    },
+    [canvas]
+  );
 
-    scaleCanvas();
-    window.addEventListener('resize', scaleCanvas);
-
-    return () => window.removeEventListener('resize', scaleCanvas);
-  }, [canvas, canvas?.offsetHeight, canvas?.height, canvas?.offsetWidth, canvas?.width]);
+  // Handle resize, sync to state
+  useEffect(() => {
+    if (canvas) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.contentBoxSize[0]) {
+            scaleCanvas(entry.contentBoxSize[0].inlineSize, entry.contentBoxSize[0].blockSize);
+          } else {
+            scaleCanvas(entry.contentRect.width, entry.contentRect.height);
+          }
+        });
+      });
+      resizeObserver.observe(canvas);
+    }
+  }, [scaleCanvas, canvas]);
 
   const drawBars = useCallback(
     ({

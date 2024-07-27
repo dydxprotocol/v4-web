@@ -207,6 +207,7 @@ export const TradeForm = ({
             fallback: errorParams.errorMessage ?? '',
           })
         );
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
