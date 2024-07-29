@@ -87,7 +87,7 @@ export const AccountMenu = () => {
 
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
-  const showConfirmDeposit =
+  const showConfirmPendingDeposit =
     walletType === WalletType.Keplr &&
     MustBigNumber(usdcBalance).toNumber() > AMOUNT_RESERVED_FOR_GAS_USDC;
 
@@ -230,8 +230,8 @@ export const AccountMenu = () => {
                 />
               </div>
             </$Balances>
-            {showConfirmDeposit && (
-              <$ConfirmDeposit>
+            {showConfirmPendingDeposit && (
+              <$ConfirmPendingDeposit>
                 You have a pending deposit
                 <br /> for confirmation
                 <$IconButton
@@ -241,7 +241,7 @@ export const AccountMenu = () => {
                   onClick={() =>
                     dispatch(
                       openDialog(
-                        DialogTypes.ConfirmDeposit({
+                        DialogTypes.ConfirmPendingDeposit({
                           usdcBalance:
                             MustBigNumber(usdcBalance).toNumber() - AMOUNT_RESERVED_FOR_GAS_USDC,
                         })
@@ -249,7 +249,7 @@ export const AccountMenu = () => {
                     )
                   }
                 />
-              </$ConfirmDeposit>
+              </$ConfirmPendingDeposit>
             )}
           </$AccountInfo>
         )
@@ -496,7 +496,7 @@ const $Balances = styled.div`
   }
 `;
 
-const $ConfirmDeposit = styled.div`
+const $ConfirmPendingDeposit = styled.div`
   ${layoutMixins.row}
 
   justify-content: space-between;

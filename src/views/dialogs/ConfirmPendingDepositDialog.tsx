@@ -4,7 +4,7 @@ import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
-import { ConfirmDepositDialogProps, DialogProps } from '@/constants/dialogs';
+import { ConfirmPendingDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -24,10 +24,10 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { log } from '@/lib/telemetry';
 
-export const ConfirmDepositDialog = ({
+export const ConfirmPendingDepositDialog = ({
   setIsOpen,
   usdcBalance,
-}: DialogProps<ConfirmDepositDialogProps>) => {
+}: DialogProps<ConfirmPendingDepositDialogProps>) => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const stringGetter = useStringGetter();
@@ -50,13 +50,13 @@ export const ConfirmDepositDialog = ({
         setIsOpen(false);
       }
     } catch (err) {
-      log('ConfirmDepositDialog/handleDepositToSubAccount', err);
+      log('ConfirmPendingDepositDialog/handleDepositToSubAccount', err);
     }
     setIsLoading(false);
   };
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title="Confirm Deposit">
+    <Dialog isOpen setIsOpen={setIsOpen} title="Confirm Pending Deposit">
       <$Container>
         <$Description>
           Fund your dYdX subaccount balance once your IBC transfer has been received.

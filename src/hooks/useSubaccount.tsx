@@ -23,6 +23,7 @@ import type {
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
@@ -39,6 +40,7 @@ import {
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
@@ -289,12 +291,34 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const balances = useAppSelector(getBalances, shallowEqual);
   const usdcCoinBalance = balances?.[usdcDenom];
 
+  const isKeplr = walletType === WalletType.Keplr;
+
   useEffect(() => {
-    const isKeplr = walletType === WalletType.Keplr;
     if (usdcCoinBalance && !isKeplr) {
       rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance, rebalanceWalletFunds, walletType]);
+  }, [usdcCoinBalance, rebalanceWalletFunds, isKeplr]);
+
+  const [showDepositDialog, setShowDepositDialog] = useState(true);
+
+  useEffect(() => {
+    if (isKeplr && usdcCoinBalance) {
+      if (showDepositDialog) {
+        const balanceAmount = parseFloat(usdcCoinBalance.amount);
+        const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
+        if (shouldDeposit) {
+          dispatch(
+            openDialog(
+              DialogTypes.ConfirmPendingDeposit({
+                usdcBalance: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
+              })
+            )
+          );
+        }
+      }
+      setShowDepositDialog(false);
+    }
+  }, [isKeplr, usdcCoinBalance, showDepositDialog]);
 
   const deposit = useCallback(
     async (amount: number) => {
