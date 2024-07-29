@@ -15161,6 +15161,12 @@
                     "ticker": "IQ-USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
+                },
+                {
+                    "exchangeName": "Gate",
+                    "ticker": "IQ_USDT",
+                    "adjustByMarket": "USDT-USD",
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -22060,6 +22066,12 @@
                     "ticker": "LTO-USDT",
                     "adjustByMarket": "USDT-USD",
                     "invert": false
+                },
+                {
+                    "exchangeName": "Gate",
+                    "ticker": "LTO_USDT",
+                    "adjustByMarket": "USDT-USD",
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -25511,48 +25523,6 @@
             "assetName": "Parcl",
             "referencePrice": 0.22979554194478957,
             "cmcId": 30661
-        }
-    },
-    "CEEK": {
-        "title": "Add CEEK-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CEEK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 484,
-            "ticker": "CEEK-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -11,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "CEEK-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "CEEK-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -4,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "CEEK VR",
-            "referencePrice": 0.034975015862697106,
-            "cmcId": 2856
         }
     },
     "SDAO": {
@@ -34142,48 +34112,6 @@
             "assetName": "LET HIM COOK",
             "referencePrice": 0.0079194393622778,
             "cmcId": 32227
-        }
-    },
-    "LBR": {
-        "title": "Add LBR-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LBR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 684,
-            "ticker": "LBR-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -11,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "LBR-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "LBR-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -4,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Lybra Finance",
-            "referencePrice": 0.07882189382964397,
-            "cmcId": 24700
         }
     },
     "KARATE": {
