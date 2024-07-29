@@ -116,36 +116,39 @@ export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
-export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
-export type StakingDelegation = Abacus.exchange.dydx.abacus.output.StakingDelegation;
-export type UnbondingDelegation = Abacus.exchange.dydx.abacus.output.UnbondingDelegation;
-export type StakingRewards = Abacus.exchange.dydx.abacus.output.StakingRewards;
-export type TradingRewards = Abacus.exchange.dydx.abacus.output.TradingRewards;
-export type HistoricalTradingReward = Abacus.exchange.dydx.abacus.output.HistoricalTradingReward;
+export type AccountBalance = Abacus.exchange.dydx.abacus.output.account.AccountBalance;
+export type StakingDelegation = Abacus.exchange.dydx.abacus.output.account.StakingDelegation;
+export type UnbondingDelegation = Abacus.exchange.dydx.abacus.output.account.UnbondingDelegation;
+export type StakingRewards = Abacus.exchange.dydx.abacus.output.account.StakingRewards;
+export type TradingRewards = Abacus.exchange.dydx.abacus.output.account.TradingRewards;
+export type HistoricalTradingReward =
+  Abacus.exchange.dydx.abacus.output.account.HistoricalTradingReward;
 export const HistoricalTradingRewardsPeriod =
   Abacus.exchange.dydx.abacus.state.manager.HistoricalTradingRewardsPeriod;
 const historicalTradingRewardsPeriod = [...HistoricalTradingRewardsPeriod.values()] as const;
 export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPeriod)[number];
 
-export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
-export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
+export type Subaccount = Abacus.exchange.dydx.abacus.output.account.Subaccount;
+export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.account.SubaccountPosition;
 export type SubaccountPendingPosition =
-  Abacus.exchange.dydx.abacus.output.SubaccountPendingPosition;
-export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
+  Abacus.exchange.dydx.abacus.output.account.SubaccountPendingPosition;
+export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.account.SubaccountOrder;
 export type OrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 export const AbacusOrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 const abacusOrderStatuses = [...AbacusOrderStatus.values()] as const;
 export type AbacusOrderStatuses = (typeof abacusOrderStatuses)[number];
-export type SubaccountFills = Abacus.exchange.dydx.abacus.output.SubaccountFill[];
-export type SubaccountFill = Abacus.exchange.dydx.abacus.output.SubaccountFill;
-export type SubaccountFundingPayment = Abacus.exchange.dydx.abacus.output.SubaccountFundingPayment;
+export type SubaccountFills = Abacus.exchange.dydx.abacus.output.account.SubaccountFill[];
+export type SubaccountFill = Abacus.exchange.dydx.abacus.output.account.SubaccountFill;
+export type SubaccountFundingPayment =
+  Abacus.exchange.dydx.abacus.output.account.SubaccountFundingPayment;
 export type SubaccountFundingPayments =
-  Abacus.exchange.dydx.abacus.output.SubaccountFundingPayment[];
-export type SubaccountTransfer = Abacus.exchange.dydx.abacus.output.SubaccountTransfer;
-export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountTransfer[];
+  Abacus.exchange.dydx.abacus.output.account.SubaccountFundingPayment[];
+export type SubaccountTransfer = Abacus.exchange.dydx.abacus.output.account.SubaccountTransfer;
+export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.account.SubaccountTransfer[];
 
 // ------ Historical PnL ------ //
-export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
+export type SubAccountHistoricalPNLs =
+  Abacus.exchange.dydx.abacus.output.account.SubaccountHistoricalPNL[];
 export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.manager.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
