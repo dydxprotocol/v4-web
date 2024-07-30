@@ -27,6 +27,7 @@ type ElementProps = {
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
   state?: ButtonState | ButtonStateConfig;
+  withContentOnLoading?: boolean;
 };
 
 type StyleProps = {
@@ -48,6 +49,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       children,
       slotLeft = null,
       slotRight = null,
+      withContentOnLoading = false,
 
       ...otherProps
     },
@@ -67,7 +69,12 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         {...{ ref, action, size, shape, state, ...otherProps }}
       >
         {state[ButtonState.Loading] ? (
-          <LoadingDots size={3} />
+          <>
+            {withContentOnLoading && slotLeft}
+            {withContentOnLoading && children}
+            {withContentOnLoading && slotRight}
+            <$LoadingDots size={3} />
+          </>
         ) : (
           <>
             {slotLeft}
@@ -169,4 +176,8 @@ const StyledBaseButton = styled(BaseButton)<StyleProps>`
       ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
       ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
     `}
+`;
+
+const $LoadingDots = styled(LoadingDots)`
+  padding-top: 0.5em;
 `;
