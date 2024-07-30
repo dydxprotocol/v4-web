@@ -199,6 +199,7 @@ export const WithdrawForm = () => {
 
           const notificationParams = {
             id: notificationId,
+            // DUMMY_TX_HASH is a place holder before we get the real txHash
             txHash: DUMMY_TX_HASH,
             type: TransferNotificationTypes.Withdrawal,
             fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
@@ -212,7 +213,7 @@ export const WithdrawForm = () => {
 
           if (isCctp) {
             // we want to trigger a dummy notification first since CCTP withdraws can take
-            // up to 30s to generate a txHash
+            // up to 30s to generate a txHash, set isDummy to true
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
