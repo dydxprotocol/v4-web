@@ -161,7 +161,7 @@ export const WithdrawForm = () => {
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
-      const notificationId = Date.now().toString();
+      const notificationId = crypto?.randomUUID() ?? Date.now().toString();
 
       try {
         e.preventDefault();
