@@ -33,6 +33,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { RouteWarningMessage } from '../RouteWarningMessage';
 import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
@@ -58,8 +59,12 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { summary, requestPayload, exchange } =
-    useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const {
+    summary,
+    requestPayload,
+    exchange,
+    warning: routeWarning,
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
@@ -188,25 +193,39 @@ export const WithdrawButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
   const isFormValid =
-    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
+    !isDisabled &&
+    !isEditingSlippage &&
+    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
+    !requiresAcknowledgement;
+
+  if (!canAccountTrade) {
+    return (
+      <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+        <OnboardingTriggerButton size={ButtonSize.Base} />
+      </$WithReceipt>
+    );
+  }
 
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
-      {!canAccountTrade ? (
-        <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : (
-        <Button
-          action={ButtonAction.Primary}
-          type={ButtonType.Submit}
-          state={{
-            isDisabled: !isFormValid,
-            isLoading: (isFormValid && !requestPayload) || isLoading,
-          }}
-        >
-          {stringGetter({ key: STRING_KEYS.WITHDRAW })}
-        </Button>
-      )}
+      <RouteWarningMessage
+        hasAcknowledged={hasAcknowledged}
+        setHasAcknowledged={setHasAcknowledged}
+        routeWarningJSON={routeWarning}
+      />
+      <Button
+        action={ButtonAction.Primary}
+        type={ButtonType.Submit}
+        state={{
+          isDisabled: !isFormValid,
+          isLoading: (isFormValid && !requestPayload) || isLoading,
+        }}
+      >
+        {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+      </Button>
     </$WithReceipt>
   );
 };

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getLowestFeeChainNames,
+  getMapOfHighestFeeTokensByChainId,
   getMapOfLowestFeeTokensByChainId,
   getMapOfLowestFeeTokensByDenom,
 } from '@/constants/cctp';
@@ -283,6 +284,29 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+    });
+  });
+});
+
+describe('getMapOfHighestFeeTokensByChainId', () => {
+  it('deposits squid - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.deposit, false)).toEqual({});
+  });
+  it('deposits skip - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.deposit, true)).toEqual({});
+  });
+  it('withdrawals squid - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.withdrawal, false)).toEqual({});
+  });
+  it('withdrawals skip - should be a map with one property: ethereum chain id', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.withdrawal, true)).toEqual({
+      1: [
+        {
+          chainId: '1',
+          tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          name: 'Ethereum',
         },
       ],
     });

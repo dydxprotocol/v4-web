@@ -40,6 +40,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { RouteWarningMessage } from '../RouteWarningMessage';
 import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
@@ -105,7 +106,9 @@ export const DepositButtonAndReceipt = ({
     requestPayload,
     depositOptions,
     chain: chainIdStr,
+    warning: routeWarning,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+
   const { usdcLabel } = useTokenConfigs();
   const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -250,11 +253,22 @@ export const DepositButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
+
   const isFormValid =
-    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
+    !isDisabled &&
+    !isEditingSlippage &&
+    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
+    !requiresAcknowledgement;
 
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+      <RouteWarningMessage
+        hasAcknowledged={hasAcknowledged}
+        setHasAcknowledged={setHasAcknowledged}
+        routeWarningJSON={routeWarning}
+      />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : !isConnectedWagmi ? (
