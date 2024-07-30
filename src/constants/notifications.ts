@@ -210,19 +210,30 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS6 = 'incentives-s6',
-  IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
   IsolatedMarginLive = 'isolated-margin-live', // Added 06/12/2024
   InAppStakingLive = 'staking-live', // Added 06/24/2024
 }
 
 // Incentives Season
+export enum IncentivesDistributedNotificationIds {
+  IncentivesDistributedS4 = 'incentives-distributed-s4',
+  IncentivesDistributedS5 = 'incentives-distributed-s5',
+}
+
 export const CURRENT_SEASON_NUMBER = 6;
-export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
 export const MEDIAN_REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
 export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6;
-export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
-  ReleaseUpdateNotificationIds.IncentivesDistributedS4;
+
+export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
+  switch (seasonId) {
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS5:
+      return 5;
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS4:
+    default:
+      return 4;
+  }
+}
 
 export enum MarketWindDownNotificationIds {
   MarketWindDownFetAgix = 'market-wind-down-fet-agix',

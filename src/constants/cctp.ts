@@ -5,6 +5,7 @@ export type CctpTokenInfo = {
   chainId: string;
   tokenAddress: string;
   name: string;
+  isTestnet?: boolean;
 };
 
 type NullableTransferType = TransferTypeType | undefined | null;
@@ -16,6 +17,11 @@ const getLowestFeeChains = (type: NullableTransferType, skipEnabled: boolean) =>
   type === TransferType.deposit
     ? mainnetChains
     : mainnetChains.filter(({ chainId }) => (skipEnabled ? chainId !== '1' : true));
+
+const getHighestFeeChains = (type: NullableTransferType, skipEnabled: boolean) =>
+  type === TransferType.withdrawal
+    ? mainnetChains.filter(({ chainId }) => (skipEnabled ? chainId === '1' : false))
+    : [];
 
 // move this out if we need it in another module
 const capitalizeNames = (str: string) => str[0].toUpperCase() + str.slice(1);
@@ -35,11 +41,8 @@ export const getMapOfLowestFeeTokensByDenom = (type: NullableTransferType, skipE
     {} as Record<string, CctpTokenInfo[]>
   );
 
-export const getMapOfLowestFeeTokensByChainId = (
-  type: NullableTransferType,
-  skipEnabled: boolean
-) =>
-  getLowestFeeChains(type, skipEnabled).reduce(
+const getMapOfChainsByChainId = (chains: CctpTokenInfo[]) =>
+  chains.reduce(
     (acc, token) => {
       if (!acc[token.chainId]) {
         acc[token.chainId] = [];
@@ -49,6 +52,16 @@ export const getMapOfLowestFeeTokensByChainId = (
     },
     {} as Record<string, CctpTokenInfo[]>
   );
+
+export const getMapOfLowestFeeTokensByChainId = (
+  type: NullableTransferType,
+  skipEnabled: boolean
+) => getMapOfChainsByChainId(getLowestFeeChains(type, skipEnabled));
+
+export const getMapOfHighestFeeTokensByChainId = (
+  type: NullableTransferType,
+  skipEnabled: boolean
+) => getMapOfChainsByChainId(getHighestFeeChains(type, skipEnabled));
 
 export const cctpTokensByDenom = cctpTokens.reduce(
   (acc, token) => {

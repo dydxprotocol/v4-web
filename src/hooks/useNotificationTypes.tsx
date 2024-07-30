@@ -17,13 +17,11 @@ import {
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
-  INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  REWARD_DISTRIBUTION_SEASON_NUMBER,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
@@ -62,6 +60,7 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
+import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -275,6 +274,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
+        useIncentivesSeason();
 
       const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
@@ -403,26 +404,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxAddress } = useAccounts();
       const { data, status } = useQueryChaosLabsIncentives({
         dydxAddress,
-        season: REWARD_DISTRIBUTION_SEASON_NUMBER,
+        season: rewardDistributionSeasonNumber,
       });
 
       const { dydxRewards } = data ?? {};
 
       useEffect(() => {
-        if (dydxAddress && status === 'success') {
+        const rewards = dydxRewards ?? 0;
+        if (dydxAddress && status === 'success' && rewards > 0) {
           trigger(
-            INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
+            incentivesDistributedSeasonId,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+                params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
               }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.BODY',
                 params: {
-                  SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER,
-                  DYDX_AMOUNT: dydxRewards ?? 0,
+                  SEASON_NUMBER: rewardDistributionSeasonNumber,
+                  DYDX_AMOUNT: rewards,
                 },
               }),
               renderCustomBody({ isToast, notification }) {
@@ -431,14 +433,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     isToast={isToast}
                     notification={notification}
                     data={{
-                      points: dydxRewards ?? 0,
+                      points: rewards,
                       chainTokenLabel,
                     }}
                   />
                 );
               },
               toastSensitivity: 'foreground',
-              groupKey: INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
+              groupKey: incentivesDistributedSeasonId,
             },
             []
           );
@@ -447,13 +449,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
+      const { incentivesDistributedSeasonId } = useIncentivesSeason();
 
       const navigate = useNavigate();
 
       return (notificationId: string) => {
         if (
           notificationId === INCENTIVES_SEASON_NOTIFICATION_ID ||
-          notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID
+          notificationId === incentivesDistributedSeasonId
         ) {
           navigate(`${chainTokenLabel}`);
         }
