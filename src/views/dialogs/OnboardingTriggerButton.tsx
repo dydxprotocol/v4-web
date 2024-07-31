@@ -1,6 +1,5 @@
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -21,7 +20,7 @@ type StyleProps = {
 export const OnboardingTriggerButton = ({ className, size = ButtonSize.Small }: StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { complianceState } = useComplianceState();
+  const { disableConnectButton } = useComplianceState();
 
   const onboardingState = useAppSelector(getOnboardingState);
 
@@ -31,9 +30,7 @@ export const OnboardingTriggerButton = ({ className, size = ButtonSize.Small }: 
       action={ButtonAction.Primary}
       size={size}
       state={{
-        isDisabled:
-          complianceState === ComplianceStates.READ_ONLY &&
-          onboardingState === OnboardingState.Disconnected,
+        isDisabled: disableConnectButton,
       }}
       onClick={() => dispatch(forceOpenDialog(DialogTypes.Onboarding()))}
     >

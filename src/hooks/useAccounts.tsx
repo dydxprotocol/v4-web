@@ -17,7 +17,7 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { getGeo, getHasSubaccount, getOnboardingState } from '@/state/accountSelectors';
+import { getGeo, getHasSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
@@ -45,7 +45,6 @@ export const useAccounts = () => useContext(AccountsContext)!;
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();
   const geo = useAppSelector(getGeo);
-  const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
 
   // Wallet connection
