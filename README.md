@@ -177,6 +177,41 @@ Then run `pnpm install`
 
 **Remember to revert to remote abacus before making a PR.**
 
+# Local Client-js Development
+
+## Directory structure
+
+Our tooling assumes that the [v4-clients repo](https://github.com/dydxprotocol/v4-clients) is checked out alongside v4-web:
+
+```
+--- parent folder
+ |___ v4-web
+ |___ v4-clients
+```
+
+## Using your local v4-clients repo
+
+Whenever you have changes in v4-clients that you'd like to test in your local v4-web branch, use the following command:
+
+```
+pnpm run install-local-client-js --clean
+```
+
+The `--clean` option will uninstall the package first, **it is not needed on subsequent runs.**
+
+## Reverting to remote clients
+
+Revert any changes to @dydxprotocol/v4-clients in package.json and pnpm-lock.yaml. If you haven't made any other package changes, you can use:
+
+```
+git restore main package.json
+git restore main pnpm-lock.yaml
+```
+
+Then run `pnpm install`
+
+**Remember to revert to remote v4-clients before making a PR.**
+
 # Local Localization (l10n) Development
 
 ## Directory structure

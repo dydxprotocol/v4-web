@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { fatalExec, nonFatalExec } from './shared-utils.js';
 
 const clean = process.argv.includes('--clean');
 
@@ -26,22 +26,6 @@ fatalExec(
 );
 
 infoMessage('Vite dev server should have restarted automatically.');
-
-function nonFatalExec(cmd) {
-  try {
-    execSync(cmd, { stdio: 'inherit' });
-  } catch (error) {
-    // Do nothing.
-  }
-}
-
-function fatalExec(cmd) {
-  try {
-    execSync(cmd, { stdio: 'inherit' });
-  } catch (error) {
-    process.exit(1);
-  }
-}
 
 function infoMessage(message) {
   console.log('\n**** install-local-abacus.js: ' + message + '\n');

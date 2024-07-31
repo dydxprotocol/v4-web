@@ -27,6 +27,7 @@
     "clean-install": "rm -rf node_modules/ && pnpm i",
     "preview": "vite preview",
     "install-local-abacus": "node scripts/install-local-abacus",
+    "install-local-client-js": "node scripts/install-local-client-js",
     "install-local-l10n": "pnpm link ../v4-localization && echo Linking... please remember to restart your dev server",
     "remove-local-l10n": "pnpm unlink ../v4-localization && echo Unlinking... please remember to restart your dev server",
     "ladle": "ladle serve",

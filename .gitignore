@@ -34,4 +34,6 @@ entry_points/
 public/tradingview
 public/datafeed
 
+# Local Library Development
 local-abacus-hash
+local-client-js-hash
