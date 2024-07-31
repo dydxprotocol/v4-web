@@ -17,15 +17,17 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { getHasSubaccount } from '@/state/accountSelectors';
+import { getGeo, getHasSubaccount, getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
 
 import { useDydxClient } from './useDydxClient';
+import { useEnvFeatures } from './useEnvFeatures';
 import { useLocalStorage } from './useLocalStorage';
 import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
@@ -42,6 +44,9 @@ export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();
+  const geo = useAppSelector(getGeo);
+  const onboardingState = useAppSelector(getOnboardingState);
+  const { checkForGeo } = useEnvFeatures();
 
   // Wallet connection
   const {
@@ -309,6 +314,12 @@ const useAccountsContext = () => {
       })
     );
   }, [dispatch, dydxSubaccounts]);
+
+  useEffect(() => {
+    if (geo && isBlockedGeo(geo) && checkForGeo) {
+      disconnect();
+    }
+  }, [checkForGeo, geo]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
