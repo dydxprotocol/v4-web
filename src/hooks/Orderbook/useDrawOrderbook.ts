@@ -319,6 +319,13 @@ export const useDrawOrderbook = ({
     });
   };
 
+  const [fontFlag, setFontFlag] = useState(0);
+  useEffect(() => {
+    const inc = () => setFontFlag((f) => f + 1);
+    globalThis.document.fonts.addEventListener('loadingdone', inc);
+    return () => globalThis.document.fonts.removeEventListener('loadingdone', inc);
+  }, []);
+
   // Update histograms and row contents on data change
   useEffect(() => {
     const ctx = canvas?.getContext('2d');
@@ -350,6 +357,7 @@ export const useDrawOrderbook = ({
 
     prevData.current = data;
   }, [
+    fontFlag,
     canvasHeight,
     canvasWidth,
     data,
