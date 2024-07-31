@@ -70,11 +70,18 @@ type DepositFormProps = {
   onError?: () => void;
 };
 
+enum DepositSteps {
+  Initial = 'initial',
+  Approval = 'approval',
+  Confirm = 'confirm',
+}
+
 export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [depositStep, setDepositStep] = useState<DepositSteps>(DepositSteps.Initial);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
@@ -88,7 +95,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     saveHasAcknowledgedTerms,
   } = useAccounts();
 
-  const { addTransferNotification } = useLocalNotifications();
+  const { addOrUpdateTransferNotification } = useLocalNotifications();
 
   const {
     requestPayload,
@@ -246,6 +253,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
 
     if (sourceAmountBN > (allowance as bigint)) {
+      setDepositStep(DepositSteps.Approval);
       const simulateApprove = async (abi: Abi) =>
         publicClientWagmi.simulateContract({
           account: evmAddress,
@@ -267,7 +275,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         hash: approveTx,
       });
     }
-  }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
+  }, [signerWagmi, publicClientWagmi, sourceToken, requestPayload, evmAddress, debouncedAmount]);
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -299,10 +307,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           gasLimit: BigInt(requestPayload.gasLimit || DEFAULT_GAS_LIMIT),
           value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
+        setDepositStep(DepositSteps.Confirm);
         const txHash = await signerWagmi.sendTransaction(tx);
 
         if (txHash) {
-          addTransferNotification({
+          addOrUpdateTransferNotification({
             txHash,
             toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
@@ -333,6 +342,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setError(err);
       } finally {
         setIsLoading(false);
+        setDepositStep(DepositSteps.Initial);
       }
     },
     [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
@@ -441,6 +451,18 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     debouncedAmountBN,
   ]);
 
+  const depositCTAString = useMemo(() => {
+    if (depositStep === DepositSteps.Approval) {
+      return stringGetter({ key: STRING_KEYS.PENDING_TOKEN_APPROVAL });
+    }
+    if (depositStep === DepositSteps.Confirm) {
+      return stringGetter({ key: STRING_KEYS.PENDING_DEPOSIT_CONFIRMATION });
+    }
+    return hasAcknowledgedTerms
+      ? stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })
+      : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS_AND_DEPOSIT });
+  }, [depositStep, stringGetter, hasAcknowledgedTerms]);
+
   const isDisabled =
     Boolean(errorMessage) ||
     !sourceToken ||
@@ -507,6 +529,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           )}
           <$Footer>
             <DepositButtonAndReceipt
+              buttonLabel={depositCTAString}
               isDisabled={isDisabled}
               isLoading={isLoading}
               chainId={chainId || undefined}
