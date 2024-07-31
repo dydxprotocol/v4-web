@@ -156,7 +156,9 @@ const LaunchIncentivesContent = () => {
           onClick={() => {
             dispatch(
               openDialog(
-                DialogTypes.ExternalLink({ link: 'https://dydx.exchange/blog/v4-full-trading' })
+                DialogTypes.ExternalLink({
+                  link: 'https://dydx.forum/t/launch-of-season-5-of-the-launch-incentive-program/2725',
+                })
               )
             );
           }}
