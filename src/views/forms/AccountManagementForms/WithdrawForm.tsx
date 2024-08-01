@@ -12,7 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
-import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -64,7 +64,7 @@ import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -165,6 +165,7 @@ export const WithdrawForm = () => {
   const { screenAddresses } = useDydxClient();
   const nobleChainId = getNobleChainId();
   const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -356,6 +357,12 @@ export const WithdrawForm = () => {
               value: OSMO_USDC_IBC_DENOM,
             });
           }
+          if (name === neutronChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: NEUTRON_USDC_IBC_DENOM,
+            });
+          }
         } else {
           abacusStateManager.setTransferValue({
             field: TransferInputField.exchange,
@@ -364,7 +371,7 @@ export const WithdrawForm = () => {
         }
       }
     },
-    [osmosisChainId]
+    [neutronChainId, osmosisChainId]
   );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {

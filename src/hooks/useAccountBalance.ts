@@ -15,7 +15,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { useAccounts } from './useAccounts';
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -51,7 +51,7 @@ export const useAccountBalance = ({
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { nobleValidator, osmosisValidator, validators } = useEndpointsConfig();
+  const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
@@ -95,11 +95,15 @@ export const useAccountBalance = ({
   const cosmosAddress = useMemo(() => {
     const nobleChainId = getNobleChainId();
     const osmosisChainId = getOsmosisChainId();
+    const neutronChainId = getNeutronChainId();
     if (chainId === osmosisChainId) {
       return accounts?.[osmosisChainId]?.bech32Address;
     }
     if (chainId === nobleChainId) {
       return accounts?.[nobleChainId]?.bech32Address;
+    }
+    if (chainId === neutronChainId) {
+      return accounts?.[neutronChainId]?.bech32Address;
     }
     if (chainId === selectedDydxChainId) {
       return dydxAddress;
@@ -111,12 +115,16 @@ export const useAccountBalance = ({
     if (dydxAddress && cosmosAddress && addressOrDenom) {
       const nobleChainId = getNobleChainId();
       const osmosisChainId = getOsmosisChainId();
+      const neutronChainId = getNeutronChainId();
       const rpc = (() => {
         if (chainId === nobleChainId) {
           return nobleValidator;
         }
         if (chainId === osmosisChainId) {
           return osmosisValidator;
+        }
+        if (chainId === neutronChainId) {
+          return neutronValidator;
         }
         if (chainId === selectedDydxChainId) {
           return validators[0];
@@ -142,6 +150,7 @@ export const useAccountBalance = ({
     selectedDydxChainId,
     nobleValidator,
     osmosisValidator,
+    neutronValidator,
     validators,
   ]);
 

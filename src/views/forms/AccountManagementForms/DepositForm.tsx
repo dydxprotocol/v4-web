@@ -19,7 +19,7 @@ import {
   DEFAULT_TRANSACTION_MEMO,
 } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
-import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -65,7 +65,12 @@ import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId, getOsmosisChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  NATIVE_TOKEN_ADDRESS,
+} from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -125,6 +130,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const chainId = chainIdStr && !isKeplrWallet ? parseInt(chainIdStr) : chainIdStr ?? undefined;
   const nobleChainId = getNobleChainId();
   const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
 
   // User inputs
   const sourceToken = useMemo(
@@ -233,6 +239,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               value: OSMO_USDC_IBC_DENOM,
             });
           }
+          if (name === neutronChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: NEUTRON_USDC_IBC_DENOM,
+            });
+          }
         } else {
           abacusStateManager.setTransferValue({
             field: TransferInputField.exchange,
@@ -241,7 +253,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
       }
     },
-    [osmosisChainId]
+    [neutronChainId, osmosisChainId]
   );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
@@ -358,6 +370,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             }
             if (osmosisChainId === chainIdStr) {
               return GasPrice.fromString('0.025uosmo');
+            }
+            if (neutronChainId === chainIdStr) {
+              return GasPrice.fromString('0.0053untrn');
             }
             return undefined;
           })();

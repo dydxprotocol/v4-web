@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
-import { OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
@@ -25,7 +25,7 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
-import { getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
@@ -82,6 +82,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         }
         if (chainIdStr === getOsmosisChainId()) {
           return token.value === OSMO_USDC_IBC_DENOM;
+        }
+        if (chainIdStr === getNeutronChainId()) {
+          return token.value === NEUTRON_USDC_IBC_DENOM;
         }
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens

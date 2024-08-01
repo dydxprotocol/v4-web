@@ -13,6 +13,7 @@ interface EndpointsConfig {
   skip: string;
   nobleValidator: string;
   osmosisValidator: string;
+  neutronValidator: string;
   faucet?: string;
   stakingAPR?: string;
 }
@@ -28,6 +29,7 @@ export const useEndpointsConfig = () => {
     skip: endpointsConfig.skip,
     nobleValidator: endpointsConfig.nobleValidator,
     osmosisValidator: endpointsConfig.osmosisValidator,
+    neutronValidator: endpointsConfig.neutronValidator,
     faucet: endpointsConfig.faucet,
     stakingAPR: endpointsConfig.stakingAPR,
   };

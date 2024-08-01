@@ -24,7 +24,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { track } from '@/lib/analytics';
-import { getNobleChainId } from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -106,8 +106,21 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
     setIsOpen?.(false);
   };
 
+  const osmosisChainId = getOsmosisChainId();
   const nobleChainId = getNobleChainId();
-  const chainName = fromChainId === nobleChainId ? 'Noble' : 'Osmosis';
+  const neutronChainId = getNeutronChainId();
+  const chainName = (() => {
+    if (fromChainId === nobleChainId) {
+      return 'Noble';
+    }
+    if (fromChainId === neutronChainId) {
+      return 'Neutron';
+    }
+    if (fromChainId === osmosisChainId) {
+      return 'Osmosis';
+    }
+    return 'Source Chain';
+  })();
 
   const stepItems = [
     {

@@ -74,6 +74,10 @@ export const getOsmosisChainId = () => {
   return isMainnet ? 'osmosis-1' : 'osmo-test-5';
 };
 
+export const getNeutronChainId = () => {
+  return isMainnet ? 'neutron-1' : 'pion-1';
+};
+
 type SkipStatusParams = {
   transactionHash: string;
   chainId: string | undefined;
