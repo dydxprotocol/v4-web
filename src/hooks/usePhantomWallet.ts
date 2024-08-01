@@ -12,6 +12,10 @@ export function usePhantomWallet() {
     return pubkey;
   }, []);
 
+  const disconnect = useCallback(() => {
+    setSolAddress('');
+  }, []);
+
   useEffect(() => {
     (window as any).phantom?.solana?.on('accountChanged', (publicKey: PublicKey) => {
       if (publicKey) {
@@ -36,6 +40,7 @@ export function usePhantomWallet() {
   return {
     solAddress,
     connect,
+    disconnect,
     signMessage,
   };
 }

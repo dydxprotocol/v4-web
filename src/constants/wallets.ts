@@ -37,7 +37,7 @@ export enum WalletConnectionType {
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
   TestWallet = 'TestWallet',
-  Phantom = 'PHANTOM',
+  Phantom = 'Phantom',
 }
 
 export enum WalletErrorType {
