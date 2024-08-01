@@ -15,6 +15,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('deposits skip - returns all cctp mainnet chain names as an array', () => {
@@ -23,6 +25,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('withdrawals squid - returns all cctp mainnet chain names as an array', () => {
@@ -31,6 +35,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('deposits squid - returns all cctp mainnet chain names as an array', () => {
@@ -39,6 +45,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
 });
@@ -65,6 +73,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -99,6 +121,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'arbitrum',
         },
       ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('withdrawals squid - returns a map of token denom/addresses to token information including ETH USDC', () => {
@@ -129,6 +165,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -163,6 +213,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'arbitrum',
         },
       ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
 });
@@ -188,6 +252,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -222,6 +300,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'arbitrum',
         },
       ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('withdrawals squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -254,6 +346,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'arbitrum',
         },
       ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('deposits squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -284,6 +390,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
