@@ -21,7 +21,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { AssetTableCell } from '@/components/Table/AssetTableCell';
 import { TableCell } from '@/components/Table/TableCell';
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -105,7 +105,7 @@ export const MarketsCompactTable = ({
                 <$DetailsCell>
                   {isNew && (
                     <$RecentlyListed>
-                      <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+                      <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
                     </$RecentlyListed>
                   )}
                   <Icon iconName={IconName.ChevronRight} />
@@ -315,10 +315,4 @@ const $RecentlyListed = styled.div`
 const $InterestOutput = styled(Output)`
   color: var(--color-text-0);
   font: var(--font-mini-medium);
-`;
-
-const $NewTag = styled(Tag)`
-  background-color: var(--color-accent-faded);
-  color: var(--color-accent);
-  text-transform: uppercase;
 `;

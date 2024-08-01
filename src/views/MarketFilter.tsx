@@ -14,6 +14,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
+import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 export const MarketFilter = ({
@@ -43,15 +44,24 @@ export const MarketFilter = ({
         placeholder={stringGetter({ key: searchPlaceholderKey })}
         onTextChange={onSearchTextChange}
       />
-      <$ToggleGroupContainer $compactLayout={compactLayout}>
-        <ToggleGroup
-          items={Object.values(filters).map((value) => ({
-            label: stringGetter({ key: MARKET_FILTER_LABELS[value] }),
-            value,
-          }))}
-          value={selectedFilter}
-          onValueChange={onChangeFilter}
-        />
+
+      <$Row>
+        <$ToggleGroupContainer $compactLayout={compactLayout}>
+          <$ToggleGroup
+            items={Object.values(filters).map((value) => ({
+              label: MARKET_FILTER_LABELS[value]
+                ? stringGetter({ key: MARKET_FILTER_LABELS[value] ?? '' })
+                : value,
+              slotAfter: value === MarketFilters.PREDICTION_MARKET && (
+                <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+              ),
+              value,
+            }))}
+            value={selectedFilter}
+            onValueChange={onChangeFilter}
+          />
+        </$ToggleGroupContainer>
+
         {hasPotentialMarketsData && !hideNewMarketButton && (
           <Button
             onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
@@ -60,7 +70,7 @@ export const MarketFilter = ({
             {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
           </Button>
         )}
-      </$ToggleGroupContainer>
+      </$Row>
     </$MarketFilter>
   );
 };
@@ -84,7 +94,19 @@ const $MarketFilter = styled.div<{ $compactLayout: boolean }>`
 const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
   ${layoutMixins.row}
   justify-content: space-between;
-  overflow-x: auto;
+  overflow-x: hidden;
+  position: relative;
+  --toggle-group-paddingRight: 0.75rem;
+
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--toggle-group-paddingRight);
+    background: linear-gradient(to right, transparent 10%, var(--color-layer-2));
+  }
 
   ${({ $compactLayout }) =>
     $compactLayout &&
@@ -98,4 +120,13 @@ const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
         --button-font: var(--font-small-book);
       }
     `}
+`;
+
+const $ToggleGroup = styled(ToggleGroup)`
+  overflow-x: auto;
+  padding-right: var(--toggle-group-paddingRight);
+` as typeof ToggleGroup;
+
+const $Row = styled.div`
+  ${layoutMixins.row}
 `;

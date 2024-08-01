@@ -20,6 +20,7 @@ export enum MarketSorting {
 export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
+  PREDICTION_MARKET = 'Prediction Market',
   LAYER_1 = 'Layer 1',
   LAYER_2 = 'Layer 2',
   DEFI = 'Defi',
@@ -33,7 +34,8 @@ export enum MarketFilters {
 
 export const MARKET_FILTER_LABELS = {
   [MarketFilters.ALL]: STRING_KEYS.ALL,
-  [MarketFilters.NEW]: STRING_KEYS.NEW,
+  [MarketFilters.NEW]: STRING_KEYS.RECENTLY_LISTED,
+  [MarketFilters.PREDICTION_MARKET]: undefined,
   [MarketFilters.LAYER_1]: STRING_KEYS.LAYER_1,
   [MarketFilters.LAYER_2]: STRING_KEYS.LAYER_2,
   [MarketFilters.DEFI]: STRING_KEYS.DEFI,
