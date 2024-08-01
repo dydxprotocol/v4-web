@@ -155,6 +155,8 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
         </$MarketDropdownBanner>
       );
     }
+
+    return null;
   }, [hasSeenElectionBannerTrumpWin]);
 
   return (
