@@ -124,14 +124,23 @@ const $MarketsPageBanner = styled.div`
   padding: 0 1.5rem;
   justify-content: space-between;
   gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+
+  span {
+    font: var(--font-medium-medium);
+  }
 
   @media ${breakpoints.desktopSmall} {
     margin-left: 1rem;
     margin-right: 1rem;
   }
 
-  span {
-    font: var(--font-medium-medium);
+  @media ${breakpoints.tablet} {
+    span,
+    button {
+      z-index: 1;
+    }
   }
 `;
 
@@ -145,7 +154,9 @@ const $FlagOverlay = styled.div`
   background-repeat: no-repeat;
 
   @media ${breakpoints.mobile} {
-    width: 30%;
+    position: absolute;
+    width: 100%;
+    z-index: 0;
   }
 `;
 
