@@ -46,7 +46,7 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.RECENTLY_LISTED,
   },
   [MarketFilters.PREDICTION_MARKET]: {
-    // TODO: (TRA-516): Update string when v4-localization contains stringKey.
+    // TODO: (TRA-528): Update string when v4-localization contains stringKey.
     label: undefined,
     isNew: true,
   },
