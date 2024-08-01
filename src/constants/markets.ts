@@ -20,6 +20,7 @@ export enum MarketSorting {
 export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
+  PREDICTION_MARKET = 'Prediction Market',
   LAYER_1 = 'Layer 1',
   LAYER_2 = 'Layer 2',
   DEFI = 'Defi',
@@ -31,18 +32,51 @@ export enum MarketFilters {
   ENT = 'Entertainment',
 }
 
-export const MARKET_FILTER_LABELS = {
-  [MarketFilters.ALL]: STRING_KEYS.ALL,
-  [MarketFilters.NEW]: STRING_KEYS.NEW,
-  [MarketFilters.LAYER_1]: STRING_KEYS.LAYER_1,
-  [MarketFilters.LAYER_2]: STRING_KEYS.LAYER_2,
-  [MarketFilters.DEFI]: STRING_KEYS.DEFI,
-  [MarketFilters.AI]: STRING_KEYS.AI,
-  [MarketFilters.NFT]: STRING_KEYS.NFT,
-  [MarketFilters.GAMING]: STRING_KEYS.GAMING,
-  [MarketFilters.MEME]: STRING_KEYS.MEME,
-  [MarketFilters.RWA]: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
-  [MarketFilters.ENT]: STRING_KEYS.ENTERTAINMENT,
+export const MARKET_FILTER_OPTIONS: Record<
+  MarketFilters,
+  {
+    label?: string;
+    isNew?: boolean;
+  }
+> = {
+  [MarketFilters.ALL]: {
+    label: STRING_KEYS.ALL,
+  },
+  [MarketFilters.NEW]: {
+    label: STRING_KEYS.RECENTLY_LISTED,
+  },
+  [MarketFilters.PREDICTION_MARKET]: {
+    // TODO: (TRA-516): Update string when v4-localization contains stringKey.
+    label: undefined,
+    isNew: true,
+  },
+  [MarketFilters.LAYER_1]: {
+    label: STRING_KEYS.LAYER_1,
+  },
+  [MarketFilters.LAYER_2]: {
+    label: STRING_KEYS.LAYER_2,
+  },
+  [MarketFilters.DEFI]: {
+    label: STRING_KEYS.DEFI,
+  },
+  [MarketFilters.AI]: {
+    label: STRING_KEYS.AI,
+  },
+  [MarketFilters.NFT]: {
+    label: STRING_KEYS.NFT,
+  },
+  [MarketFilters.GAMING]: {
+    label: STRING_KEYS.GAMING,
+  },
+  [MarketFilters.MEME]: {
+    label: STRING_KEYS.MEME,
+  },
+  [MarketFilters.RWA]: {
+    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  },
+  [MarketFilters.ENT]: {
+    label: STRING_KEYS.ENTERTAINMENT,
+  },
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';

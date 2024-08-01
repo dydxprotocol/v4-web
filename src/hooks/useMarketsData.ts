@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import { MARKET_FILTER_LABELS, MarketFilters, type MarketData } from '@/constants/markets';
+import { MARKET_FILTER_OPTIONS, MarketFilters, type MarketData } from '@/constants/markets';
 
 import {
   SEVEN_DAY_SPARKLINE_ENTRIES,
@@ -19,24 +19,24 @@ import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 const filterFunctions = {
-  [MarketFilters.ALL]: () => true,
-  [MarketFilters.LAYER_1]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Layer 1');
+  [MarketFilters.AI]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('AI');
   },
+  [MarketFilters.ALL]: () => true,
   [MarketFilters.DEFI]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Defi');
   },
-  [MarketFilters.LAYER_2]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Layer 2');
-  },
-  [MarketFilters.NFT]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('NFT');
+  [MarketFilters.ENT]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('ENT');
   },
   [MarketFilters.GAMING]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Gaming');
   },
-  [MarketFilters.AI]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('AI');
+  [MarketFilters.LAYER_1]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Layer 1');
+  },
+  [MarketFilters.LAYER_2]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Layer 2');
   },
   [MarketFilters.MEME]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Meme');
@@ -44,8 +44,11 @@ const filterFunctions = {
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
-  [MarketFilters.ENT]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('ENT');
+  [MarketFilters.NFT]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('NFT');
+  },
+  [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Prediction Market');
   },
   [MarketFilters.RWA]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('RWA');
@@ -110,7 +113,7 @@ export const useMarketsData = (
     () => [
       MarketFilters.ALL,
       MarketFilters.NEW,
-      ...objectKeys(MARKET_FILTER_LABELS).filter((marketFilter) =>
+      ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
         markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
       ),
     ],

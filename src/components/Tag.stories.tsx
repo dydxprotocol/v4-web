@@ -1,6 +1,6 @@
 import type { Story } from '@ladle/react';
 
-import { Tag, TagSign, TagSize, TagType } from '@/components/Tag';
+import { NewTag, Tag, TagSign, TagSize, TagType } from '@/components/Tag';
 
 import { StoryWrapper } from '.ladle/components';
 
@@ -37,5 +37,25 @@ TagStory.argTypes = {
     options: [true, false],
     control: { type: 'select' },
     defaultValue: false,
+  },
+};
+
+export const NewTagStory: Story<Parameters<typeof Tag>[0]> = (args) => {
+  return (
+    <StoryWrapper>
+      <NewTag {...args}>NEW</NewTag>
+    </StoryWrapper>
+  );
+};
+
+NewTagStory.args = {
+  isHighlighted: false,
+};
+
+NewTagStory.argTypes = {
+  size: {
+    options: Object.values(TagSize),
+    control: { type: 'select' },
+    defaultValue: TagSize.Small,
   },
 };

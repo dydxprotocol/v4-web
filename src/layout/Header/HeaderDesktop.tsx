@@ -20,7 +20,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -67,7 +67,7 @@ export const HeaderDesktop = () => {
           label: (
             <>
               {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
-              <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
             </>
           ),
           href: AppRoute.Vault,
@@ -273,8 +273,4 @@ const $UnreadIndicator = styled.div`
   height: 0.4375rem;
   border-radius: 50%;
   background-color: var(--color-accent);
-`;
-const $NewTag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
 `;

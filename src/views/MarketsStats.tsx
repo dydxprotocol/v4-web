@@ -10,7 +10,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { ExchangeBillboards } from './ExchangeBillboards';
@@ -32,7 +32,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         <$SectionHeader>
           <$RecentlyListed>
             {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
-            <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
           </$RecentlyListed>
         </$SectionHeader>
         <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
@@ -40,7 +40,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <$Section>
         <$SectionHeader>
           <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>
-          <$NewTag>{stringGetter({ key: STRING_KEYS._24H })}</$NewTag>
+          <NewTag>{stringGetter({ key: STRING_KEYS._24H })}</NewTag>
 
           <$ToggleGroupContainer>
             <ToggleGroup
@@ -79,21 +79,20 @@ const $MarketsStats = styled.section`
     ${layoutMixins.column}
   }
 `;
+
 const $Section = styled.div`
   background: var(--color-layer-3);
   border-radius: 0.625rem;
   display: grid;
   grid-template-rows: auto 1fr;
 `;
+
 const $RecentlyListed = styled.h4`
   display: flex;
   align-items: center;
   gap: 0.375rem;
 `;
-const $NewTag = styled(Tag)`
-  background-color: var(--color-accent-faded);
-  color: var(--color-accent);
-`;
+
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;
@@ -114,6 +113,7 @@ const $ToggleGroupContainer = styled.div`
     --button-font: var(--font-mini-book);
   }
 `;
+
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
   position: relative;
