@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useShouldShowFooter } from '@/hooks/useShouldShowFooter';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -28,6 +29,8 @@ export const FooterMobile = () => {
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const marketId = useAppSelector(getCurrentMarketId);
+
+  const { disableConnectButton } = useComplianceState();
 
   if (!useShouldShowFooter()) return null;
 
@@ -53,11 +56,12 @@ export const FooterMobile = () => {
                     value: 'onboarding',
                     label: stringGetter({ key: STRING_KEYS.ONBOARDING }),
                     slotBefore: (
-                      <$StartIcon>
+                      <$StartIcon disabled={disableConnectButton}>
                         <Icon iconName={IconName.Play} />
                       </$StartIcon>
                     ),
-                    onClick: () => dispatch(openDialog(DialogTypes.Onboarding())),
+                    onClick: () =>
+                      !disableConnectButton && dispatch(openDialog(DialogTypes.Onboarding())),
                   },
               {
                 value: 'portfolio',
@@ -157,7 +161,7 @@ const $NavigationMenu = styled(NavigationMenu)`
 
 const $Icon = tw(Icon)`text-[1.5rem]`;
 
-const $StartIcon = styled.div`
+const $StartIcon = styled.div<{ disabled?: boolean }>`
   display: inline-flex;
   flex-direction: row;
   justify-content: center;
@@ -176,4 +180,11 @@ const $StartIcon = styled.div`
     width: 1.5rem;
     height: 1.5rem;
   }
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      background-color: var(--color-layer-2);
+      color: var(--color-text-0);
+    `}
 `;

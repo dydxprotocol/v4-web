@@ -68,6 +68,7 @@ export const ToggleGroup = forwardRefFn(
             >
               {item.slotBefore}
               {item.label}
+              {item.slotAfter}
             </ToggleButton>
           </Item>
         ))}

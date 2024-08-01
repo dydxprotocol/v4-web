@@ -12,6 +12,7 @@ import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -49,6 +50,7 @@ type Action = {
   key: string;
   label: string;
   icon: IconButtonProps;
+  state?: IconButtonProps['state'];
   href?: string;
   onClick?: () => void;
 };
@@ -63,6 +65,7 @@ const Profile = () => {
 
   const { evmAddress, dydxAddress, walletType } = useAccounts();
   const { chainTokenLabel } = useTokenConfigs();
+  const { disableConnectButton } = useComplianceState();
 
   const { data: ensName } = useEnsName({
     address: evmAddress,
@@ -127,6 +130,7 @@ const Profile = () => {
           key: 'connect',
           label: stringGetter({ key: STRING_KEYS.CONNECT }),
           icon: { iconName: IconName.Transfer },
+          state: { isDisabled: disableConnectButton },
           onClick: () => {
             dispatch(openDialog(DialogTypes.Onboarding()));
           },
@@ -153,10 +157,10 @@ const Profile = () => {
         </div>
       </header>
       <$Actions withSeparators={false}>
-        {actions.map(({ key, label, href, icon, onClick }) => {
+        {actions.map(({ key, label, href, icon, state, onClick }) => {
           const action = (
             <>
-              <$ActionButton {...icon} size={ButtonSize.Large} onClick={onClick} />
+              <$ActionButton {...icon} size={ButtonSize.Large} onClick={onClick} state={state} />
               <span>{label}</span>
             </>
           );
@@ -360,6 +364,11 @@ const $ActionButton = styled(IconButton)<{ iconName?: IconName }>`
           --button-textColor: var(--color-text-2);
           --button-backgroundColor: var(--color-accent);
         `}
+
+  &:disabled {
+    --button-backgroundColor: var(--color-layer-2);
+    --button-textColor: var(--color-text-0);
+  }
 `;
 
 const $Details = tw(Details)`font-small-book [--details-value-font:var(--font-medium-book)]`;

@@ -21,7 +21,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { AssetTableCell } from '@/components/Table/AssetTableCell';
 import { TableCell } from '@/components/Table/TableCell';
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -75,7 +75,7 @@ export const MarketsCompactTable = ({
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
-                tw="text-text-1 font-small-medium"
+                tw="text-text-0 font-small-medium"
               />
               <$TabletPriceChange>
                 {!priceChange24H ? (
@@ -106,9 +106,7 @@ export const MarketsCompactTable = ({
                 <$DetailsCell>
                   {isNew && (
                     <$RecentlyListed>
-                      <Tag tw="bg-accent-faded uppercase text-accent">
-                        {stringGetter({ key: STRING_KEYS.NEW })}
-                      </Tag>
+                      <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
                     </$RecentlyListed>
                   )}
                   <Icon iconName={IconName.ChevronRight} />

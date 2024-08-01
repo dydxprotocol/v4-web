@@ -118,6 +118,20 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
     [stringGetter]
   );
 
+  const slotBottom = useMemo(() => {
+    if (filter === MarketFilters.PREDICTION_MARKET) {
+      // TODO: (TRA-516): Localize string when finallized.
+      return (
+        <$Disclaimer>
+          Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
+          will settle at $0.
+        </$Disclaimer>
+      );
+    }
+
+    return null;
+  }, [filter]);
+
   return (
     <>
       <$Toolbar>
@@ -181,6 +195,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
             </$MarketNotFound>
           }
         />
+        {slotBottom}
       </$ScrollArea>
     </>
   );
@@ -335,6 +350,12 @@ const $Popover = styled(Popover)`
   &:focus-visible {
     outline: none;
   }
+`;
+
+const $Disclaimer = styled.div`
+  font: var(--font-small-medium);
+  color: var(--color-text-0);
+  padding: 1rem;
 `;
 
 const $Toolbar = styled(Toolbar)`

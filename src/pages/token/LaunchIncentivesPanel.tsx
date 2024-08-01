@@ -22,7 +22,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { Tag, TagSize } from '@/components/Tag';
+import { NewTag, TagSize } from '@/components/Tag';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
@@ -67,9 +67,7 @@ const LaunchIncentivesTitle = () => {
           FOR_V4: <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
         },
       })}
-      <Tag size={TagSize.Medium} tw="bg-accent-faded text-accent">
-        {stringGetter({ key: STRING_KEYS.NEW })}
-      </Tag>
+      <NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
     </$Title>
   );
 };
@@ -159,7 +157,9 @@ const LaunchIncentivesContent = () => {
           onClick={() => {
             dispatch(
               openDialog(
-                DialogTypes.ExternalLink({ link: 'https://dydx.exchange/blog/v4-full-trading' })
+                DialogTypes.ExternalLink({
+                  link: 'https://dydx.forum/t/launch-of-season-5-of-the-launch-incentive-program/2725',
+                })
               )
             );
           }}

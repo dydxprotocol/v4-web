@@ -20,7 +20,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -67,7 +67,7 @@ export const HeaderDesktop = () => {
           label: (
             <>
               {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
-              <Tag tw="bg-accent-faded text-accent">{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
             </>
           ),
           href: AppRoute.Vault,

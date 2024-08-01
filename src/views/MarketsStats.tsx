@@ -11,7 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Tag } from '@/components/Tag';
+import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { ExchangeBillboards } from './ExchangeBillboards';
@@ -27,16 +27,13 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   return (
-    <section
-      className={className}
-      tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
-    >
+    <section className={className} tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:px-1">
       <ExchangeBillboards />
       <$Section>
         <$SectionHeader>
           <h4 tw="flex items-center gap-0.375">
             {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
-            <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
           </h4>
         </$SectionHeader>
         <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
@@ -44,7 +41,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <$Section>
         <$SectionHeader>
           <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>
-          <$NewTag>{stringGetter({ key: STRING_KEYS._24H })}</$NewTag>
+          <NewTag>{stringGetter({ key: STRING_KEYS._24H })}</NewTag>
 
           <$ToggleGroupContainer>
             <ToggleGroup
@@ -68,8 +65,9 @@ export const MarketsStats = (props: MarketsStatsProps) => {
     </section>
   );
 };
+
 const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-layer-3`;
-const $NewTag = tw(Tag)`bg-accent-faded text-accent`;
+
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;
@@ -90,6 +88,7 @@ const $ToggleGroupContainer = styled.div`
     --button-font: var(--font-mini-book);
   }
 `;
+
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
   position: relative;

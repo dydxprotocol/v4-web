@@ -3,22 +3,14 @@ import '@/polyfills';
 import { useEffect, useState } from 'react';
 
 import '@/index.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { GrazProvider } from 'graz';
+import { QueryClient } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import styled from 'styled-components';
-import { WagmiProvider } from 'wagmi';
 
 import { SupportedLocales } from '@/constants/localization';
 
-import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
-import { DialogAreaProvider } from '@/hooks/useDialogArea';
-import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
-import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
-import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import { GlobalStyle } from '@/styles/globalStyle';
 
@@ -34,8 +26,6 @@ import {
 } from '@/state/configs';
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
-import { config } from '@/lib/wagmi';
-
 import './ladle.css';
 
 const queryClient = new QueryClient();
@@ -47,19 +37,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   );
 };
 
-const providers = [
-  wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
-  wrapProvider(WagmiProvider, { config }),
-  wrapProvider(LocaleProvider),
-  wrapProvider(RestrictionProvider),
-  wrapProvider(DydxProvider),
-  wrapProvider(AccountsProvider),
-  wrapProvider(SubaccountProvider),
-  wrapProvider(DialogAreaProvider),
-  wrapProvider(PotentialMarketsProvider),
-  wrapProvider(AppThemeAndColorModeProvider),
-];
+const providers = [wrapProvider(LocaleProvider), wrapProvider(AppThemeAndColorModeProvider)];
 
 export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState(AppTheme.Classic);

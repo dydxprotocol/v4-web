@@ -73,6 +73,7 @@ export const ComboboxMenu = <
             value={searchValue}
             onValueChange={setSearchValue}
             placeholder={inputPlaceholder}
+            data-hj-allow
           />
         </$Header>
       )}
