@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { MARKET_FILTER_LABELS, MarketFilters } from '@/constants/markets';
+import { MARKET_FILTER_OPTIONS, MarketFilters } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -49,10 +49,8 @@ export const MarketFilter = ({
         <$ToggleGroupContainer $compactLayout={compactLayout}>
           <$ToggleGroup
             items={Object.values(filters).map((value) => ({
-              label: MARKET_FILTER_LABELS[value]
-                ? stringGetter({ key: MARKET_FILTER_LABELS[value] ?? '' })
-                : value,
-              slotAfter: value === MarketFilters.PREDICTION_MARKET && (
+              label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
+              slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
                 <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
               ),
               value,

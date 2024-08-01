@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import { MARKET_FILTER_LABELS, MarketFilters, type MarketData } from '@/constants/markets';
+import { MARKET_FILTER_OPTIONS, MarketFilters, type MarketData } from '@/constants/markets';
 
 import {
   SEVEN_DAY_SPARKLINE_ENTRIES,
@@ -113,7 +113,7 @@ export const useMarketsData = (
     () => [
       MarketFilters.ALL,
       MarketFilters.NEW,
-      ...objectKeys(MARKET_FILTER_LABELS).filter((marketFilter) =>
+      ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
         markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
       ),
     ],
