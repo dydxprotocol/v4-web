@@ -372,9 +372,9 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   const state: typeof baseState = {
     ...baseState,
     sort: (columnKey, direction) => {
-      const { column: curColumnKey, direction: curDirection } = baseState.sortDescriptor;
+      const { column: currentColumnKey, direction: currentDirection } = baseState.sortDescriptor;
       // first time touching this column sort
-      if (direction == null && (columnKey !== curColumnKey || curDirection == null)) {
+      if (direction == null && (columnKey !== currentColumnKey || currentDirection == null)) {
         return baseState.sort(columnKey, firstClickSortDirection);
       }
       return baseState.sort(columnKey, direction);
