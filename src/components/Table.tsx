@@ -145,7 +145,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   withInnerBorders = false,
   withScrollSnapColumns = false,
   withScrollSnapRows = false,
-  firstClickSortDirection,
+  firstClickSortDirection = 'descending',
   className,
   style,
 }: AllTableProps<TableRowData>) => {
