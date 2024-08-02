@@ -105,6 +105,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   slotEmpty?: React.ReactNode;
   initialPageSize?: PageSize;
   paginationBehavior?: 'paginate' | 'showAll';
+  firstClickSortDirection?: 'ascending' | 'descending';
 };
 
 export type TableStyleProps = {
@@ -144,6 +145,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   withInnerBorders = false,
   withScrollSnapColumns = false,
   withScrollSnapRows = false,
+  firstClickSortDirection = 'descending',
   className,
   style,
 }: AllTableProps<TableRowData>) => {
@@ -263,6 +265,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           withScrollSnapColumns={withScrollSnapColumns}
           withScrollSnapRows={withScrollSnapRows}
           numColumns={shownColumns.length}
+          firstClickSortDirection={firstClickSortDirection}
           paginationRow={
             shouldPaginate ? (
               <TablePaginationRow
@@ -334,6 +337,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   children: TableStateProps<TableRowData>['children'];
   numColumns: number;
   paginationRow?: React.ReactNode;
+  firstClickSortDirection?: 'ascending' | 'descending';
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -358,12 +362,24 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     withInnerBorders,
     withScrollSnapColumns,
     withScrollSnapRows,
+    firstClickSortDirection,
   } = props;
 
-  const state = useTableState<TableRowData>({
+  const baseState = useTableState<TableRowData>({
     ...props,
     showSelectionCheckboxes: selectionMode === 'multiple' && selectionBehavior !== 'replace',
   });
+  const state: typeof baseState = {
+    ...baseState,
+    sort: (columnKey, direction) => {
+      const { column: currentColumnKey, direction: currentDirection } = baseState.sortDescriptor;
+      // first time touching this column sort
+      if (direction == null && (columnKey !== currentColumnKey || currentDirection == null)) {
+        return baseState.sort(columnKey, firstClickSortDirection);
+      }
+      return baseState.sort(columnKey, direction);
+    },
+  };
 
   const ref = React.useRef<HTMLTableElement>(null);
   const { collection } = state;

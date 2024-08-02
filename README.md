@@ -85,6 +85,7 @@ Set environment variables via `.env`.
 - `VITE_TOKEN_MIGRATION_URI` (optional): The URL of the token migration website.
 - `AMPLITUDE_API_KEY` (optional): Amplitude API key for enabling Amplitude; used with `pnpm run build:inject-amplitude`.
 - `AMPLITUDE_SERVER_URL` (optional): Custom Amplitude server URL
+- `GOOGLE_TAG_MANAGER_CONTAINER_ID` (optional): Id for a google tag manager container; used with `pnpm run build:inject-google-tag-manager`.
 - `HOTJAR_SITE_ID`, `HOTJAR_VERSION` (optional): used for enabling Hotjar tracking; used with `pnpm run build:inject-hotjar`
 - `BUGSNAG_API_KEY` (optional): API key for enabling Bugsnag; used with `pnpm run build:inject-bugsnag`.
 - `IOS_APP_ID` (optional): iOS app ID used for enabling deep linking to the iOS app; used with `pnpm run build:inject-app-deeplinks`.
