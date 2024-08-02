@@ -236,6 +236,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         }}
         columns={columns}
         paginationBehavior="showAll"
+        firstClickSortDirection="descending"
         className={className}
         slotEmpty={
           <$MarketNotFound>
