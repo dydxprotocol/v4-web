@@ -556,6 +556,7 @@ const assetIcons = {
   TRIBE: '/currencies/tribe.png',
   TRU: '/currencies/tru.png',
   TRUMP: '/currencies/trump.png',
+  TRUMPWIN: '/currencies/trumpwin.png',
   TRVL: '/currencies/trvl.png',
   TRX: '/currencies/trx.png',
   TT: '/currencies/tt.png',
