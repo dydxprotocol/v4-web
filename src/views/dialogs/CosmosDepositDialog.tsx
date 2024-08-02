@@ -4,13 +4,12 @@ import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
 import { AMOUNT_RESERVED_FOR_GAS_NOBLE } from '@/constants/account';
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { TransferNotificationTypes } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -23,8 +22,13 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { track } from '@/lib/analytics';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  MAX_TRACK_TX_ATTEMPTS,
+  trackSkipTxWithTenacity,
+} from '@/lib/squid';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -37,10 +41,12 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
   const { deposit } = useSubaccount();
-  const { setAllTransferNotifications } = useLocalNotifications();
   const { dydxAddress } = useAccounts();
+  const { skip } = useEndpointsConfig();
 
   const [txStatus, setTxStatus] = useState<'success' | 'error' | 'pending'>('pending');
+
+  const { setAllTransferNotifications } = useLocalNotifications();
 
   const depositToSubaccount = useCallback(async () => {
     try {
@@ -54,6 +60,19 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
         if (tx !== undefined) {
           const depositTxHash = Buffer.from(tx.hash).toString('hex');
 
+          // eslint-disable-next-line prefer-const
+          let attemptNumber = 1;
+          await trackSkipTxWithTenacity({
+            attemptNumber,
+            transactionHash: depositTxHash,
+            chainId: fromChainId,
+            baseUrl: skip,
+          });
+
+          if (attemptNumber === MAX_TRACK_TX_ATTEMPTS) {
+            throw new Error('Transaction failed');
+          }
+
           setAllTransferNotifications((transferNotification) => {
             return {
               ...transferNotification,
@@ -61,26 +80,13 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
                 if (notification.txHash === txHash) {
                   return {
                     ...notification,
-                    depositSubaccount: {
-                      txHash: depositTxHash,
-                      needToDeposit: false,
-                    },
+                    isSubaccountDepositCompleted: true,
                   };
                 }
                 return notification;
               }),
             };
           });
-          track(
-            AnalyticsEvents.TransferNotification({
-              triggeredAt: undefined,
-              timeSpent: undefined,
-              txHash,
-              toAmount,
-              type: TransferNotificationTypes.Deposit,
-              status: 'success',
-            })
-          );
 
           setTxStatus('success');
         } else {
@@ -90,16 +96,21 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
     } catch (e) {
       setTxStatus('error');
     }
-  }, [dydxAddress, setAllTransferNotifications, toAmount, txHash]);
+  }, [dydxAddress, fromChainId, skip, toAmount, txHash]);
+
+  const [isExecuted, setIsExecuted] = useState(false);
 
   useEffect(() => {
-    if (txStatus === 'pending') {
+    if (!isExecuted) {
       depositToSubaccount();
     }
-  }, [depositToSubaccount, txStatus]);
+    setIsExecuted(true);
+  }, [depositToSubaccount, isExecuted]);
 
   const onRetry = () => {
     setTxStatus('pending');
+
+    depositToSubaccount();
   };
 
   const onClose = () => {

@@ -305,12 +305,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     if (isKeplr && usdcCoinBalance) {
       if (showDepositDialog) {
         const balanceAmount = parseFloat(usdcCoinBalance.amount);
-        const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
+        const usdcBalance = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC;
+        const shouldDeposit = usdcBalance > 0 && usdcBalance.toFixed(2) !== '0.00';
         if (shouldDeposit) {
           dispatch(
             openDialog(
               DialogTypes.ConfirmPendingDeposit({
-                usdcBalance: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
+                usdcBalance,
               })
             )
           );

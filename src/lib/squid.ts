@@ -102,7 +102,7 @@ export const trackSkipTx = async ({
   return response.json();
 };
 
-const MAX_TRACK_TX_ATTEMPTS = 5;
+export const MAX_TRACK_TX_ATTEMPTS = 5;
 const TRACK_TX_INTERVAL = 1000;
 
 export const trackSkipTxWithTenacity = async ({

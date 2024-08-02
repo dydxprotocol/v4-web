@@ -24,10 +24,11 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { getNobleChainId } from '@/lib/squid';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { TransferStatusSteps } from './TransferStatusSteps';
@@ -51,7 +52,10 @@ export const TransferStatusNotification = ({
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const dispatch = useAppDispatch();
-  const { status, toAmount, isExchange, fromChainId, txHash, depositSubaccount } = transfer;
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+
+  const { status, toAmount, isExchange, fromChainId, txHash, isSubaccountDepositCompleted } =
+    transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -75,11 +79,12 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
-  const nobleChainId = getNobleChainId();
-  const isCosmosTransfer = [nobleChainId].includes(fromChainId ?? '');
-  const isComplete = isCosmosTransfer
-    ? depositSubaccount?.txHash && depositSubaccount?.needToDeposit === false
+  const isCosmosDeposit =
+    SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') && fromChainId !== selectedDydxChainId;
+  const isComplete = isCosmosDeposit
+    ? isSubaccountDepositCompleted
     : status?.squidTransactionStatus === 'success' || isExchange;
+
   const inProgressStatusString =
     type === TransferNotificationTypes.Deposit
       ? secondsLeft > 0
@@ -108,16 +113,16 @@ export const TransferStatusNotification = ({
       key: 'status',
       label: 'Status',
       // TODO: Need to add localization
-      value: isComplete ? 'Complete' : 'Awaiting Confirmation',
+      value: isComplete ? 'Confirmed' : 'Awaiting Confirmation',
     },
   ];
 
   const customContent =
-    !status && !isExchange && !isCosmosTransfer ? (
+    !status && !isExchange && !isCosmosDeposit ? (
       <LoadingDots size={3} />
     ) : (
       <$BridgingStatus>
-        {isCosmosTransfer ? (
+        {isCosmosDeposit ? (
           <>
             <$Details items={detailItems} />
             {!isToast && !isComplete && (
@@ -171,13 +176,13 @@ export const TransferStatusNotification = ({
             )}
           </>
         )}
-        {!isToast && !isComplete && !hasError && !isCosmosTransfer && (
+        {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
           <$TransferStatusSteps status={status} type={type} />
         )}
       </$BridgingStatus>
     );
 
-  const transferIcon = isCosmosTransfer ? slotIcon : isToast && slotIcon;
+  const transferIcon = isCosmosDeposit ? slotIcon : isToast && slotIcon;
 
   const transferNotif = (
     <Notification
@@ -207,7 +212,7 @@ export const TransferStatusNotification = ({
       }
       slotAction={
         isToast &&
-        !isCosmosTransfer &&
+        !isCosmosDeposit &&
         status && (
           <$Trigger
             isOpen={open}

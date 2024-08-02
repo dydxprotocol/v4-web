@@ -8,6 +8,8 @@ import { ConfirmPendingDepositDialogProps, DialogProps } from '@/constants/dialo
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -22,6 +24,7 @@ import { Output, OutputType } from '@/components/Output';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { log } from '@/lib/telemetry';
 
 export const ConfirmPendingDepositDialog = ({
@@ -30,6 +33,9 @@ export const ConfirmPendingDepositDialog = ({
 }: DialogProps<ConfirmPendingDepositDialogProps>) => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const { dydxAddress } = useAccounts();
+
+  const { setAllTransferNotifications } = useLocalNotifications();
   const stringGetter = useStringGetter();
 
   const { deposit } = useSubaccount();
@@ -45,8 +51,26 @@ export const ConfirmPendingDepositDialog = ({
     setIsLoading(true);
     try {
       const tx = await deposit(usdcBalance);
-      if (tx !== undefined) {
+      if (tx && dydxAddress) {
         await refetchQuery();
+
+        setAllTransferNotifications((transferNotification) => {
+          return {
+            ...transferNotification,
+            [dydxAddress]: transferNotification[dydxAddress].map((notification) => {
+              const isCosmosDeposit =
+                SUPPORTED_COSMOS_CHAINS.includes(notification.fromChainId ?? '') &&
+                notification.fromChainId !== selectedDydxChainId;
+              if (isCosmosDeposit) {
+                return {
+                  ...notification,
+                  isSubaccountDepositCompleted: true,
+                };
+              }
+              return notification;
+            }),
+          };
+        });
         setIsOpen(false);
       }
     } catch (err) {

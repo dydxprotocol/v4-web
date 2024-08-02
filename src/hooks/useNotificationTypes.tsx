@@ -55,7 +55,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { getNobleChainId } from '@/lib/squid';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -221,43 +221,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const nobleChainId = getNobleChainId();
-          const isCosmosTransfer = [nobleChainId].includes(fromChainId ?? '');
-          if (isCosmosTransfer) {
-            const icon = <$AssetIcon symbol="USDC" />;
-            const isFinished = depositSubaccount?.txHash && !depositSubaccount?.needToDeposit;
-            const title = isFinished
-              ? stringGetter({
-                  key: STRING_KEYS.DEPOSIT,
-                })
-              : // TODO: Need to add Localization
-                'Confirm Pending Deposit';
+          const isCosmosDeposit =
+            SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
+            fromChainId !== selectedDydxChainId;
 
-            trigger(
-              txHash,
-              {
-                icon,
-                title,
-                toastSensitivity: 'foreground',
-                renderCustomBody: ({ isToast, notification }) => (
-                  <TransferStatusNotification
-                    isToast={isToast}
-                    slotIcon={icon}
-                    slotTitle={title}
-                    transfer={transfer}
-                    type={transferType}
-                    triggeredAt={transfer.triggeredAt}
-                    notification={notification}
-                  />
-                ),
-                groupKey: NotificationType.SquidTransfer,
-              },
-              []
-            );
-          } else {
-            const isFinished =
-              (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
-            const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
+          const isFinished =
+            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+          const icon = isCosmosDeposit ? (
+            <$AssetIcon symbol="USDC" />
+          ) : (
+            <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
+          );
 
           trigger(
             id ?? txHash,
@@ -282,7 +256,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId]);
     },
     useNotificationAction: () => {
       return () => {};

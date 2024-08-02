@@ -400,9 +400,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               triggeredAt: Date.now(),
               isCctp,
               type: TransferNotificationTypes.Deposit,
-              depositSubaccount: {
-                needToDeposit: true,
-              },
             });
             abacusStateManager.clearTransferInputValues();
             setFromAmount('');
