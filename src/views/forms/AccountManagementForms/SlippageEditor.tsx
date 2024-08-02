@@ -115,7 +115,7 @@ export const SlippageEditor = ({
         {
           [EditorState.Viewing]: undefined,
           [EditorState.Selecting]: (
-            <div tw="inlineRow justify-center rounded-[0.5em] bg-layer-2">
+            <div tw="inlineRow justify-center rounded-[0.5em] bg-color-layer-2">
               <ToggleGroup
                 ref={toggleGroupRef}
                 items={[

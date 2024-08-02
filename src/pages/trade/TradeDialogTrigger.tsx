@@ -54,7 +54,7 @@ export const TradeDialogTrigger = () => {
                 value={total}
                 showSign={ShowSign.None}
                 useGrouping
-                tw="text-text-2 font-large-book"
+                tw="text-color-text-2 font-large-book"
               />
             </$TradeSummary>
           ) : (

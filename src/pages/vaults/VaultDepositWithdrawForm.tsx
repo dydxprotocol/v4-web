@@ -411,7 +411,7 @@ export const VaultDepositWithdrawForm = ({
         </$Arrow>
         <$TargetBox>
           {inputFormConfig.transactionTarget.icon === 'cross' ? (
-            <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-layer-6">C</div>
+            <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-color-layer-6">C</div>
           ) : (
             <img src="/dydx-chain.png" tw="h-2 w-2" />
           )}
@@ -503,7 +503,7 @@ const $FloatingDetails = styled(Details)`
 
   font-size: var(--details-item-fontSize, 0.8125em);
 `;
-const $Icon = tw(Icon)`text-text-0`;
+const $Icon = tw(Icon)`text-color-text-0`;
 const labels = css`
   font: var(--font-small-book);
   color: var(--color-text-0);
@@ -562,7 +562,7 @@ const $TargetBox = styled.div`
   ${boxes}
   grid-area: 2 / 3;
 `;
-const $WarningIcon = tw(Icon)`text-warning`;
+const $WarningIcon = tw(Icon)`text-color-warning`;
 
 const $InlineOutput = tw(Output)`inline`;
 

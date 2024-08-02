@@ -84,7 +84,7 @@ const RewardsPage = () => {
     />
   );
   const legalDisclaimer = (
-    <div tw="text-text-0 font-mini-book">
+    <div tw="text-color-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
         params: {

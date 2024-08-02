@@ -50,7 +50,7 @@ const getTradingRewardHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
-            <span tw="text-text-2">{stringGetter({ key: STRING_KEYS.REWARDED })}</span>
+            <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.REWARDED })}</span>
             <$TimePeriod>
               {stringGetter({
                 key: STRING_KEYS.FOR_TRADING,

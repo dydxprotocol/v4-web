@@ -20,7 +20,7 @@ export const RestrictedWalletDialog = ({
       preventClose={preventClose}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
-      slotIcon={<Icon iconName={IconName.Warning} tw="text-warning" />}
+      slotIcon={<Icon iconName={IconName.Warning} tw="text-color-warning" />}
     >
       <div tw="column gap-1">
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}

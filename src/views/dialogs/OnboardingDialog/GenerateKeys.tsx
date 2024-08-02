@@ -216,7 +216,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
         <WithReceipt
           slotReceipt={
-            <div tw="p-1 text-text-0 font-small-book">
+            <div tw="p-1 text-color-text-0 font-small-book">
               <span>
                 {stringGetter({
                   key: STRING_KEYS.FREE_SIGNING,
@@ -260,7 +260,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
             </Button>
           )}
         </WithReceipt>
-        <span tw="text-center text-text-0 font-base-book">
+        <span tw="text-center text-color-text-0 font-base-book">
           {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
         </span>
       </$Footer>

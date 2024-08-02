@@ -39,7 +39,7 @@ export const MarketTableCell = ({
       </>
     ) : (
       <>
-        <span tw="tablet:text-text-2">{asset?.name}</span>
+        <span tw="tablet:text-color-text-2">{asset?.name}</span>
         <span>{marketId}</span>
       </>
     )}

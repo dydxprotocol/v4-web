@@ -77,7 +77,7 @@ export const HeaderDesktop = () => {
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
           slotAfter: !hasSeenLaunchIncentives && (
-            <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-accent" />
+            <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
           ),
         },
         {

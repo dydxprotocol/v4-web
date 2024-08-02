@@ -45,7 +45,7 @@ export const NobleDeposit = () => {
 
       <WithReceipt
         slotReceipt={
-          <div tw="p-1 text-text-0">
+          <div tw="p-1 text-color-text-0">
             <Checkbox
               checked={hasAcknowledged}
               onCheckedChange={setHasAcknowledged}

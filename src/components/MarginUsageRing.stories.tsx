@@ -25,7 +25,7 @@ export const MarginUsageRingStyled: Story<{ value: number }> = ({ value }: { val
   return (
     <StoryWrapper>
       <$Container>
-        <MarginUsageRing value={value / 100} tw="text-accent" />
+        <MarginUsageRing value={value / 100} tw="text-color-accent" />
       </$Container>
     </StoryWrapper>
   );

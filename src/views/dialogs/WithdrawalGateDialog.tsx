@@ -34,7 +34,7 @@ export const WithdrawalGateDialog = ({
       }
       slotIcon={
         <$IconContainer>
-          <Icon iconName={IconName.Warning} tw="mb-0.125 text-[2.5rem] text-warning" />
+          <Icon iconName={IconName.Warning} tw="mb-0.125 text-[2.5rem] text-color-warning" />
         </$IconContainer>
       }
       slotFooter={

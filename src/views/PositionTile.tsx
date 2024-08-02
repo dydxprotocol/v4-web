@@ -109,7 +109,7 @@ export const PositionTile = ({
           )}
         </$PositionSizes>
       )}
-      {isLoading && <LoadingSpinner tw="text-text-0" />}
+      {isLoading && <LoadingSpinner tw="text-color-text-0" />}
     </$PositionTile>
   );
 };

@@ -37,8 +37,8 @@ const StepItem = ({
   <div tw="mb-1 flex flex-row items-center gap-1">
     <$StepNumber>{step}</$StepNumber>
     <div tw="flex flex-col">
-      <span tw="text-text-2 font-medium-book">{title}</span>
-      <span tw="text-text-0">{subtitle}</span>
+      <span tw="text-color-text-2 font-medium-book">{title}</span>
+      <span tw="text-color-text-0">{subtitle}</span>
     </div>
   </div>
 );
@@ -115,7 +115,7 @@ const NewMarket = () => {
           </Button>
           {displaySteps && (
             <>
-              <h2 tw="m-1 text-text-2 font-large-medium tablet:mx-0 tablet:my-1">
+              <h2 tw="m-1 text-color-text-2 font-large-medium tablet:mx-0 tablet:my-1">
                 {stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}
               </h2>
               {steps.map((item) => (

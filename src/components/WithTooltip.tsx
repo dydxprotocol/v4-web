@@ -73,7 +73,7 @@ export const WithTooltip = ({
         <Trigger asChild>
           <$Abbr>
             {children}
-            {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-text-0" />}
+            {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-color-text-0" />}
           </$Abbr>
         </Trigger>
 

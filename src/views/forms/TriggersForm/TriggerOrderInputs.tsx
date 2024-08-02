@@ -245,7 +245,7 @@ export const TriggerOrderInputs = ({
   const multipleOrdersButton = () => (
     <$MultipleOrdersContainer>
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
-      <Button action={ButtonAction.Navigation} onClick={onViewOrdersClick} tw="text-accent">
+      <Button action={ButtonAction.Navigation} onClick={onViewOrdersClick} tw="text-color-accent">
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
         <Icon iconName={IconName.Arrow} tw="stroke-2" />
       </Button>
@@ -265,7 +265,7 @@ export const TriggerOrderInputs = ({
     <$TriggerRow key={tooltipId}>
       <$Heading>
         {headerTooltip()}
-        <div tw="row gap-[0.5em] text-text-0 font-base-book">
+        <div tw="row gap-[0.5em] text-color-text-0 font-base-book">
           {stringGetter({ key: stringKeys.headerDiff })}
           {signedOutput()}
           <$VerticalSeparator />

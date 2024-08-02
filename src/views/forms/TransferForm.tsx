@@ -339,7 +339,7 @@ export const TransferForm = ({
           label={
             <span tw="inlineRow">
               {stringGetter({ key: STRING_KEYS.DESTINATION })}
-              {isAddressValid && <Icon iconName={IconName.Check} tw="text-success" />}
+              {isAddressValid && <Icon iconName={IconName.Check} tw="text-color-success" />}
             </span>
           }
           type={InputType.Text}

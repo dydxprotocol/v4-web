@@ -54,7 +54,7 @@ export const MarginModeSelector = ({
       className={className}
       slotTooltip={
         <div tw="flex flex-row [align-items:start]">
-          <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-warning" />
+          <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-color-warning" />
           {stringGetter({
             key: STRING_KEYS.UNABLE_TO_CHANGE_MARGIN_MODE,
             params: {

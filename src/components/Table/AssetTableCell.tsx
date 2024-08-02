@@ -45,7 +45,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
           <$Asset stacked={stacked}>{asset?.name}</$Asset>
           <Tag>{maxLeverage}</Tag>
         </div>
-        {stacked ? <span tw="text-text-0 font-mini-medium">{asset?.id}</span> : undefined}
+        {stacked ? <span tw="text-color-text-0 font-mini-medium">{asset?.id}</span> : undefined}
       </$TableCellContent>
     </TableCell>
   );

@@ -115,7 +115,7 @@ export const AccountInfoConnectedState = () => {
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
           >
-            <div tw="inline-flex items-center rounded-[50%] bg-layer-3 p-[0.5em]">
+            <div tw="inline-flex items-center rounded-[50%] bg-color-layer-3 p-[0.5em]">
               <Icon iconName={IconName.Transfer} />
             </div>
           </$CornerButton>
@@ -167,7 +167,7 @@ export const AccountInfoConnectedState = () => {
                   <$WithUsage>
                     {label}
                     {hasError ? (
-                      <Icon iconName={IconName.CautionCircle} tw="text-error" />
+                      <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
                     ) : (
                       slotRight
                     )}

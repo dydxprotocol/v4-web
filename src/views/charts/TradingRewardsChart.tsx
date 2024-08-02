@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
+import styled from 'styled-components';
 
 import {
   HistoricalTradingReward,
@@ -24,6 +25,8 @@ import { useNow } from '@/hooks/useNow';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { OutputType, formatNumberOutput } from '@/components/Output';
@@ -233,7 +236,7 @@ export const TradingRewardsChart = ({
     <>
       {rewardsData.length === 0 ? undefined : (
         <div tw="spacedRow w-full font-medium-book">
-          <span tw="h-min text-text-1">
+          <span tw="h-min text-color-text-1">
             {stringGetter({
               key: STRING_KEYS.TRADING_REWARDS,
             })}
@@ -267,15 +270,25 @@ export const TradingRewardsChart = ({
         tickSpacingY={50}
       >
         {rewardsData.length > 0 && (
-          <div tw="inlineRow isolate basis-full place-self-start text-text-2 font-large-book">
+          <$Value>
             {MustBigNumber(
               tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
                 totalTradingRewards
             ).toFixed(TOKEN_DECIMALS)}
             <AssetIcon symbol={chainTokenLabel} />
-          </div>
+          </$Value>
         )}
       </TimeSeriesChart>
     </>
   );
 };
+const $Value = styled.div`
+  place-self: start;
+  isolation: isolate;
+
+  color: var(--color-text-2);
+  font: var(--font-large-book);
+
+  ${layoutMixins.inlineRow}
+  flex-basis: 100%;
+`;

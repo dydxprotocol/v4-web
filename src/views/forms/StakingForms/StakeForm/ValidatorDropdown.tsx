@@ -157,7 +157,7 @@ export const ValidatorDropdown = memo(
             fallbackText={selectedValidator?.description?.moniker}
           />
         }
-        tw="text-text-1"
+        tw="text-color-text-1"
       />
     );
 

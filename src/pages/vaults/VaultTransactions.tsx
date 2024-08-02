@@ -25,13 +25,13 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
   const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
 
   return (
-    <div className={className} tw="rounded-[0.7rem] border border-solid border-border">
+    <div className={className} tw="rounded-[0.7rem] border border-solid border-color-border">
       {transactions.length > 0 ? (
         <>
           <div tw="flex justify-between px-1 py-0.625">
             <h3 tw="leading-7 font-base-medium">
               {stringGetter({ key: STRING_KEYS.YOUR_DEPOSITS_AND_WITHDRAWALS })}
-              <span tw="ml-0.5 text-text-0">{transactions.length}</span>
+              <span tw="ml-0.5 text-color-text-0">{transactions.length}</span>
             </h3>
             <$ShowHideHistoryButton
               size={ButtonSize.XSmall}
@@ -46,7 +46,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
           {showHistory && <VaultTransactionsTable />}
         </>
       ) : (
-        <div tw="column content-center justify-items-center p-1 text-text-0">
+        <div tw="column content-center justify-items-center p-1 text-color-text-0">
           <div>
             <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
           </div>
@@ -75,7 +75,7 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
                 type={OutputType.Date}
                 dateOptions={{ format: 'medium' }}
               />
-              <div tw="text-[0.75rem] leading-[0.7rem] text-text-0">
+              <div tw="text-[0.75rem] leading-[0.7rem] text-color-text-0">
                 <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
               </div>
             </div>

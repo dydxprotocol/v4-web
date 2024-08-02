@@ -172,7 +172,7 @@ export const ComboboxMenu = <
           </$Group>
         ))}
         {slotEmpty && searchValue.trim() !== '' && (
-          <Command.Empty tw="h-full p-1 text-text-0">{slotEmpty}</Command.Empty>
+          <Command.Empty tw="h-full p-1 text-color-text-0">{slotEmpty}</Command.Empty>
         )}
       </$List>
     </$Command>

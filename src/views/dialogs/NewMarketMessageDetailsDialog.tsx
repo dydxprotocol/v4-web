@@ -90,7 +90,7 @@ export const NewMarketMessageDetailsDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS })}
     >
-      <div tw="mt-1 flex w-full flex-col gap-1 rounded-[10px] bg-layer-3">
+      <div tw="mt-1 flex w-full flex-col gap-1 rounded-[10px] bg-color-layer-3">
         <$Tabs
           items={toggleGroupItems}
           value={codeToggleGroup}
@@ -126,7 +126,7 @@ export const NewMarketMessageDetailsDialog = ({
                   ]}
                 />
                 <div tw="mt-0.5">
-                  <span tw="text-text-0">
+                  <span tw="text-color-text-0">
                     exchange_config_json
                     {exchangeConfig && (
                       <Tag type={TagType.Number} tw="mx-[0.5ch] my-0">

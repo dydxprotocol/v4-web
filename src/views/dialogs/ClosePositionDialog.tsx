@@ -66,7 +66,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     [MobilePlaceOrderSteps.PlaceOrderFailed]: {
       title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
       description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
-      slotIcon: <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-warning" />,
+      slotIcon: <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-color-warning" />,
     },
     [MobilePlaceOrderSteps.Confirmation]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),

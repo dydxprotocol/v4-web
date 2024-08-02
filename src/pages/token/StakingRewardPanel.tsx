@@ -71,12 +71,11 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
       }
     >
       <$InlineRow>
-        <Output
+        <$PositiveOutput
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
           minimumFractionDigits={SMALL_USD_DECIMALS}
-          tw="text-text-2 font-large-book [--output-sign-color:var(--color-positive)]"
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>
@@ -121,4 +120,11 @@ const $InlineRow = styled.span`
   img {
     font-size: 1.3rem;
   }
+`;
+
+const $PositiveOutput = styled(Output)`
+  --output-sign-color: var(--color-positive);
+
+  color: var(--color-text-2);
+  font: var(--font-large-book);
 `;

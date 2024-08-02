@@ -211,7 +211,7 @@ export const CanvasOrderbook = forwardRef(
             />
           )}
           {!hideHeader && (
-            <OrderbookRow tw="h-1.75 text-text-0">
+            <OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
                 {stringGetter({ key: STRING_KEYS.PRICE })} {usdTag}
               </span>

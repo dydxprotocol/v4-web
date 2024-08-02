@@ -37,7 +37,7 @@ export const RadioButtonCards = <MenuItemValue extends string>({
             {value === item.value ? (
               <Icon
                 iconName={IconName.Check}
-                tw="h-1 w-1 rounded-[50%] bg-accent p-0.25 text-text-1"
+                tw="h-1 w-1 rounded-[50%] bg-color-accent p-0.25 text-color-text-1"
               />
             ) : (
               <$EmptyIcon />

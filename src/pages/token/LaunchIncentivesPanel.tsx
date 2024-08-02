@@ -64,7 +64,7 @@ const LaunchIncentivesTitle = () => {
       {stringGetter({
         key: STRING_KEYS.LAUNCH_INCENTIVES_TITLE,
         params: {
-          FOR_V4: <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
+          FOR_V4: <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
         },
       })}
       <NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
@@ -114,7 +114,7 @@ const EstimatedRewards = () => {
         <div>
           <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
           {seasonNumber !== undefined && (
-            <span tw="text-text-1 font-small-book">
+            <span tw="text-color-text-1 font-small-book">
               {stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
                 params: { SEASON_NUMBER: seasonNumber },
@@ -145,7 +145,7 @@ const LaunchIncentivesContent = () => {
 
   return (
     <$Column>
-      <div tw="text-text-0">
+      <div tw="text-color-text-0">
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
       </div>
       <span tw="flex items-center gap-[0.5em] font-tiny-medium">
@@ -189,7 +189,7 @@ const LaunchIncentivesContent = () => {
     </$Column>
   );
 };
-const $Panel = tw(Panel)`bg-layer-3 w-full`;
+const $Panel = tw(Panel)`bg-color-layer-3 w-full`;
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);

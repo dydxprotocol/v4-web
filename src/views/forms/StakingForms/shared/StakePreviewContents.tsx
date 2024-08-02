@@ -55,7 +55,7 @@ export const StakePreviewContents = ({
 };
 const $Row = tw.div`flex items-center justify-between gap-0.5 text-center`;
 
-const $Heading = tw.h3`basis-6/12 text-text-0 font-small-medium`;
+const $Heading = tw.h3`basis-6/12 text-color-text-0 font-small-medium`;
 
 const $StakeBox = styled.div`
   background-color: var(--color-layer-4);

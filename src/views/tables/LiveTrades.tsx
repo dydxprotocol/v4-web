@@ -79,7 +79,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         <OrderbookTradesOutput
           type={OutputType.Time}
           value={row.createdAtMilliseconds}
-          tw="text-text-0 [font-feature-settings:var(--fontFeature-monoNumbers)]"
+          tw="text-color-text-0 [font-feature-settings:var(--fontFeature-monoNumbers)]"
         />
       ),
     };
@@ -114,7 +114,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
               stepSize: stepSize ?? 10 ** (-1 * TOKEN_DECIMALS),
               stepSizeDecimals: stepSizeDecimals ?? TOKEN_DECIMALS,
             })}
-            tw="text-[color:var(--accent-color)] tablet:text-text-1"
+            tw="text-[color:var(--accent-color)] tablet:text-color-text-1"
           />
         ),
       },

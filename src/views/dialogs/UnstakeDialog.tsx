@@ -53,7 +53,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
                 key: STRING_KEYS.CURRENTLY_STAKING,
                 params: {
                   AMOUNT: (
-                    <span tw="inlineRow text-text-1">
+                    <span tw="inlineRow text-color-text-1">
                       {nativeStakingBalance}
                       <Tag>{chainTokenLabel} </Tag>
                     </span>

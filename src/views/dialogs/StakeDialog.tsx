@@ -85,7 +85,7 @@ const LegalDisclaimer = () => {
   const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
 
   return (
-    <div tw="text-center text-text-0 font-mini-book">
+    <div tw="text-center text-color-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
         params: {

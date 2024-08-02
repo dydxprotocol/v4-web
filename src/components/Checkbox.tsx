@@ -32,7 +32,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       onCheckedChange={onCheckedChange}
       id={id}
     >
-      <Indicator tw="flex items-center justify-center text-text-button">
+      <Indicator tw="flex items-center justify-center text-color-text-button">
         <CheckIcon />
       </Indicator>
     </$Root>

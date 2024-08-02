@@ -67,6 +67,6 @@ export const HorizontalSeparatorFiller = ({ className }: { className?: string })
     className={className}
     orientation="horizontal"
     decorative
-    tw="h-[var(--border-width)] flex-1 bg-border"
+    tw="h-[var(--border-width)] flex-1 bg-color-border"
   />
 );

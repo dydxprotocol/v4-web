@@ -111,4 +111,4 @@ const $Button = styled(Button)`
   justify-content: space-between;
 `;
 
-const $IconButton = tw(IconButton)`text-text-0 [--color-border:var(--color-layer-6)]`;
+const $IconButton = tw(IconButton)`text-color-text-0 [--color-border:var(--color-layer-6)]`;

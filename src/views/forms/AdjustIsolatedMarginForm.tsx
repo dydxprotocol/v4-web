@@ -368,7 +368,7 @@ export const AdjustIsolatedMarginForm = ({
       tw="spacedRow h-4 items-center rounded-0.5 px-1 py-0.75"
     >
       <div tw="column font-small-medium">
-        <span tw="text-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
+        <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
       </div>
       <div>
@@ -448,7 +448,9 @@ export const AdjustIsolatedMarginForm = ({
                 : ButtonState.Default
           }
           slotLeft={
-            ctaErrorAction ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+            ctaErrorAction ? (
+              <Icon iconName={IconName.Warning} tw="text-color-warning" />
+            ) : undefined
           }
         >
           {ctaErrorAction ?? formConfig.buttonLabel}

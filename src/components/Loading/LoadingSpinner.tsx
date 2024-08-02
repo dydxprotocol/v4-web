@@ -15,7 +15,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   disabled = false,
 }: LoadingSpinnerProps) => {
   return (
-    <div className={className} tw="leading-[0] text-text-0 [--spinner-width:auto]">
+    <div className={className} tw="leading-[0] text-color-text-0 [--spinner-width:auto]">
       <$LoadingSpinnerSvg
         id={id}
         width="38"

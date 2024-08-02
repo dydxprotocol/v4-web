@@ -3,7 +3,6 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Item, Root } from '@radix-ui/react-radio-group';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -167,7 +166,7 @@ export const NewMarketSelectionStep = ({
         label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
-          <span tw="text-text-2">
+          <span tw="text-color-text-2">
             {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
           </span>
         ) : (
@@ -295,7 +294,7 @@ export const NewMarketSelectionStep = ({
                   </span>
                 ),
                 value: (
-                  <div tw="ml-[0.5ch] text-text-0">
+                  <div tw="ml-[0.5ch] text-color-text-0">
                     {stringGetter({
                       key: STRING_KEYS.OR_MORE,
                       params: {
@@ -356,7 +355,14 @@ const $Balance = styled.span`
     margin-left: 0.5ch;
   }
 `;
-const $Header = tw.div`flex flex-1 items-center justify-between text-text-2 font-base-medium`;
+const $Header = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  color: var(--color-text-2);
+  font: var(--font-base-medium);
+  justify-content: space-between;
+`;
 
 const $Root = styled(Root)`
   display: flex;

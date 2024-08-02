@@ -536,7 +536,7 @@ export const WithdrawForm = () => {
 
   return (
     <$Form onSubmit={onSubmit}>
-      <div tw="text-text-0">
+      <div tw="text-color-text-0">
         {stringGetter({
           key: skipEnabled
             ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
@@ -562,7 +562,10 @@ export const WithdrawForm = () => {
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
               {isValidAddress ? (
-                <Icon iconName={IconName.Check} tw="mx-[1ch] my-0 text-[0.625rem] text-success" />
+                <Icon
+                  iconName={IconName.Check}
+                  tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
+                />
               ) : null}
             </span>
           }

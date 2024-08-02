@@ -104,7 +104,7 @@ export const FooterDesktop = () => {
                       useGrouping
                       type={OutputType.Number}
                       value={indexerHeight}
-                      tw="text-warning"
+                      tw="text-color-warning"
                     />
                   ),
                 }

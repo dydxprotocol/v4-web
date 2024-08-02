@@ -78,7 +78,7 @@ const $DownloadLinksInDropdown = styled.div`
     width: 7.5rem;
   }
 `;
-const $Download = tw.span`text-text-0 font-small-medium [grid-area:label]`;
+const $Download = tw.span`text-color-text-0 font-small-medium [grid-area:label]`;
 
 const $AppLink = styled(IconButton)`
   --button-icon-size: 1rem;

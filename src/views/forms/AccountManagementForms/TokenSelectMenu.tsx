@@ -105,7 +105,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
           : undefined
       }
     >
-      <div tw="row gap-0.5 text-text-2 font-base-book">
+      <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedToken ? (
           <>
             <$Img src={selectedToken?.iconUrl ?? undefined} alt="" /> {selectedToken?.name}{' '}

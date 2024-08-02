@@ -122,10 +122,10 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
     if (filter === MarketFilters.PREDICTION_MARKET) {
       // TODO: (TRA-516): Localize string when finallized.
       return (
-        <$Disclaimer>
+        <div tw="p-1 text-color-text-0 font-small-medium">
           Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
           will settle at $0.
-        </$Disclaimer>
+        </div>
       );
     }
 
@@ -351,13 +351,6 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
-
-const $Disclaimer = styled.div`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-  padding: 1rem;
-`;
-
 const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--toolbar-height);

@@ -27,7 +27,10 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   return (
-    <section className={className} tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:px-1">
+    <section
+      className={className}
+      tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
+    >
       <ExchangeBillboards />
       <$Section>
         <$SectionHeader>
@@ -65,9 +68,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
     </section>
   );
 };
-
-const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-layer-3`;
-
+const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-color-layer-3`;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;

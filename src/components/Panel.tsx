@@ -41,7 +41,7 @@ export const Panel = ({
           {slotHeader ?? (
             <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
               {slotHeaderContent}
-              <Icon iconName={IconName.ChevronRight} tw="text-[0.625rem] text-text-0" />
+              <Icon iconName={IconName.ChevronRight} tw="text-[0.625rem] text-color-text-0" />
             </$Header>
           )}
         </Link>

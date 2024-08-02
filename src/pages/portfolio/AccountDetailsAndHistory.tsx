@@ -147,7 +147,7 @@ export const AccountDetailsAndHistory = () => {
     <$AccountDetailsAndHistory>
       <$AccountValue>
         <$WithLabel label={accountValueLabel}>
-          <div tw="text-text-2 font-extra-book">
+          <div tw="text-color-text-2 font-extra-book">
             <Output
               type={OutputType.Fiat}
               value={accountEquity}

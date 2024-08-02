@@ -149,7 +149,7 @@ export const StakeRewardButtonAndReceipt = ({
                 onClick={onClick}
                 slotLeft={
                   shouldDisplayErrorAsWarning() ? (
-                    <Icon iconName={IconName.Warning} tw="text-warning" />
+                    <Icon iconName={IconName.Warning} tw="text-color-warning" />
                   ) : undefined
                 }
                 state={{

@@ -17,7 +17,7 @@ export const RewardHistoryPanel = () => {
 
   return (
     <div tw="flex flex-col gap-1">
-      <div tw="px-0.5 py-0 text-text-2 font-large-book">
+      <div tw="px-0.5 py-0 text-color-text-2 font-large-book">
         {stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       </div>
       <TradingRewardHistoryTable

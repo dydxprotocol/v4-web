@@ -25,7 +25,10 @@ export const PageMenuRadioGroupItem = <
             <span>{label}</span>
           </div>
           {value === curentValue ? (
-            <Icon iconName={IconName.Check} tw="rounded-[50%] bg-accent p-[4px] text-text-1" />
+            <Icon
+              iconName={IconName.Check}
+              tw="rounded-[50%] bg-color-accent p-[4px] text-color-text-1"
+            />
           ) : (
             <$EmptyIcon />
           )}

@@ -130,7 +130,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
           <$row>
             {step.step === currentStep ? (
               <$Icon>
-                <LoadingSpinner tw="text-accent [--spinner-width:1.25rem]" />
+                <LoadingSpinner tw="text-color-accent [--spinner-width:1.25rem]" />
               </$Icon>
             ) : step.step < currentStep ? (
               <$Icon state="complete">

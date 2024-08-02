@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
             {withContentOnLoading && slotLeft}
             {withContentOnLoading && children}
             {withContentOnLoading && slotRight}
-            <$LoadingDots size={3} />
+            <LoadingDots size={3} tw="pt-[0.5em]" />
           </>
         ) : (
           <>
@@ -176,8 +176,4 @@ const StyledBaseButton = styled(BaseButton)<StyleProps>`
       ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
       ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
     `}
-`;
-
-const $LoadingDots = styled(LoadingDots)`
-  padding-top: 0.5em;
 `;

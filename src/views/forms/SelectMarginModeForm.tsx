@@ -73,4 +73,4 @@ const $RadioButtonCards = styled(RadioButtonCards)`
   --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
   --radio-button-cards-item-header-font: var(--font-medium-medium);
 `;
-const $TertiarySpan = tw.span`text-text-0 font-base-medium`;
+const $TertiarySpan = tw.span`text-color-text-0 font-base-medium`;

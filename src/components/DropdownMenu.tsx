@@ -84,7 +84,9 @@ export const DropdownMenu = forwardRefFn(
                   {item.icon}
                   {item.label}
                 </$Item>
-                {item.separator && <Separator tw="mx-1 my-0.25 border-b-[solid] border-b-border" />}
+                {item.separator && (
+                  <Separator tw="mx-1 my-0.25 border-b-[solid] border-b-color-border" />
+                )}
               </Fragment>
             ))}
             {slotBottomContent}

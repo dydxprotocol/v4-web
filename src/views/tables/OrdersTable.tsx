@@ -249,7 +249,7 @@ const getOrdersTableColumnDef = ({
                     type={OutputType.RelativeTime}
                     relativeTimeOptions={{ format: 'singleCharacter' }}
                     value={createdAtMilliseconds}
-                    tw="text-text-0"
+                    tw="text-color-text-0"
                   />
                   <$AssetIconWithStatus>
                     <$AssetIcon symbol={asset?.id} />
@@ -294,7 +294,7 @@ const getOrdersTableColumnDef = ({
               <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
-              <span tw="text-text-0">@</span>
+              <span tw="text-color-text-0">@</span>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
             </$InlineRow>
             <span>

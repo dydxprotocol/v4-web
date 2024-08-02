@@ -1,4 +1,5 @@
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -17,6 +18,8 @@ import {
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -58,7 +61,7 @@ export const OrderStatusNotification = ({
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
-  let orderStatusIcon = <LoadingSpinner tw="text-accent [--spinner-width:0.9375rem]" />;
+  let orderStatusIcon = <LoadingSpinner tw="text-color-accent [--spinner-width:0.9375rem]" />;
   let customContent = null;
 
   switch (submissionStatus) {
@@ -98,7 +101,7 @@ export const OrderStatusNotification = ({
     case PlaceOrderStatuses.Submitted:
       if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
-        orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-warning" />;
+        orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-color-warning" />;
         customContent = (
           <span>
             {stringGetter({
@@ -127,12 +130,17 @@ export const OrderStatusNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <span tw="row gap-[0.5ch] text-text-0 font-small-book">
+        <$Label tw="text-color-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </span>
+        </$Label>
       }
       slotCustomContent={customContent}
     />
   );
 };
+
+const $Label = styled.span`
+  ${layoutMixins.row}
+  gap: 0.5ch;
+`;

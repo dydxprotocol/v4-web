@@ -37,8 +37,8 @@ export const RewardsNavPanel = ({
     <Panel
       className={className}
       slotHeaderContent={
-        <h3 tw="inlineRow -mb-1.5 text-text-1 font-medium-book">
-          {title} {titleTag && <Tag tw="bg-accent-faded text-accent">{titleTag}</Tag>}
+        <h3 tw="inlineRow -mb-1.5 text-color-text-1 font-medium-book">
+          {title} {titleTag && <Tag tw="bg-color-accent-faded text-color-accent">{titleTag}</Tag>}
         </h3>
       }
       slotRight={
@@ -47,13 +47,13 @@ export const RewardsNavPanel = ({
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
-            tw="text-text-0 [--color-border:var(--color-layer-6)]"
+            tw="text-color-text-0 [--color-border:var(--color-layer-6)]"
           />
         </div>
       }
       onClick={onNav}
     >
-      <div tw="text-text-0">
+      <div tw="text-color-text-0">
         {description}
         {learnMore && (
           <Link

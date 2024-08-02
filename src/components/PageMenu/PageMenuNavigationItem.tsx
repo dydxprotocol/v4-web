@@ -19,9 +19,9 @@ export const PageMenuNavigationItem = <
   <Link to={href ?? ''}>
     <$MenuItem>
       <div>{label}</div>
-      <div tw="row gap-1 text-text-0 font-base-book">
+      <div tw="row gap-1 text-color-text-0 font-base-book">
         {labelRight && <span>{labelRight}</span>}
-        <Icon iconName={IconName.ChevronRight} tw="text-text-0" />
+        <Icon iconName={IconName.ChevronRight} tw="text-color-text-0" />
       </div>
     </$MenuItem>
   </Link>

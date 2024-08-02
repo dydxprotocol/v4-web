@@ -107,7 +107,7 @@ export const SharePNLAnalyticsDialog = ({
             <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
 
             <span>
-              <span tw="text-text-2 font-base-bold">{assetLeft}</span>/{assetRight}
+              <span tw="text-color-text-2 font-base-bold">{assetLeft}</span>/{assetRight}
             </span>
 
             <Tag sign={sideSign}>{sideLabel}</Tag>
@@ -210,9 +210,9 @@ const $ShareableCardTitle = styled.div`
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 `;
-const $ShareableCardStatLabel = tw.div`text-right text-text-0 font-base-bold`;
+const $ShareableCardStatLabel = tw.div`text-right text-color-text-0 font-base-bold`;
 
-const $ShareableCardStatOutput = tw(Output)`font-base-bold text-text-2`;
+const $ShareableCardStatOutput = tw(Output)`font-base-bold text-color-text-2`;
 const $QrCode = styled(QrCode)`
   width: 5.25rem;
   height: 5.25rem;

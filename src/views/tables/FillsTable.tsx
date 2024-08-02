@@ -119,11 +119,11 @@ const getFillsTableColumnDef = ({
               <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
-              <span tw="text-text-0">@</span>
+              <span tw="text-color-text-0">@</span>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
             </$InlineRow>
             <$InlineRow>
-              <span tw="text-text-1">
+              <span tw="text-color-text-1">
                 {resources.liquidityStringKey
                   ? stringGetter({ key: resources.liquidityStringKey })
                   : null}
@@ -142,7 +142,7 @@ const getFillsTableColumnDef = ({
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
             value={createdAtMilliseconds}
-            tw="text-text-0"
+            tw="text-color-text-0"
           />
         ),
       },

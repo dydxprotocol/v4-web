@@ -312,10 +312,12 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $TabletOutput = tw(Output)`font-medium-book text-text-2`;
+const $TabletOutput = tw(Output)`font-medium-book text-color-text-2`;
 
-const $InlineRow = tw.div`inlineRow`;
-const $NumberOutput = tw(Output)`font-base-medium text-text-2`;
+const $InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+const $NumberOutput = tw(Output)`font-base-medium text-color-text-2`;
 
 const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   color: ${({ isNegative, isPositive }) =>

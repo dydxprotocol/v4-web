@@ -47,7 +47,7 @@ export const TradingRewardsSummaryPanel = () => {
             {
               key: 'week',
               label: (
-                <div tw="spacedRow text-text-1 font-base-book">
+                <div tw="spacedRow text-color-text-1 font-base-book">
                   <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
                 </div>
               ),

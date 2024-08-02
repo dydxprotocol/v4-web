@@ -59,7 +59,7 @@ export const Notification = ({
     <$Container className={className} isToast={isToast} onClick={onClick}>
       <header tw="row relative gap-0.5">
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
-        <div tw="flex-1 overflow-hidden text-ellipsis text-text-2 font-base-medium">
+        <div tw="flex-1 overflow-hidden text-ellipsis text-color-text-2 font-base-medium">
           {slotTitle}
         </div>
         {slotTitleRight}
@@ -68,12 +68,10 @@ export const Notification = ({
             <Output
               type={OutputType.RelativeTime}
               value={notification.timestamps[NotificationStatus.Triggered]}
-              tw="text-text-0"
+              tw="text-color-text-0"
             />
 
-            {notification.status < NotificationStatus.Seen ? (
-              <div tw="h-0.5 w-0.5 rounded-[50%] border border-solid border-layer-2 bg-accent" />
-            ) : null}
+            {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
 
             {notification.status < NotificationStatus.Cleared ? (
               <$IconButton
@@ -95,7 +93,7 @@ export const Notification = ({
         )}
       </header>
       {slotContentOrDescription && (
-        <div tw="mt-0.5 text-text-0 font-small-book [white-space:break-spaces]">
+        <div tw="mt-0.5 text-color-text-0 font-small-book [white-space:break-spaces]">
           {slotContentOrDescription}
         </div>
       )}
@@ -164,6 +162,14 @@ const $ActionItems = styled.div`
   ${$Container}:hover & {
     display: flex;
   }
+`;
+
+const $UnreadIndicator = styled.div`
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  border: 1px solid var(--color-layer-2);
 `;
 const $IconButton = styled(IconButton)`
   --button-border: none;

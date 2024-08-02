@@ -82,7 +82,7 @@ export const AccountMenu = () => {
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-warning" />;
+    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
     walletType === WalletType.Privy

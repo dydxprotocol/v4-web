@@ -60,7 +60,7 @@ const getTransferHistoryTableColumnDef = ({
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
             value={updatedAtMilliseconds}
-            tw="text-text-0"
+            tw="text-color-text-0"
           />
         ),
       },

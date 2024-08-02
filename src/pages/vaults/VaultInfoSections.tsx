@@ -25,7 +25,7 @@ import { getNumberSign } from '@/lib/numbers';
 
 import { VaultPositionsTable } from './VaultPositionsTable';
 
-const EmptyValue = () => <span tw="text-text-0">—</span>;
+const EmptyValue = () => <span tw="text-color-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
   const myVaultMetadata = useAppSelector(getUserVault);
   const stringGetter = useStringGetter();
@@ -68,8 +68,8 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     <$CardsContainer className={className}>
       {items.map((item) => (
         <$DetailCard key={item.key}>
-          <div tw="text-text-0">{item.label}</div>
-          <div tw="leading-[1.2rem] text-text-2 font-medium-book">{item.value}</div>
+          <div tw="text-color-text-0">{item.label}</div>
+          <div tw="leading-[1.2rem] text-color-text-2 font-medium-book">{item.value}</div>
         </$DetailCard>
       ))}
     </$CardsContainer>
@@ -92,7 +92,7 @@ const $DetailCard = styled.div`
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   return (
-    <div className={className} tw="text-text-0 font-small-medium">
+    <div className={className} tw="text-color-text-0 font-small-medium">
       {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}
     </div>
   );
@@ -103,7 +103,7 @@ export const VaultPositionsSection = ({ className }: { className?: string }) => 
 
   return (
     <div className={className}>
-      <div tw="row mb-1 gap-0.5 text-text-2 font-large-medium">
+      <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
         {stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
@@ -147,7 +147,9 @@ export const VaultHeader = ({ className }: { className?: string }) => {
       <div tw="row gap-1.25">
         <img src="/dydx-chain.png" tw="h-3.5 w-3.5" />
         <div>
-          <h3 tw="text-text-2 font-extra-medium">{stringGetter({ key: STRING_KEYS.VAULT })}</h3>
+          <h3 tw="text-color-text-2 font-extra-medium">
+            {stringGetter({ key: STRING_KEYS.VAULT })}
+          </h3>
         </div>
       </div>
       <$DetailItems>
@@ -155,7 +157,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
           <React.Fragment key={item.key}>
             <$VerticalSeparator />
             <div key={item.key} tw="flexColumn gap-0.375 px-0.5 py-0.25 font-base-book">
-              <div tw="text-text-0">{item.label}</div>
+              <div tw="text-color-text-0">{item.label}</div>
               <$DetailValue>{item.value}</$DetailValue>
             </div>
           </React.Fragment>

@@ -1,5 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -13,6 +14,8 @@ import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 // eslint-disable-next-line import/no-cycle
@@ -58,10 +61,10 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <span tw="row gap-[0.5ch] text-text-0 font-small-book">
+        <$Label tw="text-color-text-0 font-small-book">
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
           <OrderStatusIcon status={orderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
-        </span>
+        </$Label>
       }
       slotCustomContent={
         <FillDetails
@@ -76,3 +79,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
     />
   );
 };
+const $Label = styled.span`
+  ${layoutMixins.row}
+  gap: 0.5ch;
+`;

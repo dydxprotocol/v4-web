@@ -124,9 +124,9 @@ export const Fees = () => {
                 allowsSorting: false,
                 renderCell: ({ tier }) => (
                   <$TextRow tw="gap-0.5">
-                    <Output type={OutputType.Text} value={tier} tw="text-text-0" />
+                    <Output type={OutputType.Text} value={tier} tw="text-color-text-0" />
                     {tier === userFeeTier && (
-                      <Tag size={TagSize.Medium} tw="text-text-1">
+                      <Tag size={TagSize.Medium} tw="text-color-text-1">
                         {stringGetter({ key: STRING_KEYS.YOU })}
                       </Tag>
                     )}
@@ -297,6 +297,6 @@ const $FeeTable = styled(Table)`
     --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
 ` as typeof Table;
-const $Highlighted = tw.strong`text-text-1`;
+const $Highlighted = tw.strong`text-color-text-1`;
 
-const $HighlightOutput = tw(Output)`text-text-1`;
+const $HighlightOutput = tw(Output)`text-color-text-1`;

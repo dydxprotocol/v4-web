@@ -49,7 +49,11 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         <$MigrateAction>
           <div>
             <div>{stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}</div>
-            <Output type={OutputType.Asset} value={tokenBalance} tw="text-text-2 font-large-book" />
+            <Output
+              type={OutputType.Asset}
+              value={tokenBalance}
+              tw="text-color-text-2 font-large-book"
+            />
           </div>
           {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
             <Button
@@ -64,7 +68,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
         </$MigrateAction>
       }
     >
-      <div tw="text-text-0">
+      <div tw="text-color-text-0">
         {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
         <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} isInline tw="ml-[0.5ch]">
           {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
@@ -190,4 +194,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1.5rem;
   }
 `;
-const $InlineRow = tw.div`inlineRow text-text-0`;
+const $InlineRow = tw.div`inlineRow text-color-text-0`;

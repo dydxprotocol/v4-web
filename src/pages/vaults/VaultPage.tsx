@@ -98,7 +98,7 @@ const VaultPage = () => {
         <div tw="flexColumn gap-1.25">
           <$YourVaultDetailsCards />
           <$DepositFormContainer>
-            <div tw="rounded-[0.7rem] bg-layer-3">
+            <div tw="rounded-[0.7rem] bg-color-layer-3">
               <VaultDepositWithdrawForm />
             </div>
           </$DepositFormContainer>

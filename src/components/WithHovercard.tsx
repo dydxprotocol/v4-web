@@ -52,7 +52,7 @@ export const WithHovercard = ({
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <Portal>
         <$Content className={className} align={align} alignOffset={-16} side={side} sideOffset={8}>
-          {hovercardTitle && <h3 tw="text-text-2 font-small-bold">{hovercardTitle}</h3>}
+          {hovercardTitle && <h3 tw="text-color-text-2 font-small-bold">{hovercardTitle}</h3>}
           {hovercardBody && <p>{hovercardBody}</p>}
           {slotButton}
         </$Content>

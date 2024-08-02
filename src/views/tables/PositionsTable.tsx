@@ -117,7 +117,7 @@ const getPositionsTableColumnDef = ({
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
               </$PositionSide>
-              <span tw="text-text-0">@</span>
+              <span tw="text-color-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}

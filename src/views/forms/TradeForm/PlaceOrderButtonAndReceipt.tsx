@@ -289,7 +289,9 @@ export const PlaceOrderButtonAndReceipt = ({
       type={ButtonType.Submit}
       action={buttonAction}
       slotLeft={
-        showValidatorErrors ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+        showValidatorErrors ? (
+          <Icon iconName={IconName.Warning} tw="text-color-warning" />
+        ) : undefined
       }
       tw="w-full"
     >

@@ -139,7 +139,9 @@ export const TriggersForm = ({
               type={ButtonType.Submit}
               state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
               slotLeft={
-                hasInputErrors ? <Icon iconName={IconName.Warning} tw="text-warning" /> : undefined
+                hasInputErrors ? (
+                  <Icon iconName={IconName.Warning} tw="text-color-warning" />
+                ) : undefined
               }
               tw="w-full"
             >
@@ -171,6 +173,6 @@ const $PriceRow = styled.div`
   ${layoutMixins.spacedRow};
 `;
 
-const $PriceLabel = tw.h3`text-text-0`;
+const $PriceLabel = tw.h3`text-color-text-0`;
 
-const $Price = tw(Output)`text-text-2`;
+const $Price = tw(Output)`text-color-text-2`;

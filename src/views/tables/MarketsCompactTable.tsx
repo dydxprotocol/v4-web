@@ -75,7 +75,7 @@ export const MarketsCompactTable = ({
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
-                tw="text-text-0 font-small-medium"
+                tw="text-color-text-1 font-small-medium"
               />
               <$TabletPriceChange>
                 {!priceChange24H ? (
@@ -125,7 +125,7 @@ export const MarketsCompactTable = ({
                       type={OutputType.CompactNumber}
                       value={openInterest}
                       slotRight={` ${asset.id}`}
-                      tw="text-text-0 font-mini-medium"
+                      tw="text-color-text-0 font-mini-medium"
                     />
                   </$RecentlyListed>
                   <Icon iconName={IconName.ChevronRight} />

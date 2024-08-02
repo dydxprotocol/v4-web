@@ -77,7 +77,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
       items={HELP_ITEMS}
       slotFooter={
         latestCommit || latestVersion ? (
-          <div tw="flex cursor-default select-text flex-col text-text-0">
+          <div tw="flex cursor-default select-text flex-col text-color-text-0">
             {latestCommit && (
               <span>
                 Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>

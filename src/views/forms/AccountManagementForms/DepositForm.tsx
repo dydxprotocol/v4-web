@@ -475,7 +475,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }
   return (
     <$Form onSubmit={onSubmit}>
-      <div tw="text-text-0">
+      <div tw="text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
           params: {
@@ -540,7 +540,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               setError={setError}
             />
             {!hasAcknowledgedTerms && (
-              <div tw="mt-1 text-text-0 font-small-book">
+              <div tw="mt-1 text-color-text-0 font-small-book">
                 {stringGetter({
                   key: STRING_KEYS.DEPOSIT_ACKNOWLEDGEMENT,
                   params: {

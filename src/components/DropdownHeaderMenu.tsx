@@ -54,8 +54,8 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
               onSelect={() => (onSelect ?? onValueChange)?.(value)}
               disabled={disabled}
             >
-              <span tw="text-text-2 font-medium-book">{label}</span>
-              <span tw="text-text-0 font-small-book">{description}</span>
+              <span tw="text-color-text-2 font-medium-book">{label}</span>
+              <span tw="text-color-text-0 font-small-book">{description}</span>
             </$Item>
           ))}
         </$Content>

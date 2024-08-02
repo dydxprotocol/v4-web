@@ -56,7 +56,7 @@ export const IncentiveSeasonDistributionNotification = ({
         />
       }
       slotAction={
-        <Button tw="w-full" action={ButtonAction.Primary} size={ButtonSize.Small}>
+        <Button action={ButtonAction.Primary} size={ButtonSize.Small} tw="w-full">
           {stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →
         </Button>
       }

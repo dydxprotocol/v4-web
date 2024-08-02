@@ -197,7 +197,7 @@ const $Status = styled.div<{ withMarginBottom?: boolean }>`
     `}
 `;
 
-const $InlineOutput = tw(Output)`inline-block text-text-1`;
+const $InlineOutput = tw(Output)`inline-block text-color-text-1`;
 const $Trigger = styled.button<{ isOpen?: boolean }>`
   display: flex;
   align-items: center;

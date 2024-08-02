@@ -99,9 +99,9 @@ export const UnbondingPanels = () => {
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
                 slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-0.5" />}
-                tw="text-text-2 font-large-book"
+                tw="text-color-text-2 font-large-book"
               />
-              <div tw="text-text-0">{availableInText}</div>
+              <div tw="text-color-text-0">{availableInText}</div>
             </div>
           </Panel>
         );
