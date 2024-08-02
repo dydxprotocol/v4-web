@@ -22,7 +22,7 @@ async function inject(fileName) {
   const htmlFilePath = path.resolve(projectRoot, `../dist/entry-points/${fileName}`);
   const html = await fs.readFile(htmlFilePath, 'utf-8');
 
-  const googleTagManagerScript = `
+  const googleTagManagerHeadScript = `
           <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -31,16 +31,16 @@ async function inject(fileName) {
         })(window,document,'script','dataLayer','GTM-ABCDEFGH');</script>
         <!-- End Google Tag Manager -->
   `;
-  const injectedHtml = html.replace('</head>', `${googleTagManagerScript}\n</head>`);
+  const injectedHtml = html.replace('</head>', `${googleTagManagerHeadScript}\n</head>`);
 
-  const googleTagManagerScript2 = `
+  const googleTagManagerBodyScript = `
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${GOOGLE_TAG_MANAGER_CONTAINER_ID}"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
   `;
 
-  const injectedHtml2 = injectedHtml.replace('<body>', `<body>\n${googleTagManagerScript2}`);
+  const injectedHtml2 = injectedHtml.replace('<body>', `<body>\n${googleTagManagerBodyScript}`);
   await fs.writeFile(htmlFilePath, injectedHtml2, 'utf-8');
 
   console.log(`Google Tag Manager scripts successfully injected (${fileName}).`);
