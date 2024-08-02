@@ -34,6 +34,7 @@ jobs:
           BUGSNAG_API_KEY: ${{ secrets.BUGSNAG_API_KEY }}
           STATUS_PAGE_SCRIPT_URI: ${{ secrets.STATUS_PAGE_SCRIPT_URI }}
           IOS_APP_ID: ${{ secrets.IOS_APP_ID }}
+          GOOGLE_TAG_MANAGER_CONTAINER_ID: 'test-secret'
         run: |
           pnpm run build
           pnpm run build:inject-amplitude
