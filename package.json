@@ -12,6 +12,7 @@
     "build": "pnpm run build:set-last-commit-and-tag && pnpm run build:generate-entry-points && tsc && vite build",
     "build:inject-app-deeplinks": "sh scripts/inject-app-deeplinks.sh",
     "build:inject-amplitude": "node scripts/inject-amplitude.js",
+    "build:inject-google-tag-manager": "node scripts/inject-google-tag-manager.js",
     "build:inject-hotjar": "node scripts/inject-hotjar.js",
     "build:inject-bugsnag": "node scripts/inject-bugsnag.js",
     "build:inject-analytics": "node scripts/inject-amplitude.js && node scripts/inject-hotjar.js && node scripts/inject-bugsnag.js",

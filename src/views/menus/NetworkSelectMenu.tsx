@@ -19,6 +19,8 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
 
   return (
     <$DropdownSelectMenu
+      disabled={networks.length <= 1}
+      hideIcon
       items={networks}
       value={selectedNetwork}
       onValueChange={switchNetwork}
@@ -27,15 +29,24 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
     />
   );
 };
+
 const $DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
 
   width: max-content;
 
   & > span:first-of-type {
-    ${layoutMixins.textOverflow}
+    display: inline-block;
     max-width: 5.625rem;
     min-width: 0;
     white-space: nowrap;
+  }
+
+  &:not(:disabled) > span:first-of-type {
+    ${layoutMixins.textOverflow}
+  }
+
+  &:disabled {
+    cursor: default;
   }
 ` as typeof DropdownSelectMenu;
