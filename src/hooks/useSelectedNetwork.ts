@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { useWallets } from '@privy-io/react-auth';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
+import { AVAILABLE_ENVIRONMENTS, DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
 
 import { setSelectedNetwork } from '@/state/app';
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -43,6 +43,13 @@ export const useSelectedNetwork = (): {
     },
     [dispatch, disconnect, setLocalStorageNetwork, chainId]
   );
+
+  // Ensure the selected network is valid
+  useEffect(() => {
+    if (!AVAILABLE_ENVIRONMENTS.environments.includes(selectedNetwork)) {
+      switchNetwork(DEFAULT_APP_ENVIRONMENT);
+    }
+  }, [selectedNetwork, switchNetwork]);
 
   return { switchNetwork, selectedNetwork };
 };
