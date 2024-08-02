@@ -31,6 +31,7 @@ type ElementProps<MenuItemValue extends string> = {
 
 type StyleProps = {
   align?: 'center' | 'start' | 'end';
+  hideIcon?: boolean;
   sideOffset?: number;
   className?: string;
 };
@@ -51,6 +52,7 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
     );
   })(),
   align = 'start',
+  hideIcon,
   sideOffset = 1,
   className,
 
@@ -59,9 +61,11 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
   const triggerContent = (
     <>
       {children}
-      <$DropdownIcon aria-hidden="true">
-        <Icon iconName={IconName.Triangle} aria-hidden="true" />
-      </$DropdownIcon>
+      {!hideIcon && (
+        <$DropdownIcon aria-hidden="true">
+          <Icon iconName={IconName.Triangle} aria-hidden="true" />
+        </$DropdownIcon>
+      )}
     </>
   );
 
