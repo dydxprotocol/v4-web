@@ -41,7 +41,7 @@ const Markets = () => {
           <$FlagOverlay />
           <IconButton
             iconName={IconName.Arrow}
-            onClick={() => navigate(`${AppRoute.Trade}/ETH-USD`)}
+            onClick={() => navigate(`${AppRoute.Trade}/TRUMPWIN-USD`)}
           />
         </$MarketsPageBanner>
       );
@@ -144,8 +144,9 @@ const $MarketsPageBanner = styled.div`
   }
 `;
 
+// Note: 573px; is the width of the flag image
 const $FlagOverlay = styled.div`
-  width: 573px; // width of flag image
+  width: 573px;
   height: 100%;
   background-image: ${({ theme }) => `
     linear-gradient(90deg, ${theme.layer4} 0%, ${theme.tooltipBackground} 53%, ${theme.layer4} 99%),
