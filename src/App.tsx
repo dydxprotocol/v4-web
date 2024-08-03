@@ -39,6 +39,7 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
+import { RestrictionWarning } from './components/RestrictionWarning';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useInitializePage } from './hooks/useInitializePage';
@@ -85,7 +86,7 @@ const Content = () => {
       <GlobalStyle />
       <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
         {isNotTablet && <HeaderDesktop />}
-
+        <RestrictionWarning />
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -224,6 +225,7 @@ const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
   display: grid;
   grid-template:
     'Header' var(--page-currentHeaderHeight)
+    'RestrictionWarning' min-content
     'Main' minmax(min-content, 1fr)
     'Footer' var(--page-currentFooterHeight)
     / 100%;

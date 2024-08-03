@@ -48,6 +48,8 @@ enum OrderbookRowAnimationType {
   NONE,
 }
 
+const GRADIENT_MULTIPLIER = 1.3;
+
 export type Rekt = { x1: number; x2: number; y1: number; y2: number };
 
 export const useDrawOrderbook = ({
@@ -103,18 +105,16 @@ export const useDrawOrderbook = ({
   }, [canvas]);
 
   const drawBars = ({
-    barType,
     ctx,
-    depthOrSizeValue,
-    gradientMultiplier,
+    value,
+    gradientMultiplier = GRADIENT_MULTIPLIER,
     histogramAccentColor,
     histogramSide: inHistogramSide,
     rekt,
   }: {
-    barType: 'depth' | 'size';
     ctx: CanvasRenderingContext2D;
-    depthOrSizeValue: number;
-    gradientMultiplier: number;
+    value: number;
+    gradientMultiplier?: number;
     histogramAccentColor: string;
     histogramSide: 'left' | 'right';
     rekt: Rekt;
@@ -122,9 +122,9 @@ export const useDrawOrderbook = ({
     const { x1, x2, y1, y2 } = rekt;
 
     // X values
-    const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
-    const barWidth = depthOrSizeValue
-      ? Math.min((depthOrSizeValue / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
+    const maxHistogramBarWidth = x2 - x1 - 2;
+    const barWidth = value
+      ? Math.min((value / histogramRange) * maxHistogramBarWidth, maxHistogramBarWidth)
       : 0;
 
     const { gradient, bar } = getHistogramXValues({
@@ -294,26 +294,13 @@ export const useDrawOrderbook = ({
     // Depth Bar
     if (depth) {
       drawBars({
-        barType: 'depth',
         ctx,
-        depthOrSizeValue: depth,
-        gradientMultiplier: 1.3,
+        value: depth,
         histogramAccentColor,
         histogramSide,
         rekt,
       });
     }
-
-    // Size Bar
-    drawBars({
-      barType: 'size',
-      ctx,
-      depthOrSizeValue: size,
-      gradientMultiplier: 5,
-      histogramAccentColor,
-      histogramSide,
-      rekt,
-    });
 
     if (mine && mine > 0) {
       drawMineCircle({ ctx, rekt });
@@ -331,6 +318,13 @@ export const useDrawOrderbook = ({
       rekt,
     });
   };
+
+  const [fontFlag, setFontFlag] = useState(0);
+  useEffect(() => {
+    const inc = () => setFontFlag((f) => f + 1);
+    globalThis.document.fonts.addEventListener('loadingdone', inc);
+    return () => globalThis.document.fonts.removeEventListener('loadingdone', inc);
+  }, []);
 
   // Update histograms and row contents on data change
   useEffect(() => {
@@ -363,6 +357,7 @@ export const useDrawOrderbook = ({
 
     prevData.current = data;
   }, [
+    fontFlag,
     canvasHeight,
     canvasWidth,
     data,

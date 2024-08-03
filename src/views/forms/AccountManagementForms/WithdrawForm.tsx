@@ -69,6 +69,8 @@ import { log } from '@/lib/telemetry';
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
 
+const DUMMY_TX_HASH = 'withdraw_dummy_tx_hash';
+
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
@@ -105,7 +107,7 @@ export const WithdrawForm = () => {
     [token, resources]
   );
 
-  const { addTransferNotification } = useLocalNotifications();
+  const { addOrUpdateTransferNotification } = useLocalNotifications();
 
   // Async Data
   const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
@@ -159,6 +161,8 @@ export const WithdrawForm = () => {
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
+      const notificationId = crypto?.randomUUID() ?? Date.now().toString();
+
       try {
         e.preventDefault();
 
@@ -190,27 +194,40 @@ export const WithdrawForm = () => {
             })
           );
         } else {
+          const nobleChainId = getNobleChainId();
+          const toChainId = exchange ? nobleChainId : chainIdStr || undefined;
+
+          const notificationParams = {
+            id: notificationId,
+            // DUMMY_TX_HASH is a place holder before we get the real txHash
+            txHash: DUMMY_TX_HASH,
+            type: TransferNotificationTypes.Withdrawal,
+            fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
+            toChainId,
+            toAmount: debouncedAmountBN.toNumber(),
+            triggeredAt: Date.now(),
+            isCctp,
+            isExchange: Boolean(exchange),
+            requestId: requestPayload.requestId ?? undefined,
+          };
+
+          if (isCctp) {
+            // we want to trigger a dummy notification first since CCTP withdraws can take
+            // up to 30s to generate a txHash, set isDummy to true
+            addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
+          }
+
           const txHash = await sendSquidWithdraw(
             debouncedAmountBN.toNumber(),
             requestPayload.data,
             isCctp
           );
-          const nobleChainId = getNobleChainId();
-          const toChainId = exchange ? nobleChainId : chainIdStr || undefined;
+
           if (txHash && toChainId) {
-            addTransferNotification({
-              txHash,
-              type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-              toChainId,
-              toAmount: debouncedAmountBN.toNumber(),
-              triggeredAt: Date.now(),
-              isCctp,
-              isExchange: Boolean(exchange),
-              requestId: requestPayload.requestId ?? undefined,
-            });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
+
+            addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
 
             track(
               AnalyticsEvents.TransferWithdraw({
@@ -226,6 +243,8 @@ export const WithdrawForm = () => {
                 toAmountMin: summary?.toAmountMin || undefined,
               })
             );
+          } else {
+            throw new Error('No transaction hash returned');
           }
         }
       } catch (err) {
@@ -244,6 +263,14 @@ export const WithdrawForm = () => {
               : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
           );
         }
+        if (isCctp) {
+          // if error update the dummy notification with error
+          addOrUpdateTransferNotification({
+            id: notificationId,
+            txHash: DUMMY_TX_HASH,
+            status: { error: stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }) },
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -258,6 +285,7 @@ export const WithdrawForm = () => {
       toToken,
       screenAddresses,
       stringGetter,
+      addOrUpdateTransferNotification,
     ]
   );
 

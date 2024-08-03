@@ -140,6 +140,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             value={value ?? undefined}
             // Other
             data-1p-ignore // prevent 1Password fill
+            data-hj-allow
             {...otherProps}
           />
         ) : (

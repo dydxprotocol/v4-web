@@ -1,10 +1,12 @@
 import styled from 'styled-components';
 
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { REWARD_DISTRIBUTION_SEASON_NUMBER } from '@/constants/notifications';
 
+import { useIncentivesSeason } from '@/hooks/useIncentivesSeason';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 // eslint-disable-next-line import/no-cycle
@@ -26,6 +28,8 @@ export const IncentiveSeasonDistributionNotification = ({
   notification,
 }: IncentiveSeasonDistributionNotificationProps) => {
   const stringGetter = useStringGetter();
+  const { rewardDistributionSeasonNumber } = useIncentivesSeason();
+
   const { chainTokenLabel, points } = data;
 
   return (
@@ -35,7 +39,7 @@ export const IncentiveSeasonDistributionNotification = ({
       slotIcon={<Icon iconName={IconName.RewardStar} />}
       slotTitle={stringGetter({
         key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-        params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+        params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
       })}
       slotCustomContent={
         <$Details
@@ -44,12 +48,17 @@ export const IncentiveSeasonDistributionNotification = ({
               key: 'season_distribution',
               label: stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_REWARDS,
-                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+                params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
               }),
               value: <$Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },
           ]}
         />
+      }
+      slotAction={
+        <$Button action={ButtonAction.Primary} size={ButtonSize.Small}>
+          {stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →
+        </$Button>
       }
     />
   );
@@ -63,8 +72,12 @@ const $Details = styled(Details)`
 `;
 
 const $Notification = styled(Notification)`
+  --relativeTime-backgroundColor: transparent;
+
   background-image: url('/dots-background-2.svg');
   background-size: cover;
+
+  --action-marginTop: 0.75rem;
 `;
 
 const $Output = styled(Output)`
@@ -73,4 +86,8 @@ const $Output = styled(Output)`
     color: var(--color-success);
     margin-right: 0.5ch;
   }
+`;
+
+const $Button = styled(Button)`
+  width: 100%;
 `;

@@ -143,7 +143,6 @@ const RewardsPage = () => {
           </$DoubleColumnView>
         </$DetachedSection>
       )}
-      ;
     </$Page>
   );
 };

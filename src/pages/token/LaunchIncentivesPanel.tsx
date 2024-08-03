@@ -21,7 +21,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { Tag, TagSize } from '@/components/Tag';
+import { NewTag, TagSize } from '@/components/Tag';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
@@ -66,7 +66,7 @@ const LaunchIncentivesTitle = () => {
           FOR_V4: <$ForV4>{stringGetter({ key: STRING_KEYS.FOR_V4 })}</$ForV4>,
         },
       })}
-      <$NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+      <NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
     </$Title>
   );
 };
@@ -156,7 +156,9 @@ const LaunchIncentivesContent = () => {
           onClick={() => {
             dispatch(
               openDialog(
-                DialogTypes.ExternalLink({ link: 'https://dydx.exchange/blog/v4-full-trading' })
+                DialogTypes.ExternalLink({
+                  link: 'https://dydx.forum/t/launch-of-season-5-of-the-launch-incentive-program/2725',
+                })
               )
             );
           }}
@@ -304,9 +306,4 @@ const $ChaosLabsLogo = styled.span`
   align-items: center;
   gap: 0.5em;
   font: var(--font-tiny-medium);
-`;
-
-const $NewTag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
 `;

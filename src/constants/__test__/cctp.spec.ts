@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getLowestFeeChainNames,
+  getMapOfHighestFeeTokensByChainId,
   getMapOfLowestFeeTokensByChainId,
   getMapOfLowestFeeTokensByDenom,
 } from '@/constants/cctp';
@@ -14,6 +15,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('deposits skip - returns all cctp mainnet chain names as an array', () => {
@@ -22,6 +25,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('withdrawals squid - returns all cctp mainnet chain names as an array', () => {
@@ -30,6 +35,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
   it('deposits squid - returns all cctp mainnet chain names as an array', () => {
@@ -38,6 +45,8 @@ describe('getLowestFeeChainNames', () => {
       'Avalanche',
       'Optimism',
       'Arbitrum',
+      'Base',
+      'Polygon',
     ]);
   });
 });
@@ -64,6 +73,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -98,6 +121,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'arbitrum',
         },
       ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('withdrawals squid - returns a map of token denom/addresses to token information including ETH USDC', () => {
@@ -128,6 +165,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -162,6 +213,20 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'arbitrum',
         },
       ],
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359': [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
 });
@@ -187,6 +252,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
         },
       ],
     });
@@ -221,6 +300,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'arbitrum',
         },
       ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('withdrawals squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -253,6 +346,20 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'arbitrum',
         },
       ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
     });
   });
   it('deposits squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -283,6 +390,43 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '42161',
           tokenAddress: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
           name: 'arbitrum',
+        },
+      ],
+      8453: [
+        {
+          chainId: '8453',
+          tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          name: 'Base',
+        },
+      ],
+      137: [
+        {
+          chainId: '137',
+          tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+          name: 'Polygon',
+        },
+      ],
+    });
+  });
+});
+
+describe('getMapOfHighestFeeTokensByChainId', () => {
+  it('deposits squid - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.deposit, false)).toEqual({});
+  });
+  it('deposits skip - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.deposit, true)).toEqual({});
+  });
+  it('withdrawals squid - should be an empty map', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.withdrawal, false)).toEqual({});
+  });
+  it('withdrawals skip - should be a map with one property: ethereum chain id', () => {
+    expect(getMapOfHighestFeeTokensByChainId(TransferType.withdrawal, true)).toEqual({
+      1: [
+        {
+          chainId: '1',
+          tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          name: 'Ethereum',
         },
       ],
     });
