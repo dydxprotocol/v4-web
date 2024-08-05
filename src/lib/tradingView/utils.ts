@@ -15,14 +15,28 @@ export const mapCandle = ({
   high,
   low,
   baseTokenVolume,
-}: Candle): TradingViewBar => ({
-  time: new Date(startedAt).getTime(),
-  low: parseFloat(low),
-  high: parseFloat(high),
-  open: parseFloat(open),
-  close: parseFloat(close),
-  volume: Math.ceil(Number(baseTokenVolume)),
-});
+  trades,
+  orderbookMidPriceOpen,
+  orderbookMidPriceClose,
+}: Candle): TradingViewBar => {
+  const hasNoTrades = trades === 0;
+  // Empty (0 trade) candles in markets will show O(pen) H(igh) L(ow) C(lose) data via mid-price.
+  // Otherwise, candles display OHLC data from historical trades.
+  const useOhlc = hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
+
+  return {
+    time: new Date(startedAt).getTime(),
+    low: useOhlc
+      ? Math.min(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(low),
+    high: useOhlc
+      ? Math.max(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(high),
+    open: useOhlc ? parseFloat(orderbookMidPriceOpen) : parseFloat(open),
+    close: useOhlc ? parseFloat(orderbookMidPriceClose) : parseFloat(close),
+    volume: Math.ceil(Number(baseTokenVolume)),
+  };
+};
 
 export const getSymbol = (marketId: string): TradingViewSymbol => ({
   description: marketId,
