@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
 
+// eslint-disable-next-line import/no-cycle
 import { Notification, type NotificationProps } from '@/components/Notification';
 
 export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: NotificationProps) => {
