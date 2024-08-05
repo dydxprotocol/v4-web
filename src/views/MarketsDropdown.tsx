@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
+import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -19,6 +21,8 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
@@ -29,6 +33,7 @@ import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 
@@ -120,7 +125,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
 
   const slotBottom = useMemo(() => {
     if (filter === MarketFilters.PREDICTION_MARKET) {
-      // TODO: (TRA-516): Localize string when finallized.
+      // TODO: (TRA-528): Localize string when finallized.
       return (
         <$Disclaimer>
           Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
@@ -132,6 +137,28 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
     return null;
   }, [filter]);
 
+  const [hasSeenElectionBannerTrumpWin, setHasSeenElectionBannerTrupmWin] = useLocalStorage({
+    key: LocalStorageKey.HasSeenElectionBannerTRUMPWIN,
+    defaultValue: false,
+  });
+
+  const slotTop = useMemo(() => {
+    if (!hasSeenElectionBannerTrumpWin && testFlags.enablePredictionMarketPerp) {
+      // TODO: (TRA-528): Update localization string when copy is finallized
+      return (
+        <$MarketDropdownBanner>
+          <span>🇺🇸 Trade the U.S. presidential election →</span>
+          <$IconButton
+            onClick={() => setHasSeenElectionBannerTrupmWin(true)}
+            iconName={IconName.Close}
+          />
+        </$MarketDropdownBanner>
+      );
+    }
+
+    return null;
+  }, [hasSeenElectionBannerTrumpWin]);
+
   return (
     <>
       <$Toolbar>
@@ -142,6 +169,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           onSearchTextChange={setSearchFilter}
         />
       </$Toolbar>
+      {slotTop}
       <$ScrollArea>
         <$Table
           withInnerBorders
@@ -365,9 +393,24 @@ const $Toolbar = styled(Toolbar)`
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
+const $MarketDropdownBanner = styled.div`
+  ${layoutMixins.row}
+  background-color: var(--color-layer-1);
+  padding: 0.9063rem 1rem;
+  font: var(--font-base-medium);
+  color: var(--color-text-1);
+  border-bottom: solid var(--border-width) var(--color-border);
+  justify-content: space-between;
+`;
+
 const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
+`;
+
+const $IconButton = styled(IconButton)`
+  --button-border: none;
+  --button-backgroundColor: transparent;
 `;
 
 const $Table = styled(Table)`

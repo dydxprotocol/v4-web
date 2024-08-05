@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -16,9 +16,13 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Switch } from '@/components/Switch';
 import { MarketsStats } from '@/views/MarketsStats';
 import { MarketsTable } from '@/views/tables/MarketsTable';
+
+import { testFlags } from '@/lib/testFlags';
 
 const Markets = () => {
   const stringGetter = useStringGetter();
@@ -27,6 +31,23 @@ const Markets = () => {
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
+
+  const marketsPageBanner = useMemo(() => {
+    // TODO: (TRA-528): Localize text when finallized. Update navigate link to TRUMPWIN-USD (Use Market redux state to ensure existance)
+    if (testFlags.enablePredictionMarketPerp) {
+      return (
+        <$MarketsPageBanner>
+          <span>🇺🇸 Leverage trade the outcome of the U.S. Election</span>
+          <$FlagOverlay />
+          <IconButton
+            iconName={IconName.Arrow}
+            onClick={() => navigate(`${AppRoute.Trade}/TRUMPWIN-USD`)}
+          />
+        </$MarketsPageBanner>
+      );
+    }
+    return null;
+  }, []);
 
   return (
     <$Page>
@@ -44,6 +65,7 @@ const Markets = () => {
             )
           }
         />
+        {marketsPageBanner}
         <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
 
@@ -79,6 +101,7 @@ const $ContentSectionHeader = styled(ContentSectionHeader)`
     }
   }
 `;
+
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
@@ -91,14 +114,63 @@ const $HeaderSection = styled.section`
     margin-bottom: 1rem;
   }
 `;
+
+const $MarketsPageBanner = styled.div`
+  ${layoutMixins.row}
+  height: 5rem;
+  border-radius: 10px;
+  background-color: var(--color-layer-4);
+  margin-bottom: 1rem;
+  padding: 0 1.5rem;
+  justify-content: space-between;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+
+  span {
+    font: var(--font-medium-medium);
+  }
+
+  @media ${breakpoints.desktopSmall} {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  @media ${breakpoints.tablet} {
+    span,
+    button {
+      z-index: 1;
+    }
+  }
+`;
+
+// Note: 573px; is the width of the flag image
+const $FlagOverlay = styled.div`
+  width: 573px;
+  height: 100%;
+  background-image: ${({ theme }) => `
+    linear-gradient(90deg, ${theme.layer4} 0%, ${theme.tooltipBackground} 53%, ${theme.layer4} 99%),
+    url('/AmericanFlag.png')
+  `};
+  background-repeat: no-repeat;
+
+  @media ${breakpoints.mobile} {
+    position: absolute;
+    width: 100%;
+    z-index: 0;
+  }
+`;
+
 const $MarketsTable = styled(MarketsTable)`
   ${layoutMixins.contentSectionAttached}
 `;
+
 const $MarketsStats = styled(MarketsStats)<{
   showHighlights?: boolean;
 }>`
   ${({ showHighlights }) => !showHighlights && 'display: none;'}
 `;
+
 const $Highlights = styled.label`
   align-items: center;
   gap: 1rem;
@@ -118,4 +190,5 @@ const $Highlights = styled.label`
     display: flex;
   }
 `;
+
 export default Markets;

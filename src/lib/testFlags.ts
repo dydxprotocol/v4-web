@@ -47,6 +47,10 @@ class TestFlags {
   get referrer() {
     return this.queryParams.utm_source;
   }
+
+  get enablePredictionMarketPerp() {
+    return !!this.queryParams.prediction;
+  }
 }
 
 export const testFlags = new TestFlags();
