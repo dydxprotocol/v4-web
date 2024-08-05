@@ -8,6 +8,8 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
+import { testFlags } from '../testFlags';
+
 export const mapCandle = ({
   startedAt,
   open,
@@ -15,14 +17,26 @@ export const mapCandle = ({
   high,
   low,
   baseTokenVolume,
-}: Candle): TradingViewBar => ({
-  time: new Date(startedAt).getTime(),
-  low: parseFloat(low),
-  high: parseFloat(high),
-  open: parseFloat(open),
-  close: parseFloat(close),
-  volume: Math.ceil(Number(baseTokenVolume)),
-});
+  trades,
+  orderbookMidPriceOpen,
+  orderbookMidPriceClose,
+}: Candle): TradingViewBar => {
+  const hasNoTrades = trades === 0;
+  const useOhlc = testFlags.ohlc && hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
+
+  return {
+    time: new Date(startedAt).getTime(),
+    low: useOhlc
+      ? Math.min(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(low),
+    high: useOhlc
+      ? Math.max(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(high),
+    open: useOhlc ? parseFloat(orderbookMidPriceOpen) : parseFloat(open),
+    close: useOhlc ? parseFloat(orderbookMidPriceClose) : parseFloat(close),
+    volume: Math.ceil(Number(baseTokenVolume)),
+  };
+};
 
 export const getSymbol = (marketId: string): TradingViewSymbol => ({
   description: marketId,
