@@ -8,8 +8,6 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
-import { testFlags } from '../testFlags';
-
 export const mapCandle = ({
   startedAt,
   open,
@@ -22,7 +20,9 @@ export const mapCandle = ({
   orderbookMidPriceClose,
 }: Candle): TradingViewBar => {
   const hasNoTrades = trades === 0;
-  const useOhlc = testFlags.ohlc && hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
+  // Empty (0 trade) candles in markets will show O(pen) H(igh) L(ow) C(lose) data via mid-price.
+  // Otherwise, candles display OHLC data from historical trades.
+  const useOhlc = hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
 
   return {
     time: new Date(startedAt).getTime(),
