@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
@@ -14,8 +15,6 @@ import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
@@ -220,9 +219,7 @@ const $Container = styled.div<{ backgroundImagePath: string }>`
   }
 `;
 
-const $RowItem = styled.div`
-  ${layoutMixins.inlineRow};
-`;
+const $RowItem = tw.div`inlineRow`;
 const $Pill = styled.div`
   border-radius: 1rem;
   display: inline-flex;

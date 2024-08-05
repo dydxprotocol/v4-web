@@ -11,8 +11,6 @@ import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
@@ -74,10 +72,10 @@ export const WithConfirmationPopover = forwardRef(
             tw="column gap-0.25"
           >
             {children}
-            <$ConfirmationButtons>
+            <div tw="row justify-end gap-0.25">
               {onCancel && <$CancelButton iconName={IconName.Close} onClick={onCancel} />}
               {onConfirm && <$ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />}
-            </$ConfirmationButtons>
+            </div>
           </form>
         </$Content>
       </Portal>
@@ -91,13 +89,6 @@ const $Content = styled(Content)`
     outline: none;
   }
 `;
-const $ConfirmationButtons = styled.div`
-  ${layoutMixins.row};
-
-  justify-content: flex-end;
-  gap: 0.25rem;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-height: 1.25rem;
   --button-font: var(--font-tiny-book);

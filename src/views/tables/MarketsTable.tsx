@@ -314,9 +314,7 @@ const $Table = styled(Table)`
 
 const $TabletOutput = tw(Output)`font-medium-book text-color-text-2`;
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
+const $InlineRow = tw.div`inlineRow`;
 const $NumberOutput = tw(Output)`font-base-medium text-color-text-2`;
 
 const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`

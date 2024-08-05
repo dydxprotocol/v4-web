@@ -1,5 +1,4 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -18,8 +17,6 @@ import {
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -130,17 +127,12 @@ export const OrderStatusNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <$Label tw="text-color-text-0 font-small-book">
+        <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </$Label>
+        </span>
       }
       slotCustomContent={customContent}
     />
   );
 };
-
-const $Label = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;

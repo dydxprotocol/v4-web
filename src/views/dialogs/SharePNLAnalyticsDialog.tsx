@@ -103,7 +103,7 @@ export const SharePNLAnalyticsDialog = ({
         }}
       >
         <div tw="flexColumn h-full">
-          <$ShareableCardTitle>
+          <div tw="row mb-0.75 gap-0.5">
             <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
 
             <span>
@@ -111,7 +111,7 @@ export const SharePNLAnalyticsDialog = ({
             </span>
 
             <Tag sign={sideSign}>{sideLabel}</Tag>
-          </$ShareableCardTitle>
+          </div>
 
           <$HighlightOutput
             isNegative={unrealizedPnlIsNegative}
@@ -204,11 +204,6 @@ const $ShareableCard = styled.div`
   background-color: var(--color-layer-4);
   padding: 1.75rem 1.25rem 1.25rem 1.25rem;
   border-radius: 0.5rem;
-`;
-const $ShareableCardTitle = styled.div`
-  ${layoutMixins.row};
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
 `;
 const $ShareableCardStatLabel = tw.div`text-right text-color-text-0 font-base-bold`;
 

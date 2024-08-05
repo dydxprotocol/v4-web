@@ -116,7 +116,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               dispatch(setAppColorMode(colorMode));
             }}
           >
-            <$ColorPreferenceLabel>
+            <div tw="inlineRow gap-[1ch]">
               <$ArrowIconContainer>
                 <$ArrowIcon
                   iconName={IconName.Arrow}
@@ -130,7 +130,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
                 />
               </$ArrowIconContainer>
               {stringGetter({ key: label })}
-            </$ColorPreferenceLabel>
+            </div>
             <$DotIndicator $selected={currentColorMode === colorMode} />
           </$ColorPreferenceItem>
         ))}
@@ -237,11 +237,6 @@ const $AppThemeHeader = styled.h3<{ textcolor: string }>`
   `}
   z-index: 1;
 `;
-const $ColorPreferenceLabel = styled.div`
-  ${layoutMixins.inlineRow};
-  gap: 1ch;
-`;
-
 const $ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.25rem;

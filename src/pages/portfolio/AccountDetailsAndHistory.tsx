@@ -300,7 +300,7 @@ const $Card = styled.div`
 `;
 
 const $EmptyCard = styled($Card)`
-  ${layoutMixins.column};
+  ${layoutMixins.column}
 
   display: grid;
   gap: 1rem;

@@ -12,8 +12,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
@@ -169,9 +167,7 @@ const $PriceBox = styled.div`
   padding: 0.625em 0.75em;
 `;
 
-const $PriceRow = styled.div`
-  ${layoutMixins.spacedRow};
-`;
+const $PriceRow = tw.div`spacedRow`;
 
 const $PriceLabel = tw.h3`text-color-text-0`;
 

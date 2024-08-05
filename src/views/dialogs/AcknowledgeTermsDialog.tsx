@@ -76,7 +76,7 @@ const $TOS = styled.section`
   padding: 1rem 1rem 1rem 2rem;
   border-radius: 0.875rem;
   > ul {
-    ${layoutMixins.column};
+    ${layoutMixins.column}
     gap: 1rem;
   }
 `;

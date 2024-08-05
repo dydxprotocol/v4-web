@@ -148,9 +148,10 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
       return (
         <$MarketDropdownBanner>
           <span>🇺🇸 Trade the U.S. presidential election →</span>
-          <$IconButton
+          <IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            tw="[--button-backgroundColor:transparent] [--button-border:none]"
           />
         </$MarketDropdownBanner>
       );
@@ -400,12 +401,6 @@ const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
 `;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-`;
-
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 

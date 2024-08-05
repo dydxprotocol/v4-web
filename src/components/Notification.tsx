@@ -145,7 +145,7 @@ const $ActionItems = styled.div`
   min-width: fit-content;
   padding-left: 0.5rem;
   height: 100%;
-  ${layoutMixins.row};
+  ${layoutMixins.row}
   justify-content: end;
   gap: 0.5rem;
 

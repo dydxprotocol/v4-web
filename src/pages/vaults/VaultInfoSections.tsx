@@ -87,7 +87,7 @@ const $DetailCard = styled.div`
   padding: 0.5rem 1rem;
   font: var(--font-base-book);
 
-  ${layoutMixins.column};
+  ${layoutMixins.column}
 `;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();

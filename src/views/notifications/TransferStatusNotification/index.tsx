@@ -10,8 +10,6 @@ import { TransferNotifcation, TransferNotificationTypes } from '@/constants/noti
 import { useInterval } from '@/hooks/useInterval';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { AlertMessage } from '@/components/AlertMessage';
 import { Collapsible } from '@/components/Collapsible';
 import { Icon, IconName } from '@/components/Icon';
@@ -123,7 +121,7 @@ export const TransferStatusNotification = ({
       slotIcon={isToast && slotIcon}
       slotTitle={slotTitle}
       slotCustomContent={
-        <$BridgingStatus>
+        <div tw="flexColumn gap-0.5">
           {!status && !isExchange ? (
             <>
               {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
@@ -140,7 +138,7 @@ export const TransferStatusNotification = ({
               )}
             </>
           )}
-        </$BridgingStatus>
+        </div>
       }
       slotAction={
         isToast &&
@@ -181,11 +179,6 @@ export const TransferStatusNotification = ({
     transferNotif
   );
 };
-const $BridgingStatus = styled.div`
-  ${layoutMixins.flexColumn};
-  gap: 0.5rem;
-`;
-
 const $Status = styled.div<{ withMarginBottom?: boolean }>`
   color: var(--color-text-0);
   font-size: 0.875rem;
