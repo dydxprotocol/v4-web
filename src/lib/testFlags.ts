@@ -49,6 +49,8 @@ class TestFlags {
   }
 
   get ohlc() {
+    // When enabled, empty (0 trade) candles in markets will show O(pen) H(igh) L(ow) C(lose) data via mid-price.
+    // When disabled, candles will only display OHLC data from historical trades.
     return !!this.queryParams.ohlc;
   }
 }

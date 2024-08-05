@@ -21,21 +21,19 @@ export const mapCandle = ({
   orderbookMidPriceOpen,
   orderbookMidPriceClose,
 }: Candle): TradingViewBar => {
-  const isOhlcEnabled = testFlags.ohlc;
   const hasNoTrades = trades === 0;
+  const useOhlc = testFlags.ohlc && hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
 
   return {
     time: new Date(startedAt).getTime(),
-    low: parseFloat(low),
-    high: parseFloat(high),
-    open:
-      isOhlcEnabled && hasNoTrades && orderbookMidPriceOpen
-        ? parseFloat(orderbookMidPriceOpen)
-        : parseFloat(open),
-    close:
-      isOhlcEnabled && hasNoTrades && orderbookMidPriceClose
-        ? parseFloat(orderbookMidPriceClose)
-        : parseFloat(close),
+    low: useOhlc
+      ? Math.min(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(low),
+    high: useOhlc
+      ? Math.max(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
+      : parseFloat(high),
+    open: useOhlc ? parseFloat(orderbookMidPriceOpen) : parseFloat(open),
+    close: useOhlc ? parseFloat(orderbookMidPriceClose) : parseFloat(close),
     volume: Math.ceil(Number(baseTokenVolume)),
   };
 };
