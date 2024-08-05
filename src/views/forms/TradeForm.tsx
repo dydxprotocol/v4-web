@@ -49,12 +49,14 @@ import {
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
+import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
 import { TradeFormInputs } from './TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
@@ -93,7 +95,7 @@ export const TradeForm = ({
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { side } = currentTradeData ?? {};
+  const { marketId, side } = currentTradeData ?? {};
 
   const selectedOrderSide = getSelectedOrderSide(side);
 
@@ -238,6 +240,35 @@ export const TradeForm = ({
     </$TopActionsRow>
   );
 
+  const tradeFormMessages = (
+    <>
+      {testFlags.enablePredictionMarketPerp && <TradeFormInfoMessages marketId={marketId} />}
+
+      {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+        <AlertMessage type={AlertType.Error}>
+          <span>{complianceMessage}</span>
+        </AlertMessage>
+      )}
+
+      {alertContent && (
+        <AlertMessage type={alertType}>
+          <div tw="row gap-0.75">
+            {alertContent}
+            {shouldPromptUserToPlaceLimitOrder && (
+              <$IconButton
+                iconName={IconName.Arrow}
+                shape={ButtonShape.Circle}
+                action={ButtonAction.Navigation}
+                size={ButtonSize.XSmall}
+                onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+              />
+            )}
+          </div>
+        </AlertMessage>
+      )}
+    </>
+  );
+
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
       {isTablet && showOrderbook && (
@@ -247,29 +278,7 @@ export const TradeForm = ({
         <TradeFormInputs />
         <TradeSizeInputs />
         <AdvancedTradeOptions />
-
-        {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
-          <AlertMessage type={AlertType.Error}>
-            <span>{complianceMessage}</span>
-          </AlertMessage>
-        )}
-
-        {alertContent && (
-          <AlertMessage type={alertType}>
-            <div tw="row gap-0.75">
-              {alertContent}
-              {shouldPromptUserToPlaceLimitOrder && (
-                <$IconButton
-                  iconName={IconName.Arrow}
-                  shape={ButtonShape.Circle}
-                  action={ButtonAction.Navigation}
-                  size={ButtonSize.XSmall}
-                  onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
-                />
-              )}
-            </div>
-          </AlertMessage>
-        )}
+        {tradeFormMessages}
       </$InputsColumn>
     </$OrderbookAndInputs>
   );

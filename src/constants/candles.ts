@@ -14,6 +14,8 @@ export interface Candle {
   usdVolume: string;
   trades: number;
   startingOpenInterest: string;
+  orderbookMidPriceOpen?: string;
+  orderbookMidPriceClose?: string;
 }
 
 export interface TradingViewBar {
