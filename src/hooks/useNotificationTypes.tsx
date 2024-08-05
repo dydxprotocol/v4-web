@@ -19,10 +19,10 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
+  MarketLaunchNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
@@ -37,9 +37,9 @@ import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
-import { StakingLiveNotification } from '@/views/notifications/StakingLiveNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -278,13 +278,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         useIncentivesSeason();
 
       const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
-      const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
-      const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
-      const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
-      const stakingLiveExpirationDate = new Date('2024-07-24T23:59:59');
-
-      const { isolatedMarginLearnMore } = useURLConfigs();
-
+      const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
       const currentDate = new Date();
 
       useEffect(() => {
@@ -312,89 +306,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (currentDate <= conditionalOrdersExpirationDate) {
+        if (currentDate <= tradeUSElectionExpirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.RevampedConditionalOrders,
+            MarketLaunchNotificationIds.TrumpWin,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.BODY',
-                params: {
-                  TWITTER_LINK: (
-                    <Link
-                      href="https://twitter.com/dYdX/status/1785339109268935042"
-                      isAccent
-                      isInline
-                    >
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.RevampedConditionalOrders,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= fokDeprecationExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.FOKDeprecation,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.FOK_DEPRECATION.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.FOK_DEPRECATION.BODY',
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.FOKDeprecation,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= isolatedMarginLiveExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.IsolatedMarginLive,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.BODY',
-                params: {
-                  LEARN_MORE: (
-                    <Link href={isolatedMarginLearnMore} isAccent isInline>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IsolatedMarginLive,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= stakingLiveExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.InAppStakingLive,
-            {
-              title: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.TITLE' }),
+              title: 'Trade the U.S. election!',
               body: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.BODY' }),
               renderCustomBody({ isToast, notification }) {
-                return <StakingLiveNotification isToast={isToast} notification={notification} />;
+                return (
+                  <MarketLaunchTrumpwinNotification isToast={isToast} notification={notification} />
+                );
               },
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.InAppStakingLive,
+              groupKey: MarketLaunchNotificationIds.TrumpWin,
             },
             []
           );

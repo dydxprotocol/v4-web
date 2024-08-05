@@ -41,7 +41,7 @@ const Markets = () => {
           <$FlagOverlay />
           <IconButton
             iconName={IconName.Arrow}
-            onClick={() => navigate(`${AppRoute.Trade}/TRUMPWIN-USD`)}
+            onClick={() => navigate(`${AppRoute.Trade}/TRUMP-USD`)}
           />
         </$MarketsPageBanner>
       );

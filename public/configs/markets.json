@@ -6515,7 +6515,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/maga/", 
         "name": "MAGA", 
         "tags": [
-            "Meme"
+            "Meme",
+            "Prediction Market"
         ], 
         "websiteLink": "https://magamemecoin.com/", 
         "whitepaperLink": null

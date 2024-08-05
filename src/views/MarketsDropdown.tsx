@@ -1,6 +1,6 @@
 import { Key, memo, useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -37,7 +37,13 @@ import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 
-const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
+const MarketsDropdownContent = ({
+  closeDropdown,
+  onRowAction,
+}: {
+  closeDropdown: () => void;
+  onRowAction?: (market: Key) => void;
+}) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
@@ -147,7 +153,14 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
       // TODO: (TRA-528): Update localization string when copy is finallized
       return (
         <$MarketDropdownBanner>
-          <span>🇺🇸 Trade the U.S. presidential election →</span>
+          <NavLink
+            to={`${AppRoute.Trade}/TRUMP-USD`}
+            onClick={() => {
+              closeDropdown();
+            }}
+          >
+            🇺🇸 Trade the U.S. presidential election →
+          </NavLink>
           <$IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
@@ -268,6 +281,7 @@ export const MarketsDropdown = memo(
         triggerType={TriggerType.MarketDropdown}
       >
         <MarketsDropdownContent
+          closeDropdown={() => setIsOpen(false)}
           onRowAction={(market: Key) => {
             navigate(`${AppRoute.Trade}/${market}`);
             setIsOpen(false);

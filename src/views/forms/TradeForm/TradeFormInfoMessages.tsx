@@ -19,7 +19,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
     defaultValue: false,
   });
 
-  if (marketId === 'TRUMPWIN-USD' && !hasSeenTradeFormMessageTrumpWin) {
+  if (marketId === 'TRUMP-USD' && !hasSeenTradeFormMessageTrumpWin) {
     // TODO: (TRA-528): Localize string when finallized and add LEARN_MORE link
     return (
       <AlertMessage type={AlertType.Notice}>
