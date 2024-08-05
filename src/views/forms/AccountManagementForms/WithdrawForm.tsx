@@ -63,8 +63,8 @@ import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';

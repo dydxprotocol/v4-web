@@ -281,6 +281,8 @@ class AbacusStateManager {
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (walletType === WalletType.Keplr) {
         this.stateManager.cosmosWalletConnected = true;
+      } else {
+        this.stateManager.cosmosWalletConnected = false;
       }
     }
   };

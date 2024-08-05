@@ -117,70 +117,66 @@ export const TransferStatusNotification = ({
     },
   ];
 
-  const customContent =
-    !status && !isExchange && !isCosmosDeposit ? (
-      <LoadingDots size={3} />
-    ) : (
-      <$BridgingStatus>
-        {isCosmosDeposit ? (
-          <>
-            <$Details items={detailItems} />
-            {!isToast && !isComplete && (
-              <Button
-                action={ButtonAction.Primary}
-                type={ButtonType.Button}
-                size={ButtonSize.Small}
-                onClick={() => {
-                  dispatch(
-                    openDialog(
-                      DialogTypes.CosmosDeposit({
-                        fromChainId,
-                        toAmount,
-                        txHash,
-                      })
-                    )
-                  );
-                }}
-              >
-                {/* TODO: Need to add localization */}
-                Confirm Deposit
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            <$Status>
+  const content = (
+    <$BridgingStatus>
+      {isCosmosDeposit ? (
+        <>
+          <$Details items={detailItems} />
+          {!isToast && !isComplete && (
+            <Button
+              action={ButtonAction.Primary}
+              type={ButtonType.Button}
+              size={ButtonSize.Small}
+              onClick={() => {
+                dispatch(
+                  openDialog(
+                    DialogTypes.CosmosDeposit({
+                      fromChainId,
+                      toAmount,
+                      txHash,
+                    })
+                  )
+                );
+              }}
+            >
+              {/* TODO: Need to add localization */}
+              Confirm Deposit
+            </Button>
+          )}
+        </>
+      ) : (
+        <>
+          <$Status>
+            {stringGetter({
+              key: statusString,
+              params: {
+                AMOUNT_USD: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
+                ESTIMATED_DURATION: (
+                  <$InlineOutput
+                    type={OutputType.Text}
+                    value={formatSeconds(Math.max(secondsLeft || 0, 0))}
+                  />
+                ),
+              },
+            })}
+          </$Status>
+          {hasError && (
+            <AlertMessage type={AlertType.Error}>
               {stringGetter({
-                key: statusString,
+                key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                 params: {
-                  AMOUNT_USD: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
-                  ESTIMATED_DURATION: (
-                    <$InlineOutput
-                      type={OutputType.Text}
-                      value={formatSeconds(Math.max(secondsLeft || 0, 0))}
-                    />
-                  ),
+                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
                 },
               })}
-            </$Status>
-            {hasError && (
-              <AlertMessage type={AlertType.Error}>
-                {stringGetter({
-                  key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                  params: {
-                    ERROR_MESSAGE:
-                      error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                  },
-                })}
-              </AlertMessage>
-            )}
-          </>
-        )}
-        {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
-          <$TransferStatusSteps status={status} type={type} />
-        )}
-      </$BridgingStatus>
-    );
+            </AlertMessage>
+          )}
+        </>
+      )}
+      {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
+        <$TransferStatusSteps status={status} type={type} />
+      )}
+    </$BridgingStatus>
+  );
 
   const transferIcon = isCosmosDeposit ? slotIcon : isToast && slotIcon;
 
@@ -192,7 +188,7 @@ export const TransferStatusNotification = ({
       slotTitle={slotTitle}
       slotCustomContent={
         <$BridgingStatus>
-          {!status && !isExchange ? (
+          {!status && !isExchange && !isCosmosDeposit ? (
             <>
               {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
               <div>
@@ -202,9 +198,11 @@ export const TransferStatusNotification = ({
           ) : (
             <>
               {content}
-              {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
-              {!isToast && !isComplete && !hasError && (
-                <$TransferStatusSteps status={status} type={type} />
+              {!isCosmosDeposit && !isComplete && (
+                <>
+                  <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
+                  {!isToast && !hasError && <$TransferStatusSteps status={status} type={type} />}
+                </>
               )}
             </>
           )}

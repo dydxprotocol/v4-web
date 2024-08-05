@@ -35,7 +35,7 @@ export const ConfirmPendingDepositDialog = ({
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { dydxAddress } = useAccounts();
 
-  const { setAllTransferNotifications } = useLocalNotifications();
+  const { transferNotifications, addOrUpdateTransferNotification } = useLocalNotifications();
   const stringGetter = useStringGetter();
 
   const { deposit } = useSubaccount();
@@ -54,22 +54,18 @@ export const ConfirmPendingDepositDialog = ({
       if (tx && dydxAddress) {
         await refetchQuery();
 
-        setAllTransferNotifications((transferNotification) => {
-          return {
-            ...transferNotification,
-            [dydxAddress]: transferNotification[dydxAddress].map((notification) => {
-              const isCosmosDeposit =
-                SUPPORTED_COSMOS_CHAINS.includes(notification.fromChainId ?? '') &&
-                notification.fromChainId !== selectedDydxChainId;
-              if (isCosmosDeposit) {
-                return {
-                  ...notification,
-                  isSubaccountDepositCompleted: true,
-                };
-              }
-              return notification;
-            }),
-          };
+        transferNotifications.forEach((notification) => {
+          const isCosmosPendingDeposit =
+            SUPPORTED_COSMOS_CHAINS.includes(notification.fromChainId ?? '') &&
+            notification.fromChainId !== selectedDydxChainId &&
+            notification.isSubaccountDepositCompleted !== true;
+          if (isCosmosPendingDeposit) {
+            const updatedNotification = {
+              ...notification,
+              isSubaccountDepositCompleted: true,
+            };
+            addOrUpdateTransferNotification(updatedNotification);
+          }
         });
         setIsOpen(false);
       }

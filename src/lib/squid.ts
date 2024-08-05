@@ -66,18 +66,6 @@ export const fetchSquidStatus = async (
   return response.json();
 };
 
-export const getNobleChainId = () => {
-  return isMainnet ? 'noble-1' : 'grand-1';
-};
-
-export const getOsmosisChainId = () => {
-  return isMainnet ? 'osmosis-1' : 'osmo-test-5';
-};
-
-export const getNeutronChainId = () => {
-  return isMainnet ? 'neutron-1' : 'pion-1';
-};
-
 type SkipStatusParams = {
   transactionHash: string;
   chainId: string | undefined;

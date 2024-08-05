@@ -13,9 +13,13 @@ import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  SUPPORTED_COSMOS_CHAINS,
+} from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
 
 import { useAccounts } from './useAccounts';
 import { useEndpointsConfig } from './useEndpointsConfig';

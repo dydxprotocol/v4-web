@@ -90,7 +90,7 @@ export const AccountMenu = () => {
   const showConfirmPendingDeposit =
     walletType === WalletType.Keplr &&
     MustBigNumber(usdcBalance).toNumber() > AMOUNT_RESERVED_FOR_GAS_USDC &&
-    MustBigNumber(usdcBalance).toFixed(2) !== '0.00';
+    MustBigNumber(usdcBalance).minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {

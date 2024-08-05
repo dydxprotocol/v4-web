@@ -22,13 +22,8 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  MAX_TRACK_TX_ATTEMPTS,
-  trackSkipTxWithTenacity,
-} from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
+import { MAX_TRACK_TX_ATTEMPTS, trackSkipTxWithTenacity } from '@/lib/squid';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -46,7 +41,7 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
 
   const [txStatus, setTxStatus] = useState<'success' | 'error' | 'pending'>('pending');
 
-  const { setAllTransferNotifications } = useLocalNotifications();
+  const { transferNotifications, addOrUpdateTransferNotification } = useLocalNotifications();
 
   const depositToSubaccount = useCallback(async () => {
     try {
@@ -73,19 +68,15 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
             throw new Error('Transaction failed');
           }
 
-          setAllTransferNotifications((transferNotification) => {
-            return {
-              ...transferNotification,
-              [dydxAddress]: transferNotification[dydxAddress].map((notification) => {
-                if (notification.txHash === txHash) {
-                  return {
-                    ...notification,
-                    isSubaccountDepositCompleted: true,
-                  };
-                }
-                return notification;
-              }),
-            };
+          const notification = transferNotifications.find((n) => n.txHash === txHash);
+
+          if (!notification) {
+            throw new Error('Notification not found');
+          }
+
+          addOrUpdateTransferNotification({
+            ...notification,
+            isSubaccountDepositCompleted: true,
           });
 
           setTxStatus('success');
@@ -117,8 +108,8 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
     setIsOpen?.(false);
   };
 
-  const osmosisChainId = getOsmosisChainId();
   const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
   const neutronChainId = getNeutronChainId();
   const chainName = (() => {
     if (fromChainId === nobleChainId) {

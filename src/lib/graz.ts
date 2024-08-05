@@ -2,11 +2,10 @@ import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { WalletType as GrazWalletType, type ConfigureGrazArgs } from 'graz';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
 
 import { getLocalStorage } from './localStorage';
 import { validateAgainstAvailableEnvironments } from './network';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from './squid';
 
 const selectedNetwork = getLocalStorage({
   key: LocalStorageKey.SelectedNetwork,
@@ -14,6 +13,19 @@ const selectedNetwork = getLocalStorage({
   validateFn: validateAgainstAvailableEnvironments,
 });
 const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
+
+export const getNobleChainId = () => {
+  return isMainnet ? 'noble-1' : 'grand-1';
+};
+
+export const getOsmosisChainId = () => {
+  return isMainnet ? 'osmosis-1' : 'osmo-test-5';
+};
+
+export const getNeutronChainId = () => {
+  return isMainnet ? 'neutron-1' : 'pion-1';
+};
+
 const osmosisChainId = getOsmosisChainId();
 const nobleChainId = getNobleChainId();
 const neutronChainId = getNeutronChainId();

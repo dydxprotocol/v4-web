@@ -25,7 +25,7 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/squid';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
 
 import { LowestFeesDecoratorText } from './LowestFeesText';
 

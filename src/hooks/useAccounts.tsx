@@ -22,7 +22,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
-import { getNobleChainId } from '@/lib/squid';
+import { getNobleChainId } from '@/lib/graz';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';

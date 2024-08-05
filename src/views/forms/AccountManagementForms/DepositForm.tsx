@@ -63,14 +63,14 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
-import { MustBigNumber } from '@/lib/numbers';
 import {
   getNeutronChainId,
   getNobleChainId,
   getOsmosisChainId,
-  NATIVE_TOKEN_ADDRESS,
-} from '@/lib/squid';
+  SUPPORTED_COSMOS_CHAINS,
+} from '@/lib/graz';
+import { MustBigNumber } from '@/lib/numbers';
+import { NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -392,7 +392,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           const txHash = tx?.transactionHash;
 
           if (txHash) {
-            addTransferNotification({
+            addOrUpdateTransferNotification({
               txHash,
               toChainId: selectedDydxChainId,
               fromChainId: chainIdStr || undefined,
