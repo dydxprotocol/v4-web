@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 
-import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -16,10 +14,6 @@ export const RestrictionWarning = () => {
   const stringGetter = useStringGetter();
   const { help } = useURLConfigs();
 
-  const { complianceState } = useComplianceState();
-  if (complianceState !== ComplianceStates.READ_ONLY) {
-    return null;
-  }
   return (
     <$RestrictedWarning>
       {stringGetter({
