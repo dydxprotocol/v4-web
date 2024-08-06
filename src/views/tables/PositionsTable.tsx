@@ -191,7 +191,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals, stepSizeDecimals }) => (
+        renderCell: ({ assetId, size, notionalTotal, stepSizeDecimals }) => (
           <TableCell stacked>
             <$OutputSigned
               type={OutputType.Asset}
@@ -201,11 +201,7 @@ const getPositionsTableColumnDef = ({
               sign={getNumberSign(size?.current)}
               fractionDigits={stepSizeDecimals}
             />
-            <Output
-              type={OutputType.Fiat}
-              value={notionalTotal?.current}
-              fractionDigits={tickSizeDecimals}
-            />
+            <Output type={OutputType.Fiat} value={notionalTotal?.current} />
           </TableCell>
         ),
       },
