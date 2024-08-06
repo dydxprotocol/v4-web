@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogProps, DialogTypes, ExchangeOfflineDialogProps } from '@/constants/dialogs';
@@ -10,8 +9,6 @@ import { isDev } from '@/constants/networks';
 
 import { useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
@@ -48,14 +45,10 @@ export const ExchangeOfflineDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
-      <$Content>
+      <div tw="column gap-1">
         <p>{statusErrorMessage?.body}</p>
         {isDev && <NetworkSelectMenu />}
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

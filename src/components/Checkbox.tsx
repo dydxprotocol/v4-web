@@ -2,8 +2,6 @@ import { Indicator, Root } from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled, { css } from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 type ElementProps = {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
@@ -26,7 +24,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }: CheckboxProps) => (
-  <$Container>
+  <div tw="row gap-[1ch] font-small-book">
     <$Root
       className={className}
       checked={checked}
@@ -34,23 +32,17 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       onCheckedChange={onCheckedChange}
       id={id}
     >
-      <$Indicator>
+      <Indicator tw="flex items-center justify-center text-color-text-button">
         <CheckIcon />
-      </$Indicator>
+      </Indicator>
     </$Root>
     {label && (
       <$Label disabled={disabled} htmlFor={id}>
         {label}
       </$Label>
     )}
-  </$Container>
+  </div>
 );
-const $Container = styled.div`
-  ${layoutMixins.row}
-  gap: 1ch;
-  font: var(--font-small-book);
-`;
-
 const $Root = styled(Root)`
   --checkbox-backgroundColor: var(--color-layer-0);
   --checkbox-borderColor: var(--color-border);
@@ -71,15 +63,6 @@ const $Root = styled(Root)`
     --checkbox-backgroundColor: var(--color-layer-1);
   }
 `;
-
-const $Indicator = styled(Indicator)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--color-text-button);
-`;
-
 const $Label = styled.label<{ disabled?: boolean }>`
   cursor: pointer;
   color: var(--color-text-2);

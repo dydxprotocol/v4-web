@@ -35,13 +35,13 @@ export const Panel = ({
   className,
 }: PanelProps) => (
   <$Panel onClick={onClick} className={className}>
-    <$Left>
+    <div tw="flexColumn w-full">
       {href ? (
         <Link to={href}>
           {slotHeader ?? (
             <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
               {slotHeaderContent}
-              <$Icon iconName={IconName.ChevronRight} />
+              <Icon iconName={IconName.ChevronRight} tw="text-[0.625rem] text-color-text-0" />
             </$Header>
           )}
         </Link>
@@ -54,7 +54,7 @@ export const Panel = ({
         ))
       )}
       <$Content>{children}</$Content>
-    </$Left>
+    </div>
     {slotRight}
   </$Panel>
 );
@@ -89,12 +89,6 @@ const $Panel = styled.section<{ onClick?: () => void }>`
       }
     `}
 `;
-
-const $Left = styled.div`
-  ${layoutMixins.flexColumn}
-  width: 100%;
-`;
-
 const $Header = styled.header<{ hasSeparator?: boolean }>`
   ${layoutMixins.spacedRow}
   padding: var(--panel-paddingY) var(--panel-paddingX);
@@ -106,12 +100,6 @@ const $Header = styled.header<{ hasSeparator?: boolean }>`
       box-shadow: 0 var(--border-width) var(--border-color);
     `}
 `;
-
-const $Icon = styled(Icon)`
-  color: var(--color-text-0);
-  font-size: 0.625rem;
-`;
-
 const $Content = styled.div`
   ${layoutMixins.scrollArea}
   ${layoutMixins.stickyArea0}

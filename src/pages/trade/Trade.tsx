@@ -68,14 +68,14 @@ const TradePage = () => {
       tradeLayout={tradeLayout}
       isHorizontalPanelOpen={isHorizontalPanelOpen}
     >
-      <$Top>
+      <header tw="[grid-area:Top]">
         <MarketSelectorAndStats />
-      </$Top>
+      </header>
 
-      <$SideSection gridArea="Side">
+      <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
         <AccountInfo />
         <TradeBox />
-      </$SideSection>
+      </$GridSection>
 
       <$GridSection gridArea="Vertical">
         <VerticalPanel tradeLayout={tradeLayout} />
@@ -202,15 +202,6 @@ const $TradeLayoutMobile = styled.article`
     justify-content: start;
   }
 `;
-
-const $Top = styled.header`
-  grid-area: Top;
-`;
-
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
-`;
-
-const $SideSection = styled($GridSection)`
-  grid-template-rows: auto minmax(0, 1fr);
 `;

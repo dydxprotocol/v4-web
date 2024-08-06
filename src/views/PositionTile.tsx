@@ -57,8 +57,8 @@ export const PositionTile = ({
       showNarrowVariation={showNarrowVariation}
     >
       <div>
-        {showNarrowVariation && <$AssetIcon symbol={symbol} />}
-        <$PositionTags>
+        {showNarrowVariation && <AssetIcon symbol={symbol} tw="text-[2.25rem]" />}
+        <div tw="inlineRow">
           <PositionSideTag positionSide={currentPositionSide} size={TagSize.Medium} />
           {hasSizeDiff && newPositionSide && currentPositionSide !== newPositionSide && (
             <>
@@ -66,7 +66,7 @@ export const PositionTile = ({
               <PositionSideTag positionSide={newPositionSide} size={TagSize.Medium} />
             </>
           )}
-        </$PositionTags>
+        </div>
       </div>
 
       {!hasNoCurrentOrPostOrderPosition && (
@@ -81,7 +81,7 @@ export const PositionTile = ({
             withBaseFont
           />
           {hasSizeDiff ? (
-            <$PostOrderSizeRow>
+            <div tw="inlineRow">
               <DiffArrow
                 sign={
                   MustBigNumber(postOrderSize).gt(currentSize ?? 0)
@@ -97,7 +97,7 @@ export const PositionTile = ({
                 tag={symbol}
                 withBaseFont
               />
-            </$PostOrderSizeRow>
+            </div>
           ) : (
             <$Output
               type={OutputType.Fiat}
@@ -109,14 +109,10 @@ export const PositionTile = ({
           )}
         </$PositionSizes>
       )}
-      {isLoading && <$LoadingSpinner />}
+      {isLoading && <LoadingSpinner tw="text-color-text-0" />}
     </$PositionTile>
   );
 };
-const $PositionTags = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $PositionSizes = styled.div<{ showNarrowVariation?: boolean }>`
   display: flex;
   flex-direction: column;
@@ -224,16 +220,4 @@ const $PositionTile = styled.div<{
         width: 100%;
       }
     `};
-`;
-
-const $PostOrderSizeRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 2.25rem;
-`;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  color: var(--color-text-0);
 `;

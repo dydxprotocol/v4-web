@@ -47,21 +47,21 @@ export const MarginModeSelector = ({
         stringGetter({
           key: MARGIN_MODE_STRINGS[marginMode.rawValue],
         })}
-      <$TriangleIcon iconName={IconName.Triangle} />
+      <Icon iconName={IconName.Triangle} tw="ml-[0.5ch] rotate-[0.75turn] text-[0.4375rem]" />
     </Button>
   ) : (
     <$WarningTooltip
       className={className}
       slotTooltip={
-        <$WarningTooltipContent>
-          <$CautionIcon iconName={IconName.Warning} />
+        <div tw="flex flex-row [align-items:start]">
+          <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-color-warning" />
           {stringGetter({
             key: STRING_KEYS.UNABLE_TO_CHANGE_MARGIN_MODE,
             params: {
               MARKET: currentAssetId,
             },
           })}
-        </$WarningTooltipContent>
+        </div>
       }
     >
       <Button disabled>
@@ -73,25 +73,7 @@ export const MarginModeSelector = ({
     </$WarningTooltip>
   );
 };
-
-const $TriangleIcon = styled(Icon)`
-  font-size: 0.4375rem;
-  transform: rotate(0.75turn);
-  margin-left: 0.5ch;
-`;
-
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
   border: 1px solid ${({ theme }) => theme.warning}30;
-`;
-
-const $WarningTooltipContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: start;
-`;
-
-const $CautionIcon = styled(Icon)`
-  font-size: 1.5rem;
-  color: var(--color-warning);
 `;

@@ -1,15 +1,12 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -32,36 +29,24 @@ export const StakeConfirmationButtonRow = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
   return canAccountTrade ? (
-    <$Row>
-      <$EditButton
+    <div tw="inlineRow w-full gap-1">
+      <Button
         action={ButtonAction.Base}
         onClick={() => setStakeFormStep(StakeFormSteps.EditInputs)}
+        tw="grow"
       >
         {stringGetter({ key: STRING_KEYS.EDIT })}
-      </$EditButton>
-      <$SubmitButton action={ButtonAction.Primary} type={ButtonType.Submit} state={{ isLoading }}>
+      </Button>
+      <Button
+        action={ButtonAction.Primary}
+        type={ButtonType.Submit}
+        state={{ isLoading }}
+        tw="grow-[3]"
+      >
         {submitText}
-      </$SubmitButton>
-    </$Row>
+      </Button>
+    </div>
   ) : (
-    <$OnboardingTriggerButton size={ButtonSize.Base} />
+    <OnboardingTriggerButton size={ButtonSize.Base} tw="w-full" />
   );
 };
-
-const $Row = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-  width: 100%;
-`;
-
-const $EditButton = styled(Button)`
-  flex-grow: 1;
-`;
-
-const $SubmitButton = styled(Button)`
-  flex-grow: 3;
-`;
-
-const $OnboardingTriggerButton = styled(OnboardingTriggerButton)`
-  width: 100%;
-`;

@@ -42,7 +42,7 @@ export const SettingsHeader = ({
   return (
     <$SettingsHeader>
       <BackButton />
-      <$Label>{currentRoute?.label}</$Label>
+      <h1 tw="p-0.5 font-extra-medium">{currentRoute?.label}</h1>
     </$SettingsHeader>
   );
 };
@@ -55,9 +55,4 @@ const $SettingsHeader = styled.header`
 
   padding: 0 1rem;
   background-color: var(--color-layer-2);
-`;
-
-const $Label = styled.h1`
-  padding: 0.5rem;
-  font: var(--font-extra-medium);
 `;

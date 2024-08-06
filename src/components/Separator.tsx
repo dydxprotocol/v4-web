@@ -62,13 +62,11 @@ export const WithSeparators = ({
         </Fragment>
       ))
     : children;
-
-const StyledHorizontalSeparatorFiller = styled(Separator)`
-  flex: 1;
-  height: var(--border-width);
-  background-color: var(--color-border);
-`;
-
 export const HorizontalSeparatorFiller = ({ className }: { className?: string }) => (
-  <StyledHorizontalSeparatorFiller className={className} orientation="horizontal" decorative />
+  <Separator
+    className={className}
+    orientation="horizontal"
+    decorative
+    tw="h-[var(--border-width)] flex-1 bg-color-border"
+  />
 );

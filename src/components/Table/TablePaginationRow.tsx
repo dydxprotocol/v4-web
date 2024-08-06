@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -77,13 +78,14 @@ export const TablePaginationRow = ({
         key: STRING_KEYS.SHOW,
         params: {
           NUMBER: (
-            <$DropdownSelectMenu
+            <DropdownSelectMenu
               value={String(pageSize)}
               items={PAGE_SIZES.map((size) => ({
                 label: String(size),
                 value: String(size),
               }))}
               onValueChange={(value: String) => setPageSize(Number(value) as PageSize)}
+              tw="[--dropdownSelectMenu-item-font-size:var(--fontSize-mini)]"
             />
           ),
         },
@@ -107,9 +109,7 @@ export const TablePaginationRow = ({
   );
 };
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
+const $InlineRow = tw.div`inlineRow`;
 
 const $PaginationRow = styled.div`
   ${layoutMixins.spacedRow}
@@ -121,8 +121,4 @@ const $ToggleGroup = styled(ToggleGroup)`
     border: none;
     background-color: transparent;
   }
-`;
-
-const $DropdownSelectMenu = styled(DropdownSelectMenu)`
-  --dropdownSelectMenu-item-font-size: var(--fontSize-mini);
 `;

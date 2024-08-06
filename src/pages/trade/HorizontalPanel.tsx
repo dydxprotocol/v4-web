@@ -167,7 +167,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         label: stringGetter({ key: STRING_KEYS.ORDERS }),
 
         slotRight: isWaitingForOrderToIndex ? (
-          <$LoadingSpinner />
+          <LoadingSpinner tw="[--spinner-width:1rem]" />
         ) : (
           ordersTagNumber && (
             <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
@@ -270,7 +270,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   );
 
   const slotBottom = {
-    [InfoSection.Position]: <$UnopenedIsolatedPositions onViewOrders={onViewOrders} />,
+    [InfoSection.Position]: (
+      <MaybeUnopenedIsolatedPositionsDrawer onViewOrders={onViewOrders} tw="mt-auto" />
+    ),
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
@@ -298,7 +300,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   value: PanelView.CurrentMarket,
                   ...(currentMarketAssetId
                     ? {
-                        slotBefore: <$AssetIcon symbol={currentMarketAssetId} />,
+                        slotBefore: <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />,
                         label: currentMarketAssetId,
                       }
                     : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
@@ -350,10 +352,6 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1em;
   }
 `;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1.5em;
-`;
 const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs);
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
@@ -363,14 +361,6 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
     background-color: var(--color-layer-2);
   }
 ` as typeof collapsibleTabsType;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  --spinner-width: 1rem;
-`;
-const $UnopenedIsolatedPositions = styled(MaybeUnopenedIsolatedPositionsDrawer)`
-  margin-top: auto;
-`;
-
 const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputInnerSelectMenu}
   --trigger-height: 1.75rem;

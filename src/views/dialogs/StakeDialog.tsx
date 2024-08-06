@@ -10,8 +10,6 @@ import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
@@ -56,17 +54,21 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
       slotIcon={dialogProps[currentStep].slotIcon}
       slotFooter={<LegalDisclaimer />}
       title={
-        <$Title>
+        <span tw="inlineRow">
           {dialogProps[currentStep].title}
           {stakingApr && (
-            <$Tag sign={TagSign.Positive}>
+            <Tag sign={TagSign.Positive} tw="inline-block">
               {stringGetter({
                 key: STRING_KEYS.EST_APR,
-                params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+                params: {
+                  PERCENTAGE: (
+                    <Output type={OutputType.Percent} value={stakingApr} tw="inline-block" />
+                  ),
+                },
               })}
-            </$Tag>
+            </Tag>
           )}
-        </$Title>
+        </span>
       }
       description={dialogProps[currentStep].description}
     >
@@ -83,7 +85,7 @@ const LegalDisclaimer = () => {
   const openStrideDialog = () => dispatch(forceOpenDialog(DialogTypes.ExternalNavStride()));
 
   return (
-    <$LegalDisclaimer>
+    <div tw="text-center text-color-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
         params: {
@@ -99,29 +101,11 @@ const LegalDisclaimer = () => {
           ),
         },
       })}
-    </$LegalDisclaimer>
+    </div>
   );
 };
 
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
   --dialog-content-paddingBottom: 1rem;
-`;
-
-const $Title = styled.span`
-  ${layoutMixins.inlineRow}
-`;
-
-const $Tag = styled(Tag)`
-  display: inline-block;
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;
-
-const $LegalDisclaimer = styled.div`
-  text-align: center;
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
 `;

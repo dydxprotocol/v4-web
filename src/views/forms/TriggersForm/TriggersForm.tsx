@@ -1,6 +1,7 @@
 import { FormEvent } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -10,8 +11,6 @@ import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
@@ -110,7 +109,7 @@ export const TriggersForm = ({
   };
 
   return (
-    <$Form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} tw="column gap-[1.25ch]">
       {priceInfo}
       <TriggerOrdersInputs
         symbol={symbol}
@@ -133,11 +132,16 @@ export const TriggersForm = ({
             tickSizeDecimals={tickSizeDecimals}
           />
           <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
-            <$Button
+            <Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
               state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
-              slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+              slotLeft={
+                hasInputErrors ? (
+                  <Icon iconName={IconName.Warning} tw="text-color-warning" />
+                ) : undefined
+              }
+              tw="w-full"
             >
               {hasInputErrors
                 ? stringGetter({
@@ -146,18 +150,13 @@ export const TriggersForm = ({
                 : !!existingStopLossOrder || !!existingTakeProfitOrder
                   ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                   : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-            </$Button>
+            </Button>
           </WithTooltip>
         </>
       )}
-    </$Form>
+    </form>
   );
 };
-const $Form = styled.form`
-  ${layoutMixins.column}
-  gap: 1.25ch;
-`;
-
 const $PriceBox = styled.div`
   background-color: var(--color-layer-2);
   border-radius: 0.5em;
@@ -168,22 +167,8 @@ const $PriceBox = styled.div`
   padding: 0.625em 0.75em;
 `;
 
-const $PriceRow = styled.div`
-  ${layoutMixins.spacedRow};
-`;
+const $PriceRow = tw.div`spacedRow`;
 
-const $PriceLabel = styled.h3`
-  color: var(--color-text-0);
-`;
+const $PriceLabel = tw.h3`text-color-text-0`;
 
-const $Price = styled(Output)`
-  color: var(--color-text-2);
-`;
-
-const $Button = styled(Button)`
-  width: 100%;
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
+const $Price = tw(Output)`text-color-text-2`;

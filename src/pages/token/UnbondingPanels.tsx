@@ -30,7 +30,7 @@ export const UnbondingPanels = () => {
   }
 
   return (
-    <$Container>
+    <div tw="flexColumn gap-1.5">
       {unbondingDelegations.map((delegation) => {
         const completionDate = new Date(delegation.completionTime).getTime();
         const currentDate = new Date().getTime();
@@ -94,26 +94,21 @@ export const UnbondingPanels = () => {
               </$Header>
             }
           >
-            <$Content>
-              <$Balance
+            <div tw="flexColumn gap-1">
+              <Output
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
-                slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+                slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-0.5" />}
+                tw="text-color-text-2 font-large-book"
               />
-              <$Footer>{availableInText}</$Footer>
-            </$Content>
+              <div tw="text-color-text-0">{availableInText}</div>
+            </div>
           </Panel>
         );
       })}
-    </$Container>
+    </div>
   );
 };
-
-const $Container = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-`;
-
 const $Header = styled.div`
   ${layoutMixins.spacedRow}
   padding: var(--panel-paddingY) var(--panel-paddingX) 0;
@@ -125,22 +120,4 @@ const $Title = styled.h3`
 
   font: var(--font-medium-book);
   color: var(--color-text-1);
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-`;
-
-const $Balance = styled(Output)`
-  font: var(--font-large-book);
-  color: var(--color-text-2);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5rem;
-`;
-
-const $Footer = styled.div`
-  color: var(--color-text-0);
 `;

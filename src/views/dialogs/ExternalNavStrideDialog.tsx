@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, DialogTypes, ExternalNavStrideDialogProps } from '@/constants/dialogs';
@@ -34,10 +35,10 @@ export const ExternalNavStrideDialog = ({
       forceOpenDialog(
         DialogTypes.ExternalLink({
           buttonText: (
-            <$Span>
+            <span tw="flex items-center gap-[0.5ch]">
               {stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE })}
               <Icon iconName={IconName.LinkOut} />
-            </$Span>
+            </span>
           ),
           link: strideZoneApp,
           title: stringGetter({ key: STRING_KEYS.LIQUID_STAKING_AND_LEAVING }),
@@ -117,13 +118,4 @@ const $Button = styled(Button)`
   justify-content: space-between;
 `;
 
-const $IconButton = styled(IconButton)`
-  color: var(--color-text-0);
-  --color-border: var(--color-layer-6);
-`;
-
-const $Span = styled.span`
-  display: flex;
-  align-items: center;
-  gap: 0.5ch;
-`;
+const $IconButton = tw(IconButton)`text-color-text-0 [--color-border:var(--color-layer-6)]`;

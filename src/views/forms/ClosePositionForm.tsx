@@ -233,7 +233,7 @@ export const ClosePositionForm = ({
 
   const inputs = (
     <$InputsColumn>
-      <$FormInput
+      <FormInput
         id="close-position-amount"
         label={
           <>
@@ -246,6 +246,7 @@ export const ClosePositionForm = ({
         type={InputType.Number}
         value={size ?? ''}
         max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
+        tw="w-full"
       />
 
       <$ToggleGroup
@@ -267,14 +268,14 @@ export const ClosePositionForm = ({
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <$PreviewAndConfirmContent>
+        <div tw="flexColumn gap-[var(--form-input-gap)]">
           <PositionPreview />
           {alertMessage}
-        </$PreviewAndConfirmContent>
+        </div>
       ) : (
         <$MobileLayout>
           <$OrderbookContainer>
-            <$Orderbook hideHeader />
+            <CanvasOrderbook hideHeader tw="min-h-full" />
           </$OrderbookContainer>
 
           <$Right>
@@ -286,7 +287,7 @@ export const ClosePositionForm = ({
 
       <$Footer>
         {size != null && (
-          <$ButtonRow>
+          <div tw="row justify-self-end px-0 py-0.5">
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}
@@ -296,7 +297,7 @@ export const ClosePositionForm = ({
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
-          </$ButtonRow>
+          </div>
         )}
 
         <PlaceOrderButtonAndReceipt
@@ -345,12 +346,6 @@ const $ClosePositionForm = styled.form`
     }
   }
 `;
-
-const $PreviewAndConfirmContent = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: var(--form-input-gap);
-`;
-
 const $MobileLayout = styled.div`
   height: 0;
   // Apply dialog's top/left/right padding to inner scroll areas
@@ -369,11 +364,6 @@ const $OrderbookContainer = styled.div`
   padding-top: var(--dialog-content-paddingTop);
   padding-bottom: var(--form-rowGap);
 `;
-
-const $Orderbook = styled(CanvasOrderbook)`
-  min-height: 100%;
-`;
-
 const $Right = styled.div`
   height: 0;
   min-height: 100%;
@@ -386,11 +376,6 @@ const $Right = styled.div`
   padding-bottom: var(--form-rowGap);
   gap: 1rem;
 `;
-
-const $FormInput = styled(FormInput)`
-  width: 100%;
-`;
-
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 
@@ -408,13 +393,6 @@ const $Footer = styled.footer`
 
   ${layoutMixins.column}
 `;
-
-const $ButtonRow = styled.div`
-  ${layoutMixins.row}
-  justify-self: end;
-  padding: 0.5rem 0 0.5rem 0;
-`;
-
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;

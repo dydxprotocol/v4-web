@@ -24,19 +24,24 @@ export const StakingLiveNotification = ({ isToast, notification }: NotificationP
       notification={notification}
       slotTitle={stringGetter({ key: NOTIFICATIONS_STRING_KEYS.IN_APP_STAKING_LIVE_TITLE })}
       slotCustomContent={
-        <$Container>
-          <$LeftColumn>
+        <div tw="flex justify-between">
+          <div tw="flex flex-col justify-between gap-0.5">
             {stringGetter({ key: NOTIFICATIONS_STRING_KEYS.IN_APP_STAKING_LIVE_BODY })}
-            <$Button
+            <Button
               onClick={() => navigate(`${chainTokenLabel}`)}
               action={ButtonAction.Primary}
               size={ButtonSize.Small}
+              tw="w-min"
             >
               {stringGetter({ key: STRING_KEYS.STAKE_NOW })}
-            </$Button>
-          </$LeftColumn>
-          <$Img src="/staking.png" alt={stringGetter({ key: STRING_KEYS.STAKING })} />
-        </$Container>
+            </Button>
+          </div>
+          <img
+            src="/staking.png"
+            alt={stringGetter({ key: STRING_KEYS.STAKING })}
+            tw="h-5 w-5 self-center"
+          />
+        </div>
       }
     />
   );
@@ -46,27 +51,4 @@ const $Notification = styled(Notification)`
   --relativeTime-backgroundColor: transparent;
 
   background: linear-gradient(to right, var(--color-layer-3) 33%, var(--color-positive-dark) 100%);
-`;
-
-const $Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const $LeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 0.5rem;
-`;
-
-const $Button = styled(Button)`
-  width: min-content;
-`;
-
-const $Img = styled.img`
-  width: 5rem;
-  height: 5rem;
-
-  align-self: center;
 `;

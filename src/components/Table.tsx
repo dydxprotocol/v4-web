@@ -476,7 +476,10 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
       </TableBodyRowGroup>
       {paginationRow && (
         <$Tfoot>
-          <$PaginationTr key="pagination">
+          <tr
+            key="pagination"
+            tw="shadow-[0_calc(-1_*_var(--border-width))_0_0_var(--border-color)]"
+          >
             <td
               colSpan={numColumns}
               onMouseDown={(e) => e.preventDefault()}
@@ -484,7 +487,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
             >
               {paginationRow}
             </td>
-          </$PaginationTr>
+          </tr>
         </$Tfoot>
       )}
     </$Table>
@@ -1031,8 +1034,4 @@ const $Tbody = styled.tbody<TableStyleProps>`
 const $Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
-`;
-
-const $PaginationTr = styled.tr`
-  box-shadow: 0 calc(-1 * var(--border-width)) 0 0 var(--border-color);
 `;

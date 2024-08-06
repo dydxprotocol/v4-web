@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
@@ -668,11 +668,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
 ];
 
-const $Icon = styled.img`
-  height: 1.5rem;
-  width: 1.5rem;
-`;
+const $Icon = tw.img`h-1.5 w-1.5`;
 
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
+const $WarningIcon = tw(Icon)`text-color-warning`;

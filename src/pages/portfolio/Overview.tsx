@@ -53,7 +53,7 @@ export const Overview = () => {
         <AccountDetailsAndHistory />
       </DetachedSection>
 
-      <$AttachedExpandingSection>
+      <AttachedExpandingSection tw="mt-1">
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
 
         <PositionsTable
@@ -85,7 +85,7 @@ export const Overview = () => {
           showClosePositionAction={shouldRenderActions}
           withOuterBorder
         />
-      </$AttachedExpandingSection>
+      </AttachedExpandingSection>
       <DetachedSection>
         <$MaybeUnopenedIsolatedPositionsPanel
           header={
@@ -103,10 +103,10 @@ export const Overview = () => {
               title={stringGetter({ key: STRING_KEYS.VAULT })}
               slotRight={
                 isTablet && (
-                  <$Link onClick={handleViewVault} isAccent>
+                  <Link onClick={handleViewVault} isAccent tw="font-small-book">
                     {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}{' '}
                     <Icon iconName={IconName.Arrow} />
-                  </$Link>
+                  </Link>
                 )
               }
             />
@@ -117,11 +117,6 @@ export const Overview = () => {
     </div>
   );
 };
-
-const $AttachedExpandingSection = styled(AttachedExpandingSection)`
-  margin-top: 1rem;
-`;
-
 const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -138,8 +133,4 @@ const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
   > div {
     padding-left: 1rem;
   }
-`;
-
-const $Link = styled(Link)`
-  font: var(--font-small-book);
 `;

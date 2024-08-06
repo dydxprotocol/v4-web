@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import {
   Nullable,
@@ -244,10 +245,10 @@ export const TriggerOrderInputs = ({
   const multipleOrdersButton = () => (
     <$MultipleOrdersContainer>
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
-      <$ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
+      <Button action={ButtonAction.Navigation} onClick={onViewOrdersClick} tw="text-color-accent">
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        <$ArrowIcon iconName={IconName.Arrow} />
-      </$ViewAllButton>
+        <Icon iconName={IconName.Arrow} tw="stroke-2" />
+      </Button>
     </$MultipleOrdersContainer>
   );
 
@@ -264,7 +265,7 @@ export const TriggerOrderInputs = ({
     <$TriggerRow key={tooltipId}>
       <$Heading>
         {headerTooltip()}
-        <$HeadingInfo>
+        <div tw="row gap-[0.5em] text-color-text-0 font-base-book">
           {stringGetter({ key: stringKeys.headerDiff })}
           {signedOutput()}
           <$VerticalSeparator />
@@ -276,7 +277,7 @@ export const TriggerOrderInputs = ({
           >
             {stringGetter({ key: STRING_KEYS.CLEAR })}
           </$ClearButton>
-        </$HeadingInfo>
+        </div>
       </$Heading>
       <$InlineRow>
         <FormInput
@@ -309,17 +310,7 @@ export const TriggerOrderInputs = ({
     </$TriggerRow>
   );
 };
-const $Heading = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $HeadingInfo = styled.div`
-  ${layoutMixins.row}
-  font: var(--font-base-book);
-  gap: 0.5em;
-  color: var(--color-text-0);
-`;
-
+const $Heading = tw.div`spacedRow`;
 const $SignedOutput = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -343,10 +334,7 @@ const $ClearButton = styled(Button)`
   --button-padding: 0;
 `;
 
-const $TriggerRow = styled.div`
-  ${layoutMixins.column}
-  gap: 1ch;
-`;
+const $TriggerRow = tw.div`column gap-[1ch]`;
 
 const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}
@@ -363,12 +351,4 @@ const $MultipleOrdersContainer = styled.div`
   border-radius: 0.5em;
 
   color: var(--color-text-2);
-`;
-
-const $ViewAllButton = styled(Button)`
-  color: var(--color-accent);
-`;
-
-const $ArrowIcon = styled(Icon)`
-  stroke-width: 2;
 `;

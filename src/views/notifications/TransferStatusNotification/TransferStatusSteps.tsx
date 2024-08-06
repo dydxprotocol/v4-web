@@ -124,13 +124,13 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
   if (!status) return <LoadingDots size={3} />;
 
   return (
-    <$BridgingStatus className={className}>
+    <div className={className} tw="flexColumn gap-1 px-0 py-1">
       {steps.map((step) => (
-        <$Step key={step.step}>
+        <div key={step.step} tw="spacedRow">
           <$row>
             {step.step === currentStep ? (
               <$Icon>
-                <$Spinner />
+                <LoadingSpinner tw="text-color-accent [--spinner-width:1.25rem]" />
               </$Icon>
             ) : step.step < currentStep ? (
               <$Icon state="complete">
@@ -150,24 +150,13 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
               <$Label highlighted={currentStep >= step.step}>{step.label}</$Label>
             )}
           </$row>
-        </$Step>
+        </div>
       ))}
-    </$BridgingStatus>
+    </div>
   );
 };
-const $BridgingStatus = styled.div`
-  ${layoutMixins.flexColumn};
-
-  gap: 1rem;
-  padding: 1rem 0;
-`;
-
-const $Step = styled.div`
-  ${layoutMixins.spacedRow};
-`;
-
 const $row = styled.div`
-  ${layoutMixins.inlineRow};
+  ${layoutMixins.inlineRow}
   gap: 0.5rem;
 `;
 
@@ -195,13 +184,6 @@ const $Icon = styled.div<{ state?: 'complete' | 'default' }>`
           `,
         }[state]}
 `;
-
-const $Spinner = styled(LoadingSpinner)`
-  --spinner-width: 1.25rem;
-
-  color: var(--color-accent);
-`;
-
 const $Label = styled($row)<{ highlighted?: boolean }>`
   ${({ highlighted }) =>
     highlighted

@@ -12,6 +12,7 @@ import {
   Trigger,
 } from '@radix-ui/react-dialog';
 import styled, { css, keyframes } from 'styled-components';
+import tw from 'twin.macro';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 
@@ -133,10 +134,14 @@ export const Dialog = ({
             </$StackedHeaderTopRow>
           ) : (
             <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
-              <$HeaderTopRow>
+              <div tw="row gap-[var(--dialog-title-gap)]">
                 {onBack && <BackButton onClick={onBack} />}
 
-                {slotIcon && <$Icon>{slotIcon}</$Icon>}
+                {slotIcon && (
+                  <div tw="row h-[1em] w-[1em] text-[length:var(--dialog-icon-size)] leading-none">
+                    {slotIcon}
+                  </div>
+                )}
 
                 {title && <$Title>{title}</$Title>}
 
@@ -145,7 +150,7 @@ export const Dialog = ({
                     <Icon iconName={IconName.Close} />
                   </$Close>
                 )}
-              </$HeaderTopRow>
+              </div>
 
               {description && <$Description>{description}</$Description>}
 
@@ -409,12 +414,6 @@ const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
       --stickyArea-backdropFilter: none;
     `};
 `;
-
-const $HeaderTopRow = styled.div`
-  ${layoutMixins.row}
-  gap: var(--dialog-title-gap);
-`;
-
 const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean; $withBlur: boolean }>`
   ${layoutMixins.flexColumn}
   align-items: center;
@@ -455,17 +454,6 @@ const $Content = styled.div`
 
   isolation: isolate;
 `;
-
-const $Icon = styled.div`
-  ${layoutMixins.row}
-
-  width: 1em;
-  height: 1em;
-
-  font-size: var(--dialog-icon-size); /* 1 line-height */
-  line-height: 1;
-`;
-
 const $Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;
@@ -515,21 +503,9 @@ const $BackButton = styled(BackButton)`
   top: var(--dialog-header-paddingTop);
 `;
 
-const $Title = styled(Title)`
-  flex: 1;
+const $Title = tw(Title)`flex-1 font-large-medium text-color-text-2 overflow-hidden text-ellipsis`;
 
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled(Description)`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-base-book);
-`;
+const $Description = tw(Description)`mt-0.5 text-color-text-0 font-base-book`;
 
 const $Footer = styled.footer`
   display: grid;

@@ -312,7 +312,7 @@ export const DepthChart = ({
               verticalCrosshairStyle={{ strokeWidth: 1, strokeDasharray: '5 5', opacity: 0.7 }}
               snapCrosshairToDatumX={!isEditingOrder}
               renderXAxisLabel={({ tooltipData }) => (
-                <$XAxisLabelOutput
+                <AxisLabelOutput
                   type={OutputType.Fiat}
                   value={
                     isEditingOrder && chartPointAtPointer
@@ -331,6 +331,7 @@ export const DepthChart = ({
                         : (tooltipData!.nearestDatum?.key as DepthChartSeries)
                     ]
                   }
+                  tw="shadow-[0_0_0.5rem_var(--color-layer-2)]"
                 />
               )}
               showHorizontalCrosshair
@@ -423,11 +424,6 @@ const $Container = styled.div`
     }
   }
 `;
-
-const $XAxisLabelOutput = styled(AxisLabelOutput)`
-  box-shadow: 0 0 0.5rem var(--color-layer-2);
-`;
-
 const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 

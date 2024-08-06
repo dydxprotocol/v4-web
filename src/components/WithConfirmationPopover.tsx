@@ -11,8 +11,6 @@ import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
@@ -64,20 +62,21 @@ export const WithConfirmationPopover = forwardRef(
           align={align}
           onOpenAutoFocus={(e: Event) => e.preventDefault()}
         >
-          <$Form
+          <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
               e.stopPropagation();
 
               onConfirm?.(e);
             }}
+            tw="column gap-0.25"
           >
             {children}
-            <$ConfirmationButtons>
+            <div tw="row justify-end gap-0.25">
               {onCancel && <$CancelButton iconName={IconName.Close} onClick={onCancel} />}
               {onConfirm && <$ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />}
-            </$ConfirmationButtons>
-          </$Form>
+            </div>
+          </form>
         </$Content>
       </Portal>
     </Root>
@@ -90,19 +89,6 @@ const $Content = styled(Content)`
     outline: none;
   }
 `;
-
-const $Form = styled.form`
-  ${layoutMixins.column}
-  gap: 0.25rem;
-`;
-
-const $ConfirmationButtons = styled.div`
-  ${layoutMixins.row};
-
-  justify-content: flex-end;
-  gap: 0.25rem;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-height: 1.25rem;
   --button-font: var(--font-tiny-book);

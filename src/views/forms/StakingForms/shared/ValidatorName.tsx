@@ -14,7 +14,7 @@ export const ValidatorName = ({
   className?: string;
 }) => {
   return (
-    <$ValidatorName className={className}>
+    <div className={className} tw="flex items-center">
       <ValidatorFaviconIcon
         url={validator?.description?.website}
         fallbackText={validator?.description?.moniker}
@@ -26,15 +26,9 @@ export const ValidatorName = ({
       ) : (
         <$TruncatedText>{validator?.description?.moniker} </$TruncatedText>
       )}
-    </$ValidatorName>
+    </div>
   );
 };
-
-const $ValidatorName = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const $TruncatedText = styled.div`
   ${layoutMixins.textTruncate}
   color: var(--color-text-1);

@@ -5,6 +5,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -14,7 +15,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -91,7 +91,7 @@ const getFillsTableColumnDef = ({
           </TableColumnHeader>
         ),
         renderCell: ({ resources, size, stepSizeDecimals, asset }) => (
-          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+          <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="text-[2.25rem]" />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -119,15 +119,15 @@ const getFillsTableColumnDef = ({
               <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
-              <$SecondaryColor>@</$SecondaryColor>
+              <span tw="text-color-text-0">@</span>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
             </$InlineRow>
             <$InlineRow>
-              <$BaseColor>
+              <span tw="text-color-text-1">
                 {resources.liquidityStringKey
                   ? stringGetter({ key: resources.liquidityStringKey })
                   : null}
-              </$BaseColor>
+              </span>
               <Output type={OutputType.Fiat} value={fee} />
             </$InlineRow>
           </TableCell>
@@ -138,10 +138,11 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.createdAtMilliseconds,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAtMilliseconds }) => (
-          <$TimeOutput
+          <Output
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
             value={createdAtMilliseconds}
+            tw="text-color-text-0"
           />
         ),
       },
@@ -158,7 +159,7 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         renderCell: ({ asset, orderSide }) => (
-          <$TableCell>
+          <TableCell tw="gap-0.25">
             {orderSide && (
               <$Side side={orderSide}>
                 {stringGetter({
@@ -170,7 +171,7 @@ const getFillsTableColumnDef = ({
               </$Side>
             )}
             <Output type={OutputType.Text} value={asset?.id} />
-          </$TableCell>
+          </TableCell>
         ),
       },
       [FillsTableColumnKey.Liquidity]: {
@@ -362,7 +363,7 @@ export const FillsTable = ({
       )}
       slotEmpty={
         <>
-          <$Icon iconName={IconName.History} />
+          <Icon iconName={IconName.History} tw="text-[3em]" />
           <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
         </>
       }
@@ -378,35 +379,7 @@ export const FillsTable = ({
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;
-
-const $TableCell = styled(TableCell)`
-  gap: 0.25rem;
-`;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $Icon = styled(Icon)`
-  font-size: 3em;
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 2.25rem;
-`;
-
-const $SecondaryColor = styled.span`
-  color: var(--color-text-0);
-`;
-
-const $BaseColor = styled.span`
-  color: var(--color-text-1);
-`;
-
-const $TimeOutput = styled(Output)`
-  color: var(--color-text-0);
-`;
-
+const $InlineRow = tw.div`inlineRow`;
 const $Side = styled.span<{ side: Nullable<OrderSide> }>`
   ${({ side }) =>
     side &&

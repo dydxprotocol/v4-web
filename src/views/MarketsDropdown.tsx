@@ -90,7 +90,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ priceChange24HPercent }) => (
-            <$InlineRow>
+            <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
@@ -100,7 +100,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
               )}
-            </$InlineRow>
+            </div>
           ),
         },
         {
@@ -127,10 +127,10 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
     if (filter === MarketFilters.PREDICTION_MARKET) {
       // TODO: (TRA-528): Localize string when finallized.
       return (
-        <$Disclaimer>
+        <div tw="p-1 text-color-text-0 font-small-medium">
           Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
           will settle at $0.
-        </$Disclaimer>
+        </div>
       );
     }
 
@@ -148,9 +148,10 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
       return (
         <$MarketDropdownBanner>
           <span>🇺🇸 Trade the U.S. presidential election →</span>
-          <$IconButton
+          <IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            tw="[--button-backgroundColor:transparent] [--button-border:none]"
           />
         </$MarketDropdownBanner>
       );
@@ -379,13 +380,6 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
-
-const $Disclaimer = styled.div`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-  padding: 1rem;
-`;
-
 const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--toolbar-height);
@@ -407,12 +401,6 @@ const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
 `;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-`;
-
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 
@@ -437,11 +425,6 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);

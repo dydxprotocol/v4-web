@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction } from '@/constants/buttons';
 import { AcknowledgeTermsDialogProps, DialogProps } from '@/constants/dialogs';
@@ -35,7 +36,7 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
     >
-      <$Content>
+      <div tw="flexColumn gap-1">
         <p>
           {stringGetter({
             key: STRING_KEYS.TOS_TITLE,
@@ -66,22 +67,16 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
             {stringGetter({ key: STRING_KEYS.I_AGREE })}
           </$Button>
         </$Footer>
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-`;
-
 const $TOS = styled.section`
   background-color: var(--color-layer-4);
   padding: 1rem 1rem 1rem 2rem;
   border-radius: 0.875rem;
   > ul {
-    ${layoutMixins.column};
+    ${layoutMixins.column}
     gap: 1rem;
   }
 `;
@@ -93,6 +88,4 @@ const $Footer = styled.div`
   gap: 1rem;
 `;
 
-const $Button = styled(Button)`
-  flex-grow: 1;
-`;
+const $Button = tw(Button)`grow`;

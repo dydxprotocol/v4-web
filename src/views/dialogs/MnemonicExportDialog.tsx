@@ -10,7 +10,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -45,16 +44,16 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
   const content = {
     [MnemonicExportStep.AcknowledgeRisk]: (
       <>
-        <$WaitingSpan>
+        <span tw="row gap-1 text-color-text-1">
           <$CautionIconContainer>
             <Icon iconName={IconName.CautionCircleStroked} />
           </$CautionIconContainer>
 
           <p>{stringGetter({ key: STRING_KEYS.SECRET_PHRASE_RISK })}</p>
-        </$WaitingSpan>
-        <$WithReceipt
+        </span>
+        <WithReceipt
           slotReceipt={
-            <$CheckboxContainer>
+            <div tw="p-1 text-color-text-0">
               <Checkbox
                 checked={hasAcknowledged}
                 onCheckedChange={setHasAcknowledged}
@@ -63,8 +62,9 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
                   key: STRING_KEYS.SECRET_PHRASE_RISK_ACK,
                 })}
               />
-            </$CheckboxContainer>
+            </div>
           }
+          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
         >
           <TimeoutButton
             action={ButtonAction.Destroy}
@@ -74,14 +74,14 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
           >
             {stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE })}
           </TimeoutButton>
-        </$WithReceipt>
+        </WithReceipt>
       </>
     ),
     [MnemonicExportStep.DisplayMnemonic]: (
       <>
-        <$AlertMessage type={AlertType.Error}>
+        <AlertMessage type={AlertType.Error} tw="m-0 font-base-book">
           {stringGetter({ key: STRING_KEYS.NEVER_SHARE_PHRASE })}
-        </$AlertMessage>
+        </AlertMessage>
         <$RevealControls>
           <span>
             {stringGetter({ key: isShowing ? STRING_KEYS.NOT_READY : STRING_KEYS.READY })}
@@ -123,22 +123,17 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
   }[currentStep];
 
   return (
-    <$Dialog
+    <Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={title}
       description={stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE_DESCRIPTION })}
+      tw="notMobile:[--dialog-width:30rem]"
     >
-      <$Content>{content}</$Content>
-    </$Dialog>
+      <div tw="column gap-1">{content}</div>
+    </Dialog>
   );
 };
-const $WaitingSpan = styled.span`
-  ${layoutMixins.row}
-  gap: 1rem;
-  color: var(--color-text-1);
-`;
-
 const $CautionIconContainer = styled.div`
   ${layoutMixins.stack}
   min-width: 2.5rem;
@@ -161,21 +156,6 @@ const $CautionIconContainer = styled.div`
     background-color: var(--color-gradient-error);
   }
 `;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $CheckboxContainer = styled.div`
-  padding: 1rem;
-  color: var(--color-text-0);
-`;
-
-const $AlertMessage = styled(AlertMessage)`
-  font: var(--font-base-book);
-  margin: 0;
-`;
-
 const $RevealControls = styled.div`
   ${layoutMixins.spacedRow}
 
@@ -242,15 +222,4 @@ const $Word = styled.li`
     text-align: end;
     margin-right: 0.25rem;
   }
-`;
-
-const $Dialog = styled(Dialog)`
-  @media ${breakpoints.notMobile} {
-    --dialog-width: 30rem;
-  }
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
 `;

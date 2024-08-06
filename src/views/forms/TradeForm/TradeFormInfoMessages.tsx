@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 import { type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -23,7 +21,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
     // TODO: (TRA-528): Localize string when finallized and add LEARN_MORE link
     return (
       <AlertMessage type={AlertType.Notice}>
-        <$Text>
+        <div tw="text-color-text-1">
           This is a Prediction Market and will settle at $1 if Donald J. Trump wins the 2024 US
           Presidential Election. Otherwise, it will settle at $0.00001.{' '}
           <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -40,14 +38,10 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
             {stringGetter({ key: STRING_KEYS.DISMISS })}
           </Link>
           .
-        </$Text>
+        </div>
       </AlertMessage>
     );
   }
 
   return null;
 };
-
-const $Text = styled.div`
-  color: var(--color-text-1);
-`;

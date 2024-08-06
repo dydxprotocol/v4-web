@@ -69,12 +69,13 @@ export const MarketsCompactTable = ({
             tickSizeDecimals,
           }) => (
             <TableCell stacked>
-              <$TabletOutput
+              <Output
                 withBaseFont
                 withSubscript
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
+                tw="text-color-text-1 font-small-medium"
               />
               <$TabletPriceChange>
                 {!priceChange24H ? (
@@ -120,10 +121,11 @@ export const MarketsCompactTable = ({
                 <$DetailsCell>
                   <$RecentlyListed>
                     <Output type={OutputType.CompactFiat} value={openInterestUSDC} />
-                    <$InterestOutput
+                    <Output
                       type={OutputType.CompactNumber}
                       value={openInterest}
                       slotRight={` ${asset.id}`}
+                      tw="text-color-text-0 font-mini-medium"
                     />
                   </$RecentlyListed>
                   <Icon iconName={IconName.ChevronRight} />
@@ -251,12 +253,6 @@ const $Table = styled(Table)`
     }
   }
 ` as typeof Table;
-
-const $TabletOutput = styled(Output)`
-  font: var(--font-small-medium);
-  color: var(--color-text-1);
-`;
-
 const $TabletPriceChange = styled.div`
   ${layoutMixins.inlineRow}
 
@@ -310,9 +306,4 @@ const $RecentlyListed = styled.div`
     text-align: right;
     justify-content: flex-end;
   }
-`;
-
-const $InterestOutput = styled(Output)`
-  color: var(--color-text-0);
-  font: var(--font-mini-medium);
 `;

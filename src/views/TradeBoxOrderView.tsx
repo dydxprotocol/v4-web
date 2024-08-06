@@ -36,7 +36,7 @@ export const TradeBoxOrderView = () => {
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
   return (
-    <$TradeBoxOrderViewContainer>
+    <div tw="flex min-h-full flex-col gap-0.25 pt-0.875">
       <$TopActionsRow>
         <$MarginAndLeverageButtons>
           <MarginModeSelector openInTradeBox />
@@ -58,18 +58,9 @@ export const TradeBoxOrderView = () => {
         }
         withUnderline
       />
-    </$TradeBoxOrderViewContainer>
+    </div>
   );
 };
-
-const $TradeBoxOrderViewContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-top: 0.875rem;
-  min-height: 100%;
-`;
-
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
   border-top: var(--border-width) solid var(--border-color);

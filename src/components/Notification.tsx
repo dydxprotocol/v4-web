@@ -57,15 +57,18 @@ export const Notification = ({
 
   return (
     <$Container className={className} isToast={isToast} onClick={onClick}>
-      <$Header>
+      <header tw="row relative gap-0.5">
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
-        <$Title>{slotTitle}</$Title>
+        <div tw="flex-1 overflow-hidden text-ellipsis text-color-text-2 font-base-medium">
+          {slotTitle}
+        </div>
         {slotTitleRight}
         {withClose && !isToast && (
           <$ActionItems>
-            <$Output
+            <Output
               type={OutputType.RelativeTime}
               value={notification.timestamps[NotificationStatus.Triggered]}
+              tw="text-color-text-0"
             />
 
             {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
@@ -88,9 +91,13 @@ export const Notification = ({
             ) : null}
           </$ActionItems>
         )}
-      </$Header>
-      {slotContentOrDescription && <$Description>{slotContentOrDescription}</$Description>}
-      {slotAction && <$Action>{slotAction}</$Action>}
+      </header>
+      {slotContentOrDescription && (
+        <div tw="mt-0.5 text-color-text-0 font-small-book [white-space:break-spaces]">
+          {slotContentOrDescription}
+        </div>
+      )}
+      {slotAction && <div tw="mt-[var(--action-marginTop)] font-small-book">{slotAction}</div>}
     </$Container>
   );
 };
@@ -122,13 +129,6 @@ const $Container = styled.div<{ isToast?: boolean }>`
           backdrop-filter: none;
         `}
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.row}
-  position: relative;
-  gap: 0.5rem;
-`;
-
 const $Icon = styled.div`
   ${layoutMixins.row}
   float: left;
@@ -141,34 +141,11 @@ const $Icon = styled.div`
     height: 1.5rem;
   }
 `;
-
-const $Title = styled.div`
-  flex: 1;
-
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled.div`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-  white-space: break-spaces;
-`;
-
-const $Action = styled.div`
-  margin-top: var(--action-marginTop);
-  font: var(--font-small-book);
-`;
-
 const $ActionItems = styled.div`
   min-width: fit-content;
   padding-left: 0.5rem;
   height: 100%;
-  ${layoutMixins.row};
+  ${layoutMixins.row}
   justify-content: end;
   gap: 0.5rem;
 
@@ -194,11 +171,6 @@ const $UnreadIndicator = styled.div`
   background-color: var(--color-accent);
   border: 1px solid var(--color-layer-2);
 `;
-
-const $Output = styled(Output)`
-  color: var(--color-text-0);
-`;
-
 const $IconButton = styled(IconButton)`
   --button-border: none;
   --button-textColor: var(--color-text-0);

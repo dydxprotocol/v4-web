@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 import { formatUnits } from 'viem';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -17,7 +18,6 @@ import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
@@ -84,14 +84,14 @@ const RewardsPage = () => {
     />
   );
   const legalDisclaimer = (
-    <$LegalDisclaimer>
+    <div tw="text-color-text-0 font-mini-book">
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
         params: {
           TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
         },
       })}
-    </$LegalDisclaimer>
+    </div>
   );
 
   useEffect(() => {
@@ -124,13 +124,13 @@ const RewardsPage = () => {
       ) : (
         <$DetachedSection>
           {showMigratePanel && <MigratePanel />}
-          <$DoubleColumnView>
-            <$LeftColumn>
+          <div tw="flex gap-1.5">
+            <div tw="flexColumn flex-[2] gap-1.5">
               <TradingRewardsChartPanel />
               <LaunchIncentivesPanel />
               <RewardHistoryPanel />
-            </$LeftColumn>
-            <$RightColumn>
+            </div>
+            <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
               <StakingPanel />
@@ -139,8 +139,8 @@ const RewardsPage = () => {
               <GovernancePanel />
               <RewardsHelpPanel />
               {legalDisclaimer}
-            </$RightColumn>
-          </$DoubleColumnView>
+            </div>
+          </div>
         </$DetachedSection>
       )}
     </$Page>
@@ -153,36 +153,4 @@ const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
 `;
 
-const $DetachedSection = styled(DetachedSection)`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem;
-  max-width: 80rem;
-
-  @media ${breakpoints.tablet} {
-    width: 100vw;
-  }
-`;
-
-const $DoubleColumnView = styled.div`
-  display: flex;
-  gap: 1.5rem;
-`;
-
-const $LeftColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  flex: 2;
-`;
-
-const $RightColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  flex: 1;
-`;
-
-const $LegalDisclaimer = styled.div`
-  font: var(--font-mini-book);
-  color: var(--color-text-0);
-`;
+const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;

@@ -1,5 +1,4 @@
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import styled from 'styled-components';
 
 import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
@@ -43,7 +42,7 @@ export const FundingChartTooltipContent = ({
           : stringGetter({ key: STRING_KEYS.HISTORICAL_FUNDING_RATE })}
       </h4>
 
-      <$Details
+      <Details
         layout="column"
         items={
           [
@@ -103,11 +102,8 @@ export const FundingChartTooltipContent = ({
             },
           ] satisfies Array<DetailsItem>
         }
+        tw="[--details-item-vertical-padding:0.2rem]"
       />
     </TooltipContent>
   );
 };
-
-const $Details = styled(Details)`
-  --details-item-vertical-padding: 0.2rem;
-`;

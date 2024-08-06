@@ -11,8 +11,6 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
@@ -120,10 +118,12 @@ export const NotificationsMenu = ({
       items={items}
       title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
       slotTrigger={
-        <$TriggerContainer>
+        <div tw="stack">
           {slotTrigger}
-          {hasUnreadNotifications && <$TriggerUnreadIndicator />}
-        </$TriggerContainer>
+          {hasUnreadNotifications && (
+            <$UnreadIndicator tw="relative right-[-0.2rem] top-[-0.325rem] place-self-center" />
+          )}
+        </div>
       }
       slotFooter={
         <$FooterToolbar>
@@ -176,19 +176,6 @@ const $UnreadIndicator = styled.div`
   background-color: var(--color-accent);
   border: 1px solid var(--color-layer-2);
 `;
-
-const $TriggerContainer = styled.div`
-  ${layoutMixins.stack}
-`;
-
-const $TriggerUnreadIndicator = styled($UnreadIndicator)`
-  place-self: center;
-
-  position: relative;
-  right: -0.2rem;
-  top: -0.325rem;
-`;
-
 const $FooterToolbar = styled(Toolbar)`
   display: flex;
   flex-wrap: wrap;

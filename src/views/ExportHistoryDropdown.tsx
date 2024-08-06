@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
-import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -281,16 +280,17 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         },
         {
           label: (
-            <$Button
+            <Button
               state={{
                 isDisabled: !checkedTrades && !checkedTransfers,
                 isLoading: isPendingExportTrades || isPendingExportTransfers,
               }}
               action={ButtonAction.Primary}
               size={ButtonSize.XSmall}
+              tw="w-full"
             >
               {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
-            </$Button>
+            </Button>
           ),
           value: 'download',
           onSelect: exportData,
@@ -306,7 +306,3 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     </DropdownMenu>
   );
 };
-
-const $Button = styled(Button)`
-  width: 100%;
-`;
