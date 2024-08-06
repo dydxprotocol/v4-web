@@ -19,6 +19,7 @@ import {
   MathWalletIcon,
   MetaMaskIcon,
   OkxWalletIcon,
+  PhantomIcon,
   RainbowIcon,
   TokenPocketIcon,
   TrustWalletIcon,
@@ -36,6 +37,7 @@ export enum WalletConnectionType {
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
   TestWallet = 'TestWallet',
+  Phantom = 'Phantom',
 }
 
 export enum WalletErrorType {
@@ -68,6 +70,9 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.WalletConnect2]: {
     name: 'WalletConnect 2.0',
     wagmiConnectorId: 'walletConnect',
+  },
+  [WalletConnectionType.Phantom]: {
+    name: 'Phantom',
   },
   [WalletConnectionType.CosmosSigner]: {
     name: 'CosmosSigner',
@@ -102,6 +107,7 @@ export enum WalletType {
   TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
   Privy = 'PRIVY',
+  Phantom = 'PHANTOM',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -277,6 +283,12 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: EmailIcon,
     connectionTypes: [WalletConnectionType.Privy],
   },
+  [WalletType.Phantom]: {
+    type: WalletType.Phantom,
+    stringKey: STRING_KEYS.PHANTOM,
+    icon: PhantomIcon,
+    connectionTypes: [WalletConnectionType.Phantom],
+  },
 };
 
 // Injected EIP-1193 Providers
@@ -332,6 +344,7 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
 export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 
 export type EvmAddress = `0x${string}`;
+export type SolAddress = `${string}`;
 export type DydxAddress = `dydx${string}`;
 
 export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
