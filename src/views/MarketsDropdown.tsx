@@ -150,9 +150,9 @@ const MarketsDropdownContent = ({
     if (!hasSeenElectionBannerTrumpWin && testFlags.enablePredictionMarketPerp) {
       return (
         <$MarketDropdownBanner>
-          <$FlagOverlay />
+          <$FlagGradient />
           <Link
-            to={`${AppRoute.Trade}/TRUMP-USD`}
+            to={`${AppRoute.Trade}/TRUMPWIN-USD`}
             onClick={() => {
               closeDropdown();
             }}
@@ -261,21 +261,26 @@ export const MarketsDropdown = memo(
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
-          <$TriggerContainer $isOpen={isOpen}>
-            {isOpen ? (
-              <h2>{stringGetter({ key: STRING_KEYS.SELECT_MARKET })}</h2>
-            ) : (
-              <div>
-                <AssetIcon symbol={symbol} />
-                <h2>{currentMarketId}</h2>
-                {leverageTag}
-              </div>
-            )}
-            <p>
-              {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <DropdownIcon isOpen={isOpen} />
-            </p>
-          </$TriggerContainer>
+          <>
+            {currentMarketId === 'TRUMPWIN-USD' && <$TriggerFlag />}
+            <$TriggerContainer $isOpen={isOpen}>
+              {isOpen ? (
+                <h2 tw="text-color-text-2 font-medium-medium">
+                  {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
+                </h2>
+              ) : (
+                <div tw="spacedRow gap-[0.625rem]">
+                  <AssetIcon symbol={symbol} />
+                  <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  {leverageTag}
+                </div>
+              )}
+              <p tw="row gap-0.5 text-color-text-0 font-small-book">
+                {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
+                <DropdownIcon isOpen={isOpen} />
+              </p>
+            </$TriggerContainer>
+          </>
         }
         triggerType={TriggerType.MarketDropdown}
       >
@@ -315,6 +320,7 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
 const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
   --marketsDropdown-width: var(--sidebar-width);
   width: var(--sidebar-width);
+  position: relative;
 
   ${layoutMixins.spacedRow}
   padding: 0 1.25rem;
@@ -326,29 +332,6 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
     css`
       --marketsDropdown-width: var(--marketsDropdown-openWidth);
     `}
-
-  > :first-child {
-    ${layoutMixins.row}
-    gap: 0.625rem;
-
-    img {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-
-    h2 {
-      color: var(--color-text-1);
-      font: var(--font-medium-medium);
-    }
-  }
-
-  > :last-child {
-    ${layoutMixins.row}
-    gap: 0.5rem;
-
-    color: var(--color-text-0);
-    font: var(--font-small-book);
-  }
 `;
 
 const $Popover = styled(Popover)`
@@ -414,7 +397,7 @@ const $MarketDropdownBanner = styled.div`
   }
 `;
 
-const $FlagOverlay = styled.div`
+const $FlagGradient = styled.div`
   width: 573px;
   height: 100%;
   background-image: ${({ theme }) => `
@@ -424,6 +407,16 @@ const $FlagOverlay = styled.div`
   background-repeat: no-repeat;
   position: absolute;
   z-index: 0;
+  right: 0;
+`;
+
+const $TriggerFlag = styled.div`
+  background: url('/AmericanFlag2.png') no-repeat;
+  mix-blend-mode: luminosity;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
   right: 0;
 `;
 

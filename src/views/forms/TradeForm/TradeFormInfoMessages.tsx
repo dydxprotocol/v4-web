@@ -17,7 +17,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
     defaultValue: false,
   });
 
-  if (marketId === 'TRUMP-USD' && !hasSeenTradeFormMessageTrumpWin) {
+  if (marketId === 'TRUMPWIN-USD' && !hasSeenTradeFormMessageTrumpWin) {
     return (
       <AlertMessage type={AlertType.Notice}>
         <div tw="text-color-text-1">

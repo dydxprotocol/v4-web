@@ -26,7 +26,7 @@ export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: Noti
         </span>
       }
       slotAction={
-        <$Link to={`${AppRoute.Trade}/TRUMP-USD`}>
+        <$Link to={`${AppRoute.Trade}/TRUMPWIN-USD`}>
           {stringGetter({ key: STRING_KEYS.TRADE_NOW })} →
         </$Link>
       }

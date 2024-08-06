@@ -35,7 +35,7 @@ const Markets = () => {
   const marketsPageBanner = useMemo(() => {
     if (testFlags.enablePredictionMarketPerp) {
       return (
-        <$MarketsPageBanner to={`${AppRoute.Trade}/TRUMP-USD`}>
+        <$MarketsPageBanner to={`${AppRoute.Trade}/TRUMPWIN-USD`}>
           <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>
           <$FlagOverlay />
           <IconButton iconName={IconName.Arrow} />
