@@ -1,6 +1,6 @@
-import { Key, memo, useMemo, useState } from 'react';
+import { Key, MouseEvent, memo, useMemo, useState } from 'react';
 
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -135,7 +135,7 @@ const MarketsDropdownContent = ({
       return (
         <$Disclaimer>
           Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
-          will settle at $0.
+          will settle at $0.001.
         </$Disclaimer>
       );
     }
@@ -153,16 +153,19 @@ const MarketsDropdownContent = ({
       // TODO: (TRA-528): Update localization string when copy is finallized
       return (
         <$MarketDropdownBanner>
-          <NavLink
+          <$FlagOverlay />
+          <Link
             to={`${AppRoute.Trade}/TRUMP-USD`}
             onClick={() => {
               closeDropdown();
             }}
           >
             🇺🇸 Trade the U.S. presidential election →
-          </NavLink>
+          </Link>
           <$IconButton
-            onClick={() => setHasSeenElectionBannerTrupmWin(true)}
+            onClick={(e: MouseEvent) => {
+              setHasSeenElectionBannerTrupmWin(true);
+            }}
             iconName={IconName.Close}
           />
         </$MarketDropdownBanner>
@@ -415,6 +418,24 @@ const $MarketDropdownBanner = styled.div`
   color: var(--color-text-1);
   border-bottom: solid var(--border-width) var(--color-border);
   justify-content: space-between;
+  position: relative;
+
+  & > * {
+    z-index: 1;
+  }
+`;
+
+const $FlagOverlay = styled.div`
+  width: 573px;
+  height: 100%;
+  background-image: ${({ theme }) => `
+    linear-gradient(90deg, ${theme.layer1} 0%, ${theme.tooltipBackground} 53%, ${theme.layer1} 99%),
+    url('/AmericanFlag.png')
+  `};
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 0;
+  right: 0;
 `;
 
 const $ScrollArea = styled.div`

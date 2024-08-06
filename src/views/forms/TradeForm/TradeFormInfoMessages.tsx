@@ -25,7 +25,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
       <AlertMessage type={AlertType.Notice}>
         <$Text>
           This is a Prediction Market and will settle at $1 if Donald J. Trump wins the 2024 US
-          Presidential Election. Otherwise, it will settle at $0.00001.{' '}
+          Presidential Election. Otherwise, it will settle at $0.001.{' '}
           <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
           </Link>{' '}
@@ -50,4 +50,8 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
 
 const $Text = styled.div`
   color: var(--color-text-1);
+
+  a {
+    text-decoration: underline;
+  }
 `;

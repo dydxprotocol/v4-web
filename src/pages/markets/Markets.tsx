@@ -36,13 +36,10 @@ const Markets = () => {
     // TODO: (TRA-528): Localize text when finallized. Update navigate link to TRUMPWIN-USD (Use Market redux state to ensure existance)
     if (testFlags.enablePredictionMarketPerp) {
       return (
-        <$MarketsPageBanner>
+        <$MarketsPageBanner onClick={() => navigate(`${AppRoute.Trade}/TRUMP-USD`)}>
           <span>🇺🇸 Leverage trade the outcome of the U.S. Election</span>
           <$FlagOverlay />
-          <IconButton
-            iconName={IconName.Arrow}
-            onClick={() => navigate(`${AppRoute.Trade}/TRUMP-USD`)}
-          />
+          <IconButton iconName={IconName.Arrow} />
         </$MarketsPageBanner>
       );
     }
@@ -119,7 +116,7 @@ const $MarketsPageBanner = styled.div`
   ${layoutMixins.row}
   height: 5rem;
   border-radius: 10px;
-  background-color: var(--color-layer-4);
+  background-color: var(--color-layer-1);
   margin-bottom: 1rem;
   padding: 0 1.5rem;
   justify-content: space-between;
@@ -149,7 +146,7 @@ const $FlagOverlay = styled.div`
   width: 573px;
   height: 100%;
   background-image: ${({ theme }) => `
-    linear-gradient(90deg, ${theme.layer4} 0%, ${theme.tooltipBackground} 53%, ${theme.layer4} 99%),
+    linear-gradient(90deg, ${theme.layer1} 0%, ${theme.tooltipBackground} 53%, ${theme.layer1} 99%),
     url('/AmericanFlag.png')
   `};
   background-repeat: no-repeat;

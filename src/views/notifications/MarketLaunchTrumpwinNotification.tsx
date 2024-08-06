@@ -13,10 +13,11 @@ export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: Noti
       notification={notification}
       slotIcon="🇺🇸"
       slotTitle="Trade the U.S. election!"
+      // TODO: (TRA-528): Localize text when finallized
       slotCustomContent={
         <span>
           <$Market>TRUMPWIN-USD</$Market> is now live. This market will settle at $1 if Donald J.
-          Trump wins the election. Otherwise, it will settle at $0.00001.
+          Trump wins the election. Otherwise, it will settle at $0.001.
         </span>
       }
       slotAction={<$Link to={`${AppRoute.Trade}/TRUMP-USD`}>Trade now →</$Link>}

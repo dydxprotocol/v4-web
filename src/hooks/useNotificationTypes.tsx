@@ -55,6 +55,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -306,12 +307,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (currentDate <= tradeUSElectionExpirationDate) {
+        if (testFlags.enablePredictionMarketPerp && currentDate <= tradeUSElectionExpirationDate) {
           trigger(
             MarketLaunchNotificationIds.TrumpWin,
             {
+              // TODO: (TRA-528): Localize this notification
               title: 'Trade the U.S. election!',
-              body: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.BODY' }),
+              body: 'TRUMPWIN-USD is now live. This market will settle at $1 if Donald J. Trump wins the election. Otherwise, it will settle at $0.001.',
               renderCustomBody({ isToast, notification }) {
                 return (
                   <MarketLaunchTrumpwinNotification isToast={isToast} notification={notification} />
