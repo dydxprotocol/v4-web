@@ -9,5 +9,26 @@
   },
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
+  },
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list", "tw"],
+  "tailwindCSS.experimental.classRegex": [
+    "tw`([^`]*)", // tw`...`
+    "tw=\"([^\"]*)", // <div tw="..." />
+    "tw={\"([^\"}]*)", // <div tw={"..."} />
+    "tw\\.\\w+`([^`]*)", // tw.xxx`...`
+    "tw\\(.*?\\)`([^`]*)" // tw(Component)`...`
+  ],
+  "tailwindCSS.emmetCompletions": true,
+  "emmet.includeLanguages": {
+    "\"typescript\"": "\"typescriptreact\""
+  },
+  "emmet.syntaxProfiles": {
+    "jsx": {
+      "markup.attributes": {
+        "class": "tw",
+        "class*": "tw"
+      },
+      "self_closing_tag": true
+    }
   }
 }
