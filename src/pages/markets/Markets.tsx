@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -35,7 +36,7 @@ const Markets = () => {
   const marketsPageBanner = useMemo(() => {
     if (testFlags.enablePredictionMarketPerp) {
       return (
-        <$MarketsPageBanner to={`${AppRoute.Trade}/TRUMPWIN-USD`}>
+        <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
           <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>
           <$FlagOverlay />
           <IconButton iconName={IconName.Arrow} />

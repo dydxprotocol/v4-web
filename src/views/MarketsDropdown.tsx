@@ -6,7 +6,7 @@ import styled, { css, keyframes } from 'styled-components';
 import { ButtonSize } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, type MarketData } from '@/constants/markets';
+import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -152,17 +152,16 @@ const MarketsDropdownContent = ({
         <$MarketDropdownBanner>
           <$FlagGradient />
           <Link
-            to={`${AppRoute.Trade}/TRUMPWIN-USD`}
+            to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}
             onClick={() => {
               closeDropdown();
             }}
           >
             🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
-          <IconButton
+          <$IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
-            tw="[--button-backgroundColor:transparent] [--button-border:none]"
           />
         </$MarketDropdownBanner>
       );
@@ -255,6 +254,8 @@ export const MarketsDropdown = memo(
         </Tag>
       ) : undefined;
 
+    const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
+
     return (
       <$Popover
         open={isOpen}
@@ -262,7 +263,7 @@ export const MarketsDropdown = memo(
         sideOffset={1}
         slotTrigger={
           <>
-            {currentMarketId === 'TRUMPWIN-USD' && <$TriggerFlag />}
+            {triggerBackground}
             <$TriggerContainer $isOpen={isOpen}>
               {isOpen ? (
                 <h2 tw="text-color-text-2 font-medium-medium">
@@ -395,6 +396,11 @@ const $MarketDropdownBanner = styled.div`
   & > * {
     z-index: 1;
   }
+`;
+
+const $IconButton = styled(IconButton)`
+  --button-backgroundColor: transparent;
+  --button-border: none;
 `;
 
 const $FlagGradient = styled.div`

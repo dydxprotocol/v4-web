@@ -14,6 +14,7 @@ import {
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
+import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -314,7 +315,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               title: stringGetter({ key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_TITLE }),
               body: stringGetter({
                 key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
-                params: { MARKET: 'TRUMPWIN-USD' },
+                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
               }),
               renderCustomBody({ isToast, notification }) {
                 return (

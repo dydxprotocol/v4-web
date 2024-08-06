@@ -85,3 +85,7 @@ export enum FundingDirection {
   ToLong = 'ToLong',
   None = 'None',
 }
+
+export const PREDICTION_MARKET = {
+  TRUMPWIN: 'TRUMPWIN-USD',
+};

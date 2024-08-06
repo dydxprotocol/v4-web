@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -21,12 +22,12 @@ export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: Noti
         <span>
           {stringGetter({
             key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
-            params: { MARKET: <$Market>TRUMPWIN-USD</$Market> },
+            params: { MARKET: <$Market>{PREDICTION_MARKET.TRUMPWIN}</$Market> },
           })}
         </span>
       }
       slotAction={
-        <$Link to={`${AppRoute.Trade}/TRUMPWIN-USD`}>
+        <$Link to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
           {stringGetter({ key: STRING_KEYS.TRADE_NOW })} →
         </$Link>
       }
