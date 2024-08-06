@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 import { type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -22,40 +20,33 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
   if (marketId === 'TRUMP-USD' && !hasSeenTradeFormMessageTrumpWin) {
     return (
       <AlertMessage type={AlertType.Notice}>
-        <$Text>
+        <div tw="text-color-text-1">
           {stringGetter({
-            key: STRING_KEYS.TRUMPWIN_DESC,
-            params: {
-              LEARN_MORE: (
-                <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-                </Link>
-              ),
-              DISMISS: (
-                <Link
-                  isInline
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    setHasSeenTradeFormMessageTrumpWin(true);
-                  }}
-                >
-                  {stringGetter({ key: STRING_KEYS.DISMISS })}
-                </Link>
-              ),
-            },
-          })}
-        </$Text>
+              key: STRING_KEYS.TRUMPWIN_DESC,
+              params: {
+                LEARN_MORE: (
+                  <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()} tw="underline">
+                    {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+                  </Link>
+                ),
+                DISMISS: (
+                  <Link
+                    isInline
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      setHasSeenTradeFormMessageTrumpWin(true);
+                    }}
+                    tw="underline"
+                  >
+                    {stringGetter({ key: STRING_KEYS.DISMISS })}
+                  </Link>
+                ),
+              },
+            })}
+        </div>
       </AlertMessage>
     );
   }
 
   return null;
 };
-
-const $Text = styled.div`
-  color: var(--color-text-1);
-
-  a {
-    text-decoration: underline;
-  }
-`;

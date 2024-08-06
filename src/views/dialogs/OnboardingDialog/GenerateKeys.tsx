@@ -169,7 +169,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
 
   return (
     <>
-      <$StatusCardsContainer>
+      <div tw="grid gap-1">
         {[
           {
             status: EvmDerivedAccountStatus.Deriving,
@@ -190,7 +190,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
               ) : status === step.status ? (
                 <LoadingSpinner />
               ) : (
-                <$GreenCheckCircle />
+                <GreenCheckCircle tw="[--icon-size:2.375rem]" />
               )}
               <div>
                 <h3>{step.title}</h3>
@@ -198,10 +198,10 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
               </div>
             </$StatusCard>
           ))}
-      </$StatusCardsContainer>
+      </div>
 
       <$Footer>
-        <$RememberMe htmlFor="remember-me">
+        <label htmlFor="remember-me" tw="spacedRow font-base-book">
           <WithTooltip withIcon tooltip="remember-me">
             {stringGetter({ key: STRING_KEYS.REMEMBER_ME })}
           </WithTooltip>
@@ -212,25 +212,26 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
             checked={shouldRememberMe}
             onCheckedChange={setShouldRememberMe}
           />
-        </$RememberMe>
+        </label>
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
-        <$WithReceipt
+        <WithReceipt
           slotReceipt={
-            <$ReceiptArea>
+            <div tw="p-1 text-color-text-0 font-small-book">
               <span>
                 {stringGetter({
                   key: STRING_KEYS.FREE_SIGNING,
                   params: {
                     FREE: (
-                      <$Green>
+                      <span tw="text-green">
                         {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
-                      </$Green>
+                      </span>
                     ),
                   },
                 })}
               </span>
-            </$ReceiptArea>
+            </div>
           }
+          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
         >
           {!isMatchingNetwork ? (
             <Button
@@ -258,17 +259,14 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
                   })}
             </Button>
           )}
-        </$WithReceipt>
-        <$Disclaimer>{stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}</$Disclaimer>
+        </WithReceipt>
+        <span tw="text-center text-color-text-0 font-base-book">
+          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
+        </span>
       </$Footer>
     </>
   );
 };
-const $StatusCardsContainer = styled.div`
-  display: grid;
-  gap: 1rem;
-`;
-
 const $StatusCard = styled.div<{ active?: boolean }>`
   ${layoutMixins.row}
   gap: 1rem;
@@ -304,33 +302,4 @@ const $Footer = styled.footer`
 
   display: grid;
   gap: 1rem;
-`;
-
-const $RememberMe = styled.label`
-  ${layoutMixins.spacedRow}
-  font: var(--font-base-book);
-`;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $ReceiptArea = styled.div`
-  padding: 1rem;
-  font: var(--font-small-book);
-  color: var(--color-text-0);
-`;
-
-const $Green = styled.span`
-  color: var(--color-green);
-`;
-
-const $GreenCheckCircle = styled(GreenCheckCircle)`
-  --icon-size: 2.375rem;
-`;
-
-const $Disclaimer = styled.span`
-  text-align: center;
-  color: var(--color-text-0);
-  font: var(--font-base-book);
 `;

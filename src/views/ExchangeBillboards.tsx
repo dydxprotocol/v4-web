@@ -7,7 +7,6 @@ import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -26,7 +25,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
   } = usePerpetualMarketsStats();
   return (
-    <$MarketBillboardsWrapper>
+    <div tw="column gap-0.5">
       {[
         {
           key: 'volume',
@@ -54,9 +53,9 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           link: `${chainTokenLabel}`,
         },
       ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
-        <$BillboardContainer key={key}>
+        <div key={key} tw="row flex-1 justify-between rounded-0.625 bg-color-layer-3 px-1.25 py-1">
           <$BillboardStat>
-            <$BillboardTitle>
+            <div tw="row gap-0.375">
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label>{stringGetter({ key: labelKey })}</label>
               <Tag>{stringGetter({ key: tagKey })}</Tag>
@@ -71,45 +70,27 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                   {stringGetter({ key: linkLabelKey })}
                 </$BillboardLink>
               ) : null}
-            </$BillboardTitle>
-            <$Output
+            </div>
+            <Output
               useGrouping
               withBaseFont
               fractionDigits={fractionDigits}
               type={type}
               value={value}
+              tw="text-color-text-2 font-extra-book tablet:font-base-book"
             />
           </$BillboardStat>
-        </$BillboardContainer>
+        </div>
       ))}
-    </$MarketBillboardsWrapper>
+    </div>
   );
 };
-
-const $MarketBillboardsWrapper = styled.div`
-  ${layoutMixins.column}
-  gap: 0.5rem;
-`;
-const $BillboardContainer = styled.div`
-  ${layoutMixins.row}
-  flex: 1;
-  justify-content: space-between;
-
-  background-color: var(--color-layer-3);
-  padding: 1rem 1.25rem;
-  border-radius: 0.625rem;
-`;
 const $BillboardLink = styled(Button)`
   --button-textColor: var(--color-accent);
   --button-height: unset;
   --button-padding: 0;
   justify-content: flex-start;
   margin-left: auto;
-`;
-const $BillboardTitle = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.375rem;
 `;
 const $BillboardStat = styled.div`
   ${layoutMixins.column}
@@ -124,13 +105,5 @@ const $BillboardStat = styled.div`
   output {
     color: var(--color-text-1);
     font: var(--font-large-medium);
-  }
-`;
-const $Output = styled(Output)`
-  font: var(--font-extra-book);
-  color: var(--color-text-2);
-
-  @media ${breakpoints.tablet} {
-    font: var(--font-base-book);
   }
 `;

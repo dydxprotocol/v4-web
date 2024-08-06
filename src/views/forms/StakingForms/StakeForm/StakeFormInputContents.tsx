@@ -5,7 +5,6 @@ import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxpr
 import BigNumber from 'bignumber.js';
 import { debounce } from 'lodash';
 import { NumberFormatValues } from 'react-number-format';
-import styled from 'styled-components';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -107,7 +106,11 @@ export const StakeFormInputContents = ({
 
   return (
     <>
-      <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
+      <WithDetailsReceipt
+        side="bottom"
+        detailItems={amountDetailItems}
+        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+      >
         <FormInput
           id="stakeAmount"
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
@@ -124,7 +127,7 @@ export const StakeFormInputContents = ({
             )
           }
         />
-      </$WithDetailsReceipt>
+      </WithDetailsReceipt>
       <StakeRewardButtonAndReceipt
         detailItems={detailItems}
         alert={error}
@@ -142,7 +145,3 @@ export const StakeFormInputContents = ({
     </>
   );
 };
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;

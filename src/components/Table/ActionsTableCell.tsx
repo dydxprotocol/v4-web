@@ -9,15 +9,10 @@ type ElementProps = {
 };
 
 export const ActionsTableCell = ({ children }: ElementProps) => (
-  <$ActionsCell>
+  <div tw="flex justify-end">
     <$Toolbar $numChildren={React.Children.toArray(children).length}>{children}</$Toolbar>
-  </$ActionsCell>
+  </div>
 );
-const $ActionsCell = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
 const $Toolbar = styled(Toolbar)<{ $numChildren: number }>`
   ${({ $numChildren }) =>
     $numChildren &&

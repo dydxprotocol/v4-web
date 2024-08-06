@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -14,8 +15,6 @@ import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
@@ -180,7 +179,7 @@ export const WithdrawButtonAndReceipt = ({
       key: 'leverage',
       label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
       value: (
-        <$DiffOutput
+        <DiffOutput
           type={OutputType.Multiple}
           value={leverage?.current}
           newValue={leverage?.postOrder}
@@ -188,6 +187,7 @@ export const WithdrawButtonAndReceipt = ({
           withDiff={Boolean(
             leverage?.current && leverage?.postOrder && leverage.current !== leverage?.postOrder
           )}
+          tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />
       ),
     },
@@ -229,18 +229,9 @@ export const WithdrawButtonAndReceipt = ({
     </$WithReceipt>
   );
 };
-const $DiffOutput = styled(DiffOutput)`
-  --diffOutput-valueWithDiff-fontSize: 1em;
-`;
+const $RowWithGap = tw.span`row gap-[0.5ch]`;
 
-const $RowWithGap = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
+const $WithReceipt = tw(WithReceipt)`[--withReceipt-backgroundColor:var(--color-layer-2)]`;
 
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;

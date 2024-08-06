@@ -1,8 +1,4 @@
-import styled from 'styled-components';
-
 import type { Asset } from '@/constants/abacus';
-
-import breakpoints from '@/styles/breakpoints';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -32,7 +28,7 @@ export const MarketTableCell = ({
     slotLeft={
       <>
         {showFavorite && <Icon iconName={IconName.Star} />}
-        <$AssetIcon symbol={asset?.id} />
+        <AssetIcon symbol={asset?.id} tw="text-[1.25rem] tablet:text-[2.25rem]" />
       </>
     }
   >
@@ -43,22 +39,9 @@ export const MarketTableCell = ({
       </>
     ) : (
       <>
-        <$Asset>{asset?.name}</$Asset>
+        <span tw="tablet:text-color-text-2">{asset?.name}</span>
         <span>{marketId}</span>
       </>
     )}
   </TableCell>
 );
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1.25rem;
-
-  @media ${breakpoints.tablet} {
-    font-size: 2.25rem;
-  }
-`;
-
-const $Asset = styled.span`
-  @media ${breakpoints.tablet} {
-    color: var(--color-text-2);
-  }
-`;

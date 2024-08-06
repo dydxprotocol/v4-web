@@ -7,8 +7,6 @@ import { TradeTypes } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Details } from '@/components/Details';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
@@ -37,10 +35,10 @@ export const FillDetails = ({
         {
           key: 'size',
           label: (
-            <$Label>
+            <span tw="row gap-[0.5ch]">
               {stringGetter({ key: STRING_KEYS.SIZE })}
               <OrderSideTag orderSide={orderSide} />
-            </$Label>
+            </span>
           ),
           value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
         },
@@ -62,11 +60,6 @@ export const FillDetails = ({
     />
   );
 };
-const $Label = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;
-
 const $Details = styled(Details)`
   --details-item-height: 1rem;
 

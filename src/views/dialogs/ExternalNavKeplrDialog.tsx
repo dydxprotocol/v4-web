@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, DialogTypes, ExternalNavKeplrDialogProps } from '@/constants/dialogs';
@@ -110,7 +111,4 @@ const $Button = styled(Button)`
   justify-content: space-between;
 `;
 
-const $IconButton = styled(IconButton)`
-  color: var(--color-text-0);
-  --color-border: var(--color-layer-6);
-`;
+const $IconButton = tw(IconButton)`text-color-text-0 [--color-border:var(--color-layer-6)]`;

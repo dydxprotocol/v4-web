@@ -16,47 +16,32 @@ export const RewardHistoryPanel = () => {
   const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
 
   return (
-    <$RewardHistoryContainer>
-      <$Title>{stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}</$Title>
-      <$TradingRewardHistoryTable period={HistoricalTradingRewardsPeriod.DAILY} />
+    <div tw="flex flex-col gap-1">
+      <div tw="px-0.5 py-0 text-color-text-2 font-large-book">
+        {stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
+      </div>
+      <TradingRewardHistoryTable
+        period={HistoricalTradingRewardsPeriod.DAILY}
+        tw="[--computed-radius:0.875rem]"
+      />
       <$Description>
         {stringGetter({
           key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION,
           params: {
             REWARDS_HISTORY_START_DATE: (
-              <$Output
+              <Output
                 type={OutputType.Date}
                 value={Number(rewardsHistoryStartDate)}
                 timeOptions={{ useUTC: true }}
+                tw="inline"
               />
             ),
           },
         })}
       </$Description>
-    </$RewardHistoryContainer>
+    </div>
   );
 };
-
-const $RewardHistoryContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const $Title = styled.div`
-  font: var(--font-large-book);
-  color: var(--color-text-2);
-  padding: 0 0.5rem;
-`;
-
-const $TradingRewardHistoryTable = styled(TradingRewardHistoryTable)`
-  --computed-radius: 0.875rem;
-`;
-
-const $Output = styled(Output)`
-  display: inline;
-`;
-
 const $Description = styled.span`
   font: var(--font-mini-book);
   color: var(--color-text-0);

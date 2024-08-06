@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 
 export type NumberValueProps = {
@@ -20,7 +18,10 @@ export const NumberValue = ({ className, value, withSubscript }: NumberValueProp
         {punctuationSymbol}
         {Boolean(zeros) && (
           <>
-            0<$Sub title={value}>{zeros}</$Sub>
+            0
+            <sub title={value} tw="text-[0.85em]">
+              {zeros}
+            </sub>
           </>
         )}
         {decimalDigits}
@@ -30,6 +31,3 @@ export const NumberValue = ({ className, value, withSubscript }: NumberValueProp
 
   return value;
 };
-const $Sub = styled.sub`
-  font-size: 0.85em;
-`;

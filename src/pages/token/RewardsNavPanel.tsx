@@ -1,13 +1,9 @@
 import React from 'react';
 
-import styled from 'styled-components';
-
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -41,58 +37,35 @@ export const RewardsNavPanel = ({
     <Panel
       className={className}
       slotHeaderContent={
-        <$Title>
-          {title} {titleTag && <$Tag>{titleTag}</$Tag>}
-        </$Title>
+        <h3 tw="inlineRow -mb-1.5 text-color-text-1 font-medium-book">
+          {title} {titleTag && <Tag tw="bg-color-accent-faded text-color-accent">{titleTag}</Tag>}
+        </h3>
       }
       slotRight={
-        <$Arrow>
-          <$IconButton
+        <div tw="pr-1.5">
+          <IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
+            tw="text-color-text-0 [--color-border:var(--color-layer-6)]"
           />
-        </$Arrow>
+        </div>
       }
       onClick={onNav}
     >
-      <$Description>
+      <div tw="text-color-text-0">
         {description}
         {learnMore && (
-          <$Link href={learnMore} isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+          <Link
+            href={learnMore}
+            isInline
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            tw="ml-[0.5ch]"
+          >
             {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-          </$Link>
+          </Link>
         )}
-      </$Description>
+      </div>
     </Panel>
   );
 };
-
-const $Title = styled.h3`
-  ${layoutMixins.inlineRow}
-  font: var(--font-medium-book);
-  margin-bottom: -1.5rem;
-  color: var(--color-text-1);
-`;
-
-const $Tag = styled(Tag)`
-  color: var(--color-accent);
-  background-color: var(--color-accent-faded);
-`;
-
-const $Arrow = styled.div`
-  padding-right: 1.5rem;
-`;
-
-const $IconButton = styled(IconButton)`
-  --color-border: var(--color-layer-6);
-  color: var(--color-text-0);
-`;
-
-const $Description = styled.div`
-  color: var(--color-text-0);
-`;
-
-const $Link = styled(Link)`
-  margin-left: 0.5ch;
-`;

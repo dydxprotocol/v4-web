@@ -1,5 +1,4 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -18,8 +17,6 @@ import {
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -61,7 +58,7 @@ export const OrderStatusNotification = ({
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
-  let orderStatusIcon = <$LoadingSpinner />;
+  let orderStatusIcon = <LoadingSpinner tw="text-color-accent [--spinner-width:0.9375rem]" />;
   let customContent = null;
 
   switch (submissionStatus) {
@@ -73,7 +70,9 @@ export const OrderStatusNotification = ({
         if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
 
         orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
-        orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
+        orderStatusIcon = (
+          <OrderStatusIcon status={indexedOrderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
+        );
 
         if (order && fill) {
           customContent = (
@@ -99,7 +98,7 @@ export const OrderStatusNotification = ({
     case PlaceOrderStatuses.Submitted:
       if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
-        orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
+        orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-color-warning" />;
         customContent = (
           <span>
             {stringGetter({
@@ -128,36 +127,12 @@ export const OrderStatusNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <$OrderStatus>
+        <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </$OrderStatus>
+        </span>
       }
       slotCustomContent={customContent}
     />
   );
 };
-
-const $Label = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;
-
-const $OrderStatus = styled($Label)`
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-`;
-
-const $LoadingSpinner = styled(LoadingSpinner)`
-  --spinner-width: 0.9375rem;
-  color: var(--color-accent);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
-
-const $OrderStatusIcon = styled(OrderStatusIcon)`
-  width: 0.9375rem;
-  height: 0.9375rem;
-`;

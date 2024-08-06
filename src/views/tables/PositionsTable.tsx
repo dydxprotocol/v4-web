@@ -22,7 +22,6 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -102,7 +101,10 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+          <TableCell
+            stacked
+            slotLeft={<AssetIcon symbol={asset?.id} tw="inlineRow min-w-[unset] text-[2.25rem]" />}
+          >
             <$HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
@@ -110,18 +112,18 @@ const getPositionsTableColumnDef = ({
               showSign={ShowSign.None}
               tag={asset?.id}
             />
-            <$InlineRow>
+            <div tw="inlineRow">
               <$PositionSide>
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
               </$PositionSide>
-              <$SecondaryColor>@</$SecondaryColor>
+              <span tw="text-color-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}
                 showSign={ShowSign.None}
               />
-            </$InlineRow>
+            </div>
           </TableCell>
         ),
       },
@@ -514,7 +516,7 @@ export const PositionsTable = ({
       })}
       slotEmpty={
         <>
-          <$Icon iconName={IconName.Positions} />
+          <Icon iconName={IconName.Positions} tw="text-[3em]" />
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
@@ -552,21 +554,6 @@ const $Table = styled(Table)`
     }
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  ${layoutMixins.inlineRow}
-  min-width: unset;
-  font-size: 2.25rem;
-`;
-
-const $SecondaryColor = styled.span`
-  color: var(--color-text-0);
-`;
-
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -591,8 +578,4 @@ const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
-`;
-
-const $Icon = styled(Icon)`
-  font-size: 3em;
 `;

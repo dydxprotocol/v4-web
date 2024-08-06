@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import styled from 'styled-components';
-
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -101,14 +99,15 @@ export const OrderSizeInput = ({
       }
       open={shouldShowCustomAmount}
     >
-      <$SizeInputRow>
-        <$OrderSizeSlider
+      <div tw="flex items-center gap-0.25">
+        <OrderSizeSlider
           setAbacusSize={(sizeString: string) => setAbacusSize(parseFloat(sizeString))}
           setOrderSizeInput={(sizeString: string) => setOrderSize(parseFloat(sizeString))}
           size={orderSize}
           positionSize={positionSize ?? undefined}
           stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}
           className={className}
+          tw="w-full"
         />
         <FormInput
           type={InputType.Number}
@@ -116,16 +115,7 @@ export const OrderSizeInput = ({
           slotRight={<Tag>{symbol}</Tag>}
           onInput={onSizeInput}
         />
-      </$SizeInputRow>
+      </div>
     </Collapsible>
   );
 };
-const $OrderSizeSlider = styled(OrderSizeSlider)`
-  width: 100%;
-`;
-
-const $SizeInputRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;

@@ -1,5 +1,6 @@
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
@@ -61,7 +62,9 @@ export const StakingPanel = ({ className }: { className?: string }) => {
 
   const aprText = stringGetter({
     key: STRING_KEYS.EST_APR,
-    params: { PERCENTAGE: <$Output type={OutputType.Percent} value={stakingApr} /> },
+    params: {
+      PERCENTAGE: <Output type={OutputType.Percent} value={stakingApr} tw="inline-block" />,
+    },
   });
 
   return (
@@ -74,7 +77,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             {chainTokenLabel}
           </$Title>
           {complianceState === ComplianceStates.FULL_ACCESS && (
-            <$ActionButtons>
+            <Toolbar tw="inlineRow gap-0.5 p-0 [--stickyArea-topHeight:max-content]">
               {!canAccountTrade ? (
                 <OnboardingTriggerButton size={ButtonSize.Small} />
               ) : (
@@ -86,12 +89,12 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
                 />
               )}
-            </$ActionButtons>
+            </Toolbar>
           )}
         </$Header>
       }
     >
-      <$Content>
+      <div tw="flexColumn gap-0.75">
         <$BalanceRow>
           <div>
             <$Label>
@@ -126,7 +129,11 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   key: STRING_KEYS.STAKED,
                 })}
               </WithTooltip>
-              {stakingApr && <$Tag sign={TagSign.Positive}>{aprText}</$Tag>}
+              {stakingApr && (
+                <Tag sign={TagSign.Positive} tw="inline-block">
+                  {aprText}
+                </Tag>
+              )}
             </$Label>
             <$BalanceOutput
               type={OutputType.Asset}
@@ -164,7 +171,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             },
           ]}
         />
-      </$Content>
+      </div>
     </Panel>
   );
 };
@@ -184,27 +191,6 @@ const $Title = styled.h3`
     font-size: 1.5rem;
   }
 `;
-
-const $ActionButtons = styled(Toolbar)`
-  ${layoutMixins.inlineRow}
-  --stickyArea-topHeight: max-content;
-  gap: 0.5rem;
-  padding: 0;
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.75rem;
-`;
-
-const $Tag = styled(Tag)`
-  display: inline-block;
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
-`;
-
 const $TotalBalance = styled(Details)`
   div {
     --scrollArea-height: auto;
@@ -224,11 +210,7 @@ const $BalanceRow = styled.div`
   padding: 1rem;
 `;
 
-const $Label = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.5rem;
-`;
+const $Label = tw.div`row gap-0.5`;
 
 const $BalanceOutput = styled(Output)<{ isPositive: boolean }>`
   font-size: var(--fontSize-large);

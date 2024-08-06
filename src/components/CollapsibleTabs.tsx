@@ -77,21 +77,21 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
             ))}
           </$TabsList>
 
-          <$Toolbar>
+          <Toolbar tw="inlineRow">
             {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
               <$IconButton iconName={IconName.Caret} isToggle />
             </CollapsibleTrigger>
-          </$Toolbar>
+          </Toolbar>
         </$Header>
 
-        <$CollapsibleContent>
+        <CollapsibleContent tw="stack shadow-none">
           {tabItems.map(({ asChild, value, content }) => (
             <$TabsContent key={value} asChild={asChild} value={value}>
               {content}
             </$TabsContent>
           ))}
-        </$CollapsibleContent>
+        </CollapsibleContent>
       </$CollapsibleRoot>
     </$TabsRoot>
   );
@@ -157,11 +157,6 @@ const $TabsTrigger = styled(TabsTrigger)`
     background-color: var(--trigger-active-backgroundColor);
   }
 `;
-
-const $Toolbar = styled(Toolbar)`
-  ${layoutMixins.inlineRow}
-`;
-
 const $TabsContent = styled(TabsContent)`
   ${layoutMixins.flexColumn}
 
@@ -213,13 +208,6 @@ const $Header = styled.header`
     box-shadow: none;
   }
 `;
-
-const $CollapsibleContent = styled(CollapsibleContent)`
-  ${layoutMixins.stack}
-
-  box-shadow: none;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-icon-size: 1em;
   ${$CollapsibleRoot}[data-state='closed'] & {

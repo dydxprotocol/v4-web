@@ -104,7 +104,7 @@ export const LeverageSlider = ({
   };
 
   return (
-    <$SliderContainer className={className}>
+    <div className={className} tw="h-[1.375rem]">
       <$Slider
         label="MarketLeverage"
         min={min}
@@ -116,7 +116,7 @@ export const LeverageSlider = ({
         midpoint={midpoint}
         orderSide={orderSide}
       />
-    </$SliderContainer>
+    </div>
   );
 };
 const $Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
@@ -131,8 +131,4 @@ const $Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
       var(--color-positive) 100%
     );
   `}
-`;
-
-const $SliderContainer = styled.div`
-  height: 1.375rem;
 `;

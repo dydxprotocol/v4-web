@@ -22,7 +22,7 @@ export const History = () => {
       {isNotTablet && (
         <$NavigationMenu
           orientation="horizontal"
-          slotAfter={<$ExportButton />}
+          slotAfter={<ExportHistoryDropdown tw="ml-auto" />}
           items={[
             {
               group: 'navigation',
@@ -54,11 +54,6 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
-
-const $ExportButton = styled(ExportHistoryDropdown)`
-  margin-left: auto;
-`;
-
 const $NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
 

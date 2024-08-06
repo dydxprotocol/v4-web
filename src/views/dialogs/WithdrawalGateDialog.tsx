@@ -8,7 +8,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LinkOutIcon } from '@/icons';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -35,11 +34,11 @@ export const WithdrawalGateDialog = ({
       }
       slotIcon={
         <$IconContainer>
-          <$Icon iconName={IconName.Warning} />
+          <Icon iconName={IconName.Warning} tw="mb-0.125 text-[2.5rem] text-color-warning" />
         </$IconContainer>
       }
       slotFooter={
-        <$ButtonRow>
+        <div tw="grid grid-cols-[1fr_1fr] gap-1">
           <Button
             type={ButtonType.Link}
             action={ButtonAction.Secondary}
@@ -51,17 +50,17 @@ export const WithdrawalGateDialog = ({
           <Button action={ButtonAction.Primary} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CLOSE })}
           </Button>
-        </$ButtonRow>
+        </div>
       }
     >
-      <$Content>
+      <div tw="column gap-1">
         {stringGetter({
           key: STRING_KEYS.WITHDRAWALS_PAUSED_DESC,
           params: {
             ESTIMATED_DURATION: estimatedUnblockTime,
           },
         })}
-      </$Content>
+      </div>
     </Dialog>
   );
 };
@@ -76,21 +75,4 @@ const $IconContainer = styled.div`
   min-width: 4.5rem;
   min-height: 4.5rem;
   background-color: var(--color-gradient-warning);
-`;
-
-const $Icon = styled(Icon)`
-  color: var(--color-warning);
-  font-size: 2.5rem;
-  margin-bottom: 0.125rem;
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;
-
-const $ButtonRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
 `;

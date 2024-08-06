@@ -52,24 +52,26 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
-        <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
+        <div tw="inlineRow h-[var(--dialog-icon-size)]">
+          {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
+        </div>
       ),
       description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
     },
     [MobilePlaceOrderSteps.PlacingOrder]: {
       title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
       description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-      slotIcon: <$Ring withAnimation value={0.25} />,
+      slotIcon: <Ring withAnimation value={0.25} tw="[--ring-color:var(--color-accent)]" />,
     },
     [MobilePlaceOrderSteps.PlaceOrderFailed]: {
       title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
       description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
-      slotIcon: <$WarningIcon iconName={IconName.Warning} />,
+      slotIcon: <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-color-warning" />,
     },
     [MobilePlaceOrderSteps.Confirmation]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
       description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
-      slotIcon: <$GreenCheckCircle />,
+      slotIcon: <GreenCheckCircle tw="[--icon-size:2rem]" />,
     },
   };
 
@@ -99,9 +101,9 @@ const CloseOrderHeader = () => {
     useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
-    <$CloseOrderHeader>
+    <div tw="spacedRow">
       <h2>{stringGetter({ key: STRING_KEYS.CLOSE })}</h2>
-      <$Right>
+      <div tw="inlineRow mr-0.5 gap-1">
         <$MarketDetails>
           <MidMarketPrice />
           <$PriceChange
@@ -111,8 +113,8 @@ const CloseOrderHeader = () => {
           />
         </$MarketDetails>
         <$VerticalSeparator />
-      </$Right>
-    </$CloseOrderHeader>
+      </div>
+    </div>
   );
 };
 const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
@@ -130,25 +132,6 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
       --dialog-icon-size: 2.5rem;
     `}
 `;
-
-const $Ring = styled(Ring)`
-  --ring-color: var(--color-accent);
-`;
-
-const $GreenCheckCircle = styled(GreenCheckCircle)`
-  --icon-size: 2rem;
-`;
-
-const $CloseOrderHeader = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $Right = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-  margin-right: 0.5rem;
-`;
-
 const $MarketDetails = styled.div`
   ${layoutMixins.rowColumn}
   justify-items: flex-end;
@@ -164,14 +147,4 @@ const $VerticalSeparator = styled(VerticalSeparator)`
   && {
     height: 3rem;
   }
-`;
-
-const $PreviewTitle = styled.div`
-  ${layoutMixins.inlineRow}
-  height: var(--dialog-icon-size);
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-  font-size: 1.5rem;
 `;

@@ -30,11 +30,13 @@ export const PortfolioCard = ({
         {assetIcon ?? <AssetIcon symbol={assetId} />}
         {assetName}
       </$MarketRow>
-      <$MarginRow>
-        <$MarginLabel>{detailLabel}</$MarginLabel>
-        <$MarginValue>{detailValue}</$MarginValue>
-      </$MarginRow>
-      <$ActionRow>{actionSlot}</$ActionRow>
+      <div tw="spacedRow mt-0.5 px-0.625 py-0">
+        <span tw="text-color-text-0 font-mini-book">{detailLabel}</span>
+        <span tw="font-small-book">{detailValue}</span>
+      </div>
+      <div tw="spacedRow mt-0.5 border-t-[length:var(--border)] px-0.625 py-0 pt-0.5">
+        {actionSlot}
+      </div>
     </$PortfolioCard>
   );
 };
@@ -59,27 +61,4 @@ const $MarketRow = styled.div`
   img {
     font-size: 1.25rem; // 20px x 20px
   }
-`;
-
-const $MarginRow = styled.div`
-  ${layoutMixins.spacedRow}
-  padding: 0 0.625rem;
-  margin-top: 0.5rem;
-`;
-
-const $MarginLabel = styled.span`
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
-`;
-
-const $MarginValue = styled.span`
-  font: var(--font-small-book);
-`;
-
-const $ActionRow = styled.div`
-  ${layoutMixins.spacedRow}
-  border-top: var(--border);
-  margin-top: 0.5rem;
-  padding: 0 0.625rem;
-  padding-top: 0.5rem;
 `;

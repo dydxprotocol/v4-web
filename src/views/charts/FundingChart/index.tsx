@@ -94,7 +94,13 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       renderXAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
 
-        return <$XAxisLabelOutput type={OutputType.DateTime} value={tooltipDatum.time} />;
+        return (
+          <AxisLabelOutput
+            type={OutputType.DateTime}
+            value={tooltipDatum.time}
+            tw="shadow-[0_0_0.5rem_var(--color-layer-2)]"
+          />
+        );
       }}
       renderYAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
@@ -125,7 +131,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       numGridLines={1}
       slotEmpty={<LoadingSpace id="funding-chart-loading" />}
     >
-      <$FundingRateToggle>
+      <div tw="isolate m-1 [place-self:start_end]">
         <ToggleGroup
           items={Object.keys(FundingRateResolution).map((rate) => ({
             value: rate as FundingRateResolution,
@@ -146,7 +152,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
           onValueChange={setFundingRateView}
           size={ButtonSize.XSmall}
         />
-      </$FundingRateToggle>
+      </div>
 
       <$CurrentFundingRate isShowing={!tooltipContext?.tooltipOpen}>
         <h4>
@@ -174,13 +180,6 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
     </TimeSeriesChart>
   );
 };
-const $FundingRateToggle = styled.div`
-  place-self: start end;
-  isolation: isolate;
-
-  margin: 1rem;
-`;
-
 const $CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
   place-self: start center;
   padding: clamp(1.5rem, 9rem - 15%, 4rem);
@@ -216,11 +215,6 @@ const $CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
-
-const $XAxisLabelOutput = styled(AxisLabelOutput)`
-  box-shadow: 0 0 0.5rem var(--color-layer-2);
-`;
-
 const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 

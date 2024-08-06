@@ -2,6 +2,7 @@ import { Key, useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -78,7 +79,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     fractionDigits={tickSizeDecimals}
                     withBaseFont
                   />
-                  <$TabletPriceChange>
+                  <$InlineRow tw="font-small-book">
                     {!priceChange24H ? (
                       <Output type={OutputType.Fiat} value={null} />
                     ) : (
@@ -94,7 +95,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                         />
                       </>
                     )}
-                  </$TabletPriceChange>
+                  </$InlineRow>
                 </TableCell>
               ),
             },
@@ -127,7 +128,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'priceChange24HChart',
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
               renderCell: ({ line, priceChange24HPercent }) => (
-                <$SparklineChartContainer>
+                <div tw="h-2 w-3">
                   <SparklineChart
                     data={(line?.toArray() ?? []).map((datum, index) => ({
                       x: index + 1,
@@ -137,7 +138,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     yAccessor={(datum) => datum.y}
                     positive={MustBigNumber(priceChange24HPercent).gt(0)}
                   />
-                </$SparklineChartContainer>
+                </div>
               ),
               allowsSorting: false,
             },
@@ -311,23 +312,10 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $TabletOutput = styled(Output)`
-  font: var(--font-medium-book);
-  color: var(--color-text-2);
-`;
+const $TabletOutput = tw(Output)`font-medium-book text-color-text-2`;
 
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $TabletPriceChange = styled($InlineRow)`
-  font: var(--font-small-book);
-`;
-
-const $NumberOutput = styled(Output)`
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
-`;
+const $InlineRow = tw.div`inlineRow`;
+const $NumberOutput = tw(Output)`font-base-medium text-color-text-2`;
 
 const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   color: ${({ isNegative, isPositive }) =>
@@ -351,9 +339,4 @@ const $MarketNotFound = styled.div`
     font: var(--font-medium-book);
     font-weight: 500;
   }
-`;
-
-const $SparklineChartContainer = styled.div`
-  width: 3rem;
-  height: 2rem;
 `;

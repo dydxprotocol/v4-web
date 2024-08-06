@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
@@ -12,8 +12,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow } from '@/components/DiffArrow';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -107,7 +105,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
           : undefined
       }
     >
-      <$AssetRow>
+      <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedToken ? (
           <>
             <$Img src={selectedToken?.iconUrl ?? undefined} alt="" /> {selectedToken?.name}{' '}
@@ -116,20 +114,8 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_ASSET })
         )}
-      </$AssetRow>
+      </div>
     </SearchSelectMenu>
   );
 };
-
-const $AssetRow = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-  color: var(--color-text-2);
-  font: var(--font-base-book);
-`;
-
-const $Img = styled.img`
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-`;
+const $Img = tw.img`h-1.25 w-1.25 rounded-[50%]`;

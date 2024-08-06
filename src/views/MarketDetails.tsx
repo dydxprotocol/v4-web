@@ -157,14 +157,14 @@ export const MarketDetails: React.FC = () => {
 
   return (
     <$MarketDetails>
-      <$Header>
-        <$WrapRow>
+      <header tw="column gap-1.25">
+        <div tw="row flex-wrap gap-0.5">
           <$MarketTitle>
             <AssetIcon symbol={id} />
             {name}
           </$MarketTitle>
-          {isTablet && <$MarketLinks />}
-        </$WrapRow>
+          {isTablet && <MarketLinks tw="[place-self:start_end]" />}
+        </div>
 
         <$MarketDescription>
           {primaryDescriptionKey && <p>{stringGetter({ key: `APP.${primaryDescriptionKey}` })}</p>}
@@ -174,7 +174,7 @@ export const MarketDetails: React.FC = () => {
         </$MarketDescription>
 
         {!isTablet && (
-          <$Buttons>
+          <div tw="row flex-wrap gap-0.5 overflow-x-auto">
             {whitepaperLink && (
               <Button
                 type={ButtonType.Link}
@@ -208,11 +208,11 @@ export const MarketDetails: React.FC = () => {
                 CoinmarketCap
               </Button>
             )}
-          </$Buttons>
+          </div>
         )}
-      </$Header>
+      </header>
 
-      <$Details items={items} withSeparators />
+      <Details items={items} withSeparators tw="font-mini-book" />
     </$MarketDetails>
   );
 };
@@ -237,16 +237,6 @@ const $MarketDetails = styled.div`
     padding: 0 clamp(0.5rem, 7.5%, 2.5rem);
   }
 `;
-const $Header = styled.header`
-  ${layoutMixins.column}
-  gap: 1.25rem;
-`;
-const $WrapRow = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-
-  flex-wrap: wrap;
-`;
 const $MarketTitle = styled.h3`
   ${layoutMixins.row}
   font: var(--font-large-medium);
@@ -256,9 +246,6 @@ const $MarketTitle = styled.h3`
     width: 2.25rem;
     height: 2.25rem;
   }
-`;
-const $MarketLinks = styled(MarketLinks)`
-  place-self: start end;
 `;
 const $MarketDescription = styled.div`
   ${layoutMixins.column}
@@ -271,14 +258,4 @@ const $MarketDescription = styled.div`
       color: var(--color-text-0);
     }
   }
-`;
-const $Buttons = styled.div`
-  ${layoutMixins.row}
-  flex-wrap: wrap;
-  gap: 0.5rem;
-
-  overflow-x: auto;
-`;
-const $Details = styled(Details)`
-  font: var(--font-mini-book);
 `;

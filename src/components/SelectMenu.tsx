@@ -47,7 +47,7 @@ export const SelectMenu = <T extends string>({
           <Value />
         )}
         {React.Children.toArray(children).length > 1 && (
-          <$TriggerIcon iconName={IconName.Triangle} />
+          <Icon iconName={IconName.Triangle} tw="h-0.375 w-0.625 text-color-text-0" />
         )}
       </$Trigger>
       <Portal>
@@ -112,10 +112,4 @@ const $ItemIndicator = styled(ItemIndicator)`
 const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
   border-radius: 0;
-`;
-
-const $TriggerIcon = styled(Icon)`
-  width: 0.625rem;
-  height: 0.375rem;
-  color: var(--color-text-0);
 `;

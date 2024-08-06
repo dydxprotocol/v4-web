@@ -24,11 +24,12 @@ export const ValidatorFaviconIcon = ({
       const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
       return (
-        <$Img
+        <img
           className={className}
           src={`${baseUrl}/favicon.ico`}
           alt="validator favicon"
           onError={() => setIconFail(true)}
+          tw="mr-[0.25em] h-[1.5em] w-[1.5em] rounded-[50%] object-cover"
         />
       );
     } catch (error) {
@@ -49,13 +50,5 @@ const $IconContainer = styled.div`
   border-radius: 50%;
   font-weight: bold;
   color: var(--color-text-1);
-  margin-right: 0.25em;
-`;
-
-const $Img = styled.img`
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  object-fit: cover;
   margin-right: 0.25em;
 `;

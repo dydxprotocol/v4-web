@@ -23,6 +23,6 @@
     },
     "types": ["node", "@wdio/globals", "mocha"]
   },
-  "include": ["src", "scripts", "styled.d.ts", "__tests__", "wdio.conf.ts"],
+  "include": ["src", "scripts", "styled.d.ts", "__tests__", "wdio.conf.ts", "types"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,7 +1,5 @@
 import { useCallback } from 'react';
 
-import styled from 'styled-components';
-
 import { SubaccountPendingPosition } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -46,24 +44,18 @@ export const PotentialPositionCard = ({
       detailValue={<Output type={OutputType.Fiat} value={freeCollateral?.current} />}
       actionSlot={
         <>
-          <$Link onClick={() => onViewOrders(marketId)} isAccent>
+          <Link onClick={() => onViewOrders(marketId)} isAccent tw="font-small-book">
             {stringGetter({ key: orderCount > 1 ? STRING_KEYS.VIEW_ORDERS : STRING_KEYS.VIEW })}{' '}
             <Icon iconName={IconName.Arrow} />
-          </$Link>
-          <$CancelLink onClick={() => onCancelOrders(marketId)}>
+          </Link>
+          <Link
+            onClick={() => onCancelOrders(marketId)}
+            tw="font-small-book [--link-color:var(--color-risk-high)]"
+          >
             {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ORDERS : STRING_KEYS.CANCEL })}{' '}
-          </$CancelLink>
+          </Link>
         </>
       }
     />
   );
 };
-
-const $Link = styled(Link)`
-  font: var(--font-small-book);
-`;
-
-const $CancelLink = styled(Link)`
-  --link-color: var(--color-risk-high);
-  font: var(--font-small-book);
-`;

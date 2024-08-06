@@ -10,7 +10,6 @@ import { AppRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -44,9 +43,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           getCellValue: (row) => row.asset?.id,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ asset, currentLeverageMultiple, currentPosition }) => (
-            <TableCell stacked slotLeft={<$AssetIcon symbol={asset.id} />}>
+            <TableCell stacked slotLeft={<AssetIcon symbol={asset.id} tw="h-[2.5em]" />}>
               {asset.name}
-              <$CellRow>
+              <div tw="row gap-0.25">
                 <$OutputSigned
                   value={
                     currentPosition.asset < 0
@@ -58,7 +57,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 />
                 @
                 <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
-              </$CellRow>
+              </div>
             </TableCell>
           ),
         },
@@ -86,7 +85,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
             <TableCell
               stacked
               slotRight={
-                <$Sparklines style={{ width: 50, height: 50 }}>
+                <div style={{ width: 50, height: 50 }} tw="ml-0.5">
                   <SparklineChart
                     data={thirtyDayPnl.sparklinePoints.map((elem, index) => ({
                       x: index + 1,
@@ -96,7 +95,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     yAccessor={(datum) => datum.y}
                     positive={thirtyDayPnl.absolute > 0}
                   />
-                </$Sparklines>
+                </div>
               }
             >
               <$OutputSigned
@@ -167,15 +166,4 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
     })[sign]};
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  height: 2.5em;
-`;
-const $CellRow = styled.div`
-  ${layoutMixins.row}
-  gap: 0.25rem;
-`;
-const $Sparklines = styled.div`
-  margin-left: 0.5rem;
 `;

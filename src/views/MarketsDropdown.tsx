@@ -1,4 +1,4 @@
-import { Key, MouseEvent, memo, useMemo, useState } from 'react';
+import { Key, memo, useMemo, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
@@ -96,7 +96,7 @@ const MarketsDropdownContent = ({
           getCellValue: (row) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ priceChange24HPercent }) => (
-            <$InlineRow>
+            <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
@@ -106,7 +106,7 @@ const MarketsDropdownContent = ({
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
               )}
-            </$InlineRow>
+            </div>
           ),
         },
         {
@@ -131,7 +131,11 @@ const MarketsDropdownContent = ({
 
   const slotBottom = useMemo(() => {
     if (filter === MarketFilters.PREDICTION_MARKET) {
-      return <$Disclaimer>{stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}</$Disclaimer>;
+      return (
+        <div tw="p-1 text-color-text-0 font-small-medium">
+          {stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}
+        </div>
+      );
     }
 
     return null;
@@ -155,11 +159,10 @@ const MarketsDropdownContent = ({
           >
             🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
-          <$IconButton
-            onClick={(e: MouseEvent) => {
-              setHasSeenElectionBannerTrupmWin(true);
-            }}
+          <IconButton
+            onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            tw="[--button-backgroundColor:transparent] [--button-border:none]"
           />
         </$MarketDropdownBanner>
       );
@@ -389,13 +392,6 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
-
-const $Disclaimer = styled.div`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-  padding: 1rem;
-`;
-
 const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--toolbar-height);
@@ -435,12 +431,6 @@ const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
 `;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-`;
-
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 
@@ -465,11 +455,6 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);
