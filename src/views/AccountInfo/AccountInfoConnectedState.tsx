@@ -67,6 +67,8 @@ export const AccountInfoConnectedState = () => {
     (!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
     (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral));
 
+  const isAccountMarginUsageError = listOfErrors?.[0] === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
+
   const showHeader = !hasDiff && !isTablet;
 
   return (
@@ -124,7 +126,7 @@ export const AccountInfoConnectedState = () => {
           items={[
             {
               key: AccountInfoItem.MarginUsage,
-              hasError: listOfErrors?.includes('INVALID_NEW_ACCOUNT_MARGIN_USAGE'),
+              hasError: isAccountMarginUsageError,
               tooltip: 'cross-margin-usage',
               isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
                 MustBigNumber(marginUsage?.current)
