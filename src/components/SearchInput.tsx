@@ -38,6 +38,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
           iconName={IconName.Close}
           onClick={() => {
             setValue('');
+            onTextChange?.('');
           }}
         />
       )}
