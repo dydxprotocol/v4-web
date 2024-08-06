@@ -48,5 +48,10 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)`
 
   &:disabled {
     cursor: default;
+
+    > span:first-of-type {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 ` as typeof DropdownSelectMenu;

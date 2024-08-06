@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -33,11 +33,10 @@ const Markets = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   const marketsPageBanner = useMemo(() => {
-    // TODO: (TRA-528): Localize text when finallized. Update navigate link to TRUMPWIN-USD (Use Market redux state to ensure existance)
     if (testFlags.enablePredictionMarketPerp) {
       return (
-        <$MarketsPageBanner onClick={() => navigate(`${AppRoute.Trade}/TRUMP-USD`)}>
-          <span>🇺🇸 Leverage trade the outcome of the U.S. Election</span>
+        <$MarketsPageBanner to={`${AppRoute.Trade}/TRUMP-USD`}>
+          <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>
           <$FlagOverlay />
           <IconButton iconName={IconName.Arrow} />
         </$MarketsPageBanner>
@@ -112,7 +111,7 @@ const $HeaderSection = styled.section`
   }
 `;
 
-const $MarketsPageBanner = styled.div`
+const $MarketsPageBanner = styled(Link)`
   ${layoutMixins.row}
   height: 5rem;
   border-radius: 10px;

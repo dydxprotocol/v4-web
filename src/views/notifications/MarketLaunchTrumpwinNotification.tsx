@@ -1,26 +1,35 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 // eslint-disable-next-line import/no-cycle
 import { Notification, type NotificationProps } from '@/components/Notification';
 
 export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: NotificationProps) => {
+  const stringGetter = useStringGetter();
   return (
     <Notification
       isToast={isToast}
       notification={notification}
       slotIcon="🇺🇸"
-      slotTitle="Trade the U.S. election!"
-      // TODO: (TRA-528): Localize text when finallized
+      slotTitle={stringGetter({ key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_TITLE })}
       slotCustomContent={
         <span>
-          <$Market>TRUMPWIN-USD</$Market> is now live. This market will settle at $1 if Donald J.
-          Trump wins the election. Otherwise, it will settle at $0.001.
+          {stringGetter({
+            key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
+            params: { MARKET: <$Market>TRUMPWIN-USD</$Market> },
+          })}
         </span>
       }
-      slotAction={<$Link to={`${AppRoute.Trade}/TRUMP-USD`}>Trade now →</$Link>}
+      slotAction={
+        <$Link to={`${AppRoute.Trade}/TRUMP-USD`}>
+          {stringGetter({ key: STRING_KEYS.TRADE_NOW })} →
+        </$Link>
+      }
     />
   );
 };

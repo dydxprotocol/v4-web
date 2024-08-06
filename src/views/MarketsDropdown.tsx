@@ -131,13 +131,7 @@ const MarketsDropdownContent = ({
 
   const slotBottom = useMemo(() => {
     if (filter === MarketFilters.PREDICTION_MARKET) {
-      // TODO: (TRA-528): Localize string when finallized.
-      return (
-        <$Disclaimer>
-          Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
-          will settle at $0.001.
-        </$Disclaimer>
-      );
+      return <$Disclaimer>{stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}</$Disclaimer>;
     }
 
     return null;
@@ -150,7 +144,6 @@ const MarketsDropdownContent = ({
 
   const slotTop = useMemo(() => {
     if (!hasSeenElectionBannerTrumpWin && testFlags.enablePredictionMarketPerp) {
-      // TODO: (TRA-528): Update localization string when copy is finallized
       return (
         <$MarketDropdownBanner>
           <$FlagOverlay />
@@ -160,7 +153,7 @@ const MarketsDropdownContent = ({
               closeDropdown();
             }}
           >
-            🇺🇸 Trade the U.S. presidential election →
+            🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
           <$IconButton
             onClick={(e: MouseEvent) => {

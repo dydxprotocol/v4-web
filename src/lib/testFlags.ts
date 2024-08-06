@@ -49,7 +49,7 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return true;
+    return !!this.queryParams.prediction;
   }
 }
 

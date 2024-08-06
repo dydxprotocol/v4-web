@@ -20,26 +20,30 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
   });
 
   if (marketId === 'TRUMP-USD' && !hasSeenTradeFormMessageTrumpWin) {
-    // TODO: (TRA-528): Localize string when finallized and add LEARN_MORE link
     return (
       <AlertMessage type={AlertType.Notice}>
         <$Text>
-          This is a Prediction Market and will settle at $1 if Donald J. Trump wins the 2024 US
-          Presidential Election. Otherwise, it will settle at $0.001.{' '}
-          <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-          </Link>{' '}
-          or{' '}
-          <Link
-            isInline
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              setHasSeenTradeFormMessageTrumpWin(true);
-            }}
-          >
-            {stringGetter({ key: STRING_KEYS.DISMISS })}
-          </Link>
-          .
+          {stringGetter({
+            key: STRING_KEYS.TRUMPWIN_DESC,
+            params: {
+              LEARN_MORE: (
+                <Link isInline onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+                </Link>
+              ),
+              DISMISS: (
+                <Link
+                  isInline
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setHasSeenTradeFormMessageTrumpWin(true);
+                  }}
+                >
+                  {stringGetter({ key: STRING_KEYS.DISMISS })}
+                </Link>
+              ),
+            },
+          })}
         </$Text>
       </AlertMessage>
     );

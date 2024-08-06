@@ -311,9 +311,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             MarketLaunchNotificationIds.TrumpWin,
             {
-              // TODO: (TRA-528): Localize this notification
-              title: 'Trade the U.S. election!',
-              body: 'TRUMPWIN-USD is now live. This market will settle at $1 if Donald J. Trump wins the election. Otherwise, it will settle at $0.001.',
+              title: stringGetter({ key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
+                params: { MARKET: 'TRUMPWIN-USD' },
+              }),
               renderCustomBody({ isToast, notification }) {
                 return (
                   <MarketLaunchTrumpwinNotification isToast={isToast} notification={notification} />
