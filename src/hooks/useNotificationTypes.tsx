@@ -279,11 +279,37 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
+      const twitter200BVolumeExpirationDate = new Date('2024-08-16T23:59:59');
       const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
       const currentDate = new Date();
 
       useEffect(() => {
+        if (currentDate <= twitter200BVolumeExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.Twitter200BVolume,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.BODY',
+                params: {
+                  HERE_LINK: (
+                    <Link href="https://x.com/dYdX/status/1819342483794415784" isAccent isInline>
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.Twitter200BVolume,
+            },
+            []
+          );
+        }
+
         if (currentDate <= incentivesExpirationDate) {
           trigger(
             INCENTIVES_SEASON_NOTIFICATION_ID,

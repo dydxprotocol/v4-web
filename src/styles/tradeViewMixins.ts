@@ -1,9 +1,4 @@
-import {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import { css } from 'styled-components';
 
 export const tradeViewMixins = {
   horizontalTable: css`
@@ -34,4 +29,4 @@ export const tradeViewMixins = {
       --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
     }
   `,
-} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;

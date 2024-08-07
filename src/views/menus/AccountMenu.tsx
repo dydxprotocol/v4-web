@@ -67,7 +67,14 @@ export const AccountMenu = () => {
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
-  const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
+  const { evmAddress, solAddress, walletType, dydxAddress, hdKey } = useAccounts();
+
+  let address: string | undefined;
+  if (walletType === WalletType.Phantom) {
+    address = truncateAddress(solAddress, '');
+  } else {
+    address = truncateAddress(evmAddress, '0x');
+  }
 
   const privy = usePrivy();
   const { google, discord, twitter } = privy?.user ?? {};
@@ -148,7 +155,7 @@ export const AccountMenu = () => {
                 </div>
                 <$Column>
                   <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                  <$Address>{truncateAddress(evmAddress, '0x')}</$Address>
+                  <$Address>{address}</$Address>
                 </$Column>
               </$AddressRow>
             )}
@@ -364,7 +371,7 @@ const AssetActions = memo(
           <WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
-            tw="[--tooltip-backgroundColor:var(--color-layer-5)]"
+            tw="[--tooltip-backgroundColor:--color-layer-5]"
           >
             <$IconButton
               key={dialog.type}
@@ -404,7 +411,6 @@ const $label = styled.div`
 
 const $Balances = styled.div`
   ${layoutMixins.flexColumn}
-
   > div {
     ${layoutMixins.spacedRow}
     box-shadow: 0 0 0 1px var(--color-border);
@@ -417,6 +423,7 @@ const $Balances = styled.div`
     &:first-child {
       border-radius: 0.5rem 0.5rem 0 0;
     }
+
     &:last-child {
       border-radius: 0 0 0.5rem 0.5rem;
     }
@@ -431,7 +438,7 @@ const $DropdownMenu = styled(DropdownMenu)`
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
 ` as typeof DropdownMenu;
-const $Address = tw.span`font-base-book [font-feature-settings:var(--fontFeature-monoNumbers)]`;
+const $Address = tw.span`font-base-book [font-feature-settings:--fontFeature-monoNumbers]`;
 
 const $ConnectToChain = styled($Column)`
   max-width: 12em;

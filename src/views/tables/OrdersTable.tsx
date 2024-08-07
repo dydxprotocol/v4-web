@@ -122,7 +122,7 @@ const getOrdersTableColumnDef = ({
                     : undefined
                 }
                 side="right"
-                tw="[--tooltip-backgroundColor:var(--color-layer-5)]"
+                tw="[--tooltip-backgroundColor:--color-layer-5]"
               >
                 <OrderStatusIcon status={status.rawValue} />
               </WithTooltip>

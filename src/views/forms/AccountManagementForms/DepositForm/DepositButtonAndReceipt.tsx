@@ -260,7 +260,7 @@ export const DepositButtonAndReceipt = ({
   return (
     <WithReceipt
       slotReceipt={<$Details items={submitButtonReceipt} />}
-      tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+      tw="[--withReceipt-backgroundColor:--color-layer-2]"
     >
       <RouteWarningMessage
         hasAcknowledged={hasAcknowledged}

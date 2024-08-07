@@ -249,7 +249,7 @@ const $EstimatedRewardsCardContent = styled.div`
     gap: 0.15rem;
     font: var(--font-medium-book);
 
-    :first-child {
+    &:first-child {
       color: var(--color-text-2);
     }
   }

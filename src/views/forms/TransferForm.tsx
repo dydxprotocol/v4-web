@@ -388,7 +388,7 @@ export const TransferForm = ({
       <WithDetailsReceipt
         side="bottom"
         detailItems={amountDetailItems}
-        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
       >
         <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}

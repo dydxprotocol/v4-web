@@ -85,7 +85,7 @@ export const DropdownMenu = forwardRefFn(
                   {item.label}
                 </$Item>
                 {item.separator && (
-                  <Separator tw="mx-1 my-0.25 border-b-[solid] border-b-color-border" />
+                  <Separator tw="mx-1 my-0.25 border-b-[length:--border-width] border-b-color-border [border-bottom-style:solid]" />
                 )}
               </Fragment>
             ))}

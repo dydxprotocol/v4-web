@@ -34,14 +34,16 @@ import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
-import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
+import { ComplianceStates } from './constants/compliance';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
+import { useCommandMenu } from './hooks/useCommandMenu';
+import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
@@ -64,6 +66,7 @@ const queryClient = new QueryClient();
 const Content = () => {
   useInitializePage();
   useAnalytics();
+  useCommandMenu();
 
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
@@ -71,6 +74,9 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
+
+  const { complianceState } = useComplianceState();
+  const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -84,9 +90,13 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
+      <$Content
+        isShowingHeader={isShowingHeader}
+        isShowingFooter={isShowingFooter}
+        showRestrictionWarning={showRestrictionWarning}
+      >
         {isNotTablet && <HeaderDesktop />}
-        <RestrictionWarning />
+        {showRestrictionWarning && <RestrictionWarning />}
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -135,8 +145,6 @@ const Content = () => {
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
         </$DialogArea>
-
-        <GlobalCommandDialog />
       </$Content>
     </>
   );
@@ -180,7 +188,11 @@ const App = () => {
   );
 };
 
-const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
+const $Content = styled.div<{
+  isShowingHeader: boolean;
+  isShowingFooter: boolean;
+  showRestrictionWarning: boolean;
+}>`
   /* Computed */
   --page-currentHeaderHeight: 0px;
   --page-currentFooterHeight: 0px;
@@ -223,12 +235,14 @@ const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
-  grid-template:
-    'Header' var(--page-currentHeaderHeight)
-    'RestrictionWarning' min-content
-    'Main' minmax(min-content, 1fr)
-    'Footer' var(--page-currentFooterHeight)
-    / 100%;
+  ${({ showRestrictionWarning }) => css`
+    grid-template:
+      'Header' var(--page-currentHeaderHeight)
+      ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
+      'Main' minmax(min-content, 1fr)
+      'Footer' var(--page-currentFooterHeight)
+      / 100%;
+  `}
 
   transition: 0.3s var(--ease-out-expo);
 `;

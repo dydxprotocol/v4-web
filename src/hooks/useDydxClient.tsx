@@ -116,7 +116,15 @@ const useDydxClientContext = () => {
         setFaucetClient(undefined);
       }
     })();
-  }, [networkConfig]);
+  }, [
+    chainTokenDecimals,
+    chainTokenDenom,
+    networkConfig,
+    selectedNetwork,
+    usdcDecimals,
+    usdcDenom,
+    usdcGasDenom,
+  ]);
 
   // ------ Gas Denom ------ //
 
@@ -144,8 +152,9 @@ const useDydxClientContext = () => {
   }, [compositeClient, setSelectedGasDenom]);
 
   // ------ Wallet Methods ------ //
-  const getWalletFromEvmSignature = async ({ signature }: { signature: string }) => {
+  const getWalletFromSignature = async ({ signature }: { signature: string }) => {
     const { mnemonic, privateKey, publicKey } =
+      // This method should be renamed to deriveHDKeyFromSignature as it is used for both solana and ethereum signatures
       onboarding.deriveHDKeyFromEthereumSignature(signature);
 
     return {
@@ -425,7 +434,7 @@ const useDydxClientContext = () => {
     selectedGasDenom: gasDenom,
 
     // Wallet Methods
-    getWalletFromEvmSignature,
+    getWalletFromSignature,
 
     // Public Methods
     requestAllAccountTransfers,

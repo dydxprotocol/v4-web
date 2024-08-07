@@ -85,7 +85,7 @@ export const TablePaginationRow = ({
                 value: String(size),
               }))}
               onValueChange={(value: String) => setPageSize(Number(value) as PageSize)}
-              tw="[--dropdownSelectMenu-item-font-size:var(--fontSize-mini)]"
+              tw="[--dropdownSelectMenu-item-font-size:--fontSize-mini]"
             />
           ),
         },

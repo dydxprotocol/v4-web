@@ -49,7 +49,7 @@ export const MobileTopPanel = () => {
 
   const items = [
     {
-      content: <AccountInfo tw="[--account-info-section-height:var(--tabContent-height)]" />,
+      content: <AccountInfo tw="[--account-info-section-height:--tabContent-height]" />,
       label: stringGetter({ key: STRING_KEYS.WALLET }),
       value: Tab.Account,
       icon: IconName.Coins,

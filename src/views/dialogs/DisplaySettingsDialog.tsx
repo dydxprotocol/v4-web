@@ -87,7 +87,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               </$AppThemeHeader>
               <img src="/chart-bars.svg" tw="z-[1] h-auto w-full" />
               <$CheckIndicator>
-                <Icon iconName={IconName.Check} tw="h-[var(--icon-size)] w-[var(--icon-size)]" />
+                <Icon iconName={IconName.Check} tw="h-[--icon-size] w-[--icon-size]" />
               </$CheckIndicator>
             </$AppThemeItem>
           );

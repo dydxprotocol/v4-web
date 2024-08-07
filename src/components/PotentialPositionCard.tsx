@@ -50,7 +50,7 @@ export const PotentialPositionCard = ({
           </Link>
           <Link
             onClick={() => onCancelOrders(marketId)}
-            tw="font-small-book [--link-color:var(--color-risk-high)]"
+            tw="font-small-book [--link-color:--color-risk-high]"
           >
             {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ORDERS : STRING_KEYS.CANCEL })}{' '}
           </Link>
