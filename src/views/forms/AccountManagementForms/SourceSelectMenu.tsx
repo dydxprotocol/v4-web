@@ -81,8 +81,6 @@ export const SourceSelectMenu = ({
     return null;
   };
 
-  // console.log('SOURCE SELECT MENU', walletType, chains);
-
   const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,

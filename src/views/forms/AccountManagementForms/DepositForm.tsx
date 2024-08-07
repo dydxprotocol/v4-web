@@ -103,17 +103,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const {
     requestPayload,
-    token: tokenStr,
+    token,
     exchange,
-    chain,
+    chain: chainIdStr,
     resources,
     summary,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
-  const chainIdStr = chain;
-  const token = tokenStr;
   // todo are these guaranteed to be base 10?
   /* eslint-disable radix */
   let chainId: number | string | undefined;
