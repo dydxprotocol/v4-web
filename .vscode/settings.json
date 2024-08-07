@@ -10,7 +10,7 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
-  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list", "tw"],
+  "tailwindCSS.classAttributes": ["tw"],
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)", // tw`...`
     "tw=\"([^\"]*)", // <div tw="..." />
