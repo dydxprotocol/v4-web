@@ -96,7 +96,7 @@ const $Wallets = styled.div`
   /* display: flex;
   flex-wrap: wrap;
 
-  :after {
+  &:after {
     content: '';
     flex: 2;
   } */

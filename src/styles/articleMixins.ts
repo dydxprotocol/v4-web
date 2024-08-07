@@ -1,9 +1,4 @@
-import {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import { css } from 'styled-components';
 
 export const articleMixins = {
   article: css`
@@ -47,4 +42,4 @@ export const articleMixins = {
       padding: 0.5rem 1rem;
     }
   `,
-} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;

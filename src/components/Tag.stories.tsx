@@ -40,7 +40,7 @@ TagStory.argTypes = {
   },
 };
 
-export const NewTagStory: Story<Parameters<typeof Tag>[0]> = (args) => {
+export const NewTagStory: Story<Omit<Parameters<typeof Tag>[0], 'ref'>> = (args) => {
   return (
     <StoryWrapper>
       <NewTag {...args}>NEW</NewTag>

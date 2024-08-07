@@ -1,11 +1,6 @@
 import { forwardRef } from 'react';
 
-import styled, {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
 
@@ -155,7 +150,7 @@ const getDisabledStateForButtonAction = (action?: ButtonAction) => {
 
 const buttonStateVariants = (
   action?: ButtonAction
-): Record<ButtonState, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>> => ({
+): Record<ButtonState, ReturnType<typeof css>> => ({
   [ButtonState.Default]: css``,
 
   [ButtonState.Disabled]: getDisabledStateForButtonAction(action),
