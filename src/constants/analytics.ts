@@ -150,18 +150,6 @@ export const AnalyticsEvents = unionize(
     OnboardingAcknowledgeTermsButtonClick: ofType<{
       agreed: boolean;
     }>(),
-    OnboardingDepositFundsClick: ofType<{
-      chainId: string | undefined;
-      tokenAddress: string | undefined;
-      tokenSymbol: string | undefined;
-      slippage: number | undefined;
-      gasFee: number | undefined;
-      bridgeFee: number | undefined;
-      exchangeRate: number | undefined;
-      estimatedRouteDuration: number | undefined;
-      toAmount: number | undefined;
-      toAmountMin: number | undefined;
-    }>(),
     OnboardingSwitchNetworkClick: ofType<{}>(),
     OnboardingSendRequestClick: ofType<{
       firstAttempt: boolean;
@@ -187,6 +175,18 @@ export const AnalyticsEvents = unionize(
       roundtripMs: number;
       /** URL/IP of node the order was sent to */
       validatorUrl: string;
+    }>(),
+    TransferDepositFundsClick: ofType<{
+      chainId: string | undefined;
+      tokenAddress: string | undefined;
+      tokenSymbol: string | undefined;
+      slippage: number | undefined;
+      gasFee: number | undefined;
+      bridgeFee: number | undefined;
+      exchangeRate: number | undefined;
+      estimatedRouteDuration: number | undefined;
+      toAmount: number | undefined;
+      toAmountMin: number | undefined;
     }>(),
     TransferDeposit: ofType<{
       chainId?: string;

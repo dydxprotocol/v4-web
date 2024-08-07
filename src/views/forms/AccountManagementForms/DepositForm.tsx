@@ -280,7 +280,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       track(
-        AnalyticsEvents.OnboardingDepositFundsClick({
+        AnalyticsEvents.TransferDepositFundsClick({
           chainId: chainIdStr || undefined,
           tokenAddress: sourceToken?.address || undefined,
           tokenSymbol: sourceToken?.symbol || undefined,
