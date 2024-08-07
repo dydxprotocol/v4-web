@@ -235,7 +235,7 @@ export const CanvasOrderbook = forwardRef(
           )}
           {layout === 'vertical' ? (
             <>
-              <div ref={orderbookRef} tw="flex flex-1 flex-col overflow-y-auto">
+              <div ref={orderbookRef} tw="flex flex-1 flex-col justify-evenly overflow-y-auto">
                 {asksOrderbook}
                 <OrderbookMiddleRow
                   tickSizeDecimals={tickSizeDecimals}
@@ -260,6 +260,7 @@ export const CanvasOrderbook = forwardRef(
   }
 );
 const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
+  min-height: 100%;
   max-height: 100%;
   display: flex;
   flex-direction: column;
