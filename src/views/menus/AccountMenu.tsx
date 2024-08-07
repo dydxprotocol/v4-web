@@ -371,7 +371,7 @@ const AssetActions = memo(
           <WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
-            tw="[--tooltip-backgroundColor:var(--color-layer-5)]"
+            tw="[--tooltip-backgroundColor:--color-layer-5]"
           >
             <$IconButton
               key={dialog.type}
@@ -438,7 +438,7 @@ const $DropdownMenu = styled(DropdownMenu)`
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
 ` as typeof DropdownMenu;
-const $Address = tw.span`font-base-book [font-feature-settings:var(--fontFeature-monoNumbers)]`;
+const $Address = tw.span`font-base-book [font-feature-settings:--fontFeature-monoNumbers]`;
 
 const $ConnectToChain = styled($Column)`
   max-width: 12em;

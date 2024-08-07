@@ -445,7 +445,7 @@ export const Output = ({
           withBaseFont={withBaseFont}
         >
           {slotLeft}
-          {sign && <span tw="text-[color:var(--output-sign-color)]">{sign}</span>}
+          {sign && <span tw="text-[color:--output-sign-color]">{sign}</span>}
           {hasValue && renderedNumber}
           {slotRight}
           {tag && <Tag tw="ml-[0.5ch]">{tag}</Tag>}

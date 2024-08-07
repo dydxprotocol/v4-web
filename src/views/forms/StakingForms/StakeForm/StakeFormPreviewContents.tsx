@@ -44,7 +44,7 @@ export const StakeFormPreviewContents = ({
         <>
           <AssetIcon
             symbol={chainTokenLabel}
-            tw="text-[length:var(--icon-size)] [--icon-size:2.25rem]"
+            tw="text-[length:--icon-size] [--icon-size:2.25rem]"
           />
           <Output value={stakedAmount} type={OutputType.Asset} tag={chainTokenLabel} />
         </>
@@ -54,7 +54,7 @@ export const StakeFormPreviewContents = ({
           <ValidatorFaviconIcon
             url={website}
             fallbackText={moniker}
-            tw="h-[var(--icon-size)] w-[var(--icon-size)] [--icon-size:2.25rem]"
+            tw="h-[--icon-size] w-[--icon-size] [--icon-size:2.25rem]"
           />
           {moniker}
         </>

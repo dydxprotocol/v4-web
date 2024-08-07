@@ -97,7 +97,7 @@ export const Notification = ({
           {slotContentOrDescription}
         </div>
       )}
-      {slotAction && <div tw="mt-[var(--action-marginTop)] font-small-book">{slotAction}</div>}
+      {slotAction && <div tw="mt-[--action-marginTop] font-small-book">{slotAction}</div>}
     </$Container>
   );
 };

@@ -589,7 +589,7 @@ export const WithdrawForm = () => {
       <WithDetailsReceipt
         side="bottom"
         detailItems={amountInputReceipt}
-        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
       >
         <FormInput
           type={InputType.Number}

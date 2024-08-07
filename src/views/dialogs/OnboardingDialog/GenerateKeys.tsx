@@ -235,7 +235,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
               </span>
             </div>
           }
-          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+          tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
           {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
             <Button

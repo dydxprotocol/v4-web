@@ -127,7 +127,7 @@ export const UnstakeFormInputContents = ({
               ),
             },
           ]}
-          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+          tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
           <FormInput
             id="unstakeAmount"
@@ -169,10 +169,7 @@ export const UnstakeFormInputContents = ({
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
               </$Button>
             ) : (
-              <$Button
-                onClick={setAllUnstakeAmountsToMax}
-                tw="[--button-textColor:var(--color-accent)]"
-              >
+              <$Button onClick={setAllUnstakeAmountsToMax} tw="[--button-textColor:--color-accent]">
                 {stringGetter({ key: STRING_KEYS.ALL })}
               </$Button>
             )}

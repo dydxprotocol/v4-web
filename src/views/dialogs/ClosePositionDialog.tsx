@@ -52,7 +52,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
-        <div tw="inlineRow h-[var(--dialog-icon-size)]">
+        <div tw="inlineRow h-[--dialog-icon-size]">
           {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
         </div>
       ),
@@ -61,7 +61,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     [MobilePlaceOrderSteps.PlacingOrder]: {
       title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
       description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-      slotIcon: <Ring withAnimation value={0.25} tw="[--ring-color:var(--color-accent)]" />,
+      slotIcon: <Ring withAnimation value={0.25} tw="[--ring-color:--color-accent]" />,
     },
     [MobilePlaceOrderSteps.PlaceOrderFailed]: {
       title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),

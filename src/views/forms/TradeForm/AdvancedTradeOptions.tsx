@@ -80,7 +80,7 @@ export const AdvancedTradeOptions = () => {
       triggerIconSide="right"
       fullWidth
     >
-      <div tw="grid gap-[var(--form-input-gap)]">
+      <div tw="grid gap-[--form-input-gap]">
         {needsTimeRow && (
           <$AdvancedInputsRow>
             {hasTimeInForce && timeInForce != null && (

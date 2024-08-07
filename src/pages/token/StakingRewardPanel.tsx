@@ -63,7 +63,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
             action={ButtonAction.Primary}
             size={ButtonSize.Base}
             onClick={openStakingRewardDialog}
-            tw="z-[1] mr-[var(--panel-paddingX)]"
+            tw="z-[1] mr-[--panel-paddingX]"
           >
             {stringGetter({ key: STRING_KEYS.CLAIM })}
           </Button>

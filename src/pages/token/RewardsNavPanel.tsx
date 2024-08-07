@@ -47,7 +47,7 @@ export const RewardsNavPanel = ({
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
-            tw="text-color-text-0 [--color-border:var(--color-layer-6)]"
+            tw="text-color-text-0 [--color-border:--color-layer-6]"
           />
         </div>
       }
