@@ -145,7 +145,6 @@ const Content = () => {
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
         </$DialogArea>
-
       </$Content>
     </>
   );
