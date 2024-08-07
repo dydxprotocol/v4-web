@@ -208,6 +208,7 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
+  Twitter200BVolume = 'twitter-200b-volume',
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS6 = 'incentives-s6',
   FOKDeprecation = 'fok-deprecation',
