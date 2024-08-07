@@ -233,6 +233,10 @@ export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistribute
   }
 }
 
+export enum MarketLaunchNotificationIds {
+  TrumpWin = 'market-launch-trumpwin',
+}
+
 export enum MarketWindDownNotificationIds {
   MarketWindDownFetAgix = 'market-wind-down-fet-agix',
   MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
