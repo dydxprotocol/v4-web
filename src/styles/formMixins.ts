@@ -1,9 +1,4 @@
-import {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import { css } from 'styled-components';
 
 import breakpoints from './breakpoints';
 import { layoutMixins } from './layoutMixins';
@@ -196,4 +191,4 @@ export const formMixins = {
       --form-input-gap: 1rem;
     }
   `,
-} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;

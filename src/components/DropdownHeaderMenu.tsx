@@ -84,7 +84,7 @@ const $Trigger = styled(Trigger)`
   font: var(--font-extra-medium);
   outline: none;
 
-  :hover {
+  &:hover {
     filter: brightness(var(--hover-filter-base));
   }
 `;
