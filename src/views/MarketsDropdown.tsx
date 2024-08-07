@@ -270,7 +270,7 @@ export const MarketsDropdown = memo(
                   {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
                 </h2>
               ) : (
-                <div tw="spacedRow gap-[0.625rem]">
+                <div tw="spacedRow gap-0.625">
                   <AssetIcon symbol={symbol} />
                   <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                   {leverageTag}

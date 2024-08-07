@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
@@ -22,27 +21,20 @@ export const MarketLaunchTrumpwinNotification = ({ isToast, notification }: Noti
         <span>
           {stringGetter({
             key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
-            params: { MARKET: <$Market>{PREDICTION_MARKET.TRUMPWIN}</$Market> },
+            params: {
+              MARKET: <span tw="text-color-text-1">{PREDICTION_MARKET.TRUMPWIN}</span>,
+            },
           })}
         </span>
       }
       slotAction={
-        <$Link to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
+        <Link
+          to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}
+          tw="text-color-accent visited:text-color-accent"
+        >
           {stringGetter({ key: STRING_KEYS.TRADE_NOW })} →
-        </$Link>
+        </Link>
       }
     />
   );
 };
-
-const $Market = styled.span`
-  color: var(--color-text-1);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;

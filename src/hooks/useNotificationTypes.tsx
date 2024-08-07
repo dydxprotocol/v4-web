@@ -24,6 +24,7 @@ import {
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
+  ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
