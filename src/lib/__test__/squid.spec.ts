@@ -25,7 +25,6 @@ const toChainPending = (chainId: string | undefined): SkipTransactionStatus => (
     estimatedRouteDuration: '<30 minutes',
   },
   transactionUrl: undefined,
-  
   transactionId: undefined,
 });
 
