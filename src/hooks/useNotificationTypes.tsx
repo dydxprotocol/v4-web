@@ -300,7 +300,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: stringGetter({
                 key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.BODY',
                 params: {
-                  HERE_LINK: 'https://x.com/dYdX/status/1819342483794415784',
+                  HERE_LINK: (
+                    <Link
+                      href="https://x.com/dYdX/status/1819342483794415784"
+                      isAccent
+                      isInline
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
                 },
               }),
               toastSensitivity: 'foreground',
