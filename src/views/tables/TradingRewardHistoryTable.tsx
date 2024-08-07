@@ -86,7 +86,7 @@ const getTradingRewardHistoryTableColumnDef = ({
             value={amount}
             showSign={ShowSign.Both}
             slotRight={<AssetIcon symbol={chainTokenLabel} />}
-            tw="gap-[0.5ch] [--output-sign-color:var(--color-positive)]"
+            tw="gap-[0.5ch] [--output-sign-color:--color-positive]"
           />
         ),
       },

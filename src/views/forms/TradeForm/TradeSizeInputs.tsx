@@ -198,7 +198,7 @@ export const TradeSizeInputs = () => {
   );
 
   return (
-    <div tw="flexColumn gap-[var(--form-input-gap)]">
+    <div tw="flexColumn gap-[--form-input-gap]">
       {showUSDCInput ? usdcInput : sizeInput}
       {needsLeverage && (
         <MarketLeverageInput

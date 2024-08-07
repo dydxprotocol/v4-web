@@ -371,7 +371,7 @@ const $ActionButton = styled(IconButton)<{ iconName?: IconName }>`
   }
 `;
 
-const $Details = tw(Details)`font-small-book [--details-value-font:var(--font-medium-book)]`;
+const $Details = tw(Details)`font-small-book [--details-value-font:--font-medium-book]`;
 
 const $RewardsPanel = styled(Panel)`
   grid-area: rewards;

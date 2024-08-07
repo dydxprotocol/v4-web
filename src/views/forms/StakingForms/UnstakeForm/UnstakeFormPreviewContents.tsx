@@ -59,7 +59,7 @@ export const UnstakeFormPreviewContents = ({
           <ValidatorIcons
             numToShow={3}
             validators={unstakingValidators}
-            tw="[--border-color:var(--color-layer-4)] [--icon-size:2.25rem]"
+            tw="[--border-color:--color-layer-4] [--icon-size:2.25rem]"
           />
           <$ValidatorsLabel>
             {unstakingValidators.map((validator) => validator.description?.moniker).join(', ')}
@@ -70,7 +70,7 @@ export const UnstakeFormPreviewContents = ({
         <>
           <AssetIcon
             symbol={chainTokenLabel}
-            tw="text-[length:var(--icon-size)] [--icon-size:2.25rem]"
+            tw="text-[length:--icon-size] [--icon-size:2.25rem]"
           />
           <Output
             value={delegationsToUnstake.reduce(

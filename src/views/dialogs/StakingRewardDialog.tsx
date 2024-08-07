@@ -155,7 +155,7 @@ export const StakingRewardDialog = ({
               value={usdcRewards}
               showSign={ShowSign.Both}
               minimumFractionDigits={SMALL_USD_DECIMALS}
-              tw="[--output-sign-color:var(--color-positive)]"
+              tw="[--output-sign-color:--color-positive]"
             />
             {usdcLabel}
           </$Pill>

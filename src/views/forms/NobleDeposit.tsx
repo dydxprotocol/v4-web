@@ -56,7 +56,7 @@ export const NobleDeposit = () => {
             />
           </div>
         }
-        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
       >
         <TimeoutButton
           timeoutInSeconds={8}

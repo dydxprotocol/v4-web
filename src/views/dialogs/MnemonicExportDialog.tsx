@@ -64,7 +64,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
               />
             </div>
           }
-          tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+          tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
           <TimeoutButton
             action={ButtonAction.Destroy}

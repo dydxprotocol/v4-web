@@ -49,7 +49,7 @@ export const TradingRewardsChartPanel = () => {
             </$EmptyCard>
           </div>
         }
-        tw="h-20 [--trading-rewards-line-color:var(--color-positive)]"
+        tw="h-20 [--trading-rewards-line-color:--color-positive]"
       />
     </Panel>
   );

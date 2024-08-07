@@ -111,7 +111,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
                 />
               </div>
             }
-            tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+            tw="[--withReceipt-backgroundColor:--color-layer-2]"
           >
             <Button
               action={ButtonAction.Primary}

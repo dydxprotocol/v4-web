@@ -109,7 +109,7 @@ export const StakeFormInputContents = ({
       <WithDetailsReceipt
         side="bottom"
         detailItems={amountDetailItems}
-        tw="[--withReceipt-backgroundColor:var(--color-layer-2)]"
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
       >
         <FormInput
           id="stakeAmount"
