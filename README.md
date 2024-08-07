@@ -127,23 +127,6 @@ Edit `vercel.json` and configure the `rewrites` configuration option. It is an a
 
 Note: The first matching rule takes precedence over anything defined afterwards in the array.
 
-# VSCode setup
-
-We use twin.macro for tailwind styling shorthands. To get the tailwind VSCode extension to work correctly, add the following to your settings.json:
-
-```
-  "tailwindCSS.classAttributes": [
-    "tw"
-  ],
-  "tailwindCSS.experimental.classRegex": [
-    "tw`([^`]*)", // tw`...`
-    "tw=\"([^\"]*)", // <div tw="..." />
-    "tw={\"([^\"}]*)", // <div tw={"..."} />
-    "tw\\.\\w+`([^`]*)", // tw.xxx`...`
-    "tw\\(.*?\\)`([^`]*)" // tw(Component)`...`
-  ]
-```
-
 # Testing
 
 ## Unit testing
