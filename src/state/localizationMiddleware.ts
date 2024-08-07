@@ -17,6 +17,7 @@ import {
 import { initializeLocalization } from '@/state/app';
 import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
+import { getBrowserLanguage } from '@/lib/language';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 
 const getNewLocaleData = ({
@@ -55,8 +56,9 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
 
       if (localStorageLocale) {
         store.dispatch(setSelectedLocale({ locale: localStorageLocale }));
-      } else if (globalThis.navigator?.language) {
-        const browserLanguageBaseTag = globalThis.navigator.language.split('-')[0].toLowerCase();
+      } else {
+        const browserLanguage = getBrowserLanguage();
+        const browserLanguageBaseTag = browserLanguage.split('-')[0].toLowerCase();
 
         let locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
           SupportedLocales.EN) as SupportedLocales;
@@ -68,6 +70,7 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
 
         store.dispatch(setSelectedLocale({ locale, isAutoDetect: true }));
       }
+
       break;
     }
     // @ts-ignore
