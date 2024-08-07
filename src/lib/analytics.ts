@@ -24,7 +24,7 @@ export const identify = (property: AnalyticsUserProperty) => {
 };
 
 export const track = (event: AnalyticsEvent) => {
-  if (DEBUG_ANALYTICS) {
+  if (DEBUG_ANALYTICS || import.meta.env.VITE_LOG_TRACK_EVENTS === 'true') {
     // eslint-disable-next-line no-console
     console.log(`[Analytics] ${event.type}`, event.payload);
   }

@@ -187,6 +187,7 @@ export const AnalyticsEvents = unionize(
       estimatedRouteDuration: number | undefined;
       toAmount: number | undefined;
       toAmountMin: number | undefined;
+      depositCTAString: string;
     }>(),
     TransferDeposit: ofType<{
       chainId?: string;

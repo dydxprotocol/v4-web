@@ -291,6 +291,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
           toAmount: summary?.toAmount || undefined,
           toAmountMin: summary?.toAmountMin || undefined,
+          depositCTAString,
         })
       );
       try {
