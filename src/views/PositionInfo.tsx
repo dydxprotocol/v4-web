@@ -385,7 +385,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           withOverflow={false}
           withSeparators
           isLoading={isLoading}
-          tw="font-mini-book [--details-value-font:var(--font-small-book)]"
+          tw="font-mini-book [--details-value-font:--font-small-book]"
         />
 
         {!hasNoPositionInMarket && actions}

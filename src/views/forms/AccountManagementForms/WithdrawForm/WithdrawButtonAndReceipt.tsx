@@ -231,7 +231,7 @@ export const WithdrawButtonAndReceipt = ({
 };
 const $RowWithGap = tw.span`row gap-[0.5ch]`;
 
-const $WithReceipt = tw(WithReceipt)`[--withReceipt-backgroundColor:var(--color-layer-2)]`;
+const $WithReceipt = tw(WithReceipt)`[--withReceipt-backgroundColor:--color-layer-2]`;
 
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;

@@ -129,4 +129,4 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
   --dialog-icon-size: 1.25rem;
 `;
 
-const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:var(--color-accent)]`;
+const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:--color-accent]`;

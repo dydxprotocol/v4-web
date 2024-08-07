@@ -77,7 +77,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
       slotIcon={dialogProps[currentStep].slotIcon}
       title={dialogProps[currentStep].title}
       description={dialogProps[currentStep].description}
-      tw="[--dialog-content-paddingTop:var(--default-border-width)]"
+      tw="[--dialog-content-paddingTop:--default-border-width]"
     >
       <UnstakeForm currentStep={currentStep} setCurrentStep={setCurrentStep} onDone={closeDialog} />
     </Dialog>

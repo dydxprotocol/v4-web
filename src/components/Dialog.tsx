@@ -134,11 +134,11 @@ export const Dialog = ({
             </$StackedHeaderTopRow>
           ) : (
             <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
-              <div tw="row gap-[var(--dialog-title-gap)]">
+              <div tw="row gap-[--dialog-title-gap]">
                 {onBack && <BackButton onClick={onBack} />}
 
                 {slotIcon && (
-                  <div tw="row h-[1em] w-[1em] text-[length:var(--dialog-icon-size)] leading-none">
+                  <div tw="row h-[1em] w-[1em] text-[length:--dialog-icon-size] leading-none">
                     {slotIcon}
                   </div>
                 )}

@@ -268,7 +268,7 @@ export const ClosePositionForm = ({
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <div tw="flexColumn gap-[var(--form-input-gap)]">
+        <div tw="flexColumn gap-[--form-input-gap]">
           <PositionPreview />
           {alertMessage}
         </div>
