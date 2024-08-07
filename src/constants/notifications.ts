@@ -209,11 +209,7 @@ export type TransferNotifcation = {
 
 export enum ReleaseUpdateNotificationIds {
   Twitter200BVolume = 'twitter-200b-volume',
-  RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS6 = 'incentives-s6',
-  FOKDeprecation = 'fok-deprecation',
-  IsolatedMarginLive = 'isolated-margin-live', // Added 06/12/2024
-  InAppStakingLive = 'staking-live', // Added 06/24/2024
 }
 
 // Incentives Season

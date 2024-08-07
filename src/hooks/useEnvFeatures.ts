@@ -5,11 +5,9 @@ import { useAppSelector } from '@/state/appTypes';
 
 export interface EnvironmentFeatures {
   checkForGeo: boolean;
-  reduceOnlySupported: boolean;
   withdrawalSafetyEnabled: boolean;
   CCTPWithdrawalOnly: boolean;
   CCTPDepositOnly: boolean;
-  isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
   isOhlcEnabled: boolean;
 }
