@@ -103,12 +103,12 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       // 1. First signature
       setStatus(EvmDerivedAccountStatus.Deriving);
 
+      const signature = await signTypedDataAsync();
       track(
         AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
           signatureNumber: 1,
         })
       );
-      const signature = await signTypedDataAsync();
       const { wallet: dydxWallet } = await getWalletFromEvmSignature({ signature });
 
       // 2. Ensure signature is deterministic
@@ -125,13 +125,13 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         if (!hasPreviousTransactions) {
           setStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
 
+          const additionalSignature = await signTypedDataAsync();
           // Second signature
           track(
             AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
               signatureNumber: 2,
             })
           );
-          const additionalSignature = await signTypedDataAsync();
 
           if (signature !== additionalSignature) {
             throw new Error(
