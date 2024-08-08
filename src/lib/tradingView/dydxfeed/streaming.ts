@@ -16,7 +16,6 @@ export const subscribeOnStream = ({
   resolution,
   onRealtimeCallback,
   subscribeUID,
-  onResetCacheNeededCallback,
   lastBar,
 }: {
   symbolInfo: LibrarySymbolInfo;
@@ -33,7 +32,6 @@ export const subscribeOnStream = ({
   const handler = {
     id: subscribeUID,
     callback: onRealtimeCallback,
-    onResetCacheNeededCallback,
   };
 
   let subscriptionItem = subscriptionsByChannelId.get(channelId);
