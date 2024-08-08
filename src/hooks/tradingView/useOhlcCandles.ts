@@ -1,7 +1,4 @@
-/* eslint-disable prettier/prettier */
 import { useEffect } from 'react';
-
-import { TvWidget } from '@/constants/tvchart';
 
 import abacusStateManager from '@/lib/abacus';
 
@@ -14,11 +11,9 @@ import { useTradingViewChart } from '../useTradingViewChart';
 export const useOhlcCandles = ({
   ohlcToggle,
   isChartReady,
-  tvWidget,
 }: {
   ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
-  tvWidget: TvWidget | null;
 }) => {
   const { ohlcToggleOn, setOhlcToggleOn } = useTradingViewChart();
 
@@ -32,32 +27,14 @@ export const useOhlcCandles = ({
   useEffect(
     // Update ohlc button on toggle
     () => {
-      if (isChartReady && tvWidget) {
-        tvWidget.onChartReady(() => {
-          tvWidget.headerReady().then(() => {
-            if (ohlcToggleOn) {
-              ohlcToggle?.classList?.add('ohlc-active');
-              // for (const channelId of subscriptionsByChannelId.keys()) {
-              //   for (const uid of Object.values(subscriptionsByChannelId.get(channelId).handlers)) {
-              // uid.onResetCacheNeededCallback(); xcxc
-              //   }
-              // }
-              // tvWidget.chart().resetData();
-            } else {
-              ohlcToggle?.classList?.remove('ohlc-active');
-              // for (const channelId of subscriptionsByChannelId.keys()) {
-              //   for (const uid of Object.values(subscriptionsByChannelId.get(channelId).handlers)) {
-              // uid.onResetCacheNeededCallback(); xcxc
-              //   }
-              // }
-              // tvWidget.chart().resetData();
-            }
-            abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
-          });
-        });
+      if (ohlcToggleOn) {
+        ohlcToggle?.classList?.add('ohlc-active');
+      } else {
+        ohlcToggle?.classList?.remove('ohlc-active');
       }
+      abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
     },
-    [ohlcToggleOn, ohlcToggle?.classList, isChartReady, tvWidget]
+    [ohlcToggleOn, ohlcToggle?.classList]
   );
 
   return { ohlcToggleOn };

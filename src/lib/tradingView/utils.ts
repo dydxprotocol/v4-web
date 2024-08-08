@@ -1,6 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
@@ -29,6 +29,7 @@ const getOhlcValues = ({
 }) => {
   const useOhlc =
     ohlcToggleOn && trades === 0 && orderbookOpen !== undefined && orderbookClose !== undefined;
+
   return {
     low: useOhlc ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
     high: useOhlc ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
@@ -49,7 +50,7 @@ export const mapCandle =
     trades,
     orderbookMidPriceOpen,
     orderbookMidPriceClose,
-  }: Candle): TradingViewBar => {
+  }: Candle): TradingViewChartBar => {
     const tradeOpen = parseFloat(open);
     const tradeClose = parseFloat(close);
     const tradeLow = parseFloat(low);
@@ -80,13 +81,13 @@ export const mapCandle =
     };
   };
 
-const mapTradingViewBar = ({
+const mapTradingViewChartBar = ({
   ohlcToggleOn,
   bar,
 }: {
   ohlcToggleOn: boolean;
-  bar: TradingViewBar;
-}): TradingViewBar => {
+  bar: TradingViewChartBar;
+}): TradingViewChartBar => {
   const { trades, orderbookOpen, orderbookClose, tradeOpen, tradeClose, tradeLow, tradeHigh } = bar;
 
   return {
@@ -119,18 +120,18 @@ export const getHistorySlice = ({
   firstDataRequest,
   ohlcToggleOn,
 }: {
-  bars?: TradingViewBar[];
+  bars?: TradingViewChartBar[];
   fromMs: number;
   toMs: number;
   firstDataRequest: boolean;
   ohlcToggleOn: boolean;
-}): TradingViewBar[] => {
+}): TradingViewChartBar[] => {
   if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0].time)) {
     return [];
   }
 
   return bars
-    .map((bar) => mapTradingViewBar({ ohlcToggleOn, bar }))
+    .map((bar) => mapTradingViewChartBar({ ohlcToggleOn, bar }))
     .filter(({ time }) => time >= fromMs);
 };
 

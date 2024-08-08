@@ -21,6 +21,7 @@ import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStringGetter } from '../useStringGetter';
+import { useTradingViewChart } from '../useTradingViewChart';
 
 /**
  * @description Hook to handle drawing chart lines
@@ -35,7 +36,7 @@ export const useChartLines = ({
   orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
 }) => {
-  const [showOrderLines, setShowOrderLines] = useState(true);
+  const { orderLinesToggleOn, setOrderLinesToggleOn } = useTradingViewChart();
 
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
@@ -246,33 +247,33 @@ export const useChartLines = ({
   }, []);
 
   const drawChartLines = useCallback(() => {
-    if (showOrderLines) {
+    if (orderLinesToggleOn) {
       updateOrderLines();
       updatePositionLines();
     } else {
       clearChartLines();
     }
-  }, [updatePositionLines, updateOrderLines, clearChartLines, showOrderLines]);
+  }, [updatePositionLines, updateOrderLines, clearChartLines, orderLinesToggleOn]);
 
   // Effects
 
   useEffect(() => {
     // Initialize onClick for order line toggle
     if (isChartReady && orderLineToggle) {
-      orderLineToggle.onclick = () => setShowOrderLines((prev) => !prev);
+      orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
     }
-  }, [isChartReady, orderLineToggle]);
+  }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
 
   useEffect(
     // Update display button on toggle
     () => {
-      if (showOrderLines) {
+      if (orderLinesToggleOn) {
         orderLineToggle?.classList?.add('order-lines-active');
       } else {
         orderLineToggle?.classList?.remove('order-lines-active');
       }
     },
-    [showOrderLines, orderLineToggle?.classList]
+    [orderLinesToggleOn, orderLineToggle?.classList]
   );
 
   useEffect(

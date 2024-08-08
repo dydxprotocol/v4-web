@@ -39,7 +39,7 @@ export const TvChart = () => {
     savedResolution: savedResolution as ResolutionString | undefined,
   });
   const { chartLines } = useChartLines({ tvWidget, orderLineToggle, isChartReady });
-  useOhlcCandles({ ohlcToggle, isChartReady, tvWidget });
+  useOhlcCandles({ ohlcToggle, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
