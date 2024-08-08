@@ -101,6 +101,7 @@ export const useTradingView = ({
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+        auto_save_delay: 1,
       };
 
       const tvChartWidget = new Widget(options);
