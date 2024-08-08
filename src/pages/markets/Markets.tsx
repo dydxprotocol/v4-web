@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -33,16 +34,12 @@ const Markets = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   const marketsPageBanner = useMemo(() => {
-    // TODO: (TRA-528): Localize text when finallized. Update navigate link to TRUMPWIN-USD (Use Market redux state to ensure existance)
     if (testFlags.enablePredictionMarketPerp) {
       return (
-        <$MarketsPageBanner>
-          <span>🇺🇸 Leverage trade the outcome of the U.S. Election</span>
+        <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
+          <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>
           <$FlagOverlay />
-          <IconButton
-            iconName={IconName.Arrow}
-            onClick={() => navigate(`${AppRoute.Trade}/TRUMPWIN-USD`)}
-          />
+          <IconButton iconName={IconName.Arrow} />
         </$MarketsPageBanner>
       );
     }
@@ -115,11 +112,11 @@ const $HeaderSection = styled.section`
   }
 `;
 
-const $MarketsPageBanner = styled.div`
+const $MarketsPageBanner = styled(Link)`
   ${layoutMixins.row}
   height: 5rem;
   border-radius: 10px;
-  background-color: var(--color-layer-4);
+  background-color: var(--color-layer-1);
   margin-bottom: 1rem;
   padding: 0 1.5rem;
   justify-content: space-between;
@@ -149,7 +146,7 @@ const $FlagOverlay = styled.div`
   width: 573px;
   height: 100%;
   background-image: ${({ theme }) => `
-    linear-gradient(90deg, ${theme.layer4} 0%, ${theme.tooltipBackground} 53%, ${theme.layer4} 99%),
+    linear-gradient(90deg, ${theme.layer1} 0%, ${theme.tooltipBackground} 53%, ${theme.layer1} 99%),
     url('/AmericanFlag.png')
   `};
   background-repeat: no-repeat;

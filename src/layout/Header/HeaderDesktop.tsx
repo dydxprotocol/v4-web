@@ -215,7 +215,7 @@ const $Header = styled.header`
 
   font-size: 0.9375rem;
 
-  :before {
+  &:before {
     backdrop-filter: blur(10px);
   }
 `;

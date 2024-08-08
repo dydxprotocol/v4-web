@@ -49,7 +49,6 @@ import {
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -242,7 +241,7 @@ export const TradeForm = ({
 
   const tradeFormMessages = (
     <>
-      {testFlags.enablePredictionMarketPerp && <TradeFormInfoMessages marketId={marketId} />}
+      <TradeFormInfoMessages marketId={marketId} />
 
       {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
         <AlertMessage type={AlertType.Error}>

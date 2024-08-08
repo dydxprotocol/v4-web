@@ -208,6 +208,7 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
+  Twitter200BVolume = 'twitter-200b-volume',
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS6 = 'incentives-s6',
   FOKDeprecation = 'fok-deprecation',
@@ -230,6 +231,10 @@ export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistribute
     default:
       return 5;
   }
+}
+
+export enum MarketLaunchNotificationIds {
+  TrumpWin = 'market-launch-trumpwin',
 }
 
 export enum MarketWindDownNotificationIds {

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { AcknowledgeTermsDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,6 +18,8 @@ import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
+import { track } from '@/lib/analytics';
+
 export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTermsDialogProps>) => {
   const stringGetter = useStringGetter();
   const { saveHasAcknowledgedTerms } = useAccounts();
@@ -24,10 +27,20 @@ export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTer
   const onAcknowledgement = () => {
     saveHasAcknowledgedTerms(true);
     setIsOpen(false);
+    track(
+      AnalyticsEvents.OnboardingAcknowledgeTermsButtonClick({
+        agreed: true,
+      })
+    );
   };
 
   const onClose = () => {
     setIsOpen(false);
+    track(
+      AnalyticsEvents.OnboardingAcknowledgeTermsButtonClick({
+        agreed: false,
+      })
+    );
   };
 
   return (

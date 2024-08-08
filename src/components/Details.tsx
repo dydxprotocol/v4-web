@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import styled, { ThemeProps, css, type FlattenInterpolation } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
@@ -208,7 +208,7 @@ const itemLayoutVariants = {
     justify-items: start;
     gap: 0.375rem;
   `,
-} satisfies Record<string, FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;
 const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
