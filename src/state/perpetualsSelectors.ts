@@ -169,13 +169,13 @@ export const getPerpetualCandlesForMarket = (
  * @param resolution
  * @returns TradingViewBar data for specified marketId and resolution
  */
-export const getPerpetualBarsForPriceChart = () =>
+export const getPerpetualBarsForPriceChart = (ohlcToggleOn: boolean) =>
   createAppSelector(
     [
       (state: RootState, marketId: string, resolution: string) =>
         getPerpetualCandlesForMarket(state, marketId, resolution),
     ],
-    (candles): TradingViewBar[] => candles.map(mapCandle)
+    (candles): TradingViewBar[] => candles.map(mapCandle(ohlcToggleOn))
   );
 
 /**

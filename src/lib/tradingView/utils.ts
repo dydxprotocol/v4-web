@@ -8,33 +8,99 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
-export const mapCandle = ({
-  startedAt,
-  open,
-  close,
-  high,
-  low,
-  baseTokenVolume,
+const getOhlcValues = ({
+  ohlcToggleOn,
   trades,
-  orderbookMidPriceOpen,
-  orderbookMidPriceClose,
-}: Candle): TradingViewBar => {
-  const hasNoTrades = trades === 0;
-  // Empty (0 trade) candles in markets will show O(pen) H(igh) L(ow) C(lose) data via mid-price.
-  // Otherwise, candles display OHLC data from historical trades.
-  const useOhlc = hasNoTrades && orderbookMidPriceOpen && orderbookMidPriceClose;
+  tradeOpen,
+  tradeClose,
+  tradeLow,
+  tradeHigh,
+  orderbookOpen,
+  orderbookClose,
+}: {
+  ohlcToggleOn: boolean;
+  trades: number;
+  tradeOpen: number;
+  tradeClose: number;
+  tradeLow: number;
+  tradeHigh: number;
+  orderbookOpen?: number;
+  orderbookClose?: number;
+}) => {
+  const useOhlc =
+    ohlcToggleOn && trades === 0 && orderbookOpen !== undefined && orderbookClose !== undefined;
+  return {
+    low: useOhlc ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
+    high: useOhlc ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
+    open: useOhlc ? orderbookOpen : tradeOpen,
+    close: useOhlc ? orderbookClose : tradeClose,
+  };
+};
+
+export const mapCandle =
+  (ohlcToggleOn: boolean) =>
+  ({
+    startedAt,
+    open,
+    close,
+    high,
+    low,
+    baseTokenVolume,
+    trades,
+    orderbookMidPriceOpen,
+    orderbookMidPriceClose,
+  }: Candle): TradingViewBar => {
+    const tradeOpen = parseFloat(open);
+    const tradeClose = parseFloat(close);
+    const tradeLow = parseFloat(low);
+    const tradeHigh = parseFloat(high);
+    const orderbookOpen = orderbookMidPriceOpen ? parseFloat(orderbookMidPriceOpen) : undefined;
+    const orderbookClose = orderbookMidPriceClose ? parseFloat(orderbookMidPriceClose) : undefined;
+
+    return {
+      ...getOhlcValues({
+        ohlcToggleOn,
+        trades,
+        tradeOpen,
+        tradeClose,
+        tradeLow,
+        tradeHigh,
+        orderbookOpen,
+        orderbookClose,
+      }),
+      time: new Date(startedAt).getTime(),
+      volume: Math.ceil(Number(baseTokenVolume)),
+      tradeOpen,
+      tradeClose,
+      orderbookOpen,
+      orderbookClose,
+      tradeLow,
+      tradeHigh,
+      trades,
+    };
+  };
+
+const mapTradingViewBar = ({
+  ohlcToggleOn,
+  bar,
+}: {
+  ohlcToggleOn: boolean;
+  bar: TradingViewBar;
+}): TradingViewBar => {
+  const { trades, orderbookOpen, orderbookClose, tradeOpen, tradeClose, tradeLow, tradeHigh } = bar;
 
   return {
-    time: new Date(startedAt).getTime(),
-    low: useOhlc
-      ? Math.min(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
-      : parseFloat(low),
-    high: useOhlc
-      ? Math.max(parseFloat(orderbookMidPriceOpen), parseFloat(orderbookMidPriceClose))
-      : parseFloat(high),
-    open: useOhlc ? parseFloat(orderbookMidPriceOpen) : parseFloat(open),
-    close: useOhlc ? parseFloat(orderbookMidPriceClose) : parseFloat(close),
-    volume: Math.ceil(Number(baseTokenVolume)),
+    ...bar,
+    ...getOhlcValues({
+      ohlcToggleOn,
+      trades,
+      tradeOpen,
+      tradeClose,
+      tradeLow,
+      tradeHigh,
+      orderbookOpen,
+      orderbookClose,
+    }),
   };
 };
 
@@ -51,17 +117,21 @@ export const getHistorySlice = ({
   fromMs,
   toMs,
   firstDataRequest,
+  ohlcToggleOn,
 }: {
   bars?: TradingViewBar[];
   fromMs: number;
   toMs: number;
   firstDataRequest: boolean;
+  ohlcToggleOn: boolean;
 }): TradingViewBar[] => {
   if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0].time)) {
     return [];
   }
 
-  return bars.filter(({ time }) => time >= fromMs);
+  return bars
+    .map((bar) => mapTradingViewBar({ ohlcToggleOn, bar }))
+    .filter(({ time }) => time >= fromMs);
 };
 
 export const getChartLineColors = ({

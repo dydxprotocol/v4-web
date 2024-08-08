@@ -19,12 +19,21 @@ export interface Candle {
 }
 
 export interface TradingViewBar {
+  // Properties corresponding to the TradingView.Bar interface, used for rendering
   time: number;
   low: number;
   high: number;
   open: number;
   close: number;
   volume: number;
+  // Properties used to re-map Bars conditionally if OHLC is enabled
+  tradeOpen: number;
+  tradeClose: number;
+  orderbookOpen?: number;
+  orderbookClose?: number;
+  tradeLow: number;
+  tradeHigh: number;
+  trades: number;
 }
 
 export interface TradingViewSymbol {

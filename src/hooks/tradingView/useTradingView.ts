@@ -30,6 +30,7 @@ import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
+import { useTradingViewChart } from '../useTradingViewChart';
 import { useURLConfigs } from '../useURLConfigs';
 
 /**
@@ -60,6 +61,7 @@ export const useTradingView = ({
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
+  const { ohlcToggleOn } = useTradingViewChart();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,
@@ -94,7 +96,7 @@ export const useTradingView = ({
       const options = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
+        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale, ohlcToggleOn),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
@@ -150,7 +152,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo]);
+  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo, ohlcToggleOn]);
 
   return { savedResolution };
 };

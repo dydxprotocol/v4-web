@@ -47,6 +47,7 @@ import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { TradingViewChartProvider } from './hooks/useTradingViewChart';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -177,6 +178,7 @@ const providers = [
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(AppThemeAndColorModeProvider),
+  wrapProvider(TradingViewChartProvider),
 ];
 
 const App = () => {

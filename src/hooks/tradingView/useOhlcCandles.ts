@@ -1,4 +1,11 @@
-import { useEffect, useState } from 'react';
+/* eslint-disable prettier/prettier */
+import { useEffect } from 'react';
+
+import { TvWidget } from '@/constants/tvchart';
+
+import abacusStateManager from '@/lib/abacus';
+
+import { useTradingViewChart } from '../useTradingViewChart';
 
 /**
  * @description Hook to handle drawing candles with OHLC or orderbook price
@@ -7,28 +14,51 @@ import { useEffect, useState } from 'react';
 export const useOhlcCandles = ({
   ohlcToggle,
   isChartReady,
+  tvWidget,
 }: {
   ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
+  tvWidget: TvWidget | null;
 }) => {
-  const [useOhlc, setUseOhlc] = useState(true);
+  const { ohlcToggleOn, setOhlcToggleOn } = useTradingViewChart();
 
   useEffect(() => {
     // Initialize onClick for ohlc toggle
     if (isChartReady && ohlcToggle) {
-      ohlcToggle.onclick = () => setUseOhlc((prev) => !prev);
+      ohlcToggle.onclick = () => setOhlcToggleOn((prev) => !prev);
     }
-  }, [isChartReady, ohlcToggle]);
+  }, [isChartReady, ohlcToggle, setOhlcToggleOn]);
 
   useEffect(
     // Update ohlc button on toggle
     () => {
-      if (useOhlc) {
-        ohlcToggle?.classList?.add('ohlc-active');
-      } else {
-        ohlcToggle?.classList?.remove('ohlc-active');
+      if (isChartReady && tvWidget) {
+        tvWidget.onChartReady(() => {
+          tvWidget.headerReady().then(() => {
+            if (ohlcToggleOn) {
+              ohlcToggle?.classList?.add('ohlc-active');
+              // for (const channelId of subscriptionsByChannelId.keys()) {
+              //   for (const uid of Object.values(subscriptionsByChannelId.get(channelId).handlers)) {
+              // uid.onResetCacheNeededCallback(); xcxc
+              //   }
+              // }
+              // tvWidget.chart().resetData();
+            } else {
+              ohlcToggle?.classList?.remove('ohlc-active');
+              // for (const channelId of subscriptionsByChannelId.keys()) {
+              //   for (const uid of Object.values(subscriptionsByChannelId.get(channelId).handlers)) {
+              // uid.onResetCacheNeededCallback(); xcxc
+              //   }
+              // }
+              // tvWidget.chart().resetData();
+            }
+            abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
+          });
+        });
       }
     },
-    [useOhlc, ohlcToggle?.classList]
+    [ohlcToggleOn, ohlcToggle?.classList, isChartReady, tvWidget]
   );
+
+  return { ohlcToggleOn };
 };
