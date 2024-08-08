@@ -1,11 +1,12 @@
 import { lazy, Suspense, useMemo } from 'react';
 
+import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
@@ -176,6 +177,7 @@ const providers = [
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
+  wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
 ];
 
@@ -187,6 +189,16 @@ const App = () => {
     <Content />
   );
 };
+
+// This implements the default behavior from styled-components v5
+function shouldForwardProp(propName: string, target: WebTarget): boolean {
+  if (typeof target === 'string') {
+    // For HTML elements, forward the prop if it is a valid HTML attribute
+    return isPropValid(propName);
+  }
+  // For other elements, forward all props
+  return true;
+}
 
 const $Content = styled.div<{
   isShowingHeader: boolean;
