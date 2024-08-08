@@ -1,5 +1,4 @@
 import type { DydxAddress, EvmAddress } from './wallets';
-import { SolAddress } from './wallets';
 
 export enum OnboardingSteps {
   ChooseWallet = 'ChooseWallet',
@@ -43,16 +42,6 @@ export type EvmDerivedAddresses = {
     dydxAddress?: DydxAddress;
   };
 };
-
-export type SolDerivedAddresses = {
-  version?: string;
-} & Record<
-  SolAddress,
-  {
-    encryptedSignature?: string;
-    dydxAddress?: DydxAddress;
-  }
->;
 
 export type Hdkey = {
   mnemonic: string;

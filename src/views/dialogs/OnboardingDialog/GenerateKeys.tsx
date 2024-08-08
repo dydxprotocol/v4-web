@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxAddress, WalletType } from '@/constants/wallets';
+import { DydxAddress } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -42,7 +42,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const stringGetter = useStringGetter();
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
-  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, walletType } = useAccounts();
+  const { setWalletFromEvmSignature, saveEvmSignature } = useAccounts();
 
   const [error, setError] = useState<string>();
 
@@ -84,7 +84,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   };
 
   // 2. Derive keys from EVM account
-  const { getWalletFromSignature } = useDydxClient();
+  const { getWalletFromEvmSignature } = useDydxClient();
   const { getSubaccounts } = useAccounts();
 
   const isDeriving = ![
@@ -92,7 +92,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signMessageAsync = useSignForWalletDerivation(walletType);
+  const signTypedDataAsync = useSignForWalletDerivation();
 
   const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
 
@@ -103,13 +103,13 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       // 1. First signature
       setStatus(EvmDerivedAccountStatus.Deriving);
 
-      const signature = await signMessageAsync();
       track(
         AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
           signatureNumber: 1,
         })
       );
-      const { wallet: dydxWallet } = await getWalletFromSignature({ signature });
+      const signature = await signTypedDataAsync();
+      const { wallet: dydxWallet } = await getWalletFromEvmSignature({ signature });
 
       // 2. Ensure signature is deterministic
       // Check if subaccounts exist
@@ -126,12 +126,12 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           setStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
 
           // Second signature
-          const additionalSignature = await signMessageAsync();
           track(
             AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
               signatureNumber: 2,
             })
           );
+          const additionalSignature = await signTypedDataAsync();
 
           if (signature !== additionalSignature) {
             throw new Error(
@@ -150,17 +150,13 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         return;
       }
 
-      await setWalletFromSignature(signature);
+      await setWalletFromEvmSignature(signature);
 
       // 3: Remember me (encrypt and store signature)
       if (shouldRememberMe && staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
 
-        if (walletType === WalletType.Phantom) {
-          saveSolSignature(encryptedSignature);
-        } else {
-          saveEvmSignature(encryptedSignature);
-        }
+        saveEvmSignature(encryptedSignature);
       }
 
       // 4. Done
@@ -261,7 +257,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           }
           tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
-          {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
+          {!isMatchingNetwork ? (
             <Button
               action={ButtonAction.Primary}
               onClick={onClickSwitchNetwork}
@@ -307,6 +303,7 @@ const $StatusCard = styled.div<{ active?: boolean }>`
     css`
       background-color: var(--color-layer-6);
     `}
+
   > div {
     ${layoutMixins.column}
     gap: 0.25rem;
