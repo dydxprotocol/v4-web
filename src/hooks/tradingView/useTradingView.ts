@@ -30,7 +30,6 @@ import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
-import { useTradingViewChart } from '../useTradingViewChart';
 import { useURLConfigs } from '../useURLConfigs';
 
 /**
@@ -40,11 +39,13 @@ export const useTradingView = ({
   tvWidgetRef,
   orderLineToggleRef,
   ohlcToggleRef,
+  ohlcToggleOn,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   ohlcToggleRef: React.MutableRefObject<HTMLElement | null>;
+  ohlcToggleOn: boolean;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -61,7 +62,6 @@ export const useTradingView = ({
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
-  const { ohlcToggleOn } = useTradingViewChart();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,

@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import abacusStateManager from '@/lib/abacus';
-
-import { useTradingViewChart } from '../useTradingViewChart';
 
 /**
  * @description Hook to handle drawing candles with OHLC or orderbook price
@@ -11,12 +9,14 @@ import { useTradingViewChart } from '../useTradingViewChart';
 export const useOhlcCandles = ({
   ohlcToggle,
   isChartReady,
+  ohlcToggleOn,
+  setOhlcToggleOn,
 }: {
   ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
+  ohlcToggleOn: boolean;
+  setOhlcToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const { ohlcToggleOn, setOhlcToggleOn } = useTradingViewChart();
-
   useEffect(() => {
     // Initialize onClick for ohlc toggle
     if (isChartReady && ohlcToggle) {

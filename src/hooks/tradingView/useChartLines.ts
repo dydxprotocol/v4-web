@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -21,7 +21,6 @@ import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStringGetter } from '../useStringGetter';
-import { useTradingViewChart } from '../useTradingViewChart';
 
 /**
  * @description Hook to handle drawing chart lines
@@ -31,13 +30,15 @@ export const useChartLines = ({
   tvWidget,
   orderLineToggle,
   isChartReady,
+  orderLinesToggleOn,
+  setOrderLinesToggleOn,
 }: {
   tvWidget: TvWidget | null;
   orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
+  orderLinesToggleOn: boolean;
+  setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const { orderLinesToggleOn, setOrderLinesToggleOn } = useTradingViewChart();
-
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
