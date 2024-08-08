@@ -27,14 +27,16 @@ export const useOhlcCandles = ({
   useEffect(
     // Update ohlc button on toggle
     () => {
-      if (ohlcToggleOn) {
-        ohlcToggle?.classList?.add('ohlc-active');
-      } else {
-        ohlcToggle?.classList?.remove('ohlc-active');
+      if (isChartReady) {
+        if (ohlcToggleOn) {
+          ohlcToggle?.classList?.add('ohlc-active');
+        } else {
+          ohlcToggle?.classList?.remove('ohlc-active');
+        }
+        abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
       }
-      abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
     },
-    [ohlcToggleOn, ohlcToggle?.classList]
+    [ohlcToggleOn, ohlcToggle?.classList, isChartReady]
   );
 
   return { ohlcToggleOn };
