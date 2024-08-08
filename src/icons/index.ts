@@ -94,7 +94,6 @@ export { default as MagicIcon } from './wallets/magic.svg';
 export { default as MathWalletIcon } from './wallets/mathwallet.svg';
 export { default as MetaMaskIcon } from './wallets/metamask.svg';
 export { default as OkxWalletIcon } from './wallets/okx-wallet.svg';
-export { default as PhantomIcon } from './wallets/phantom.svg';
 export { default as RainbowIcon } from './wallets/rainbow-wallet.svg';
 export { default as TestWalletIcon } from './wallets/test-wallet.svg';
 export { default as TokenPocketIcon } from './wallets/tokenpocket.svg';
