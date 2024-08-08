@@ -23,7 +23,7 @@ export class StatefulOrderError extends Error {
 type RouteErrorCodes = 5;
 
 const routeErrorCodesToMessageOverride = {
-  5: 'This route is not yet supported, please check back soon as we are adding new routes. Please try another route instead!',
+  5: 'This route will be supported soon. In the meantime please try another asset/chain!',
 };
 
 export const getRouteErrorMessageOverride = (
