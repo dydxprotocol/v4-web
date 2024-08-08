@@ -145,6 +145,21 @@ export const AnalyticsEvents = unionize(
     DisconnectWallet: ofType<{}>(),
 
     // Onboarding
+    OnboardingDeriveKeysSignatureReceived: ofType<{
+      signatureNumber: number;
+    }>(),
+    OnboardingAcknowledgeTermsButtonClick: ofType<{
+      agreed: boolean;
+    }>(),
+    OnboardingSwitchNetworkClick: ofType<{}>(),
+    OnboardingSendRequestClick: ofType<{
+      firstAttempt: boolean;
+    }>(),
+    OnboardingTriggerClick: ofType<{
+      // if onboarding state is Disconnected, then user clicked "Connect Wallet"
+      // if onboarding state is WalletConnected, then user clicked "Recover Keys"
+      state: OnboardingState;
+    }>(),
     OnboardingStepChanged: ofType<{
       state: OnboardingState;
       step?: OnboardingSteps;
@@ -161,6 +176,19 @@ export const AnalyticsEvents = unionize(
       roundtripMs: number;
       /** URL/IP of node the order was sent to */
       validatorUrl: string;
+    }>(),
+    TransferDepositFundsClick: ofType<{
+      chainId: string | undefined;
+      tokenAddress: string | undefined;
+      tokenSymbol: string | undefined;
+      slippage: number | undefined;
+      gasFee: number | undefined;
+      bridgeFee: number | undefined;
+      exchangeRate: number | undefined;
+      estimatedRouteDuration: number | undefined;
+      toAmount: number | undefined;
+      toAmountMin: number | undefined;
+      depositCTAString: string;
     }>(),
     TransferDeposit: ofType<{
       chainId?: string;
