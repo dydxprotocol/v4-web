@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +58,6 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { testFlags } from '@/lib/testFlags';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -65,6 +65,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
+import { useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -277,6 +278,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const featureFlags = useAllStatsigGateValues();
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
@@ -335,7 +337,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (testFlags.enablePredictionMarketPerp && currentDate <= tradeUSElectionExpirationDate) {
+        if (
+          featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+          currentDate <= tradeUSElectionExpirationDate
+        ) {
           trigger(
             MarketLaunchNotificationIds.TrumpWin,
             {

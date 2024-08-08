@@ -1,5 +1,6 @@
 import { Key, memo, useMemo, useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -13,6 +14,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -33,7 +35,6 @@ import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 
@@ -49,6 +50,7 @@ const MarketsDropdownContent = ({
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
+  const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo(
@@ -146,8 +148,14 @@ const MarketsDropdownContent = ({
     defaultValue: false,
   });
 
+  const currentDate = new Date();
+
   const slotTop = useMemo(() => {
-    if (!hasSeenElectionBannerTrumpWin && testFlags.enablePredictionMarketPerp) {
+    if (
+      !hasSeenElectionBannerTrumpWin &&
+      featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+      currentDate < new Date('2024-11-06T23:59:59')
+    ) {
       return (
         <$MarketDropdownBanner>
           <$FlagGradient />

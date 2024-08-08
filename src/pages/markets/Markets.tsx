@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -10,6 +11,7 @@ import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -23,18 +25,17 @@ import { Switch } from '@/components/Switch';
 import { MarketsStats } from '@/views/MarketsStats';
 import { MarketsTable } from '@/views/tables/MarketsTable';
 
-import { testFlags } from '@/lib/testFlags';
-
 const Markets = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const featureFlags = useAllStatsigGateValues();
   const [showHighlights, setShowHighlights] = useState(true);
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   const marketsPageBanner = useMemo(() => {
-    if (testFlags.enablePredictionMarketPerp) {
+    if (featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi]) {
       return (
         <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
           <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>

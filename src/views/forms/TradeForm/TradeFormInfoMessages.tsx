@@ -1,3 +1,5 @@
+import { StatSigFlags } from '@/types/statsig';
+
 import { type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -5,17 +7,17 @@ import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Link } from '@/components/Link';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string> }) => {
   const stringGetter = useStringGetter();
   const { predictionMarketLearnMore } = useURLConfigs();
+  const featureFlags = useAllStatsigGateValues();
 
   const [hasSeenTradeFormMessageTrumpWin, setHasSeenTradeFormMessageTrumpWin] = useLocalStorage({
     key: LocalStorageKey.HasSeenTradeFormMessageTRUMPWIN,
@@ -23,7 +25,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
   });
 
   if (
-    testFlags.enablePredictionMarketPerp &&
+    featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
     marketId === PREDICTION_MARKET.TRUMPWIN &&
     !hasSeenTradeFormMessageTrumpWin
   ) {
