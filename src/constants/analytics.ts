@@ -128,6 +128,7 @@ export const AnalyticsEvents = unionize(
     }>(),
     NavigateDialog: ofType<{
       type: DialogTypesTypes;
+      fromDialogType?: DialogTypesTypes;
     }>(),
     NavigateDialogClose: ofType<{
       type: DialogTypesTypes;
