@@ -11,7 +11,7 @@ import {
 import { DialogTypesTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
+import { getGeo, getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
@@ -49,6 +49,12 @@ export const useAnalytics = () => {
           : breakpointMatches.isDesktopLarge
             ? 'DESKTOP_LARGE'
             : 'UNSUPPORTED';
+
+  // AnalyticsUserProperty.Geo
+  const geo = useAppSelector(getGeo) ?? undefined;
+  useEffect(() => {
+    identify(AnalyticsUserProperties.Geo(geo ?? null));
+  }, [geo]);
 
   useEffect(() => {
     identify(AnalyticsUserProperties.CustomDomainReferrer(document.referrer));
