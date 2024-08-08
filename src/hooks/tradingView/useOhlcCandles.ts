@@ -31,18 +31,20 @@ export const useOhlcCandles = ({
   useEffect(
     // Update ohlc button on toggle
     () => {
-      tvWidget?.onChartReady(() => {
-        tvWidget.headerReady().then(() => {
-          if (ohlcToggleOn) {
-            ohlcToggle?.classList?.add('ohlc-active');
-          } else {
-            ohlcToggle?.classList?.remove('ohlc-active');
-          }
-          abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
+      if (isChartReady) {
+        tvWidget?.onChartReady(() => {
+          tvWidget.headerReady().then(() => {
+            if (ohlcToggleOn) {
+              ohlcToggle?.classList?.add('ohlc-active');
+            } else {
+              ohlcToggle?.classList?.remove('ohlc-active');
+            }
+            abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
+          });
         });
-      });
+      }
     },
-    [ohlcToggleOn, ohlcToggle, tvWidget]
+    [ohlcToggleOn, ohlcToggle, tvWidget, isChartReady]
   );
 
   return { ohlcToggleOn };

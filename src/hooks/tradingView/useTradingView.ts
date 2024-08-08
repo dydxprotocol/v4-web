@@ -107,7 +107,7 @@ export const useTradingView = ({
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
-      tvWidgetRef.current.onChartReady(() => {
+      tvWidgetRef.current?.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
             if (orderLineToggleRef) {

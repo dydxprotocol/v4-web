@@ -268,15 +268,17 @@ export const useChartLines = ({
   useEffect(
     // Update display button on toggle
     () => {
-      runOnChartReady(() => {
-        if (orderLinesToggleOn) {
-          orderLineToggle?.classList?.add('order-lines-active');
-        } else {
-          orderLineToggle?.classList?.remove('order-lines-active');
-        }
-      });
+      if (isChartReady) {
+        runOnChartReady(() => {
+          if (orderLinesToggleOn) {
+            orderLineToggle?.classList?.add('order-lines-active');
+          } else {
+            orderLineToggle?.classList?.remove('order-lines-active');
+          }
+        });
+      }
     },
-    [orderLinesToggleOn, orderLineToggle, runOnChartReady]
+    [orderLinesToggleOn, orderLineToggle, runOnChartReady, isChartReady]
   );
 
   useEffect(
