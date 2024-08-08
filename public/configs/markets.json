@@ -5508,6 +5508,15 @@
         "websiteLink": "https://rendernetwork.com/", 
         "whitepaperLink": "https://renderfoundation.com/whitepaper"
     }, 
+    "RENDER-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/render/", 
+        "name": "Render Token", 
+        "tags": [
+            "AI"
+        ], 
+        "websiteLink": "https://rendernetwork.com/", 
+        "whitepaperLink": "https://renderfoundation.com/whitepaper"
+    }, 
     "RNT-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/real-nigger-tate/", 
         "name": "Real Nigger Tate", 
