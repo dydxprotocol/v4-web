@@ -104,6 +104,11 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       setStatus(EvmDerivedAccountStatus.Deriving);
 
       const signature = await signMessageAsync();
+      track(
+        AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
+          signatureNumber: 1,
+        })
+      );
       const { wallet: dydxWallet } = await getWalletFromSignature({ signature });
 
       // 2. Ensure signature is deterministic
@@ -122,6 +127,11 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
 
           // Second signature
           const additionalSignature = await signMessageAsync();
+          track(
+            AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({
+              signatureNumber: 2,
+            })
+          );
 
           if (signature !== additionalSignature) {
             throw new Error(
@@ -169,6 +179,20 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         }
       }
     }
+  };
+
+  const onClickSwitchNetwork = () => {
+    switchNetworkAndDeriveKeys().then(onKeysDerived);
+    track(AnalyticsEvents.OnboardingSwitchNetworkClick());
+  };
+
+  const onClickSendRequestOrTryAgain = () => {
+    deriveKeys().then(onKeysDerived);
+    track(
+      AnalyticsEvents.OnboardingSendRequestClick({
+        firstAttempt: !error,
+      })
+    );
   };
 
   return (
@@ -240,7 +264,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => switchNetworkAndDeriveKeys().then(onKeysDerived)}
+              onClick={onClickSwitchNetwork}
               state={{ isLoading: isSwitchingNetwork }}
             >
               {stringGetter({ key: STRING_KEYS.SWITCH_NETWORK })}
@@ -248,7 +272,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           ) : (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => deriveKeys().then(onKeysDerived)}
+              onClick={onClickSendRequestOrTryAgain}
               state={{
                 isLoading: isDeriving,
                 isDisabled: status !== EvmDerivedAccountStatus.NotDerived,
