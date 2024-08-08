@@ -5,6 +5,7 @@ import { StatsigClient } from '@statsig/js-client';
 import {
   StatsigProvider as StatsigProviderInternal,
   useStatsigClient,
+  useStatsigUser,
 } from '@statsig/react-bindings';
 
 import { initStatsigAsync } from '@/lib/statsig';
@@ -29,10 +30,15 @@ export const useStatsigGateValue = (gate: StatSigFlags) => {
 
 export const useAllStatsigGateValues = () => {
   const { checkGate } = useStatsigClient();
-  const allGateValues = useMemo(() => {
-    return Object.values(StatSigFlags).reduce((acc, gate) => {
-      return { ...acc, [gate]: checkGate(gate) };
-    }, {} as StatsigConfigType);
-  }, []);
+  const { user } = useStatsigUser();
+  const allGateValues = useMemo(
+    () =>
+      Object.values(StatSigFlags).reduce((acc, gate) => {
+        return { ...acc, [gate]: checkGate(gate) };
+      }, {} as StatsigConfigType),
+    // Certain flag values may change once a user connects their wallet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user]
+  );
   return allGateValues;
 };
