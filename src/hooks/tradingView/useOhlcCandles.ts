@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
 
+import { TvWidget } from '@/constants/tvchart';
+
 import abacusStateManager from '@/lib/abacus';
 
 /**
@@ -11,11 +13,13 @@ export const useOhlcCandles = ({
   isChartReady,
   ohlcToggleOn,
   setOhlcToggleOn,
+  tvWidget,
 }: {
   ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
   ohlcToggleOn: boolean;
   setOhlcToggleOn: Dispatch<SetStateAction<boolean>>;
+  tvWidget: TvWidget | null;
 }) => {
   useEffect(() => {
     // Initialize onClick for ohlc toggle
@@ -27,16 +31,18 @@ export const useOhlcCandles = ({
   useEffect(
     // Update ohlc button on toggle
     () => {
-      if (isChartReady) {
-        if (ohlcToggleOn) {
-          ohlcToggle?.classList?.add('ohlc-active');
-        } else {
-          ohlcToggle?.classList?.remove('ohlc-active');
-        }
-        abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
-      }
+      tvWidget?.onChartReady(() => {
+        tvWidget.headerReady().then(() => {
+          if (ohlcToggleOn) {
+            ohlcToggle?.classList?.add('ohlc-active');
+          } else {
+            ohlcToggle?.classList?.remove('ohlc-active');
+          }
+          abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
+        });
+      });
     },
-    [ohlcToggleOn, ohlcToggle?.classList, isChartReady]
+    [ohlcToggleOn, ohlcToggle, tvWidget]
   );
 
   return { ohlcToggleOn };

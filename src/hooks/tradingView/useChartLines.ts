@@ -268,15 +268,15 @@ export const useChartLines = ({
   useEffect(
     // Update display button on toggle
     () => {
-      if (isChartReady) {
+      runOnChartReady(() => {
         if (orderLinesToggleOn) {
           orderLineToggle?.classList?.add('order-lines-active');
         } else {
           orderLineToggle?.classList?.remove('order-lines-active');
         }
-      }
+      });
     },
-    [orderLinesToggleOn, orderLineToggle?.classList, isChartReady]
+    [orderLinesToggleOn, orderLineToggle, runOnChartReady]
   );
 
   useEffect(

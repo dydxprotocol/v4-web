@@ -49,7 +49,7 @@ export const TvChart = () => {
     orderLinesToggleOn,
     setOrderLinesToggleOn,
   });
-  useOhlcCandles({ ohlcToggle, isChartReady, ohlcToggleOn, setOhlcToggleOn });
+  useOhlcCandles({ ohlcToggle, isChartReady, ohlcToggleOn, setOhlcToggleOn, tvWidget });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
