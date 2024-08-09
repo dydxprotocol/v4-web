@@ -46,12 +46,16 @@ export const AnalyticsUserProperties = unionize(
   {
     // Referrer
     CustomDomainReferrer: ofType<string | null>(),
+
     // Environment
     Locale: ofType<SupportedLocales>(),
     Breakpoint: ofType<
       'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
     >(),
     Version: ofType<string | null>(),
+
+    // Location
+    Geo: ofType<string | null>(),
 
     // StatSigFlags
     StatsigFlags: ofType<{ [key in StatSigFlags]?: boolean }>(),
@@ -73,6 +77,7 @@ export const AnalyticsUserProperties = unionize(
 
 export const AnalyticsUserPropertyLoggableTypes = {
   Locale: 'selectedLocale',
+  Geo: 'geo',
   Breakpoint: 'breakpoint',
   Version: 'version',
   StatsigFlags: 'statsigFlags',
