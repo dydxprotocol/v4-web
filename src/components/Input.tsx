@@ -184,6 +184,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             autoComplete="off"
             autoCorrect="off"
             data-1p-ignore // prevent 1Password fill
+            data-hj-allow
             {...otherProps}
           />
         )}
