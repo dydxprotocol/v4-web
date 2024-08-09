@@ -327,17 +327,25 @@ export const useChartLines = ({
     ]
   );
 
+  useEffect(
+    () => {
+      if (initialWidget && !isChartReady) {
+        // Clear lines when chart switches to not ready after initialization (i.e. when orderbookCandles is toggled)
+        clearChartLines();
+      } else if (!isAccountConnected) {
+        // Clear lines when disconnecting account
+        clearChartLines();
+      }
+    },
+    // We intentionally avoid rerunning this hook on update of initialWidget
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isChartReady, clearChartLines, isAccountConnected]
+  );
+
   useEffect(() => {
     // Clear lines when switching markets
     return () => clearChartLines();
   }, [currentMarketId, clearChartLines]);
-
-  useEffect(() => {
-    // Clear lines when disconnecting account
-    if (!isAccountConnected) {
-      clearChartLines();
-    }
-  }, [isAccountConnected, clearChartLines]);
 
   return { chartLines: chartLinesRef.current };
 };

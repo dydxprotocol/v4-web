@@ -38,14 +38,14 @@ import { useURLConfigs } from '../useURLConfigs';
 export const useTradingView = ({
   tvWidgetRef,
   orderLineToggleRef,
-  ohlcToggleRef,
-  ohlcToggleOn,
+  orderbookCandlesToggleRef,
+  orderbookCandlesToggleOn,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
-  ohlcToggleRef: React.MutableRefObject<HTMLElement | null>;
-  ohlcToggleOn: boolean;
+  orderbookCandlesToggleRef: React.MutableRefObject<HTMLElement | null>;
+  orderbookCandlesToggleOn: boolean;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -96,7 +96,12 @@ export const useTradingView = ({
       const options = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale, ohlcToggleOn),
+        datafeed: getDydxDatafeed(
+          store,
+          getCandlesForDatafeed,
+          initialPriceScale,
+          orderbookCandlesToggleOn
+        ),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
@@ -120,7 +125,7 @@ export const useTradingView = ({
                 stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
               );
             }
-            if (isOhlcEnabled && ohlcToggleRef) {
+            if (isOhlcEnabled && orderbookCandlesToggleRef) {
               const getOhlcTooltipString = tooltipStrings.ohlc;
               const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
                 stringGetter,
@@ -129,9 +134,9 @@ export const useTradingView = ({
                 featureFlags,
               });
 
-              ohlcToggleRef.current = tvWidgetRef.current.createButton();
-              ohlcToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
-              ohlcToggleRef.current.setAttribute('title', ohlcBody as string);
+              orderbookCandlesToggleRef.current = tvWidgetRef.current.createButton();
+              orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
+              orderbookCandlesToggleRef.current.setAttribute('title', ohlcBody as string);
             }
           }
         });
@@ -147,13 +152,13 @@ export const useTradingView = ({
     return () => {
       orderLineToggleRef.current?.remove();
       orderLineToggleRef.current = null;
-      ohlcToggleRef.current?.remove();
-      ohlcToggleRef.current = null;
+      orderbookCandlesToggleRef.current?.remove();
+      orderbookCandlesToggleRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo, ohlcToggleOn]);
+  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo, orderbookCandlesToggleOn]);
 
   return { savedResolution };
 };
