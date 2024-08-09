@@ -464,6 +464,7 @@ const assetIcons = {
   REEF: '/currencies/reef.png',
   REI: '/currencies/rei.png',
   REN: '/currencies/ren.png',
+  RENDER: '/currencies/render.png',
   REQ: '/currencies/req.png',
   REVV: '/currencies/revv.png',
   REZ: '/currencies/rez.png',
