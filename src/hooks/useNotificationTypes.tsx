@@ -58,6 +58,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -214,22 +215,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
           const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
-          const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
-          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
-
           const transferType =
             type ??
             (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const title = stringGetter({
-            key: {
-              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[transferType],
-          });
+          const isCosmosDeposit =
+            SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
+            fromChainId !== selectedDydxChainId;
+
+          const isFinished =
+            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+          const icon = isCosmosDeposit ? (
+            <$AssetIcon symbol="USDC" />
+          ) : (
+            <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
+          );
+
+          const title = isCosmosDeposit
+            ? // TODO: Need to add localization
+              'Confirm Pending Deposit'
+            : stringGetter({
+                key: {
+                  deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+                  withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+                }[transferType],
+              });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
           // TODO: remove typeguards once skip implements estimatedrouteduration
@@ -267,7 +279,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -630,5 +642,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;
+
+const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
 const $WarningIcon = tw(Icon)`text-color-warning`;

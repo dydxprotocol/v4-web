@@ -36,6 +36,7 @@ import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 
+import { config as grazConfig } from '@/lib/graz';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
@@ -166,7 +167,7 @@ const providers = [
   }),
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
+  wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),

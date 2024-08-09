@@ -19,6 +19,14 @@ export type AdjustTargetLeverageDialogProps = {};
 export type ClosePositionDialogProps = {};
 export type CancelPendingOrdersDialogProps = { marketId: string };
 export type ComplianceConfigDialogProps = {};
+export type ConfirmPendingDepositDialogProps = {
+  usdcBalance: number;
+};
+export type CosmosDepositDialogProps = {
+  fromChainId?: string;
+  toAmount?: number;
+  txHash: string;
+};
 export type DepositDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
@@ -94,6 +102,8 @@ export const DialogTypes = unionize(
     CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
+    ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
+    CosmosDeposit: ofType<CosmosDepositDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),

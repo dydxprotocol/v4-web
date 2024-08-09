@@ -12,6 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -61,8 +62,8 @@ import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -76,6 +77,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
+  const { dydxAddress, walletType } = useAccounts();
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -118,6 +120,10 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
+    if (walletType === WalletType.Keplr && dydxAddress) {
+      abacusStateManager.setTransfersSourceAddress(dydxAddress);
+    }
+
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
       value: TransferType.withdrawal.rawValue,
@@ -126,7 +132,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, []);
+  }, [dydxAddress, walletType]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -156,7 +162,9 @@ export const WithdrawForm = () => {
   }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
-  const { dydxAddress } = useAccounts();
+  const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -318,8 +326,6 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
-  const { walletType } = useAccounts();
-
   useEffect(() => {
     if (walletType === WalletType.Privy) {
       abacusStateManager.setTransferValue({
@@ -327,24 +333,45 @@ export const WithdrawForm = () => {
         value: 'coinbase',
       });
     }
+    if (walletType === WalletType.Keplr) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: nobleChainId,
+      });
+    }
   }, [walletType]);
 
-  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
-    if (name) {
-      setWithdrawAmount('');
-      if (type === 'chain') {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.chain,
-          value: name,
-        });
-      } else {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.exchange,
-          value: name,
-        });
+  const onSelectNetwork = useCallback(
+    (name: string, type: 'chain' | 'exchange') => {
+      if (name) {
+        setWithdrawAmount('');
+        if (type === 'chain') {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.chain,
+            value: name,
+          });
+          if (name === osmosisChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: OSMO_USDC_IBC_DENOM,
+            });
+          }
+          if (name === neutronChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: NEUTRON_USDC_IBC_DENOM,
+            });
+          }
+        } else {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.exchange,
+            value: name,
+          });
+        }
       }
-    }
-  }, []);
+    },
+    [neutronChainId, osmosisChainId]
+  );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
     if (selectedToken) {

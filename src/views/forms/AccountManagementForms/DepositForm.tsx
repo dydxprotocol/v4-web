@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { calculateFee, GasPrice, MsgTransferEncodeObject } from '@cosmjs/stargate';
+import { GAS_MULTIPLIER } from '@dydxprotocol/v4-client-js';
+import { useAccount as useAccountGraz, useStargateSigningClient } from 'graz';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -10,8 +13,13 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEventPayloads, AnalyticsEvents } from '@/constants/analytics';
+import {
+  AnalyticsEventPayloads,
+  AnalyticsEvents,
+  DEFAULT_TRANSACTION_MEMO,
+} from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -50,17 +58,23 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getOnboardingGuards } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
+import { closeDialog, forceOpenDialog, openDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  SUPPORTED_COSMOS_CHAINS,
+} from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
+import { NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
-import { NobleDeposit } from '../NobleDeposit';
+import { CoinbaseDeposit } from '../CoinbaseDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -93,9 +107,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     publicClientWagmi,
     nobleAddress,
     saveHasAcknowledgedTerms,
+    walletType,
   } = useAccounts();
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
+
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   const {
     requestPayload,
@@ -110,7 +127,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   // todo are these guaranteed to be base 10?
   // eslint-disable-next-line radix
-  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
+  const chainId = chainIdStr && !isKeplrWallet ? parseInt(chainIdStr) : chainIdStr ?? undefined;
+  const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
 
   // User inputs
   const sourceToken = useMemo(
@@ -120,7 +140,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const sourceChain = useMemo(
     () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
-    [chainId, resources]
+    [chainIdStr, resources]
   );
 
   const [fromAmount, setFromAmount] = useState('');
@@ -129,19 +149,28 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { usdcLabel } = useTokenConfigs();
 
+  const { data: accounts } = useAccountGraz({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+  const { data: signingClient } = useStargateSigningClient({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+
   // Async Data
   const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
-    decimals: sourceToken?.decimals || undefined,
-    isCosmosChain: false,
+    isCosmosChain: isKeplrWallet,
   });
-
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
 
-  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
+  useEffect(() => {
+    setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);
+  }, [isCctp, isKeplrWallet]);
 
   useEffect(() => {
     const hasInvalidInput =
@@ -156,10 +185,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }, [debouncedAmountBN.toNumber()]);
 
   useEffect(() => {
-    if (dydxAddress && evmAddress) {
+    if (dydxAddress) {
       // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
       // worth investigating a better fix on abacus
-      abacusStateManager.setTransfersSourceAddress(evmAddress);
+      if (evmAddress) {
+        abacusStateManager.setTransfersSourceAddress(evmAddress);
+      }
+      if (walletType === WalletType.Keplr && nobleAddress) {
+        abacusStateManager.setTransfersSourceAddress(nobleAddress);
+      }
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
         value: TransferType.deposit.rawValue,
@@ -168,13 +202,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress]);
+  }, [dydxAddress, evmAddress, nobleAddress, walletType]);
 
   useEffect(() => {
     if (error) onError?.();
   }, [error]);
-
-  const { walletType } = useAccounts();
 
   useEffect(() => {
     if (walletType === WalletType.Privy) {
@@ -183,25 +215,46 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         value: 'coinbase',
       });
     }
-  }, [walletType]);
-
-  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
-    if (name) {
-      abacusStateManager.clearTransferInputValues();
-      setFromAmount('');
-      if (type === 'chain') {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.chain,
-          value: name,
-        });
-      } else {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.exchange,
-          value: name,
-        });
-      }
+    if (walletType === WalletType.Keplr) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: nobleChainId,
+      });
     }
-  }, []);
+  }, [nobleAddress, nobleChainId, walletType]);
+
+  const onSelectNetwork = useCallback(
+    (name: string, type: 'chain' | 'exchange') => {
+      if (name) {
+        abacusStateManager.clearTransferInputValues();
+        setFromAmount('');
+        if (type === 'chain') {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.chain,
+            value: name,
+          });
+          if (name === osmosisChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: OSMO_USDC_IBC_DENOM,
+            });
+          }
+          if (name === neutronChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: NEUTRON_USDC_IBC_DENOM,
+            });
+          }
+        } else {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.exchange,
+            value: name,
+          });
+        }
+      }
+    },
+    [neutronChainId, osmosisChainId]
+  );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
     if (selectedToken) {
@@ -233,7 +286,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (balance) {
       setFromAmount(balanceBN.toString());
     }
-  }, [balance, setFromAmount]);
+  }, [balance, balanceBN]);
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
@@ -297,6 +350,101 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       try {
         e.preventDefault();
 
+        if (chainIdStr && SUPPORTED_COSMOS_CHAINS.includes(chainIdStr)) {
+          setIsLoading(true);
+
+          if (!requestPayload?.data) {
+            throw new Error('Missing request payload');
+          }
+
+          const transaction = JSON.parse(requestPayload.data);
+
+          const transferMsg: MsgTransferEncodeObject = {
+            typeUrl: transaction.typeUrl,
+            value: transaction.value,
+          };
+
+          const account = accounts?.[chainIdStr];
+          const signerAddress = account?.bech32Address;
+
+          if (!signerAddress) {
+            throw new Error('Missing signer address');
+          }
+
+          const memo = `${DEFAULT_TRANSACTION_MEMO} | ${signerAddress}`;
+
+          const gasEstimate = await signingClient?.[chainIdStr]?.simulate(
+            signerAddress,
+            [transferMsg],
+            memo
+          );
+
+          const gasPrice = (() => {
+            if (nobleChainId === chainIdStr) {
+              return GasPrice.fromString('0.1uusdc');
+            }
+            if (osmosisChainId === chainIdStr) {
+              return GasPrice.fromString('0.025uosmo');
+            }
+            if (neutronChainId === chainIdStr) {
+              return GasPrice.fromString('0.0053untrn');
+            }
+            return undefined;
+          })();
+
+          if (!gasEstimate || !gasPrice) {
+            throw new Error('Failed to estimate gas');
+          }
+
+          const fee = calculateFee(Math.floor(gasEstimate * GAS_MULTIPLIER), gasPrice);
+          const tx = await signingClient?.[chainIdStr]?.signAndBroadcast(
+            signerAddress,
+            [transferMsg],
+            fee,
+            memo
+          );
+
+          const txHash = tx?.transactionHash;
+
+          if (txHash) {
+            addOrUpdateTransferNotification({
+              txHash,
+              toChainId: selectedDydxChainId,
+              fromChainId: chainIdStr || undefined,
+              toAmount: summary?.usdcSize ?? undefined,
+              triggeredAt: Date.now(),
+              isCctp,
+              type: TransferNotificationTypes.Deposit,
+            });
+            abacusStateManager.clearTransferInputValues();
+            setFromAmount('');
+
+            onDeposit?.({
+              chainId: chainIdStr || undefined,
+              tokenAddress: sourceToken?.address || undefined,
+              tokenSymbol: sourceToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
+            });
+            dispatch(closeDialog());
+            dispatch(
+              openDialog(
+                DialogTypes.CosmosDeposit({
+                  fromChainId: chainIdStr,
+                  toAmount: summary?.toAmount ?? undefined,
+                  txHash,
+                })
+              )
+            );
+          }
+          return;
+        }
+
         if (!signerWagmi) {
           throw new Error('Missing signer');
         }
@@ -328,7 +476,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addOrUpdateTransferNotification({
             txHash,
-            toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
+            toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
@@ -360,7 +508,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
+    [requestPayload, signerWagmi, chainIdStr, sourceToken, sourceChain, nobleChainId]
   );
 
   const amountInputReceipt = [
@@ -510,7 +658,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         onSelect={onSelectNetwork}
       />
       {exchange && nobleAddress ? (
-        <NobleDeposit />
+        <CoinbaseDeposit />
       ) : (
         <>
           <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />

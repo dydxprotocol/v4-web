@@ -21,9 +21,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';
@@ -44,6 +46,7 @@ export const SourceSelectMenu = ({
 }: ElementProps) => {
   const { walletType } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -67,6 +70,7 @@ export const SourceSelectMenu = ({
     () => getMapOfHighestFeeTokensByChainId(type, skipEnabled),
     [type, skipEnabled]
   );
+  const isKeplrWallet = walletType === WalletType.Keplr;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -77,6 +81,7 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
+
   const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,
@@ -88,6 +93,9 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
+      if (isKeplrWallet) {
+        return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
+      }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -119,11 +127,12 @@ export const SourceSelectMenu = ({
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
-          group: 'exchanges',
-          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-          items: exchangeItems,
-        },
+        !isKeplrWallet &&
+          exchangeItems.length > 0 && {
+            group: 'exchanges',
+            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+            items: exchangeItems,
+          },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {

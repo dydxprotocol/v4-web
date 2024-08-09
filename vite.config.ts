@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import { defineConfig } from 'vite';
+import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import ViteRestart from 'vite-plugin-restart';
 import svgr from 'vite-plugin-svgr';
 
@@ -50,6 +51,7 @@ export default defineConfig(({ mode }) => ({
     ],
   },
   plugins: [
+    nodePolyfills(),
     react({
       babel: {
         plugins: [

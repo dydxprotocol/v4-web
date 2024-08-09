@@ -7,6 +7,8 @@ import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverage
 import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
+import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
+import { CosmosDepositDialog } from '@/views/dialogs/CosmosDepositDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
@@ -65,6 +67,8 @@ export const DialogManager = () => {
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
     CancelPendingOrders: (args) => <CancelAllOrdersDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
+    ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
+    CosmosDeposit: (args) => <CosmosDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
