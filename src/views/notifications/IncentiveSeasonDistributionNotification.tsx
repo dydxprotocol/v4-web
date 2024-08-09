@@ -56,9 +56,9 @@ export const IncentiveSeasonDistributionNotification = ({
         />
       }
       slotAction={
-        <$Button action={ButtonAction.Primary} size={ButtonSize.Small}>
+        <Button action={ButtonAction.Primary} size={ButtonSize.Small} tw="w-full">
           {stringGetter({ key: STRING_KEYS.STAKE_FOR_REWARDS })} →
-        </$Button>
+        </Button>
       }
     />
   );
@@ -86,8 +86,4 @@ const $Output = styled(Output)`
     color: var(--color-success);
     margin-right: 0.5ch;
   }
-`;
-
-const $Button = styled(Button)`
-  width: 100%;
 `;

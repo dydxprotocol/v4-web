@@ -21,10 +21,10 @@ export const TradingRewardsChartPanel = () => {
 
   return (
     <Panel>
-      <$TradingRewardsChart
+      <TradingRewardsChart
         selectedLocale={selectedLocale}
         slotEmpty={
-          <$EmptyChart>
+          <div tw="grid cursor-default">
             <$EmptyCard>
               {onboardingState !== OnboardingState.AccountConnected ? (
                 <>
@@ -40,30 +40,20 @@ export const TradingRewardsChartPanel = () => {
                 </>
               ) : (
                 <>
-                  <$EmptyIcon iconName={IconName.OrderPending} />
+                  <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
                   {stringGetter({
                     key: STRING_KEYS.TRADING_REWARD_CHART_EMPTY_STATE,
                   })}
                 </>
               )}
             </$EmptyCard>
-          </$EmptyChart>
+          </div>
         }
+        tw="h-20 [--trading-rewards-line-color:--color-positive]"
       />
     </Panel>
   );
 };
-
-const $TradingRewardsChart = styled(TradingRewardsChart)`
-  --trading-rewards-line-color: var(--color-positive);
-  height: 20rem;
-`;
-
-const $EmptyChart = styled.div`
-  display: grid;
-  cursor: default;
-`;
-
 const $EmptyCard = styled.div`
   width: 16.75rem;
 
@@ -76,8 +66,4 @@ const $EmptyCard = styled.div`
 
   font: var(--font-base-book);
   color: var(--color-text-0);
-`;
-
-const $EmptyIcon = styled(Icon)`
-  font-size: 3em;
 `;

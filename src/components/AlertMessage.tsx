@@ -49,6 +49,12 @@ const AlertContainer = styled.div<StyleProps>`
           --alert-background: var(--color-layer-7);
         `;
       }
+      case AlertType.Notice: {
+        return css`
+          --alert-accent-color: var(--color-accent);
+          --alert-background: var(--color-accent-faded);
+        `;
+      }
       case AlertType.Success: {
         return css`
           --alert-accent-color: var(--color-success);

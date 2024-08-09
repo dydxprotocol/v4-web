@@ -8,8 +8,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { VaultDepositWithdrawForm } from '@/pages/vaults/VaultDepositWithdrawForm';
 
@@ -34,10 +32,10 @@ export const VaultDepositWithdrawDialog = ({
       setIsOpen={setIsOpen}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
       title={
-        <$VaultDialogTitle>
-          <$VaultImg src="/dydx-chain.png" />
+        <div tw="row gap-1 font-extra-bold">
+          <img src="/dydx-chain.png" tw="h-2.5 w-2.5" />
           {stringGetter({ key: STRING_KEYS.VAULT })}
-        </$VaultDialogTitle>
+        </div>
       }
       hasHeaderBorder
     >
@@ -50,15 +48,4 @@ const $Dialog = styled(Dialog)`
   --dialog-content-paddingRight: 0;
   --dialog-content-paddingBottom: 0;
   --dialog-content-paddingLeft: 0;
-`;
-
-const $VaultImg = styled.img`
-  width: 2.5rem;
-  height: 2.5rem;
-`;
-
-const $VaultDialogTitle = styled.div`
-  ${layoutMixins.row}
-  gap: 1rem;
-  font: var(--font-extra-bold);
 `;

@@ -1,9 +1,4 @@
-import {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import { css } from 'styled-components';
 
 import { layoutMixins } from './layoutMixins';
 
@@ -55,9 +50,9 @@ export const tableMixins = {
     color: var(--tableStickyRow-textColor, var(--color-text-0));
 
     span:nth-child(2) {
-      :before {
+      &:before {
         content: '| ';
       }
     }
   `,
-} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;

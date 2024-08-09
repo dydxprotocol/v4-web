@@ -59,7 +59,7 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
 
   return (
     <Root orientation="vertical">
-      <$List>
+      <List tw="gap-0.5">
         {items.map((item) =>
           !item.subitems ? (
             <$NavItem key={item.value} onSelect={onSelectItem} {...item} />
@@ -81,7 +81,7 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
             </Collapsible>
           )
         )}
-      </$List>
+      </List>
     </Root>
   );
 };
@@ -92,11 +92,6 @@ const navItemStyle = css`
   --item-checked-backgroundColor: var(--color-layer-1);
   --item-checked-textColor: var(--color-text-0);
 `;
-
-const $List = styled(List)`
-  gap: 0.5rem;
-`;
-
 const $CollapsibleItem = styled(Item)`
   ${navItemStyle}
   --item-padding: 0;

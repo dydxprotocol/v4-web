@@ -55,6 +55,8 @@ export default defineConfig(({ mode }) => ({
     react({
       babel: {
         plugins: [
+          'babel-plugin-twin',
+          'babel-plugin-macros',
           [
             'babel-plugin-styled-components',
             {
@@ -64,9 +66,11 @@ export default defineConfig(({ mode }) => ({
         ],
       },
     }),
+
     svgr({
       exportAsDefault: true,
     }),
+
     // Currently, the Vite file watcher is unable to watch folders within node_modules.
     // Workaround is to use ViteRestart plugin + a generated file to trigger the restart.
     // See https://github.com/vitejs/vite/issues/8619

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
@@ -101,16 +102,16 @@ export const SharePNLAnalyticsDialog = ({
           }
         }}
       >
-        <$ShareableCardSide>
-          <$ShareableCardTitle>
-            <$AssetIcon symbol={assetId} />
+        <div tw="flexColumn h-full">
+          <div tw="row mb-0.75 gap-0.5">
+            <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
 
             <span>
-              <$ShareableCardTitleAsset>{assetLeft}</$ShareableCardTitleAsset>/{assetRight}
+              <span tw="text-color-text-2 font-base-bold">{assetLeft}</span>/{assetRight}
             </span>
 
             <Tag sign={sideSign}>{sideLabel}</Tag>
-          </$ShareableCardTitle>
+          </div>
 
           <$HighlightOutput
             isNegative={unrealizedPnlIsNegative}
@@ -119,11 +120,11 @@ export const SharePNLAnalyticsDialog = ({
             showSign={ShowSign.Both}
           />
 
-          <$Logo />
-        </$ShareableCardSide>
+          <LogoIcon tw="mt-auto h-auto w-[5.125rem]" />
+        </div>
 
         <div>
-          <$ShareableCardStats>
+          <div tw="grid grid-cols-[repeat(2,1fr)] gap-[1.125rem] gap-y-0.5">
             <$ShareableCardStatLabel>
               {stringGetter({ key: STRING_KEYS.ENTRY })}
             </$ShareableCardStatLabel>
@@ -143,7 +144,7 @@ export const SharePNLAnalyticsDialog = ({
               value={leverage}
               showSign={ShowSign.None}
             />
-          </$ShareableCardStats>
+          </div>
 
           <$QrCode
             size={68}
@@ -161,7 +162,7 @@ export const SharePNLAnalyticsDialog = ({
         </div>
       </$ShareableCard>
 
-      <$Actions>
+      <div tw="flex gap-1">
         <$Action
           action={ButtonAction.Secondary}
           slotLeft={<Icon iconName={IconName.Copy} />}
@@ -188,19 +189,11 @@ export const SharePNLAnalyticsDialog = ({
         >
           {stringGetter({ key: STRING_KEYS.SHARE })}
         </$Action>
-      </$Actions>
+      </div>
     </Dialog>
   );
 };
-
-const $Actions = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-const $Action = styled(Button)`
-  flex: 1;
-`;
+const $Action = tw(Button)`flex-1`;
 
 const $ShareableCard = styled.div`
   ${layoutMixins.row}
@@ -212,45 +205,9 @@ const $ShareableCard = styled.div`
   padding: 1.75rem 1.25rem 1.25rem 1.25rem;
   border-radius: 0.5rem;
 `;
+const $ShareableCardStatLabel = tw.div`text-right text-color-text-0 font-base-bold`;
 
-const $ShareableCardSide = styled.div`
-  ${layoutMixins.flexColumn}
-  height: 100%;
-`;
-
-const $ShareableCardTitle = styled.div`
-  ${layoutMixins.row};
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-`;
-
-const $ShareableCardTitleAsset = styled.span`
-  font: var(--font-base-bold);
-  color: var(--color-text-2);
-`;
-
-const $ShareableCardStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.125rem;
-  row-gap: 0.5rem;
-`;
-
-const $ShareableCardStatLabel = styled.div`
-  font: var(--font-base-bold);
-  text-align: right;
-  color: var(--color-text-0);
-`;
-
-const $ShareableCardStatOutput = styled(Output)`
-  font: var(--font-base-bold);
-  color: var(--color-text-2);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  height: 1.625rem;
-`;
-
+const $ShareableCardStatOutput = tw(Output)`font-base-bold text-color-text-2`;
 const $QrCode = styled(QrCode)`
   width: 5.25rem;
   height: 5.25rem;
@@ -274,10 +231,4 @@ const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
         ? `var(--color-negative)`
         : `var(--color-positive)`
       : `var(--color-text-1)`};
-`;
-
-const $Logo = styled(LogoIcon)`
-  width: 5.125rem;
-  margin-top: auto;
-  height: auto;
 `;

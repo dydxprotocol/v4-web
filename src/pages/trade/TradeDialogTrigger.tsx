@@ -43,18 +43,24 @@ export const TradeDialogTrigger = () => {
         <$TradeDialogTrigger hasSummary={hasSummary}>
           {hasSummary ? (
             <$TradeSummary>
-              <$TradeType>
+              <div tw="inlineRow">
                 <span>
                   {stringGetter({ key: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey })}
                 </span>
                 <OrderSideTag size={TagSize.Medium} orderSide={selectedOrderSide} />
-              </$TradeType>
-              <$Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />
+              </div>
+              <Output
+                type={OutputType.Fiat}
+                value={total}
+                showSign={ShowSign.None}
+                useGrouping
+                tw="text-color-text-2 font-large-book"
+              />
             </$TradeSummary>
           ) : (
             stringGetter({ key: STRING_KEYS.TAP_TO_TRADE })
           )}
-          <$Icon iconName={IconName.Caret} />
+          <Icon iconName={IconName.Caret} tw="h-1.5 w-1.5 [rotate:0.5turn]" />
         </$TradeDialogTrigger>
       }
     />
@@ -78,19 +84,4 @@ const $TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
 const $TradeSummary = styled.div`
   ${layoutMixins.rowColumn}
   font: var(--font-medium-book);
-`;
-
-const $TradeType = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-2);
-  font: var(--font-large-book);
-`;
-
-const $Icon = styled(Icon)`
-  rotate: 0.5turn;
-  width: 1.5rem;
-  height: 1.5rem;
 `;

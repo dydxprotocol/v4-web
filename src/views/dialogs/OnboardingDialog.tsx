@@ -1,6 +1,7 @@
 import { useEffect, useState, type ElementType } from 'react';
 
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -14,7 +15,6 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
@@ -115,10 +115,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     />
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1rem;
-`;
+const $Content = tw.div`flexColumn gap-1`;
 
 const $Dialog = styled(Dialog)<{ width?: string }>`
   @media ${breakpoints.notMobile} {
@@ -132,8 +129,4 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
   --dialog-icon-size: 1.25rem;
 `;
 
-const $Ring = styled(Ring)`
-  width: 1.25rem;
-  height: 1.25rem;
-  --ring-color: var(--color-accent);
-`;
+const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:--color-accent]`;

@@ -80,7 +80,7 @@ export const AdvancedTradeOptions = () => {
       triggerIconSide="right"
       fullWidth
     >
-      <$AdvancedInputsContainer>
+      <div tw="grid gap-[--form-input-gap]">
         {needsTimeRow && (
           <$AdvancedInputsRow>
             {hasTimeInForce && timeInForce != null && (
@@ -221,7 +221,7 @@ export const AdvancedTradeOptions = () => {
             )}
           </>
         )}
-      </$AdvancedInputsContainer>
+      </div>
     </$Collapsible>
   );
 };
@@ -237,12 +237,6 @@ const $Collapsible = styled(Collapsible)`
 
   margin: -0.5rem 0;
 `;
-
-const $AdvancedInputsContainer = styled.div`
-  display: grid;
-  gap: var(--form-input-gap);
-`;
-
 const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}
 `;

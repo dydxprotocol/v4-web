@@ -1,16 +1,20 @@
 import { Key, memo, useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { StatSigFlags } from '@/types/statsig';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
+import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, type MarketData } from '@/constants/markets';
+import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,6 +23,8 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
@@ -32,12 +38,19 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
 
-const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
+const MarketsDropdownContent = ({
+  closeDropdown,
+  onRowAction,
+}: {
+  closeDropdown: () => void;
+  onRowAction?: (market: Key) => void;
+}) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
+  const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo(
@@ -85,7 +98,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           getCellValue: (row) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ priceChange24HPercent }) => (
-            <$InlineRow>
+            <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
@@ -95,7 +108,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
               )}
-            </$InlineRow>
+            </div>
           ),
         },
         {
@@ -120,17 +133,50 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
 
   const slotBottom = useMemo(() => {
     if (filter === MarketFilters.PREDICTION_MARKET) {
-      // TODO: (TRA-516): Localize string when finallized.
       return (
-        <$Disclaimer>
-          Prediction Markets will settle at $1 if the event occurs as predicted. Otherwise, they
-          will settle at $0.
-        </$Disclaimer>
+        <div tw="p-1 text-color-text-0 font-small-medium">
+          {stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}
+        </div>
       );
     }
 
     return null;
   }, [filter]);
+
+  const [hasSeenElectionBannerTrumpWin, setHasSeenElectionBannerTrupmWin] = useLocalStorage({
+    key: LocalStorageKey.HasSeenElectionBannerTRUMPWIN,
+    defaultValue: false,
+  });
+
+  const currentDate = new Date();
+
+  const slotTop = useMemo(() => {
+    if (
+      !hasSeenElectionBannerTrumpWin &&
+      featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+      currentDate < new Date('2024-11-06T23:59:59')
+    ) {
+      return (
+        <$MarketDropdownBanner>
+          <$FlagGradient />
+          <Link
+            to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}
+            onClick={() => {
+              closeDropdown();
+            }}
+          >
+            🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
+          </Link>
+          <$IconButton
+            onClick={() => setHasSeenElectionBannerTrupmWin(true)}
+            iconName={IconName.Close}
+          />
+        </$MarketDropdownBanner>
+      );
+    }
+
+    return null;
+  }, [hasSeenElectionBannerTrumpWin]);
 
   return (
     <>
@@ -142,6 +188,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           onSearchTextChange={setSearchFilter}
         />
       </$Toolbar>
+      {slotTop}
       <$ScrollArea>
         <$Table
           withInnerBorders
@@ -215,31 +262,39 @@ export const MarketsDropdown = memo(
         </Tag>
       ) : undefined;
 
+    const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
+
     return (
       <$Popover
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
-          <$TriggerContainer $isOpen={isOpen}>
-            {isOpen ? (
-              <h2>{stringGetter({ key: STRING_KEYS.SELECT_MARKET })}</h2>
-            ) : (
-              <div>
-                <AssetIcon symbol={symbol} />
-                <h2>{currentMarketId}</h2>
-                {leverageTag}
-              </div>
-            )}
-            <p>
-              {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <DropdownIcon isOpen={isOpen} />
-            </p>
-          </$TriggerContainer>
+          <>
+            {triggerBackground}
+            <$TriggerContainer $isOpen={isOpen}>
+              {isOpen ? (
+                <h2 tw="text-color-text-2 font-medium-medium">
+                  {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
+                </h2>
+              ) : (
+                <div tw="spacedRow gap-0.625">
+                  <AssetIcon symbol={symbol} />
+                  <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  {leverageTag}
+                </div>
+              )}
+              <p tw="row gap-0.5 text-color-text-0 font-small-book">
+                {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
+                <DropdownIcon isOpen={isOpen} />
+              </p>
+            </$TriggerContainer>
+          </>
         }
         triggerType={TriggerType.MarketDropdown}
       >
         <MarketsDropdownContent
+          closeDropdown={() => setIsOpen(false)}
           onRowAction={(market: Key) => {
             navigate(`${AppRoute.Trade}/${market}`);
             setIsOpen(false);
@@ -274,6 +329,7 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
 const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
   --marketsDropdown-width: var(--sidebar-width);
   width: var(--sidebar-width);
+  position: relative;
 
   ${layoutMixins.spacedRow}
   padding: 0 1.25rem;
@@ -285,29 +341,6 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
     css`
       --marketsDropdown-width: var(--marketsDropdown-openWidth);
     `}
-
-  > :first-child {
-    ${layoutMixins.row}
-    gap: 0.625rem;
-
-    img {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-
-    h2 {
-      color: var(--color-text-1);
-      font: var(--font-medium-medium);
-    }
-  }
-
-  > :last-child {
-    ${layoutMixins.row}
-    gap: 0.5rem;
-
-    color: var(--color-text-0);
-    font: var(--font-small-book);
-  }
 `;
 
 const $Popover = styled(Popover)`
@@ -351,13 +384,6 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
-
-const $Disclaimer = styled.div`
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-  padding: 1rem;
-`;
-
 const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--toolbar-height);
@@ -365,11 +391,53 @@ const $Toolbar = styled(Toolbar)`
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
+const $MarketDropdownBanner = styled.div`
+  ${layoutMixins.row}
+  background-color: var(--color-layer-1);
+  padding: 0.9063rem 1rem;
+  font: var(--font-base-medium);
+  color: var(--color-text-1);
+  border-bottom: solid var(--border-width) var(--color-border);
+  justify-content: space-between;
+  position: relative;
+
+  & > * {
+    z-index: 1;
+  }
+`;
+
+const $IconButton = styled(IconButton)`
+  --button-backgroundColor: transparent;
+  --button-border: none;
+`;
+
+const $FlagGradient = styled.div`
+  width: 573px;
+  height: 100%;
+  background-image: ${({ theme }) => `
+    linear-gradient(90deg, ${theme.layer1} 0%, ${theme.tooltipBackground} 53%, ${theme.layer1} 99%),
+    url('/AmericanFlag.png')
+  `};
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 0;
+  right: 0;
+`;
+
+const $TriggerFlag = styled.div`
+  background: url('/AmericanFlag2.png') no-repeat;
+  mix-blend-mode: luminosity;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+`;
+
 const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
 `;
-
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 
@@ -394,11 +462,6 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);

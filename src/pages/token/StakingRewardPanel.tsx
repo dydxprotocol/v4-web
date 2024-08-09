@@ -59,13 +59,14 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
       }
       slotRight={
         canAccountTrade && (
-          <$Button
+          <Button
             action={ButtonAction.Primary}
             size={ButtonSize.Base}
             onClick={openStakingRewardDialog}
+            tw="z-[1] mr-[--panel-paddingX]"
           >
             {stringGetter({ key: STRING_KEYS.CLAIM })}
-          </$Button>
+          </Button>
         )
       }
     >
@@ -111,12 +112,6 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
     mask-image: linear-gradient(270deg, transparent, var(--gradient-start-color) 60%);
   }
 `;
-
-const $Button = styled(Button)`
-  margin-right: var(--panel-paddingX);
-  z-index: 1;
-`;
-
 const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
 

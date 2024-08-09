@@ -1,5 +1,6 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -72,7 +73,4 @@ const $RadioButtonCards = styled(RadioButtonCards)`
   --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
   --radio-button-cards-item-header-font: var(--font-medium-medium);
 `;
-const $TertiarySpan = styled.span`
-  color: var(--color-text-0);
-  font: var(--font-base-medium);
-`;
+const $TertiarySpan = tw.span`text-color-text-0 font-base-medium`;

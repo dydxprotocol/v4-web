@@ -52,7 +52,7 @@ export const WithHovercard = ({
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <Portal>
         <$Content className={className} align={align} alignOffset={-16} side={side} sideOffset={8}>
-          {hovercardTitle && <$Title>{hovercardTitle}</$Title>}
+          {hovercardTitle && <h3 tw="text-color-text-2 font-small-bold">{hovercardTitle}</h3>}
           {hovercardBody && <p>{hovercardBody}</p>}
           {slotButton}
         </$Content>
@@ -74,9 +74,4 @@ const $Content = styled(Content)`
 
   font-size: 0.8125em;
   border-radius: 0.33rem;
-`;
-
-const $Title = styled.h3`
-  font: var(--font-small-bold);
-  color: var(--color-text-2);
 `;

@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -94,17 +95,17 @@ const VaultPage = () => {
           <$VaultDescription />
           <$VaultPositionsSection />
         </$VaultDetailsColumn>
-        <$VaultDepositWithdrawFormColumn>
+        <div tw="flexColumn gap-1.25">
           <$YourVaultDetailsCards />
           <$DepositFormContainer>
-            <$PlaceholderBox>
+            <div tw="rounded-[0.7rem] bg-color-layer-3">
               <VaultDepositWithdrawForm />
-            </$PlaceholderBox>
+            </div>
           </$DepositFormContainer>
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
           </$VaultTransactionsCardContainer>
-        </$VaultDepositWithdrawFormColumn>
+        </div>
       </$TwoColumnContainer>
     </$Page>
   );
@@ -145,15 +146,7 @@ const $TwoColumnContainer = styled.div`
     grid-template-columns: 1fr;
   }
 `;
-const $VaultDetailsColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-`;
-const $VaultDepositWithdrawFormColumn = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-`;
-
+const $VaultDetailsColumn = tw.div`flexColumn gap-1.25`;
 const xPaddingWhenSmall = css`
   @media (${breakpoints.desktopSmall}) {
     padding-left: 1rem;
@@ -177,17 +170,7 @@ const $DepositFormContainer = styled.div`
 const $VaultDescription = styled(VaultDescription)`
   ${xPaddingWhenSmall}
 `;
-
-const $PlaceholderBox = styled.div`
-  border-radius: 0.7rem;
-  background-color: var(--color-layer-3);
-`;
-
-const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)`
-  display: flex;
-  min-height: 1px;
-  max-height: 1px;
-`;
+const $HorizontalSeparatorFiller = tw(HorizontalSeparatorFiller)`flex min-h-px max-h-px`;
 
 const $PnlRow = styled.div``;
 const $PnlChart = styled(VaultPnlChart)``;

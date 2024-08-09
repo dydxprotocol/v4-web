@@ -1,9 +1,6 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -34,17 +31,11 @@ export const MarketLinks = () => {
   ].filter(({ href }) => href);
 
   return (
-    <$MarketLinks>
+    <div tw="row ml-auto gap-0.5">
       {linkItems.map(
         ({ key, href, icon }) =>
           href && <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
       )}
-    </$MarketLinks>
+    </div>
   );
 };
-const $MarketLinks = styled.div`
-  ${layoutMixins.row}
-
-  margin-left: auto;
-  gap: 0.5rem;
-`;

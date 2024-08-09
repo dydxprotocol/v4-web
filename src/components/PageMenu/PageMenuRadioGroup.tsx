@@ -24,7 +24,14 @@ export const PageMenuRadioGroupItem = <
             {slotBefore}
             <span>{label}</span>
           </div>
-          {value === curentValue ? <$CheckIcon iconName={IconName.Check} /> : <$EmptyIcon />}
+          {value === curentValue ? (
+            <Icon
+              iconName={IconName.Check}
+              tw="rounded-[50%] bg-color-accent p-[4px] text-color-text-1"
+            />
+          ) : (
+            <$EmptyIcon />
+          )}
         </$MenuItem>
       ))}
     </$Root>
@@ -43,16 +50,6 @@ const $MenuItem = styled(Item)`
   --item-padding: 1.25rem 1.625rem;
   --item-checked-backgroundColor: var(--color-layer-0);
 `;
-
-const $CheckIcon = styled(Icon)`
-  padding: 4px;
-
-  border-radius: 50%;
-
-  color: var(--color-text-1);
-  background-color: var(--color-accent);
-`;
-
 const $EmptyIcon = styled.div`
   width: 0.9em;
   height: 0.9em;

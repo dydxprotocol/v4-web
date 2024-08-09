@@ -1,11 +1,7 @@
-import styled from 'styled-components';
-
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
@@ -44,12 +40,12 @@ export const AdvancedTriggersOptions = ({
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   return (
-    <$Container>
-      <$Header>
+    <div tw="column">
+      <h3 tw="inlineRow mb-0.5 text-color-text-0 font-small-medium">
         {stringGetter({ key: STRING_KEYS.ADVANCED })}
         <HorizontalSeparatorFiller />
-      </$Header>
-      <$Content>
+      </h3>
+      <div tw="grid gap-[0.5em]">
         <OrderSizeInput
           className={className}
           differingOrderSizes={differingOrderSizes}
@@ -67,23 +63,7 @@ export const AdvancedTriggersOptions = ({
             tickSizeDecimals={tickSizeDecimals}
           />
         )}
-      </$Content>
-    </$Container>
+      </div>
+    </div>
   );
 };
-const $Container = styled.div`
-  ${layoutMixins.column}
-`;
-
-const $Header = styled.h3`
-  ${layoutMixins.inlineRow}
-  font: var(--font-small-medium);
-  color: var(--color-text-0);
-
-  margin-bottom: 0.5rem;
-`;
-
-const $Content = styled.div`
-  display: grid;
-  gap: 0.5em;
-`;

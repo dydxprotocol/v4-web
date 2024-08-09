@@ -41,6 +41,7 @@ export type ExternalLinkDialogProps = {
 export type ExternalNavStrideDialogProps = {};
 export type FillDetailsDialogProps = { fillId: string };
 export type GeoComplianceDialogProps = {};
+export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
 export type ManageFundsDialogProps = { selectedTransferType?: string };
@@ -112,6 +113,7 @@ export const DialogTypes = unionize(
     ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
     FillDetails: ofType<FillDetailsDialogProps>(),
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
+    GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
     ManageFunds: ofType<ManageFundsDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),

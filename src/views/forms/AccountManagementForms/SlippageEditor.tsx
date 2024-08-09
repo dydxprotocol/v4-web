@@ -8,8 +8,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
@@ -93,7 +91,7 @@ export const SlippageEditor = ({
   }
 
   return (
-    <$WithConfirmationPopover
+    <WithConfirmationPopover
       open={editorState !== EditorState.Viewing}
       onOpenChange={onOpenChange}
       align="end"
@@ -102,17 +100,22 @@ export const SlippageEditor = ({
       onCancel={onCancel}
       onConfirm={editorState === EditorState.Editing ? onConfirmSlippage : undefined}
       slotTrigger={
-        <$SlippageOutput onClick={() => setEditorState(EditorState.Selecting)}>
+        // eslint-disable-next-line jsx-a11y/control-has-associated-label, react/button-has-type
+        <button
+          onClick={() => setEditorState(EditorState.Selecting)}
+          tw="row gap-[0.5ch] underline"
+        >
           <Output type={OutputType.Percent} value={slippage} />
           <Icon iconName={IconName.Pencil} />
-        </$SlippageOutput>
+        </button>
       }
+      tw="w-10 text-[0.625rem]"
     >
       {
         {
           [EditorState.Viewing]: undefined,
           [EditorState.Selecting]: (
-            <$SlippageInput>
+            <div tw="inlineRow justify-center rounded-[0.5em] bg-color-layer-2">
               <ToggleGroup
                 ref={toggleGroupRef}
                 items={[
@@ -125,7 +128,7 @@ export const SlippageEditor = ({
                 shape={ButtonShape.Rectangle}
                 size={ButtonSize.XSmall}
               />
-            </$SlippageInput>
+            </div>
           ),
           [EditorState.Editing]: (
             <$FormInput
@@ -138,28 +141,9 @@ export const SlippageEditor = ({
           ),
         }[editorState]
       }
-    </$WithConfirmationPopover>
+    </WithConfirmationPopover>
   );
 };
-const $SlippageOutput = styled.button`
-  ${layoutMixins.row}
-  text-decoration: underline;
-  gap: 0.5ch;
-`;
-
-const $WithConfirmationPopover = styled(WithConfirmationPopover)`
-  font-size: 0.625rem;
-  width: 10rem;
-`;
-
-const $SlippageInput = styled.div`
-  ${layoutMixins.inlineRow}
-
-  justify-content: center;
-  background-color: var(--color-layer-2);
-  border-radius: 0.5em;
-`;
-
 const $FormInput = styled(FormInput)`
   --form-input-height: 1.5rem;
 

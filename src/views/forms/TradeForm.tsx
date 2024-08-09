@@ -55,6 +55,7 @@ import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
+import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
 import { TradeFormInputs } from './TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
@@ -93,7 +94,7 @@ export const TradeForm = ({
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { side } = currentTradeData ?? {};
+  const { marketId, side } = currentTradeData ?? {};
 
   const selectedOrderSide = getSelectedOrderSide(side);
 
@@ -219,7 +220,7 @@ export const TradeForm = ({
 
   const tabletActionsRow = isTablet && (
     <$TopActionsRow>
-      <$OrderbookButtons>
+      <div tw="inlineRow justify-between gap-0.25 notTablet:hidden">
         <$OrderbookButton
           slotRight={<Icon iconName={IconName.Caret} />}
           onPressedChange={setShowOrderbook}
@@ -228,7 +229,7 @@ export const TradeForm = ({
           {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
         </$OrderbookButton>
         {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-      </$OrderbookButtons>
+      </div>
 
       <$ToggleGroup
         items={allTradeTypeItems}
@@ -238,36 +239,45 @@ export const TradeForm = ({
     </$TopActionsRow>
   );
 
+  const tradeFormMessages = (
+    <>
+      <TradeFormInfoMessages marketId={marketId} />
+
+      {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+        <AlertMessage type={AlertType.Error}>
+          <span>{complianceMessage}</span>
+        </AlertMessage>
+      )}
+
+      {alertContent && (
+        <AlertMessage type={alertType}>
+          <div tw="row gap-0.75">
+            {alertContent}
+            {shouldPromptUserToPlaceLimitOrder && (
+              <$IconButton
+                iconName={IconName.Arrow}
+                shape={ButtonShape.Circle}
+                action={ButtonAction.Navigation}
+                size={ButtonSize.XSmall}
+                onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+              />
+            )}
+          </div>
+        </AlertMessage>
+      )}
+    </>
+  );
+
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
-      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
+      {isTablet && showOrderbook && (
+        <CanvasOrderbook rowsPerSide={5} hideHeader tw="notTablet:hidden" />
+      )}
       <$InputsColumn>
         <TradeFormInputs />
         <TradeSizeInputs />
         <AdvancedTradeOptions />
-
-        {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
-          <AlertMessage type={AlertType.Error}>
-            <span>{complianceMessage}</span>
-          </AlertMessage>
-        )}
-
-        {alertContent && (
-          <AlertMessage type={alertType}>
-            <$Message>
-              {alertContent}
-              {shouldPromptUserToPlaceLimitOrder && (
-                <$IconButton
-                  iconName={IconName.Arrow}
-                  shape={ButtonShape.Circle}
-                  action={ButtonAction.Navigation}
-                  size={ButtonSize.XSmall}
-                  onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
-                />
-              )}
-            </$Message>
-          </AlertMessage>
-        )}
+        {tradeFormMessages}
       </$InputsColumn>
     </$OrderbookAndInputs>
   );
@@ -275,7 +285,7 @@ export const TradeForm = ({
   const tradeFooter = (
     <$Footer>
       {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-        <$ButtonRow>
+        <div tw="row justify-self-end px-0 py-0.5">
           <Button
             type={ButtonType.Reset}
             action={ButtonAction.Reset}
@@ -285,7 +295,7 @@ export const TradeForm = ({
           >
             {stringGetter({ key: STRING_KEYS.CLEAR })}
           </Button>
-        </$ButtonRow>
+        </div>
       )}
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
@@ -330,7 +340,7 @@ const $TradeForm = styled.form`
 
   /* Rules */
   --orderbox-column-width: 180px;
-  --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
+  --orderbox-gap: 1rem;
 
   min-height: 100%;
   isolation: isolate;
@@ -370,16 +380,7 @@ const $TopActionsRow = styled.div`
 
   @media ${breakpoints.tablet} {
     grid-auto-columns: var(--orderbox-column-width) 1fr;
-    gap: var(--form-input-gap);
-  }
-`;
-const $OrderbookButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  justify-content: space-between;
-  gap: 0.25rem;
-
-  @media ${breakpoints.notTablet} {
-    display: none;
+    gap: var(--orderbox-gap);
   }
 `;
 const $OrderbookButton = styled(ToggleButton)`
@@ -415,9 +416,8 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
     ${({ showOrderbook }) =>
       showOrderbook
         ? css`
-            grid-auto-columns: var(--orderbook-width) 1fr;
-            gap: var(--form-input-gap);
-            margin-left: calc(-1 * var(--tradeBox-content-paddingLeft));
+            grid-auto-columns: var(--orderbox-column-width) 1fr;
+            gap: var(--orderbox-gap);
           `
         : css`
             grid-auto-columns: 1fr;
@@ -425,13 +425,7 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
           `}
   }
 `;
-const $Orderbook = styled(CanvasOrderbook)`
-  width: 100%;
 
-  @media ${breakpoints.notTablet} {
-    display: none;
-  }
-`;
 const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
 
@@ -443,12 +437,6 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
-
-const $Message = styled.div`
-  ${layoutMixins.row}
-  gap: 0.75rem;
-`;
-
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
@@ -462,13 +450,6 @@ const $IconButton = styled(IconButton)`
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
-
-const $ButtonRow = styled.div`
-  ${layoutMixins.row}
-  justify-self: end;
-  padding: 0.5rem 0 0.5rem 0;
-`;
-
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);

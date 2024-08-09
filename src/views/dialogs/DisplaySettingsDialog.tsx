@@ -33,10 +33,10 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
 
   const sectionHeader = (heading: string) => {
     return (
-      <$Header>
+      <header tw="inlineRow">
         {heading}
         <HorizontalSeparatorFiller />
-      </$Header>
+      </header>
     );
   };
 
@@ -85,9 +85,9 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               <$AppThemeHeader textcolor={textColor}>
                 {stringGetter({ key: label })}
               </$AppThemeHeader>
-              <$Image src="/chart-bars.svg" />
+              <img src="/chart-bars.svg" tw="z-[1] h-auto w-full" />
               <$CheckIndicator>
-                <$CheckIcon iconName={IconName.Check} />
+                <Icon iconName={IconName.Check} tw="h-[--icon-size] w-[--icon-size]" />
               </$CheckIndicator>
             </$AppThemeItem>
           );
@@ -116,7 +116,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               dispatch(setAppColorMode(colorMode));
             }}
           >
-            <$ColorPreferenceLabel>
+            <div tw="inlineRow gap-[1ch]">
               <$ArrowIconContainer>
                 <$ArrowIcon
                   iconName={IconName.Arrow}
@@ -130,7 +130,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
                 />
               </$ArrowIconContainer>
               {stringGetter({ key: label })}
-            </$ColorPreferenceLabel>
+            </div>
             <$DotIndicator $selected={currentColorMode === colorMode} />
           </$ColorPreferenceItem>
         ))}
@@ -164,11 +164,6 @@ const $Section = styled.div`
   ${gridStyle}
   padding: 1rem 0;
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.inlineRow}
-`;
-
 const $AppThemeRoot = styled(Root)`
   ${gridStyle}
   grid-template-columns: 1fr 1fr;
@@ -242,18 +237,6 @@ const $AppThemeHeader = styled.h3<{ textcolor: string }>`
   `}
   z-index: 1;
 `;
-
-const $Image = styled.img`
-  width: 100%;
-  height: auto;
-  z-index: 1;
-`;
-
-const $ColorPreferenceLabel = styled.div`
-  ${layoutMixins.inlineRow};
-  gap: 1ch;
-`;
-
 const $ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.25rem;
@@ -332,9 +315,4 @@ const $CheckIndicator = styled(Indicator)`
 
   background-color: var(--color-accent);
   color: var(--color-text-button);
-`;
-
-const $CheckIcon = styled(Icon)`
-  width: var(--icon-size);
-  height: var(--icon-size);
 `;

@@ -34,5 +34,6 @@ export const useAllStatsigGateValues = () => {
       return { ...acc, [gate]: checkGate(gate) };
     }, {} as StatsigConfigType);
   }, []);
+
   return allGateValues;
 };

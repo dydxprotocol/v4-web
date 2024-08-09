@@ -556,6 +556,7 @@ const assetIcons = {
   TRIBE: '/currencies/tribe.png',
   TRU: '/currencies/tru.png',
   TRUMP: '/currencies/trump.png',
+  TRUMPWIN: '/currencies/trumpwin.png',
   TRVL: '/currencies/trvl.png',
   TRX: '/currencies/trx.png',
   TT: '/currencies/tt.png',
@@ -678,17 +679,15 @@ export const AssetIcon = ({
   className?: string;
 }) =>
   isAssetSymbol(symbol) ? (
-    <$Img src={assetIcons[symbol]} className={className} alt={symbol} />
+    <img
+      src={assetIcons[symbol]}
+      className={className}
+      alt={symbol}
+      tw="h-[1em] w-auto rounded-[50%]"
+    />
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
-
-const $Img = styled.img`
-  width: auto;
-  height: 1em;
-  border-radius: 50%;
-`;
-
 const $Placeholder = styled.div`
   background-color: var(--color-layer-5);
   width: 1em;

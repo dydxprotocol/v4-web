@@ -39,7 +39,6 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -393,7 +392,7 @@ export const WithdrawForm = () => {
         </span>
       ),
       value: (
-        <$DiffOutput
+        <DiffOutput
           type={OutputType.Fiat}
           value={freeCollateral?.current}
           newValue={freeCollateral?.postOrder}
@@ -402,6 +401,7 @@ export const WithdrawForm = () => {
           withDiff={
             Boolean(withdrawAmount) && !debouncedAmountBN.isNaN() && !debouncedAmountBN.isZero()
           }
+          tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />
       ),
     },
@@ -521,7 +521,7 @@ export const WithdrawForm = () => {
                   selectedLocale,
                   fractionDigits: TOKEN_DECIMALS,
                 })}
-                <$Tag>{usdcLabel}</$Tag>
+                <Tag tw="ml-[0.5ch]">{usdcLabel}</Tag>
               </span>
             ),
           },
@@ -563,7 +563,7 @@ export const WithdrawForm = () => {
 
   return (
     <$Form onSubmit={onSubmit}>
-      <$Subheader>
+      <div tw="text-color-text-0">
         {stringGetter({
           key: skipEnabled
             ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
@@ -578,8 +578,8 @@ export const WithdrawForm = () => {
             ),
           },
         })}
-      </$Subheader>
-      <$DestinationRow>
+      </div>
+      <div tw="spacedRow grid-cols-[1fr_1fr] gap-1">
         <FormInput
           type={InputType.Text}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
@@ -588,7 +588,12 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? <$CheckIcon iconName={IconName.Check} /> : null}
+              {isValidAddress ? (
+                <Icon
+                  iconName={IconName.Check}
+                  tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
+                />
+              ) : null}
             </span>
           }
         />
@@ -597,7 +602,7 @@ export const WithdrawForm = () => {
           selectedChain={chainIdStr || undefined}
           onSelect={onSelectNetwork}
         />
-      </$DestinationRow>
+      </div>
       {isInvalidNobleAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
@@ -608,7 +613,11 @@ export const WithdrawForm = () => {
         onSelectToken={onSelectToken}
         isExchange={Boolean(exchange)}
       />
-      <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+      <WithDetailsReceipt
+        side="bottom"
+        detailItems={amountInputReceipt}
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
+      >
         <FormInput
           type={InputType.Number}
           decimals={USD_DECIMALS}
@@ -626,9 +635,11 @@ export const WithdrawForm = () => {
             />
           }
         />
-      </$WithDetailsReceipt>
+      </WithDetailsReceipt>
       {errorMessage && (
-        <$AlertMessage type={alertType ?? AlertType.Error}>{errorMessage}</$AlertMessage>
+        <AlertMessage type={alertType ?? AlertType.Error} tw="inline">
+          {errorMessage}
+        </AlertMessage>
       )}
       <$Footer>
         <WithdrawButtonAndReceipt
@@ -642,18 +653,6 @@ export const WithdrawForm = () => {
     </$Form>
   );
 };
-const $Subheader = styled.div`
-  color: var(--color-text-0);
-`;
-
-const $Tag = styled(Tag)`
-  margin-left: 0.5ch;
-`;
-
-const $DiffOutput = styled(DiffOutput)`
-  --diffOutput-valueWithDiff-fontSize: 1em;
-`;
-
 const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
@@ -661,25 +660,4 @@ const $Form = styled.form`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-`;
-
-const $DestinationRow = styled.div`
-  ${layoutMixins.spacedRow}
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-const $AlertMessage = styled(AlertMessage)`
-  display: inline;
-`;
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $CheckIcon = styled(Icon)`
-  margin: 0 1ch;
-
-  color: var(--color-success);
-  font-size: 0.625rem;
 `;

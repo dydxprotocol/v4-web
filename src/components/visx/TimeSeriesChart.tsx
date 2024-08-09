@@ -275,7 +275,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           }}
         >
           <EventEmitterProvider>
-            <$ParentSize>
+            <ParentSize tw="grid min-h-0 overflow-auto overscroll-contain">
               {/* eslint-disable-next-line react/no-unused-prop-types */}
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
@@ -436,7 +436,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                   </XYChart>
                 );
               }}
-            </$ParentSize>
+            </ParentSize>
           </EventEmitterProvider>
         </DataProvider>
       ) : (
@@ -486,15 +486,6 @@ const $Container = styled.div`
     }
   }
 `;
-
-const $ParentSize = styled(ParentSize)`
-  min-height: 0;
-  display: grid;
-
-  overflow: auto;
-  overscroll-behavior: contain;
-`;
-
 const $YAxisBackground = styled.foreignObject`
   background: var(--stickyArea-background);
 

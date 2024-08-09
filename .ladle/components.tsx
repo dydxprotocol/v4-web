@@ -65,7 +65,7 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <Provider store={store}>
-      <StoryHeader>
+      <div tw="flex flex-row items-center gap-[8px] ">
         <h4>Active Theme:</h4>
         <SelectMenu value={theme} onValueChange={setTheme}>
           {[
@@ -104,20 +104,12 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
             <SelectItem key={value} value={value} label={label} />
           ))}
         </SelectMenu>
-      </StoryHeader>
+      </div>
       <hr />
       {content}
     </Provider>
   );
 };
-
-const StoryHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-`;
-
 const StoryContent = styled.div`
   --default-border-width: 1px;
   --border-width: var(--default-border-width);

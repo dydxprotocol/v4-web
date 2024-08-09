@@ -60,13 +60,14 @@ export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & Elemen
     return (
       <$OrderbookMiddleRow ref={ref} side={side} isHeader={isHeader}>
         <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
-        <$PriceOutputSpan>
-          <$Output
+        <span tw="flex flex-col">
+          <Output
             type={OutputType.Number}
             value={orderbookMidMarketPrice}
             fractionDigits={tickSizeDecimals}
+            tw="[justify-content:right]"
           />
-        </$PriceOutputSpan>
+        </span>
         <span /> {/* Empty cell */}
       </$OrderbookMiddleRow>
     );
@@ -90,11 +91,3 @@ const $OrderbookMiddleRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
 `;
 
 // matching the output height and styling with price span
-const $PriceOutputSpan = styled.span`
-  display: flex;
-  flex-direction: column;
-`;
-
-const $Output = styled(Output)`
-  justify-content: right;
-`;

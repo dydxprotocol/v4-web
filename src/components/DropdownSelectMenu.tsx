@@ -11,6 +11,7 @@ import {
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -31,6 +32,7 @@ type ElementProps<MenuItemValue extends string> = {
 
 type StyleProps = {
   align?: 'center' | 'start' | 'end';
+  hideIcon?: boolean;
   sideOffset?: number;
   className?: string;
 };
@@ -51,6 +53,7 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
     );
   })(),
   align = 'start',
+  hideIcon,
   sideOffset = 1,
   className,
 
@@ -59,9 +62,11 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
   const triggerContent = (
     <>
       {children}
-      <$DropdownIcon aria-hidden="true">
-        <Icon iconName={IconName.Triangle} aria-hidden="true" />
-      </$DropdownIcon>
+      {!hideIcon && (
+        <$DropdownIcon aria-hidden="true">
+          <Icon iconName={IconName.Triangle} aria-hidden="true" />
+        </$DropdownIcon>
+      )}
     </>
   );
 
@@ -147,11 +152,7 @@ const $RadioItem = styled(RadioItem)`
   --item-font-size: var(--dropdownSelectMenu-item-font-size);
 `;
 
-const $ItemLabel = styled.span`
-  flex: 1;
-
-  ${layoutMixins.inlineRow}
-`;
+const $ItemLabel = tw.span`inlineRow flex-1`;
 
 const $ItemIndicator = styled(ItemIndicator)`
   margin-left: auto;

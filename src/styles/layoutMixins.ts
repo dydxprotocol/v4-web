@@ -1,10 +1,4 @@
-import {
-  css,
-  keyframes,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import { css, keyframes } from 'styled-components';
 
 const withOuterBorder = css`
   box-shadow: 0 0 0 var(--border-width) var(--border-color);
@@ -958,4 +952,4 @@ export const layoutMixins = {
     min-height: 100%;
     place-items: center;
   `,
-} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
+} satisfies Record<string, ReturnType<typeof css>>;

@@ -6519,7 +6519,16 @@
         ], 
         "websiteLink": "https://magamemecoin.com/", 
         "whitepaperLink": null
-    }, 
+    },
+    "TRUMPWIN-USD": {
+        "coinMarketCapsLink": null, 
+        "name": "TRUMPWIN", 
+        "tags": [
+            "Prediction Market"
+        ], 
+        "websiteLink": "https://polymarket.com/event/presidential-election-winner-2024", 
+        "whitepaperLink": null
+    },
     "TRVL-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/trvl/", 
         "name": "TRVL", 

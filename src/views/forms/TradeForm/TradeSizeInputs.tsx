@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { TradeInputField } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -197,7 +198,7 @@ export const TradeSizeInputs = () => {
   );
 
   return (
-    <$Column>
+    <div tw="flexColumn gap-[--form-input-gap]">
       {showUSDCInput ? usdcInput : sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
@@ -207,15 +208,9 @@ export const TradeSizeInputs = () => {
           }
         />
       )}
-    </$Column>
+    </div>
   );
 };
-
-const $Column = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: var(--form-input-gap);
-`;
-
 const $ToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
   --button-font: var(--font-base-book);
@@ -231,6 +226,4 @@ const $ToggleButton = styled(ToggleButton)`
   }
 `;
 
-const $Tooltip = styled.div`
-  display: inline-flex;
-`;
+const $Tooltip = tw.div`inline-flex`;

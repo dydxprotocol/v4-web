@@ -1,11 +1,6 @@
 import { forwardRef } from 'react';
 
-import styled, {
-  css,
-  type FlattenInterpolation,
-  type FlattenSimpleInterpolation,
-  type ThemeProps,
-} from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
 
@@ -73,7 +68,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
             {withContentOnLoading && slotLeft}
             {withContentOnLoading && children}
             {withContentOnLoading && slotRight}
-            <$LoadingDots size={3} />
+            <LoadingDots size={3} tw="pt-[0.5em]" />
           </>
         ) : (
           <>
@@ -155,7 +150,7 @@ const getDisabledStateForButtonAction = (action?: ButtonAction) => {
 
 const buttonStateVariants = (
   action?: ButtonAction
-): Record<ButtonState, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>> => ({
+): Record<ButtonState, ReturnType<typeof css>> => ({
   [ButtonState.Default]: css``,
 
   [ButtonState.Disabled]: getDisabledStateForButtonAction(action),
@@ -176,8 +171,4 @@ const StyledBaseButton = styled(BaseButton)<StyleProps>`
       ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
       ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
     `}
-`;
-
-const $LoadingDots = styled(LoadingDots)`
-  padding-top: 0.5em;
 `;

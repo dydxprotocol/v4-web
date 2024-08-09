@@ -1,14 +1,11 @@
 import { type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
-import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
@@ -47,7 +44,7 @@ export const ToggleGroup = forwardRefFn(
     const { isTablet } = useBreakpoints();
 
     return (
-      <$Root
+      <Root
         ref={ref}
         type="single"
         value={value}
@@ -59,6 +56,7 @@ export const ToggleGroup = forwardRefFn(
         }}
         className={className}
         loop
+        tw="row gap-[0.33em]"
       >
         {items.map((item) => (
           <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
@@ -74,11 +72,7 @@ export const ToggleGroup = forwardRefFn(
             </ToggleButton>
           </Item>
         ))}
-      </$Root>
+      </Root>
     );
   }
 );
-const $Root = styled(Root)`
-  ${layoutMixins.row}
-  gap: 0.33em;
-`;

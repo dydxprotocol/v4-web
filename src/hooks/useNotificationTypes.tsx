@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 
+import { StatSigFlags } from '@/types/statsig';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
@@ -14,11 +15,13 @@ import {
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
+import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
+  MarketLaunchNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
@@ -37,9 +40,9 @@ import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
-import { StakingLiveNotification } from '@/views/notifications/StakingLiveNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -63,6 +66,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
+import { useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -286,20 +290,41 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const featureFlags = useAllStatsigGateValues();
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
+      const twitter200BVolumeExpirationDate = new Date('2024-08-16T23:59:59');
       const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
-      const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
-      const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
-      const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
-      const stakingLiveExpirationDate = new Date('2024-07-24T23:59:59');
-
-      const { isolatedMarginLearnMore } = useURLConfigs();
-
+      const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
       const currentDate = new Date();
 
       useEffect(() => {
+        if (currentDate <= twitter200BVolumeExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.Twitter200BVolume,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.BODY',
+                params: {
+                  HERE_LINK: (
+                    <Link href="https://x.com/dYdX/status/1819342483794415784" isAccent isInline>
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.Twitter200BVolume,
+            },
+            []
+          );
+        }
+
         if (currentDate <= incentivesExpirationDate) {
           trigger(
             INCENTIVES_SEASON_NOTIFICATION_ID,
@@ -324,89 +349,25 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (currentDate <= conditionalOrdersExpirationDate) {
+        if (
+          featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+          currentDate <= tradeUSElectionExpirationDate
+        ) {
           trigger(
-            ReleaseUpdateNotificationIds.RevampedConditionalOrders,
+            MarketLaunchNotificationIds.TrumpWin,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.TITLE',
-              }),
+              title: stringGetter({ key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_TITLE }),
               body: stringGetter({
-                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.BODY',
-                params: {
-                  TWITTER_LINK: (
-                    <Link
-                      href="https://twitter.com/dYdX/status/1785339109268935042"
-                      isAccent
-                      isInline
-                    >
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
+                key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
+                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
               }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.RevampedConditionalOrders,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= fokDeprecationExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.FOKDeprecation,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.FOK_DEPRECATION.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.FOK_DEPRECATION.BODY',
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.FOKDeprecation,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= isolatedMarginLiveExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.IsolatedMarginLive,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.BODY',
-                params: {
-                  LEARN_MORE: (
-                    <Link href={isolatedMarginLearnMore} isAccent isInline>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IsolatedMarginLive,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= stakingLiveExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.InAppStakingLive,
-            {
-              title: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.TITLE' }),
-              body: stringGetter({ key: 'NOTIFICATIONS.IN_APP_STAKING_LIVE.BODY' }),
               renderCustomBody({ isToast, notification }) {
-                return <StakingLiveNotification isToast={isToast} notification={notification} />;
+                return (
+                  <MarketLaunchTrumpwinNotification isToast={isToast} notification={notification} />
+                );
               },
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.InAppStakingLive,
+              groupKey: MarketLaunchNotificationIds.TrumpWin,
             },
             []
           );
@@ -680,15 +641,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
 ];
 
-const $Icon = styled.img`
-  height: 1.5rem;
-  width: 1.5rem;
-`;
+const $Icon = tw.img`h-1.5 w-1.5`;
 
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
-`;
+const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1.5rem;
-`;
+const $WarningIcon = tw(Icon)`text-color-warning`;

@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, type Ref } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
@@ -25,6 +25,7 @@ export type TabItem<TabItemsValue> = {
   subitems?: TabItem<TabItemsValue>[];
   customTrigger?: ReactNode;
   asChild?: boolean;
+  ref?: Ref<HTMLDivElement>;
 };
 
 type ElementProps<TabItemsValue> = {
@@ -125,9 +126,10 @@ export const Tabs = <TabItemsValue extends string>({
       <$Header $side={side}>{triggers}</$Header>
 
       {sharedContent ?? (
-        <$Stack>
-          {items.map(({ asChild, value: childValue, content, forceMount }) => (
+        <div tw="stack shadow-none">
+          {items.map(({ asChild, value: childValue, content, forceMount, ref }) => (
             <$Content
+              ref={ref}
               key={childValue}
               asChild={asChild}
               value={childValue}
@@ -138,7 +140,7 @@ export const Tabs = <TabItemsValue extends string>({
               {content}
             </$Content>
           ))}
-        </$Stack>
+        </div>
       )}
     </$Root>
   );
@@ -277,13 +279,6 @@ const $Trigger = styled(Trigger)<{ $withBorders?: boolean; $withUnderline?: bool
       ${tabTriggerUnderlineStyle}
     `}
 `;
-
-const $Stack = styled.div`
-  ${layoutMixins.stack}
-
-  box-shadow: none;
-`;
-
 const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
   ${layoutMixins.flexColumn}
   outline: none;

@@ -1,11 +1,7 @@
-import styled from 'styled-components';
-
 import { AdjustTargetLeverageDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 
@@ -22,13 +18,9 @@ export const AdjustTargetLeverageDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE })}
     >
-      <$Content>
+      <div tw="column gap-1">
         <AdjustTargetLeverageForm onSetTargetLeverage={() => setIsOpen?.(false)} />
-      </$Content>
+      </div>
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
-`;

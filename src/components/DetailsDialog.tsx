@@ -27,7 +27,7 @@ export const DetailsDialog = ({ slotIcon, title, items, slotFooter, setIsOpen }:
       placement={isTablet ? DialogPlacement.Default : DialogPlacement.Sidebar}
     >
       <$Content>
-        <$Details withSeparators justifyItems="end" items={items} />
+        <Details withSeparators justifyItems="end" items={items} tw="font-small-book" />
 
         <$Footer>{slotFooter}</$Footer>
       </$Content>
@@ -40,11 +40,6 @@ const $Content = styled.div`
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
   gap: 1rem;
 `;
-
-const $Details = styled(Details)`
-  font: var(--font-small-book);
-`;
-
 const $Footer = styled.footer`
   ${layoutMixins.gridEqualColumns}
   gap: 0.66rem;

@@ -45,7 +45,7 @@ export const MarketFilter = ({
         onTextChange={onSearchTextChange}
       />
 
-      <$Row>
+      <div tw="row">
         <$ToggleGroupContainer $compactLayout={compactLayout}>
           <$ToggleGroup
             items={Object.values(filters).map((value) => ({
@@ -68,7 +68,7 @@ export const MarketFilter = ({
             {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
           </Button>
         )}
-      </$Row>
+      </div>
     </$MarketFilter>
   );
 };
@@ -124,7 +124,3 @@ const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
   padding-right: var(--toggle-group-paddingRight);
 ` as typeof ToggleGroup;
-
-const $Row = styled.div`
-  ${layoutMixins.row}
-`;

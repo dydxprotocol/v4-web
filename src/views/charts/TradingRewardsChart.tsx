@@ -235,12 +235,12 @@ export const TradingRewardsChart = ({
   return (
     <>
       {rewardsData.length === 0 ? undefined : (
-        <$TitleContainer>
-          <$Title>
+        <div tw="spacedRow w-full font-medium-book">
+          <span tw="h-min text-color-text-1">
             {stringGetter({
               key: STRING_KEYS.TRADING_REWARDS,
             })}
-          </$Title>
+          </span>
 
           <ToggleGroup
             items={toggleGroupItems}
@@ -248,7 +248,7 @@ export const TradingRewardsChart = ({
             onValueChange={setTradingRewardsPeriod}
             onInteraction={onToggleInteract}
           />
-        </$TitleContainer>
+        </div>
       )}
       <TimeSeriesChart
         className={className}
@@ -282,19 +282,6 @@ export const TradingRewardsChart = ({
     </>
   );
 };
-
-const $TitleContainer = styled.div`
-  ${layoutMixins.spacedRow}
-  width: 100%;
-
-  font: var(--font-medium-book);
-`;
-
-const $Title = styled.span`
-  color: var(--color-text-1);
-  height: min-content;
-`;
-
 const $Value = styled.div`
   place-self: start;
   isolation: isolate;

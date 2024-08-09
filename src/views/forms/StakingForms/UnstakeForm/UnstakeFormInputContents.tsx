@@ -14,8 +14,6 @@ import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -97,16 +95,16 @@ export const UnstakeFormInputContents = ({
   return (
     <>
       {currentDelegations?.length === 1 ? (
-        <$WithDetailsReceipt
+        <WithDetailsReceipt
           side="bottom"
           detailItems={[
             {
               key: 'amount',
               label: (
-                <$InlineRow>
+                <span tw="inlineRow">
                   {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })}
                   <Tag>{chainTokenLabel}</Tag>
-                </$InlineRow>
+                </span>
               ),
               value: (
                 <DiffOutput
@@ -129,6 +127,7 @@ export const UnstakeFormInputContents = ({
               ),
             },
           ]}
+          tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
           <FormInput
             id="unstakeAmount"
@@ -153,15 +152,15 @@ export const UnstakeFormInputContents = ({
               />
             }
           />
-        </$WithDetailsReceipt>
+        </WithDetailsReceipt>
       ) : (currentDelegations?.length ?? 0) > 1 ? (
-        <$GridLayout>
+        <div tw="grid grid-cols-[1fr_1fr] gap-1">
           <div>
             {stringGetter({
               key: STRING_KEYS.VALIDATOR,
             })}
           </div>
-          <$SpacedRow>
+          <div tw="spacedRow">
             {stringGetter({
               key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
             })}
@@ -170,11 +169,11 @@ export const UnstakeFormInputContents = ({
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
               </$Button>
             ) : (
-              <$AllButton onClick={setAllUnstakeAmountsToMax}>
+              <$Button onClick={setAllUnstakeAmountsToMax} tw="[--button-textColor:--color-accent]">
                 {stringGetter({ key: STRING_KEYS.ALL })}
-              </$AllButton>
+              </$Button>
             )}
-          </$SpacedRow>
+          </div>
           {stakingValidators &&
             currentDelegations?.map((delegation) => {
               const balance = MustBigNumber(delegation.amount).toNumber();
@@ -203,7 +202,7 @@ export const UnstakeFormInputContents = ({
                 </React.Fragment>
               );
             })}
-        </$GridLayout>
+        </div>
       ) : null}
       <StakeRewardButtonAndReceipt
         detailItems={detailItems}
@@ -219,32 +218,9 @@ export const UnstakeFormInputContents = ({
     </>
   );
 };
-
-const $GridLayout = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $InlineRow = styled.span`
-  ${layoutMixins.inlineRow}
-`;
-
-const $SpacedRow = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
 const $Button = styled(Button)`
   --button-border: none;
   --button-padding: 0;
   --button-height: auto;
   --button-hover-filter: none;
-`;
-
-const $AllButton = styled($Button)`
-  --button-textColor: var(--color-accent);
 `;

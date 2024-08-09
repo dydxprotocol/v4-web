@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import type { Asset, MarketConfigs } from '@/constants/abacus';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
@@ -42,11 +41,11 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={asset?.id} />}>
       <$TableCellContent stacked={stacked}>
-        <$AssetAndTag>
+        <div tw="row gap-0.5">
           <$Asset stacked={stacked}>{asset?.name}</$Asset>
           <Tag>{maxLeverage}</Tag>
-        </$AssetAndTag>
-        {stacked ? <$AssetID>{asset?.id}</$AssetID> : undefined}
+        </div>
+        {stacked ? <span tw="text-color-text-0 font-mini-medium">{asset?.id}</span> : undefined}
       </$TableCellContent>
     </TableCell>
   );
@@ -58,12 +57,6 @@ const $TableCellContent = styled.div<{ stacked?: boolean }>`
   flex-direction: ${({ stacked }) => (stacked ? 'column' : 'row')};
   align-items: ${({ stacked }) => (stacked ? 'flex-start' : 'center')};
 `;
-
-const $AssetAndTag = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-`;
-
 const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
   font-size: ${({ stacked }) => (stacked ? '1.5rem' : '2rem')};
 
@@ -71,12 +64,6 @@ const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
     font-size: ${({ stacked }) => (stacked ? '1.5rem' : '2.25rem')};
   }
 `;
-
-const $AssetID = styled.span`
-  color: var(--color-text-0);
-  font: var(--font-mini-medium);
-`;
-
 const $Asset = styled.span<{ stacked?: boolean }>`
   color: var(--color-text-1);
   font: ${({ stacked }) => (stacked ? 'var(--font-small-medium)' : 'var(--font-medium-medium)')};

@@ -1,13 +1,30 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+
+import { shallowEqual } from 'react-redux';
+
+import { DialogTypes } from '@/constants/dialogs';
+
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closeDialog, openDialog } from '@/state/dialogs';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const useCommandMenu = () => {
-  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
 
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'k' && (event.ctrlKey || event.metaKey)) {
-      setIsCommandMenuOpen((isOpen) => !isOpen);
-    }
-  }, []);
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'k' && (event.ctrlKey || event.metaKey)) {
+        const isCommandDialogOpen = activeDialog && DialogTypes.is.GlobalCommand(activeDialog);
+        if (isCommandDialogOpen) {
+          dispatch(closeDialog());
+        } else {
+          dispatch(openDialog(DialogTypes.GlobalCommand()));
+        }
+      }
+    },
+    [activeDialog]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -16,14 +33,4 @@ export const useCommandMenu = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
-
-  const closeCommandMenu = useCallback(() => {
-    setIsCommandMenuOpen(false);
-  }, []);
-
-  return {
-    closeCommandMenu,
-    isCommandMenuOpen,
-    setIsCommandMenuOpen,
-  };
 };

@@ -3,15 +3,11 @@ import {
   IncentivesDistributedNotificationIds,
 } from '@/constants/notifications';
 
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-
 export const useIncentivesSeason = () => {
-  const { seasonFiveIncentivesDistributed } = useEnvFeatures();
-
-  const incentivesDistributedSeasonId = seasonFiveIncentivesDistributed
-    ? IncentivesDistributedNotificationIds.IncentivesDistributedS5
-    : IncentivesDistributedNotificationIds.IncentivesDistributedS4;
-
+  // Add an env flag here for easy development + release of reward distribution notifications
+  // Example: https://github.com/dydxprotocol/v4-web/pull/809
+  const incentivesDistributedSeasonId =
+    IncentivesDistributedNotificationIds.IncentivesDistributedS5;
   const rewardDistributionSeasonNumber = getSeasonRewardDistributionNumber(
     incentivesDistributedSeasonId
   );

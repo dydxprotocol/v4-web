@@ -15,7 +15,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   disabled = false,
 }: LoadingSpinnerProps) => {
   return (
-    <$Spinner className={className}>
+    <div className={className} tw="leading-[0] text-color-text-0 [--spinner-width:auto]">
       <$LoadingSpinnerSvg
         id={id}
         width="38"
@@ -41,7 +41,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           />
         )}
       </$LoadingSpinnerSvg>
-    </$Spinner>
+    </div>
   );
 };
 
@@ -54,14 +54,6 @@ export const LoadingSpace: React.FC<LoadingSpaceProps> = ({ className, id }: Loa
 const $LoadingSpaceContainer = styled.div`
   ${layoutMixins.centered}
 `;
-
-const $Spinner = styled.div`
-  --spinner-width: auto;
-
-  line-height: 0;
-  color: var(--color-text-0);
-`;
-
 const $LoadingSpinnerSvg = styled.svg`
   width: var(--spinner-width);
   height: auto;

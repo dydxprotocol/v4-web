@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketSorting } from '@/constants/markets';
@@ -26,14 +27,17 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   return (
-    <$MarketsStats className={className}>
+    <section
+      className={className}
+      tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
+    >
       <ExchangeBillboards />
       <$Section>
         <$SectionHeader>
-          <$RecentlyListed>
+          <h4 tw="flex items-center gap-0.375">
             {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
             <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-          </$RecentlyListed>
+          </h4>
         </$SectionHeader>
         <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
       </$Section>
@@ -61,38 +65,10 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         </$SectionHeader>
         <MarketsCompactTable sorting={sorting} />
       </$Section>
-    </$MarketsStats>
+    </section>
   );
 };
-
-const $MarketsStats = styled.section`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-
-  @media ${breakpoints.desktopSmall} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.column}
-  }
-`;
-
-const $Section = styled.div`
-  background: var(--color-layer-3);
-  border-radius: 0.625rem;
-  display: grid;
-  grid-template-rows: auto 1fr;
-`;
-
-const $RecentlyListed = styled.h4`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-`;
-
+const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-color-layer-3`;
 const $ToggleGroupContainer = styled.div`
   ${layoutMixins.row}
   position: absolute;

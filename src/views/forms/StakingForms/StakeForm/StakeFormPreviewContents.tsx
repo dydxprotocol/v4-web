@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
-import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
@@ -43,13 +42,20 @@ export const StakeFormPreviewContents = ({
       slotRightHeading={stringGetter({ key: STRING_KEYS.VALIDATOR })}
       slotLeft={
         <>
-          <$AssetIcon symbol={chainTokenLabel} />
+          <AssetIcon
+            symbol={chainTokenLabel}
+            tw="text-[length:--icon-size] [--icon-size:2.25rem]"
+          />
           <Output value={stakedAmount} type={OutputType.Asset} tag={chainTokenLabel} />
         </>
       }
       slotRight={
         <>
-          <$ValidatorIcon url={website} fallbackText={moniker} />
+          <ValidatorFaviconIcon
+            url={website}
+            fallbackText={moniker}
+            tw="h-[--icon-size] w-[--icon-size] [--icon-size:2.25rem]"
+          />
           {moniker}
         </>
       }
@@ -58,15 +64,3 @@ export const StakeFormPreviewContents = ({
     />
   );
 };
-
-const $AssetIcon = styled(AssetIcon)`
-  --icon-size: 2.25rem;
-  font-size: var(--icon-size);
-`;
-
-const $ValidatorIcon = styled(ValidatorFaviconIcon)`
-  --icon-size: 2.25rem;
-
-  height: var(--icon-size);
-  width: var(--icon-size);
-`;

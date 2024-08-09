@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AbacusInputTypes, Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -33,7 +34,7 @@ import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
-  maxRowsPerSide?: number;
+  rowsPerSide?: number;
   layout?: 'vertical' | 'horizontal';
 };
 
@@ -48,13 +49,13 @@ export const CanvasOrderbook = forwardRef(
       histogramSide = 'right',
       hideHeader = false,
       layout = 'vertical',
-      maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
+      rowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
     const { asks, bids, hasOrderbook, histogramRange, currentGrouping } = useCalculateOrderbookData(
       {
-        maxRowsPerSide,
+        rowsPerSide,
       }
     );
 
@@ -66,12 +67,12 @@ export const CanvasOrderbook = forwardRef(
     const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
     /**
-     * Slice asks and bids to maxRowsPerSide using empty rows
+     * Slice asks and bids to rowsPerSide using empty rows
      */
     const { asksSlice, bidsSlice } = useMemo(() => {
       const emptyAskRows =
-        asks.length < maxRowsPerSide
-          ? new Array<undefined>(maxRowsPerSide - asks.length).fill(undefined)
+        asks.length < rowsPerSide
+          ? new Array<undefined>(rowsPerSide - asks.length).fill(undefined)
           : [];
 
       const newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
@@ -80,8 +81,8 @@ export const CanvasOrderbook = forwardRef(
       ];
 
       const emptyBidRows =
-        bids.length < maxRowsPerSide
-          ? new Array<undefined>(maxRowsPerSide - bids.length).fill(undefined)
+        bids.length < rowsPerSide
+          ? new Array<undefined>(rowsPerSide - bids.length).fill(undefined)
           : [];
       const newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
         ...bids,
@@ -92,7 +93,7 @@ export const CanvasOrderbook = forwardRef(
         asksSlice: layout === 'horizontal' ? newAsksSlice : newAsksSlice.reverse(),
         bidsSlice: newBidsSlice,
       };
-    }, [asks, bids, layout, maxRowsPerSide]);
+    }, [asks, bids, layout, rowsPerSide]);
 
     const orderbookRef = useRef<HTMLDivElement>(null);
     useCenterOrderbook({
@@ -151,7 +152,7 @@ export const CanvasOrderbook = forwardRef(
     const usdTag = <Tag>USD</Tag>;
     const assetTag = id ? <Tag>{id}</Tag> : undefined;
     const asksOrderbook = (
-      <$OrderbookSideContainer $side="asks" $rows={maxRowsPerSide}>
+      <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
           {[...asksSlice].reverse().map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
             row ? (
@@ -173,7 +174,7 @@ export const CanvasOrderbook = forwardRef(
       </$OrderbookSideContainer>
     );
     const bidsOrderbook = (
-      <$OrderbookSideContainer $side="bids" $rows={maxRowsPerSide}>
+      <$OrderbookSideContainer $side="bids" $rows={rowsPerSide}>
         <$HoverRows>
           {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
             row ? (
@@ -199,7 +200,7 @@ export const CanvasOrderbook = forwardRef(
       </$OrderbookSideContainer>
     );
     return (
-      <$OrderbookContainer ref={ref}>
+      <div ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
           {!hideHeader && (
             <OrderbookControls
@@ -210,7 +211,7 @@ export const CanvasOrderbook = forwardRef(
             />
           )}
           {!hideHeader && (
-            <$Header>
+            <OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
                 {stringGetter({ key: STRING_KEYS.PRICE })} {usdTag}
               </span>
@@ -222,7 +223,7 @@ export const CanvasOrderbook = forwardRef(
                 {stringGetter({ key: STRING_KEYS.TOTAL })}{' '}
                 {displayUnit === 'fiat' ? usdTag : assetTag}
               </span>
-            </$Header>
+            </OrderbookRow>
           )}
 
           {(displaySide === 'top' || layout === 'horizontal') && (
@@ -234,64 +235,38 @@ export const CanvasOrderbook = forwardRef(
           )}
           {layout === 'vertical' ? (
             <>
-              <$OrderbookWrapper ref={orderbookRef}>
+              <div ref={orderbookRef} tw="flex flex-1 flex-col justify-evenly overflow-y-auto">
                 {asksOrderbook}
                 <OrderbookMiddleRow
                   tickSizeDecimals={tickSizeDecimals}
                   ref={orderbookMiddleRowRef}
                 />
                 {bidsOrderbook}
-              </$OrderbookWrapper>
+              </div>
               {displaySide === 'bottom' && (
                 <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
               )}
             </>
           ) : (
-            <$HorizontalOrderbook>
+            <div tw="grid grid-cols-[1fr_1fr] overflow-y-auto">
               {asksOrderbook}
               {bidsOrderbook}
-            </$HorizontalOrderbook>
+            </div>
           )}
         </$OrderbookContent>
         {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
-      </$OrderbookContainer>
+      </div>
     );
   }
 );
-
-const $OrderbookContainer = styled.div`
-  display: flex;
-  flex: 1 1 0%;
-  flex-direction: column;
-  overflow: hidden;
-`;
-
 const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
+  min-height: 100%;
   max-height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
   ${({ $isLoading }) => $isLoading && 'flex: 1;'}
 `;
-
-const $Header = styled(OrderbookRow)`
-  height: 1.75rem;
-  color: var(--color-text-0);
-`;
-
-const $OrderbookWrapper = styled.div`
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0%;
-`;
-
-const $HorizontalOrderbook = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  overflow-y: auto;
-`;
-
 const $OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks'; $rows: number }>`
   ${({ $rows }) => css`
     min-height: calc(${$rows} * ${ORDERBOOK_ROW_HEIGHT}px);
@@ -335,6 +310,4 @@ const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-const $OrderbookMiddleRow = styled(OrderbookMiddleRow)`
-  position: absolute;
-`;
+const $OrderbookMiddleRow = tw(OrderbookMiddleRow)`absolute`;

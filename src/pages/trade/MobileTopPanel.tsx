@@ -49,7 +49,7 @@ export const MobileTopPanel = () => {
 
   const items = [
     {
-      content: <$AccountInfo />,
+      content: <AccountInfo tw="[--account-info-section-height:--tabContent-height]" />,
       label: stringGetter({ key: STRING_KEYS.WALLET }),
       value: Tab.Account,
       icon: IconName.Coins,
@@ -153,11 +153,6 @@ const $TabButton = styled(ToggleButton)`
     height: 1.375rem;
   }
 `;
-
-const $AccountInfo = styled(AccountInfo)`
-  --account-info-section-height: var(--tabContent-height);
-`;
-
 const $ScrollableTableContainer = styled.div`
   ${layoutMixins.scrollArea}
   --scrollArea-height: var(--tabContent-height);

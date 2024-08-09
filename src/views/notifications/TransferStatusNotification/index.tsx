@@ -1,6 +1,7 @@
 import { MouseEvent, useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -10,8 +11,6 @@ import { TransferNotifcation, TransferNotificationTypes } from '@/constants/noti
 
 import { useInterval } from '@/hooks/useInterval';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -118,7 +117,7 @@ export const TransferStatusNotification = ({
   ];
 
   const content = (
-    <$BridgingStatus>
+    <div tw="flexColumn gap-0.5">
       {isCosmosDeposit ? (
         <>
           <$Details items={detailItems} />
@@ -173,9 +172,9 @@ export const TransferStatusNotification = ({
         </>
       )}
       {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
-        <$TransferStatusSteps status={status} type={type} />
+        <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
       )}
-    </$BridgingStatus>
+    </div>
   );
 
   const transferIcon = isCosmosDeposit ? slotIcon : isToast && slotIcon;
@@ -187,7 +186,7 @@ export const TransferStatusNotification = ({
       slotIcon={transferIcon}
       slotTitle={slotTitle}
       slotCustomContent={
-        <$BridgingStatus>
+        <div tw="flexColumn gap-0.5">
           {!status && !isExchange && !isCosmosDeposit ? (
             <>
               {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
@@ -201,12 +200,14 @@ export const TransferStatusNotification = ({
               {!isCosmosDeposit && !isComplete && (
                 <>
                   <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
-                  {!isToast && !hasError && <$TransferStatusSteps status={status} type={type} />}
+                  {!isToast && !hasError && (
+                    <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+                  )}
                 </>
               )}
             </>
           )}
-        </$BridgingStatus>
+        </div>
       }
       slotAction={
         isToast &&
@@ -236,9 +237,9 @@ export const TransferStatusNotification = ({
       side="bottom"
       slotReceipt={
         <Collapsible open={open} onOpenChange={setOpen} label="" withTrigger={false}>
-          <$Receipt>
+          <div tw="px-1 py-0">
             <TransferStatusSteps status={status} type={type} />
-          </$Receipt>
+          </div>
         </Collapsible>
       }
     >
@@ -248,11 +249,6 @@ export const TransferStatusNotification = ({
     transferNotif
   );
 };
-const $BridgingStatus = styled.div`
-  ${layoutMixins.flexColumn};
-  gap: 0.5rem;
-`;
-
 const $Status = styled.div<{ withMarginBottom?: boolean }>`
   color: var(--color-text-0);
   font-size: 0.875rem;
@@ -264,16 +260,7 @@ const $Status = styled.div<{ withMarginBottom?: boolean }>`
     `}
 `;
 
-const $InlineOutput = styled(Output)`
-  display: inline-block;
-
-  color: var(--color-text-1);
-`;
-
-const $TransferStatusSteps = styled(TransferStatusSteps)`
-  padding: 0.5rem 0 0;
-`;
-
+const $InlineOutput = tw(Output)`inline-block text-color-text-1`;
 const $Trigger = styled.button<{ isOpen?: boolean }>`
   display: flex;
   align-items: center;
@@ -299,10 +286,6 @@ const $Trigger = styled.button<{ isOpen?: boolean }>`
         rotate: -0.5turn;
       }
     `}
-`;
-
-const $Receipt = styled.div`
-  padding: 0 1rem;
 `;
 
 const $Details = styled(Details)`

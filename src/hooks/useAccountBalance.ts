@@ -78,10 +78,12 @@ export const useAccountBalance = ({
         ...tokenContract,
         functionName: 'balanceOf',
         args: [evmAddress ?? '0x'],
+        chainId: typeof chainId === 'number' ? chainId : undefined,
       } as const,
       {
         ...tokenContract,
         functionName: 'decimals',
+        chainId: typeof chainId === 'number' ? chainId : undefined,
       } as const,
     ],
     query: {

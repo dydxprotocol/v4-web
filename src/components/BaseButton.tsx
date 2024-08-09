@@ -110,6 +110,7 @@ const buttonSizeVariants = {
 const buttonShapeVariants = {
   [ButtonShape.Circle]: css`
     --button-width: var(--button-height);
+    min-width: var(--button-width);
     --button-radius: 50%;
   `,
   [ButtonShape.Rectangle]: css`

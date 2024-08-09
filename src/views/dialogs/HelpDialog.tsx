@@ -77,7 +77,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
       items={HELP_ITEMS}
       slotFooter={
         latestCommit || latestVersion ? (
-          <$Footer>
+          <div tw="flex cursor-default select-text flex-col text-color-text-0">
             {latestCommit && (
               <span>
                 Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
@@ -89,7 +89,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
                 <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
               </span>
             )}
-          </$Footer>
+          </div>
         ) : undefined
       }
     />
@@ -103,13 +103,4 @@ const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   @media ${breakpoints.notMobile} {
     --dialog-width: var(--dialog-small-width);
   }
-`;
-
-const $Footer = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  color: var(--color-text-0);
-  cursor: default;
-  user-select: text;
 `;

@@ -139,8 +139,8 @@ const PortfolioPage = () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <$SideBar>
-            <$NavigationMenu
+          <div tw="flexColumn h-full justify-between">
+            <NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -224,6 +224,7 @@ const PortfolioPage = () => {
                   ],
                 },
               ]}
+              tw="p-0.5 pt-0"
             />
             {onboardingState === OnboardingState.AccountConnected && (
               <$Footer>
@@ -254,7 +255,7 @@ const PortfolioPage = () => {
                   )}
               </$Footer>
             )}
-          </$SideBar>
+          </div>
         )
       }
     >
@@ -269,14 +270,6 @@ const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
 `;
-
-const $SideBar = styled.div`
-  ${layoutMixins.flexColumn}
-  justify-content: space-between;
-
-  height: 100%;
-`;
-
 const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
@@ -289,12 +282,6 @@ const $Footer = styled.div`
     flex-grow: 1;
   }
 `;
-
-const $NavigationMenu = styled(NavigationMenu)`
-  padding: 0.5rem;
-  padding-top: 0;
-`;
-
 const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;

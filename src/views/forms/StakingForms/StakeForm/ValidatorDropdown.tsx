@@ -61,7 +61,7 @@ const ValidatorsDropdownContent = ({
                   key: STRING_KEYS.COMMISSION_PERCENTAGE,
                   params: {
                     PERCENTAGE: (
-                      <$CommissionOutput type={OutputType.Percent} value={commissionRate} />
+                      <Output type={OutputType.Percent} value={commissionRate} tw="inline" />
                     ),
                   },
                 })}
@@ -148,7 +148,7 @@ export const ValidatorDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
 
     const output = (
-      <$Output
+      <Output
         type={OutputType.Text}
         value={selectedValidator?.description?.moniker}
         slotLeft={
@@ -157,6 +157,7 @@ export const ValidatorDropdown = memo(
             fallbackText={selectedValidator?.description?.moniker}
           />
         }
+        tw="text-color-text-1"
       />
     );
 
@@ -173,10 +174,10 @@ export const ValidatorDropdown = memo(
         open={isOpen}
         onOpenChange={setIsOpen}
         slotTrigger={
-          <$Trigger>
+          <span tw="flex items-center">
             {slotTrigger}
-            <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
-          </$Trigger>
+            <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} tw="ml-0.5" />
+          </span>
         }
         triggerType={TriggerType.MarketDropdown}
         align="end"
@@ -198,11 +199,6 @@ const $ScrollArea = styled.div`
 
   max-height: 20rem;
 `;
-
-const $DropdownIcon = styled(DropdownIcon)`
-  margin-left: 0.5rem;
-`;
-
 const $Popover = styled(Popover)`
   ${popoverMixins.popover}
 `;
@@ -211,16 +207,3 @@ const $Table = styled(Table)`
   --tableRow-backgroundColor: var(--color-layer-4);
   --tableCell-padding: 0.5rem 1rem;
 ` as typeof Table;
-
-const $Trigger = styled.span`
-  display: flex;
-  align-items: center;
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-1);
-`;
-
-const $CommissionOutput = styled(Output)`
-  display: inline;
-`;

@@ -337,10 +337,10 @@ export const TransferForm = ({
           id="destination"
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
-            <$DestinationInputLabel>
+            <span tw="inlineRow">
               {stringGetter({ key: STRING_KEYS.DESTINATION })}
-              {isAddressValid && <$CheckIcon iconName={IconName.Check} />}
-            </$DestinationInputLabel>
+              {isAddressValid && <Icon iconName={IconName.Check} tw="text-color-success" />}
+            </span>
           }
           type={InputType.Text}
           value={recipientAddress ?? ''}
@@ -365,14 +365,14 @@ export const TransferForm = ({
       </$Row>
 
       {recipientAddress && !isAddressValid && (
-        <$AddressValidationAlertMessage type={AlertType.Error}>
+        <AlertMessage type={AlertType.Error} tw="-mt-0.75">
           {stringGetter({
             key:
               dydxAddress === recipientAddress
                 ? STRING_KEYS.TRANSFER_TO_YOURSELF
                 : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
           })}
-        </$AddressValidationAlertMessage>
+        </AlertMessage>
       )}
 
       <$SelectMenu
@@ -385,7 +385,11 @@ export const TransferForm = ({
         ))}
       </$SelectMenu>
 
-      <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
+      <WithDetailsReceipt
+        side="bottom"
+        detailItems={amountDetailItems}
+        tw="[--withReceipt-backgroundColor:--color-layer-2]"
+      >
         <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           type={InputType.Number}
@@ -404,7 +408,7 @@ export const TransferForm = ({
           }
           disabled={isLoading}
         />
-      </$WithDetailsReceipt>
+      </WithDetailsReceipt>
 
       {showMemoField && (
         <FormInput
@@ -478,11 +482,6 @@ const $SelectItem = styled(SelectItem)`
 const $NetworkSelectMenu = styled($SelectMenu)`
   pointer-events: none;
 ` as typeof SelectMenu;
-
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
   height: 100%;
@@ -491,19 +490,6 @@ const $InlineRow = styled.span`
     font-size: 1.1em;
   }
 `;
-
-const $DestinationInputLabel = styled.span`
-  ${layoutMixins.inlineRow}
-`;
-
-const $CheckIcon = styled(Icon)`
-  color: var(--color-success);
-`;
-
-const $AddressValidationAlertMessage = styled(AlertMessage)`
-  margin-top: -0.75rem;
-`;
-
 const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 

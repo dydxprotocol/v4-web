@@ -30,7 +30,7 @@ export const BlockRewardNotification = ({
   const { BLOCK_REWARD_AMOUNT, TOKEN_NAME } = data;
 
   return (
-    <$Notification
+    <Notification
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
@@ -48,6 +48,7 @@ export const BlockRewardNotification = ({
           ]}
         />
       }
+      tw="bg-[url('/dots-background-2.svg')] bg-cover"
     />
   );
 };
@@ -58,12 +59,6 @@ const $Details = styled(Details)`
     color: var(--color-text-2);
   }
 `;
-
-const $Notification = styled(Notification)`
-  background-image: url('/dots-background-2.svg');
-  background-size: cover;
-`;
-
 const $Output = styled(Output)`
   &:before {
     content: '+';

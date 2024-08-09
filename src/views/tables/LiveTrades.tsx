@@ -76,7 +76,11 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       getCellValue: (row: RowData) => row.createdAtMilliseconds,
       label: stringGetter({ key: STRING_KEYS.TIME }),
       renderCell: (row: RowData) => (
-        <$TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
+        <OrderbookTradesOutput
+          type={OutputType.Time}
+          value={row.createdAtMilliseconds}
+          tw="text-color-text-0 [font-feature-settings:--fontFeature-monoNumbers]"
+        />
       ),
     };
     return [
@@ -86,11 +90,12 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: (row: RowData) => (
-          <$SideOutput
+          <Output
             type={OutputType.Text}
             value={stringGetter({
               key: row.side === OrderSide.BUY ? STRING_KEYS.BUY : STRING_KEYS.SELL,
             })}
+            tw="text-[color:--accent-color]"
           />
         ),
       },
@@ -100,7 +105,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         tag: id,
         renderCell: (row: RowData) => (
-          <$SizeOutput
+          <Output
             type={OutputType.Text}
             value={getConsistentAssetSizeString(row.size, {
               decimalSeparator,
@@ -109,7 +114,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
               stepSize: stepSize ?? 10 ** (-1 * TOKEN_DECIMALS),
               stepSizeDecimals: stepSizeDecimals ?? TOKEN_DECIMALS,
             })}
-            histogramSide={histogramSide}
+            tw="text-[color:--accent-color] tablet:text-color-text-1"
           />
         ),
       },
@@ -158,23 +163,6 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     />
   );
 };
-const $TimeOutput = styled(OrderbookTradesOutput)`
-  color: var(--color-text-0);
-  font-feature-settings: var(--fontFeature-monoNumbers);
-`;
-
-const $SideOutput = styled(Output)`
-  color: var(--accent-color);
-`;
-
-const $SizeOutput = styled(Output)<StyleProps>`
-  color: var(--accent-color);
-
-  @media ${breakpoints.tablet} {
-    color: var(--color-text-1);
-  }
-`;
-
 const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   background: var(--color-layer-2);

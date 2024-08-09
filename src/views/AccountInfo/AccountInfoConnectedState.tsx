@@ -67,14 +67,16 @@ export const AccountInfoConnectedState = () => {
     (!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
     (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral));
 
+  const isAccountMarginUsageError = listOfErrors?.[0] === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
+
   const showHeader = !hasDiff && !isTablet;
 
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
       {!showHeader ? null : (
-        <$Header>
+        <header tw="spacedRow px-1.25 py-0 font-small-book">
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
-          <$TransferButtons>
+          <div tw="inlineRow gap-1">
             <$Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
@@ -106,25 +108,25 @@ export const AccountInfoConnectedState = () => {
                 </WithTooltip>
               </>
             )}
-          </$TransferButtons>
-        </$Header>
+          </div>
+        </header>
       )}
-      <$Stack>
+      <div tw="stack">
         {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <$CornerButton
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
           >
-            <$CircleContainer>
+            <div tw="inline-flex items-center rounded-[50%] bg-color-layer-3 p-[0.5em]">
               <Icon iconName={IconName.Transfer} />
-            </$CircleContainer>
+            </div>
           </$CornerButton>
         )}
         <$Details
           items={[
             {
               key: AccountInfoItem.MarginUsage,
-              hasError: listOfErrors?.includes('INVALID_NEW_ACCOUNT_MARGIN_USAGE'),
+              hasError: isAccountMarginUsageError,
               tooltip: 'cross-margin-usage',
               isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
                 MustBigNumber(marginUsage?.current)
@@ -166,7 +168,11 @@ export const AccountInfoConnectedState = () => {
                 <WithTooltip tooltip={tooltip}>
                   <$WithUsage>
                     {label}
-                    {hasError ? <$CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
+                    {hasError ? (
+                      <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
+                    ) : (
+                      slotRight
+                    )}
                   </$WithUsage>
                 </WithTooltip>
               ),
@@ -185,14 +191,10 @@ export const AccountInfoConnectedState = () => {
           showHeader={showHeader}
           isLoading={isLoading}
         />
-      </$Stack>
+      </div>
     </$ConnectedAccountInfoContainer>
   );
 };
-const $Stack = styled.div`
-  ${layoutMixins.stack}
-`;
-
 const $CornerButton = styled(Button)`
   ${layoutMixins.withOuterBorder}
   z-index: 1;
@@ -208,20 +210,6 @@ const $CornerButton = styled(Button)`
     display: none;
   }
 `;
-
-const $CircleContainer = styled.div`
-  display: inline-flex;
-  align-items: center;
-
-  background-color: var(--color-layer-3);
-  padding: 0.5em;
-  border-radius: 50%;
-`;
-
-const $CautionIcon = styled(Icon)`
-  color: var(--color-error);
-`;
-
 const $WithUsage = styled.div`
   ${layoutMixins.row}
 
@@ -257,18 +245,6 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
     }
   }
 `;
-
-const $Header = styled.header`
-  ${layoutMixins.spacedRow}
-  font: var(--font-small-book);
-  padding: 0 1.25rem;
-`;
-
-const $TransferButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 1rem;
-`;
-
 const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
   ${layoutMixins.column}
 

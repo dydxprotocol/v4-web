@@ -1,6 +1,5 @@
 import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import {
   AbacusMarginMode,
@@ -17,8 +16,6 @@ import { CancelOrderStatuses } from '@/constants/trade';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -121,12 +118,12 @@ export const OrderDetailsDialog = ({
         key: 'status',
         label: stringGetter({ key: STRING_KEYS.STATUS }),
         value: (
-          <$Row>
+          <div tw="inlineRow">
             <OrderStatusIcon status={status.rawValue} />
-            <$Status>
+            <span tw="font-small-medium">
               {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
-            </$Status>
-          </$Row>
+            </span>
+          </div>
         ),
       },
       {
@@ -220,7 +217,7 @@ export const OrderDetailsDialog = ({
 
   return (
     <DetailsDialog
-      slotIcon={<$AssetIcon symbol={asset?.id} />}
+      slotIcon={<AssetIcon symbol={asset?.id} tw="text-[1em]" />}
       title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
       slotFooter={
         isAccountViewOnly ? null : isOrderStatusClearable(status) ? (
@@ -243,14 +240,3 @@ export const OrderDetailsDialog = ({
     />
   );
 };
-const $Row = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $Status = styled.span`
-  font: var(--font-small-medium);
-`;
-
-const $AssetIcon = styled(AssetIcon)`
-  font-size: 1em;
-`;

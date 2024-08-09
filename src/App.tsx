@@ -1,11 +1,12 @@
 import { lazy, Suspense, useMemo } from 'react';
 
+import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
@@ -34,15 +35,17 @@ import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
-import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { config as grazConfig } from '@/lib/graz';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
+import { ComplianceStates } from './constants/compliance';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
+import { useCommandMenu } from './hooks/useCommandMenu';
+import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
@@ -65,6 +68,7 @@ const queryClient = new QueryClient();
 const Content = () => {
   useInitializePage();
   useAnalytics();
+  useCommandMenu();
 
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
@@ -72,6 +76,9 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
+
+  const { complianceState } = useComplianceState();
+  const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -85,9 +92,13 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
+      <$Content
+        isShowingHeader={isShowingHeader}
+        isShowingFooter={isShowingFooter}
+        showRestrictionWarning={showRestrictionWarning}
+      >
         {isNotTablet && <HeaderDesktop />}
-        <RestrictionWarning />
+        {showRestrictionWarning && <RestrictionWarning />}
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -131,13 +142,11 @@ const Content = () => {
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <$NotificationsToastArea />
+        <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
 
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
         </$DialogArea>
-
-        <GlobalCommandDialog />
       </$Content>
     </>
   );
@@ -169,6 +178,7 @@ const providers = [
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
+  wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
 ];
 
@@ -181,7 +191,21 @@ const App = () => {
   );
 };
 
-const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
+// This implements the default behavior from styled-components v5
+function shouldForwardProp(propName: string, target: WebTarget): boolean {
+  if (typeof target === 'string') {
+    // For HTML elements, forward the prop if it is a valid HTML attribute
+    return isPropValid(propName);
+  }
+  // For other elements, forward all props
+  return true;
+}
+
+const $Content = styled.div<{
+  isShowingHeader: boolean;
+  isShowingFooter: boolean;
+  showRestrictionWarning: boolean;
+}>`
   /* Computed */
   --page-currentHeaderHeight: 0px;
   --page-currentFooterHeight: 0px;
@@ -224,12 +248,14 @@ const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
-  grid-template:
-    'Header' var(--page-currentHeaderHeight)
-    'RestrictionWarning' min-content
-    'Main' minmax(min-content, 1fr)
-    'Footer' var(--page-currentFooterHeight)
-    / 100%;
+  ${({ showRestrictionWarning }) => css`
+    grid-template:
+      'Header' var(--page-currentHeaderHeight)
+      ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
+      'Main' minmax(min-content, 1fr)
+      'Footer' var(--page-currentFooterHeight)
+      / 100%;
+  `}
 
   transition: 0.3s var(--ease-out-expo);
 `;
@@ -244,12 +270,6 @@ const $Main = styled.main`
 
   position: relative;
 `;
-
-const $NotificationsToastArea = styled(NotificationsToastArea)`
-  grid-area: Main;
-  z-index: 2;
-`;
-
 const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;

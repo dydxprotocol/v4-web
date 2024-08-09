@@ -56,10 +56,11 @@ const getTransferHistoryTableColumnDef = ({
         getCellValue: (row) => row.updatedAtMilliseconds,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ updatedAtMilliseconds }) => (
-          <$TimeOutput
+          <Output
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
             value={updatedAtMilliseconds}
+            tw="text-color-text-0"
           />
         ),
       },
@@ -102,9 +103,13 @@ const getTransferHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.TRANSACTION }),
         renderCell: ({ transactionHash }) =>
           transactionHash ? (
-            <$TxHash withIcon href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}>
+            <Link
+              withIcon
+              href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
+              tw="justify-end"
+            >
               {truncateAddress(transactionHash, '')}
-            </$TxHash>
+            </Link>
           ) : (
             '-'
           ),
@@ -179,11 +184,3 @@ export const TransferHistoryTable = ({
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;
-
-const $TimeOutput = styled(Output)`
-  color: var(--color-text-0);
-`;
-
-const $TxHash = styled(Link)`
-  justify-content: flex-end;
-`;

@@ -46,8 +46,7 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.RECENTLY_LISTED,
   },
   [MarketFilters.PREDICTION_MARKET]: {
-    // TODO: (TRA-516): Update string when v4-localization contains stringKey.
-    label: undefined,
+    label: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
   [MarketFilters.LAYER_1]: {
@@ -86,3 +85,7 @@ export enum FundingDirection {
   ToLong = 'ToLong',
   None = 'None',
 }
+
+export const PREDICTION_MARKET = {
+  TRUMPWIN: 'TRUMPWIN-USD',
+};

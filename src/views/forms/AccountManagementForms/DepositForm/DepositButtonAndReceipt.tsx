@@ -17,8 +17,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -153,11 +151,11 @@ export const DepositButtonAndReceipt = ({
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: (
-        <$ExchangeRate>
+        <span tw="row gap-[0.5ch]">
           <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
           =
           <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-        </$ExchangeRate>
+        </span>
       ),
     },
     typeof summary?.gasFee === 'number' && {
@@ -260,7 +258,10 @@ export const DepositButtonAndReceipt = ({
     !requiresAcknowledgement;
 
   return (
-    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
+    <WithReceipt
+      slotReceipt={<$Details items={submitButtonReceipt} />}
+      tw="[--withReceipt-backgroundColor:--color-layer-2]"
+    >
       <RouteWarningMessage
         hasAcknowledged={hasAcknowledged}
         setHasAcknowledged={setHasAcknowledged}
@@ -293,18 +294,9 @@ export const DepositButtonAndReceipt = ({
           {buttonLabel}
         </Button>
       )}
-    </$WithReceipt>
+    </WithReceipt>
   );
 };
-const $ExchangeRate = styled.span`
-  ${layoutMixins.row}
-  gap: 0.5ch;
-`;
-
-const $WithReceipt = styled(WithReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
 const $Details = styled(Details)`
   --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
