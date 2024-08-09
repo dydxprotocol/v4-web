@@ -36,8 +36,8 @@ import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
 enum AccountInfoItem {
-  BuyingPower = 'buying-power',
-  MarginUsage = 'margin-usage',
+  AvailableBalance = 'available-balance',
+  PortfolioValue = 'portfolio-value',
 }
 
 const getUsageValue = (value: Nullable<TradeState<number>>) => {
@@ -56,18 +56,15 @@ export const AccountInfoConnectedState = () => {
 
   const { dydxAccounts } = useAccounts();
 
-  const inputErrors = useAppSelector(getInputErrors, shallowEqual);
+  // const inputErrors = useAppSelector(getInputErrors, shallowEqual);
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
-  const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
   const { freeCollateral, marginUsage } = subAccount ?? {};
 
   const hasDiff =
     (!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
     (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral));
-
-  const isAccountMarginUsageError = listOfErrors?.[0] === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
 
   const showHeader = !hasDiff && !isTablet;
 
@@ -125,32 +122,31 @@ export const AccountInfoConnectedState = () => {
         <$Details
           items={[
             {
-              key: AccountInfoItem.MarginUsage,
-              hasError: isAccountMarginUsageError,
-              tooltip: 'cross-margin-usage',
-              isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
-                MustBigNumber(marginUsage?.current)
+              key: AccountInfoItem.PortfolioValue,
+              hasError: false,
+              isPositive: !MustBigNumber(subAccount?.equity?.postOrder).gt(
+                MustBigNumber(subAccount?.equity?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-              type: OutputType.Percent,
-              value: marginUsage,
-              slotRight: <MarginUsageRing value={getUsageValue(marginUsage)} />,
+              label: stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
+              type: OutputType.Fiat,
+              value: subAccount?.equity,
             },
             {
-              key: AccountInfoItem.BuyingPower,
+              key: AccountInfoItem.AvailableBalance,
               hasError:
                 isNumber(freeCollateral?.postOrder) &&
                 MustBigNumber(freeCollateral?.postOrder).lt(0),
-              tooltip: 'cross-free-collateral',
+              tooltip: 'available-balance',
               isPositive: MustBigNumber(freeCollateral?.postOrder).gt(
                 MustBigNumber(freeCollateral?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE }),
               type: OutputType.Fiat,
               value:
                 MustBigNumber(freeCollateral?.current).lt(0) && freeCollateral?.postOrder === null
                   ? undefined
                   : freeCollateral,
+              slotRight: <MarginUsageRing value={getUsageValue(marginUsage)} />,
             },
           ].map(
             ({
