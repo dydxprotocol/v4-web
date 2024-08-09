@@ -18,13 +18,25 @@ export interface Candle {
   orderbookMidPriceClose?: string;
 }
 
-export interface TradingViewBar {
+interface TradingViewBar {
+  // Properties corresponding to the TradingView.Bar interface, used by library for rendering
   time: number;
   low: number;
   high: number;
   open: number;
   close: number;
   volume: number;
+}
+
+export interface TradingViewChartBar extends TradingViewBar {
+  // Additional properties used to re-map Bars conditionally if OHLC is enabled
+  tradeOpen: number;
+  tradeClose: number;
+  orderbookOpen?: number;
+  orderbookClose?: number;
+  tradeLow: number;
+  tradeHigh: number;
+  trades: number;
 }
 
 export interface TradingViewSymbol {
