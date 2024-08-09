@@ -1,5 +1,5 @@
 import { Nullable } from '@/constants/abacus';
-import { Candle, TradingViewBar } from '@/constants/candles';
+import { Candle, TradingViewChartBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
@@ -167,15 +167,15 @@ export const getPerpetualCandlesForMarket = (
  *
  * @param marketId
  * @param resolution
- * @returns TradingViewBar data for specified marketId and resolution
+ * @returns TradingViewChartBar data for specified marketId and resolution
  */
-export const getPerpetualBarsForPriceChart = () =>
+export const getPerpetualBarsForPriceChart = (ohlcToggleOn: boolean) =>
   createAppSelector(
     [
       (state: RootState, marketId: string, resolution: string) =>
         getPerpetualCandlesForMarket(state, marketId, resolution),
     ],
-    (candles): TradingViewBar[] => candles.map(mapCandle)
+    (candles): TradingViewChartBar[] => candles.map(mapCandle(ohlcToggleOn))
   );
 
 /**

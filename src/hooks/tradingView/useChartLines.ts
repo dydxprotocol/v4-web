@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -32,13 +32,15 @@ export const useChartLines = ({
   tvWidget,
   orderLineToggle,
   isChartReady,
+  orderLinesToggleOn,
+  setOrderLinesToggleOn,
 }: {
   tvWidget: TvWidget | null;
   orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
+  orderLinesToggleOn: boolean;
+  setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const [showOrderLines, setShowOrderLines] = useState(true);
-
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
@@ -250,33 +252,37 @@ export const useChartLines = ({
   }, []);
 
   const drawChartLines = useCallback(() => {
-    if (showOrderLines) {
+    if (orderLinesToggleOn) {
       updateOrderLines();
       updatePositionLines();
     } else {
       clearChartLines();
     }
-  }, [updatePositionLines, updateOrderLines, clearChartLines, showOrderLines]);
+  }, [updatePositionLines, updateOrderLines, clearChartLines, orderLinesToggleOn]);
 
   // Effects
 
   useEffect(() => {
     // Initialize onClick for order line toggle
     if (isChartReady && orderLineToggle) {
-      orderLineToggle.onclick = () => setShowOrderLines((prev) => !prev);
+      orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
     }
-  }, [isChartReady, orderLineToggle]);
+  }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
 
   useEffect(
     // Update display button on toggle
     () => {
-      if (showOrderLines) {
-        orderLineToggle?.classList?.add('order-lines-active');
-      } else {
-        orderLineToggle?.classList?.remove('order-lines-active');
+      if (isChartReady) {
+        runOnChartReady(() => {
+          if (orderLinesToggleOn) {
+            orderLineToggle?.classList?.add('order-lines-active');
+          } else {
+            orderLineToggle?.classList?.remove('order-lines-active');
+          }
+        });
       }
     },
-    [showOrderLines, orderLineToggle?.classList]
+    [orderLinesToggleOn, orderLineToggle, runOnChartReady, isChartReady]
   );
 
   useEffect(

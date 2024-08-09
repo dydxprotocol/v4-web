@@ -1,6 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/constants/analytics';
-import type { Candle, TradingViewBar } from '@/constants/candles';
+import type { Candle, TradingViewChartBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
 
 import { testFlags } from '@/lib/testFlags';
@@ -27,6 +27,8 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
   private currentCandleId: string | undefined;
 
   private isConnecting: boolean = false;
+
+  ohlcToggleOn: boolean = true;
 
   connect(url: string, connected: (p0: boolean) => void, received: (p0: string) => void): void {
     this.url = url;
@@ -133,7 +135,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                 // - the second entry reflects the new candle
                 contents.forEach((updatedCandle: Candle) => {
                   if (updatedCandle && subscriptionItem) {
-                    const bar: TradingViewBar = mapCandle(updatedCandle);
+                    const bar: TradingViewChartBar = mapCandle(this.ohlcToggleOn)(updatedCandle);
                     subscriptionItem.lastBar = bar;
 
                     // send data to every subscriber of that symbol

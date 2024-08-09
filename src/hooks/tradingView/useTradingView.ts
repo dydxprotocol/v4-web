@@ -39,11 +39,13 @@ export const useTradingView = ({
   tvWidgetRef,
   orderLineToggleRef,
   ohlcToggleRef,
+  ohlcToggleOn,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   ohlcToggleRef: React.MutableRefObject<HTMLElement | null>;
+  ohlcToggleOn: boolean;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -94,17 +96,18 @@ export const useTradingView = ({
       const options = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
+        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale, ohlcToggleOn),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+        auto_save_delay: 1,
       };
 
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
-      tvWidgetRef.current.onChartReady(() => {
+      tvWidgetRef.current?.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
             if (orderLineToggleRef) {
@@ -150,7 +153,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo]);
+  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo, ohlcToggleOn]);
 
   return { savedResolution };
 };
