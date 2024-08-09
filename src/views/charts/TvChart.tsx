@@ -10,6 +10,7 @@ import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketA
 import { useOhlcCandles } from '@/hooks/tradingView/useOhlcCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
+import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -27,10 +28,13 @@ export const TvChart = () => {
   const ohlcToggleRef = useRef<HTMLElement | null>(null);
   const ohlcToggle = ohlcToggleRef.current;
 
+  const { ohlcToggleOn, setOhlcToggleOn, orderLinesToggleOn, setOrderLinesToggleOn } =
+    useTradingViewToggles();
   const { savedResolution } = useTradingView({
     tvWidgetRef,
     orderLineToggleRef,
     ohlcToggleRef,
+    ohlcToggleOn,
     setIsChartReady,
   });
   useChartMarketAndResolution({
@@ -38,8 +42,14 @@ export const TvChart = () => {
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
-  const { chartLines } = useChartLines({ tvWidget, orderLineToggle, isChartReady });
-  useOhlcCandles({ ohlcToggle, isChartReady });
+  const { chartLines } = useChartLines({
+    tvWidget,
+    orderLineToggle,
+    isChartReady,
+    orderLinesToggleOn,
+    setOrderLinesToggleOn,
+  });
+  useOhlcCandles({ ohlcToggle, isChartReady, ohlcToggleOn, setOhlcToggleOn, tvWidget });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (

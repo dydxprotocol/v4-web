@@ -1,4 +1,8 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+
+import { TvWidget } from '@/constants/tvchart';
+
+import abacusStateManager from '@/lib/abacus';
 
 /**
  * @description Hook to handle drawing candles with OHLC or orderbook price
@@ -7,28 +11,41 @@ import { useEffect, useState } from 'react';
 export const useOhlcCandles = ({
   ohlcToggle,
   isChartReady,
+  ohlcToggleOn,
+  setOhlcToggleOn,
+  tvWidget,
 }: {
   ohlcToggle: HTMLElement | null;
   isChartReady: boolean;
+  ohlcToggleOn: boolean;
+  setOhlcToggleOn: Dispatch<SetStateAction<boolean>>;
+  tvWidget: TvWidget | null;
 }) => {
-  const [useOhlc, setUseOhlc] = useState(true);
-
   useEffect(() => {
     // Initialize onClick for ohlc toggle
     if (isChartReady && ohlcToggle) {
-      ohlcToggle.onclick = () => setUseOhlc((prev) => !prev);
+      ohlcToggle.onclick = () => setOhlcToggleOn((prev) => !prev);
     }
-  }, [isChartReady, ohlcToggle]);
+  }, [isChartReady, ohlcToggle, setOhlcToggleOn]);
 
   useEffect(
     // Update ohlc button on toggle
     () => {
-      if (useOhlc) {
-        ohlcToggle?.classList?.add('ohlc-active');
-      } else {
-        ohlcToggle?.classList?.remove('ohlc-active');
+      if (isChartReady) {
+        tvWidget?.onChartReady(() => {
+          tvWidget.headerReady().then(() => {
+            if (ohlcToggleOn) {
+              ohlcToggle?.classList?.add('ohlc-active');
+            } else {
+              ohlcToggle?.classList?.remove('ohlc-active');
+            }
+            abacusStateManager.toggleOhlcCandles(ohlcToggleOn);
+          });
+        });
       }
     },
-    [useOhlc, ohlcToggle?.classList]
+    [ohlcToggleOn, ohlcToggle, tvWidget, isChartReady]
   );
+
+  return { ohlcToggleOn };
 };
