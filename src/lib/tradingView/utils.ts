@@ -121,6 +121,7 @@ export const getWidgetOverrides = ({
       'scalesProperties.textColor': theme.textPrimary,
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
+      'scalesProperties.fontSize': 12,
     },
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
@@ -143,6 +144,7 @@ export const getWidgetOptions = () => {
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',
+    custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: [
       'header_symbol_search',

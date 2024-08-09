@@ -22,6 +22,8 @@ import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStringGetter } from '../useStringGetter';
 
+const CHART_LINE_FONT = 'bold 10px Satoshi';
+
 /**
  * @description Hook to handle drawing chart lines
  */
@@ -71,7 +73,7 @@ export const useChartLines = ({
     [tvWidget]
   );
 
-  const setLineColors = useCallback(
+  const setLineColorsAndFont = useCallback(
     ({ chartLine }: { chartLine: ChartLine }) => {
       const { line, chartLineType } = chartLine;
       const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
@@ -86,7 +88,9 @@ export const useChartLines = ({
         .setBodyBackgroundColor(backgroundColor)
         .setBodyBorderColor(borderColor)
         .setBodyTextColor(textColor)
-        .setQuantityTextColor(textButtonColor);
+        .setQuantityTextColor(textButtonColor)
+        .setBodyFont(CHART_LINE_FONT)
+        .setQuantityFont(CHART_LINE_FONT);
 
       if (maybeQuantityColor != null) {
         line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
@@ -139,12 +143,12 @@ export const useChartLines = ({
 
         if (positionLine) {
           const chartLine: ChartLine = { line: positionLine, chartLineType };
-          setLineColors({ chartLine });
+          setLineColorsAndFont({ chartLine });
           chartLinesRef.current[key] = chartLine;
         }
       }
     },
-    [setLineColors, tvWidget]
+    [setLineColorsAndFont, tvWidget]
   );
 
   const updatePositionLines = useCallback(() => {
@@ -229,14 +233,14 @@ export const useChartLines = ({
                 line: orderLine,
                 chartLineType: ORDER_SIDES[side.name],
               };
-              setLineColors({ chartLine });
+              setLineColorsAndFont({ chartLine });
               chartLinesRef.current[key] = chartLine;
             }
           }
         }
       }
     );
-  }, [setLineColors, stringGetter, currentMarketOrders, tvWidget]);
+  }, [setLineColorsAndFont, stringGetter, currentMarketOrders, tvWidget]);
 
   const clearChartLines = useCallback(() => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {
