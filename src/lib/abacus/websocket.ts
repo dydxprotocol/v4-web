@@ -28,7 +28,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
   private isConnecting: boolean = false;
 
-  ohlcToggleOn: boolean = true;
+  orderbookCandlesToggleOn: boolean = true;
 
   connect(url: string, connected: (p0: boolean) => void, received: (p0: string) => void): void {
     this.url = url;
@@ -135,7 +135,9 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                 // - the second entry reflects the new candle
                 contents.forEach((updatedCandle: Candle) => {
                   if (updatedCandle && subscriptionItem) {
-                    const bar: TradingViewChartBar = mapCandle(this.ohlcToggleOn)(updatedCandle);
+                    const bar: TradingViewChartBar = mapCandle(this.orderbookCandlesToggleOn)(
+                      updatedCandle
+                    );
                     subscriptionItem.lastBar = bar;
 
                     // send data to every subscriber of that symbol

@@ -50,7 +50,7 @@ export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
   initialPriceScale: number | null,
-  ohlcToggleOn: boolean
+  orderbookCandlesToggleOn: boolean
 ) => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
@@ -120,7 +120,7 @@ export const getDydxDatafeed = (
     }
 
     try {
-      const currentMarketBars = getPerpetualBarsForPriceChart(ohlcToggleOn)(
+      const currentMarketBars = getPerpetualBarsForPriceChart(orderbookCandlesToggleOn)(
         store.getState(),
         symbolInfo.name,
         resolution
@@ -132,7 +132,7 @@ export const getDydxDatafeed = (
         fromMs,
         toMs,
         firstDataRequest,
-        ohlcToggleOn,
+        orderbookCandlesToggleOn,
       });
 
       let fetchedCandles: Candle[] | undefined;
@@ -155,7 +155,7 @@ export const getDydxDatafeed = (
 
       const bars = [
         ...cachedBars,
-        ...(fetchedCandles?.map(mapCandle(ohlcToggleOn)) ?? []),
+        ...(fetchedCandles?.map(mapCandle(orderbookCandlesToggleOn)) ?? []),
       ].reverse();
 
       if (bars.length === 0) {
