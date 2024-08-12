@@ -64,8 +64,7 @@ export const AccountInfoConnectedState = () => {
   const portfolioValue = subAccount?.equity;
 
   const hasDiff =
-    (!!portfolioValue?.postOrder && getTradeStateWithDoubleValuesHasDiff(portfolioValue)) ||
-    (!!availableBalance?.postOrder && getTradeStateWithDoubleValuesHasDiff(availableBalance));
+    !!availableBalance?.postOrder && getTradeStateWithDoubleValuesHasDiff(availableBalance);
 
   const showHeader = !hasDiff && !isTablet;
 
@@ -133,7 +132,8 @@ export const AccountInfoConnectedState = () => {
           items={[
             {
               key: AccountInfoItem.PortfolioValue,
-              hasError: isPostOrderTradeStateNegative(portfolioValue),
+              hideDiff: true,
+              hasError: false,
               isPositive: MustBigNumber(portfolioValue?.postOrder).gt(
                 MustBigNumber(portfolioValue?.current)
               ),
@@ -160,27 +160,30 @@ export const AccountInfoConnectedState = () => {
                 </WithTooltip>
               ),
             },
-          ].map(({ key, hasError, isPositive, label, type, value, slotRight }) => ({
-            key,
-            label: (
-              <$WithUsage>
-                {label}
-                {hasError ? (
-                  <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
-                ) : (
-                  slotRight
-                )}
-              </$WithUsage>
-            ),
-            value: (
-              <AccountInfoDiffOutput
-                hasError={hasError}
-                isPositive={isPositive}
-                type={type}
-                value={value}
-              />
-            ),
-          }))}
+          ].map(
+            ({ key, hasError, hideDiff = false, isPositive, label, type, value, slotRight }) => ({
+              key,
+              label: (
+                <$WithUsage>
+                  {label}
+                  {hasError ? (
+                    <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
+                  ) : (
+                    slotRight
+                  )}
+                </$WithUsage>
+              ),
+              value: (
+                <AccountInfoDiffOutput
+                  hasError={hasError}
+                  hideDiff={hideDiff}
+                  isPositive={isPositive}
+                  type={type}
+                  value={value}
+                />
+              ),
+            })
+          )}
           layout="grid"
           withOverflow={false}
           showHeader={showHeader}
@@ -224,12 +227,23 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
   font: var(--font-mini-book);
 
   > * {
-    height: ${({ showHeader }) =>
-      !showHeader
-        ? `calc(var(--account-info-section-height))`
-        : `calc((var(--account-info-section-height) - var(--tabs-height)))`};
+    ${({ showHeader }) =>
+      showHeader
+        ? css`
+            height: calc((var(--account-info-section-height) - var(--tabs-height)));
+            padding: 0.625rem 1rem;
+          `
+        : css`
+            height: calc(var(--account-info-section-height));
+            padding: 1.25rem 1rem 0.6rem;
+          `}
+    display: flex;
+    flex-direction: column;
 
-    padding: 0.625rem 1rem;
+    & > :last-child {
+      flex-grow: 1;
+      align-items: center;
+    }
   }
 
   @media ${breakpoints.tablet} {
