@@ -435,8 +435,8 @@ class AbacusStateManager {
     this.websocket.send(requestText);
   };
 
-  toggleOhlcCandles = (useOhlc: boolean) => {
-    this.websocket.ohlcToggleOn = useOhlc;
+  toggleOrderbookCandles = (useOrderbookCandles: boolean) => {
+    this.websocket.orderbookCandlesToggleOn = useOrderbookCandles;
   };
 
   getChainById = (chainId: string) => {
