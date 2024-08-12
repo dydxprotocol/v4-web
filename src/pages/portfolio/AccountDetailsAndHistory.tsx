@@ -102,8 +102,13 @@ export const AccountDetailsAndHistory = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 
-  const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const {
+    buyingPower,
+    equity,
+    freeCollateral: availableBalance,
+    leverage,
+    marginUsage,
+  } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 
@@ -127,7 +132,7 @@ export const AccountDetailsAndHistory = () => {
       key: 'AvailableBalance',
       labelKey: STRING_KEYS.AVAILABLE_BALANCE,
       type: OutputType.Fiat,
-      value: freeCollateral?.current,
+      value: availableBalance?.current,
     },
     {
       key: 'Leverage',

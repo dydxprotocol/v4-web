@@ -57,7 +57,6 @@ export const AccountInfoConnectedState = () => {
 
   const { dydxAccounts } = useAccounts();
 
-  // const inputErrors = useAppSelector(getInputErrors, shallowEqual);
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
