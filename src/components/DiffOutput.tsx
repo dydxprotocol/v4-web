@@ -77,32 +77,17 @@ const $DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>
       `,
     })[layout]}
 
-  ${({ withDiff }) => {
-    return (
-      withDiff &&
-      css`
-        & > :first-child {
-          color: var(--diffOutput-valueWithDiff-color, var(--diffOutput-value-color));
-          font: var(--diffOutput-valueWithDiff-font);
-        }
+  ${({ withDiff }) =>
+    withDiff &&
+    css`
+      & > :first-child {
+        color: var(--diffOutput-valueWithDiff-color, var(--diffOutput-value-color));
+        font: var(--diffOutput-valueWithDiff-font);
+      }
 
-        & > :last-child {
-          color: var(--diffOutput-newValue-color);
-          font: var(--diffOutput-newValue-font);
-        }
-      ` &&
-      !withDiff &&
-      css`
-        & > :first-child {
-          color: var(--diffOutput-valueWithDiff-color, var(--diffOutput-value-color));
-          font: var(--diffOutput-valueWithDiff-font);
-        }
-
-        & > :last-child {
-          color: var(--diffOutput-newValue-color);
-          font: var(--diffOutput-newValue-font);
-        }
-      `
-    );
-  }}
+      & > :last-child {
+        color: var(--diffOutput-newValue-color);
+        font: var(--diffOutput-newValue-font);
+      }
+    `}
 `;
