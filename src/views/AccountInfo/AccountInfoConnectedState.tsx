@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -28,7 +30,6 @@ import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getInputErrors } from '@/state/inputsSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
@@ -60,13 +61,23 @@ export const AccountInfoConnectedState = () => {
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
-  const { freeCollateral, marginUsage } = subAccount ?? {};
+  const { freeCollateral: availableBalance, marginUsage } = subAccount ?? {};
+  const portfolioValue = subAccount?.equity;
 
   const hasDiff =
-    (!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
-    (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral));
+    (!!portfolioValue?.postOrder && getTradeStateWithDoubleValuesHasDiff(portfolioValue)) ||
+    (!!availableBalance?.postOrder && getTradeStateWithDoubleValuesHasDiff(availableBalance));
 
   const showHeader = !hasDiff && !isTablet;
+
+  const isPostOrderTradeStateNegative = useCallback(
+    (tradeStateValue: Nullable<TradeState<number>>) => {
+      return (
+        isNumber(tradeStateValue?.postOrder) && MustBigNumber(tradeStateValue?.postOrder).lt(0)
+      );
+    },
+    []
+  );
 
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
@@ -123,65 +134,54 @@ export const AccountInfoConnectedState = () => {
           items={[
             {
               key: AccountInfoItem.PortfolioValue,
-              hasError: false,
-              isPositive: !MustBigNumber(subAccount?.equity?.postOrder).gt(
-                MustBigNumber(subAccount?.equity?.current)
+              hasError: isPostOrderTradeStateNegative(portfolioValue),
+              isPositive: MustBigNumber(portfolioValue?.postOrder).gt(
+                MustBigNumber(portfolioValue?.current)
               ),
               label: stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
               type: OutputType.Fiat,
-              value: subAccount?.equity,
+              value: portfolioValue,
             },
             {
               key: AccountInfoItem.AvailableBalance,
-              hasError:
-                isNumber(freeCollateral?.postOrder) &&
-                MustBigNumber(freeCollateral?.postOrder).lt(0),
-              tooltip: 'available-balance',
-              isPositive: MustBigNumber(freeCollateral?.postOrder).gt(
-                MustBigNumber(freeCollateral?.current)
+              hasError: isPostOrderTradeStateNegative(availableBalance),
+              isPositive: MustBigNumber(availableBalance?.postOrder).gt(
+                MustBigNumber(availableBalance?.current)
               ),
               label: stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE }),
               type: OutputType.Fiat,
               value:
-                MustBigNumber(freeCollateral?.current).lt(0) && freeCollateral?.postOrder === null
+                MustBigNumber(availableBalance?.current).lt(0) &&
+                availableBalance?.postOrder === null
                   ? undefined
-                  : freeCollateral,
-              slotRight: <MarginUsageRing value={getUsageValue(marginUsage)} />,
-            },
-          ].map(
-            ({
-              key,
-              hasError,
-              tooltip = undefined,
-              isPositive,
-              label,
-              type,
-              value,
-              slotRight,
-            }) => ({
-              key,
-              label: (
-                <WithTooltip tooltip={tooltip}>
-                  <$WithUsage>
-                    {label}
-                    {hasError ? (
-                      <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
-                    ) : (
-                      slotRight
-                    )}
-                  </$WithUsage>
+                  : availableBalance,
+              slotRight: (
+                <WithTooltip tooltip="cross-margin-usage">
+                  <MarginUsageRing value={getUsageValue(marginUsage)} />
                 </WithTooltip>
               ),
-              value: (
-                <AccountInfoDiffOutput
-                  hasError={hasError}
-                  isPositive={isPositive}
-                  type={type}
-                  value={value}
-                />
-              ),
-            })
-          )}
+            },
+          ].map(({ key, hasError, isPositive, label, type, value, slotRight }) => ({
+            key,
+            label: (
+              <$WithUsage>
+                {label}
+                {hasError ? (
+                  <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
+                ) : (
+                  slotRight
+                )}
+              </$WithUsage>
+            ),
+            value: (
+              <AccountInfoDiffOutput
+                hasError={hasError}
+                isPositive={isPositive}
+                type={type}
+                value={value}
+              />
+            ),
+          }))}
           layout="grid"
           withOverflow={false}
           showHeader={showHeader}
