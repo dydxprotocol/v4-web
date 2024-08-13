@@ -81,7 +81,7 @@ const useNotificationsContext = () => {
       ([, value]) =>
         !SingleSessionNotificationTypes.includes(value.type) ||
         (value.type === NotificationType.AbacusGenerated &&
-          !isAbacusNotificationSingleSession(value))
+          !isAbacusNotificationSingleSession(value.id))
     );
 
     const newNotifications = Object.fromEntries(filteredEntries);

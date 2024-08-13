@@ -1,7 +1,6 @@
-import { AbacusNotification } from '@/constants/abacus';
 import { SingleSessionAbacusNotificationTypes } from '@/constants/notifications';
 
-export const isAbacusNotificationSingleSession = (notification: AbacusNotification) => {
-  const notificationType = notification.id.split(':')[0];
+export const isAbacusNotificationSingleSession = (notificationId: string) => {
+  const notificationType = notificationId.split(':')[0];
   return SingleSessionAbacusNotificationTypes.includes(notificationType);
 };
