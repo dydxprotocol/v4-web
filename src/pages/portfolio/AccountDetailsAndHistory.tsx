@@ -102,8 +102,13 @@ export const AccountDetailsAndHistory = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 
-  const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const {
+    buyingPower,
+    equity,
+    freeCollateral: availableBalance,
+    leverage,
+    marginUsage,
+  } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 
@@ -124,10 +129,10 @@ export const AccountDetailsAndHistory = () => {
       value: marginUsage?.current,
     },
     !isTablet && {
-      key: 'FreeCollateral',
-      labelKey: STRING_KEYS.FREE_COLLATERAL,
+      key: 'AvailableBalance',
+      labelKey: STRING_KEYS.AVAILABLE_BALANCE,
       type: OutputType.Fiat,
-      value: freeCollateral?.current,
+      value: availableBalance?.current,
     },
     {
       key: 'Leverage',
@@ -214,7 +219,7 @@ const $AccountDetailsAndHistory = styled.div<{ isSidebarOpen?: boolean }>`
   display: grid;
   grid-template:
     'PortfolioValue PortfolioValue Chart'
-    'MarginUsage FreeCollateral Chart'
+    'MarginUsage AvailableBalance Chart'
     'Leverage BuyingPower Chart'
     / 9.375rem 9.375rem 1fr;
 
