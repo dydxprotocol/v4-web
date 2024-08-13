@@ -7,7 +7,7 @@
             "ticker": "MOTHER-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -17,7 +17,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -43,7 +43,7 @@
             "ticker": "BLAST-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -59,7 +59,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -85,7 +85,7 @@
             "ticker": "ZRO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -106,7 +106,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -132,7 +132,7 @@
             "ticker": "ZK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -148,7 +148,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -174,7 +174,7 @@
             "ticker": "POPCAT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -184,7 +184,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -210,7 +210,7 @@
             "ticker": "TREMP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -231,7 +231,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -257,7 +257,7 @@
             "ticker": "SCF-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -267,7 +267,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -293,7 +293,7 @@
             "ticker": "GME-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -315,7 +315,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -341,7 +341,7 @@
             "ticker": "SC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -351,7 +351,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -377,7 +377,7 @@
             "ticker": "BOME-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -399,7 +399,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -425,7 +425,7 @@
             "ticker": "PONKE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -447,7 +447,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -473,7 +473,7 @@
             "ticker": "MEW-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -483,7 +483,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -509,7 +509,7 @@
             "ticker": "MICHI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -519,7 +519,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -545,7 +545,7 @@
             "ticker": "TIME-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -555,7 +555,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -581,7 +581,7 @@
             "ticker": "BNB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -597,7 +597,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -8,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -623,7 +623,7 @@
             "ticker": "SOL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -669,7 +669,7 @@
             "ticker": "TON-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -711,7 +711,7 @@
             "ticker": "ADA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -731,7 +731,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -757,7 +757,7 @@
             "ticker": "TRX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -778,7 +778,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -804,7 +804,7 @@
             "ticker": "AVAX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -850,7 +850,7 @@
             "ticker": "SHIB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -870,7 +870,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -896,7 +896,7 @@
             "ticker": "DOT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -916,7 +916,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -942,7 +942,7 @@
             "ticker": "BCH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -962,7 +962,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -8,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -988,7 +988,7 @@
             "ticker": "LINK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1034,7 +1034,7 @@
             "ticker": "DAI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1054,7 +1054,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1080,7 +1080,7 @@
             "ticker": "NEAR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1100,7 +1100,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1126,7 +1126,7 @@
             "ticker": "MATIC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1146,7 +1146,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1172,7 +1172,7 @@
             "ticker": "ICP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1192,7 +1192,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1218,7 +1218,7 @@
             "ticker": "UNI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1238,7 +1238,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1264,7 +1264,7 @@
             "ticker": "PEPE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -15,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1284,7 +1284,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": 0,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1310,7 +1310,7 @@
             "ticker": "XMR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1332,7 +1332,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -8,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1358,7 +1358,7 @@
             "ticker": "APT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1379,7 +1379,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1405,7 +1405,7 @@
             "ticker": "HBAR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1420,7 +1420,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1446,7 +1446,7 @@
             "ticker": "FIL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1461,7 +1461,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1487,7 +1487,7 @@
             "ticker": "ATOM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1534,7 +1534,7 @@
             "ticker": "STX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1549,7 +1549,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1575,7 +1575,7 @@
             "ticker": "MKR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -6,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1595,7 +1595,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -9,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1621,7 +1621,7 @@
             "ticker": "VET-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1637,7 +1637,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1663,7 +1663,7 @@
             "ticker": "ARB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1678,7 +1678,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1704,7 +1704,7 @@
             "ticker": "IMX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1724,7 +1724,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1750,7 +1750,7 @@
             "ticker": "INJ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1770,7 +1770,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1796,7 +1796,7 @@
             "ticker": "SUI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1816,7 +1816,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1842,7 +1842,7 @@
             "ticker": "OP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1889,7 +1889,7 @@
             "ticker": "AAVE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1909,7 +1909,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -8,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1935,7 +1935,7 @@
             "ticker": "AR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1951,7 +1951,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -1977,7 +1977,7 @@
             "ticker": "WIF-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -1987,7 +1987,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2013,7 +2013,7 @@
             "ticker": "GRT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2039,7 +2039,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2065,7 +2065,7 @@
             "ticker": "BONK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2085,7 +2085,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2111,7 +2111,7 @@
             "ticker": "FLOKI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -13,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2132,7 +2132,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -2,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2158,7 +2158,7 @@
             "ticker": "THETA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2174,7 +2174,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2200,7 +2200,7 @@
             "ticker": "TIA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2215,7 +2215,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2241,7 +2241,7 @@
             "ticker": "JUP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2267,7 +2267,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2293,7 +2293,7 @@
             "ticker": "ONDO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2308,7 +2308,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2334,7 +2334,7 @@
             "ticker": "RUNE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2355,7 +2355,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2381,7 +2381,7 @@
             "ticker": "JASMY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2402,7 +2402,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2428,7 +2428,7 @@
             "ticker": "ALGO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2448,7 +2448,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2474,7 +2474,7 @@
             "ticker": "PYTH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2500,7 +2500,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2526,7 +2526,7 @@
             "ticker": "LDO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2546,7 +2546,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2572,7 +2572,7 @@
             "ticker": "FTM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2592,7 +2592,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2618,7 +2618,7 @@
             "ticker": "FLOW-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2639,7 +2639,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2665,7 +2665,7 @@
             "ticker": "SEI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2680,7 +2680,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2706,7 +2706,7 @@
             "ticker": "EGLD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2727,7 +2727,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2753,7 +2753,7 @@
             "ticker": "QNT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2768,7 +2768,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2794,7 +2794,7 @@
             "ticker": "EOS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2815,7 +2815,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2841,7 +2841,7 @@
             "ticker": "BTT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -16,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2856,7 +2856,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": 1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2882,7 +2882,7 @@
             "ticker": "PYUSD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2897,7 +2897,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2923,7 +2923,7 @@
             "ticker": "AXS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2943,7 +2943,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -2969,7 +2969,7 @@
             "ticker": "FLR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -2995,7 +2995,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3021,7 +3021,7 @@
             "ticker": "XTZ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3042,7 +3042,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3068,7 +3068,7 @@
             "ticker": "BEAM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3083,7 +3083,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3109,7 +3109,7 @@
             "ticker": "STRK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3130,7 +3130,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3156,7 +3156,7 @@
             "ticker": "SAND-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3182,7 +3182,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3208,7 +3208,7 @@
             "ticker": "ENS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3229,7 +3229,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3255,7 +3255,7 @@
             "ticker": "GALA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3281,7 +3281,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3307,7 +3307,7 @@
             "ticker": "WLD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3323,7 +3323,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3349,7 +3349,7 @@
             "ticker": "AKT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3364,7 +3364,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3390,7 +3390,7 @@
             "ticker": "ZEC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3405,7 +3405,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3431,7 +3431,7 @@
             "ticker": "ORDI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3447,7 +3447,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3473,7 +3473,7 @@
             "ticker": "TUSD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3488,7 +3488,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3514,7 +3514,7 @@
             "ticker": "MANA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3535,7 +3535,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3561,7 +3561,7 @@
             "ticker": "ENA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3576,7 +3576,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3602,7 +3602,7 @@
             "ticker": "W-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3623,7 +3623,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3649,7 +3649,7 @@
             "ticker": "CHZ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3669,7 +3669,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3695,7 +3695,7 @@
             "ticker": "MINA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3716,7 +3716,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3742,7 +3742,7 @@
             "ticker": "SNX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3762,7 +3762,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3788,7 +3788,7 @@
             "ticker": "MOG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -15,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3804,7 +3804,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": 0,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3830,7 +3830,7 @@
             "ticker": "RAY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3845,7 +3845,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3871,7 +3871,7 @@
             "ticker": "GNO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -7,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3886,7 +3886,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -8,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3912,7 +3912,7 @@
             "ticker": "ASTR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3933,7 +3933,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -3959,7 +3959,7 @@
             "ticker": "PENDLE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -3980,7 +3980,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4006,7 +4006,7 @@
             "ticker": "LPT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4027,7 +4027,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4053,7 +4053,7 @@
             "ticker": "SAFE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4068,7 +4068,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4094,7 +4094,7 @@
             "ticker": "APE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4120,7 +4120,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4146,7 +4146,7 @@
             "ticker": "1INCH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4167,7 +4167,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4193,7 +4193,7 @@
             "ticker": "COMP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4213,7 +4213,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4239,7 +4239,7 @@
             "ticker": "KAVA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4260,7 +4260,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4286,7 +4286,7 @@
             "ticker": "ANT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4301,7 +4301,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4327,7 +4327,7 @@
             "ticker": "DASH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4342,7 +4342,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4368,7 +4368,7 @@
             "ticker": "AEVO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4389,7 +4389,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4415,7 +4415,7 @@
             "ticker": "WOO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4436,7 +4436,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4462,7 +4462,7 @@
             "ticker": "KSM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4477,7 +4477,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4503,7 +4503,7 @@
             "ticker": "PEOPLE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4519,7 +4519,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4545,7 +4545,7 @@
             "ticker": "MANTA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4561,7 +4561,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4587,7 +4587,7 @@
             "ticker": "ENJ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4607,7 +4607,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4633,7 +4633,7 @@
             "ticker": "ANKR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4654,7 +4654,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4680,7 +4680,7 @@
             "ticker": "BAT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4700,7 +4700,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4726,7 +4726,7 @@
             "ticker": "DYM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4747,7 +4747,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4773,7 +4773,7 @@
             "ticker": "BLUR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4793,7 +4793,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4819,7 +4819,7 @@
             "ticker": "OSMO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4834,7 +4834,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4860,7 +4860,7 @@
             "ticker": "ZRX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4886,7 +4886,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4912,7 +4912,7 @@
             "ticker": "RPL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4927,7 +4927,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4953,7 +4953,7 @@
             "ticker": "CELO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -4969,7 +4969,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -4995,7 +4995,7 @@
             "ticker": "MEME-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5011,7 +5011,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5037,7 +5037,7 @@
             "ticker": "GMT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5058,7 +5058,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5084,7 +5084,7 @@
             "ticker": "DYDX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5105,7 +5105,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5131,7 +5131,7 @@
             "ticker": "ARKM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5152,7 +5152,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5178,7 +5178,7 @@
             "ticker": "QTUM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5199,7 +5199,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5225,7 +5225,7 @@
             "ticker": "TRAC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5245,7 +5245,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5271,7 +5271,7 @@
             "ticker": "GMX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5286,7 +5286,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5312,7 +5312,7 @@
             "ticker": "ETHW-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5327,7 +5327,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5353,7 +5353,7 @@
             "ticker": "MASK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5374,7 +5374,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5400,7 +5400,7 @@
             "ticker": "SKL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5415,7 +5415,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5441,7 +5441,7 @@
             "ticker": "CSPR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5462,7 +5462,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5488,7 +5488,7 @@
             "ticker": "T-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5509,7 +5509,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5535,7 +5535,7 @@
             "ticker": "BICO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5550,7 +5550,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5576,7 +5576,7 @@
             "ticker": "METIS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5592,7 +5592,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5618,7 +5618,7 @@
             "ticker": "YFI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -6,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5638,7 +5638,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -9,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5664,7 +5664,7 @@
             "ticker": "LRC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5684,7 +5684,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5710,7 +5710,7 @@
             "ticker": "BAND-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5725,7 +5725,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5751,7 +5751,7 @@
             "ticker": "IO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5767,7 +5767,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5793,7 +5793,7 @@
             "ticker": "ETHFI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5814,7 +5814,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5840,7 +5840,7 @@
             "ticker": "STORJ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5866,7 +5866,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5892,7 +5892,7 @@
             "ticker": "AMP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5907,7 +5907,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5933,7 +5933,7 @@
             "ticker": "FXS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5948,7 +5948,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -5974,7 +5974,7 @@
             "ticker": "UMA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -5994,7 +5994,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6020,7 +6020,7 @@
             "ticker": "ACH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6035,7 +6035,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6061,7 +6061,7 @@
             "ticker": "AUDIO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6081,7 +6081,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6107,7 +6107,7 @@
             "ticker": "SUSHI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6127,7 +6127,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6153,7 +6153,7 @@
             "ticker": "ZETA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6174,7 +6174,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6200,7 +6200,7 @@
             "ticker": "GLMR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6215,7 +6215,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6241,7 +6241,7 @@
             "ticker": "CHR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6256,7 +6256,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6282,7 +6282,7 @@
             "ticker": "ICX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6297,7 +6297,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6323,7 +6323,7 @@
             "ticker": "API3-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6344,7 +6344,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6370,7 +6370,7 @@
             "ticker": "COTI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6385,7 +6385,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6411,7 +6411,7 @@
             "ticker": "LSK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6426,7 +6426,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6452,7 +6452,7 @@
             "ticker": "MUMU-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6462,7 +6462,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6488,7 +6488,7 @@
             "ticker": "BAL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6503,7 +6503,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6529,7 +6529,7 @@
             "ticker": "YGG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6550,7 +6550,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6576,7 +6576,7 @@
             "ticker": "XNO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6591,7 +6591,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6617,7 +6617,7 @@
             "ticker": "GIGA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6627,7 +6627,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6653,7 +6653,7 @@
             "ticker": "CTSI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6668,7 +6668,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6694,7 +6694,7 @@
             "ticker": "RLC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6709,7 +6709,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6735,7 +6735,7 @@
             "ticker": "SAGA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6750,7 +6750,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6776,7 +6776,7 @@
             "ticker": "TRU-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6791,7 +6791,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6817,7 +6817,7 @@
             "ticker": "POND-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6832,7 +6832,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6858,7 +6858,7 @@
             "ticker": "ALT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6873,7 +6873,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6899,7 +6899,7 @@
             "ticker": "C98-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6914,7 +6914,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6940,7 +6940,7 @@
             "ticker": "POWR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6955,7 +6955,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -6981,7 +6981,7 @@
             "ticker": "MAGIC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -6997,7 +6997,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7023,7 +7023,7 @@
             "ticker": "NYM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7038,7 +7038,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7064,7 +7064,7 @@
             "ticker": "CVC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7079,7 +7079,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7105,7 +7105,7 @@
             "ticker": "WOLF-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7115,7 +7115,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7141,7 +7141,7 @@
             "ticker": "USTC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7156,7 +7156,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7182,7 +7182,7 @@
             "ticker": "SLERF-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7198,7 +7198,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7224,7 +7224,7 @@
             "ticker": "KNC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7244,7 +7244,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7270,7 +7270,7 @@
             "ticker": "DKA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7286,7 +7286,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7312,7 +7312,7 @@
             "ticker": "MYRO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7327,7 +7327,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7353,7 +7353,7 @@
             "ticker": "PHA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7368,7 +7368,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7394,7 +7394,7 @@
             "ticker": "MOVR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7409,7 +7409,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7435,7 +7435,7 @@
             "ticker": "SPELL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -13,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7450,7 +7450,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -2,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7476,7 +7476,7 @@
             "ticker": "REQ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7491,7 +7491,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7517,7 +7517,7 @@
             "ticker": "NOS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7526,7 +7526,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7552,7 +7552,7 @@
             "ticker": "OXT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7567,7 +7567,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7593,7 +7593,7 @@
             "ticker": "DESO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7609,7 +7609,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7635,7 +7635,7 @@
             "ticker": "EUL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7650,7 +7650,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7676,7 +7676,7 @@
             "ticker": "HFT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7691,7 +7691,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7717,7 +7717,7 @@
             "ticker": "GODS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7732,7 +7732,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7758,7 +7758,7 @@
             "ticker": "STG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7773,7 +7773,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7799,7 +7799,7 @@
             "ticker": "SYN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7814,7 +7814,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7840,7 +7840,7 @@
             "ticker": "WEN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7855,7 +7855,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7881,7 +7881,7 @@
             "ticker": "XPLA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7897,7 +7897,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7923,7 +7923,7 @@
             "ticker": "ALICE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7938,7 +7938,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -7964,7 +7964,7 @@
             "ticker": "PORTAL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -7979,7 +7979,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8005,7 +8005,7 @@
             "ticker": "BNT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8020,7 +8020,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8046,7 +8046,7 @@
             "ticker": "BLZ-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8061,7 +8061,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8087,7 +8087,7 @@
             "ticker": "SCRT-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8102,7 +8102,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8128,7 +8128,7 @@
             "ticker": "AGLD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8143,7 +8143,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8169,7 +8169,7 @@
             "ticker": "ACA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8184,7 +8184,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8210,7 +8210,7 @@
             "ticker": "BADGER-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8225,7 +8225,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8251,7 +8251,7 @@
             "ticker": "RAD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8266,7 +8266,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8292,7 +8292,7 @@
             "ticker": "ARPA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8307,7 +8307,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8333,7 +8333,7 @@
             "ticker": "ALPHA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8347,7 +8347,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8373,7 +8373,7 @@
             "ticker": "OGN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8388,7 +8388,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8414,7 +8414,7 @@
             "ticker": "GHST-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8429,7 +8429,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8455,7 +8455,7 @@
             "ticker": "FORTH-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8470,7 +8470,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8496,7 +8496,7 @@
             "ticker": "MLN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -8,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8511,7 +8511,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -7,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8537,7 +8537,7 @@
             "ticker": "DADDY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8547,7 +8547,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8573,7 +8573,7 @@
             "ticker": "TLM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8588,7 +8588,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8614,7 +8614,7 @@
             "ticker": "MANEKI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8630,7 +8630,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8656,7 +8656,7 @@
             "ticker": "XCN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8671,7 +8671,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8697,7 +8697,7 @@
             "ticker": "TNSR-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8712,7 +8712,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8738,7 +8738,7 @@
             "ticker": "PSTAKE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8753,7 +8753,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8779,7 +8779,7 @@
             "ticker": "BOBA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8794,7 +8794,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8820,7 +8820,7 @@
             "ticker": "REN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8835,7 +8835,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8861,7 +8861,7 @@
             "ticker": "OMG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8876,7 +8876,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8902,7 +8902,7 @@
             "ticker": "PERP-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8917,7 +8917,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8943,7 +8943,7 @@
             "ticker": "PDA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8958,7 +8958,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -8984,7 +8984,7 @@
             "ticker": "IDEX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -8999,7 +8999,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9025,7 +9025,7 @@
             "ticker": "POLS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9040,7 +9040,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9066,7 +9066,7 @@
             "ticker": "UNFI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -9,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9081,7 +9081,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -6,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9107,7 +9107,7 @@
             "ticker": "ADX-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9122,7 +9122,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9148,7 +9148,7 @@
             "ticker": "MXC-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9163,7 +9163,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9189,7 +9189,7 @@
             "ticker": "BENDOG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9199,7 +9199,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9225,7 +9225,7 @@
             "ticker": "BRAINLET-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9235,7 +9235,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9261,7 +9261,7 @@
             "ticker": "NODL-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9276,7 +9276,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9302,7 +9302,7 @@
             "ticker": "SRM-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9317,7 +9317,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9343,7 +9343,7 @@
             "ticker": "BEER-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9359,7 +9359,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9385,7 +9385,7 @@
             "ticker": "ZERO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -13,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9401,7 +9401,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -2,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9427,7 +9427,7 @@
             "ticker": "GARI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9442,7 +9442,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9468,7 +9468,7 @@
             "ticker": "GINNAN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -15,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9478,7 +9478,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": 0,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9504,7 +9504,7 @@
             "ticker": "NEIRO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9514,7 +9514,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9540,7 +9540,7 @@
             "ticker": "ZEUS-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9555,7 +9555,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9581,7 +9581,7 @@
             "ticker": "ROCKY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9591,7 +9591,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9617,7 +9617,7 @@
             "ticker": "AURA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9627,7 +9627,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9653,7 +9653,7 @@
             "ticker": "RETARDIO-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9663,7 +9663,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9689,7 +9689,7 @@
             "ticker": "TRUNK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -10,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9698,7 +9698,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -5,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9724,7 +9724,7 @@
             "ticker": "SELFIE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9734,7 +9734,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9760,7 +9760,7 @@
             "ticker": "MINI-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9770,7 +9770,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9796,7 +9796,7 @@
             "ticker": "NUB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9806,7 +9806,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9832,7 +9832,7 @@
             "ticker": "KAMA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9842,7 +9842,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9868,7 +9868,7 @@
             "ticker": "SIGMA-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9878,7 +9878,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9904,7 +9904,7 @@
             "ticker": "HARAMBE-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9914,7 +9914,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9940,7 +9940,7 @@
             "ticker": "MAD-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -14,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9950,7 +9950,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -1,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -9976,7 +9976,7 @@
             "ticker": "HAMMY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -9986,7 +9986,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10012,7 +10012,7 @@
             "ticker": "ZACK-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10022,7 +10022,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10048,7 +10048,7 @@
             "ticker": "WUF-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -15,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10058,7 +10058,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": 0,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10084,7 +10084,7 @@
             "ticker": "SGB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -12,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10098,7 +10098,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -3,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10124,7 +10124,7 @@
             "ticker": "BUB-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10134,7 +10134,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10160,7 +10160,7 @@
             "ticker": "CATDOG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -13,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10170,7 +10170,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -2,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10196,7 +10196,7 @@
             "ticker": "DUCKY-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10206,7 +10206,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10232,7 +10232,7 @@
             "ticker": "FWOG-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10242,7 +10242,7 @@
                     "invert": true
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
@@ -10268,7 +10268,7 @@
             "ticker": "LOCKIN-USD",
             "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
             "priceExponent": -11,
-            "minPriceChange": 2500,
+            "minPriceChange": 800,
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
@@ -10278,7 +10278,7 @@
                     "invert": false
                 }
             ],
-            "liquidityTier": 1,
+            "liquidityTier": 2,
             "atomicResolution": -4,
             "quantumConversionExponent": -9,
             "defaultFundingPpm": 0,
