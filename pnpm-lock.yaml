@@ -50,6 +50,9 @@ dependencies:
   '@js-joda/core':
     specifier: ^5.5.3
     version: 5.5.3
+  '@keplr-wallet/types':
+    specifier: ^0.12.121
+    version: 0.12.121
   '@privy-io/react-auth':
     specifier: ^1.73.0
     version: 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.1.3)
@@ -4616,6 +4619,12 @@ packages:
 
   /@keplr-wallet/types@0.12.12:
     resolution: {integrity: sha512-fo6b8j9EXnJukGvZorifJWEm1BPIrvaTLuu5PqaU5k1ANDasm/FL1NaUuaTBVvhRjINtvVXqYpW/rVUinA9MBA==}
+    dependencies:
+      long: 4.0.0
+    dev: false
+
+  /@keplr-wallet/types@0.12.121:
+    resolution: {integrity: sha512-5CHUUnuufbLeZxwmqEM5rC0EEDxpdMLCoBtgJJ5UtY/0o17qIixSoPZqftp2A4roUe2eEp3GHsXUdb/1nakb9g==}
     dependencies:
       long: 4.0.0
     dev: false
@@ -16242,7 +16251,7 @@ packages:
       '@cosmsnap/snapper': 0.1.31
       '@dao-dao/cosmiframe': 0.1.0(@cosmjs/amino@0.32.2)(@cosmjs/proto-signing@0.32.2)
       '@keplr-wallet/cosmos': 0.12.109
-      '@keplr-wallet/types': 0.12.109
+      '@keplr-wallet/types': 0.12.121
       '@leapwallet/cosmos-social-login-capsule-provider': 0.0.39(@cosmjs/encoding@0.32.2)(@cosmjs/proto-signing@0.32.2)(fp-ts@2.16.8)
       '@metamask/providers': 12.0.0
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)

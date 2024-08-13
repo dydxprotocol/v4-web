@@ -32,35 +32,37 @@ const neutronChainId = getNeutronChainId();
 
 export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId, neutronChainId];
 
+export const GRAZ_CHAINS = [
+  // dYdX
+  {
+    chainId: dydxChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.validators[0],
+    bech32Config: {
+      bech32PrefixAccAddr: BECH32_PREFIX,
+    },
+  },
+  // Noble
+  {
+    chainId: nobleChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
+    bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
+  },
+  // Osmosis
+  {
+    chainId: osmosisChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.osmosisValidator,
+    bech32Config: { bech32PrefixAccAddr: 'osmo' },
+  },
+  // Neutron
+  {
+    chainId: neutronChainId,
+    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.neutronValidator,
+    bech32Config: { bech32PrefixAccAddr: 'neutron' },
+  },
+];
+
 export const config: ConfigureGrazArgs = {
   autoReconnect: false,
   defaultWallet: GrazWalletType.KEPLR,
-  chains: [
-    // dYdX
-    {
-      chainId: dydxChainId,
-      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.validators[0],
-      bech32Config: {
-        bech32PrefixAccAddr: BECH32_PREFIX,
-      },
-    },
-    // Noble
-    {
-      chainId: nobleChainId,
-      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
-      bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
-    },
-    // Osmosis
-    {
-      chainId: osmosisChainId,
-      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.osmosisValidator,
-      bech32Config: { bech32PrefixAccAddr: 'osmo' },
-    },
-    // Neutron
-    {
-      chainId: neutronChainId,
-      rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.neutronValidator,
-      bech32Config: { bech32PrefixAccAddr: 'neutron' },
-    },
-  ] as ConfigureGrazArgs['chains'],
+  chains: GRAZ_CHAINS as ConfigureGrazArgs['chains'],
 };

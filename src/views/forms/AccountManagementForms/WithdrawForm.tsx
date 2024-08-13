@@ -46,7 +46,7 @@ import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType, formatNumberOutput } from '@/components/Output';
+import { formatNumberOutput, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -62,7 +62,7 @@ import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId, GRAZ_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -101,7 +101,20 @@ export const WithdrawForm = () => {
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
-  const isValidAddress = toAddress && isAddress(toAddress);
+  const isValidAddress = useMemo(() => {
+    if (toAddress) {
+      if (walletType === WalletType.Keplr) {
+        const prefix = GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
+          .bech32PrefixAccAddr;
+
+        if (prefix) {
+          return validateCosmosAddress(toAddress, prefix);
+        }
+      }
+      return isAddress(toAddress);
+    }
+    return false;
+  }, [chainIdStr, toAddress, walletType]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -201,7 +214,6 @@ export const WithdrawForm = () => {
             })
           );
         } else {
-          const nobleChainId = getNobleChainId();
           const toChainId = exchange ? nobleChainId : chainIdStr || undefined;
 
           const notificationParams = {
@@ -458,6 +470,13 @@ export const WithdrawForm = () => {
         }),
       };
 
+    if (!isValidAddress) {
+      return {
+        // TODO: Need to add localization
+        errorMessage: 'Please enter a valid address.',
+      };
+    }
+
     if (routeErrors) {
       const routeErrorMessageOverride = getRouteErrorMessageOverride(
         routeErrors,
@@ -544,6 +563,7 @@ export const WithdrawForm = () => {
     stringGetter,
     summary,
     usdcWithdrawalCapacity,
+    isValidAddress,
   ]);
 
   const isInvalidNobleAddress = Boolean(

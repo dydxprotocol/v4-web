@@ -73,6 +73,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const { walletType } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
 
+  const isKeplr = walletType === WalletType.Keplr;
+
   const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({
       getFaucetFunds: async ({
@@ -239,12 +241,16 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             false
           );
         } catch (error) {
+          // Reset the default options after the tx is sent.
+          if (isKeplr && window.keplr) {
+            window.keplr.defaultOptions = {};
+          }
           log('useSubaccount/sendSquidWithdrawFromSubaccount', error);
           throw error;
         }
       },
     }),
-    [compositeClient, usdcDecimals]
+    [compositeClient, isKeplr, usdcDecimals]
   );
 
   const [subaccountNumber] = useState(0);
@@ -290,8 +296,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const balances = useAppSelector(getBalances, shallowEqual);
   const usdcCoinBalance = balances?.[usdcDenom];
-
-  const isKeplr = walletType === WalletType.Keplr;
 
   useEffect(() => {
     if (usdcCoinBalance && !isKeplr) {
@@ -379,10 +383,25 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!subaccountClient) {
         return undefined;
       }
+
+      // If the dYdX USDC balance is less than the amount to IBC transfer, the signature cannot be made,
+      // so disable the balance check only for this tx.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {
+          sign: {
+            disableBalanceCheck: true,
+          },
+        };
+      }
       const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
-      return hashFromTx(tx?.hash);
+
+      // Reset the default options after the tx is sent.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {};
+      }
+      return hashFromTx(tx.hash);
     },
-    [subaccountClient, sendSquidWithdrawFromSubaccount]
+    [subaccountClient, sendSquidWithdrawFromSubaccount, isKeplr]
   );
 
   const adjustIsolatedMarginOfPosition = useCallback(
