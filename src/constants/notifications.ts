@@ -41,6 +41,8 @@ export const SingleSessionNotificationTypes = [
   NotificationType.OrderStatus,
 ];
 
+export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
+
 export type NotificationId = string | number;
 
 export type NotificationParams = {
