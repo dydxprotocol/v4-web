@@ -40,6 +40,7 @@ export interface LinksConfigs {
   vaultsLearnMore: string;
   rndrParamProposal?: string;
   predictionMarketLearnMore?: string;
+  discoveryProgram?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -83,5 +84,6 @@ export const useURLConfigs = (): LinksConfigs => {
     vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
     rndrParamProposal: linksConfigs.rndrParamProposal,
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
+    discoveryProgram: linksConfigs.discoveryProgram,
   };
 };

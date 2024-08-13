@@ -276,6 +276,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
+      const { discoveryProgram } = useURLConfigs();
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
@@ -288,16 +289,45 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const currentDate = new Date();
 
       useEffect(() => {
+        if (discoveryProgram) {
+          trigger(
+            ReleaseUpdateNotificationIds.DiscoveryProgram,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.BODY',
+                params: {
+                  HERE_LINK: (
+                    <Link
+                      href="https://www.dydx.foundation/blog/dydx-discovery-user-interviews?utm_source=dYdXTelegram&utm_medium=GlobalSocial&utm_campaign=GlobalSocial"
+                      isAccent
+                      isInline
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.DiscoveryProgram,
+            },
+            []
+          );
+        }
+
         if (currentDate <= twitter200BVolumeExpirationDate) {
           trigger(
             ReleaseUpdateNotificationIds.Twitter200BVolume,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
-                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.TITLE',
+                key: STRING_KEYS.DISCOVERY_PROGRAM_TITLE,
               }),
               body: stringGetter({
-                key: 'NOTIFICATIONS.TWITTER_DYDX_200B_GIVEAWAY.BODY',
+                key: STRING_KEYS.DISCOVERY_PROGRAM_BODY,
                 params: {
                   HERE_LINK: (
                     <Link href="https://x.com/dYdX/status/1819342483794415784" isAccent isInline>
