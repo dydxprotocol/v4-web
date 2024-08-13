@@ -301,11 +301,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.BODY',
                 params: {
                   HERE_LINK: (
-                    <Link
-                      href="https://www.dydx.foundation/blog/dydx-discovery-user-interviews?utm_source=dYdXTelegram&utm_medium=GlobalSocial&utm_campaign=GlobalSocial"
-                      isAccent
-                      isInline
-                    >
+                    <Link href={discoveryProgram} isAccent isInline>
                       {stringGetter({ key: STRING_KEYS.HERE })}
                     </Link>
                   ),
