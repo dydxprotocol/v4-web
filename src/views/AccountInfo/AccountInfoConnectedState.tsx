@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -63,19 +61,16 @@ export const AccountInfoConnectedState = () => {
   const { freeCollateral: availableBalance, marginUsage } = subAccount ?? {};
   const portfolioValue = subAccount?.equity;
 
-  const hasDiff =
-    !!availableBalance?.postOrder && getTradeStateWithDoubleValuesHasDiff(availableBalance);
+  const isPostOrderBalanceNegative =
+    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance?.postOrder).lt(0);
 
-  const showHeader = !hasDiff && !isTablet;
+  // Do not show diff state if there is no postOrder balance or if it is negative
+  const showDiff =
+    !!availableBalance?.postOrder &&
+    getTradeStateWithDoubleValuesHasDiff(availableBalance) &&
+    !isPostOrderBalanceNegative;
 
-  const isPostOrderTradeStateNegative = useCallback(
-    (tradeStateValue: Nullable<TradeState<number>>) => {
-      return (
-        isNumber(tradeStateValue?.postOrder) && MustBigNumber(tradeStateValue?.postOrder).lt(0)
-      );
-    },
-    []
-  );
+  const showHeader = !showDiff && !isTablet;
 
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
@@ -143,7 +138,8 @@ export const AccountInfoConnectedState = () => {
             },
             {
               key: AccountInfoItem.AvailableBalance,
-              hasError: isPostOrderTradeStateNegative(availableBalance),
+              hasError: isPostOrderBalanceNegative,
+              hideDiff: isPostOrderBalanceNegative,
               isPositive: MustBigNumber(availableBalance?.postOrder).gt(
                 MustBigNumber(availableBalance?.current)
               ),
