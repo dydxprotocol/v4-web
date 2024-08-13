@@ -101,7 +101,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const { fee, price: expectedPrice, reward } = summary ?? {};
 
-  // check if required fields are filled and summary has been calculated
+  // approximation for whether inputs are filled by whether summary has been calculated
   const areInputsFilled = fee != null || reward != null;
 
   const renderMarginValue = () => {
@@ -289,7 +289,7 @@ export const PlaceOrderButtonAndReceipt = ({
       type={ButtonType.Submit}
       action={buttonAction}
       slotLeft={
-        showValidatorErrors ? (
+        showValidatorErrors && areInputsFilled ? (
           <Icon iconName={IconName.Warning} tw="text-color-warning" />
         ) : undefined
       }
