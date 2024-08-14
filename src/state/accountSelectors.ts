@@ -466,6 +466,25 @@ export const getCurrentMarketFills = createAppSelector(
     !currentMarketId ? [] : marketFills[currentMarketId]
 );
 
+const getFillsForOrderId = createAppSelector(
+  [(s, orderId) => orderId, getSubaccountFills],
+  (orderId, fills) => (orderId ? groupBy(fills, 'orderId')[orderId] ?? [] : [])
+);
+
+/**
+ * @returns the average price the order is filled at
+ */
+export const getAverageFillPriceForOrder = () =>
+  createAppSelector([(s, orderId) => getFillsForOrderId(s, orderId)], (fillsForOrderId) => {
+    let total = 0;
+    let totalSize = 0;
+    fillsForOrderId.forEach((fill) => {
+      total += fill.price * fill.size;
+      totalSize += fill.size;
+    });
+    return totalSize > 0 ? total / totalSize : null;
+  });
+
 /**
  * @param state
  * @returns list of transfers for the currently connected subaccount
