@@ -29,6 +29,9 @@ dependencies:
   '@cosmjs/tendermint-rpc':
     specifier: ^0.32.1
     version: 0.32.2
+  '@datadog/browser-logs':
+    specifier: ^5.23.3
+    version: 5.23.3
   '@dydxprotocol/v4-abacus':
     specifier: 1.8.96
     version: 1.8.96
@@ -3225,8 +3228,7 @@ packages:
   /@dydxprotocol/v4-abacus@1.8.96:
     resolution: {integrity: sha512-89Qzu1V5vq5eK5al+vPHsDe4iihIRdbS+wLp8+UllZwmemhQHzX7eTGXfqzggEHR6dpt8+Imda8xNBDgZLcZ+w==}
     dependencies:
-      '@js-joda/core': 3.2.0
-      format-util: 1.0.5
+      '@datadog/browser-core': 5.23.3
     dev: false
 
   /@dydxprotocol/v4-client-js@1.1.27:
@@ -25173,3 +25175,12 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.8.87.tgz:
+    resolution: {integrity: sha512-P1zd1/xclbvTTYHUKTevdYyetWXsvGRC3fJGMPPDce18Gi/me6rMVDvUtNsMLU37ZQtsfuUQzEPWWgKVJHOvHw==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.8.87.tgz}
+    name: '@dydxprotocol/v4-abacus'
+    version: 1.8.87
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
+    dev: false
