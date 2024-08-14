@@ -67,7 +67,7 @@ export const MarketDetails: React.FC = () => {
     },
     {
       key: 'ticker',
-      label: 'ticker',
+      label: stringGetter({ key: STRING_KEYS.TICKER }),
       value: market,
     },
     {

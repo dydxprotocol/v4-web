@@ -107,7 +107,7 @@ export const OrderDetailsDialog = ({
       },
       {
         key: 'market-id',
-        label: 'ticker',
+        label: stringGetter({ key: STRING_KEYS.TICKER }),
         value: marketId,
       },
       {

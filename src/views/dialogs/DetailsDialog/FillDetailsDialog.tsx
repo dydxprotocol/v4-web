@@ -40,7 +40,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
       },
       {
         key: 'market-id',
-        label: 'ticker',
+        label: stringGetter({ key: STRING_KEYS.TICKER }),
         value: marketId,
       },
       {
