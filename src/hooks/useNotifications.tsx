@@ -24,6 +24,7 @@ import {
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics';
+import { isAbacusNotificationSingleSession } from '@/lib/notifications';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -77,7 +78,10 @@ const useNotificationsContext = () => {
     // save notifications to localstorage, but filter out single session notifications
     const originalEntries = Object.entries(notifications);
     const filteredEntries = originalEntries.filter(
-      ([, value]) => !SingleSessionNotificationTypes.includes(value.type)
+      ([, value]) =>
+        !SingleSessionNotificationTypes.includes(value.type) ||
+        (value.type === NotificationType.AbacusGenerated &&
+          !isAbacusNotificationSingleSession(value.id))
     );
 
     const newNotifications = Object.fromEntries(filteredEntries);
