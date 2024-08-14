@@ -7,7 +7,6 @@ import abacusStateManager from '@/lib/abacus';
 /**
  * @description Hook to handle drawing candles with historical trades or orderbook prices
  */
-
 export const useOrderbookCandles = ({
   orderbookCandlesToggle,
   isChartReady,
@@ -31,18 +30,18 @@ export const useOrderbookCandles = ({
   useEffect(
     // Update orderbookCandles button on toggle
     () => {
-      if (isChartReady) {
-        tvWidget?.onChartReady(() => {
-          tvWidget.headerReady().then(() => {
-            if (orderbookCandlesToggleOn) {
-              orderbookCandlesToggle?.classList?.add('ohlc-active');
-            } else {
-              orderbookCandlesToggle?.classList?.remove('ohlc-active');
-            }
-            abacusStateManager.toggleOrderbookCandles(orderbookCandlesToggleOn);
-          });
+      if (!isChartReady || !tvWidget) return;
+
+      tvWidget.onChartReady(() => {
+        tvWidget.headerReady().then(() => {
+          if (orderbookCandlesToggleOn) {
+            orderbookCandlesToggle?.classList?.add('ohlc-active');
+          } else {
+            orderbookCandlesToggle?.classList?.remove('ohlc-active');
+          }
+          abacusStateManager.toggleOrderbookCandles(orderbookCandlesToggleOn);
         });
-      }
+      });
     },
     [orderbookCandlesToggleOn, orderbookCandlesToggle, tvWidget, isChartReady]
   );

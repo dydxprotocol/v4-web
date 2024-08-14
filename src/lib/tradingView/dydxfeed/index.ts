@@ -1,9 +1,12 @@
+import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 import type {
   DatafeedConfiguration,
   ErrorCallback,
+  GetMarksCallback,
   HistoryCallback,
   LibrarySymbolInfo,
+  Mark,
   OnReadyCallback,
   ResolutionString,
   ResolveCallback,
@@ -12,18 +15,20 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
 import { type RootStore } from '@/state/_store';
+import { getMarketFills } from '@/state/accountSelectors';
 import { setCandles } from '@/state/perpetuals';
 import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
 import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
-import { getHistorySlice, getSymbol, mapCandle } from '../utils';
+import { getHistorySlice, getMarkForOrderFills, getSymbol, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 
@@ -31,6 +36,7 @@ const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
 const configurationData: DatafeedConfiguration = {
   supported_resolutions: objectKeys(RESOLUTION_MAP),
+  supports_marks: true,
   exchanges: [
     {
       value: 'dYdX', // `exchange` argument for the `searchSymbols` method, if a user selects this exchange
@@ -50,7 +56,13 @@ export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
   initialPriceScale: number | null,
-  orderbookCandlesToggleOn: boolean
+  orderbookCandlesToggleOn: boolean,
+  localeSeparators: {
+    group?: string;
+    decimal?: string;
+  },
+  selectedLocale: SupportedLocales,
+  stringGetter: StringGetterFunction
 ) => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
@@ -94,6 +106,33 @@ export const getDydxDatafeed = (
     };
 
     setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
+  },
+
+  getMarks: async (
+    symbolInfo: LibrarySymbolInfo,
+    from: number,
+    to: number,
+    onDataCallback: GetMarksCallback<Mark>,
+    resolution: ResolutionString
+  ) => {
+    const [fromMs, toMs] = [from * 1000, to * 1000];
+    const fills = getMarketFills(store.getState())[symbolInfo.name] ?? [];
+    const inRangeFills = fills.filter(
+      (fill) => fill.createdAtMilliseconds >= fromMs && fill.createdAtMilliseconds <= toMs
+    );
+    const fillsByOrderId = groupBy(inRangeFills, 'orderId');
+    const marks = Object.entries(fillsByOrderId).map(([orderId, orderFills]) =>
+      getMarkForOrderFills(
+        orderFills,
+        orderId,
+        fromMs,
+        resolution,
+        stringGetter,
+        localeSeparators,
+        selectedLocale
+      )
+    );
+    onDataCallback(marks);
   },
 
   getBars: async (

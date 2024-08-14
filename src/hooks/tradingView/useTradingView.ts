@@ -28,6 +28,7 @@ import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/
 import { useDydxClient } from '../useDydxClient';
 import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
+import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
@@ -40,18 +41,21 @@ export const useTradingView = ({
   orderLineToggleRef,
   orderbookCandlesToggleRef,
   orderbookCandlesToggleOn,
+  buySellMarksToggleRef,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderbookCandlesToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderbookCandlesToggleOn: boolean;
+  buySellMarksToggleRef: React.MutableRefObject<HTMLElement | null>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
   const { isOhlcEnabled } = useEnvFeatures();
+  const { group, decimal } = useLocaleSeparators();
 
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -100,7 +104,10 @@ export const useTradingView = ({
           store,
           getCandlesForDatafeed,
           initialPriceScale,
-          orderbookCandlesToggleOn
+          orderbookCandlesToggleOn,
+          { decimal, group },
+          selectedLocale,
+          stringGetter
         ),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
@@ -138,6 +145,14 @@ export const useTradingView = ({
               orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
               orderbookCandlesToggleRef.current.setAttribute('title', ohlcBody as string);
             }
+            if (buySellMarksToggleRef) {
+              buySellMarksToggleRef.current = tvWidgetRef.current.createButton();
+              buySellMarksToggleRef.current.innerHTML = `<span>Buys/Sells</span> <div class="toggle"></div>`;
+              buySellMarksToggleRef.current.setAttribute(
+                'title',
+                'Display historic buys and sells'
+              );
+            }
           }
         });
 
@@ -154,6 +169,8 @@ export const useTradingView = ({
       orderLineToggleRef.current = null;
       orderbookCandlesToggleRef.current?.remove();
       orderbookCandlesToggleRef.current = null;
+      buySellMarksToggleRef.current?.remove();
+      buySellMarksToggleRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
       setIsChartReady(false);
