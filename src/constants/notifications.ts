@@ -208,6 +208,7 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
+  DiscoveryProgram = 'discovery-program',
   Twitter200BVolume = 'twitter-200b-volume',
   IncentivesS6 = 'incentives-s6',
 }

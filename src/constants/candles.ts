@@ -29,7 +29,7 @@ interface TradingViewBar {
 }
 
 export interface TradingViewChartBar extends TradingViewBar {
-  // Additional properties used to re-map Bars conditionally if OHLC is enabled
+  // Additional properties used to re-map Bars conditionally if orderbookCandles is enabled
   tradeOpen: number;
   tradeClose: number;
   orderbookOpen?: number;

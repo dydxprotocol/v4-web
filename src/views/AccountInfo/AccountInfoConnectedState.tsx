@@ -28,7 +28,6 @@ import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getInputErrors } from '@/state/inputsSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
@@ -36,8 +35,8 @@ import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
 enum AccountInfoItem {
-  BuyingPower = 'buying-power',
-  MarginUsage = 'margin-usage',
+  AvailableBalance = 'available-balance',
+  PortfolioValue = 'portfolio-value',
 }
 
 const getUsageValue = (value: Nullable<TradeState<number>>) => {
@@ -56,20 +55,22 @@ export const AccountInfoConnectedState = () => {
 
   const { dydxAccounts } = useAccounts();
 
-  const inputErrors = useAppSelector(getInputErrors, shallowEqual);
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
-  const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
-  const { freeCollateral, marginUsage } = subAccount ?? {};
+  const { freeCollateral: availableBalance, marginUsage } = subAccount ?? {};
+  const portfolioValue = subAccount?.equity;
 
-  const hasDiff =
-    (!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
-    (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral));
+  const isPostOrderBalanceNegative =
+    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance?.postOrder).lt(0);
 
-  const isAccountMarginUsageError = listOfErrors?.[0] === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
+  // Do not show diff state if there is no postOrder balance or if it is negative
+  const showDiff =
+    !!availableBalance?.postOrder &&
+    getTradeStateWithDoubleValuesHasDiff(availableBalance) &&
+    !isPostOrderBalanceNegative;
 
-  const showHeader = !hasDiff && !isTablet;
+  const showHeader = !showDiff && !isTablet;
 
   return (
     <$ConnectedAccountInfoContainer $showHeader={showHeader}>
@@ -125,60 +126,53 @@ export const AccountInfoConnectedState = () => {
         <$Details
           items={[
             {
-              key: AccountInfoItem.MarginUsage,
-              hasError: isAccountMarginUsageError,
-              tooltip: 'cross-margin-usage',
-              isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
-                MustBigNumber(marginUsage?.current)
+              key: AccountInfoItem.PortfolioValue,
+              hideDiff: true,
+              hasError: false,
+              isPositive: MustBigNumber(portfolioValue?.postOrder).gt(
+                MustBigNumber(portfolioValue?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-              type: OutputType.Percent,
-              value: marginUsage,
-              slotRight: <MarginUsageRing value={getUsageValue(marginUsage)} />,
+              label: stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
+              type: OutputType.Fiat,
+              value: portfolioValue,
             },
             {
-              key: AccountInfoItem.BuyingPower,
-              hasError:
-                isNumber(freeCollateral?.postOrder) &&
-                MustBigNumber(freeCollateral?.postOrder).lt(0),
-              tooltip: 'cross-free-collateral',
-              isPositive: MustBigNumber(freeCollateral?.postOrder).gt(
-                MustBigNumber(freeCollateral?.current)
+              key: AccountInfoItem.AvailableBalance,
+              hasError: isPostOrderBalanceNegative,
+              hideDiff: isPostOrderBalanceNegative,
+              isPositive: MustBigNumber(availableBalance?.postOrder).gt(
+                MustBigNumber(availableBalance?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE }),
               type: OutputType.Fiat,
               value:
-                MustBigNumber(freeCollateral?.current).lt(0) && freeCollateral?.postOrder === null
+                MustBigNumber(availableBalance?.current).lt(0) &&
+                availableBalance?.postOrder === null
                   ? undefined
-                  : freeCollateral,
+                  : availableBalance,
+              slotRight: (
+                <WithTooltip tooltip="cross-margin-usage">
+                  <MarginUsageRing value={getUsageValue(marginUsage)} />
+                </WithTooltip>
+              ),
             },
           ].map(
-            ({
-              key,
-              hasError,
-              tooltip = undefined,
-              isPositive,
-              label,
-              type,
-              value,
-              slotRight,
-            }) => ({
+            ({ key, hasError, hideDiff = false, isPositive, label, type, value, slotRight }) => ({
               key,
               label: (
-                <WithTooltip tooltip={tooltip}>
-                  <$WithUsage>
-                    {label}
-                    {hasError ? (
-                      <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
-                    ) : (
-                      slotRight
-                    )}
-                  </$WithUsage>
-                </WithTooltip>
+                <$WithUsage>
+                  {label}
+                  {hasError ? (
+                    <Icon iconName={IconName.CautionCircle} tw="text-color-error" />
+                  ) : (
+                    slotRight
+                  )}
+                </$WithUsage>
               ),
               value: (
                 <AccountInfoDiffOutput
                   hasError={hasError}
+                  hideDiff={hideDiff}
                   isPositive={isPositive}
                   type={type}
                   value={value}
@@ -229,12 +223,23 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
   font: var(--font-mini-book);
 
   > * {
-    height: ${({ showHeader }) =>
-      !showHeader
-        ? `calc(var(--account-info-section-height))`
-        : `calc((var(--account-info-section-height) - var(--tabs-height)))`};
+    ${({ showHeader }) =>
+      showHeader
+        ? css`
+            height: calc((var(--account-info-section-height) - var(--tabs-height)));
+            padding: 0.625rem 1rem;
+          `
+        : css`
+            height: calc(var(--account-info-section-height));
+            padding: 1.25rem 1rem 0.6rem;
+          `}
+    display: flex;
+    flex-direction: column;
 
-    padding: 0.625rem 1rem;
+    & > :last-child {
+      flex-grow: 1;
+      align-items: center;
+    }
   }
 
   @media ${breakpoints.tablet} {

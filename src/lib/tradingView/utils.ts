@@ -9,7 +9,7 @@ import { Themes } from '@/styles/themes';
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
 const getOhlcValues = ({
-  ohlcToggleOn,
+  orderbookCandlesToggleOn,
   trades,
   tradeOpen,
   tradeClose,
@@ -18,7 +18,7 @@ const getOhlcValues = ({
   orderbookOpen,
   orderbookClose,
 }: {
-  ohlcToggleOn: boolean;
+  orderbookCandlesToggleOn: boolean;
   trades: number;
   tradeOpen: number;
   tradeClose: number;
@@ -27,19 +27,22 @@ const getOhlcValues = ({
   orderbookOpen?: number;
   orderbookClose?: number;
 }) => {
-  const useOhlc =
-    ohlcToggleOn && trades === 0 && orderbookOpen !== undefined && orderbookClose !== undefined;
+  const useOrderbookCandles =
+    orderbookCandlesToggleOn &&
+    trades === 0 &&
+    orderbookOpen !== undefined &&
+    orderbookClose !== undefined;
 
   return {
-    low: useOhlc ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
-    high: useOhlc ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
-    open: useOhlc ? orderbookOpen : tradeOpen,
-    close: useOhlc ? orderbookClose : tradeClose,
+    low: useOrderbookCandles ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
+    high: useOrderbookCandles ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
+    open: useOrderbookCandles ? orderbookOpen : tradeOpen,
+    close: useOrderbookCandles ? orderbookClose : tradeClose,
   };
 };
 
 export const mapCandle =
-  (ohlcToggleOn: boolean) =>
+  (orderbookCandlesToggleOn: boolean) =>
   ({
     startedAt,
     open,
@@ -60,7 +63,7 @@ export const mapCandle =
 
     return {
       ...getOhlcValues({
-        ohlcToggleOn,
+        orderbookCandlesToggleOn,
         trades,
         tradeOpen,
         tradeClose,
@@ -82,10 +85,10 @@ export const mapCandle =
   };
 
 const mapTradingViewChartBar = ({
-  ohlcToggleOn,
+  orderbookCandlesToggleOn,
   bar,
 }: {
-  ohlcToggleOn: boolean;
+  orderbookCandlesToggleOn: boolean;
   bar: TradingViewChartBar;
 }): TradingViewChartBar => {
   const { trades, orderbookOpen, orderbookClose, tradeOpen, tradeClose, tradeLow, tradeHigh } = bar;
@@ -93,7 +96,7 @@ const mapTradingViewChartBar = ({
   return {
     ...bar,
     ...getOhlcValues({
-      ohlcToggleOn,
+      orderbookCandlesToggleOn,
       trades,
       tradeOpen,
       tradeClose,
@@ -118,20 +121,20 @@ export const getHistorySlice = ({
   fromMs,
   toMs,
   firstDataRequest,
-  ohlcToggleOn,
+  orderbookCandlesToggleOn,
 }: {
   bars?: TradingViewChartBar[];
   fromMs: number;
   toMs: number;
   firstDataRequest: boolean;
-  ohlcToggleOn: boolean;
+  orderbookCandlesToggleOn: boolean;
 }): TradingViewChartBar[] => {
   if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0].time)) {
     return [];
   }
 
   return bars
-    .map((bar) => mapTradingViewChartBar({ ohlcToggleOn, bar }))
+    .map((bar) => mapTradingViewChartBar({ orderbookCandlesToggleOn, bar }))
     .filter(({ time }) => time >= fromMs);
 };
 
