@@ -161,7 +161,7 @@ export const NewMarketPreviewStep = ({
                   : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
-              delayBlocks: newMarketProposal.delayBlocks,
+              delayBlocks: 30, // newMarketProposal.delayBlocks,
             });
 
             if ((tx as IndexedTx)?.code === 0) {
