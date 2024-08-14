@@ -418,7 +418,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
-  await sleep(400 * 1000);
+  await sleep(300 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
@@ -446,7 +446,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // for all markets proposed, determine if the slinky metrics are ok
   for (const proposal of marketsProposed.values()) {
     for (const exchange of proposal.params.exchangeConfigJson) {
-      validateSlinkyMetricsPerTicker(
+      await validateSlinkyMetricsPerTicker(
         dydxTickerToSlinkyTicker(proposal.params.ticker),
         exchange.ticker.toLowerCase(),
         EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
@@ -472,11 +472,11 @@ function dydxTickerToSlinkyTicker(ticker: string): string {
   return ticker.toLowerCase().replace('-', '/');
 }
 
-function validateSlinkyMetricsPerTicker(
+async function validateSlinkyMetricsPerTicker(
   ticker: string,
   exchangeSpecificTicker: string,
   exchange: string
-): void {
+): Promise<void> {
   const prometheus = new PrometheusDriver({
     endpoint: PROMETHEUS_SERVER_URL,
     baseURL: '/api/v1',
@@ -504,24 +504,24 @@ function validateSlinkyMetricsPerTicker(
   const step = 60;
 
   // determine success-rate for slinky queries to each exchange
-  makePrometheusRateQuery(prometheus, exchangeAPIQuerySuccessRate, start, end, step, 0.7);
+  await makePrometheusRateQuery(prometheus, exchangeAPIQuerySuccessRate, start, end, step, 0.7);
 
   // determine success rate for slinky price aggregation per market
-  makePrometheusRateQuery(prometheus, slinkyPriceAggregationQuery, start, end, step, 0.7);
+  await makePrometheusRateQuery(prometheus, slinkyPriceAggregationQuery, start, end, step, 0.7);
 
   // determine success rate for slinky price provider per market
-  makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
+  await makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
 }
 
-function makePrometheusRateQuery(
+async function makePrometheusRateQuery(
   prometheus: PrometheusDriver,
   query: string,
   start: number,
   end: number,
   step: number,
   threshold: number
-): void {
-  prometheus
+): Promise<void> {
+  await prometheus
     .rangeQuery(query, start, end, step)
     .then((response) => {
       const series = response.result;
@@ -545,6 +545,7 @@ function makePrometheusRateQuery(
       });
     })
     .catch((error) => {
+      console.log("Error in prometheus query");
       throw error;
     });
 }
