@@ -499,7 +499,7 @@ async function validateSlinkyMetricsPerTicker(
   /
   sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`;
 
-  const start = new Date().getTime() - 3 * 60 * 1000;
+  const start = new Date().getTime() - 2 * 60 * 1000;
   const end = new Date().getTime();
   const step = 60;
 
