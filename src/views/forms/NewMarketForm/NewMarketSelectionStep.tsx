@@ -11,10 +11,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import {
-  NUM_ORACLES_TO_QUALIFY_AS_SAFE,
-  type NewMarketProposal,
-} from '@/constants/potentialMarkets';
+import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -108,20 +105,12 @@ export const NewMarketSelectionStep = ({
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
-    return potentialMarkets?.filter(({ params: { ticker, exchangeConfigJson, marketType } }) => {
+    return potentialMarkets?.filter(({ params: { ticker } }) => {
       if (marketIds.includes(ticker)) {
         return false;
       }
 
-      if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-        return exchangeConfigJson.length > 0;
-      }
-
-      if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
-        return true;
-      }
-
-      return false;
+      return true;
     });
   }, [potentialMarkets, marketIds]);
 
