@@ -4077,6 +4077,8 @@ packages:
       }
     dependencies:
       '@datadog/browser-core': 5.23.3
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
     dev: false
 
   /@dydxprotocol/v4-client-js@1.1.27:

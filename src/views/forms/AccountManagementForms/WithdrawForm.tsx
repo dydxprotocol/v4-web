@@ -64,6 +64,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
+import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -246,21 +247,21 @@ export const WithdrawForm = () => {
             setWithdrawAmount('');
 
             addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-
-            track(
-              AnalyticsEvents.TransferWithdraw({
-                chainId: toChainId,
-                tokenAddress: toToken?.address || undefined,
-                tokenSymbol: toToken?.symbol || undefined,
-                slippage: slippage || undefined,
-                gasFee: summary?.gasFee || undefined,
-                bridgeFee: summary?.bridgeFee || undefined,
-                exchangeRate: summary?.exchangeRate || undefined,
-                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-                toAmount: summary?.toAmount || undefined,
-                toAmountMin: summary?.toAmountMin || undefined,
-              })
-            );
+            const transferWithdrawContext = {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
+              txHash,
+            };
+            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+            dd.info('Transfer withdraw submitted', transferWithdrawContext);
           } else {
             throw new Error('No transaction hash returned');
           }
@@ -482,16 +483,17 @@ export const WithdrawForm = () => {
         routeErrors,
         routeErrorMessage
       );
-
-      track(
-        AnalyticsEvents.RouteError({
-          transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessageOverride ?? undefined,
-          amount: debouncedAmount,
-          chainId: chainIdStr ?? undefined,
-          assetId: toToken?.toString(),
-        })
-      );
+      const routeErrorContext = {
+        transferType: TransferType.withdrawal.name,
+        errorMessage: routeErrorMessageOverride ?? undefined,
+        amount: debouncedAmount,
+        chainId: chainIdStr ?? undefined,
+        assetAddress: toToken?.address,
+        assetSymbol: toToken?.symbol,
+        assetName: toToken?.name,
+      };
+      track(AnalyticsEvents.RouteError(routeErrorContext));
+      dd.info('Route error received', routeErrorContext);
       return {
         errorMessage: routeErrorMessageOverride
           ? stringGetter({
