@@ -64,8 +64,8 @@
       "atomicResolution": -6,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
-      "stepBaseQuantums": 100000,
-      "subticksPerTick": 10000000,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
       "delayBlocks": 3600
     },
     "initialDeposit": {
