@@ -471,6 +471,7 @@ const assetIcons = {
   RIO: '/currencies/rio.png',
   RLC: '/currencies/rlc.png',
   RNDR: '/currencies/rndr.png',
+  RENDER: '/currencies/render.png',
   ROOT: '/currencies/root.png',
   ROSE: '/currencies/rose.png',
   ROUTE: '/currencies/route.png',
