@@ -45,7 +45,7 @@ const Markets = () => {
       );
     }
     return null;
-  }, []);
+  }, [featureFlags, stringGetter]);
 
   return (
     <$Page>

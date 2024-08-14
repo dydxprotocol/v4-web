@@ -15,9 +15,17 @@ import { createAppSelector } from './appTypes';
 export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
 
 /**
- * @returns marketId of the market the user is currently viewing
+ * @returns marketId of the market the user is currently viewing (Internal)
  */
 export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
+
+/**
+ * @returns displayId of the currentMarket the user is viewing (Render)
+ */
+export const getCurrentMarketDisplayId = (state: RootState) => {
+  const currentMarketId = getCurrentMarketId(state) ?? '';
+  return state.perpetuals?.markets?.[currentMarketId]?.displayId;
+};
 
 /**
  * @returns assetId of the currentMarket

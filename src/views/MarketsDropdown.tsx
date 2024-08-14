@@ -58,11 +58,11 @@ const MarketsDropdownContent = ({
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.market,
+          getCellValue: (row) => row.displayId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({
             assetId,
-            id,
+            displayId,
             isNew,
             effectiveInitialMarginFraction,
             initialMarginFraction,
@@ -70,7 +70,7 @@ const MarketsDropdownContent = ({
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
-              <h2>{id}</h2>
+              <h2>{displayId}</h2>
               <Tag>
                 <Output
                   type={OutputType.Multiple}
@@ -141,7 +141,7 @@ const MarketsDropdownContent = ({
     }
 
     return null;
-  }, [filter]);
+  }, [filter, stringGetter]);
 
   const [hasSeenElectionBannerTrumpWin, setHasSeenElectionBannerTrupmWin] = useLocalStorage({
     key: LocalStorageKey.HasSeenElectionBannerTRUMPWIN,
@@ -176,7 +176,14 @@ const MarketsDropdownContent = ({
     }
 
     return null;
-  }, [hasSeenElectionBannerTrumpWin]);
+  }, [
+    currentDate,
+    setHasSeenElectionBannerTrupmWin,
+    hasSeenElectionBannerTrumpWin,
+    stringGetter,
+    closeDropdown,
+    featureFlags,
+  ]);
 
   return (
     <>
