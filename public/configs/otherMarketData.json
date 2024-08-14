@@ -44,12 +44,12 @@
       "cmcId": 0.0
     }
   },
-  "TRUMPWIN": {
+  "TRUMPWIN2": {
     "title": "Add TRUMPWIN-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRUMPWIN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
       "id": 1,
-      "ticker": "TRUMPWIN-USD",
+      "ticker": "TRUMPWIN2-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -4,
       "minPriceChange": 500,
@@ -73,7 +73,7 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": "TRUMPWIN",
+      "assetName": "TRUMPWIN2",
       "referencePrice": 0.501,
       "cmcId": 0.0
     }
