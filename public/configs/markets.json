@@ -5419,6 +5419,15 @@
         "websiteLink": "https://renproject.io/", 
         "whitepaperLink": "https://renproject.io/litepaper.pdf"
     }, 
+    "RENDER-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/render/", 
+        "name": "Render Token", 
+        "tags": [
+            "AI"
+        ], 
+        "websiteLink": "https://rendernetwork.com/", 
+        "whitepaperLink": "https://renderfoundation.com/whitepaper"
+    }, 
     "REQ-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/request/", 
         "name": "Request", 
