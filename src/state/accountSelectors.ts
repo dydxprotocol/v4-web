@@ -16,6 +16,7 @@ import {
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
+import { MustBigNumber } from '@/lib/numbers';
 import {
   getHydratedTradingData,
   isOrderStatusClearable,
@@ -476,13 +477,13 @@ const getFillsForOrderId = createAppSelector(
  */
 export const getAverageFillPriceForOrder = () =>
   createAppSelector([(s, orderId) => getFillsForOrderId(s, orderId)], (fillsForOrderId) => {
-    let total = 0;
-    let totalSize = 0;
+    let total = MustBigNumber(0);
+    let totalSize = MustBigNumber(0);
     fillsForOrderId.forEach((fill) => {
-      total += fill.price * fill.size;
-      totalSize += fill.size;
+      total = total.plus(MustBigNumber(fill.price).times(fill.size));
+      totalSize = totalSize.plus(fill.size);
     });
-    return totalSize > 0 ? total / totalSize : null;
+    return totalSize.gt(0) ? total.div(totalSize) : null;
   });
 
 /**
