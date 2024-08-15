@@ -27,8 +27,6 @@ export const TriggersDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS })}
       slotIcon={<AssetIcon symbol={assetId} />}
-      withOverlay={false}
-      clickOutsideToClose
     >
       <TriggersForm
         marketId={marketId}

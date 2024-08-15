@@ -93,13 +93,7 @@ export const SharePNLAnalyticsDialog = ({
   const [assetLeft, assetRight] = marketId.split('-');
 
   return (
-    <Dialog
-      isOpen
-      setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}
-      withOverlay={false}
-      clickOutsideToClose
-    >
+    <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}>
       <$ShareableCard
         ref={(domNode) => {
           if (domNode) {

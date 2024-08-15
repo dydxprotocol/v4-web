@@ -175,7 +175,7 @@ export const popoverMixins = {
     }
 
     &[data-state='open']:after {
-      backdrop-filter: blur(6px);
+      backdrop-filter: brightness(var(--overlay-filter));
     }
   `,
 

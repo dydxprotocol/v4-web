@@ -73,6 +73,7 @@ export const TvChart = () => {
 const $PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
   user-select: none;
+  pointer-events: initial; // allow pointer events when dialog overlay is visible
 
   height: 100%;
 
