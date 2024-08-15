@@ -26,6 +26,7 @@ import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
+import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketIntroDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
@@ -84,6 +85,7 @@ export const DialogManager = () => {
     NewMarketMessageDetails: (args) => <NewMarketMessageDetailsDialog {...args} {...modalProps} />,
     Onboarding: (args) => <OnboardingDialog {...args} {...modalProps} />,
     OrderDetails: (args) => <OrderDetailsDialog {...args} {...modalProps} />,
+    PredictionMarketIntro: (args) => <PredictionMarketIntroDialog {...args} {...modalProps} />,
     Preferences: (args) => <PreferencesDialog {...args} {...modalProps} />,
     RateLimit: (args) => <RateLimitDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
