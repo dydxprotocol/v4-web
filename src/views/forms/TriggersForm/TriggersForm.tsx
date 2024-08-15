@@ -131,6 +131,10 @@ export const TriggersForm = ({
             stepSizeDecimals={stepSizeDecimals}
             tickSizeDecimals={tickSizeDecimals}
           />
+          <div tw="text-color-text-0 font-small-book">
+            {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_AUTOMATICALLY_CANCELED })}{' '}
+            {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
+          </div>
           <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
             <Button
               action={ButtonAction.Primary}
