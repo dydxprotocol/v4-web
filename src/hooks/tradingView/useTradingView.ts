@@ -126,7 +126,7 @@ export const useTradingView = ({
               orderLineToggleRef.current = tvWidgetRef.current.createButton();
               orderLineToggleRef.current.innerHTML = `<span>${stringGetter({
                 key: STRING_KEYS.ORDER_LINES,
-              })}</span> <div class="displayOrdersButton-toggle"></div>`;
+              })}</span> <div class="toggle"></div>`;
               orderLineToggleRef.current.setAttribute(
                 'title',
                 stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
@@ -142,12 +142,12 @@ export const useTradingView = ({
               });
 
               orderbookCandlesToggleRef.current = tvWidgetRef.current.createButton();
-              orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
+              orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="toggle"></div>`;
               orderbookCandlesToggleRef.current.setAttribute('title', ohlcBody as string);
             }
             if (buySellMarksToggleRef) {
               buySellMarksToggleRef.current = tvWidgetRef.current.createButton();
-              buySellMarksToggleRef.current.innerHTML = `<span>Buys/Sells</span> <div class="displayOrdersButton-toggle"></div>`;
+              buySellMarksToggleRef.current.innerHTML = `<span>Buys/Sells</span> <div class="toggle"></div>`;
               buySellMarksToggleRef.current.setAttribute(
                 'title',
                 'Display historic buys and sells'

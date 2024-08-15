@@ -35,9 +35,9 @@ export const useOrderbookCandles = ({
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           if (orderbookCandlesToggleOn) {
-            orderbookCandlesToggle?.classList?.add('ohlc-active');
+            orderbookCandlesToggle?.classList?.add('toggle-active');
           } else {
-            orderbookCandlesToggle?.classList?.remove('ohlc-active');
+            orderbookCandlesToggle?.classList?.remove('toggle-active');
           }
           abacusStateManager.toggleOrderbookCandles(orderbookCandlesToggleOn);
         });
