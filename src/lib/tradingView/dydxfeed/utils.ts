@@ -4,7 +4,7 @@ import { Mark, ResolutionString } from 'public/tradingview/charting_library';
 
 import { AbacusOrderSide, SubaccountFills } from '@/constants/abacus';
 import { RESOLUTION_TO_INTERVAL_MS } from '@/constants/candles';
-import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
+import { STRING_KEYS, StringGetterFunction, SupportedLocales } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { formatNumberOutput, OutputType } from '@/components/Output';
@@ -80,12 +80,26 @@ export const getMarkForOrderFills = (
   );
   const fill = orderFills[0];
   const fillDetails = getFillDetails()(store.getState(), fill.id);
-  const actionText = fill.side.name === AbacusOrderSide.Buy.name ? 'Bought' : 'Sold';
+
+  const textParams = {
+    ASSET_SIZE: formattedSize,
+    ASSET: fillDetails?.asset?.id,
+    PRICE: formattedAveragePrice,
+  };
+
+  const text = stringGetter({
+    key:
+      fill.side.name === AbacusOrderSide.Buy.name
+        ? STRING_KEYS.BUY_MARK_TOOLTIP
+        : STRING_KEYS.SELL_MARK_TOOLTIP,
+    params: textParams,
+  }) as string;
+
   return {
     id: orderId,
     time: getBarTime(barStartMs, fill.createdAtMilliseconds, resolution) ?? 0,
     minSize: 20,
-    text: `${actionText} ${formattedSize} ${fillDetails?.asset?.id} at ${formattedAveragePrice}`,
+    text,
     labelFontColor: 'white',
     ...MARK_UI_OPTIONS[fill.side.name],
   };
