@@ -221,6 +221,13 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   const isEmpty = data.length === 0;
   const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
+  const bodyListItems = useMemo(
+    () =>
+      shouldPaginate && items.length > pageSize
+        ? items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+        : items,
+    [currentPage, items, pageSize, shouldPaginate]
+  );
   return (
     <$TableWrapper
       className={className}
@@ -284,13 +291,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
             )}
           </TableHeader>
 
-          <TableBody
-            items={
-              shouldPaginate && items.length > pageSize
-                ? items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                : items
-            }
-          >
+          <TableBody items={bodyListItems}>
             {(item) => (
               <Row key={internalGetRowKey(item)}>
                 {(columnKey) => (
