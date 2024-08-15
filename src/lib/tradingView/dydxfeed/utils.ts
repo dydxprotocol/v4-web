@@ -14,10 +14,10 @@ import { getFillDetails } from '@/state/accountSelectors';
 
 /**
  * @description Converts times in ms to the appropriate bar time (in seconds)
- * For example, if the starting time = 50ms, interval = 100ms, a value of 260ms would
- * be grouped into the bar at 250ms
+ * For example, if the starting time = 5000ms, interval = 10,000ms, a value of 26,000ms would
+ * be grouped into the bar at 25,000ms = 25s
  */
-function getBarTime(
+export function getBarTime(
   chartStartTimeMs: number,
   fillTimeMs: number,
   resolution: ResolutionString
