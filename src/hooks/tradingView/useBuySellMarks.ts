@@ -2,6 +2,10 @@ import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import { TvWidget } from '@/constants/tvchart';
 
+import { getMarketFills } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+
 /**
  * @description Hook to handle marks for historic buys and sells on the TV chart
  */
@@ -18,8 +22,12 @@ export function useBuySellMarks({
   tvWidget: TvWidget | null;
   isChartReady: boolean;
 }) {
+  const marketId = useAppSelector(getCurrentMarketId);
+  const fills = useAppSelector(getMarketFills);
+  const currentMarketFills = marketId ? fills[marketId] : undefined;
+
   useEffect(() => {
-    // Initialize onClick for orderbook candles toggle
+    // Initialize onClick for Buys/Sells toggle
     if (isChartReady && buySellMarksToggle) {
       buySellMarksToggle.onclick = () => setBuySellMarksToggleOn((prev) => !prev);
     }
@@ -42,6 +50,6 @@ export function useBuySellMarks({
         });
       });
     },
-    [buySellMarksToggleOn, buySellMarksToggle, tvWidget, isChartReady]
+    [buySellMarksToggleOn, buySellMarksToggle, tvWidget, isChartReady, currentMarketFills]
   );
 }
