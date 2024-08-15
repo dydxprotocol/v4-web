@@ -1,22 +1,10 @@
-import BigNumber from 'bignumber.js';
-import { sum } from 'lodash';
-import { Mark, ResolutionString } from 'public/tradingview/charting_library';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { AbacusOrderSide, SubaccountFills } from '@/constants/abacus';
-import {
-  Candle,
-  RESOLUTION_TO_INTERVAL_MS,
-  TradingViewChartBar,
-  TradingViewSymbol,
-} from '@/constants/candles';
-import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
 import { Themes } from '@/styles/themes';
-
-import { formatNumberOutput, OutputType } from '@/components/Output';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
@@ -226,7 +214,7 @@ export const getWidgetOverrides = ({
 
 export const getWidgetOptions = () => {
   return {
-    // debug: true,
+    debug: true,
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',
@@ -261,85 +249,4 @@ export const getSavedResolution = ({ savedConfig }: { savedConfig?: object }): s
   )?.state?.interval;
 
   return savedResolution ?? null;
-};
-
-/**
- * @description Converts times in ms to the appropriate bar time (in seconds)
- * For example, if the starting time = 50ms, interval = 100ms, a value of 260ms would
- * be grouped into the bar at 250ms
- */
-function getBarTime(
-  chartStartTimeMs: number,
-  fillTimeMs: number,
-  resolution: ResolutionString
-): number | undefined {
-  const intervalMs = RESOLUTION_TO_INTERVAL_MS[resolution];
-
-  const [startBn, intervalSizeBn, fillTimeBn] = [
-    BigNumber(chartStartTimeMs),
-    BigNumber(intervalMs),
-    BigNumber(fillTimeMs),
-  ];
-  const numIntervalsBetween = fillTimeBn.minus(startBn).dividedToIntegerBy(intervalSizeBn);
-  return startBn
-    .plus(numIntervalsBetween.multipliedBy(intervalSizeBn))
-    .dividedToIntegerBy(1000)
-    .toNumber();
-}
-
-function averageFillPrice(fills: SubaccountFills) {
-  const totalSize = sum(fills.map((fill) => fill.size * fill.price));
-  const size = sum(fills.map((fill) => fill.size));
-  return (totalSize / size).toFixed(2);
-}
-
-const MARK_UI_OPTIONS = {
-  [AbacusOrderSide.Buy.name]: {
-    color: 'blue' as const,
-    label: 'B',
-  },
-  [AbacusOrderSide.Sell.name]: {
-    color: 'red' as const,
-    label: 'S',
-  },
-};
-
-export const getMarkForOrderFills = (
-  orderFills: SubaccountFills,
-  orderId: string,
-  barStartMs: number,
-  resolution: ResolutionString,
-  stringGetter: StringGetterFunction,
-  localeSeparators: { group?: string; decimal?: string },
-  selectedLocale: SupportedLocales
-): Mark => {
-  const formattedAveragePrice = formatNumberOutput(
-    averageFillPrice(orderFills),
-    OutputType.CompactFiat,
-    {
-      decimalSeparator: localeSeparators.decimal,
-      groupSeparator: localeSeparators.group,
-      selectedLocale,
-    }
-  );
-  const formattedSize = formatNumberOutput(
-    sum(orderFills.map((fill) => fill.size)),
-    OutputType.Asset,
-    {
-      fractionDigits: TOKEN_DECIMALS,
-      decimalSeparator: localeSeparators.decimal,
-      groupSeparator: localeSeparators.group,
-      selectedLocale,
-    }
-  );
-  const fill = orderFills[0];
-  const actionText = fill.side.name === AbacusOrderSide.Buy.name ? 'Bought' : 'Sold';
-  return {
-    id: orderId,
-    time: getBarTime(barStartMs, fill.createdAtMilliseconds, resolution) ?? 0,
-    minSize: 20,
-    text: `${actionText} ${formattedSize} for ${formattedAveragePrice} average`,
-    labelFontColor: 'white',
-    ...MARK_UI_OPTIONS[fill.side.name],
-  };
 };

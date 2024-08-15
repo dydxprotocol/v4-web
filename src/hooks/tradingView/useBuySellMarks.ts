@@ -33,10 +33,10 @@ export function useBuySellMarks({
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           if (buySellMarksToggleOn) {
-            buySellMarksToggle?.classList?.add('active');
+            buySellMarksToggle?.classList?.add('order-lines-active');
             tvWidget.activeChart().refreshMarks();
           } else {
-            buySellMarksToggle?.classList?.remove('active');
+            buySellMarksToggle?.classList?.remove('order-lines-active');
             tvWidget.activeChart().clearMarks();
           }
         });

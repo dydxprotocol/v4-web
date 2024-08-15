@@ -23,14 +23,19 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { type RootStore } from '@/state/_store';
 import { getMarketFills } from '@/state/accountSelectors';
 import { setCandles } from '@/state/perpetuals';
-import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
+import {
+  getMarketConfig,
+  getMarketData,
+  getPerpetualBarsForPriceChart,
+} from '@/state/perpetualsSelectors';
 
 import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
-import { getHistorySlice, getMarkForOrderFills, getSymbol, mapCandle } from '../utils';
+import { getHistorySlice, getSymbol, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming';
+import { getMarkForOrderFills } from './utils';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
@@ -116,6 +121,9 @@ export const getDydxDatafeed = (
     resolution: ResolutionString
   ) => {
     const [fromMs, toMs] = [from * 1000, to * 1000];
+    const market = getMarketData(store.getState(), symbolInfo.name);
+    if (!market) return;
+
     const fills = getMarketFills(store.getState())[symbolInfo.name] ?? [];
     const inRangeFills = fills.filter(
       (fill) => fill.createdAtMilliseconds >= fromMs && fill.createdAtMilliseconds <= toMs
@@ -123,6 +131,7 @@ export const getDydxDatafeed = (
     const fillsByOrderId = groupBy(inRangeFills, 'orderId');
     const marks = Object.entries(fillsByOrderId).map(([orderId, orderFills]) =>
       getMarkForOrderFills(
+        store,
         orderFills,
         orderId,
         fromMs,
