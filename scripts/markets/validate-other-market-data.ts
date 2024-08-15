@@ -244,6 +244,7 @@ enum ValidationError {
   CLOB_SPT_MISMATCH = 'subticks per tick mismatch',
   PERP_AR_MISMATCH = 'Atomic resolution mismatch',
   PERP_LT_MISMATCH = 'Liquidity tier mismatch',
+  SLINKY_METRICS_FAILURE = 'Slinky metrics failure',
 }
 
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
@@ -449,7 +450,8 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       await validateSlinkyMetricsPerTicker(
         dydxTickerToSlinkyTicker(proposal.params.ticker),
         exchange.ticker.toLowerCase(),
-        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
+        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName,
+        allErrors
       );
     }
   }
@@ -475,7 +477,8 @@ function dydxTickerToSlinkyTicker(ticker: string): string {
 async function validateSlinkyMetricsPerTicker(
   ticker: string,
   exchangeSpecificTicker: string,
-  exchange: string
+  exchange: string,
+  allErrors: Map<String, ValidationError>
 ): Promise<void> {
   const prometheus = new PrometheusDriver({
     endpoint: PROMETHEUS_SERVER_URL,
@@ -499,18 +502,38 @@ async function validateSlinkyMetricsPerTicker(
   /
   sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`;
 
-  const start = new Date().getTime() - 2 * 60 * 1000;
+  const start = new Date().getTime() - 3 * 60 * 1000;
   const end = new Date().getTime();
   const step = 60;
 
+  async function handlePrometheusRateQuery(
+    query: string,
+    threshold: number,
+  ): Promise<void> {
+    try {
+      await makePrometheusRateQuery(prometheus, query, start, end, step, threshold);
+    } catch (error) {
+      allErrors.set(`${exchange} and ${ticker}: ${error}`, ValidationError.SLINKY_METRICS_FAILURE);
+    }
+  }
+
   // determine success-rate for slinky queries to each exchange
-  await makePrometheusRateQuery(prometheus, exchangeAPIQuerySuccessRate, start, end, step, 0.7);
+  await handlePrometheusRateQuery(
+    exchangeAPIQuerySuccessRate,
+    0.7,
+  );
 
   // determine success rate for slinky price aggregation per market
-  await makePrometheusRateQuery(prometheus, slinkyPriceAggregationQuery, start, end, step, 0.7);
+  await handlePrometheusRateQuery(
+    slinkyPriceAggregationQuery,
+    0.7,
+  );
 
   // determine success rate for slinky price provider per market
-  await makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
+  await handlePrometheusRateQuery(
+    slinkyProviderPricesQuery,
+    0.7,
+  );
 }
 
 async function makePrometheusRateQuery(
@@ -519,7 +542,7 @@ async function makePrometheusRateQuery(
   start: number,
   end: number,
   step: number,
-  threshold: number
+  threshold: number,
 ): Promise<void> {
   await prometheus
     .rangeQuery(query, start, end, step)
@@ -545,7 +568,6 @@ async function makePrometheusRateQuery(
       });
     })
     .catch((error) => {
-      console.log("Error in prometheus query");
       throw error;
     });
 }
