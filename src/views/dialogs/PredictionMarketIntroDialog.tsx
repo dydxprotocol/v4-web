@@ -21,15 +21,15 @@ export const PredictionMarketIntroDialog = ({
 }: DialogProps<PredictionMarketIntroDialogProps>) => {
   const stringGetter = useStringGetter();
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
-  const [, setHasSeenPredictionMarketIntro] = useLocalStorage({
-    key: LocalStorageKey.HasSeenPredictionMarketIntro,
+  const [, setHasSeenPredictionMarketsIntro] = useLocalStorage({
+    key: LocalStorageKey.HasSeenPredictionMarketsIntro,
     defaultValue: false,
   });
 
   const onContinue = useCallback(() => {
-    setHasSeenPredictionMarketIntro(doNotShowAgain);
+    setHasSeenPredictionMarketsIntro(doNotShowAgain);
     setIsOpen(false);
-  }, [doNotShowAgain, setIsOpen, setHasSeenPredictionMarketIntro]);
+  }, [doNotShowAgain, setIsOpen, setHasSeenPredictionMarketsIntro]);
 
   const renderPoint = ({
     icon,
