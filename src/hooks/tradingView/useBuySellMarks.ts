@@ -6,6 +6,8 @@ import { getMarketFills } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { useAppThemeAndColorModeContext } from '../useAppThemeAndColorMode';
+
 /**
  * @description Hook to handle marks for historic buys and sells on the TV chart
  */
@@ -26,6 +28,8 @@ export function useBuySellMarks({
   const fills = useAppSelector(getMarketFills);
   const currentMarketFills = marketId ? fills[marketId] : undefined;
 
+  const theme = useAppThemeAndColorModeContext();
+
   useEffect(() => {
     // Initialize onClick for Buys/Sells toggle
     if (isChartReady && buySellMarksToggle) {
@@ -34,7 +38,7 @@ export function useBuySellMarks({
   }, [isChartReady, buySellMarksToggle, setBuySellMarksToggleOn]);
 
   useEffect(
-    // Update marks on toggle and on new fills
+    // Update marks on toggle and on new fills and on display preference changes
     () => {
       if (!isChartReady || !tvWidget) return;
 
@@ -50,6 +54,13 @@ export function useBuySellMarks({
         });
       });
     },
-    [buySellMarksToggleOn, buySellMarksToggle, tvWidget, isChartReady, currentMarketFills]
+    [
+      buySellMarksToggleOn,
+      buySellMarksToggle,
+      tvWidget,
+      isChartReady,
+      currentMarketFills,
+      theme.positive,
+    ]
   );
 }

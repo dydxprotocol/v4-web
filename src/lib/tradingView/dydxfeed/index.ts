@@ -20,8 +20,11 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
+import { Themes } from '@/styles/themes';
+
 import { type RootStore } from '@/state/_store';
 import { getMarketFills } from '@/state/accountSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { setCandles } from '@/state/perpetuals';
 import {
   getMarketConfig,
@@ -120,6 +123,9 @@ export const getDydxDatafeed = (
     onDataCallback: GetMarksCallback<Mark>,
     resolution: ResolutionString
   ) => {
+    const theme = getAppTheme(store.getState());
+    const colorMode = getAppColorMode(store.getState());
+
     const [fromMs, toMs] = [from * 1000, to * 1000];
     const market = getMarketData(store.getState(), symbolInfo.name);
     if (!market) return;
@@ -138,7 +144,8 @@ export const getDydxDatafeed = (
         resolution,
         stringGetter,
         localeSeparators,
-        selectedLocale
+        selectedLocale,
+        Themes[theme][colorMode]
       )
     );
     onDataCallback(marks);

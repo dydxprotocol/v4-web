@@ -1,11 +1,12 @@
 import BigNumber from 'bignumber.js';
 import { sum } from 'lodash';
-import { Mark, ResolutionString } from 'public/tradingview/charting_library';
+import { Mark, MarkCustomColor, ResolutionString } from 'public/tradingview/charting_library';
 
 import { AbacusOrderSide, SubaccountFills } from '@/constants/abacus';
 import { RESOLUTION_TO_INTERVAL_MS } from '@/constants/candles';
 import { STRING_KEYS, StringGetterFunction, SupportedLocales } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { ThemeColorBase } from '@/constants/styles/colors';
 
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
@@ -42,17 +43,6 @@ function averageFillPrice(fills: SubaccountFills) {
   return totalSize / size;
 }
 
-const MARK_UI_OPTIONS = {
-  [AbacusOrderSide.Buy.name]: {
-    color: 'blue' as const,
-    label: 'B',
-  },
-  [AbacusOrderSide.Sell.name]: {
-    color: 'red' as const,
-    label: 'S',
-  },
-};
-
 export const getMarkForOrderFills = (
   store: RootStore,
   orderFills: SubaccountFills,
@@ -61,7 +51,8 @@ export const getMarkForOrderFills = (
   resolution: ResolutionString,
   stringGetter: StringGetterFunction,
   localeSeparators: { group?: string; decimal?: string },
-  selectedLocale: SupportedLocales
+  selectedLocale: SupportedLocales,
+  theme: ThemeColorBase
 ): Mark => {
   const formattedAveragePrice = formatNumberOutput(averageFillPrice(orderFills), OutputType.Fiat, {
     decimalSeparator: localeSeparators.decimal,
@@ -95,12 +86,21 @@ export const getMarkForOrderFills = (
     params: textParams,
   }) as string;
 
+  const color: MarkCustomColor =
+    fill.side.name === AbacusOrderSide.Buy.name
+      ? {
+          color: theme.positive,
+          background: theme.positive,
+        }
+      : { color: theme.negative, background: theme.negative };
+
   return {
     id: orderId,
     time: getBarTime(barStartMs, fill.createdAtMilliseconds, resolution) ?? 0,
-    minSize: 20,
+    minSize: 16,
     text,
     labelFontColor: 'white',
-    ...MARK_UI_OPTIONS[fill.side.name],
+    color,
+    label: fill.side.name === AbacusOrderSide.Buy.name ? 'B' : 'S',
   };
 };
