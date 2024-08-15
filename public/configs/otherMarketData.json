@@ -2576,11 +2576,6 @@
             "minExchanges": 1,
             "exchangeConfigJson": [
                 {
-                    "exchangeName": "Bitstamp",
-                    "ticker": "FTM/USD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Huobi",
                     "ticker": "ftmusdt",
                     "adjustByMarket": "USDT-USD",
