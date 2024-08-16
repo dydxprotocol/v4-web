@@ -147,10 +147,10 @@ export const useTradingView = ({
             }
             if (buySellMarksToggleRef) {
               buySellMarksToggleRef.current = tvWidgetRef.current.createButton();
-              buySellMarksToggleRef.current.innerHTML = `<span>Buys/Sells</span> <div class="toggle"></div>`;
+              buySellMarksToggleRef.current.innerHTML = `<span>${stringGetter({ key: STRING_KEYS.BUYS_SELLS_TOGGLE })}</span> <div class="toggle"></div>`;
               buySellMarksToggleRef.current.setAttribute(
                 'title',
-                'Display historic buys and sells'
+                stringGetter({ key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP })
               );
             }
           }
