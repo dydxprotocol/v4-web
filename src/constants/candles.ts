@@ -73,7 +73,6 @@ export const RESOLUTION_TO_INTERVAL_MS = {
   '1D': timeUnits.day,
 } as Record<ResolutionString, number>;
 
-
 /**
  * @description ResolutionStrings used with TradingView's charting library mapped to CandleResolution
  */

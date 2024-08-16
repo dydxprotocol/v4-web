@@ -13,6 +13,8 @@ import { formatNumberOutput, OutputType } from '@/components/Output';
 import { RootStore } from '@/state/_store';
 import { getFillDetails } from '@/state/accountSelectors';
 
+import { getAverageFillPrice } from '@/lib/orders';
+
 /**
  * @description Converts times in ms to the appropriate bar time (in seconds)
  * For example, if the starting time = 5000ms, interval = 10,000ms, a value of 26,000ms would
@@ -37,12 +39,6 @@ export function getBarTime(
     .toNumber();
 }
 
-function averageFillPrice(fills: SubaccountFills) {
-  const totalSize = sum(fills.map((fill) => fill.size * fill.price));
-  const size = sum(fills.map((fill) => fill.size));
-  return totalSize / size;
-}
-
 export const getMarkForOrderFills = (
   store: RootStore,
   orderFills: SubaccountFills,
@@ -54,11 +50,15 @@ export const getMarkForOrderFills = (
   selectedLocale: SupportedLocales,
   theme: ThemeColorBase
 ): Mark => {
-  const formattedAveragePrice = formatNumberOutput(averageFillPrice(orderFills), OutputType.Fiat, {
-    decimalSeparator: localeSeparators.decimal,
-    groupSeparator: localeSeparators.group,
-    selectedLocale,
-  });
+  const formattedAveragePrice = formatNumberOutput(
+    getAverageFillPrice(orderFills),
+    OutputType.Fiat,
+    {
+      decimalSeparator: localeSeparators.decimal,
+      groupSeparator: localeSeparators.group,
+      selectedLocale,
+    }
+  );
   const formattedSize = formatNumberOutput(
     sum(orderFills.map((fill) => fill.size)),
     OutputType.Asset,
