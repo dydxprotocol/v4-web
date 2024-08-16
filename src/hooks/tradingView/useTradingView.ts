@@ -158,7 +158,14 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo, orderbookCandlesToggleOn]);
+  }, [
+    tvWidgetRef,
+    selectedLocale,
+    selectedNetwork,
+    !!marketId,
+    hasPriceScaleInfo,
+    orderbookCandlesToggleOn,
+  ]);
 
   return { savedResolution };
 };
