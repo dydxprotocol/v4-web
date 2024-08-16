@@ -25,7 +25,11 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
-import { getFillByClientId, getOrderByClientId } from '@/state/accountSelectors';
+import {
+  getAverageFillPriceForOrder,
+  getFillByClientId,
+  getOrderByClientId,
+} from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
@@ -48,6 +52,10 @@ export const OrderStatusNotification = ({
   const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
   const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
   const marketData = useAppSelector((s) => getMarketData(s, localOrder.marketId), shallowEqual);
+  const averageFillPrice = useParameterizedSelector(
+    getAverageFillPriceForOrder,
+    localOrder.orderId
+  );
 
   const { assetId } = marketData ?? {};
   const { equityTiersLearnMore } = useURLConfigs();
@@ -81,7 +89,7 @@ export const OrderStatusNotification = ({
               tradeType={getTradeType(order.type.rawValue) ?? undefined}
               filledAmount={order.totalFilled}
               assetId={assetId}
-              averagePrice={order.price}
+              averagePrice={averageFillPrice ?? order.price}
               tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
             />
           );
