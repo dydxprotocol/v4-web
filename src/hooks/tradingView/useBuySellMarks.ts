@@ -54,13 +54,6 @@ export function useBuySellMarks({
         });
       });
     },
-    [
-      buySellMarksToggleOn,
-      buySellMarksToggle,
-      tvWidget,
-      isChartReady,
-      currentMarketFills,
-      theme.positive,
-    ]
+    [buySellMarksToggleOn, buySellMarksToggle, tvWidget, isChartReady, currentMarketFills, theme]
   );
 }
