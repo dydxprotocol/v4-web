@@ -456,6 +456,7 @@ class AbacusStateManager {
       // This filters out any feature flags in the enum that are not part of the
       // kotlin statsig config object
       if (k in StatsigConfig) {
+        // @ts-ignore
         StatsigConfig[k] = v;
       }
     });
