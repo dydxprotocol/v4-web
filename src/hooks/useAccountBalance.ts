@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
-import { useAccount as useAccountGraz } from 'graz';
 import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
@@ -13,15 +12,11 @@ import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  SUPPORTED_COSMOS_CHAINS,
-} from '@/lib/graz';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/cosmosChains';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
+import { useCosmosAccount } from './useCosmosAccount';
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useEnvConfig } from './useEnvConfig';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -93,10 +88,7 @@ export const useAccountBalance = ({
     },
   });
 
-  const { data: accounts } = useAccountGraz({
-    chainId: SUPPORTED_COSMOS_CHAINS,
-    multiChain: true,
-  });
+  const { accounts } = useCosmosAccount();
 
   const cosmosAddress = useMemo(() => {
     const nobleChainId = getNobleChainId();

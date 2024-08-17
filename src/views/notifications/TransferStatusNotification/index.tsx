@@ -27,7 +27,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/cosmosChains';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { TransferStatusSteps } from './TransferStatusSteps';

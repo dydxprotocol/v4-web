@@ -25,7 +25,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/cosmosChains';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';

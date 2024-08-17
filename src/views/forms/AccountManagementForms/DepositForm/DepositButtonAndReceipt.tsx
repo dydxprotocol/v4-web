@@ -65,7 +65,7 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi, isConnectedGraz } = useWalletConnection();
+  const { connectWallet, isConnectedWagmi, isKeplrConnected } = useWalletConnection();
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
@@ -269,7 +269,7 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi && !isConnectedGraz ? (
+      ) : !isConnectedWagmi && !isKeplrConnected ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>

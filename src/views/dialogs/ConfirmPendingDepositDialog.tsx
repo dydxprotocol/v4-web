@@ -24,7 +24,7 @@ import { Output, OutputType } from '@/components/Output';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/cosmosChains';
 import { log } from '@/lib/telemetry';
 
 export const ConfirmPendingDepositDialog = ({

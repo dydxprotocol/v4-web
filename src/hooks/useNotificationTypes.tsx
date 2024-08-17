@@ -58,7 +58,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { SUPPORTED_COSMOS_CHAINS } from '@/lib/graz';
+import { SUPPORTED_COSMOS_CHAINS } from '@/lib/cosmosChains';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
