@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { useOfflineSigners as useOfflineSignersGraz } from 'graz';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -18,6 +17,7 @@ import {
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo, getHasSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
@@ -47,6 +47,7 @@ const useAccountsContext = () => {
   const dispatch = useAppDispatch();
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   // Wallet connection
   const {
@@ -59,7 +60,7 @@ const useAccountsContext = () => {
     signerWagmi,
     publicClientWagmi,
     dydxAddress: connectedDydxAddress,
-    signerGraz,
+    getCosmosOfflineSigner,
   } = useWalletConnection();
 
   // EVM wallet connection
@@ -149,9 +150,6 @@ const useAccountsContext = () => {
   const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
-  const { data: nobleSignerGraz } = useOfflineSignersGraz({
-    chainId: nobleChainId,
-  });
 
   const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
     try {
@@ -222,11 +220,13 @@ const useAccountsContext = () => {
         setLocalDydxWallet(wallet);
 
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
-      } else if (connectedDydxAddress && signerGraz) {
-        dispatch(setOnboardingState(OnboardingState.WalletConnected));
+      } else if (connectedDydxAddress) {
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz.offlineSigner));
-          dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
+          if (dydxOfflineSigner) {
+            setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
+            dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          }
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
         }
@@ -267,7 +267,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [evmAddress, evmDerivedAddresses, signerWagmi, connectedDydxAddress, signerGraz]);
+  }, [evmAddress, evmDerivedAddresses, signerWagmi, connectedDydxAddress]);
 
   // abacus
   useEffect(() => {
@@ -281,8 +281,10 @@ const useAccountsContext = () => {
       if (hdKey?.mnemonic) {
         nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
       }
-      if (nobleSignerGraz !== undefined) {
-        nobleWallet = await LocalWallet.fromOfflineSigner(nobleSignerGraz.offlineSigner);
+
+      const nobleOfflineSigner = await getCosmosOfflineSigner(nobleChainId);
+      if (nobleOfflineSigner !== undefined) {
+        nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
       }
 
       if (nobleWallet !== undefined) {
@@ -291,7 +293,7 @@ const useAccountsContext = () => {
       }
     };
     setNobleWallet();
-  }, [hdKey?.mnemonic, nobleSignerGraz]);
+  }, [hdKey?.mnemonic]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -363,9 +365,6 @@ const useAccountsContext = () => {
     evmAddress,
     signerWagmi,
     publicClientWagmi,
-
-    // Wallet connection (Cosmos)
-    signerGraz,
 
     // EVM → dYdX account derivation
     setWalletFromEvmSignature,

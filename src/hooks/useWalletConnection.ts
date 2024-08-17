@@ -6,7 +6,6 @@ import {
   useAccount as useAccountGraz,
   useConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
-  useOfflineSigners as useOfflineSignersGraz,
 } from 'graz';
 import {
   useAccount as useAccountWagmi,
@@ -69,12 +68,22 @@ export const useWalletConnection = () => {
   const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
     chainId: selectedDydxChainId,
   });
-  const { data: signerGraz } = useOfflineSignersGraz({
-    chainId: selectedDydxChainId,
-  });
+
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
   const dydxAddressGraz = dydxAccountGraz?.bech32Address;
+
+  const getCosmosOfflineSigner = async (chainId: string) => {
+    if (isConnectedGraz) {
+      const keplr = window.keplr;
+
+      const offlineSigner = await keplr?.getOfflineSigner(chainId);
+
+      return offlineSigner;
+    }
+
+    return undefined;
+  };
 
   useEffect(() => {
     // Cache last connected address
@@ -193,7 +202,7 @@ export const useWalletConnection = () => {
         walletConnectionType: walletConnection?.type,
       };
     },
-    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login]
+    [isConnectedGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login]
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -251,7 +260,6 @@ export const useWalletConnection = () => {
   }, [
     selectedWalletType,
     signerWagmi,
-    signerGraz,
     evmDerivedAddresses,
     evmAddress,
     reconnectWagmi,
@@ -343,6 +351,6 @@ export const useWalletConnection = () => {
     dydxAddress,
     dydxAddressGraz,
     isConnectedGraz,
-    signerGraz,
+    getCosmosOfflineSigner,
   };
 };
