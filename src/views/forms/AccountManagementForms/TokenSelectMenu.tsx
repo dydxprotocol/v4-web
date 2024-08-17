@@ -6,6 +6,7 @@ import tw from 'twin.macro';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
@@ -22,13 +23,7 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  NEUTRON_USDC_IBC_DENOM,
-  OSMO_USDC_IBC_DENOM,
-} from '@/lib/cosmosChains';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
 
 import { LowestFeesDecoratorText } from './LowestFeesText';
 

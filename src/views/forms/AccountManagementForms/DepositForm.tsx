@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { calculateFee, MsgTransferEncodeObject, SigningStargateClient } from '@cosmjs/stargate';
+import { calculateFee, GasPrice, MsgTransferEncodeObject } from '@cosmjs/stargate';
 import { GAS_MULTIPLIER } from '@dydxprotocol/v4-client-js';
-import { Keplr } from '@keplr-wallet/provider-extension';
+import { useAccount as useAccountGraz, useStargateSigningClient } from 'graz';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -19,6 +19,7 @@ import {
   DEFAULT_TRANSACTION_MEMO,
 } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -35,7 +36,6 @@ import { WalletType, type EvmAddress } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCosmosAccount } from '@/hooks/useCosmosAccount';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -64,14 +64,11 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
 import {
-  COSMOS_CHAIN_INFOS,
   getNeutronChainId,
   getNobleChainId,
   getOsmosisChainId,
-  NEUTRON_USDC_IBC_DENOM,
-  OSMO_USDC_IBC_DENOM,
   SUPPORTED_COSMOS_CHAINS,
-} from '@/lib/cosmosChains';
+} from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
 import { NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -152,7 +149,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { usdcLabel } = useTokenConfigs();
 
-  const { accounts } = useCosmosAccount();
+  const { data: accounts } = useAccountGraz({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+  const { data: signingClient } = useStargateSigningClient({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
 
   // Async Data
   const { balance } = useAccountBalance({
@@ -369,24 +373,36 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
           const memo = `${DEFAULT_TRANSACTION_MEMO} | ${signerAddress}`;
 
-          const keplr = await Keplr.getKeplr();
+          const gasEstimate = await signingClient?.[chainIdStr]?.simulate(
+            signerAddress,
+            [transferMsg],
+            memo
+          );
 
-          if (!keplr) {
-            throw new Error('Keplr not found');
-          }
-
-          const offlineSigner = keplr.getOfflineSigner(chainIdStr);
-          const signingClient = await SigningStargateClient.connectWithSigner('', offlineSigner);
-          const gasEstimate = await signingClient.simulate(signerAddress, [transferMsg], memo);
-
-          const gasPrice = COSMOS_CHAIN_INFOS[chainIdStr]?.gasPrice;
+          const gasPrice = (() => {
+            if (nobleChainId === chainIdStr) {
+              return GasPrice.fromString('0.1uusdc');
+            }
+            if (osmosisChainId === chainIdStr) {
+              return GasPrice.fromString('0.025uosmo');
+            }
+            if (neutronChainId === chainIdStr) {
+              return GasPrice.fromString('0.0053untrn');
+            }
+            return undefined;
+          })();
 
           if (!gasEstimate || !gasPrice) {
             throw new Error('Failed to estimate gas');
           }
 
           const fee = calculateFee(Math.floor(gasEstimate * GAS_MULTIPLIER), gasPrice);
-          const tx = await signingClient.signAndBroadcast(signerAddress, [transferMsg], fee, memo);
+          const tx = await signingClient?.[chainIdStr]?.signAndBroadcast(
+            signerAddress,
+            [transferMsg],
+            fee,
+            memo
+          );
 
           const txHash = tx?.transactionHash;
 

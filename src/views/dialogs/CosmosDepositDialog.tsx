@@ -22,7 +22,7 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { COSMOS_CHAIN_INFOS } from '@/lib/cosmosChains';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/lib/graz';
 import { MAX_TRACK_TX_ATTEMPTS, trackSkipTxWithTenacity } from '@/lib/squid';
 
 type ElementProps = {
@@ -108,7 +108,21 @@ export const CosmosDepositDialog = ({ setIsOpen, toAmount, txHash, fromChainId }
     setIsOpen?.(false);
   };
 
-  const chainName = COSMOS_CHAIN_INFOS[fromChainId ?? '']?.chainName ?? 'Source Chain';
+  const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
+  const chainName = (() => {
+    if (fromChainId === nobleChainId) {
+      return 'Noble';
+    }
+    if (fromChainId === neutronChainId) {
+      return 'Neutron';
+    }
+    if (fromChainId === osmosisChainId) {
+      return 'Osmosis';
+    }
+    return 'Source Chain';
+  })();
 
   const stepItems = [
     {

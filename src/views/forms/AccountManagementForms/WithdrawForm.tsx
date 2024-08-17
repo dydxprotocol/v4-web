@@ -12,6 +12,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -61,10 +62,10 @@ import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId, GRAZ_CHAINS } from '@/lib/graz';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
-import { COSMOS_CHAIN_INFOS, getNeutronChainId, getNobleChainId, getOsmosisChainId, NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/lib/cosmosChains';
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
 
@@ -102,8 +103,9 @@ export const WithdrawForm = () => {
 
   const isValidAddress = useMemo(() => {
     if (toAddress) {
-      if (walletType === WalletType.Keplr && chainIdStr) {
-        const prefix = COSMOS_CHAIN_INFOS[chainIdStr]?.bech32Prefix;
+      if (walletType === WalletType.Keplr) {
+        const prefix = GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
+          .bech32PrefixAccAddr;
 
         if (prefix) {
           return validateCosmosAddress(toAddress, prefix);
