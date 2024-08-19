@@ -27,7 +27,6 @@ import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 import { useDydxClient } from '../useDydxClient';
-import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
 import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
@@ -66,7 +65,6 @@ export const useTradingView = ({
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
 
-  const { isOhlcEnabled } = useEnvFeatures();
   const { group, decimal } = useLocaleSeparators();
 
   const appTheme = useAppSelector(getAppTheme);
@@ -107,15 +105,13 @@ export const useTradingView = ({
       label: string;
       tooltip: string;
     }) => {
-      if (toggleRef) {
-        toggleRef.current = tvWidget.createButton();
-        toggleRef.current.innerHTML = `<span>${label}</span> <div class="toggle"></div>`;
-        toggleRef.current.setAttribute('title', tooltip);
-        if (isOn) {
-          toggleRef.current.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
-        }
-        toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
+      toggleRef.current = tvWidget.createButton();
+      toggleRef.current.innerHTML = `<span>${label}</span> <div class="toggle"></div>`;
+      toggleRef.current.setAttribute('title', tooltip);
+      if (isOn) {
+        toggleRef.current.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
       }
+      toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
     },
     []
   );
@@ -163,6 +159,7 @@ export const useTradingView = ({
       tvWidgetRef.current?.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
+            // Order Lines
             initializeToggle({
               toggleRef: orderLineToggleRef,
               tvWidget: tvWidgetRef.current,
@@ -175,24 +172,26 @@ export const useTradingView = ({
                 key: STRING_KEYS.ORDER_LINES_TOOLTIP,
               }),
             });
-            if (isOhlcEnabled) {
-              const getOhlcTooltipString = tooltipStrings.ohlc;
-              const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
-                stringGetter,
-                stringParams: {},
-                urlConfigs,
-                featureFlags,
-              });
 
-              initializeToggle({
-                toggleRef: orderbookCandlesToggleRef,
-                tvWidget: tvWidgetRef.current,
-                isOn: orderbookCandlesToggleOn,
-                setToggleOn: setOrderbookCandlesToggleOn,
-                label: `${ohlcTitle}*`,
-                tooltip: ohlcBody as string,
-              });
-            }
+            // Orderbook Candles (OHLC)
+            const getOhlcTooltipString = tooltipStrings.ohlc;
+            const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
+              stringGetter,
+              stringParams: {},
+              urlConfigs,
+              featureFlags,
+            });
+
+            initializeToggle({
+              toggleRef: orderbookCandlesToggleRef,
+              tvWidget: tvWidgetRef.current,
+              isOn: orderbookCandlesToggleOn,
+              setToggleOn: setOrderbookCandlesToggleOn,
+              label: `${ohlcTitle}*`,
+              tooltip: ohlcBody as string,
+            });
+
+            // Buy/Sell Marks
             initializeToggle({
               toggleRef: buySellMarksToggleRef,
               tvWidget: tvWidgetRef.current,
