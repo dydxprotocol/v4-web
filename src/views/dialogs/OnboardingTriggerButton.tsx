@@ -13,7 +13,7 @@ import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 
 type StyleProps = {
   className?: string;

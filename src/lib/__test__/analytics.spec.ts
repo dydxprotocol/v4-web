@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import * as analytics from '@/constants/analytics';
 
-import { identify, track } from '@/lib/analytics/amplitude';
+import { identify, track } from '@/lib/analytics/analytics';
 
 describe('identify', () => {
   it('initializes and dispatches custom identify event with property and propertyValue', () => {

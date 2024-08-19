@@ -12,7 +12,7 @@ import { DepositForm } from '@/views/forms/AccountManagementForms/DepositForm';
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import abacusStateManager from '@/lib/abacus';
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 
 type ElementProps = {
   onDeposit?: () => void;

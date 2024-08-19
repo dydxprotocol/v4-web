@@ -18,7 +18,7 @@ import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 
 export const AcknowledgeTermsDialog = ({ setIsOpen }: DialogProps<AcknowledgeTermsDialogProps>) => {
   const stringGetter = useStringGetter();

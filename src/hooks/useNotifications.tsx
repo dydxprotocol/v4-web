@@ -23,7 +23,7 @@ import {
   type Notifications,
 } from '@/constants/notifications';
 
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 import { isAbacusNotificationSingleSession } from '@/lib/notifications';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 

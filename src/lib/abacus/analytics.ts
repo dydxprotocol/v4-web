@@ -1,7 +1,7 @@
 import type { AbacusTrackingProtocol, Nullable } from '@/constants/abacus';
 import type { AnalyticsEvent } from '@/constants/analytics';
 
-import { track } from '../analytics/amplitude';
+import { track } from '../analytics/analytics';
 import { log as telemetryLog } from '../telemetry';
 
 class AbacusAnalytics implements AbacusTrackingProtocol {
