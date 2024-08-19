@@ -54,7 +54,7 @@ import { forceOpenDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { track } from '@/lib/analytics/analytics';
+import { track } from '@/lib/analytics/amplitude';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';

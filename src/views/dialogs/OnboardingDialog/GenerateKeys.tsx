@@ -27,7 +27,7 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { track } from '@/lib/analytics/analytics';
+import { track } from '@/lib/analytics/amplitude';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
