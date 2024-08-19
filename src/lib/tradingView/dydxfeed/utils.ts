@@ -99,7 +99,7 @@ export const getMarkForOrderFills = (
     time: getBarTime(barStartMs, fill.createdAtMilliseconds, resolution) ?? 0,
     minSize: 16,
     text,
-    labelFontColor: 'white',
+    labelFontColor: theme.textPrimary,
     color,
     label: fill.side.name === AbacusOrderSide.Buy.name ? 'B' : 'S',
   };
