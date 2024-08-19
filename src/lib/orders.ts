@@ -1,4 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import BigNumber from 'bignumber.js';
 
 import {
   AbacusOrderStatus,
@@ -6,6 +7,7 @@ import {
   AbacusOrderTypes,
   KotlinIrEnumValues,
   Nullable,
+  SubaccountFills,
   TRADE_TYPES,
   type Asset,
   type OrderStatus,
@@ -140,3 +142,13 @@ export const getHydratedTradingData = <
 
 export const getTradeType = (orderType: string) =>
   TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];
+
+export const getAverageFillPrice = (fills: SubaccountFills) => {
+  let total = BigNumber(0);
+  let totalSize = BigNumber(0);
+  fills.forEach((fill) => {
+    total = total.plus(BigNumber(fill.price).times(fill.size));
+    totalSize = totalSize.plus(fill.size);
+  });
+  return totalSize.gt(0) ? total.div(totalSize) : null;
+};
