@@ -21,12 +21,12 @@ export const useOrderbookCandles = ({
   setOrderbookCandlesToggleOn: Dispatch<SetStateAction<boolean>>;
   tvWidget: TvWidget | null;
 }) => {
-  useEffect(() => {
-    // Initialize onClick for orderbook candles toggle
-    if (isChartReady && orderbookCandlesToggle) {
-      orderbookCandlesToggle.onclick = () => setOrderbookCandlesToggleOn((prev) => !prev);
-    }
-  }, [isChartReady, orderbookCandlesToggle, setOrderbookCandlesToggleOn]);
+  // useEffect(() => {
+  //   // Initialize onClick for orderbook candles toggle
+  //   if (isChartReady && orderbookCandlesToggle) {
+  //     orderbookCandlesToggle.onclick = () => setOrderbookCandlesToggleOn((prev) => !prev);
+  //   }
+  // }, [isChartReady, orderbookCandlesToggle, setOrderbookCandlesToggleOn]);
 
   useEffect(
     // Update orderbookCandles button on toggle

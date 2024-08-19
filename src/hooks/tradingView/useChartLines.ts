@@ -262,12 +262,12 @@ export const useChartLines = ({
 
   // Effects
 
-  useEffect(() => {
-    // Initialize onClick for order line toggle
-    if (isChartReady && orderLineToggle) {
-      orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
-    }
-  }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
+  // useEffect(() => {
+  //   // Initialize onClick for order line toggle
+  //   if (isChartReady && orderLineToggle) {
+  //     orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
+  //   }
+  // }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
 
   useEffect(
     // Update display button on toggle

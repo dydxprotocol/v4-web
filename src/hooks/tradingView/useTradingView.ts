@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
@@ -38,14 +38,20 @@ import { useURLConfigs } from '../useURLConfigs';
 export const useTradingView = ({
   tvWidgetRef,
   orderLineToggleRef,
+  orderLinesToggleOn,
+  setOrderLinesToggleOn,
   orderbookCandlesToggleRef,
   orderbookCandlesToggleOn,
+  setOrderbookCandlesToggleOn,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
+  orderLinesToggleOn: boolean;
+  setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
   orderbookCandlesToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderbookCandlesToggleOn: boolean;
+  setOrderbookCandlesToggleOn: Dispatch<SetStateAction<boolean>>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -74,6 +80,34 @@ export const useTradingView = ({
 
   const hasMarkets = marketIds.length > 0;
   const hasPriceScaleInfo = initialPriceScale !== null || hasMarkets;
+
+  const initializeToggle = useCallback(
+    ({
+      toggleRef,
+      tvWidget,
+      isOn,
+      setToggleOn,
+    }: {
+      toggleRef: React.MutableRefObject<HTMLElement | null>;
+      tvWidget: TvWidget;
+      isOn: boolean;
+      setToggleOn: Dispatch<SetStateAction<boolean>>;
+    }) => {
+      toggleRef.current = tvWidget.createButton();
+      toggleRef.current.innerHTML = `<span>${stringGetter({
+        key: STRING_KEYS.ORDER_LINES,
+      })}</span> <div class="displayOrdersButton-toggle"></div>`;
+      toggleRef.current.setAttribute(
+        'title',
+        stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+      );
+      if (isOn) {
+        toggleRef.current.classList.add('order-lines-active');
+      }
+      toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
+    },
+    [stringGetter]
+  );
 
   useEffect(() => {
     // we only need tick size from current market for the price scale settings
@@ -116,14 +150,12 @@ export const useTradingView = ({
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
             if (orderLineToggleRef) {
-              orderLineToggleRef.current = tvWidgetRef.current.createButton();
-              orderLineToggleRef.current.innerHTML = `<span>${stringGetter({
-                key: STRING_KEYS.ORDER_LINES,
-              })}</span> <div class="displayOrdersButton-toggle"></div>`;
-              orderLineToggleRef.current.setAttribute(
-                'title',
-                stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
-              );
+              initializeToggle({
+                toggleRef: orderLineToggleRef,
+                tvWidget: tvWidgetRef.current,
+                isOn: orderLinesToggleOn,
+                setToggleOn: setOrderLinesToggleOn,
+              });
             }
             if (isOhlcEnabled && orderbookCandlesToggleRef) {
               const getOhlcTooltipString = tooltipStrings.ohlc;
@@ -137,6 +169,11 @@ export const useTradingView = ({
               orderbookCandlesToggleRef.current = tvWidgetRef.current.createButton();
               orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
               orderbookCandlesToggleRef.current.setAttribute('title', ohlcBody as string);
+              if (orderbookCandlesToggleOn) {
+                orderbookCandlesToggleRef.current.classList.add('ohlc-active');
+              }
+              orderbookCandlesToggleRef.current.onclick = () =>
+                setOrderbookCandlesToggleOn((prev) => !prev);
             }
           }
         });

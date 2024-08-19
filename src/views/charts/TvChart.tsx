@@ -25,20 +25,24 @@ export const TvChart = () => {
 
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
+
   const orderbookCandlesToggleRef = useRef<HTMLElement | null>(null);
   const orderbookCandlesToggle = orderbookCandlesToggleRef.current;
 
   const {
-    orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     orderLinesToggleOn,
     setOrderLinesToggleOn,
+    orderbookCandlesToggleOn,
+    setOrderbookCandlesToggleOn,
   } = useTradingViewToggles();
   const { savedResolution } = useTradingView({
     tvWidgetRef,
     orderLineToggleRef,
+    orderLinesToggleOn,
+    setOrderLinesToggleOn,
     orderbookCandlesToggleRef,
     orderbookCandlesToggleOn,
+    setOrderbookCandlesToggleOn,
     setIsChartReady,
   });
   useChartMarketAndResolution({
