@@ -1,7 +1,7 @@
 import { AnalyticsEvents } from '@/constants/analytics';
 import { isDev } from '@/constants/networks';
 
-import { track } from './analytics/analytics';
+import { track } from './analytics/amplitude';
 
 export const log = (location: string, error: Error, metadata?: any) => {
   if (isDev) {
