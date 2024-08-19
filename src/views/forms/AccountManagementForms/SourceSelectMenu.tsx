@@ -36,6 +36,8 @@ type ElementProps = {
   onSelect: (name: string, type: 'chain' | 'exchange') => void;
 };
 
+const solanaChainIdPrefix = 'solana';
+
 export const SourceSelectMenu = ({
   label,
   selectedExchange,
@@ -43,11 +45,11 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { walletType } = useAccounts();
-  // eslint-disable-next-line prefer-const
-  let { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
+  const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
-  if (walletType === WalletType.Phantom) CCTPDepositOnly = true;
+  const CCTPDepositOnly = walletType === WalletType.Phantom ? true : initialCCTPDepositValue;
+
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
@@ -93,7 +95,8 @@ export const SourceSelectMenu = ({
     }))
     .filter((chain) => {
       // only solana chains are supported on phantom
-      if (walletType === WalletType.Phantom && !chain.value.startsWith('solana')) return false;
+      if (walletType === WalletType.Phantom && !chain.value.startsWith(solanaChainIdPrefix))
+        return false;
       return true;
     })
     .filter((chain) => {

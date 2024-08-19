@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Connection as SolanaConnection } from '@solana/web3.js';
 
 import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
@@ -6,5 +8,10 @@ import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 export const useSolanaConnection = () => {
   const endpointsConfig = useEndpointsConfig();
 
-  return new SolanaConnection(endpointsConfig.solanaRpcUrl);
+  const connection = React.useMemo(
+    () => new SolanaConnection(endpointsConfig.solanaRpcUrl),
+    [endpointsConfig.solanaRpcUrl]
+  );
+
+  return connection;
 };
