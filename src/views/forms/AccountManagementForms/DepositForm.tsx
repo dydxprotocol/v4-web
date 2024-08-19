@@ -476,20 +476,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
     return undefined;
   }, [
-    isCctp,
     error,
     routeErrors,
-    fromAmount,
-    balance,
-    summary?.aggregatePriceImpact,
-    debouncedAmountBN,
-    stringGetter,
-    usdcLabel,
     routeErrorMessage,
-    debouncedAmount,
-    chainIdStr,
-    sourceToken,
+    balance,
     chainId,
+    fromAmount,
+    sourceToken,
+    stringGetter,
+    summary,
+    debouncedAmountBN,
   ]);
 
   const depositCTAString = useMemo(() => {

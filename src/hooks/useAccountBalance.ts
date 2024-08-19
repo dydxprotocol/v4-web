@@ -48,10 +48,10 @@ export const useAccountBalance = ({
   isCosmosChain,
 }: UseAccountBalanceProps = {}): {
   balance: string | undefined;
-  isQueryFetching: any;
+  isQueryFetching: boolean;
   nativeStakingBalance: number;
   nativeTokenBalance: BigNumber;
-  queryStatus: any;
+  queryStatus: 'success' | 'error' | 'pending';
   usdcBalance: number;
 } => {
   const { evmAddress, dydxAddress, solAddress } = useAccounts();
@@ -98,7 +98,6 @@ export const useAccountBalance = ({
     },
   });
 
-  // const solanaNative = useSolanaNativeBalance(solAddress) // May not need this, depends on bridge flow
   const solanaToken = useSolanaTokenBalance({ address: solAddress, token: addressOrDenom });
 
   const cosmosQueryFn = useCallback(async () => {
@@ -115,7 +114,7 @@ export const useAccountBalance = ({
       return formatUnits(BigInt(balanceAsCoin.amount), decimals);
     }
     return undefined;
-  }, [addressOrDenom, bech32AddrPrefix, decimals, dydxAddress, rpc]);
+  }, [addressOrDenom, chainId, rpc]);
 
   const cosmosQuery = useQuery({
     enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
@@ -152,21 +151,23 @@ export const useAccountBalance = ({
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount).toNumber();
 
-  const res = {
+  let queryStatus = evmNative.status;
+  let isQueryFetching = evmNative.isFetching;
+  if (isCosmosChain) {
+    queryStatus = cosmosQuery.status;
+    isQueryFetching = cosmosQuery.isFetching;
+  }
+  if (isSolanaChain) {
+    queryStatus = solanaToken.status;
+    isQueryFetching = solanaToken.isFetching;
+  }
+
+  return {
     balance,
     nativeTokenBalance,
     nativeStakingBalance,
     usdcBalance,
-    queryStatus: isCosmosChain
-      ? cosmosQuery.status
-      : isSolanaChain
-        ? solanaToken.status
-        : evmNative.status,
-    isQueryFetching: isCosmosChain
-      ? cosmosQuery.isFetching
-      : isSolanaChain
-        ? solanaToken.isFetching
-        : evmNative.isFetching,
+    queryStatus,
+    isQueryFetching,
   };
-  return res;
 };
