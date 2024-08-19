@@ -11,7 +11,8 @@ import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
+import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
@@ -63,6 +64,7 @@ export const useTradingView = ({
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
+
   const { isOhlcEnabled } = useEnvFeatures();
   const { group, decimal } = useLocaleSeparators();
 
@@ -94,27 +96,27 @@ export const useTradingView = ({
       tvWidget,
       isOn,
       setToggleOn,
-      labelStringKey,
-      tooltipStringKey,
+      label,
+      tooltip,
     }: {
       toggleRef: React.MutableRefObject<HTMLElement | null>;
       tvWidget: TvWidget;
       isOn: boolean;
       setToggleOn: Dispatch<SetStateAction<boolean>>;
-      labelStringKey: string;
-      tooltipStringKey: string;
+      label: string;
+      tooltip: string;
     }) => {
-      toggleRef.current = tvWidget.createButton();
-      toggleRef.current.innerHTML = `<span>${stringGetter({
-        key: labelStringKey,
-      })}</span> <div class="toggle"></div>`;
-      toggleRef.current.setAttribute('title', stringGetter({ key: tooltipStringKey }));
-      if (isOn) {
-        toggleRef.current.classList.add('toggle-active');
+      if (toggleRef) {
+        toggleRef.current = tvWidget.createButton();
+        toggleRef.current.innerHTML = `<span>${label}</span> <div class="toggle"></div>`;
+        toggleRef.current.setAttribute('title', tooltip);
+        if (isOn) {
+          toggleRef.current.classList.add('toggle-active');
+        }
+        toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
       }
-      toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
     },
-    [stringGetter]
+    []
   );
 
   useEffect(() => {
@@ -160,36 +162,48 @@ export const useTradingView = ({
       tvWidgetRef.current?.onChartReady(() => {
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
-            if (orderLineToggleRef) {
-              initializeToggle({
-                toggleRef: orderLineToggleRef,
-                tvWidget: tvWidgetRef.current,
-                isOn: orderLinesToggleOn,
-                setToggleOn: setOrderLinesToggleOn,
-                labelStringKey: STRING_KEYS.ORDER_LINES,
-                tooltipStringKey: STRING_KEYS.ORDER_LINES_TOOLTIP,
+            initializeToggle({
+              toggleRef: orderLineToggleRef,
+              tvWidget: tvWidgetRef.current,
+              isOn: orderLinesToggleOn,
+              setToggleOn: setOrderLinesToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.ORDER_LINES,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+              }),
+            });
+            if (isOhlcEnabled) {
+              const getOhlcTooltipString = tooltipStrings.ohlc;
+              const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
+                stringGetter,
+                stringParams: {},
+                urlConfigs,
+                featureFlags,
               });
-            }
-            if (isOhlcEnabled && orderbookCandlesToggleRef) {
+
               initializeToggle({
-                toggleRef: buySellMarksToggleRef,
+                toggleRef: orderbookCandlesToggleRef,
                 tvWidget: tvWidgetRef.current,
                 isOn: orderbookCandlesToggleOn,
                 setToggleOn: setOrderbookCandlesToggleOn,
-                labelStringKey: TOOLTIP_STRING_KEYS.OHLC_TITLE, 
-                tooltipStringKey: TOOLTIP_STRING_KEYS.OHLC_BODY, 
+                label: `${ohlcTitle}*`,
+                tooltip: ohlcBody as string,
               });
             }
-            if (buySellMarksToggleRef) {
-              initializeToggle({
-                toggleRef: buySellMarksToggleRef,
-                tvWidget: tvWidgetRef.current,
-                isOn: setBuySellMarksToggleOn,
-                setToggleOn: setBuySellMarksToggleOn,
-                labelStringKey: STRING_KEYS.BUYS_SELLS_TOGGLE,
-                tooltipStringKey: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-              });
-            }
+            initializeToggle({
+              toggleRef: buySellMarksToggleRef,
+              tvWidget: tvWidgetRef.current,
+              isOn: buySellMarksToggleOn,
+              setToggleOn: setBuySellMarksToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+              }),
+            });
           }
         });
 
@@ -217,14 +231,14 @@ export const useTradingView = ({
     selectedNetwork,
     !!marketId,
     hasPriceScaleInfo,
-    orderbookCandlesToggleOn,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
     buySellMarksToggleRef,
     setBuySellMarksToggleOn,
     setOrderLinesToggleOn,
     setOrderbookCandlesToggleOn,
-    tvWidgetRef
+    orderbookCandlesToggleOn,
+    tvWidgetRef,
   ]);
 
   return { savedResolution };

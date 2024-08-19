@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { TvWidget } from '@/constants/tvchart';
 
@@ -11,22 +11,13 @@ export const useOrderbookCandles = ({
   orderbookCandlesToggle,
   isChartReady,
   orderbookCandlesToggleOn,
-  setOrderbookCandlesToggleOn,
   tvWidget,
 }: {
   orderbookCandlesToggle: HTMLElement | null;
   isChartReady: boolean;
   orderbookCandlesToggleOn: boolean;
-  setOrderbookCandlesToggleOn: Dispatch<SetStateAction<boolean>>;
   tvWidget: TvWidget | null;
 }) => {
-  // useEffect(() => {
-  //   // Initialize onClick for orderbook candles toggle
-  //   if (isChartReady && orderbookCandlesToggle) {
-  //     orderbookCandlesToggle.onclick = () => setOrderbookCandlesToggleOn((prev) => !prev);
-  //   }
-  // }, [isChartReady, orderbookCandlesToggle, setOrderbookCandlesToggleOn]);
-
   useEffect(
     // Update orderbookCandles button on toggle
     () => {

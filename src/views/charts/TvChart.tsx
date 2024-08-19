@@ -63,13 +63,11 @@ export const TvChart = () => {
     orderLineToggle,
     isChartReady,
     orderLinesToggleOn,
-    setOrderLinesToggleOn,
   });
   useOrderbookCandles({
     orderbookCandlesToggle,
     isChartReady,
     orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     tvWidget,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });

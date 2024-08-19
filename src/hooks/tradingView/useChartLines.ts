@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -33,13 +33,11 @@ export const useChartLines = ({
   orderLineToggle,
   isChartReady,
   orderLinesToggleOn,
-  setOrderLinesToggleOn,
 }: {
   tvWidget: TvWidget | null;
   orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
   orderLinesToggleOn: boolean;
-  setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
@@ -261,13 +259,6 @@ export const useChartLines = ({
   }, [updatePositionLines, updateOrderLines, clearChartLines, orderLinesToggleOn]);
 
   // Effects
-
-  // useEffect(() => {
-  //   // Initialize onClick for order line toggle
-  //   if (isChartReady && orderLineToggle) {
-  //     orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
-  //   }
-  // }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
 
   useEffect(
     // Update display button on toggle
