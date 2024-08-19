@@ -8,7 +8,7 @@ import type { TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 import {
   STATUS_ERROR_GRACE_PERIOD,
   fetchTransferStatus,
