@@ -1,8 +1,9 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
 import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
@@ -33,13 +34,11 @@ export const useChartLines = ({
   orderLineToggle,
   isChartReady,
   orderLinesToggleOn,
-  setOrderLinesToggleOn,
 }: {
   tvWidget: TvWidget | null;
   orderLineToggle: HTMLElement | null;
   isChartReady: boolean;
   orderLinesToggleOn: boolean;
-  setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
@@ -262,22 +261,15 @@ export const useChartLines = ({
 
   // Effects
 
-  useEffect(() => {
-    // Initialize onClick for order line toggle
-    if (isChartReady && orderLineToggle) {
-      orderLineToggle.onclick = () => setOrderLinesToggleOn((prev) => !prev);
-    }
-  }, [isChartReady, orderLineToggle, setOrderLinesToggleOn]);
-
   useEffect(
     // Update display button on toggle
     () => {
       if (isChartReady) {
         runOnChartReady(() => {
           if (orderLinesToggleOn) {
-            orderLineToggle?.classList?.add('toggle-active');
+            orderLineToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderLineToggle?.classList?.remove('toggle-active');
+            orderLineToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
         });
       }

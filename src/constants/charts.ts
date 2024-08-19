@@ -3,6 +3,8 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { FundingDirection } from './markets';
 
+export const TOGGLE_ACTIVE_CLASS_NAME = 'toggle-active';
+
 // ------ Depth Chart ------ //
 export enum DepthChartSeries {
   Asks = 'Asks',
