@@ -77,5 +77,6 @@ export enum OpacityToken {
 export enum BrightnessFilterToken {
   Darken10 = '0.9',
   Darken5 = '0.95',
+  Darken30 = '0.7',
   Lighten10 = '1.1',
 }

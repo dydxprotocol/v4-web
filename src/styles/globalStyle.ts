@@ -55,5 +55,6 @@ export const GlobalStyle = createGlobalStyle`
     --hover-filter-base: ${({ theme }) => theme.hoverFilterBase};
     --hover-filter-variant: ${({ theme }) => theme.hoverFilterVariant};
     --active-filter: ${({ theme }) => theme.activeFilter};
+    --overlay-filter: ${({ theme }) => theme.overlayFilter};
   }
 `;

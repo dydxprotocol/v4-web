@@ -52,6 +52,7 @@ type StyleProps = {
   className?: string;
   stacked?: boolean;
   withAnimation?: boolean;
+  withOverlay?: boolean;
 };
 
 export type DialogProps = ElementProps & StyleProps;
@@ -88,18 +89,17 @@ export const Dialog = ({
   hasHeaderBorder = false,
   hasHeaderBlur = true,
   withAnimation = false,
+  withOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement),
   children,
   className,
 }: DialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const showOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement);
-
   return (
-    <Root modal={showOverlay} open={isOpen} onOpenChange={setIsOpen}>
+    <Root modal={withOverlay} open={isOpen} onOpenChange={setIsOpen}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <DialogPortal withPortal={placement !== DialogPlacement.Inline} container={portalContainer}>
-        {showOverlay && <$Overlay />}
+        {withOverlay && <$Overlay />}
         <$Container
           placement={placement}
           className={className}
@@ -107,7 +107,7 @@ export const Dialog = ({
             closeButtonRef.current?.focus();
           }}
           onInteractOutside={(e: Event) => {
-            if (!showOverlay || preventClose) {
+            if (!withOverlay || preventClose) {
               e.preventDefault();
             }
           }}
@@ -172,29 +172,9 @@ const $Overlay = styled(Overlay)`
   position: fixed;
   inset: 0;
 
-  pointer-events: none;
+  pointer-events: none !important;
 
-  @media (prefers-reduced-motion: reduce) {
-    backdrop-filter: blur(8px);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    &[data-state='open'] {
-      animation: ${keyframes`
-        to {
-          backdrop-filter: blur(8px);
-        }
-      `} 0.15s var(--ease-out-expo) forwards;
-    }
-
-    &[data-state='closed'] {
-      animation: ${keyframes`
-        from {
-          backdrop-filter: blur(8px);
-        }
-      `} 0.15s;
-    }
-  }
+  backdrop-filter: brightness(var(--overlay-filter));
 `;
 
 const $Container = styled(Content)<{
