@@ -25,7 +25,7 @@ import { getInputTradeData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
 import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
 
 import { LeverageSlider } from './LeverageSlider';
@@ -45,7 +45,7 @@ export const MarketLeverageInput = ({
   const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { leverage, size: currentPositionSize } = currentPositionData ?? {};
+  const { leverage, size: currentPositionSize, maxLeverage: maxLeverageState, buyingPower, id } = currentPositionData ?? {};
   const { current: currentSize, postOrder: postOrderSize } = currentPositionSize ?? {};
   const { current: currentLeverage, postOrder: postOrderLeverage } = leverage ?? {};
   const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig ?? {};
@@ -59,7 +59,9 @@ export const MarketLeverageInput = ({
 
   const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
 
-  const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+  const maxLeverage = MustBigNumber(maxLeverageState?.current ?? 0).abs();
+  // const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+  // console.log("xcxc", id, buyingPower, maxLeverage.toNumber())
 
   const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
 
