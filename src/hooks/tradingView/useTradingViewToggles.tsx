@@ -6,6 +6,7 @@ export const useTradingViewToggles = () => {
   // Otherwise, candles calculate OHLC data from historical trades.
   const [orderbookCandlesToggleOn, setOrderbookCandlesToggleOn] = useState(true);
   const [orderLinesToggleOn, setOrderLinesToggleOn] = useState(true);
+  const [buySellMarksToggleOn, setBuySellMarksToggleOn] = useState(true);
 
   return {
     // Orderbook Candles
@@ -14,5 +15,8 @@ export const useTradingViewToggles = () => {
     // Chart Order Lines
     orderLinesToggleOn,
     setOrderLinesToggleOn,
+    // Buy Sell Marks
+    buySellMarksToggleOn,
+    setBuySellMarksToggleOn,
   };
 };

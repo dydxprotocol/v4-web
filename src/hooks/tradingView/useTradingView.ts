@@ -28,6 +28,7 @@ import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/
 import { useDydxClient } from '../useDydxClient';
 import { useEnvFeatures } from '../useEnvFeatures';
 import { useLocalStorage } from '../useLocalStorage';
+import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
@@ -40,18 +41,21 @@ export const useTradingView = ({
   orderLineToggleRef,
   orderbookCandlesToggleRef,
   orderbookCandlesToggleOn,
+  buySellMarksToggleRef,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderbookCandlesToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderbookCandlesToggleOn: boolean;
+  buySellMarksToggleRef: React.MutableRefObject<HTMLElement | null>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
   const { isOhlcEnabled } = useEnvFeatures();
+  const { group, decimal } = useLocaleSeparators();
 
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -100,7 +104,10 @@ export const useTradingView = ({
           store,
           getCandlesForDatafeed,
           initialPriceScale,
-          orderbookCandlesToggleOn
+          orderbookCandlesToggleOn,
+          { decimal, group },
+          selectedLocale,
+          stringGetter
         ),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
@@ -119,7 +126,7 @@ export const useTradingView = ({
               orderLineToggleRef.current = tvWidgetRef.current.createButton();
               orderLineToggleRef.current.innerHTML = `<span>${stringGetter({
                 key: STRING_KEYS.ORDER_LINES,
-              })}</span> <div class="displayOrdersButton-toggle"></div>`;
+              })}</span> <div class="toggle"></div>`;
               orderLineToggleRef.current.setAttribute(
                 'title',
                 stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
@@ -135,8 +142,16 @@ export const useTradingView = ({
               });
 
               orderbookCandlesToggleRef.current = tvWidgetRef.current.createButton();
-              orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="ohlcButton-toggle"></div>`;
+              orderbookCandlesToggleRef.current.innerHTML = `<span>${`${ohlcTitle}*`}</span> <div class="toggle"></div>`;
               orderbookCandlesToggleRef.current.setAttribute('title', ohlcBody as string);
+            }
+            if (buySellMarksToggleRef) {
+              buySellMarksToggleRef.current = tvWidgetRef.current.createButton();
+              buySellMarksToggleRef.current.innerHTML = `<span>${stringGetter({ key: STRING_KEYS.BUYS_SELLS_TOGGLE })}</span> <div class="toggle"></div>`;
+              buySellMarksToggleRef.current.setAttribute(
+                'title',
+                stringGetter({ key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP })
+              );
             }
           }
         });
@@ -154,6 +169,8 @@ export const useTradingView = ({
       orderLineToggleRef.current = null;
       orderbookCandlesToggleRef.current?.remove();
       orderbookCandlesToggleRef.current = null;
+      buySellMarksToggleRef.current?.remove();
+      buySellMarksToggleRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
       setIsChartReady(false);

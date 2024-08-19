@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import type { TvWidget } from '@/constants/tvchart';
 
+import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
 import { useChartLines } from '@/hooks/tradingView/useChartLines';
 import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
 import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
@@ -27,18 +28,23 @@ export const TvChart = () => {
   const orderLineToggle = orderLineToggleRef.current;
   const orderbookCandlesToggleRef = useRef<HTMLElement | null>(null);
   const orderbookCandlesToggle = orderbookCandlesToggleRef.current;
+  const buySellMarksToggleRef = useRef<HTMLElement | null>(null);
+  const buySellMarksToggle = buySellMarksToggleRef.current;
 
   const {
     orderbookCandlesToggleOn,
     setOrderbookCandlesToggleOn,
     orderLinesToggleOn,
     setOrderLinesToggleOn,
+    setBuySellMarksToggleOn,
+    buySellMarksToggleOn,
   } = useTradingViewToggles();
   const { savedResolution } = useTradingView({
     tvWidgetRef,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
     orderbookCandlesToggleOn,
+    buySellMarksToggleRef,
     setIsChartReady,
   });
   useChartMarketAndResolution({
@@ -61,6 +67,13 @@ export const TvChart = () => {
     tvWidget,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
+  useBuySellMarks({
+    buySellMarksToggle,
+    buySellMarksToggleOn,
+    setBuySellMarksToggleOn,
+    tvWidget,
+    isChartReady,
+  });
 
   return (
     <$PriceChart isChartReady={isChartReady}>

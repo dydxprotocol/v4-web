@@ -275,9 +275,9 @@ export const useChartLines = ({
       if (isChartReady) {
         runOnChartReady(() => {
           if (orderLinesToggleOn) {
-            orderLineToggle?.classList?.add('order-lines-active');
+            orderLineToggle?.classList?.add('toggle-active');
           } else {
-            orderLineToggle?.classList?.remove('order-lines-active');
+            orderLineToggle?.classList?.remove('toggle-active');
           }
         });
       }
