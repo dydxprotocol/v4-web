@@ -26,25 +26,31 @@ export const TvChart = () => {
 
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
+
   const orderbookCandlesToggleRef = useRef<HTMLElement | null>(null);
   const orderbookCandlesToggle = orderbookCandlesToggleRef.current;
   const buySellMarksToggleRef = useRef<HTMLElement | null>(null);
   const buySellMarksToggle = buySellMarksToggleRef.current;
 
   const {
-    orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     orderLinesToggleOn,
     setOrderLinesToggleOn,
+    orderbookCandlesToggleOn,
+    setOrderbookCandlesToggleOn,
     setBuySellMarksToggleOn,
     buySellMarksToggleOn,
   } = useTradingViewToggles();
   const { savedResolution } = useTradingView({
     tvWidgetRef,
     orderLineToggleRef,
+    orderLinesToggleOn,
+    setOrderLinesToggleOn,
     orderbookCandlesToggleRef,
     orderbookCandlesToggleOn,
+    setOrderbookCandlesToggleOn,
     buySellMarksToggleRef,
+    buySellMarksToggleOn,
+    setBuySellMarksToggleOn,
     setIsChartReady,
   });
   useChartMarketAndResolution({
@@ -57,23 +63,20 @@ export const TvChart = () => {
     orderLineToggle,
     isChartReady,
     orderLinesToggleOn,
-    setOrderLinesToggleOn,
   });
   useOrderbookCandles({
     orderbookCandlesToggle,
     isChartReady,
     orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     tvWidget,
   });
-  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
   useBuySellMarks({
     buySellMarksToggle,
     buySellMarksToggleOn,
-    setBuySellMarksToggleOn,
     tvWidget,
     isChartReady,
   });
+  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
     <$PriceChart isChartReady={isChartReady}>

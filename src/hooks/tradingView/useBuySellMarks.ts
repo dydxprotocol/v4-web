@@ -1,5 +1,6 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { useEffect } from 'react';
 
+import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { TvWidget } from '@/constants/tvchart';
 
 import { getMarketFills } from '@/state/accountSelectors';
@@ -14,13 +15,11 @@ import { useAppThemeAndColorModeContext } from '../useAppThemeAndColorMode';
 export function useBuySellMarks({
   buySellMarksToggle,
   buySellMarksToggleOn,
-  setBuySellMarksToggleOn,
   tvWidget,
   isChartReady,
 }: {
   buySellMarksToggle: HTMLElement | null;
   buySellMarksToggleOn: boolean;
-  setBuySellMarksToggleOn: Dispatch<SetStateAction<boolean>>;
   tvWidget: TvWidget | null;
   isChartReady: boolean;
 }) {
@@ -30,13 +29,6 @@ export function useBuySellMarks({
 
   const theme = useAppThemeAndColorModeContext();
 
-  useEffect(() => {
-    // Initialize onClick for Buys/Sells toggle
-    if (isChartReady && buySellMarksToggle) {
-      buySellMarksToggle.onclick = () => setBuySellMarksToggleOn((prev) => !prev);
-    }
-  }, [isChartReady, buySellMarksToggle, setBuySellMarksToggleOn]);
-
   useEffect(
     // Update marks on toggle and on new fills and on display preference changes
     () => {
@@ -45,10 +37,10 @@ export function useBuySellMarks({
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           if (buySellMarksToggleOn) {
-            buySellMarksToggle?.classList?.add('toggle-active');
+            buySellMarksToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
             tvWidget.activeChart().refreshMarks();
           } else {
-            buySellMarksToggle?.classList?.remove('toggle-active');
+            buySellMarksToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
             tvWidget.activeChart().clearMarks();
           }
         });
