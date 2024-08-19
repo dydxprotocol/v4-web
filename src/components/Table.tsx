@@ -1,4 +1,4 @@
-import React, { Key, useCallback, useEffect, useState } from 'react';
+import React, { Key, useCallback, useMemo, useState } from 'react';
 
 import {
   Cell, // CollectionBuilderContext,
@@ -25,7 +25,6 @@ import {
   useTableRow,
   useTableRowGroup,
 } from 'react-aria';
-import { useAsyncList } from 'react-stately';
 import styled, { css } from 'styled-components';
 
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
@@ -163,42 +162,45 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const collator = useCollator();
 
-  const sortFn = (
-    a: TableRowData | CustomRowConfig,
-    b: TableRowData | CustomRowConfig,
-    sortColumn?: Key,
-    sortDirection?: SortDirection
-  ) => {
-    if (!sortColumn) return 0;
+  const sortFn = useCallback(
+    (
+      a: TableRowData | CustomRowConfig,
+      b: TableRowData | CustomRowConfig,
+      sortColumn?: Key,
+      sortDirection?: SortDirection
+    ) => {
+      if (!sortColumn) return 0;
 
-    const column = columns.find((c) => c.columnKey === sortColumn);
-    if (column == null || column.allowsSorting === false) {
-      return 0;
-    }
-    const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
-    const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
-
-    if (first == null || second == null) {
-      if (first === second) {
+      const column = columns.find((c) => c.columnKey === sortColumn);
+      if (column == null || column.allowsSorting === false) {
         return 0;
       }
-      if (first != null) {
-        return 1;
-      }
-      return -1;
-    }
+      const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
+      const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
 
-    return (
-      // Compare the items by the sorted column
-      (Number.isNaN(Number(first))
-        ? // String
-          collator.compare(String(first), String(second))
-        : // Number
-          MustBigNumber(first).comparedTo(MustBigNumber(second))) *
-      // Flip the direction if descending order is specified.
-      (sortDirection === 'descending' ? -1 : 1)
-    );
-  };
+      if (first == null || second == null) {
+        if (first === second) {
+          return 0;
+        }
+        if (first != null) {
+          return 1;
+        }
+        return -1;
+      }
+
+      return (
+        // Compare the items by the sorted column
+        (Number.isNaN(Number(first))
+          ? // String
+            collator.compare(String(first), String(second))
+          : // Number
+            MustBigNumber(first).comparedTo(MustBigNumber(second))) *
+        // Flip the direction if descending order is specified.
+        (sortDirection === 'descending' ? -1 : 1)
+      );
+    },
+    [collator, columns]
+  );
 
   const internalGetRowKey = useCallback(
     (row: TableRowData | CustomRowConfig) => {
@@ -207,30 +209,25 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     [getRowKey]
   );
 
-  const list = useAsyncList<TableRowData | CustomRowConfig>({
-    getKey: internalGetRowKey,
-    load: async ({ sortDescriptor }) => ({
-      items: sortDescriptor?.column
-        ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
-        : data,
-    }),
-
-    initialSortDescriptor: defaultSortDescriptor,
-
-    sort: async ({ items, sortDescriptor }) => ({
-      items: [...items].sort((a, b) =>
-        sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction)
-      ),
-    }),
-  });
-
-  // FIX: refactor table so we don't have to manually reload
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => list.reload(), [data]);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(
+    defaultSortDescriptor
+  );
+  const items = useMemo(() => {
+    return sortDescriptor?.column
+      ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
+      : data;
+  }, [data, sortDescriptor?.column, sortDescriptor?.direction, sortFn]);
 
   const isEmpty = data.length === 0;
   const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
+  const bodyListItems = useMemo(
+    () =>
+      shouldPaginate && items.length > pageSize
+        ? items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+        : items,
+    [currentPage, items, pageSize, shouldPaginate]
+  );
   return (
     <$TableWrapper
       className={className}
@@ -242,8 +239,8 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
       {!isEmpty ? (
         <TableRoot
           aria-label={label}
-          sortDescriptor={list.sortDescriptor}
-          onSortChange={list.sort}
+          sortDescriptor={sortDescriptor}
+          onSortChange={setSortDescriptor}
           selectedKeys={selectedKeys}
           setSelectedKeys={setSelectedKeys}
           selectionMode={selectionMode}
@@ -294,13 +291,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
             )}
           </TableHeader>
 
-          <TableBody
-            items={
-              shouldPaginate && list.items.length > pageSize
-                ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                : list.items
-            }
-          >
+          <TableBody items={bodyListItems}>
             {(item) => (
               <Row key={internalGetRowKey(item)}>
                 {(columnKey) => (
