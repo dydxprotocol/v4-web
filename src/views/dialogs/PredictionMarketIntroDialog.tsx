@@ -80,7 +80,7 @@ export const PredictionMarketIntroDialog = ({
         <Checkbox
           checked={doNotShowAgain}
           onCheckedChange={() => {
-            setDoNotShowAgain(!doNotShowAgain);
+            setDoNotShowAgain((prev) => !prev);
           }}
           label={stringGetter({ key: STRING_KEYS.DONT_SHOW_ME_AGAIN })}
         />
