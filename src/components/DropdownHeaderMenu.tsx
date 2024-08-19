@@ -74,7 +74,7 @@ const $Trigger = styled(Trigger)`
   --trigger-open-textColor: var(--color-text-2);
 
   &[data-state='open']:after {
-    backdrop-filter: blur(6px);
+    backdrop-filter: brightness(var(--overlay-filter));
     height: 100vh;
   }
 

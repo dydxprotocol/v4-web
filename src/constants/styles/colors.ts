@@ -114,4 +114,5 @@ type Filters = {
   hoverFilterBase: string;
   hoverFilterVariant: string;
   activeFilter: string;
+  overlayFilter: string;
 };
