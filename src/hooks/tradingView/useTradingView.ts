@@ -10,6 +10,7 @@ import {
 import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
+import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
@@ -111,7 +112,7 @@ export const useTradingView = ({
         toggleRef.current.innerHTML = `<span>${label}</span> <div class="toggle"></div>`;
         toggleRef.current.setAttribute('title', tooltip);
         if (isOn) {
-          toggleRef.current.classList.add('toggle-active');
+          toggleRef.current.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
         }
         toggleRef.current.onclick = () => setToggleOn((prev) => !prev);
       }

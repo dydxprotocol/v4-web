@@ -70,14 +70,13 @@ export const TvChart = () => {
     orderbookCandlesToggleOn,
     tvWidget,
   });
-  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
   useBuySellMarks({
     buySellMarksToggle,
     buySellMarksToggleOn,
-    setBuySellMarksToggleOn,
     tvWidget,
     isChartReady,
   });
+  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
     <$PriceChart isChartReady={isChartReady}>

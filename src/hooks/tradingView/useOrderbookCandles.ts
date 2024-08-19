@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { TvWidget } from '@/constants/tvchart';
 
 import abacusStateManager from '@/lib/abacus';
@@ -26,9 +27,9 @@ export const useOrderbookCandles = ({
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           if (orderbookCandlesToggleOn) {
-            orderbookCandlesToggle?.classList?.add('toggle-active');
+            orderbookCandlesToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderbookCandlesToggle?.classList?.remove('toggle-active');
+            orderbookCandlesToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
           abacusStateManager.toggleOrderbookCandles(orderbookCandlesToggleOn);
         });

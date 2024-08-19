@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
@@ -266,9 +267,9 @@ export const useChartLines = ({
       if (isChartReady) {
         runOnChartReady(() => {
           if (orderLinesToggleOn) {
-            orderLineToggle?.classList?.add('toggle-active');
+            orderLineToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderLineToggle?.classList?.remove('toggle-active');
+            orderLineToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
         });
       }
