@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { EN_LOCALE_DATA, EU_LOCALES, LocaleData, SupportedLocales } from '@/constants/localization';
 
-import { track } from '@/lib/analytics/analytics';
+import { track } from '@/lib/analytics/amplitude';
 
 export interface LocalizationState {
   isLocaleLoaded: boolean;

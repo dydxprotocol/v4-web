@@ -18,7 +18,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { identify, track } from '@/lib/analytics/analytics';
+import { identify, track } from '@/lib/analytics/amplitude';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';

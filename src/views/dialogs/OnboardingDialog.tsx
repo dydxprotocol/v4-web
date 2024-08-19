@@ -25,7 +25,7 @@ import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/Testnet
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
-import { track } from '@/lib/analytics/analytics';
+import { track } from '@/lib/analytics/amplitude';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
