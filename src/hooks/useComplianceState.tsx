@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
 
 import { ComplianceStatus } from '@/constants/abacus';
+import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -11,7 +11,12 @@ import { Link } from '@/components/Link';
 import { OutputType, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
+import {
+  getComplianceStatus,
+  getComplianceUpdatedAt,
+  getGeo,
+  getOnboardingState,
+} from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -28,6 +33,7 @@ export const useComplianceState = () => {
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
 
   const complianceState = useMemo(() => {
@@ -104,9 +110,6 @@ export const useComplianceState = () => {
     complianceStatus,
     complianceState,
     complianceMessage,
+    disableConnectButton,
   };
 };
-
-const $TermsOfUseLink = styled(TermsOfUseLink)`
-  text-decoration: underline;
-`;
