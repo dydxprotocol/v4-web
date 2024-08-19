@@ -118,15 +118,15 @@ export const getDydxDatafeed = (
 
   getMarks: async (
     symbolInfo: LibrarySymbolInfo,
-    from: number,
-    to: number,
+    fromSeconds: number,
+    toSeconds: number,
     onDataCallback: GetMarksCallback<Mark>,
     resolution: ResolutionString
   ) => {
     const theme = getAppTheme(store.getState());
     const colorMode = getAppColorMode(store.getState());
 
-    const [fromMs, toMs] = [from * 1000, to * 1000];
+    const [fromMs, toMs] = [fromSeconds * 1000, toSeconds * 1000];
     const market = getMarketData(store.getState(), symbolInfo.name);
     if (!market) return;
 

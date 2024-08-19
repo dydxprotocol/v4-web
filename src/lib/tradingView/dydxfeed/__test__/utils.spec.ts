@@ -1,7 +1,7 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 import { describe, expect, it } from 'vitest';
 
-import { getBarTime } from '../tradingView/dydxfeed/utils';
+import { getBarTime } from '../utils';
 
 describe('getBarTime', () => {
   it('should return the correct value when times start at 0', () => {
