@@ -4,9 +4,9 @@ import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { SubaccountPosition } from '@/constants/abacus';
-import { TradeBoxDialogTypes } from '@/constants/dialogs';
+import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_MARKETID } from '@/constants/markets';
+import { DEFAULT_MARKETID, PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -14,7 +14,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { getOpenPositions } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { closeDialogInTradeBox } from '@/state/dialogs';
+import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
@@ -36,6 +36,17 @@ export const useCurrentMarketId = () => {
     key: LocalStorageKey.LastViewedMarket,
     defaultValue: DEFAULT_MARKETID,
   });
+
+  const [hasSeenPredictionMarketsIntro] = useLocalStorage({
+    key: LocalStorageKey.HasSeenPredictionMarketsIntro,
+    defaultValue: false,
+  });
+
+  const onNavigateToPredictionMarket = () => {
+    if (!hasSeenPredictionMarketsIntro) {
+      dispatch(openDialog(DialogTypes.PredictionMarketIntro()));
+    }
+  };
 
   const validId = useMemo(() => {
     if (marketIds.length === 0) return marketId ?? lastViewedMarket;
@@ -66,6 +77,11 @@ export const useCurrentMarketId = () => {
         // If marketId is valid, set currentMarketId
         setLastViewedMarket(marketId);
         dispatch(setCurrentMarketId(marketId));
+
+        // If changed to a prediction market, display Prediction Market explainer
+        if (Object.values(PREDICTION_MARKET).includes(marketId)) {
+          onNavigateToPredictionMarket();
+        }
 
         if (
           activeTradeBoxDialog != null &&
