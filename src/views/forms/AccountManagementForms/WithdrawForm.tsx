@@ -59,7 +59,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
-import { track } from '@/lib/analytics/amplitude';
+import { track } from '@/lib/analytics/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
