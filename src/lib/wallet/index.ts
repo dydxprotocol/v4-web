@@ -1,4 +1,4 @@
-import { MetamaskErrorCodes } from '@/constants/errors';
+import { DydxError, MetamaskErrorCodes } from '@/constants/errors';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import {
   WalletConnectionType,
@@ -78,7 +78,7 @@ export const getWalletConnection = ({
   return undefined;
 };
 
-const getWalletErrorType = ({ error }: { error: any }) => {
+const getWalletErrorType = ({ error }: { error: DydxError }) => {
   const { message, code } = error;
   const messageLower = message.toLowerCase();
 
@@ -118,7 +118,8 @@ const getWalletErrorType = ({ error }: { error: any }) => {
   return WalletErrorType.Unknown;
 };
 
-export const getErrorMessageForCode = ({ code, message }: { code: number; message: string }) => {
+export const getErrorMessageForCode = (error: DydxError) => {
+  const { code, message } = error;
   if (code === MetamaskErrorCodes.RESOURCE_UNAVAILABLE) {
     // TODO: localize
     return 'Request already pending. Please complete in your wallet extension';
@@ -130,7 +131,7 @@ export const parseWalletError = ({
   error,
   stringGetter,
 }: {
-  error: any;
+  error: DydxError;
   stringGetter: StringGetterFunction;
 }) => {
   const walletErrorType = getWalletErrorType({ error });

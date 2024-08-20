@@ -1,4 +1,5 @@
 import { STRING_KEYS } from './localization';
+import { WalletConnectionType } from './wallets';
 
 export type ErrorParams =
   | {
@@ -17,4 +18,14 @@ export const DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS = {
 export enum MetamaskErrorCodes {
   // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#32002
   RESOURCE_UNAVAILABLE = -32002,
+}
+
+/**
+ * Dydx has an interface for errors that includes more accessible properties than the generic ts error interface
+ * The generic interface only has name, message, and stack.
+ * This interface includes an optional code and walletConnectionType as well.
+ */
+export interface DydxError extends Error {
+  code?: string | number;
+  walletConnectionType?: WalletConnectionType;
 }
