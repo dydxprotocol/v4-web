@@ -17,18 +17,40 @@ export const useSolanaTokenBalance = ({ address, token }: BalanceProps) => {
       if (!address || !token) {
         throw new Error('Account or token address is not present');
       }
-      const accountOwner = new PublicKey(address);
-      const tokenMint = new PublicKey(token);
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(accountOwner, {
-        mint: tokenMint,
-      });
+      const owner = new PublicKey(address);
+      const mint = new PublicKey(token);
+      const response = await connection.getParsedTokenAccountsByOwner(owner, { mint });
+
+      // An array of all of the owner's associated token accounts for the `mint`.
+      const accounts = response.value
+
+      // The owner has no associated token accounts open for the 
+      // specified token mint, and therefore, their balance is zero.
+      if (accounts.length === 0)
+        return {
+          data: {
+            formatted: 0,
+            amount: 0,
+            decimals: 0,
+          },
+        }
+
+      // Select the associated token account owned by the user with the highest amount
+      const largestAccount = accounts.reduce((largest, current) => {
+        const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount
+        const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount
+        return currentBalance >= largestBalance ? current : largest
+      }, accounts[0]
+      );
+
       return {
         data: {
-          formatted: tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount,
-          amount: tokenAccounts.value[0].account.data.parsed.info.tokenAmount.amount,
-          decimals: tokenAccounts.value[0].account.data.parsed.info.tokenAmount.decimals,
+          formatted: largestAccount.account.data.parsed.info.tokenAmount.uiAmount,
+          amount: largestAccount.account.data.parsed.info.tokenAmount.amount,
+          decimals: largestAccount.account.data.parsed.info.tokenAmount.decimals,
         },
-      };
+      }
+
     } catch (error) {
       throw new Error(`Failed to fetch Solana balance: ${error.message}`);
     }
