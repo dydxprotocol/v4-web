@@ -29,6 +29,9 @@ dependencies:
   '@cosmjs/tendermint-rpc':
     specifier: ^0.32.1
     version: 0.32.2
+  '@datadog/browser-logs':
+    specifier: ^5.23.3
+    version: 5.23.3
   '@dydxprotocol/v4-abacus':
     specifier: 1.11.2
     version: 1.11.2
