@@ -8,6 +8,8 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
+const MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES = 10;
+
 const getOhlcValues = ({
   orderbookCandlesToggleOn,
   trades,
@@ -29,7 +31,7 @@ const getOhlcValues = ({
 }) => {
   const useOrderbookCandles =
     orderbookCandlesToggleOn &&
-    trades === 0 &&
+    trades <= MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES &&
     orderbookOpen !== undefined &&
     orderbookClose !== undefined;
 
