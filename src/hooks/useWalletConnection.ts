@@ -178,6 +178,7 @@ export const useWalletConnection = () => {
           throw Object.assign(
             new Error([error.message, error.cause?.message].filter(Boolean).join('\n')),
             {
+              code: error.code,
               walletConnectionType: walletConnection?.type,
             }
           );

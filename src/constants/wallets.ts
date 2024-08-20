@@ -49,6 +49,9 @@ export enum WalletErrorType {
 
   // Misc
   Unknown,
+
+  // Metamask
+  PendingMetamaskRequest,
 }
 
 type WalletConnectionTypeConfig = {
