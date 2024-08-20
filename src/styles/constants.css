@@ -51,3 +51,9 @@
   --form-input-paddingY: 0.25rem;
   --form-input-paddingX: 0.625rem;
 }
+
+.smartbanner--ios {
+  font-size: 18px;
+  color: #007aff;
+  z-index: 10;
+}
