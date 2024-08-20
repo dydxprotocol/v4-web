@@ -96,3 +96,8 @@ strong,
 b {
   font-weight: 700;
 }
+
+/* Fixes the smart banner being unclickable. We want this to rise above all app banners */
+.smartbanner--ios {
+  z-index: 999;
+}
