@@ -69,6 +69,11 @@ export const getWalletConnection = ({
           type: WalletConnectionType.Privy,
         };
       }
+      case WalletConnectionType.Phantom: {
+        return {
+          type: WalletConnectionType.Phantom,
+        };
+      }
       default: {
         continue;
       }
