@@ -1,4 +1,4 @@
-import { DydxError, MetamaskErrorCodes } from '@/constants/errors';
+import { DydxError, EipErrorCodes } from '@/constants/errors';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import {
   WalletConnectionType,
@@ -83,7 +83,7 @@ const getWalletErrorType = ({ error }: { error: DydxError }) => {
   const messageLower = message.toLowerCase();
 
   // Metamask - already pending request
-  if (code === MetamaskErrorCodes.RESOURCE_UNAVAILABLE) {
+  if (code === EipErrorCodes.RESOURCE_UNAVAILABLE) {
     return WalletErrorType.PendingMetamaskRequest;
   }
 
@@ -120,7 +120,7 @@ const getWalletErrorType = ({ error }: { error: DydxError }) => {
 
 export const getErrorMessageForCode = (error: DydxError) => {
   const { code, message } = error;
-  if (code === MetamaskErrorCodes.RESOURCE_UNAVAILABLE) {
+  if (code === EipErrorCodes.RESOURCE_UNAVAILABLE) {
     // TODO: localize
     return 'Request already pending. Please complete in your wallet extension';
   }

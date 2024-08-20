@@ -15,7 +15,14 @@ export const DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS = {
   errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG,
 };
 
-export enum MetamaskErrorCodes {
+/**
+ * Error codes provided by ethereum EIPS 1474 and 1193
+ * https://eips.ethereum.org/EIPS/eip-1474#error-codes
+ * https://eips.ethereum.org/EIPS/eip-1193#provider-errors
+ *
+ * There error codes are valid for EIPS compliant EVM wallets (including Metamask) and Phantom wallet.
+ */
+export enum EipErrorCodes {
   // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#32002
   RESOURCE_UNAVAILABLE = -32002,
 }
