@@ -22,9 +22,9 @@ export const useSolanaTokenBalance = ({ address, token }: BalanceProps) => {
       const response = await connection.getParsedTokenAccountsByOwner(owner, { mint });
 
       // An array of all of the owner's associated token accounts for the `mint`.
-      const accounts = response.value
+      const accounts = response.value;
 
-      // The owner has no associated token accounts open for the 
+      // The owner has no associated token accounts open for the
       // specified token mint, and therefore, their balance is zero.
       if (accounts.length === 0)
         return {
@@ -33,15 +33,14 @@ export const useSolanaTokenBalance = ({ address, token }: BalanceProps) => {
             amount: 0,
             decimals: 0,
           },
-        }
+        };
 
       // Select the associated token account owned by the user with the highest amount
       const largestAccount = accounts.reduce((largest, current) => {
-        const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount
-        const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount
-        return currentBalance >= largestBalance ? current : largest
-      }, accounts[0]
-      );
+        const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount;
+        const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount;
+        return currentBalance >= largestBalance ? current : largest;
+      }, accounts[0]);
 
       return {
         data: {
@@ -49,8 +48,7 @@ export const useSolanaTokenBalance = ({ address, token }: BalanceProps) => {
           amount: largestAccount.account.data.parsed.info.tokenAmount.amount,
           decimals: largestAccount.account.data.parsed.info.tokenAmount.decimals,
         },
-      }
-
+      };
     } catch (error) {
       throw new Error(`Failed to fetch Solana balance: ${error.message}`);
     }
