@@ -3,11 +3,11 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const SMARTBANNER_APP_NAME = process.env.SMARTBANNER_APP_NAME;
-const SMARTBANNER_ORG_NAME = process.env.SMARTBANNER_ORG_NAME;
-const SMARTBANNER_ICON_URL = process.env.SMARTBANNER_ICON_URL;
-const SMARTBANNER_APPSTORE_URL = process.env.SMARTBANNER_APPSTORE_URL;
-const SMARTBANNER_GOOGLEPLAY_URL = process.env.SMARTBANNER_GOOGLEPLAY_URL;
+const SMARTBANNER_APP_NAME = 'some fake thing';
+const SMARTBANNER_ORG_NAME = 'some fake thing';
+const SMARTBANNER_ICON_URL = 'some fake thing';
+const SMARTBANNER_APPSTORE_URL = 'some fake thing';
+const SMARTBANNER_GOOGLEPLAY_URL = 'some fake thing';
 
 const currentPath = fileURLToPath(import.meta.url);
 const projectRoot = path.dirname(currentPath);
@@ -23,7 +23,7 @@ if (
     const files = await fs.readdir('entry-points');
     for (const file of files) {
       inject(file);
-    };
+    }
   } catch (err) {
     console.error('Error injecting Smartbanner scripts:', err);
   }
@@ -42,26 +42,32 @@ async function inject(fileName) {
   /* hardcoded injection depending on whether the app is available on App Store and/or Google Play */
 
   if (SMARTBANNER_APPSTORE_URL) {
-    smartbanner = `\t<meta name="smartbanner:button-url-apple" content="${SMARTBANNER_APPSTORE_URL}">\n` + smartbanner;
+    smartbanner =
+      `\t<meta name="smartbanner:button-url-apple" content="${SMARTBANNER_APPSTORE_URL}">\n` +
+      smartbanner;
   }
   if (SMARTBANNER_GOOGLEPLAY_URL) {
-    smartbanner = `\t<meta name="smartbanner:button-url-google" content="${SMARTBANNER_GOOGLEPLAY_URL}">\n` + smartbanner;
+    smartbanner =
+      `\t<meta name="smartbanner:button-url-google" content="${SMARTBANNER_GOOGLEPLAY_URL}">\n` +
+      smartbanner;
   }
   if (SMARTBANNER_APPSTORE_URL) {
     if (SMARTBANNER_GOOGLEPLAY_URL) {
-      smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="android,ios">\n` + smartbanner;
+      smartbanner =
+        `\t<meta name="smartbanner:enabled-platforms" content="android,ios">\n` + smartbanner;
     } else {
       smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="ios">\n` + smartbanner;
     }
   } else {
     if (SMARTBANNER_GOOGLEPLAY_URL) {
-      smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="android">\n` + smartbanner;
+      smartbanner =
+        `\t<meta name="smartbanner:enabled-platforms" content="android">\n` + smartbanner;
     }
   }
 
   const injectedHtml = html.replace('</head>', `${smartbanner}\n</head>`);
 
   await fs.writeFile(htmlFilePath, injectedHtml, 'utf-8');
-
+  console.log(htmlFilePath, injectedHtml);
   console.log(`Smartbanner scripts successfully injected (${fileName}).`);
 }
