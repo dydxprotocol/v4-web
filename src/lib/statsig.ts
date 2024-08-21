@@ -1,11 +1,14 @@
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import { merge } from 'lodash';
+
+import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { log } from './telemetry';
 
 let statsigClient: StatsigClient;
 let initPromise: Promise<StatsigClient> | null = null;
+
+const baseStatsigOptions = {};
 
 /**
  * This method creates a promise and assigns it to the variable initPromise.

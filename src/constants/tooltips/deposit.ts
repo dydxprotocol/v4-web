@@ -1,6 +1,5 @@
-import { StatSigFlags } from '@/types/statsig';
-
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { TransferType } from '../abacus';
 import { getLowestFeeChainNames } from '../cctp';
