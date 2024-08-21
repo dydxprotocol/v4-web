@@ -112,6 +112,7 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
+    appConfigs.staticTyping = true;
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,

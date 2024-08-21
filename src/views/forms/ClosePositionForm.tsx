@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
+import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
+  AbacusOrderType,
   ClosePositionInputField,
   ErrorType,
   ValidationError,
@@ -15,7 +17,7 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -31,11 +33,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
+import { Collapsible } from '@/components/Collapsible';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
@@ -43,7 +48,11 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketId,
+  getCurrentMarketMidMarketPrice,
+} from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -92,8 +101,18 @@ export const ClosePositionForm = ({
   const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const { size: sizeData, summary } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
+
+  const {
+    size: sizeData,
+    price,
+    type,
+    summary,
+  } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
+
   const { size, percent } = sizeData ?? {};
+  const { limitPrice } = price ?? {};
+  const useLimit = type === AbacusOrderType.Limit;
+
   const closePositionInputErrors = useAppSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData ?? {};
@@ -230,6 +249,36 @@ export const ClosePositionForm = ({
     });
   };
 
+  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+
+  const setLimitPriceToMidPrice = useCallback(() => {
+    if (!midMarketPrice) return;
+    abacusStateManager.setClosePositionValue({
+      value: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+      field: ClosePositionInputField.limitPrice,
+    });
+  }, [midMarketPrice, tickSizeDecimals]);
+
+  const midMarketPriceButton = (
+    <$MidPriceButton onClick={setLimitPriceToMidPrice} size={ButtonSize.XSmall}>
+      {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
+    </$MidPriceButton>
+  );
+
+  const onLimitPriceInput = ({ value }: NumberFormatValues) => {
+    abacusStateManager.setClosePositionValue({
+      value,
+      field: ClosePositionInputField.limitPrice,
+    });
+  };
+
+  const onUseLimitCheckedChange = (checked: Boolean) => {
+    abacusStateManager.setClosePositionValue({
+      value: checked,
+      field: ClosePositionInputField.useLimit,
+    });
+  };
+
   const alertMessage = alertContent && (
     <AlertMessage type={alertType}>
       <div tw="inline-block">
@@ -270,6 +319,36 @@ export const ClosePositionForm = ({
         onValueChange={onSelectPercentage}
         shape={ButtonShape.Rectangle}
       />
+
+      <Collapsible
+        slotTrigger={
+          <Checkbox
+            checked={useLimit}
+            onCheckedChange={onUseLimitCheckedChange}
+            id="limit-close"
+            label="Limit Close"
+          />
+        }
+        open={useLimit}
+      >
+        <FormInput
+          key="close-position-limit-price"
+          id="close-position-limit-price"
+          type={InputType.Currency}
+          label={
+            <>
+              <WithTooltip tooltip="limit-price" side="right">
+                {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+              </WithTooltip>
+              <Tag>USD</Tag>
+            </>
+          }
+          onChange={onLimitPriceInput}
+          value={limitPrice ?? ''}
+          decimals={tickSizeDecimals ?? USD_DECIMALS}
+          slotRight={midMarketPrice ? midMarketPriceButton : undefined}
+        />
+      </Collapsible>
 
       {alertMessage}
     </$InputsColumn>
@@ -407,4 +486,8 @@ const $Footer = styled.footer`
 `;
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
+`;
+
+const $MidPriceButton = styled(Button)`
+  ${formMixins.inputInnerButton}
 `;

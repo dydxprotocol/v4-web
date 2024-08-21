@@ -13,7 +13,7 @@ type ElementProps = {
   disabled?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  label: React.ReactNode;
+  label?: React.ReactNode;
   triggerIcon?: IconName;
   slotTrigger?: React.ReactNode;
   children: React.ReactNode;
