@@ -116,8 +116,8 @@ export const NewMarketForm = () => {
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
         }}
-        setAssetToAdd={setTickerToAdd}
-        assetToAdd={tickerToAdd}
+        setTickerToAdd={setTickerToAdd}
+        tickerToAdd={tickerToAdd}
         receiptItems={receiptItems}
       />
     );

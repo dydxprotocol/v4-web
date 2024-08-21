@@ -67,7 +67,7 @@ export const useLaunchableMarkets = () => {
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
 
   const filteredPotentialMarkets: HydratedMarketMap[] = useMemo(() => {
-    const marketMap = launchableMarkets.data?.market_map.markets;
+    const marketMap = launchableMarkets.data?.market_map?.markets;
     if (!marketMap) {
       return [];
     }

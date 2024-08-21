@@ -7,14 +7,10 @@ import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { USD_DECIMALS } from '@/constants/numbers';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -36,52 +32,29 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { MustBigNumber } from '@/lib/numbers';
-
 type NewMarketSelectionStepProps = {
-  assetToAdd?: string;
-  setAssetToAdd: (ticker: string) => void;
+  tickerToAdd?: string;
+  setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
   receiptItems: Parameters<typeof Details>[0]['items'];
 };
 
 export const NewMarketSelectionStep = ({
-  assetToAdd,
-  setAssetToAdd,
+  tickerToAdd,
+  setTickerToAdd,
   onConfirmMarket,
   receiptItems,
 }: NewMarketSelectionStepProps) => {
-  const { nativeTokenBalance } = useAccountBalance();
   const onboardingState = useAppSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
-  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
-  const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
-    Number(`1e${chainTokenDecimals}`)
-  );
-  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
-  const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
   const alertMessage = useMemo(() => {
-    let alert;
-    if (nativeTokenBalance.lt(initialDepositAmountBN)) {
-      alert = {
-        type: AlertType.Warning,
-        message: stringGetter({
-          key: STRING_KEYS.NOT_ENOUGH_BALANCE,
-          params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount,
-            NATIVE_TOKEN_DENOM: chainTokenLabel,
-          },
-        }),
-      };
-    }
-
+    let alert: { type: AlertType; message: string } | undefined;
     if (alert) return <AlertMessage type={alert.type}>{alert.message}</AlertMessage>;
     return null;
-  }, [chainTokenLabel, initialDepositAmount, nativeTokenBalance, stringGetter]);
+  }, []);
 
   const formHeader = useMemo(() => {
     return (
@@ -124,16 +97,16 @@ export const NewMarketSelectionStep = ({
                     label: launchableMarket.id,
                     tag: launchableMarket.ticker.currency_pair.Base,
                     onSelect: () => {
-                      setAssetToAdd(launchableMarket.id);
+                      setTickerToAdd(launchableMarket.id);
                     },
                   })) ?? [],
               },
             ]}
             label={stringGetter({ key: STRING_KEYS.MARKETS })}
           >
-            {assetToAdd ? (
+            {tickerToAdd ? (
               <span tw="text-color-text-2">
-                {assetToAdd} <Tag>{assetToAdd}</Tag>
+                {tickerToAdd} <Tag>{tickerToAdd}</Tag>
               </span>
             ) : (
               `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
@@ -178,7 +151,7 @@ export const NewMarketSelectionStep = ({
             ) : (
               <Button
                 type={ButtonType.Submit}
-                state={{ isDisabled: !assetToAdd }}
+                state={{ isDisabled: !tickerToAdd }}
                 action={ButtonAction.Primary}
               >
                 Preview Launch
