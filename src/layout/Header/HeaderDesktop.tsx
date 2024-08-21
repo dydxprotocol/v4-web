@@ -42,6 +42,7 @@ export const HeaderDesktop = () => {
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
   const showVaults = testFlags.enableVaults;
+  const showLaunchMarkets = testFlags.pml;
 
   const navItems = [
     {
@@ -61,6 +62,11 @@ export const HeaderDesktop = () => {
           value: 'MARKETS',
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
+        },
+        showLaunchMarkets && {
+          value: 'LAUNCH_MARKET',
+          label: 'Launch Markets',
+          href: AppRoute.LaunchMarket,
         },
         showVaults && {
           value: 'VAULT',
