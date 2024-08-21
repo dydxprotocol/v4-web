@@ -1,4 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { TradingTerminalWidgetOptions } from 'public/tradingview/charting_library';
 
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
@@ -212,7 +213,8 @@ export const getWidgetOverrides = ({
   };
 };
 
-export const getWidgetOptions = () => {
+export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
+  Pick<TradingTerminalWidgetOptions, 'container'> => {
   return {
     // debug: true,
     container: 'tv-price-chart',
@@ -224,10 +226,10 @@ export const getWidgetOptions = () => {
       'header_symbol_search',
       'header_compare',
       'symbol_search_hot_key',
-      'compare_symbol',
       'symbol_info',
       'go_to_date',
       'timeframes_toolbar',
+      'header_layouttoggle',
     ],
     enabled_features: [
       'remove_library_container_border',
