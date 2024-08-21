@@ -221,7 +221,7 @@ export const getDydxDatafeed = (
       }
 
       if (firstDataRequest) {
-        lastBarsCache.set(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`, {
+        lastBarsCache.set(`${symbolInfo.name}/${RESOLUTION_MAP[resolution]}`, {
           ...bars[bars.length - 1],
         });
       }
