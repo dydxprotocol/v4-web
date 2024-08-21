@@ -1,6 +1,7 @@
 import { StatsigClient } from '@statsig/js-client';
 import { merge } from 'lodash';
 
+import { STATSIG_ENVIRONMENT_TIER } from '@/constants/networks';
 import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { log } from './telemetry';
@@ -29,6 +30,7 @@ export const initStatsigAsync = async () => {
       {
         disableLogging: import.meta.env.VITE_DISABLE_STATSIG,
         disableStorage: import.meta.env.VITE_DISABLE_STATSIG,
+        environment: { tier: STATSIG_ENVIRONMENT_TIER },
       }
     );
     await statsigClient.initializeAsync();
