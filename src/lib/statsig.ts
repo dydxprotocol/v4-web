@@ -8,8 +8,6 @@ import { log } from './telemetry';
 let statsigClient: StatsigClient;
 let initPromise: Promise<StatsigClient> | null = null;
 
-const baseStatsigOptions = {};
-
 /**
  * This method creates a promise and assigns it to the variable initPromise.
  * If an initPromise has already been generated, it returns the existing promise.
