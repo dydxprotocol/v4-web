@@ -1,3 +1,6 @@
+import { ResourceUnavailableRpcError } from 'viem';
+
+import { DydxError } from '@/constants/errors';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import {
   WalletConnectionType,
@@ -82,9 +85,14 @@ export const getWalletConnection = ({
   return undefined;
 };
 
-const getWalletErrorType = ({ error }: { error: Error }) => {
-  const { message } = error;
+const getWalletErrorType = ({ error }: { error: DydxError }) => {
+  const { message, code } = error;
   const messageLower = message.toLowerCase();
+
+  // Metamask - already pending request
+  if (code === ResourceUnavailableRpcError.code) {
+    return WalletErrorType.EipResourceUnavailable;
+  }
 
   // General - Cancelled
   if (
@@ -114,15 +122,23 @@ const getWalletErrorType = ({ error }: { error: Error }) => {
   if (messageLower.includes('does not support deterministic signing')) {
     return WalletErrorType.NonDeterministicWallet;
   }
-
   return WalletErrorType.Unknown;
+};
+
+export const getErrorMessageForCode = (error: DydxError) => {
+  const { code, message } = error;
+  if (code === ResourceUnavailableRpcError.code) {
+    // TODO: localize
+    return 'Request already pending. Please complete in your wallet extension';
+  }
+  return message;
 };
 
 export const parseWalletError = ({
   error,
   stringGetter,
 }: {
-  error: Error;
+  error: DydxError;
   stringGetter: StringGetterFunction;
 }) => {
   const walletErrorType = getWalletErrorType({ error });
@@ -142,12 +158,12 @@ export const parseWalletError = ({
       message = stringGetter({
         key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
         params: {
-          ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+          ERROR_MESSAGE:
+            getErrorMessageForCode(error) || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
         },
       });
     }
   }
-
   return {
     walletErrorType,
     message,

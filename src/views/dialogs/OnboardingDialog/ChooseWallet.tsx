@@ -31,7 +31,6 @@ export const ChooseWallet = ({
   const displayedWallets = useDisplayedWallets();
 
   const { selectedWalletType, selectedWalletError } = useAccounts();
-
   return (
     <>
       {selectedWalletType && selectedWalletError && (
