@@ -15,7 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
@@ -28,7 +28,7 @@ type NewMarketPreviewStepProps = {
   ticker: string;
   onBack: () => void;
   onSuccess: (ticker: string) => void;
-  receiptItems: Parameters<typeof Details>[0]['items'];
+  receiptItems: DetailsItem[];
 };
 
 export const NewMarketPreviewStep = ({

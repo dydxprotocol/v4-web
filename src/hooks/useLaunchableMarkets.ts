@@ -78,11 +78,7 @@ export const useLaunchableMarkets = () => {
         ...data,
       }))
       .filter(({ id }) => {
-        if (marketIds.includes(id)) {
-          return false;
-        }
-
-        return true;
+        return !marketIds.includes(id);
       });
   }, [launchableMarkets.data, marketIds]);
 

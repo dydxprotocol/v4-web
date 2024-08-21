@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { PERCENT_DECIMALS, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
@@ -9,6 +9,7 @@ import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
+import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -46,46 +47,32 @@ export const NewMarketForm = () => {
     return Math.abs(p - 3);
   }, [assetToAdd]);
 
-  const receiptItems = useMemo(() => {
+  const receiptItems: DetailsItem[] = useMemo(() => {
     return [
       {
         key: 'deposit-apr',
         label: 'Deposit APR (30d)',
-        value: (
-          <Output type={OutputType.Percent} value={0.3256} fractionDigits={PERCENT_DECIMALS} />
-        ),
+        value: <Output type={OutputType.Percent} value={0.3256} />,
       },
       {
         key: 'deposit-lockup',
         label: 'Deposit Lockup',
-        value: (
-          <Output type={OutputType.Percent} value={0.3256} fractionDigits={PERCENT_DECIMALS} />
-        ),
+        value: <Output type={OutputType.Percent} value={0.3256} />,
       },
       {
         key: 'cross-margin-usage',
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-        value: (
-          <Output type={OutputType.Percent} value={0.3256} fractionDigits={PERCENT_DECIMALS} />
-        ),
+        value: <Output type={OutputType.Percent} value={0.3256} />,
       },
       step === NewMarketFormStep.PREVIEW && {
         key: 'cross-free-collateral',
         label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-        value: (
-          <DiffOutput
-            withDiff
-            type={OutputType.Fiat}
-            value={100000}
-            newValue={88000}
-            fractionDigits={USD_DECIMALS}
-          />
-        ),
+        value: <DiffOutput withDiff type={OutputType.Fiat} value={100000} newValue={88000} />,
       },
       {
         key: 'megavault-balance',
         label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-        value: <Output type={OutputType.Fiat} value={10000} fractionDigits={USD_DECIMALS} />,
+        value: <Output type={OutputType.Fiat} value={10000} />,
       },
     ].filter(isTruthy);
   }, [step, stringGetter]);

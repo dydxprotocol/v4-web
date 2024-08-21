@@ -17,7 +17,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, type DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
@@ -36,7 +36,7 @@ type NewMarketSelectionStepProps = {
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
-  receiptItems: Parameters<typeof Details>[0]['items'];
+  receiptItems: DetailsItem[];
 };
 
 export const NewMarketSelectionStep = ({
