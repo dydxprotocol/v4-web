@@ -48,6 +48,8 @@ import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { testFlags } from './lib/testFlags';
+import LaunchMarket from './pages/LaunchMarket';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -107,7 +109,14 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Markets}>
-                <Route path={MarketsRoute.New} element={<NewMarket />} />
+                {testFlags.pml ? (
+                  <Route
+                    path={MarketsRoute.New}
+                    element={<Navigate to={AppRoute.LaunchMarket} replace />}
+                  />
+                ) : (
+                  <Route path={MarketsRoute.New} element={<NewMarket />} />
+                )}
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
@@ -129,6 +138,7 @@ const Content = () => {
                 <Route path={AppRoute.Vault} element={<VaultPage />} />
               </Route>
 
+              {testFlags.pml && <Route path={AppRoute.LaunchMarket} element={<LaunchMarket />} />}
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
