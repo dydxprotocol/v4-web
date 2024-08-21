@@ -18,12 +18,14 @@ import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -92,6 +94,7 @@ export const ClosePositionForm = ({
   const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const isFirstRender = useIsFirstRender();
+  const enableLimitClose = useStatsigGateValue(StatsigFlags.ffEnableLimitClose);
 
   const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
 
@@ -320,35 +323,38 @@ export const ClosePositionForm = ({
         shape={ButtonShape.Rectangle}
       />
 
-      <Collapsible
-        slotTrigger={
-          <Checkbox
-            checked={useLimit}
-            onCheckedChange={onUseLimitCheckedChange}
-            id="limit-close"
-            label="Limit Close"
-          />
-        }
-        open={useLimit}
-      >
-        <FormInput
-          key="close-position-limit-price"
-          id="close-position-limit-price"
-          type={InputType.Currency}
-          label={
-            <>
-              <WithTooltip tooltip="limit-price" side="right">
-                {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-              </WithTooltip>
-              <Tag>USD</Tag>
-            </>
+      {enableLimitClose && (
+        <Collapsible
+          slotTrigger={
+            <Checkbox
+              checked={useLimit}
+              onCheckedChange={onUseLimitCheckedChange}
+              id="limit-close"
+              label="Limit Close"
+              tw="my-0.25"
+            />
           }
-          onChange={onLimitPriceInput}
-          value={limitPrice ?? ''}
-          decimals={tickSizeDecimals ?? USD_DECIMALS}
-          slotRight={midMarketPrice ? midMarketPriceButton : undefined}
-        />
-      </Collapsible>
+          open={useLimit}
+        >
+          <FormInput
+            key="close-position-limit-price"
+            id="close-position-limit-price"
+            type={InputType.Currency}
+            label={
+              <>
+                <WithTooltip tooltip="limit-price" side="right">
+                  {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+                </WithTooltip>
+                <Tag>USD</Tag>
+              </>
+            }
+            onChange={onLimitPriceInput}
+            value={limitPrice ?? ''}
+            decimals={tickSizeDecimals ?? USD_DECIMALS}
+            slotRight={midMarketPrice ? midMarketPriceButton : undefined}
+          />
+        </Collapsible>
+      )}
 
       {alertMessage}
     </$InputsColumn>

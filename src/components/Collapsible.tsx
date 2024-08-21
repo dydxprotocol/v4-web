@@ -83,7 +83,7 @@ const $Root = styled(Root)`
   display: grid;
 
   &[data-state='open'] {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 `;
 
