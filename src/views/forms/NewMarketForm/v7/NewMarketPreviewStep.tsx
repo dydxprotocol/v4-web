@@ -158,7 +158,10 @@ export const NewMarketPreviewStep = ({
 
       {alertMessage}
 
-      <Details items={receiptItems} />
+      <Details
+        items={receiptItems}
+        tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
+      />
 
       <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
         <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
