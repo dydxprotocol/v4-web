@@ -1,6 +1,7 @@
-import { StatSigFlags } from '@/types/statsig';
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
+
+import { StatSigFlags } from '@/constants/statsig';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';

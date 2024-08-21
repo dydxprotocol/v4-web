@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { StatsigConfig } from '../../constants/abacus';
-import { StatSigFlags } from '../../types/statsig';
-import abacusStateManager from '../abacus';
+import abacusStateManager from '..';
+import { StatsigConfig } from '../../../constants/abacus';
+import { StatSigFlags } from '../../../constants/statsig';
 
 describe('setStatsigConfigs', () => {
   it('only sets properties that exist in the kotlin object', () => {

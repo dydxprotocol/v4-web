@@ -1,6 +1,7 @@
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import { merge } from 'lodash';
+
+import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { log } from './telemetry';
 
