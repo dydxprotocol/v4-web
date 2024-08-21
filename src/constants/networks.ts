@@ -21,3 +21,10 @@ export const GOVERNANCE_CONFIG_MAP = environments.governance;
 export type DydxNetwork = keyof typeof ENVIRONMENT_CONFIG_MAP;
 export type DydxChainId = keyof typeof TOKEN_CONFIG_MAP;
 export const DEFAULT_APP_ENVIRONMENT = AVAILABLE_ENVIRONMENTS.default as DydxNetwork;
+
+export const STATSIG_ENVIRONMENT_TIER = {
+  production: 'production',
+  testnet: 'staging',
+  staging: 'development',
+  development: 'development',
+}[import.meta.env.MODE] as 'production' | 'staging' | 'development';
