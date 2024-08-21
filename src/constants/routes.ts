@@ -10,6 +10,7 @@ export enum AppRoute {
   Settings = '/settings',
   Terms = '/terms',
   Privacy = '/privacy',
+  LaunchMarket = '/launch-market',
 }
 
 export enum MarketsRoute {
