@@ -10,3 +10,7 @@ export enum StatSigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableEvmSwaps = 'ff_enable_evm_swaps',
 }
+
+export enum StatsigDynamicConfigs {
+  dcMaxSafeBridgeFees = 'dc_max_safe_bridge_fees',
+}
