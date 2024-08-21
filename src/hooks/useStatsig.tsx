@@ -10,8 +10,12 @@ import {
 
 import { initStatsigAsync } from '@/lib/statsig';
 
+import { useAccounts } from './useAccounts';
+
 export const StatsigProvider = ({ children }: { children: React.ReactNode }) => {
   const [statsigClient, setStatsigClient] = useState<StatsigClient | null>(null);
+  const { updateUserSync } = useStatsigUser();
+  const { dydxAddress } = useAccounts();
   useEffect(() => {
     const init = async () => {
       const client = await initStatsigAsync();
@@ -19,6 +23,13 @@ export const StatsigProvider = ({ children }: { children: React.ReactNode }) => 
     };
     init();
   }, []);
+
+  // TODO: consider moving either updateUser to its own hook, or the react bindings to a separate hook.
+  // we don't want to have the statsigGateValue methods module import from other hooks
+  // because then those hooks will have a circular dependency if they want to use statsig
+  useEffect(() => {
+    updateUserSync({ userID: dydxAddress });
+  });
   if (!statsigClient) return <div>{children}</div>;
   return <StatsigProviderInternal client={statsigClient}> {children} </StatsigProviderInternal>;
 };

@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { useStatsigUser } from '@statsig/react-bindings';
 import { AES, enc } from 'crypto-js';
 
 import {
@@ -50,7 +49,6 @@ export const AccountsProvider = ({ ...props }) => (
 export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
-  const { updateUserSync } = useStatsigUser();
   const dispatch = useAppDispatch();
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
@@ -248,7 +246,6 @@ const useAccountsContext = () => {
 
   const dydxAddress = useMemo(() => {
     const address = localDydxWallet?.address as DydxAddress | undefined;
-    updateUserSync({ userID: address });
     return address;
   }, [localDydxWallet]);
 
