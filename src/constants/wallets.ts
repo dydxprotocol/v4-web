@@ -50,8 +50,8 @@ export enum WalletErrorType {
   // Misc
   Unknown,
 
-  // Metamask
-  PendingMetamaskRequest,
+  // EIP specified errors
+  EipResourceUnavailable,
 }
 
 type WalletConnectionTypeConfig = {

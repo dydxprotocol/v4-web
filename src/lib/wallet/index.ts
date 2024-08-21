@@ -1,4 +1,6 @@
-import { DydxError, EipErrorCodes } from '@/constants/errors';
+import { ResourceUnavailableRpcError } from 'viem';
+
+import { DydxError } from '@/constants/errors';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import {
   WalletConnectionType,
@@ -83,8 +85,8 @@ const getWalletErrorType = ({ error }: { error: DydxError }) => {
   const messageLower = message.toLowerCase();
 
   // Metamask - already pending request
-  if (code === EipErrorCodes.RESOURCE_UNAVAILABLE) {
-    return WalletErrorType.PendingMetamaskRequest;
+  if (code === ResourceUnavailableRpcError.code) {
+    return WalletErrorType.EipResourceUnavailable;
   }
 
   // General - Cancelled
@@ -120,7 +122,7 @@ const getWalletErrorType = ({ error }: { error: DydxError }) => {
 
 export const getErrorMessageForCode = (error: DydxError) => {
   const { code, message } = error;
-  if (code === EipErrorCodes.RESOURCE_UNAVAILABLE) {
+  if (code === ResourceUnavailableRpcError.code) {
     // TODO: localize
     return 'Request already pending. Please complete in your wallet extension';
   }

@@ -178,8 +178,8 @@ export const useWalletConnection = () => {
           throw Object.assign(
             new Error([error.message, error.cause?.message].filter(Boolean).join('\n')),
             {
-              // Currently the only usecase for this is piping in metamask error codes.
-              // There's a nonzero chance of overlap so we should be wary of this
+              // Currently the only usecase for this is piping in EIP specified error codes.
+              // There's a nonzero chance of overlap so we should watch out for this
               code: error.code,
               walletConnectionType: walletConnection?.type,
             }
