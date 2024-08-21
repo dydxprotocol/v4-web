@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect } from 'react';
 
-import { StatSigFlags } from '@/types/statsig';
 import { useQuery } from '@tanstack/react-query';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import type { TransferNotifcation } from '@/constants/notifications';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 

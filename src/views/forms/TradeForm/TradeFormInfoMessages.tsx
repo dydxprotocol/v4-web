@@ -1,10 +1,9 @@
-import { StatSigFlags } from '@/types/statsig';
-
 import { type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';

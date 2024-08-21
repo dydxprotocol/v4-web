@@ -1,4 +1,3 @@
-import { StatsigConfigType } from '@/types/statsig';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import {
   APP_STRING_KEYS,
@@ -10,6 +9,8 @@ import {
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
+
+import { StatsigConfigType } from '@/constants/statsig';
 
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
 

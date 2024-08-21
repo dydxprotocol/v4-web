@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import {
   StatsigProvider as StatsigProviderInternal,
   useStatsigClient,
 } from '@statsig/react-bindings';
+
+import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { initStatsigAsync } from '@/lib/statsig';
 

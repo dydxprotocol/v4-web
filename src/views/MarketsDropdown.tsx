@@ -1,6 +1,5 @@
 import { Key, memo, useMemo, useState } from 'react';
 
-import { StatSigFlags } from '@/types/statsig';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -9,6 +8,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
