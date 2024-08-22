@@ -30,7 +30,7 @@ import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
