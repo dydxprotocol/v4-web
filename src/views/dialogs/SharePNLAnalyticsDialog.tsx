@@ -26,7 +26,7 @@ import { Tag, TagSign } from '@/components/Tag';
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
