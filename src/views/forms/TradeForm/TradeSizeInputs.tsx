@@ -29,7 +29,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
-  getInputTradeData,
   getInputTradeOptions,
   getInputTradeSizeData,
   getTradeFormInputs,
@@ -57,10 +56,6 @@ export const TradeSizeInputs = () => {
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData ?? {};
-
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
-  const { maxLeverage } = currentTradeData ?? {};
-
   const { needsLeverage } = currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -68,8 +63,6 @@ export const TradeSizeInputs = () => {
     getTradeFormInputs,
     shallowEqual
   );
-
-  console.log("Xcxc maxLeverage", maxLeverage)
 
   // Update State variables if their inputs are not being source of calculations
   // Or if they have been reset to null

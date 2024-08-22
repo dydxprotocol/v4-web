@@ -50,7 +50,8 @@ export const LeverageSlider = ({
         min:
           orderSide === OrderSide.BUY ? leverageBN.toNumber() : maxLeverageBN.negated().toNumber(),
         max: orderSide === OrderSide.BUY ? maxLeverageBN.toNumber() : leverageBN.toNumber(),
-        midpoint: orderSide === OrderSide.SELL
+        midpoint:
+          orderSide === OrderSide.SELL
             ? MustBigNumber(100)
                 .minus(leverageBN.div(leverageBN.plus(maxLeverageBN)).times(100))
                 .toNumber()
@@ -70,7 +71,6 @@ export const LeverageSlider = ({
   );
 
   const { min, max, midpoint } = sliderConfig[positionSide] || {};
-  // console.log("xcxc", min, max, midpoint, leverageBN.toNumber(), maxLeverageBN.toNumber())
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
   const debouncedSetAbacusLeverage = useMemo(
