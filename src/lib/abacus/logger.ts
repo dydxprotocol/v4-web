@@ -23,9 +23,9 @@ class AbacusLogger implements Omit<AbacusLoggingProtocol, '__doNotUseOrImplement
     dd.error(message, context, error);
   }
 
-  ddInfo(message: string, context: object) {
+  ddInfo(tag: string, message: string, context: object) {
     if (import.meta.env.VITE_ABACUS_LOG_LEVEL === 'debug') {
-      console.log(`dd info: ${message}`, context);
+      console.log(`${tag} dd info: ${message}`, context);
     }
     dd.info(message, context);
   }
