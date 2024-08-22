@@ -54,8 +54,8 @@ import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndRecei
 
 const MAX_KEY = 'MAX';
 
-// Abacus only takes in these percent options
 const SIZE_PERCENT_OPTIONS = {
+  '10%': 0.1,
   '25%': 0.25,
   '50%': 0.5,
   '75%': 0.75,
@@ -131,11 +131,6 @@ export const ClosePositionForm = ({
     abacusStateManager.setClosePositionValue({
       value: market,
       field: ClosePositionInputField.market,
-    });
-
-    abacusStateManager.setClosePositionValue({
-      value: SIZE_PERCENT_OPTIONS[MAX_KEY],
-      field: ClosePositionInputField.percent,
     });
   }, [market, currentStep]);
 
