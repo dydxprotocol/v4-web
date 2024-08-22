@@ -221,6 +221,11 @@ tr[data-role="menuitem"] {
   }
 }
 
+/* Search helper text */
+.text-HAxAr6QG {
+  color: var(--color-text-0);
+}
+
 /* Tooltip */
 .tooltip-wrapper {
   background-color: var(--color-layer-2) !important;
@@ -333,7 +338,7 @@ tr[data-role="menuitem"] {
   color: var(--setting-tab-text-color) !important;
 }
 
-.tab-nGEmjtaX:hover {
+.tab-nGEmjtaX:hover, .tab-nGEmjtaX.active-nGEmjtaX {
   --setting-tab-background-color: var(--color-layer-4);
   --setting-tab-text-color: var(--color-text-2);
 }
