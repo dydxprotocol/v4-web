@@ -127,8 +127,7 @@ tr[data-role="menuitem"] {
 }
 
 /* Tools sidebar */
-.toggleButton-OhcB9eH7,
-.button-KTgbfaP5 {
+.toggleButton-OhcB9eH7 {
   cursor: pointer;
 }
 
@@ -138,9 +137,6 @@ tr[data-role="menuitem"] {
   background-color: var(--color-layer-2) !important;
 }
 
-.button-merBkM5y,
-.button-2Vpz_LXc,
-.button-1SoiPS-f,
 .group-MBOVGQRI,
 .wrap-3jbioG5e {
   cursor: pointer;
@@ -383,7 +379,6 @@ tr[data-role="menuitem"] {
 }
 
 .button-14c_DKWJ:hover:not(.disabled-14c_DKWJ) {
-  cursor: pointer;
   background-color: var(--color-layer-3) !important;
 }
 
