@@ -1,5 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { TradingTerminalWidgetOptions } from 'public/tradingview/charting_library';
+import {
+  ChartPropertiesOverrides,
+  TradingTerminalWidgetOptions,
+} from 'public/tradingview/charting_library';
 
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
@@ -182,7 +185,7 @@ export const getWidgetOverrides = ({
       'paneProperties.vertGridProperties.color': theme.layer3,
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
-      'paneProperties.backgroundType': 'solid',
+      'paneProperties.backgroundType': 'solid' as const,
 
       'mainSeriesProperties.style': 1,
       'mainSeriesProperties.candleStyle.upColor': theme.positive,
@@ -197,7 +200,7 @@ export const getWidgetOverrides = ({
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
       'scalesProperties.fontSize': 12,
-    },
+    } as Partial<ChartPropertiesOverrides>,
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
       'volume.volume.color.1': theme.positive,
