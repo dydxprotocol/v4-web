@@ -87,7 +87,13 @@ const NavItemWithRef = <MenuItemValue extends string>(
       asChild
       target={isExternalLink(href) ? '_blank' : undefined}
     >
-      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} type={`${type}`} {...props}>
+      <NavLink
+        to={href}
+        ref={ref as Ref<HTMLAnchorElement>}
+        type={`${type}`}
+        tw="whitespace-nowrap"
+        {...props}
+      >
         {children}
       </NavLink>
     </Link>

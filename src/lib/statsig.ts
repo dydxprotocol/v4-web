@@ -1,6 +1,8 @@
-import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import { merge } from 'lodash';
+
+import { STATSIG_ENVIRONMENT_TIER } from '@/constants/networks';
+import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { log } from './telemetry';
 
@@ -28,6 +30,7 @@ export const initStatsigAsync = async () => {
       {
         disableLogging: import.meta.env.VITE_DISABLE_STATSIG,
         disableStorage: import.meta.env.VITE_DISABLE_STATSIG,
+        environment: { tier: STATSIG_ENVIRONMENT_TIER },
       }
     );
     await statsigClient.initializeAsync();
@@ -60,7 +63,11 @@ export const getStatsigConfigAsync = async (): Promise<StatsigConfigType> => {
     const gateValuesList = Object.values(StatSigFlags).map((gateId) => ({
       [gateId]: checkGateTyped(client, gateId),
     }));
-    const statsigConfig = merge({}, ...gateValuesList);
+
+    const dynamicConfigValuesList = Object.values(StatsigDynamicConfigs).map((dcName) => ({
+      [dcName]: client.getDynamicConfig(dcName)?.get('value'),
+    }));
+    const statsigConfig = merge({}, ...gateValuesList, ...dynamicConfigValuesList);
     return statsigConfig;
   } catch (err) {
     log('statsig/statsigConfigPromise', err);

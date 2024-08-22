@@ -1,5 +1,4 @@
 // eslint-disable-next-line import/no-cycle
-import { StatSigFlags } from '@/types/statsig';
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
@@ -41,6 +40,7 @@ import {
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
+import { StatSigFlags } from '@/constants/statsig';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 import {
   CLEARED_TRIGGER_LIMIT_INPUTS,

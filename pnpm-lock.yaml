@@ -30,8 +30,13 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
+<<<<<<< HEAD
     specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.8.91.tgz
     version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.8.91.tgz
+=======
+    specifier: 1.8.96
+    version: 1.8.96
+>>>>>>> cf0e73ef2f7399348c0bbc2f83992383b33f7826
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.27
     version: 1.1.27
@@ -3221,6 +3226,13 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  /@dydxprotocol/v4-abacus@1.8.96:
+    resolution: {integrity: sha512-89Qzu1V5vq5eK5al+vPHsDe4iihIRdbS+wLp8+UllZwmemhQHzX7eTGXfqzggEHR6dpt8+Imda8xNBDgZLcZ+w==}
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
+    dev: false
 
   /@dydxprotocol/v4-client-js@1.1.27:
     resolution: {integrity: sha512-O1XD7G7n/JAxN3sGowVZIkRvY4VjgveEvImhFMNHGYi9UYjFtATxhKcQ+K4v2qrVphW1teyo4PXkcknFvNSadQ==}

@@ -51,6 +51,10 @@ class TestFlags {
   get enablePredictionMarketPerp() {
     return !!this.queryParams.prediction;
   }
+
+  get pml() {
+    return !!this.queryParams.pml;
+  }
 }
 
 export const testFlags = new TestFlags();
