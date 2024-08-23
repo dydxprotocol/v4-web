@@ -224,6 +224,7 @@ const $Container = styled(Content)<{
   isolation: isolate;
   z-index: 1;
   position: absolute;
+  pointer-events: auto !important;
 
   inset: 0;
   width: 100%;

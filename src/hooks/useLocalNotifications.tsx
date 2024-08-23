@@ -9,7 +9,7 @@ import { StatSigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import {
   STATUS_ERROR_GRACE_PERIOD,
   fetchTransferStatus,

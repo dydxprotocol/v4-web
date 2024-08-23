@@ -22,7 +22,7 @@ import { getIsAccountConnected, getSubaccountId } from '@/state/accountSelectors
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { exportCSV } from '@/lib/csv';
 import { MustBigNumber } from '@/lib/numbers';
 
