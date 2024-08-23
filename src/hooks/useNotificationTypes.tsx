@@ -683,17 +683,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [dydxAddress]);
     },
-    useNotificationAction: () => {
-      const dispatch = useAppDispatch();
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
-
-      return (orderClientId: string) => {
-        const order = orders.find((o) => o.clientId?.toString() === orderClientId);
-        if (order) {
-          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
-        }
-      };
-    },
   },
 ];
 
