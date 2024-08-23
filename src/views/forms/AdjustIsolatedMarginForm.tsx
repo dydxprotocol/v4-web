@@ -187,7 +187,7 @@ export const AdjustIsolatedMarginForm = ({
 
   const alertMessage = useMemo(() => {
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
-      if (MustBigNumber(amount).gte(MustBigNumber(crossFreeCollateral))) {
+      if (MustBigNumber(amount).gt(MustBigNumber(crossFreeCollateral))) {
         return {
           message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
           type: AlertType.Error,
@@ -422,7 +422,7 @@ export const AdjustIsolatedMarginForm = ({
         <$ToggleGroup
           items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
             label: key,
-            value: value.toString(),
+            value: MustBigNumber(value).toFixed(PERCENT_DECIMALS),
           }))}
           value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
           onValueChange={setPercent}
