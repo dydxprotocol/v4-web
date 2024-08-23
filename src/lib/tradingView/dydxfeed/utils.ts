@@ -89,10 +89,10 @@ export const getMarkForOrderFills = (
   const color: MarkCustomColor =
     fill.side.name === AbacusOrderSide.Buy.name
       ? {
-          color: theme.positive,
+          border: theme.positive,
           background: theme.positive,
         }
-      : { color: theme.negative, background: theme.negative };
+      : { border: theme.negative, background: theme.negative };
 
   return {
     id: orderId,
