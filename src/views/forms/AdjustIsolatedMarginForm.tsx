@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
