@@ -672,10 +672,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
             groupKey: NotificationType.ApiError,
             withClose: false,
             toastDuration: Infinity,
-            actionAltText: 'Get in touch →',
+            // our generate script only knows to generate string keys for title and body
+            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
             renderActionSlot: () => (
               <Link href={top100TradersGetInTouch}>
-                {/* our generate script only knows to generate string keys for title and body */}
                 {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
               </Link>
             ),
