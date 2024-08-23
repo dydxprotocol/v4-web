@@ -51,11 +51,11 @@ type ElementProps = {
 };
 
 const SIZE_PERCENT_OPTIONS = {
-  '5%': '0.05',
   '10%': '0.1',
   '25%': '0.25',
   '50%': '0.5',
   '75%': '0.75',
+  '100%': '1',
 };
 
 export const AdjustIsolatedMarginForm = ({
@@ -79,6 +79,13 @@ export const AdjustIsolatedMarginForm = ({
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({
+      value: marketId,
+      field: AdjustIsolatedMarginInputField.Market,
+    });
+  }, [marketId]);
+
+  useEffect(() => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
       value: childSubaccountNumber,
       field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
     });
@@ -93,7 +100,7 @@ export const AdjustIsolatedMarginForm = ({
     };
   }, [childSubaccountNumber]);
 
-  const setAmount = ({ floatValue }: NumberFormatValues) => {
+  const setAmount = ({ floatValue }: { floatValue?: number }) => {
     abacusStateManager.setAdjustIsolatedMarginValue({
       value: floatValue,
       field: AdjustIsolatedMarginInputField.Amount,
@@ -427,7 +434,7 @@ export const AdjustIsolatedMarginForm = ({
             type={InputType.Currency}
             label={formConfig.formLabel}
             value={amount}
-            onChange={setAmount}
+            onInput={setAmount}
           />
         </WithDetailsReceipt>
       </div>
