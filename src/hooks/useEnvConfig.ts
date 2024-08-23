@@ -11,11 +11,12 @@ interface EnvironmentConfig {
   chainLogo: string;
   squidIntegratorId: string;
   rewardsHistoryStartDateMs: string;
+  top100WalletAddresses: string[];
 }
 
 export type EnvironmentConfigKey = keyof EnvironmentConfig;
 
-export const useEnvConfig = (configKey: EnvironmentConfigKey): string => {
+export const useEnvConfig = (configKey: EnvironmentConfigKey): string | string[] => {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   return ENVIRONMENT_CONFIG_MAP[selectedNetwork][configKey];
 };

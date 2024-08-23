@@ -41,6 +41,7 @@ export interface LinksConfigs {
   rndrParamProposal?: string;
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
+  top100TradersGetInTouch?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {

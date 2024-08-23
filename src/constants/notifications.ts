@@ -12,6 +12,7 @@ export enum NotificationType {
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
   MarketWindDown = 'MarketWindDown',
+  OneOff = 'OneOff',
 }
 
 export enum NotificationCategoryPreferences {
@@ -32,6 +33,7 @@ export const NotificationTypeCategory: {
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.OneOff]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -185,6 +187,8 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 
   withClose?: boolean; // Show close button for Notification
+
+  slotBodyBelow?: React.ReactNode;
 };
 
 export enum TransferNotificationTypes {
@@ -240,6 +244,10 @@ export enum MarketWindDownNotificationIds {
   MarketWindDownFetAgix = 'market-wind-down-fet-agix',
   MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
   MarketUpdateProposalRndr = 'market-update-proposal-rndr',
+}
+
+export enum OneOffNotificationIds {
+  Top100UserSupport = 'top-100-user-support',
 }
 
 /**

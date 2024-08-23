@@ -24,6 +24,7 @@ import {
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
+  OneOffNotificationIds,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
@@ -63,6 +64,7 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
+import { useEnvConfig } from './useEnvConfig';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 import { useAllStatsigGateValues } from './useStatsig';
@@ -640,6 +642,46 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [localCancelOrders]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
+
+      return (orderClientId: string) => {
+        const order = orders.find((o) => o.clientId?.toString() === orderClientId);
+        if (order) {
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
+        }
+      };
+    },
+  },
+  {
+    type: NotificationType.OneOff,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const { top100TradersGetInTouch } = useURLConfigs();
+      const top100WalletAddresses = useEnvConfig('top100WalletAddresses');
+      const stringGetter = useStringGetter();
+      useEffect(() => {
+        if (dydxAddress && top100WalletAddresses.includes(dydxAddress)) {
+          trigger(OneOffNotificationIds.Top100UserSupport, {
+            icon: <Icon iconName={IconName.SpeechBubble} />,
+            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.ApiError,
+            withClose: false,
+            toastDuration: Infinity,
+            actionAltText: 'Get in touch →',
+            renderActionSlot: () => (
+              <Link href={top100TradersGetInTouch}>
+                {/* our generate script only knows to generate string keys for title and body */}
+                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+              </Link>
+            ),
+          });
+        }
+      }, [dydxAddress]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
