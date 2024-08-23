@@ -232,6 +232,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         postOnly,
         reduceOnly,
         triggerPrice,
+        marketInfo,
+        currentHeight,
       } = params || {};
 
       setTimeout(() => {
@@ -255,8 +257,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         postOnly ?? undefined,
         reduceOnly ?? undefined,
         triggerPrice ?? undefined,
-        undefined,
-        undefined,
+        marketInfo ?? undefined,
+        currentHeight ?? undefined,
         goodTilBlock ?? undefined
       );
 
