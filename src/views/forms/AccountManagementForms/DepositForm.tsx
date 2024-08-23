@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -24,12 +24,13 @@ import {
   NumberSign,
 } from '@/constants/numbers';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
-import { WalletType, type EvmAddress } from '@/constants/wallets';
+import { type EvmAddress, WalletType } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -89,13 +90,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const {
     dydxAddress,
     evmAddress,
+    solAddress,
     signerWagmi,
     publicClientWagmi,
     nobleAddress,
+    walletType,
     saveHasAcknowledgedTerms,
   } = useAccounts();
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
+  const { signTransaction: signTransactionPhantom } = usePhantomWallet();
 
   const {
     requestPayload,
@@ -109,19 +113,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     isCctp,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   // todo are these guaranteed to be base 10?
-  // eslint-disable-next-line radix
-  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
+  /* eslint-disable radix */
+  let chainId: number | string | undefined;
+  if (chainIdStr && chainIdStr.startsWith('solana')) chainId = chainIdStr;
+  if (chainIdStr && !Number.isNaN(parseInt(chainIdStr))) chainId = parseInt(chainIdStr);
+  /* eslint-enable radix */
 
   // User inputs
-  const sourceToken = useMemo(
-    () => (token ? resources?.tokenResources?.get(token) : undefined),
-    [token, resources]
-  );
-
-  const sourceChain = useMemo(
-    () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
-    [chainId, resources]
-  );
+  const sourceToken = useMemo(() => {
+    return token ? resources?.tokenResources?.get(token) : undefined;
+  }, [token, resources]);
 
   const [fromAmount, setFromAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
@@ -153,13 +154,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     });
 
     setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedAmountBN.toNumber()]);
 
   useEffect(() => {
+    // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
+    // worth investigating a better fix on abacus
     if (dydxAddress && evmAddress) {
-      // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
-      // worth investigating a better fix on abacus
       abacusStateManager.setTransfersSourceAddress(evmAddress);
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: TransferType.deposit.rawValue,
+      });
+    }
+    if (dydxAddress && solAddress) {
+      abacusStateManager.setTransfersSourceAddress(solAddress);
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
         value: TransferType.deposit.rawValue,
@@ -168,19 +177,23 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress]);
+  }, [dydxAddress, evmAddress, solAddress]);
 
   useEffect(() => {
     if (error) onError?.();
-  }, [error]);
-
-  const { walletType } = useAccounts();
+  }, [error, onError]);
 
   useEffect(() => {
     if (walletType === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
+      });
+    }
+    if (walletType === WalletType.Phantom) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: 'solana',
       });
     }
   }, [walletType]);
@@ -226,14 +239,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       setSlippage(newSlippage);
       // TODO: to be implemented via abacus
     },
-    [setSlippage, debouncedAmount]
+    [setSlippage]
   );
 
   const onClickMax = useCallback(() => {
     if (balance) {
       setFromAmount(balanceBN.toString());
     }
-  }, [balance, setFromAmount]);
+  }, [balance, balanceBN]);
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
@@ -297,13 +310,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       try {
         e.preventDefault();
 
-        if (!signerWagmi) {
-          throw new Error('Missing signer');
-        }
-        if (!requestPayload?.targetAddress || !requestPayload.data || !requestPayload.value) {
-          throw new Error('Missing request payload');
-        }
-
         if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
           throw new Error('Noble RPC endpoint unaccessible');
         }
@@ -314,17 +320,32 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           saveHasAcknowledgedTerms(true);
         }
 
-        await validateTokenApproval();
+        let txHash: string | undefined;
+        if (walletType === WalletType.Phantom) {
+          if (!requestPayload?.data) {
+            throw new Error('Missing solana request payload');
+          }
 
-        const tx = {
-          to: requestPayload.targetAddress as EvmAddress,
-          data: requestPayload.data as EvmAddress,
-          gasLimit: BigInt(requestPayload.gasLimit || DEFAULT_GAS_LIMIT),
-          value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
-        };
-        setDepositStep(DepositSteps.Confirm);
-        const txHash = await signerWagmi.sendTransaction(tx);
+          setDepositStep(DepositSteps.Confirm);
+          txHash = await signTransactionPhantom(Buffer.from(requestPayload.data, 'base64'));
+        } else {
+          if (!signerWagmi) {
+            throw new Error('Missing signer');
+          }
+          if (!requestPayload?.targetAddress || !requestPayload?.data || !requestPayload?.value) {
+            throw new Error('Missing request payload');
+          }
+          await validateTokenApproval();
 
+          const tx = {
+            to: requestPayload.targetAddress as EvmAddress,
+            data: requestPayload.data as EvmAddress,
+            gasLimit: BigInt(requestPayload.gasLimit || DEFAULT_GAS_LIMIT),
+            value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
+          };
+          setDepositStep(DepositSteps.Confirm);
+          txHash = await signerWagmi.sendTransaction(tx);
+        }
         if (txHash) {
           addOrUpdateTransferNotification({
             txHash,
@@ -360,7 +381,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setDepositStep(DepositSteps.Initial);
       }
     },
-    [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [requestPayload, signerWagmi, signTransactionPhantom, chainId, sourceToken, chainIdStr]
   );
 
   const amountInputReceipt = [
