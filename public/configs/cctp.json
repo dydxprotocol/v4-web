@@ -34,5 +34,16 @@
     "chainId": "137",
     "tokenAddress": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
     "name": "Polygon"
+  },
+  {
+    "chainId": "solana-devnet",
+    "tokenAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+    "name": "solana",
+    "isTestnet": true
+  },
+  {
+    "chainId": "solana",
+    "tokenAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "name": "solana"
   }
 ]

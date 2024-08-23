@@ -17,6 +17,7 @@ describe('getLowestFeeChainNames', () => {
       'Arbitrum',
       'Base',
       'Polygon',
+      'Solana',
     ]);
   });
   it('deposits skip - returns all cctp mainnet chain names as an array', () => {
@@ -27,6 +28,7 @@ describe('getLowestFeeChainNames', () => {
       'Arbitrum',
       'Base',
       'Polygon',
+      'Solana',
     ]);
   });
   it('withdrawals squid - returns all cctp mainnet chain names as an array', () => {
@@ -37,6 +39,7 @@ describe('getLowestFeeChainNames', () => {
       'Arbitrum',
       'Base',
       'Polygon',
+      'Solana',
     ]);
   });
   it('deposits squid - returns all cctp mainnet chain names as an array', () => {
@@ -47,6 +50,7 @@ describe('getLowestFeeChainNames', () => {
       'Arbitrum',
       'Base',
       'Polygon',
+      'Solana',
     ]);
   });
 });
@@ -87,6 +91,13 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '137',
           tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
           name: 'Polygon',
+        },
+      ],
+      EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         },
       ],
     });
@@ -135,6 +146,13 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'Polygon',
         },
       ],
+      EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        },
+      ],
     });
   });
   it('withdrawals squid - returns a map of token denom/addresses to token information including ETH USDC', () => {
@@ -179,6 +197,13 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           chainId: '137',
           tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
           name: 'Polygon',
+        },
+      ],
+      EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         },
       ],
     });
@@ -227,6 +252,13 @@ describe('getMapOfLowestFeeTokensByDenom', () => {
           name: 'Polygon',
         },
       ],
+      EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        },
+      ],
     });
   });
 });
@@ -266,6 +298,13 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '137',
           tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
           name: 'Polygon',
+        },
+      ],
+      solana: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         },
       ],
     });
@@ -314,6 +353,13 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'Polygon',
         },
       ],
+      solana: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        },
+      ],
     });
   });
   it('withdrawals squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -360,6 +406,13 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           name: 'Polygon',
         },
       ],
+      solana: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        },
+      ],
     });
   });
   it('deposits squid - should be a map of chain ids to token information including ETH USDC', () => {
@@ -404,6 +457,13 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: '137',
           tokenAddress: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
           name: 'Polygon',
+        },
+      ],
+      solana: [
+        {
+          chainId: 'solana',
+          name: 'solana',
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         },
       ],
     });
