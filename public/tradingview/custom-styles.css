@@ -24,7 +24,7 @@ body {
   --tv-color-toolbar-button-background-active-hover: var(--color-accent);
   --tv-color-toolbar-button-text: var(--color-text-0);
   --tv-color-toolbar-button-text-hover: var(--color-text-2);
-  --tv-color-toolbar-button-text-active: var(--color-accent);
+  --tv-color-toolbar-button-text-active: var(--color-text-2);
   --tv-color-toolbar-button-text-active-hover: var(--color-text-2);
   --tv-color-item-active-text: var(--color-text-button);
   --tv-color-toolbar-toggle-button-background-active: var(--color-accent);
@@ -70,6 +70,10 @@ input:focus {
 
 tr[data-role="menuitem"] {
   cursor: pointer;
+}
+
+.chart-container-border {
+  border-radius: 0px !important;
 }
 
 .menuWrap-Kq3ruQo8 {
@@ -530,4 +534,52 @@ tr[data-role="menuitem"] {
 .tooltip-eSLcXvvL .text-hF57_4zZ {
   font-size: 12px;
   color: var(--color-text-1);
+}
+
+/* Right toolbar  */
+.widgetbar-pages {
+  border-color: var(--color-border);
+  background: none;
+  border-top-left-radius: 0px !important;
+}
+
+/* Believe it or not, each component in the widgetbar sets its own text color */
+.widgetbar-pages, .title-uNZ8yW1y, .wrap-C8ln3wvp .title-C8ln3wvp, .wrap-C8ln3wvp .icon-C8ln3wvp, .wrap-C8ln3wvp .icon-C8ln3wvp {
+  color: var(--color-text-0);
+}
+
+.widgetbar-widget {
+  background-color: var(--color-layer-2);
+}
+
+.widgetbar-hider {
+  cursor: pointer;
+}
+
+/* Object tree buttons */
+.buttons-uNZ8yW1y, .button-uNZ8yW1y, .button-uNZ8yW1y.disabled-uNZ8yW1y, .button-uNZ8yW1y.disabled-uNZ8yW1y:active, .button-uNZ8yW1y.disabled-uNZ8yW1y:before {
+  border-color: var(--color-border);
+  background: none !important;
+}
+
+.button-uNZ8yW1y.disabled-uNZ8yW1y {
+  cursor: not-allowed;
+}
+
+.button-uNZ8yW1y:hover {
+  background: none !important;
+  color: var(--color-text-0);
+}
+
+/* Object tree line item  */
+.wrap-IEe5qpW4 {
+  background-color: var(--color-layer-2) !important;
+}
+
+.wrap-IEe5qpW4:hover {
+  background-color: var(--color-layer-4) !important;
+}
+
+.wrap-C8ln3wvp .renameInput-C8ln3wvp {
+  background-color: var(--color-layer-4);
 }

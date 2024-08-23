@@ -233,12 +233,14 @@ export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
       'go_to_date',
       'timeframes_toolbar',
       'header_layouttoggle',
+      'trading_account_manager',
     ],
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',
       'dont_show_boolean_study_arguments',
       'hide_left_toolbar_by_default',
+      'keep_object_tree_widget_in_right_toolbar',
     ],
   };
 };
