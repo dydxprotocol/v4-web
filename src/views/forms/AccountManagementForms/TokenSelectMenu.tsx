@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { StatSigFlags } from '@/types/statsig';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
@@ -8,6 +7,7 @@ import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';

@@ -5,8 +5,9 @@ import isEmpty from 'lodash/isEmpty';
 import {
   LanguageCode,
   ResolutionString,
+  TradingTerminalWidgetOptions,
   widget as Widget,
-} from 'public/tradingview/charting_library';
+} from 'public/tradingview/';
 import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
@@ -134,7 +135,7 @@ export const useTradingView = ({
     if (marketId && hasPriceScaleInfo) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-      const options = {
+      const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(

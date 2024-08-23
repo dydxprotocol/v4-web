@@ -28,7 +28,7 @@ import {
   StakeRewardButtonAndReceipt,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {

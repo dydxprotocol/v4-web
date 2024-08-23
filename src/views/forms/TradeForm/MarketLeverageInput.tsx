@@ -21,7 +21,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData } from '@/state/inputsSelectors';
+import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -41,34 +41,33 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-  const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
-  const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const { initialMarginFraction, effectiveInitialMarginFraction } =
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { leverage, size: currentPositionSize } =
+    useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
+  const { side } = useAppSelector(getInputTradeData, shallowEqual) ?? {};
+  const { maxLeverage } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const { leverage, size: currentPositionSize } = currentPositionData ?? {};
   const { current: currentSize, postOrder: postOrderSize } = currentPositionSize ?? {};
   const { current: currentLeverage, postOrder: postOrderLeverage } = leverage ?? {};
-  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig ?? {};
-  const { side } = inputTradeData ?? {};
-  const orderSide = getSelectedOrderSide(side);
 
+  const orderSide = getSelectedOrderSide(side);
   const { currentPositionSide, newPositionSide } = hasPositionSideChanged({
     currentSize,
     postOrderSize,
   });
 
   const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
+  const maxLeverageFallback = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+  const maxLeverageBN = MustBigNumber(maxLeverage ?? maxLeverageFallback).abs();
 
-  const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
-
-  const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
-
+  const leverageOptions = maxLeverageBN.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
   const getSignedLeverage = (newLeverage: string | number) => {
     const newLeverageBN = MustBigNumber(newLeverage);
-    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverage)
-      ? maxLeverage
+    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverageBN)
+      ? maxLeverageBN
       : newLeverageBN;
     const newLeverageSignedBN =
       leveragePosition === PositionSide.Short ||
@@ -146,7 +145,7 @@ export const MarketLeverageInput = ({
           <LeverageSlider
             leverage={currentLeverage}
             leverageInputValue={getSignedLeverage(leverageInputValue)}
-            maxLeverage={maxLeverage}
+            maxLeverage={maxLeverageBN}
             orderSide={orderSide}
             positionSide={currentPositionSide}
             setLeverageInputValue={setLeverageInputValue}
@@ -166,7 +165,7 @@ export const MarketLeverageInput = ({
         items={leverageOptions.map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
-          disabled: maxLeverage.lt(leverageAmount),
+          disabled: maxLeverageBN.lt(leverageAmount),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={updateLeverage}

@@ -92,11 +92,10 @@ export const getDydxDatafeed = (
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
     const symbolInfo: LibrarySymbolInfo = {
-      ticker: symbolItem.full_name,
-      name: symbolItem.symbol,
+      ticker: symbolItem.symbol,
+      name: symbolItem.full_name,
       description: symbolItem.description,
       type: symbolItem.type,
-      full_name: symbolItem.full_name,
       exchange: 'dYdX',
       listed_exchange: 'dYdX',
       has_intraday: true,
@@ -204,7 +203,7 @@ export const getDydxDatafeed = (
         });
 
         store.dispatch(
-          setCandles({ candles: fetchedCandles, marketId: symbolInfo.full_name, resolution })
+          setCandles({ candles: fetchedCandles, marketId: symbolInfo.name, resolution })
         );
       }
 
@@ -222,7 +221,7 @@ export const getDydxDatafeed = (
       }
 
       if (firstDataRequest) {
-        lastBarsCache.set(`${symbolInfo.full_name}/${RESOLUTION_MAP[resolution]}`, {
+        lastBarsCache.set(`${symbolInfo.name}/${RESOLUTION_MAP[resolution]}`, {
           ...bars[bars.length - 1],
         });
       }

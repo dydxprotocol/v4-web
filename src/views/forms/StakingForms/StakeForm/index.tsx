@@ -27,7 +27,7 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';

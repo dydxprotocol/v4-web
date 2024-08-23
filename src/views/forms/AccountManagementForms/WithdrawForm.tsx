@@ -2,7 +2,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { StatSigFlags } from '@/types/statsig';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -23,6 +22,7 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
+import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -59,7 +59,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateCosmosAddress } from '@/lib/addressUtils';
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';

@@ -37,7 +37,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { track } from '@/lib/analytics';
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketLeverageInput } from './MarketLeverageInput';

@@ -29,9 +29,12 @@ dependencies:
   '@cosmjs/tendermint-rpc':
     specifier: ^0.32.1
     version: 0.32.2
+  '@datadog/browser-logs':
+    specifier: ^5.23.3
+    version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.8.89
-    version: 1.8.89
+    specifier: 1.8.97
+    version: 1.8.97
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.27
     version: 1.1.27
@@ -3222,8 +3225,23 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  /@dydxprotocol/v4-abacus@1.8.89:
-    resolution: {integrity: sha512-2M6iE1oDzzbccP3/Zi53eQhyj3wOLddg9zzYqss7Of9JuKp4ajoRpeNJEFqSziHiOdrW0vWhD3BOw+yEOmQ/Jg==}
+  /@datadog/browser-core@5.23.3:
+    resolution: {integrity: sha512-WaVJfTIHqU1m6voRlxVOEPXBBjHzr/ygE8tYTQRIVCWo7w/3yGOpc6dqlclHM/dpAHBVJ/L8/rQZLp0FoOAmOA==}
+    dev: false
+
+  /@datadog/browser-logs@5.23.3:
+    resolution: {integrity: sha512-OGUDn0KVnfWwIv8gK8q6D7Z1U2XFekKVYcqrq8UXnHM+mznn/j31I3Z/FAUuBNsk/Xr3U70OZw1QtFQTB69fng==}
+    peerDependencies:
+      '@datadog/browser-rum': 5.23.3
+    peerDependenciesMeta:
+      '@datadog/browser-rum':
+        optional: true
+    dependencies:
+      '@datadog/browser-core': 5.23.3
+    dev: false
+
+  /@dydxprotocol/v4-abacus@1.8.97:
+    resolution: {integrity: sha512-L7da6hQhpBeKVWjZu85d6PEw3h+pq5UJcOg1ECihhSPJFc3NdYoao4QYGhnN4eo7u1oWjX2xQyjhV6BWx64GfA==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5

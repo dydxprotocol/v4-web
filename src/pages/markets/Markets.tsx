@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import { StatSigFlags } from '@/types/statsig';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -8,6 +7,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';

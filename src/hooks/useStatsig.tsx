@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { StatSigFlags, StatsigConfigType } from '@/types/statsig';
 import { StatsigClient } from '@statsig/js-client';
 import {
   StatsigProvider as StatsigProviderInternal,
   useStatsigClient,
 } from '@statsig/react-bindings';
+
+import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
 
 import { initStatsigAsync } from '@/lib/statsig';
 
@@ -25,6 +26,14 @@ export const StatsigProvider = ({ children }: { children: React.ReactNode }) => 
 export const useStatsigGateValue = (gate: StatSigFlags) => {
   const { checkGate } = useStatsigClient();
   return checkGate(gate);
+};
+
+export const useStatsigDynamicConfigValue = (
+  configName: StatsigDynamicConfigs,
+  keyOverride: string = 'value'
+) => {
+  const { getDynamicConfig } = useStatsigClient();
+  return getDynamicConfig(configName)?.get(keyOverride);
 };
 
 export const useAllStatsigGateValues = () => {

@@ -1,4 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import {
+  ChartPropertiesOverrides,
+  TradingTerminalWidgetOptions,
+} from 'public/tradingview/charting_library';
 
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
@@ -7,6 +11,8 @@ import type { ChartLineType } from '@/constants/tvchart';
 import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
+
+const MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES = 10;
 
 const getOhlcValues = ({
   orderbookCandlesToggleOn,
@@ -29,7 +35,7 @@ const getOhlcValues = ({
 }) => {
   const useOrderbookCandles =
     orderbookCandlesToggleOn &&
-    trades === 0 &&
+    trades <= MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES &&
     orderbookOpen !== undefined &&
     orderbookClose !== undefined;
 
@@ -181,7 +187,7 @@ export const getWidgetOverrides = ({
       'paneProperties.vertGridProperties.color': theme.layer3,
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
-      'paneProperties.backgroundType': 'solid',
+      'paneProperties.backgroundType': 'solid' as const,
 
       'mainSeriesProperties.style': 1,
       'mainSeriesProperties.candleStyle.upColor': theme.positive,
@@ -196,7 +202,7 @@ export const getWidgetOverrides = ({
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
       'scalesProperties.fontSize': 12,
-    },
+    } as Partial<ChartPropertiesOverrides>,
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
       'volume.volume.color.1': theme.positive,
@@ -212,7 +218,8 @@ export const getWidgetOverrides = ({
   };
 };
 
-export const getWidgetOptions = () => {
+export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
+  Pick<TradingTerminalWidgetOptions, 'container'> => {
   return {
     // debug: true,
     container: 'tv-price-chart',
@@ -224,16 +231,18 @@ export const getWidgetOptions = () => {
       'header_symbol_search',
       'header_compare',
       'symbol_search_hot_key',
-      'compare_symbol',
       'symbol_info',
       'go_to_date',
       'timeframes_toolbar',
+      'header_layouttoggle',
+      'trading_account_manager',
     ],
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',
       'dont_show_boolean_study_arguments',
       'hide_left_toolbar_by_default',
+      'keep_object_tree_widget_in_right_toolbar',
     ],
   };
 };
