@@ -655,9 +655,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         errorMessage: routeErrorMessage ?? undefined,
         amount: debouncedAmount,
         chainId: chainIdStr ?? undefined,
-        assetAddress: sourceToken?.address,
-        assetSymbol: sourceToken?.symbol,
-        assetName: sourceToken?.name,
+        assetAddress: sourceToken?.address ?? undefined,
+        assetSymbol: sourceToken?.symbol ?? undefined,
+        assetName: sourceToken?.name ?? undefined,
+        assetId: sourceToken?.toString() ?? undefined,
       };
       track(AnalyticsEvents.RouteError(routeErrorContext));
       dd.info('Route error received', routeErrorContext);

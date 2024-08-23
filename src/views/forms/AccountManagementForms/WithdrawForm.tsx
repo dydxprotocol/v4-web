@@ -488,9 +488,10 @@ export const WithdrawForm = () => {
         errorMessage: routeErrorMessageOverride ?? undefined,
         amount: debouncedAmount,
         chainId: chainIdStr ?? undefined,
-        assetAddress: toToken?.address,
-        assetSymbol: toToken?.symbol,
-        assetName: toToken?.name,
+        assetAddress: toToken?.address ?? undefined,
+        assetSymbol: toToken?.symbol ?? undefined,
+        assetName: toToken?.name ?? undefined,
+        assetId: toToken?.toString() ?? undefined,
       };
       track(AnalyticsEvents.RouteError(routeErrorContext));
       dd.info('Route error received', routeErrorContext);
