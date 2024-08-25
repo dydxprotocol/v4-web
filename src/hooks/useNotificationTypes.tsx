@@ -18,13 +18,13 @@ import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  OneOffNotificationIds,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
@@ -656,32 +656,39 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.OneOff,
+    type: NotificationType.FeedbackRequest,
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
-      const { top100TradersGetInTouch } = useURLConfigs();
-      const top100WalletAddresses = useEnvConfig('top100WalletAddresses');
+      const { getInTouch } = useURLConfigs();
+      const feedbackRequestWalletAddresses = useEnvConfig('feedbackRequestWalletAddresses');
       const stringGetter = useStringGetter();
+
       useEffect(() => {
-        if (dydxAddress && top100WalletAddresses.includes(dydxAddress)) {
-          trigger(OneOffNotificationIds.Top100UserSupport, {
+        if (dydxAddress && feedbackRequestWalletAddresses.includes(dydxAddress) && getInTouch) {
+          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
             icon: <Icon iconName={IconName.SpeechBubble} />,
             title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
             body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
             toastSensitivity: 'foreground',
-            groupKey: NotificationType.ApiError,
-            withClose: false,
+            groupKey: NotificationType.FeedbackRequest,
             toastDuration: Infinity,
+            withClose: false,
             // our generate script only knows to generate string keys for title and body
             actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
             renderActionSlot: () => (
-              <Link href={top100TradersGetInTouch}>
+              <Link href={getInTouch}>
                 {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
               </Link>
             ),
           });
         }
       }, [dydxAddress]);
+    },
+    useNotificationAction: () => {
+      const { getInTouch } = useURLConfigs();
+      return () => {
+        window.open(getInTouch, '_blank');
+      };
     },
   },
 ];

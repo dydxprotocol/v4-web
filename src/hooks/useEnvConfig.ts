@@ -11,7 +11,7 @@ interface EnvironmentConfig {
   chainLogo: string;
   squidIntegratorId: string;
   rewardsHistoryStartDateMs: string;
-  top100WalletAddresses: string[];
+  feedbackRequestWalletAddresses: string[];
 }
 
 export type EnvironmentConfigKey = keyof EnvironmentConfig;
