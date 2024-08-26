@@ -1,15 +1,20 @@
 import { isDev, isTestnet } from '@/constants/networks';
+import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { useStatsigGateValue } from './useStatsig';
+
 export const useDisplayedWallets = () => {
+  const keplrEnabled = useStatsigGateValue(StatSigFlags.ffEnableKeplr);
+
   const displayedWallets = [
     WalletType.MetaMask,
 
-    (isTestnet || isDev) && WalletType.Phantom,
+    keplrEnabled && WalletType.Keplr,
 
-    isDev && WalletType.Keplr,
+    Boolean(isTestnet || isDev) && WalletType.Phantom,
 
     WalletType.WalletConnect2,
 

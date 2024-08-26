@@ -2,6 +2,18 @@ import { Secp256k1, sha256 } from '@cosmjs/crypto';
 
 import { Hdkey } from '@/constants/account';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
+import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
+import { DydxAddress } from '@/constants/wallets';
+
+import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
+
+type KeplrComplianceStorage = {
+  version?: string;
+  [address: DydxAddress]: {
+    pubKey?: string;
+    signature?: string;
+  };
+};
 
 export const signComplianceSignature = async (
   message: string,
@@ -22,6 +34,48 @@ export const signComplianceSignature = async (
   return {
     signedMessage: Buffer.from(signedMessage).toString('base64'),
     timestamp: timestampInSeconds,
+  };
+};
+
+export const signComplianceSignatureKeplr = async (
+  message: string,
+  signer: DydxAddress,
+  chainId: string
+): Promise<{ signedMessage: string; pubKey: string }> => {
+  if (!window.keplr) {
+    throw new Error('Keplr not found');
+  }
+
+  const stored = getLocalStorage<KeplrComplianceStorage>({
+    key: LocalStorageKey.KeplrCompliance,
+  });
+
+  const storedSignature = stored[signer]?.signature;
+  const storedPubKey = stored[signer]?.pubKey;
+
+  if (storedPubKey && storedSignature) {
+    return {
+      signedMessage: storedSignature,
+      pubKey: storedPubKey,
+    };
+  }
+
+  const { pub_key: pubKey, signature } = await window.keplr.signArbitrary(chainId, signer, message);
+
+  setLocalStorage({
+    key: LocalStorageKey.KeplrCompliance,
+    value: {
+      version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.KeplrCompliance],
+      [signer]: {
+        pubKey: pubKey.value,
+        signature,
+      },
+    },
+  });
+
+  return {
+    signedMessage: signature,
+    pubKey: pubKey.value,
   };
 };
 

@@ -9,6 +9,7 @@ export enum StatSigFlags {
   ffSkipMigration = 'ff_skip_migration',
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableEvmSwaps = 'ff_enable_evm_swaps',
+  ffEnableKeplr = 'ff_enable_keplr',
 }
 
 export enum StatsigDynamicConfigs {

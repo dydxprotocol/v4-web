@@ -2,11 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
-  useAccount as useAccountGraz,
-  useDisconnect as useDisconnectGraz,
-  useOfflineSigners as useOfflineSignersGraz,
-  useSuggestChainAndConnect as useConnectGraz,
   WalletType as CosmosWalletType,
+  useAccount as useAccountGraz,
+  useConnect as useConnectGraz,
+  useDisconnect as useDisconnectGraz,
 } from 'graz';
 import {
   useAccount as useAccountWagmi,
@@ -18,11 +17,11 @@ import {
 } from 'wagmi';
 
 import { EvmDerivedAddresses } from '@/constants/account';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
-  DYDX_CHAIN_INFO,
   type DydxAddress,
   type EvmAddress,
   SolAddress,
@@ -57,6 +56,7 @@ export const useWalletConnection = () => {
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const {
     solAddress: solAddressPhantom,
@@ -83,11 +83,31 @@ export const useWalletConnection = () => {
     key: LocalStorageKey.DydxAddress,
     defaultValue: undefined,
   });
-  const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz();
-  const { signer: signerGraz } = useOfflineSignersGraz();
+  const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
+    chainId: SUPPORTED_COSMOS_CHAINS,
+    multiChain: true,
+  });
+
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
-  const dydxAddressGraz = dydxAccountGraz?.bech32Address;
+  const dydxAddressGraz = isConnectedGraz
+    ? dydxAccountGraz?.[selectedDydxChainId]?.bech32Address
+    : undefined;
+
+  const getCosmosOfflineSigner = useCallback(
+    async (chainId: string) => {
+      if (isConnectedGraz) {
+        const keplr = window.keplr;
+
+        const offlineSigner = await keplr?.getOfflineSigner(chainId);
+
+        return offlineSigner;
+      }
+
+      return undefined;
+    },
+    [isConnectedGraz]
+  );
 
   useEffect(() => {
     // Cache last connected address
@@ -110,12 +130,11 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
 
   const { connectAsync: connectWagmi } = useConnectWagmi();
   const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
-  const { suggestAndConnect: connectGraz } = useConnectGraz();
+  const { connectAsync: connectGraz } = useConnectGraz();
   const [evmDerivedAddresses] = useLocalStorage({
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
@@ -170,9 +189,11 @@ export const useWalletConnection = () => {
             throw new Error(`${stringGetter({ key: wallets[wType].stringKey })} was not found.`);
           }
 
-          if (!isConnectedGraz) {
+          if (!window.keplr) {
+            window.open('https://www.keplr.app/get', '_blank');
+          } else if (!isConnectedGraz) {
             await connectGraz({
-              chainInfo: DYDX_CHAIN_INFO,
+              chainId: SUPPORTED_COSMOS_CHAINS,
               walletType: cosmosWalletType,
             });
           }
@@ -212,16 +233,7 @@ export const useWalletConnection = () => {
         walletConnectionType: walletConnection?.type,
       };
     },
-    [
-      isConnectedGraz,
-      signerGraz,
-      isConnectedWagmi,
-      signerWagmi,
-      ready,
-      authenticated,
-      login,
-      connectPhantom,
-    ]
+    [isConnectedGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login, connectPhantom]
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -288,7 +300,6 @@ export const useWalletConnection = () => {
   }, [
     selectedWalletType,
     signerWagmi,
-    signerGraz,
     evmDerivedAddresses,
     evmAddress,
     reconnectWagmi,
@@ -383,6 +394,8 @@ export const useWalletConnection = () => {
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,
-    signerGraz,
+    dydxAccountGraz,
+    isConnectedGraz,
+    getCosmosOfflineSigner,
   };
 };

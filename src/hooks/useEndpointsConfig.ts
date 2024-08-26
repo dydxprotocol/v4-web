@@ -12,6 +12,8 @@ interface EndpointsConfig {
   '0xsquid': string;
   skip: string;
   nobleValidator: string;
+  osmosisValidator: string;
+  neutronValidator: string;
   faucet?: string;
   stakingAPR?: string;
   solanaRpcUrl: string;
@@ -27,6 +29,8 @@ export const useEndpointsConfig = () => {
     '0xsquid': endpointsConfig['0xsquid'],
     skip: endpointsConfig.skip,
     nobleValidator: endpointsConfig.nobleValidator,
+    osmosisValidator: endpointsConfig.osmosisValidator,
+    neutronValidator: endpointsConfig.neutronValidator,
     faucet: endpointsConfig.faucet,
     stakingAPR: endpointsConfig.stakingAPR,
     solanaRpcUrl: endpointsConfig.solanaRpcUrl,

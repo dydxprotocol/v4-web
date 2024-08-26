@@ -207,6 +207,7 @@ export type TransferNotifcation = {
   requestId?: string;
   tracked?: boolean;
   isDummy?: boolean;
+  isSubaccountDepositCompleted?: boolean;
 };
 
 export enum ReleaseUpdateNotificationIds {
