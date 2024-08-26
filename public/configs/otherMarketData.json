@@ -17707,18 +17707,6 @@
                     "invert": false
                 },
                 {
-                    "exchangeName": "Huobi",
-                    "ticker": "frontusdt",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "FRONT-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
                     "exchangeName": "Okx",
                     "ticker": "FRONT-USDT",
                     "adjustByMarket": "USDT-USD",
