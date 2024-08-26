@@ -315,5 +315,14 @@ export type AnalyticsEventTypes = TagsOf<typeof AnalyticsEvents>;
 export type AnalyticsEventPayloads = RecordOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
+export enum TransactionMemo {
+  depositToSubaccount = `${DEFAULT_TRANSACTION_MEMO} | deposit from wallet to subaccount`,
+  withdrawFromSubaccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from subaccount to wallet`,
+  withdrawFromAccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from account`,
+
+  placeOrder = `${DEFAULT_TRANSACTION_MEMO} | Place Order`,
+  cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
+}
+
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
 export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};

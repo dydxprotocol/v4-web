@@ -23,11 +23,14 @@ export const useMatchingEvmNetwork = ({
   const { isPending, switchChainAsync } = useSwitchChain();
   const { wallets } = useWallets();
 
-  // If chainId is not a number, we can assume it is a non EVM compatible chain
-  const isMatchingNetwork = useMemo(
-    () => Boolean(chain && chainId && typeof chainId === 'number' && chain.id === chainId),
-    [chainId, chain]
-  );
+  const isMatchingNetwork = useMemo(() => {
+    // In the Keplr wallet, the network will always match
+    if (walletConnectionType === WalletConnectionType.CosmosSigner) {
+      return true;
+    }
+    // If chainId is not a number, we can assume it is a non EVM compatible chain
+    return Boolean(chain && chainId && typeof chainId === 'number' && chain.id === chainId);
+  }, [walletConnectionType, chain, chainId]);
 
   const matchNetwork = useCallback(async () => {
     if (!isMatchingNetwork) {

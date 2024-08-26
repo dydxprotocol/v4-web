@@ -3,6 +3,7 @@ import { type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
+  encodeJson,
   GAS_MULTIPLIER,
   IndexerConfig,
   Network,
@@ -14,7 +15,6 @@ import {
   OrderType,
   SubaccountClient,
   ValidatorConfig,
-  encodeJson,
   type LocalWallet,
   type SelectedGasDenom,
 } from '@dydxprotocol/v4-client-js';
@@ -32,9 +32,10 @@ import {
   type HumanReadableWithdrawPayload,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
-import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
+import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
+import { DydxAddress } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 // TODO Fix cycle
@@ -42,7 +43,7 @@ import { type RootStore } from '@/state/_store';
 import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
-import { signComplianceSignature } from '../compliance';
+import { signComplianceSignature, signComplianceSignatureKeplr } from '../compliance';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
@@ -259,7 +260,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         triggerPrice ?? undefined,
         marketInfo ?? undefined,
         currentHeight ?? undefined,
-        goodTilBlock ?? undefined
+        goodTilBlock ?? undefined,
+        TransactionMemo.placeOrder
       );
 
       // Handle stateful orders
@@ -549,24 +551,36 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     message: string;
     action: string;
     status: string;
+    chainId: string;
   }): Promise<string> {
-    if (!this.hdkey?.privateKey || !this.hdkey?.publicKey) {
-      throw new Error('Missing hdkey');
-    }
-
+    const address = this.localWallet?.address;
     try {
-      const { signedMessage, timestamp } = await signComplianceSignature(
-        params.message,
-        params.action,
-        params.status,
-        this.hdkey
-      );
-
-      return JSON.stringify({
-        signedMessage,
-        publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
-        timestamp,
-      });
+      if (this.hdkey?.privateKey && this.hdkey?.publicKey) {
+        const { signedMessage, timestamp } = await signComplianceSignature(
+          params.message,
+          params.action,
+          params.status,
+          this.hdkey
+        );
+        return JSON.stringify({
+          signedMessage,
+          publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
+          timestamp,
+        });
+      }
+      if (window.keplr && params.chainId && address) {
+        const { signedMessage, pubKey } = await signComplianceSignatureKeplr(
+          params.message,
+          address as DydxAddress,
+          params.chainId
+        );
+        return JSON.stringify({
+          signedMessage,
+          publicKey: pubKey,
+          isKeplr: true,
+        });
+      }
+      throw new Error('Missing hdkey');
     } catch (error) {
       log('DydxChainTransactions/signComplianceMessage', error);
       return stringifyTransactionError(error);
@@ -589,11 +603,16 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         throw new Error('Sender address does not match local wallet');
       }
 
+      const isIsolatedCancel =
+        params.senderAddress === params.destinationAddress &&
+        params.destinationSubaccountNumber === 0;
+
       const tx = await this.compositeClient.transferToSubaccount(
         new SubaccountClient(this.localWallet, params.subaccountNumber),
         params.destinationAddress,
         params.destinationSubaccountNumber,
-        parseFloat(params.amount).toFixed(6)
+        parseFloat(params.amount).toFixed(6),
+        isIsolatedCancel ? TransactionMemo.cancelOrderTransfer : DEFAULT_TRANSACTION_MEMO
       );
 
       const parsedTx = this.parseToPrimitives(tx);
