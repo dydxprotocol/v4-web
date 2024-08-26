@@ -63,10 +63,22 @@ export const NewMarketPreviewStep = ({
 
   const heading = (
     <>
-      <h2>Confirm Launch Details</h2>
+      <h2>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</h2>
       <span tw="text-color-text-0">
-        The deposit lockup is 30 days and your deposit will earn an estimated 34.56% APR (based on
-        the last 30 days).
+        {stringGetter({
+          key: STRING_KEYS.DEPOSIT_LOCKUP_DESCRIPTION,
+          params: {
+            NUM_DAYS: <span tw="text-color-text-1">30</span>,
+            PAST_DAYS: 30,
+            APR_PERCENTAGE: (
+              <Output
+                type={OutputType.Percent}
+                tw="inline-block text-color-success"
+                value={0.3456}
+              />
+            ),
+          },
+        })}
       </span>
     </>
   );
@@ -74,7 +86,9 @@ export const NewMarketPreviewStep = ({
   const launchVisualization = (
     <div tw="mx-auto flex flex-row items-center gap-0.25">
       <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">Amount to Deposit</span>
+        <span tw="text-small text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
+        </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
           <AssetIcon tw="h-2 w-2" symbol="USDC" />
           <Output useGrouping type={OutputType.Fiat} value={10_000} />
@@ -84,7 +98,9 @@ export const NewMarketPreviewStep = ({
       <Icon iconName={IconName.FastForward} tw="mt-[1.45rem] h-[1rem] w-[1rem] text-color-text-0" />
 
       <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">Market to Launch</span>
+        <span tw="text-small text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
+        </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
           <AssetIcon tw="h-2 w-2" symbol="ETH" />
           <Output useGrouping type={OutputType.Text} value="ETH" />
@@ -96,7 +112,14 @@ export const NewMarketPreviewStep = ({
   const liquidityTier = (
     <div tw="relative flex flex-col gap-0.75 rounded-[0.625rem] bg-color-layer-2 p-1">
       <span tw="text-base text-color-text-0">
-        Liquidity Tier is <span tw="text-color-text-1">Long-tail</span>
+        {stringGetter({
+          key: STRING_KEYS.LIQUIDITY_TIER_IS,
+          params: {
+            TIER: (
+              <span tw="text-color-text-1">{stringGetter({ key: STRING_KEYS.LONG_TAIL })}</span>
+            ),
+          },
+        })}
       </span>
       <$Details
         layout="rowColumns"
