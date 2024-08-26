@@ -156,7 +156,7 @@ export type NotificationDisplayData = {
   }) => React.ReactNode; // Custom Notification
 
   actionDescription?: string;
-  
+
   renderActionSlot?: ({
     isToast,
     notification,
