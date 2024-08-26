@@ -8,10 +8,10 @@ import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 export const useSolanaConnection = () => {
   const endpointsConfig = useEndpointsConfig();
 
-  const connection = React.useMemo(
-    () => new SolanaConnection(endpointsConfig.solanaRpcUrl),
-    [endpointsConfig.solanaRpcUrl]
-  );
+  const connection = React.useMemo(() => {
+    if (endpointsConfig.solanaRpcUrl) return new SolanaConnection(endpointsConfig.solanaRpcUrl);
+    return undefined;
+  }, [endpointsConfig.solanaRpcUrl]);
 
   return connection;
 };
