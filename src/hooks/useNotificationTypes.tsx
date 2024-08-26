@@ -687,7 +687,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useNotificationAction: () => {
       const { getInTouch } = useURLConfigs();
       return () => {
-        window.open(getInTouch, '_blank');
+        window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
     },
   },
