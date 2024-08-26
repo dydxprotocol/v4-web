@@ -5,6 +5,7 @@ import {
   type InjectedEthereumProvider,
   type WithInjectedEthereumProvider,
   type WithInjectedOkxWalletProvider,
+  WithInjectedPhantomWalletProvider,
   type WithInjectedWeb3Provider,
 } from '@/constants/wallets';
 
@@ -31,14 +32,18 @@ export const detectInjectedEip1193Providers = (): EIP1193Provider[] => {
   const web3Provider = (globalThis as typeof globalThis & WithInjectedWeb3Provider)?.web3
     ?.currentProvider;
 
-  const displacedProviders = isCoinbaseWalletBrowserExtension(ethereumProvider)
-    ? ethereumProvider.providers
-    : [];
+  const phantomProvider = (globalThis as typeof globalThis & WithInjectedPhantomWalletProvider)
+    ?.phantom?.ethereum;
+
+  const displacedProviders =
+    isCoinbaseWalletBrowserExtension(ethereumProvider) || phantomProvider // Coinbase Wallet and Phantom Wallet place displaced providers on `window.ethereum.providers`
+      ? (ethereumProvider as InjectedCoinbaseWalletExtensionProvider).providers
+      : [];
 
   const okxWalletProvider = (globalThis as typeof globalThis & WithInjectedOkxWalletProvider)
     ?.okxwallet;
 
-  return [...displacedProviders, ethereumProvider, web3Provider, okxWalletProvider].filter(
+  return [...(displacedProviders ?? []), ethereumProvider, web3Provider, okxWalletProvider].filter(
     isTruthy
   );
 };

@@ -111,6 +111,7 @@ export enum WalletType {
   OtherWallet = 'OTHER_WALLET',
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
+  PhantomEvm = 'PHANTOM_EVM',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -221,6 +222,13 @@ export const wallets: Record<WalletType, WalletConfig> = {
     matchesInjectedEip1193: (provider) => provider.isMathWallet,
     walletconnect2Id: '7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26',
   },
+  [WalletType.PhantomEvm]: {
+    type: WalletType.MetaMask,
+    stringKey: STRING_KEYS.PHANTOM, // TODO change to PHANTOM_EVM
+    icon: PhantomIcon,
+    connectionTypes: [WalletConnectionType.InjectedEip1193],
+    matchesInjectedEip1193: (provider) => Boolean(provider.isPhantom),
+  },
   [WalletType.MetaMask]: {
     type: WalletType.MetaMask,
     stringKey: STRING_KEYS.METAMASK,
@@ -318,6 +326,10 @@ export type WithInjectedWeb3Provider = {
 
 export type WithInjectedOkxWalletProvider = {
   okxwallet: InjectedWeb3Provider;
+};
+
+export type WithInjectedPhantomWalletProvider = {
+  phantom?: { ethereum?: InjectedEthereumProvider };
 };
 
 // Wallet connections
