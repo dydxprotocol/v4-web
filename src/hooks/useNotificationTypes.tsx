@@ -30,7 +30,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -64,10 +64,9 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
-import { useEnvConfig } from './useEnvConfig';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigGateValues, useStatsigDynamicConfigValue } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -660,11 +659,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
       const { getInTouch } = useURLConfigs();
-      const feedbackRequestWalletAddresses = useEnvConfig('feedbackRequestWalletAddresses');
+      const feedbackRequestWalletAddresses = useStatsigDynamicConfigValue(
+        StatsigDynamicConfigs.dcHighestVolumeUsers
+      ) as string[];
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        if (dydxAddress && feedbackRequestWalletAddresses.includes(dydxAddress) && getInTouch) {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
           trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
             icon: <Icon iconName={IconName.SpeechBubble} />,
             title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
