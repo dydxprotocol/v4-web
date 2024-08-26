@@ -51,12 +51,12 @@ export const NewMarketForm = () => {
     return [
       {
         key: 'deposit-apr',
-        label: 'Deposit APR (30d)',
+        label: `${stringGetter({ key: STRING_KEYS.DEPOSIT_APR })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
         value: <Output type={OutputType.Percent} value={0.3256} />,
       },
       {
         key: 'deposit-lockup',
-        label: 'Deposit Lockup',
+        label: stringGetter({ key: STRING_KEYS.DEPOSIT_LOCKUP }),
         value: <Output type={OutputType.Percent} value={0.3256} />,
       },
       {
@@ -85,14 +85,15 @@ export const NewMarketForm = () => {
       return <NewMarketSuccessStep href="" />;
     }
 
-    if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
+    if (true) {
+      // (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
       return (
         <NewMarketPreviewStep2
           onSuccess={() => {
             setStep(NewMarketFormStep.SUCCESS);
           }}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
-          ticker={tickerToAdd}
+          ticker={'ETH-USD'}
           receiptItems={receiptItems}
         />
       );
