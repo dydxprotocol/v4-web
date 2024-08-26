@@ -181,6 +181,13 @@ export const wallets: Record<WalletType, WalletConfig> = {
     connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => provider.isClover,
   },
+  [WalletType.PhantomEvm]: {
+    type: WalletType.PhantomEvm,
+    stringKey: STRING_KEYS.OTHER_WALLET, // TODO change to PHANTOM_EVM
+    icon: PhantomIcon,
+    connectionTypes: [WalletConnectionType.InjectedEip1193],
+    matchesInjectedEip1193: (provider) => Boolean(provider.isPhantom),
+  },
   [WalletType.CoinbaseWallet]: {
     type: WalletType.CoinbaseWallet,
     stringKey: STRING_KEYS.COINBASE_WALLET,
@@ -221,13 +228,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => provider.isMathWallet,
     walletconnect2Id: '7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26',
-  },
-  [WalletType.PhantomEvm]: {
-    type: WalletType.MetaMask,
-    stringKey: STRING_KEYS.PHANTOM, // TODO change to PHANTOM_EVM
-    icon: PhantomIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => Boolean(provider.isPhantom),
   },
   [WalletType.MetaMask]: {
     type: WalletType.MetaMask,

@@ -16,6 +16,8 @@ export const useDisplayedWallets = () => {
     WalletType.CoinbaseWallet,
 
     WalletType.OkxWallet,
+
+    WalletType.PhantomEvm,
     // Hide these wallet options until they can be properly tested on mainnet
     // WalletType.ImToken,
     // WalletType.Rainbow,
