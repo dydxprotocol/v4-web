@@ -659,13 +659,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
       const { getInTouch } = useURLConfigs();
-      const highestVolumeWalletAddresses = useStatsigDynamicConfigValue(
+      const feedbackRequestWalletAddresses = useStatsigDynamicConfigValue(
         StatsigDynamicConfigs.dcHighestVolumeUsers
       ) as string[];
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        if (dydxAddress && highestVolumeWalletAddresses.includes(dydxAddress) && getInTouch) {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
           trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
             icon: <Icon iconName={IconName.SpeechBubble} />,
             title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
