@@ -15,7 +15,7 @@ interface EnvironmentConfig {
 
 export type EnvironmentConfigKey = keyof EnvironmentConfig;
 
-export const useEnvConfig = (configKey: EnvironmentConfigKey): string | string[] => {
+export const useEnvConfig = (configKey: EnvironmentConfigKey): string => {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   return ENVIRONMENT_CONFIG_MAP[selectedNetwork][configKey];
 };
