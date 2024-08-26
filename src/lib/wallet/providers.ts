@@ -43,7 +43,11 @@ export const detectInjectedEip1193Providers = (): EIP1193Provider[] => {
   const okxWalletProvider = (globalThis as typeof globalThis & WithInjectedOkxWalletProvider)
     ?.okxwallet;
 
-  return [...(displacedProviders ?? []), ethereumProvider, web3Provider, okxWalletProvider].filter(
-    isTruthy
-  );
+  return [
+    ...(displacedProviders ?? []),
+    ethereumProvider,
+    web3Provider,
+    okxWalletProvider,
+    phantomProvider,
+  ].filter(isTruthy);
 };
