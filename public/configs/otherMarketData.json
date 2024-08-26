@@ -15649,48 +15649,6 @@
             "cmcId": 30285
         }
     },
-    "IQ": {
-        "title": "Add IQ-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IQ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 277,
-            "ticker": "IQ-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -12,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Binance",
-                    "ticker": "IQUSDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Okx",
-                    "ticker": "IQ-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -3,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "IQ",
-            "referencePrice": 0.005277791510116902,
-            "cmcId": 2930
-        }
-    },
     "DRIFT": {
         "title": "Add DRIFT-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DRIFT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -22149,48 +22107,6 @@
             "cmcId": 4038
         }
     },
-    "LTO": {
-        "title": "Add LTO-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LTO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 410,
-            "ticker": "LTO-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Binance",
-                    "ticker": "LTOUSDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "LTO-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "LTO Network",
-            "referencePrice": 0.11281022230348817,
-            "cmcId": 3714
-        }
-    },
     "TNSR": {
         "title": "Add TNSR-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TNSR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -25638,48 +25554,6 @@
             "cmcId": 9721
         }
     },
-    "BURGER": {
-        "title": "Add BURGER-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BURGER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 485,
-            "ticker": "BURGER-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -10,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Binance",
-                    "ticker": "BURGERUSDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "BURGER-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -5,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "BurgerCities",
-            "referencePrice": 0.4284694550855559,
-            "cmcId": 7158
-        }
-    },
     "ICE": {
         "title": "Add ICE-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -27453,48 +27327,6 @@
             "assetName": "OG Fan Token",
             "referencePrice": 3.0044093126418474,
             "cmcId": 5309
-        }
-    },
-    "ALPINE": {
-        "title": "Add ALPINE-USD perpetual market",
-        "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALPINE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-        "params": {
-            "id": 525,
-            "ticker": "ALPINE-USD",
-            "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-            "priceExponent": -9,
-            "minPriceChange": 800,
-            "minExchanges": 1,
-            "exchangeConfigJson": [
-                {
-                    "exchangeName": "Binance",
-                    "ticker": "ALPINEUSDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                },
-                {
-                    "exchangeName": "Kucoin",
-                    "ticker": "ALPINE-USDT",
-                    "adjustByMarket": "USDT-USD",
-                    "invert": false
-                }
-            ],
-            "liquidityTier": 2,
-            "atomicResolution": -6,
-            "quantumConversionExponent": -9,
-            "defaultFundingPpm": 0,
-            "stepBaseQuantums": 1000000,
-            "subticksPerTick": 1000000,
-            "delayBlocks": 3600
-        },
-        "initialDeposit": {
-            "denom": "adydx",
-            "amount": "10000000000000000000000"
-        },
-        "meta": {
-            "assetName": "Alpine F1 Team Fan Token",
-            "referencePrice": 1.2638121381842762,
-            "cmcId": 18112
         }
     },
     "KRL": {
