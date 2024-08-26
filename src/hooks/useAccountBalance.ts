@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
@@ -16,6 +17,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
 import { useEnvConfig } from './useEnvConfig';
+import { useSolanaTokenBalance } from './useSolanaBalance';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type UseAccountBalanceProps = {
@@ -44,13 +46,21 @@ export const useAccountBalance = ({
   decimals = 0,
   rpc,
   isCosmosChain,
-}: UseAccountBalanceProps = {}) => {
-  const { evmAddress, dydxAddress } = useAccounts();
+}: UseAccountBalanceProps = {}): {
+  balance: string | undefined;
+  isQueryFetching: boolean;
+  nativeStakingBalance: number;
+  nativeTokenBalance: BigNumber;
+  queryStatus: 'success' | 'error' | 'pending';
+  usdcBalance: number;
+} => {
+  const { evmAddress, dydxAddress, solAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
+  const isSolanaChain = !!solAddress;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
@@ -58,7 +68,7 @@ export const useAccountBalance = ({
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
     query: {
-      enabled: Boolean(!isCosmosChain && isEVMnativeToken),
+      enabled: Boolean(!isCosmosChain && !isSolanaChain && isEVMnativeToken),
     },
   });
 
@@ -87,6 +97,8 @@ export const useAccountBalance = ({
       ),
     },
   });
+
+  const solanaToken = useSolanaTokenBalance({ address: solAddress, token: addressOrDenom });
 
   const cosmosQueryFn = useCallback(async () => {
     if (dydxAddress && bech32AddrPrefix && rpc && addressOrDenom) {
@@ -117,6 +129,7 @@ export const useAccountBalance = ({
 
   const { value: evmNativeBalance, decimals: evmNativeDecimals } = evmNative.data ?? {};
   const [evmTokenBalance, evmTokenDecimals] = evmToken.data ?? [];
+
   const evmBalance = isEVMnativeToken
     ? evmNativeBalance !== undefined && evmNativeDecimals !== undefined
       ? formatUnits(evmNativeBalance, evmNativeDecimals)
@@ -124,7 +137,10 @@ export const useAccountBalance = ({
     : evmTokenBalance?.result !== undefined && evmTokenDecimals?.result !== undefined
       ? formatUnits(evmTokenBalance?.result, evmTokenDecimals?.result)
       : undefined;
-  const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
+
+  const solBalance = solanaToken?.data?.data.formatted;
+
+  const balance = isCosmosChain ? cosmosQuery.data : isSolanaChain ? solBalance : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
@@ -135,12 +151,23 @@ export const useAccountBalance = ({
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount).toNumber();
 
+  let queryStatus = evmNative.status;
+  let isQueryFetching = evmNative.isFetching;
+  if (isCosmosChain) {
+    queryStatus = cosmosQuery.status;
+    isQueryFetching = cosmosQuery.isFetching;
+  }
+  if (isSolanaChain) {
+    queryStatus = solanaToken.status;
+    isQueryFetching = solanaToken.isFetching;
+  }
+
   return {
     balance,
     nativeTokenBalance,
     nativeStakingBalance,
     usdcBalance,
-    queryStatus: isCosmosChain ? cosmosQuery.status : evmNative.status,
-    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmNative.isFetching,
+    queryStatus,
+    isQueryFetching,
   };
 };

@@ -36,6 +36,8 @@ type ElementProps = {
   onSelect: (name: string, type: 'chain' | 'exchange') => void;
 };
 
+const solanaChainIdPrefix = 'solana';
+
 export const SourceSelectMenu = ({
   label,
   selectedExchange,
@@ -43,7 +45,10 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { walletType } = useAccounts();
-  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+
+  const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
+  // Only CCTP deposits are supported for Phantom / Solana
+  const CCTPDepositOnly = walletType === WalletType.Phantom ? true : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -77,6 +82,7 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
+
   const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,
@@ -88,6 +94,12 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
+      // only solana chains are supported on phantom
+      if (walletType === WalletType.Phantom && !chain.value.startsWith(solanaChainIdPrefix))
+        return false;
+      return true;
+    })
+    .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -96,6 +108,7 @@ export const SourceSelectMenu = ({
       if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
         return !!cctpTokensByChainId[chain.value];
       }
+
       return true;
     })
     // we want lowest fee tokens first followed by non-lowest fee cctp tokens
@@ -115,7 +128,6 @@ export const SourceSelectMenu = ({
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
   const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
-
   return (
     <SearchSelectMenu
       items={[

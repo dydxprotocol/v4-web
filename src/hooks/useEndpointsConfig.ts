@@ -14,6 +14,7 @@ interface EndpointsConfig {
   nobleValidator: string;
   faucet?: string;
   stakingAPR?: string;
+  solanaRpcUrl: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -28,5 +29,6 @@ export const useEndpointsConfig = () => {
     nobleValidator: endpointsConfig.nobleValidator,
     faucet: endpointsConfig.faucet,
     stakingAPR: endpointsConfig.stakingAPR,
+    solanaRpcUrl: endpointsConfig.solanaRpcUrl,
   };
 };

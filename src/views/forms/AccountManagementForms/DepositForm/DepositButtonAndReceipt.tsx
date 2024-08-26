@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 import { StatSigFlags } from '@/constants/statsig';
+import { WalletType } from '@/constants/wallets';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -65,7 +66,7 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi } = useWalletConnection();
+  const { connectWallet, isConnectedWagmi, walletType } = useWalletConnection();
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
@@ -269,11 +270,11 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi ? (
+      ) : !isConnectedWagmi && walletType !== WalletType.Phantom ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>
-      ) : !isMatchingNetwork ? (
+      ) : !isMatchingNetwork && walletType !== WalletType.Phantom ? (
         <Button
           action={ButtonAction.Primary}
           onClick={switchNetwork}
