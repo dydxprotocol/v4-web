@@ -676,7 +676,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             // our generate script only knows to generate string keys for title and body
             actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
             renderActionSlot: () => (
-              <Link href={getInTouch}>
+              <Link href={getInTouch} isAccent>
                 {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
               </Link>
             ),
