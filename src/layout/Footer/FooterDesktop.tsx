@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
 import { useApiState } from '@/hooks/useApiState';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -14,6 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -32,6 +34,7 @@ enum ExchangeStatus {
 export const FooterDesktop = () => {
   const stringGetter = useStringGetter();
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
+  const deployerName = useEnvConfig('deployerName');
   const { statusPage } = useURLConfigs();
 
   const isStatusLoading = !status && !statusErrorMessage;
@@ -74,6 +77,11 @@ export const FooterDesktop = () => {
             {label}
           </$FooterButton>
         </WithTooltip>
+        {
+          <$FooterButton slotLeft={<ChatIcon />} size={ButtonSize.XSmall}>
+            {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
+          </$FooterButton>
+        }
 
         {globalThis?.Intercom && (
           <$FooterButton
@@ -84,9 +92,19 @@ export const FooterDesktop = () => {
             {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
           </$FooterButton>
         )}
+        {<$FooterButton size={ButtonSize.XSmall}>
+        {stringGetter({
+          key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
+          params: {
+            NAME_OF_DEPLOYER: deployerName,
+            LEARN_MORE_LINK: <Link isAccent>{stringGetter({ key: STRING_KEYS.LEARN_MORE })}</Link>,
+          },
+        })}
+      </$FooterButton>}
       </$Row>
 
-      {isDev && (
+      
+      {false && (
         <$Details
           withSeparators
           items={[
@@ -125,10 +143,12 @@ const $Footer = styled.footer`
 const $Row = styled.div`
   ${layoutMixins.row}
   ${layoutMixins.spacedRow}
-  width: var(--sidebar-width);
+  // width: var(--sidebar-width);
 
   padding: 0 0.5rem;
-  border-right: 1px solid var(--color-border);
+  > * {
+    border-right: 1px solid var(--color-border);
+  }
 `;
 
 const $StatusDot = styled.div<{ exchangeStatus?: ExchangeStatus }>`

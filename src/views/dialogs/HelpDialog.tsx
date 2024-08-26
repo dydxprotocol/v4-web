@@ -15,6 +15,7 @@ import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { Link } from '@/components/Link';
 
 const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
 const latestVersion = import.meta.env.VITE_LAST_TAG;
@@ -68,6 +69,21 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
     [stringGetter, helpCenter, community]
   );
 
+  const legalHelpBlob = (
+    <div tw="text-color-text-0 font-mini-book">
+      {stringGetter({
+        key: STRING_KEYS.SITE_OPERATED_BY_LONG,
+        params: {
+          LEARN_MORE_LINK: (
+            <Link isAccent onClick={(e) => e.stopPropagation()} isInline>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            </Link>
+          ),
+        },
+      })}
+    </div>
+  );
+
   return (
     <$ComboboxDialogMenu
       isOpen
@@ -89,8 +105,11 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
                 <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
               </span>
             )}
+            {legalHelpBlob}
           </div>
-        ) : undefined
+        ) : (
+          legalHelpBlob
+        )
       }
     />
   );
