@@ -34,7 +34,6 @@ export const detectInjectedEip1193Providers = (): EIP1193Provider[] => {
 
   const phantomProvider = (globalThis as typeof globalThis & WithInjectedPhantomWalletProvider)
     ?.phantom?.ethereum;
-  console.log('PHANTOM PROVIDER: ', phantomProvider);
 
   const displacedProviders =
     isCoinbaseWalletBrowserExtension(ethereumProvider) || phantomProvider // Coinbase Wallet and Phantom Wallet place displaced providers on `window.ethereum.providers`

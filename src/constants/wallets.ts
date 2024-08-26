@@ -183,7 +183,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.PhantomEvm]: {
     type: WalletType.PhantomEvm,
-    stringKey: STRING_KEYS.OTHER_WALLET, // TODO change to PHANTOM_EVM
+    stringKey: STRING_KEYS.PHANTOM_EVM,
     icon: PhantomIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => Boolean(provider.isPhantom),
@@ -296,7 +296,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
-    stringKey: STRING_KEYS.PHANTOM,
+    stringKey: STRING_KEYS.PHANTOM_SOL,
     icon: PhantomIcon,
     connectionTypes: [WalletConnectionType.Phantom],
   },
