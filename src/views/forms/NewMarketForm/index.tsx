@@ -85,15 +85,14 @@ export const NewMarketForm = () => {
       return <NewMarketSuccessStep href="" />;
     }
 
-    if (true) {
-      // (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
+    if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
       return (
         <NewMarketPreviewStep2
           onSuccess={() => {
             setStep(NewMarketFormStep.SUCCESS);
           }}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
-          ticker={'ETH-USD'}
+          ticker={tickerToAdd}
           receiptItems={receiptItems}
         />
       );
