@@ -9,7 +9,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 import { StatSigFlags } from '@/constants/statsig';
-import { WalletType } from '@/constants/wallets';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -34,6 +33,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { WalletType } from '@/lib/wallet/types';
 
 import { RouteWarningMessage } from '../RouteWarningMessage';
 import { SlippageEditor } from '../SlippageEditor';
@@ -66,13 +66,13 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi, walletType } = useWalletConnection();
+  const { connectWallet, isConnectedWagmi, selectedWallet } = useWalletConnection();
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
     try {
       setRequireUserActionInWallet(false);
-      await connectWallet();
+      await connectWallet({ wallet: selectedWallet });
       setRequireUserActionInWallet(false);
     } catch (e) {
       setRequireUserActionInWallet(true);
@@ -270,11 +270,11 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi && walletType !== WalletType.Phantom ? (
+      ) : !isConnectedWagmi && selectedWallet?.name !== WalletType.Phantom ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>
-      ) : !isMatchingNetwork && walletType !== WalletType.Phantom ? (
+      ) : !isMatchingNetwork && selectedWallet?.name !== WalletType.Phantom ? (
         <Button
           action={ButtonAction.Primary}
           onClick={switchNetwork}

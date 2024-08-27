@@ -1,33 +1,53 @@
+import { useMemo } from 'react';
+
+import { WalletType as CosmosWalletType } from 'graz';
+
 import { isDev, isTestnet } from '@/constants/networks';
-import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { ConnectorType, DisplayWallet, WalletType } from '@/lib/wallet/types';
 
-export const useDisplayedWallets = () => {
-  const displayedWallets = [
-    WalletType.MetaMask,
+import { useMipdInjectedWallets } from './useMipdInjectedWallets';
 
-    (isTestnet || isDev) && WalletType.Phantom,
+export const useDisplayedWallets = (): DisplayWallet[] => {
+  const injectedWallets = useMipdInjectedWallets();
 
-    isDev && WalletType.Keplr,
+  return useMemo(
+    () =>
+      [
+        ...injectedWallets.map(
+          (wallet) =>
+            ({
+              connectorType: ConnectorType.MIPD,
+              icon: wallet.detail.info.icon,
+              name: wallet.detail.info.name,
+              rdns: wallet.detail.info.rdns,
+            }) as DisplayWallet
+        ),
 
-    WalletType.WalletConnect2,
+        (isTestnet || isDev) && {
+          connectorType: ConnectorType.Phantom,
+          name: WalletType.Phantom,
+        },
 
-    WalletType.CoinbaseWallet,
+        isDev && {
+          connectorType: ConnectorType.Cosmos,
+          name: CosmosWalletType.KEPLR,
+        },
 
-    WalletType.OkxWallet,
-    // Hide these wallet options until they can be properly tested on mainnet
-    // WalletType.ImToken,
-    // WalletType.Rainbow,
-    // WalletType.TrustWallet,
-    // WalletType.HuobiWallet,
-    // WalletType.BitKeep,
-    // WalletType.Coin98,
+        { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
 
-    Boolean(import.meta.env.VITE_PRIVY_APP_ID) && WalletType.Privy,
+        { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
 
-    WalletType.OtherWallet,
-  ].filter(isTruthy);
+        { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
 
-  return displayedWallets;
+        Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
+          connectorType: ConnectorType.Privy,
+          name: WalletType.Privy,
+        },
+
+        { connectorType: ConnectorType.WalletConnect, name: WalletType.OtherWallet },
+      ].filter(isTruthy) as DisplayWallet[],
+    [injectedWallets]
+  );
 };

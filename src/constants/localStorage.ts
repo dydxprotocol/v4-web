@@ -3,8 +3,14 @@ export enum LocalStorageKey {
   EvmAddress = 'dydx.EvmAddress',
   SolAddress = 'dydx.SolAddress',
   DydxAddress = 'dydx.DydxAddress',
+
+  // deprecated
   OnboardingSelectedWalletType = 'dydx.OnboardingSelectedWalletType',
   WalletConnectionType = 'dydx.WalletConnectionType',
+
+  // new
+  OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
+
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',

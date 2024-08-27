@@ -1,30 +1,20 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
 import type { ExternalProvider } from '@ethersproject/providers';
-import type { suggestChain } from 'graz';
+import { type suggestChain } from 'graz';
 import { EIP1193Provider } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import {
-  BitkeepIcon,
-  BitpieIcon,
-  CloverWalletIcon,
-  Coin98Icon,
   CoinbaseIcon,
   EmailIcon,
   GenericWalletIcon,
-  HuobiIcon,
-  ImTokenIcon,
   KeplrIcon,
-  MathWalletIcon,
-  MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
-  RainbowIcon,
-  TokenPocketIcon,
-  TrustWalletIcon,
-  WalletConnectIcon,
 } from '@/icons';
+
+import { DisplayWallet, WalletType } from '@/lib/wallet/types';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 
@@ -88,31 +78,6 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   },
 };
 
-// Wallets
-
-export enum WalletType {
-  BitKeep = 'BITKEEP',
-  BitPie = 'BITPIE',
-  CloverWallet = 'CLOVER_WALLET',
-  CoinbaseWallet = 'COINBASE_WALLET',
-  Coin98 = 'COIN98',
-  HuobiWallet = 'HUOBI_WALLET',
-  ImToken = 'IMTOKEN',
-  Keplr = 'KEPLR',
-  // Ledger = 'LEDGER',
-  MathWallet = 'MATH_WALLET',
-  MetaMask = 'METAMASK',
-  OkxWallet = 'OKX_WALLET',
-  Rainbow = 'RAINBOW_WALLET',
-  TokenPocket = 'TOKEN_POCKET',
-  TrustWallet = 'TRUST_WALLET',
-  WalletConnect2 = 'WALLETCONNECT_2',
-  TestWallet = 'TEST_WALLET',
-  OtherWallet = 'OTHER_WALLET',
-  Privy = 'PRIVY',
-  Phantom = 'PHANTOM',
-}
-
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
   Metamask: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
   imToken: 'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef',
@@ -141,16 +106,12 @@ type WalletConfig = {
   walletconnect2Id?: string;
 };
 
-export const wallets: Record<WalletType, WalletConfig> = {
+export const wallets: Record<DisplayWallet['name'], WalletConfig> = {
   [WalletType.OtherWallet]: {
     type: WalletType.OtherWallet,
     stringKey: STRING_KEYS.OTHER_WALLET,
     icon: GenericWalletIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      // WalletConnectionType.CoinbaseWalletSdk,
-      WalletConnectionType.WalletConnect2,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) =>
       Object.entries(wallets).every(
         ([walletType, walletConfig]) =>
@@ -158,27 +119,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
           !walletConfig.matchesInjectedEip1193 ||
           !walletConfig.matchesInjectedEip1193(provider)
       ),
-  },
-  [WalletType.BitKeep]: {
-    type: WalletType.BitKeep,
-    stringKey: STRING_KEYS.BITKEEP,
-    icon: BitkeepIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isBitKeep, // isBitKeepChrome, isBitEthereum
-  },
-  [WalletType.BitPie]: {
-    type: WalletType.BitPie,
-    stringKey: STRING_KEYS.BITPIE,
-    icon: BitpieIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isBitpie,
-  },
-  [WalletType.CloverWallet]: {
-    type: WalletType.CloverWallet,
-    stringKey: STRING_KEYS.CLOVER_WALLET,
-    icon: CloverWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isClover,
   },
   [WalletType.CoinbaseWallet]: {
     type: WalletType.CoinbaseWallet,
@@ -191,45 +131,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     ],
     matchesInjectedEip1193: (provider) => provider.isCoinbaseWallet, // provider.selectedProvider?.isCoinbaseWallet,
   },
-  [WalletType.Coin98]: {
-    type: WalletType.Coin98,
-    stringKey: STRING_KEYS.COIN98,
-    icon: Coin98Icon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isCoin98,
-  },
-  [WalletType.HuobiWallet]: {
-    type: WalletType.HuobiWallet,
-    stringKey: STRING_KEYS.HUOBI_WALLET,
-    icon: HuobiIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isHbWallet,
-  },
-  [WalletType.ImToken]: {
-    type: WalletType.ImToken,
-    stringKey: STRING_KEYS.IMTOKEN,
-    icon: ImTokenIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isImToken,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.imToken,
-  },
-  [WalletType.MathWallet]: {
-    type: WalletType.MathWallet,
-    stringKey: STRING_KEYS.MATH_WALLET,
-    icon: MathWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isMathWallet,
-    walletconnect2Id: '7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26',
-  },
-  [WalletType.MetaMask]: {
-    type: WalletType.MetaMask,
-    stringKey: STRING_KEYS.METAMASK,
-    icon: MetaMaskIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) =>
-      Boolean(provider.isMetaMask) && !provider.overrideIsMetaMask,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
-  },
   [WalletType.OkxWallet]: {
     type: WalletType.OkxWallet,
     stringKey: STRING_KEYS.OKX_WALLET,
@@ -237,36 +138,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isOkxWallet,
     walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.OkxWallet,
-  },
-  [WalletType.Rainbow]: {
-    type: WalletType.Rainbow,
-    stringKey: STRING_KEYS.RAINBOW_WALLET,
-    icon: RainbowIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isRainbowWallet,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Rainbow,
-  },
-  [WalletType.TokenPocket]: {
-    type: WalletType.TokenPocket,
-    stringKey: STRING_KEYS.TOKEN_POCKET,
-    icon: TokenPocketIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isTokenPocket,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.TokenPocket,
-  },
-  [WalletType.TrustWallet]: {
-    type: WalletType.TrustWallet,
-    stringKey: STRING_KEYS.TRUST_WALLET,
-    icon: TrustWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isTrust,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Trust,
-  },
-  [WalletType.WalletConnect2]: {
-    type: WalletType.WalletConnect2,
-    stringKey: STRING_KEYS.WALLET_CONNECT_2,
-    icon: WalletConnectIcon,
-    connectionTypes: [WalletConnectionType.WalletConnect2],
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,

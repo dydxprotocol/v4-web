@@ -12,7 +12,6 @@ import {
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatSigFlags } from '@/constants/statsig';
-import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
@@ -25,6 +24,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { WalletType } from '@/lib/wallet/types';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
@@ -44,11 +44,12 @@ export const SourceSelectMenu = ({
   selectedChain,
   onSelect,
 }: ElementProps) => {
-  const { walletType } = useAccounts();
+  const { connectedWallet } = useAccounts();
 
   const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
-  const CCTPDepositOnly = walletType === WalletType.Phantom ? true : initialCCTPDepositValue;
+  const CCTPDepositOnly =
+    connectedWallet?.name === WalletType.Phantom ? true : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -95,7 +96,10 @@ export const SourceSelectMenu = ({
     }))
     .filter((chain) => {
       // only solana chains are supported on phantom
-      if (walletType === WalletType.Phantom && !chain.value.startsWith(solanaChainIdPrefix))
+      if (
+        connectedWallet?.name === WalletType.Phantom &&
+        !chain.value.startsWith(solanaChainIdPrefix)
+      )
         return false;
       return true;
     })
@@ -127,7 +131,8 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
-  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
+  const isNotPrivyDeposit =
+    type === TransferType.withdrawal || connectedWallet?.name !== WalletType.Privy;
   return (
     <SearchSelectMenu
       items={[

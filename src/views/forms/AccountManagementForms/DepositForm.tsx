@@ -24,7 +24,7 @@ import {
   NumberSign,
 } from '@/constants/numbers';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
-import { type EvmAddress, WalletType } from '@/constants/wallets';
+import { type EvmAddress } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -60,6 +60,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
+import { WalletType } from '@/lib/wallet/types';
 
 import { NobleDeposit } from '../NobleDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
@@ -94,7 +95,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     signerWagmi,
     publicClientWagmi,
     nobleAddress,
-    walletType,
+    connectedWallet,
     saveHasAcknowledgedTerms,
   } = useAccounts();
 
@@ -184,19 +185,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }, [error, onError]);
 
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (!connectedWallet) return;
+
+    if (connectedWallet.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (walletType === WalletType.Phantom) {
+    if (connectedWallet.name === WalletType.Phantom) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: 'solana',
       });
     }
-  }, [walletType]);
+  }, [connectedWallet]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
@@ -321,7 +324,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         let txHash: string | undefined;
-        if (walletType === WalletType.Phantom) {
+        if (connectedWallet?.name === WalletType.Phantom) {
           if (!requestPayload?.data) {
             throw new Error('Missing solana request payload');
           }

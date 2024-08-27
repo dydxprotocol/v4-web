@@ -3,16 +3,17 @@ import { useCallback } from 'react';
 import stableStringify from 'fast-json-stable-stringify';
 import { useSignTypedData } from 'wagmi';
 
-import { getSignTypedData, WalletType } from '@/constants/wallets';
+import { getSignTypedData } from '@/constants/wallets';
 
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { DisplayWallet } from './useDisplayedWallets';
 import { useEnvConfig } from './useEnvConfig';
 
-export default function useSignForWalletDerivation(walletType: WalletType | undefined) {
+export default function useSignForWalletDerivation(wallet: DisplayWallet | undefined) {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const ethereumChainId = useEnvConfig('ethereumChainId');
   const chainId = Number(ethereumChainId);
@@ -42,11 +43,11 @@ export default function useSignForWalletDerivation(walletType: WalletType | unde
   }, [phantomSignMessage, signTypedData]);
 
   const signMessage = useCallback(async (): Promise<string> => {
-    if (walletType === WalletType.Phantom) {
+    if (wallet?.connectorType === 'phantom') {
       return signSolanaMessage();
     }
     return signEvmMessage();
-  }, [signEvmMessage, signSolanaMessage, walletType]);
+  }, [signEvmMessage, signSolanaMessage, wallet?.connectorType]);
 
   return signMessage;
 }

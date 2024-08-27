@@ -17,7 +17,7 @@ import {
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
+import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -51,6 +51,8 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
+import { WalletIcon } from '@/components/WalletIcon';
+import { WalletType } from '@/lib/wallet/types';
 import { MobileDownloadLinks } from '../MobileDownloadLinks';
 
 export const AccountMenu = () => {
@@ -67,10 +69,10 @@ export const AccountMenu = () => {
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
-  const { evmAddress, solAddress, walletType, dydxAddress, hdKey } = useAccounts();
+  const { evmAddress, solAddress, connectedWallet, dydxAddress, hdKey } = useAccounts();
 
   let address: string | undefined;
-  if (walletType === WalletType.Phantom) {
+  if (connectedWallet?.name === WalletType.Phantom) {
     address = truncateAddress(solAddress, '');
   } else {
     address = truncateAddress(evmAddress, '0x');
@@ -92,7 +94,7 @@ export const AccountMenu = () => {
     walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
-    walletType === WalletType.Privy
+    connectedWallet?.name === WalletType.Privy
   ) {
     if (google) {
       walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
@@ -101,10 +103,10 @@ export const AccountMenu = () => {
     } else if (twitter) {
       walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
     } else {
-      walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+      walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
     }
-  } else if (walletType) {
-    walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+  } else if (connectedWallet) {
+    walletIcon = <WalletIcon wallet={connectedWallet} />;
   }
 
   return onboardingState === OnboardingState.Disconnected ? (

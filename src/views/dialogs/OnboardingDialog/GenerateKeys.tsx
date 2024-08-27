@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxAddress, WalletType } from '@/constants/wallets';
+import { DydxAddress } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -31,6 +31,7 @@ import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
+import { WalletType } from '@/lib/wallet/types';
 
 type ElementProps = {
   status: EvmDerivedAccountStatus;
@@ -42,7 +43,8 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const stringGetter = useStringGetter();
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
-  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, walletType } = useAccounts();
+  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, connectedWallet } =
+    useAccounts();
 
   const [error, setError] = useState<string>();
 
@@ -92,7 +94,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signMessageAsync = useSignForWalletDerivation(walletType);
+  const signMessageAsync = useSignForWalletDerivation(connectedWallet);
 
   const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
 
@@ -156,7 +158,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       if (shouldRememberMe && staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
 
-        if (walletType === WalletType.Phantom) {
+        if (connectedWallet?.name === WalletType.Phantom) {
           saveSolSignature(encryptedSignature);
         } else {
           saveEvmSignature(encryptedSignature);
@@ -261,7 +263,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           }
           tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
-          {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
+          {!isMatchingNetwork && connectedWallet?.name !== WalletType.Phantom ? (
             <Button
               action={ButtonAction.Primary}
               onClick={onClickSwitchNetwork}
