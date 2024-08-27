@@ -27,24 +27,24 @@ describe('test hooks', () => {
 
   it('something else', async () => {
     const handleInternal = vi.fn().mockImplementation(() => {
-      fn();
+      fn(1);
     });
-    const fn = hooks.hooked(() => {
+    const fn = hooks.hooked((arg: number) => {
       const [state, setState] = hooks.useState(0);
       hooks.useEffect(() => {
         setTimeout(() => setState((s) => s + 1), 500);
       }, []);
-      return state;
+      return state + arg;
     }, handleInternal);
 
     expect(handleInternal).not.toHaveBeenCalled();
-    expect(fn()).toEqual(0);
+    expect(fn(1)).toEqual(1);
     expect(handleInternal).not.toHaveBeenCalled();
     await delay(100);
     expect(handleInternal).not.toHaveBeenCalled();
-    expect(fn()).toEqual(0);
+    expect(fn(1)).toEqual(1);
     await delay(500);
     expect(handleInternal).toHaveBeenCalledOnce();
-    expect(fn()).toEqual(1);
+    expect(fn(1)).toEqual(2);
   });
 });
