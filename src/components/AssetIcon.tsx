@@ -661,6 +661,8 @@ const assetIcons = {
   ZKF: '/currencies/zkf.png',
   ZRO: '/currencies/zro.png',
   ZRX: '/currencies/zrx.png',
+
+  WSTETH: '/currencies/wsteth.png',
 } as const;
 
 const Placeholder = ({ className, symbol }: { className?: string; symbol: string }) => (
