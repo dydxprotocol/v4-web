@@ -6203,12 +6203,12 @@
       "cmcId": 31297.0
     }
   },
-  "BUFFI": {
+  "BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45": {
     "title": "Add BUFFI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BUFFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
       "id": 156,
-      "ticker": "BUFFI-USD",
+      "ticker": "BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15,
       "minPriceChange": 800,
@@ -39871,12 +39871,12 @@
       "cmcId": 28179.0
     }
   },
-  "WSTETH": {
+  "WSTETH,uniswap_v3,0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0": {
     "title": "Add WSTETH-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WSTETH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
       "id": 1016,
-      "ticker": "WSTETH-USD",
+      "ticker": "WSTETH,uniswap_v3,0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6,
       "minPriceChange": 800,
