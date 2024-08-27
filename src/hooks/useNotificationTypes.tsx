@@ -67,7 +67,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues, useStatsigDynamicConfigValue } from './useStatsig';
+import { useAllStatsigGateValues, useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -670,10 +670,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
       const { getInTouch } = useURLConfigs();
-      const feedbackRequestWalletAddresses = useStatsigDynamicConfigValue(
-        StatsigDynamicConfigs.dcHighestVolumeUsers
-      ) as string[];
       const stringGetter = useStringGetter();
+
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const feedbackRequestWalletAddresses =
+        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
 
       useEffect(() => {
         if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
