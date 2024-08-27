@@ -1,7 +1,10 @@
+import { useCallback } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize, ButtonType } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
@@ -19,6 +22,9 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
+
 import { isPresent } from '@/lib/typeUtils';
 
 enum FooterItems {
@@ -32,6 +38,7 @@ enum ExchangeStatus {
 }
 
 export const FooterDesktop = () => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const deployerName = useEnvConfig('deployerName');
@@ -53,6 +60,8 @@ export const FooterDesktop = () => {
           exchangeStatus: ExchangeStatus.Degraded,
           label: stringGetter({ key: STRING_KEYS.DEGRADED }),
         };
+
+  const openHelpDialog = useCallback(() => dispatch(openDialog(DialogTypes.Help())), [dispatch]);
 
   return (
     <$Footer>
@@ -77,11 +86,6 @@ export const FooterDesktop = () => {
             {label}
           </$FooterButton>
         </WithTooltip>
-        {
-          <$FooterButton slotLeft={<ChatIcon />} size={ButtonSize.XSmall}>
-            {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
-          </$FooterButton>
-        }
 
         {globalThis?.Intercom && (
           <$FooterButton
@@ -92,19 +96,22 @@ export const FooterDesktop = () => {
             {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
           </$FooterButton>
         )}
-        {<$FooterButton size={ButtonSize.XSmall}>
-        {stringGetter({
-          key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
-          params: {
-            NAME_OF_DEPLOYER: deployerName,
-            LEARN_MORE_LINK: <Link isAccent>{stringGetter({ key: STRING_KEYS.LEARN_MORE })}</Link>,
-          },
-        })}
-      </$FooterButton>}
+        <$FooterButton size={ButtonSize.XSmall}>
+          {stringGetter({
+            key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
+            params: {
+              NAME_OF_DEPLOYER: deployerName,
+              LEARN_MORE_LINK: (
+                <Link onClick={openHelpDialog}>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+                </Link>
+              ),
+            },
+          })}
+        </$FooterButton>
       </$Row>
 
-      
-      {false && (
+      {isDev && (
         <$Details
           withSeparators
           items={[
@@ -143,7 +150,6 @@ const $Footer = styled.footer`
 const $Row = styled.div`
   ${layoutMixins.row}
   ${layoutMixins.spacedRow}
-  // width: var(--sidebar-width);
 
   padding: 0 0.5rem;
   > * {

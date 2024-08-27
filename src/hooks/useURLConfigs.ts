@@ -42,6 +42,8 @@ export interface LinksConfigs {
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
   getInTouch?: string;
+  deployerTermsAndConditions?: string;
+  dydxLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -87,5 +89,7 @@ export const useURLConfigs = (): LinksConfigs => {
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
     discoveryProgram: linksConfigs.discoveryProgram,
     getInTouch: linksConfigs.getInTouch,
+    deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
+    dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
   };
 };

@@ -7,7 +7,7 @@ interface EnvironmentConfig {
   name: string;
   ethereumChainId: string;
   dydxChainId: string;
-  chainName: string; // xcxc is the deployer name the same as chain name?
+  chainName: string;
   chainLogo: string;
   deployerName: string;
   squidIntegratorId: string;
