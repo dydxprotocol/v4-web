@@ -14,4 +14,5 @@ export enum StatSigFlags {
 
 export enum StatsigDynamicConfigs {
   dcMaxSafeBridgeFees = 'dc_max_safe_bridge_fees',
+  dcHighestVolumeUsers = 'dc_highest_volume_users',
 }

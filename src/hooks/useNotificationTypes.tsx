@@ -19,6 +19,7 @@ import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
@@ -30,7 +31,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -66,7 +67,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigGateValues, useStatsigDynamicConfigValue } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -661,6 +662,44 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (order) {
           dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
+      };
+    },
+  },
+  {
+    type: NotificationType.FeedbackRequest,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const { getInTouch } = useURLConfigs();
+      const feedbackRequestWalletAddresses = useStatsigDynamicConfigValue(
+        StatsigDynamicConfigs.dcHighestVolumeUsers
+      ) as string[];
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
+          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
+            icon: <Icon iconName={IconName.SpeechBubble} />,
+            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.FeedbackRequest,
+            toastDuration: Infinity,
+            withClose: false,
+            // our generate script only knows to generate string keys for title and body
+            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
+            renderActionSlot: () => (
+              <Link href={getInTouch} isAccent>
+                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+              </Link>
+            ),
+          });
+        }
+      }, [dydxAddress]);
+    },
+    useNotificationAction: () => {
+      const { getInTouch } = useURLConfigs();
+      return () => {
+        window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
     },
   },
