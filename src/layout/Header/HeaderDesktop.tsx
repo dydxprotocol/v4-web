@@ -65,7 +65,7 @@ export const HeaderDesktop = () => {
         },
         showLaunchMarkets && {
           value: 'LAUNCH_MARKET',
-          label: 'Launch Markets',
+          label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
           href: AppRoute.LaunchMarket,
         },
         showVaults && {

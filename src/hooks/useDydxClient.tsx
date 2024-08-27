@@ -412,6 +412,13 @@ const useDydxClientContext = () => {
     return compositeClient?.validatorClient.get.getAllValidators();
   }, [compositeClient]);
 
+  const getAccountBalance = useCallback(
+    async (address: string, denom: string) => {
+      return compositeClient?.validatorClient.get.getAccountBalance(address, denom);
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -441,5 +448,6 @@ const useDydxClientContext = () => {
     getWithdrawalAndTransferGatingStatus,
     getWithdrawalCapacityByDenom,
     getValidators,
+    getAccountBalance,
   };
 };

@@ -6,7 +6,12 @@ import {
   useStatsigClient,
 } from '@statsig/react-bindings';
 
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
+import {
+  StatSigFlags,
+  StatsigConfigType,
+  StatsigDynamicConfigType,
+  StatsigDynamicConfigs,
+} from '@/constants/statsig';
 
 import { initStatsigAsync } from '@/lib/statsig';
 
@@ -28,12 +33,14 @@ export const useStatsigGateValue = (gate: StatSigFlags) => {
   return checkGate(gate);
 };
 
-export const useStatsigDynamicConfigValue = (
-  configName: StatsigDynamicConfigs,
-  keyOverride: string = 'value'
-) => {
+export const useAllStatsigDynamicConfigValues = () => {
   const { getDynamicConfig } = useStatsigClient();
-  return getDynamicConfig(configName)?.get(keyOverride);
+  const allDynamicConfigValues = useMemo(() => {
+    return Object.values(StatsigDynamicConfigs).reduce((acc, gate) => {
+      return { ...acc, [gate]: getDynamicConfig(gate).get('value') };
+    }, {} as StatsigDynamicConfigType);
+  }, [getDynamicConfig]);
+  return allDynamicConfigValues;
 };
 
 export const useAllStatsigGateValues = () => {

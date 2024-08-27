@@ -8,6 +8,7 @@ import tw from 'twin.macro';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
   STRING_KEYS,
   STRING_KEY_VALUES,
@@ -18,6 +19,7 @@ import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
@@ -29,7 +31,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -65,7 +67,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigGateValues, useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -214,22 +216,32 @@ export const notificationTypes: NotificationTypeConfig[] = [
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
           const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
-          const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
-          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
-
           const transferType =
             type ??
             (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const title = stringGetter({
-            key: {
-              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[transferType],
-          });
+          const isCosmosDeposit =
+            SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
+            fromChainId !== selectedDydxChainId;
+
+          const isFinished =
+            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+          const icon = isCosmosDeposit ? (
+            <$AssetIcon symbol="USDC" />
+          ) : (
+            <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
+          );
+
+          const title = isCosmosDeposit
+            ? stringGetter({ key: STRING_KEYS.CONFIRM_PENDING_DEPOSIT })
+            : stringGetter({
+                key: {
+                  deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+                  withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+                }[transferType],
+              });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
           // TODO: remove typeguards once skip implements estimatedrouteduration
@@ -267,7 +279,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -653,8 +665,49 @@ export const notificationTypes: NotificationTypeConfig[] = [
       };
     },
   },
+  {
+    type: NotificationType.FeedbackRequest,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const { getInTouch } = useURLConfigs();
+      const stringGetter = useStringGetter();
+
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const feedbackRequestWalletAddresses =
+        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+
+      useEffect(() => {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
+          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
+            icon: <Icon iconName={IconName.SpeechBubble} />,
+            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.FeedbackRequest,
+            toastDuration: Infinity,
+            withClose: false,
+            // our generate script only knows to generate string keys for title and body
+            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
+            renderActionSlot: () => (
+              <Link href={getInTouch} isAccent>
+                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+              </Link>
+            ),
+          });
+        }
+      }, [dydxAddress]);
+    },
+    useNotificationAction: () => {
+      const { getInTouch } = useURLConfigs();
+      return () => {
+        window.open(getInTouch, '_blank', 'noopener, noreferrer');
+      };
+    },
+  },
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;
+
+const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
 const $WarningIcon = tw(Icon)`text-color-warning`;

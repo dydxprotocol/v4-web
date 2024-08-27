@@ -30,7 +30,7 @@ import { MarketLinks } from './MarketLinks';
 export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { configs, market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { configs, displayId, market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { id, name, resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
@@ -63,6 +63,11 @@ export const MarketDetails: React.FC = () => {
     {
       key: 'market-name',
       label: stringGetter({ key: STRING_KEYS.MARKET_NAME }),
+      value: displayId,
+    },
+    {
+      key: 'ticker',
+      label: stringGetter({ key: STRING_KEYS.TICKER }),
       value: market,
     },
     {

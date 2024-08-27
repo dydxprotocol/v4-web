@@ -41,6 +41,7 @@ export interface LinksConfigs {
   rndrParamProposal?: string;
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
+  getInTouch?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -85,5 +86,6 @@ export const useURLConfigs = (): LinksConfigs => {
     rndrParamProposal: linksConfigs.rndrParamProposal,
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
     discoveryProgram: linksConfigs.discoveryProgram,
+    getInTouch: linksConfigs.getInTouch,
   };
 };
