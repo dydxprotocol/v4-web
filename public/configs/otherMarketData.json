@@ -4505,41 +4505,6 @@
       "cmcId": 9543.0
     }
   },
-  "BIDR": {
-    "title": "Add BIDR-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BIDR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 112,
-      "ticker": "BIDR-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -1,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "binance_ws",
-          "ticker": "SOLBIDR",
-          "adjustByMarket": "SOL-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": Infinity,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "BIDR",
-      "referencePrice": 0.0,
-      "cmcId": 6855.0
-    }
-  },
   "BIFI": {
     "title": "Add BIFI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BIFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -30988,41 +30953,6 @@
       "assetName": "RSS3",
       "referencePrice": 0.119801198,
       "cmcId": 17917.0
-    }
-  },
-  "RUB": {
-    "title": "Add RUB-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RUB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 791,
-      "ticker": "RUB-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -1,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "binance_ws",
-          "ticker": "SOLRUB",
-          "adjustByMarket": "SOL-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": Infinity,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": null,
-      "referencePrice": 0.0,
-      "cmcId": 2806.0
     }
   },
   "RUNE": {
