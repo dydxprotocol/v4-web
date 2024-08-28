@@ -120,7 +120,13 @@ export const TradeForm = ({
 
   const { getNotificationPreferenceForType } = useNotifications();
 
-  const { inputAlert, alertContent, alertType, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
+  const {
+    inputAlert,
+    alertContent,
+    shortAlertContent,
+    alertType,
+    shouldPromptUserToPlaceLimitOrder,
+  } = useMemo(() => {
     let alertContentInner;
     let alertTypeInner = AlertType.Error;
 
@@ -151,6 +157,7 @@ export const TradeForm = ({
       (errorCode) => inputAlertInner?.code === errorCode
     );
     return {
+      shortAlertContent: alertContentInner,
       alertContent: alertContentInner && (
         <$AlertContent>
           {alertContentInner}
@@ -315,7 +322,7 @@ export const TradeForm = ({
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
         actionStringKey={inputAlert?.actionStringKey}
-        validationErrorString={alertContent}
+        validationErrorString={shortAlertContent}
         summary={summary ?? undefined}
         currentStep={currentStep}
         showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
