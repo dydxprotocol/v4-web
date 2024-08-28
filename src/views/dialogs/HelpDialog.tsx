@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import { DialogProps, HelpDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuConfig } from '@/constants/menus';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -13,6 +15,8 @@ import breakpoints from '@/styles/breakpoints';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
+import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -21,7 +25,14 @@ const latestVersion = import.meta.env.VITE_LAST_TAG;
 
 export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { help: helpCenter, community } = useURLConfigs();
+  const deployerName = useEnvConfig('deployerName');
+  const {
+    help: helpCenter,
+    community,
+    deployerTermsAndConditions,
+    dydxLearnMore,
+    tos,
+  } = useURLConfigs();
 
   const HELP_ITEMS = useMemo(
     (): MenuConfig<string | number, string | number> => [
@@ -68,6 +79,47 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
     [stringGetter, helpCenter, community]
   );
 
+  const legalDisclaimer = (
+    <div tw="text-color-text-0 font-mini-book">
+      {stringGetter({
+        key: STRING_KEYS.SITE_OPERATED_BY_LONG,
+        params: {
+          NAME_OF_DEPLOYER: deployerName,
+          DEPLOYER_TERMS_AND_CONDITIONS: (
+            <Link
+              isInline
+              href={
+                deployerTermsAndConditions && deployerTermsAndConditions !== ''
+                  ? deployerTermsAndConditions
+                  : `${BASE_ROUTE}${AppRoute.Terms}`
+              }
+            >
+              {stringGetter({ key: STRING_KEYS.DEPLOYER_TERMS_AND_CONDITIONS })}
+            </Link>
+          ),
+          TERMS_OF_USE: <TermsOfUseLink isInline hrefOverride={tos} />,
+          LEARN_MORE_LINK: (
+            <Link isInline href={dydxLearnMore}>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+            </Link>
+          ),
+        },
+      })}
+    </div>
+  );
+
+  const maybeLatestCommit = latestCommit && (
+    <span>
+      Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
+    </span>
+  );
+
+  const maybeLatestVersion = latestVersion && (
+    <span>
+      Version - <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
+    </span>
+  );
+
   return (
     <$ComboboxDialogMenu
       isOpen
@@ -76,21 +128,15 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
       slotFooter={
-        latestCommit || latestVersion ? (
-          <div tw="flex cursor-default select-text flex-col text-color-text-0">
-            {latestCommit && (
-              <span>
-                Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
-              </span>
-            )}
-            {latestVersion && (
-              <span>
-                Version -{' '}
-                <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
-              </span>
-            )}
-          </div>
-        ) : undefined
+        <div tw="grid gap-1.5">
+          {(maybeLatestCommit || maybeLatestVersion) && (
+            <div tw="flex cursor-default select-text flex-col text-color-text-0">
+              {maybeLatestCommit}
+              {maybeLatestVersion}
+            </div>
+          )}
+          {legalDisclaimer}
+        </div>
       }
     />
   );

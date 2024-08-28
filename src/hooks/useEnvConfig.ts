@@ -9,6 +9,7 @@ interface EnvironmentConfig {
   dydxChainId: string;
   chainName: string;
   chainLogo: string;
+  deployerName: string;
   squidIntegratorId: string;
   rewardsHistoryStartDateMs: string;
 }
