@@ -154,7 +154,7 @@ export const TradeForm = ({
       alertContent: alertContentInner && (
         <$AlertContent>
           {alertContentInner}
-          {alertContentLinkText && (
+          {alertContentLinkText && alertContentLink && (
             <Link isInline href={alertContentLink}>
               {alertContentLinkText}
             </Link>

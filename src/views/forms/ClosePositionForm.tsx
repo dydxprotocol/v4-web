@@ -234,7 +234,7 @@ export const ClosePositionForm = ({
     <AlertMessage type={alertType}>
       <$AlertContent>
         {alertContent}
-        {alertContentLinkText && (
+        {alertContentLinkText && alertContentLink && (
           <Link isInline href={alertContentLink}>
             {alertContentLinkText}
           </Link>
