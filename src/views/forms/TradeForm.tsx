@@ -36,6 +36,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -123,6 +124,9 @@ export const TradeForm = ({
     let alertContentInner;
     let alertTypeInner = AlertType.Error;
 
+    let alertContentLink;
+    let alertContentLinkText;
+
     const inputAlertInner = getTradeInputAlert({
       abacusInputErrors: tradeErrors ?? [],
       stringGetter,
@@ -139,13 +143,24 @@ export const TradeForm = ({
     } else if (inputAlertInner) {
       alertContentInner = inputAlertInner.alertString;
       alertTypeInner = inputAlertInner.type;
+      alertContentLink = inputAlertInner.link;
+      alertContentLinkText = inputAlertInner.linkText;
     }
 
     const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
       (errorCode) => inputAlertInner?.code === errorCode
     );
     return {
-      alertContent: alertContentInner,
+      alertContent: alertContentInner && (
+        <$AlertContent>
+          {alertContentInner}
+          {alertContentLinkText && (
+            <Link isInline href={alertContentLink}>
+              {alertContentLinkText}
+            </Link>
+          )}
+        </$AlertContent>
+      ),
       alertType: alertTypeInner,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
       inputAlert: inputAlertInner,
@@ -437,6 +452,14 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
+
+const $AlertContent = styled.div`
+  display: inline-block;
+  a {
+    margin-left: 0.5ch;
+  }
+`;
+
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
