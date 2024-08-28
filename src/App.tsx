@@ -51,7 +51,6 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
-import LaunchableMarket from './pages/markets/LaunchableMarket';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -112,13 +111,10 @@ const Content = () => {
 
               <Route path={AppRoute.Markets}>
                 {testFlags.pml ? (
-                  <>
-                    <Route
-                      path={MarketsRoute.New}
-                      element={<Navigate to={AppRoute.LaunchMarket} replace />}
-                    />
-                    <Route path=":market" element={<LaunchableMarket />} />
-                  </>
+                  <Route
+                    path={MarketsRoute.New}
+                    element={<Navigate to={AppRoute.LaunchMarket} replace />}
+                  />
                 ) : (
                   <Route path={MarketsRoute.New} element={<NewMarket />} />
                 )}

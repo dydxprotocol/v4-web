@@ -27,3 +27,7 @@ export const getDisplayableTickerFromMarket = (market: string): string => {
 
   return `${base}-${quoteAsset}`;
 };
+
+export const getTickerFromMarketmapId = (marketmapId: string): string => {
+  return marketmapId.replace('/', '-');
+};

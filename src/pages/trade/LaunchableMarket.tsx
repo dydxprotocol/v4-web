@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
+import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 
@@ -17,19 +19,27 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { HorizontalPanel } from '../trade/HorizontalPanel';
-import { InnerPanel } from '../trade/InnerPanel';
-import { MarketSelectorAndStats } from '../trade/MarketSelectorAndStats';
-import { MobileBottomPanel } from '../trade/MobileBottomPanel';
-import { MobileTopPanel } from '../trade/MobileTopPanel';
-import { TradeDialogTrigger } from '../trade/TradeDialogTrigger';
-import { TradeHeaderMobile } from '../trade/TradeHeaderMobile';
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+
+import { HorizontalPanel } from './HorizontalPanel';
+import { InnerPanel } from './InnerPanel';
+import { MarketSelectorAndStats } from './MarketSelectorAndStats';
+import { MobileBottomPanel } from './MobileBottomPanel';
+import { MobileTopPanel } from './MobileTopPanel';
+import { TradeDialogTrigger } from './TradeDialogTrigger';
+import { TradeHeaderMobile } from './TradeHeaderMobile';
 
 const LaunchableMarket = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const match = useMatch(`/${AppRoute.Trade}/:marketId`);
+  const { marketId } = match?.params ?? {};
+
+  const displayableTicker = useMemo(() => {
+    return getDisplayableTickerFromMarket(marketId ?? '');
+  }, [marketId]);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
@@ -60,16 +70,16 @@ const LaunchableMarket = () => {
       isHorizontalPanelOpen={isHorizontalPanelOpen}
     >
       <header tw="[grid-area:Top]">
-        <MarketSelectorAndStats />
+        <MarketSelectorAndStats launchableMarketId={displayableTicker} />
       </header>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
         <AccountInfo />
-        <LaunchMarketSidePanel />
+        <$LaunchMarketSidePanel launchableMarketId={displayableTicker} />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
-        <InnerPanel />
+        <InnerPanel isViewingUnlaunchedMarket />
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
@@ -190,6 +200,11 @@ const $TradeLayoutMobile = styled.article`
     justify-content: start;
   }
 `;
+
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+`;
+
+const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
+  border-top: var(--border-width) solid var(--color-border);
 `;

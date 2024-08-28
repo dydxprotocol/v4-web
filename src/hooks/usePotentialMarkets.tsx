@@ -3,6 +3,8 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { STRING_KEYS } from '@/constants/localization';
 import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
+import { log } from '@/lib/telemetry';
+
 import { useStringGetter } from './useStringGetter';
 
 const PotentialMarketsContext = createContext<ReturnType<typeof usePotentialMarketsContext>>({
@@ -80,7 +82,7 @@ const usePotentialMarketsContext = () => {
           setPotentialMarkets(newPotentialMarkets);
         });
     } catch (error) {
-      console.log('usePotentialMarkets/potentialMarkets', error);
+      log('usePotentialMarkets/potentialMarkets', error);
       setPotentialMarkets(undefined);
     }
   }, []);
