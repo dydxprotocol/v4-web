@@ -101,6 +101,7 @@ export const NewMarketMessageDetailsDialog = ({
             [CodeToggleGroup.CREATE_ORACLE]: (
               <$Code>
                 <$Details
+                  withOverflow
                   layout="column"
                   items={[
                     {
@@ -341,7 +342,19 @@ const $Tabs = styled(ToggleGroup)`
   overflow-x: auto;
 ` as typeof ToggleGroup;
 
-const $Details = tw(Details)`[--details-item-height:1.5rem]`;
+const $Details = styled(Details)`
+  ${tw`[--details-item-height:1.5rem]`}
+
+  dt {
+    width: max-content;
+  }
+
+  dd {
+    overflow-x: auto;
+    text-overflow: ellipsis;
+  }
+`;
+
 const $Code = styled.div`
   height: 16.25rem;
   overflow: auto;

@@ -1071,7 +1071,14 @@
         "tags": [], 
         "websiteLink": "https://bt.io/", 
         "whitepaperLink": "https://www.bittorrent.com/btt/btt-docs/BitTorrent_(BTT)_White_Paper_v0.8.7_Feb_2019.pdf"
-    }, 
+    },
+    "BUFFI-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bufficorn/", 
+        "name": "Bufficorn", 
+        "tags": [], 
+        "websiteLink": "https://bufficorn.xyz/", 
+        "whitepaperLink": null
+    },
     "BURGER-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/burger-cities/", 
         "name": "BurgerCities", 

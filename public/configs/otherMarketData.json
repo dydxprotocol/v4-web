@@ -26389,6 +26389,41 @@
             "cmcId": 5804
         }
     },
+    "BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45": {
+      "title": "Add BUFFI-USD perpetual market",
+      "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BUFFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+      "params": {
+        "id": 156,
+        "ticker": "BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD",
+        "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+        "priceExponent": -15,
+        "minPriceChange": 800,
+        "minExchanges": 1.0,
+        "exchangeConfigJson": [
+          {
+            "exchangeName": "uniswapv3_api-ethereum",
+            "ticker": "BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45/WETH,uniswap_v3,0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "adjustByMarket": "WETH,uniswap_v3,0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2-USD"
+          }
+        ],
+        "liquidityTier": 2,
+        "atomicResolution": 0.0,
+        "quantumConversionExponent": -9,
+        "defaultFundingPpm": 0,
+        "stepBaseQuantums": 1000000,
+        "subticksPerTick": 1000000,
+        "delayBlocks": 3600
+      },
+      "initialDeposit": {
+        "denom": "adydx",
+        "amount": "10000000000000000000000"
+      },
+      "meta": {
+        "assetName": "Bufficorn",
+        "referencePrice": 3.6625974650000003e-06,
+        "cmcId": 32813.0
+      }
+    },
     "BURGER": {
         "title": "Add BURGER-USD perpetual market",
         "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BURGER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
