@@ -21,7 +21,7 @@ export const TradeHeaderMobile = () => {
   const { name, id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const navigate = useNavigate();
 
-  const { market, priceChange24H, priceChange24HPercent } =
+  const { displayId, priceChange24H, priceChange24HPercent } =
     useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
@@ -31,7 +31,7 @@ export const TradeHeaderMobile = () => {
         <AssetIcon symbol={id} tw="text-[2.5rem]" />
         <$Name>
           <h3>{name}</h3>
-          <span>{market}</span>
+          <span>{displayId}</span>
         </$Name>
       </div>
 

@@ -19,6 +19,7 @@ import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
@@ -30,7 +31,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -38,6 +39,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
@@ -66,7 +68,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigGateValues, useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -465,44 +467,82 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.MarketWindDown,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
+      const { contractLossMechanismLearnMore } = useURLConfigs();
 
-      const { rndrParamProposal } = useURLConfigs();
+      const MATICWindDownProposalExpirationDate = '2024-09-04';
+      const MATICWindDownDate = MATICWindDownProposalExpirationDate;
+      const MATICWindDownExpirationDate = '2024-10-04';
+      const MATICMarket = 'MATIC-USD';
 
       const currentDate = new Date();
-
-      const RNDNProposalTriggerDate = new Date('2024-07-20T22:00:00.000Z');
-      const RNDNProposalExpireDate = new Date('2024-08-20T22:00:00.000Z');
-
-      const RNDRMarket = 'RNDR-USD';
+      const outputDate = (
+        <Output tw="inline-block" type={OutputType.Date} value={MATICWindDownDate} />
+      );
 
       useEffect(() => {
         if (
-          rndrParamProposal &&
-          currentDate >= RNDNProposalTriggerDate &&
-          currentDate <= RNDNProposalExpireDate
+          maticWindDownProposal &&
+          maticWindDownProposal !== '' &&
+          currentDate <= new Date(MATICWindDownProposalExpirationDate)
+        ) {
+          trigger(MarketWindDownNotificationIds.MarketWindDownProposalMatic, {
+            title: stringGetter({
+              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.TITLE',
+              params: {
+                MARKET: MATICMarket,
+              },
+            }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.BODY',
+              params: {
+                MARKET: MATICMarket,
+                DATE: outputDate,
+                HERE_LINK: (
+                  <Link isInline isAccent href={maticWindDownProposal}>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalMatic,
+          });
+        }
+      }, [stringGetter]);
+
+      useEffect(() => {
+        if (
+          maticWindDownProposal &&
+          maticWindDownProposal !== '' &&
+          contractLossMechanismLearnMore &&
+          currentDate >= new Date(MATICWindDownDate) &&
+          currentDate <= new Date(MATICWindDownExpirationDate)
         ) {
           trigger(
-            MarketWindDownNotificationIds.MarketUpdateProposalRndr,
+            MarketWindDownNotificationIds.MarketWindDownMatic,
             {
               title: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.TITLE',
+                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.TITLE',
                 params: {
-                  MARKET: RNDRMarket,
+                  MARKET: MATICMarket,
                 },
               }),
               body: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.BODY',
+                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.BODY',
                 params: {
-                  MARKET: RNDRMarket,
+                  MARKET: MATICMarket,
+                  DATE: outputDate,
                   HERE_LINK: (
-                    <Link href={rndrParamProposal} isAccent isInline>
+                    <Link isInline isAccent href={contractLossMechanismLearnMore}>
                       {stringGetter({ key: STRING_KEYS.HERE })}
                     </Link>
                   ),
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: MarketWindDownNotificationIds.MarketUpdateProposalRndr,
+              groupKey: MarketWindDownNotificationIds.MarketWindDownMatic,
             },
             []
           );
@@ -661,6 +701,45 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (order) {
           dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
+      };
+    },
+  },
+  {
+    type: NotificationType.FeedbackRequest,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const { getInTouch } = useURLConfigs();
+      const stringGetter = useStringGetter();
+
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const feedbackRequestWalletAddresses =
+        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+
+      useEffect(() => {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
+          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
+            icon: <Icon iconName={IconName.SpeechBubble} />,
+            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.FeedbackRequest,
+            toastDuration: Infinity,
+            withClose: false,
+            // our generate script only knows to generate string keys for title and body
+            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
+            renderActionSlot: () => (
+              <Link href={getInTouch} isAccent>
+                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+              </Link>
+            ),
+          });
+        }
+      }, [dydxAddress]);
+    },
+    useNotificationAction: () => {
+      const { getInTouch } = useURLConfigs();
+      return () => {
+        window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
     },
   },

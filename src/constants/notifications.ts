@@ -12,14 +12,17 @@ export enum NotificationType {
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
   MarketWindDown = 'MarketWindDown',
+  FeedbackRequest = 'FeedbackRequest',
 }
 
 export enum NotificationCategoryPreferences {
-  General = 'General', // release updates
-  Transfers = 'Transfers', // transfers
   Trading = 'Trading', // order status, positions / liquidations, trading rewards
+  Transfers = 'Transfers', // transfers
+  General = 'General', // release updates
   MustSee = 'MustSee', // cannot be hidden: compliance, api errors
 }
+
+export const NotificationCategoryPreferenceOrder = Object.values(NotificationCategoryPreferences);
 
 export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
@@ -32,6 +35,7 @@ export const NotificationTypeCategory: {
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -241,6 +245,12 @@ export enum MarketWindDownNotificationIds {
   MarketWindDownFetAgix = 'market-wind-down-fet-agix',
   MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
   MarketUpdateProposalRndr = 'market-update-proposal-rndr',
+  MarketWindDownMatic = 'market-wind-down-matic',
+  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic',
+}
+
+export enum FeedbackRequestNotificationIds {
+  Top100UserSupport = 'top-100-user-support',
 }
 
 /**
@@ -251,3 +261,4 @@ export type NotificationPreferences = {
 } & { version: string };
 
 export const DEFAULT_TOAST_AUTO_CLOSE_MS = 5000;
+export const MAX_NUM_TOASTS = 10; // Max toasts to display on screen

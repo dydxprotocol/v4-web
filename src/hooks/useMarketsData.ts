@@ -93,7 +93,7 @@ export const useMarketsData = (
           marketData.configs
         );
       });
-  }, [allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
+  }, [allPerpetualClobIds, allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
 
   const filteredMarkets = useMemo(() => {
     const filtered = markets.filter(filterFunctions[filter]);

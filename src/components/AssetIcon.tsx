@@ -101,6 +101,7 @@ const assetIcons = {
   BSW: '/currencies/bsw.png',
   BTC: '/currencies/btc.png',
   BTT: '/currencies/btt.png',
+  BUFFI: '/currencies/buffi.png',
   C98: '/currencies/c98.png',
   CAKE: '/currencies/cake.png',
   CBK: '/currencies/cbk.png',

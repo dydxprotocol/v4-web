@@ -53,6 +53,7 @@ export const OrderDetailsDialog = ({
     asset,
     cancelReason,
     createdAtMilliseconds,
+    displayId,
     expiresAtMilliseconds,
     marketId,
     orderFlags,
@@ -102,6 +103,11 @@ export const OrderDetailsDialog = ({
       {
         key: 'market',
         label: stringGetter({ key: STRING_KEYS.MARKET }),
+        value: displayId,
+      },
+      {
+        key: 'market-id',
+        label: stringGetter({ key: STRING_KEYS.TICKER }),
         value: marketId,
       },
       {
