@@ -19,6 +19,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
 import { getSelectedTradeType } from '@/lib/tradeData';
+import { WalletInfo } from '@/lib/wallet/types';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -29,8 +30,7 @@ import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestTag = import.meta.env.VITE_LAST_TAG;
-  const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
-    useAccounts();
+  const { connectedWallet, selectedWallet, evmAddress, dydxAddress } = useAccounts();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
   /** User properties */
@@ -92,13 +92,13 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
-    identify(AnalyticsUserProperties.WalletType(walletType ?? null));
-  }, [walletType]);
+    identify(AnalyticsUserProperties.WalletType(connectedWallet?.name ?? null));
+  }, [connectedWallet?.name]);
 
-  // AnalyticsUserProperty.WalletConnectionType
+  // AnalyticsUserProperty.WalletConnectorType
   useEffect(() => {
-    identify(AnalyticsUserProperties.WalletConnectionType(walletConnectionType ?? null));
-  }, [walletConnectionType]);
+    identify(AnalyticsUserProperties.WalletConnectorType(connectedWallet?.connectorType ?? null));
+  }, [connectedWallet?.connectorType]);
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
@@ -223,23 +223,22 @@ export const useAnalytics = () => {
 
   // AnalyticsEvent.ConnectWallet
   // AnalyticsEvent.DisconnectWallet
-  const [previousSelectedWalletType, setPreviousSelectedWalletType] =
-    useState<typeof selectedWalletType>();
+  const [previousSelectedWallet, setPreviousSelectedWallet] = useState<WalletInfo>();
 
   useEffect(() => {
-    if (selectedWalletType) {
+    if (selectedWallet) {
       track(
         AnalyticsEvents.ConnectWallet({
-          walletType: selectedWalletType,
-          walletConnectionType: walletConnectionType!,
+          walletType: selectedWallet?.name,
+          walletConnectorType: selectedWallet?.connectorType!,
         })
       );
-    } else if (previousSelectedWalletType) {
+    } else if (previousSelectedWallet) {
       track(AnalyticsEvents.DisconnectWallet());
     }
 
-    setPreviousSelectedWalletType(selectedWalletType);
-  }, [selectedWalletType, walletConnectionType]);
+    setPreviousSelectedWallet(selectedWallet);
+  }, [previousSelectedWallet, selectedWallet]);
 
   // AnalyticsEvent.TradeOrderTypeSelected
   const { type: selectedOrderType } = useAppSelector(getInputTradeData, shallowEqual) ?? {};

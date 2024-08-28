@@ -38,6 +38,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -50,9 +51,8 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
-
-import { WalletIcon } from '@/components/WalletIcon';
 import { WalletType } from '@/lib/wallet/types';
+
 import { MobileDownloadLinks } from '../MobileDownloadLinks';
 
 export const AccountMenu = () => {
@@ -149,11 +149,11 @@ export const AccountMenu = () => {
                 />
               </WithTooltip>
             </$AddressRow>
-            {walletType && walletType !== WalletType.Privy && (
+            {connectedWallet && connectedWallet.name !== WalletType.Privy && (
               <$AddressRow>
                 <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
                   <Icon iconName={IconName.AddressConnector} tw="absolute top-[-1.625rem] h-1.75" />
-                  <Icon iconComponent={wallets[walletType].icon as ElementType} />
+                  <WalletIcon wallet={connectedWallet} />
                 </div>
                 <$Column>
                   <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>

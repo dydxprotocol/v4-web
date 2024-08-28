@@ -47,12 +47,12 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS } from '@/constants/wallets';
 
-import { DisplayWallet } from '@/hooks/useDisplayedWallets';
 import { getMipdConnectorByRdns } from '@/hooks/useMipdInjectedWallets';
 
 import { isTruthy } from './isTruthy';
 import { getLocalStorage } from './localStorage';
 import { validateAgainstAvailableEnvironments } from './network';
+import { WalletInfo } from './wallet/types';
 
 // Config
 
@@ -209,7 +209,7 @@ export const resolveWagmiConnector = ({
   wallet,
   walletConnectConfig,
 }: {
-  wallet: DisplayWallet;
+  wallet: WalletInfo;
   walletConnectConfig: WalletConnectConfig;
 }) => {
   if (wallet.connectorType === 'mipd') {
@@ -230,7 +230,7 @@ export const resolveWagmiConnector = ({
   return undefined;
 };
 
-export function isWagmiConnectorType(wallet: DisplayWallet | undefined): boolean {
+export function isWagmiConnectorType(wallet: WalletInfo | undefined): boolean {
   if (!wallet) return false;
 
   return ['mipd', 'coinbase', 'walletConnect'].includes(wallet.connectorType);

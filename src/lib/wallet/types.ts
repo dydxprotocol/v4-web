@@ -22,8 +22,8 @@ export enum ConnectorType {
   Phantom = 'phantom',
 }
 
-// This is the type stored in localstorage, so it must consist of serializable fields
-export type DisplayWallet =
+// This is the type stored in localstorage, so it must consist of only serializable fields
+export type WalletInfo =
   | ({
       connectorType: ConnectorType.MIPD;
     } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
@@ -40,4 +40,4 @@ export type DisplayWallet =
       connectorType: ConnectorType.Cosmos;
       name: CosmosWalletType;
     }
-  | { connectorType: ConnectorType.Test; name: 'test' };
+  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet };

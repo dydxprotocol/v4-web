@@ -18,12 +18,12 @@ import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
 import { WalletIcon } from '@/components/WalletIcon';
 
-import { ConnectorType, DisplayWallet } from '@/lib/wallet/types';
+import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
 
 export const ChooseWallet = ({
   onChooseWallet,
 }: {
-  onChooseWallet: (wallet: DisplayWallet) => void;
+  onChooseWallet: (wallet: WalletInfo) => void;
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
@@ -59,7 +59,7 @@ export const ChooseWallet = ({
             action={ButtonAction.Base}
             key={wallet.name}
             onClick={() => onChooseWallet(wallet)}
-            slotLeft={<WalletIcon wallet={wallet} />}
+            slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
           >
             {wallet.connectorType === 'mipd'

@@ -1,5 +1,6 @@
+import { ConnectorType } from '@/lib/wallet/types';
+
 import { STRING_KEYS } from './localization';
-import { WalletConnectionType } from './wallets';
 
 export type ErrorParams =
   | {
@@ -22,5 +23,5 @@ export const DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS = {
  */
 export interface DydxError extends Error {
   code?: string | number;
-  walletConnectionType?: WalletConnectionType;
+  walletConnectorType?: ConnectorType;
 }

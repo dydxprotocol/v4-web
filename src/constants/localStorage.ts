@@ -4,10 +4,6 @@ export enum LocalStorageKey {
   SolAddress = 'dydx.SolAddress',
   DydxAddress = 'dydx.DydxAddress',
 
-  // deprecated
-  OnboardingSelectedWalletType = 'dydx.OnboardingSelectedWalletType',
-  WalletConnectionType = 'dydx.WalletConnectionType',
-
   // new
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
 

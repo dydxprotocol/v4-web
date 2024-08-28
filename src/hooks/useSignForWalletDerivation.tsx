@@ -10,10 +10,11 @@ import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { DisplayWallet } from './useDisplayedWallets';
+import { WalletInfo } from '@/lib/wallet/types';
+
 import { useEnvConfig } from './useEnvConfig';
 
-export default function useSignForWalletDerivation(wallet: DisplayWallet | undefined) {
+export default function useSignForWalletDerivation(wallet: WalletInfo | undefined) {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const ethereumChainId = useEnvConfig('ethereumChainId');
   const chainId = Number(ethereumChainId);

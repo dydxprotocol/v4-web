@@ -3,6 +3,8 @@ import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { StatSigFlags } from '@/constants/statsig';
 
+import { ConnectorType, WalletType } from '@/lib/wallet/types';
+
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
@@ -11,7 +13,7 @@ import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import { TradeToggleSizeInput } from './trade';
-import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
+import type { DydxAddress, EvmAddress } from './wallets';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
@@ -65,8 +67,8 @@ export const AnalyticsUserProperties = unionize(
     Network: ofType<DydxNetwork>(),
 
     // Wallet
-    WalletType: ofType<WalletType | null>(),
-    WalletConnectionType: ofType<WalletConnectionType | null>(),
+    WalletType: ofType<WalletType | string | null>(),
+    WalletConnectorType: ofType<ConnectorType | null>(),
     WalletAddress: ofType<EvmAddress | DydxAddress | null>(),
 
     // Account
@@ -85,7 +87,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   CustomDomainReferrer: 'customDomainReferrer',
   Network: 'network',
   WalletType: 'walletType',
-  WalletConnectionType: 'walletConnectionType',
+  WalletConnectorType: 'walletConnectorType',
   WalletAddress: 'walletAddress',
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
@@ -145,8 +147,8 @@ export const AnalyticsEvents = unionize(
 
     // Wallet
     ConnectWallet: ofType<{
-      walletType: WalletType;
-      walletConnectionType: WalletConnectionType;
+      walletType: WalletType | string;
+      walletConnectorType: ConnectorType;
     }>(),
     DisconnectWallet: ofType<{}>(),
 

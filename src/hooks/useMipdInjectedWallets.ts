@@ -1,5 +1,6 @@
 import { useMemo, useSyncExternalStore } from 'react';
 
+import { uniqBy } from 'lodash';
 import { createStore, EIP6963ProviderDetail } from 'mipd';
 import { injected } from 'wagmi/connectors';
 
@@ -11,7 +12,8 @@ export type MipdInjectedWallet = {
 };
 
 function useMipdInjectedProviderDetails(): readonly EIP6963ProviderDetail[] {
-  return useSyncExternalStore(store.subscribe, store.getProviders);
+  const availableProviders = useSyncExternalStore(store.subscribe, store.getProviders);
+  return uniqBy(availableProviders, (provider: EIP6963ProviderDetail) => provider.info.rdns);
 }
 
 export function useMipdInjectedWallets(): MipdInjectedWallet[] {

@@ -36,7 +36,7 @@ import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { isWagmiConnectorType, resolveWagmiConnector } from '@/lib/wagmi';
 import { parseWalletError } from '@/lib/wallet';
-import { ConnectorType, DisplayWallet } from '@/lib/wallet/types';
+import { ConnectorType, WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { useStringGetter } from './useStringGetter';
 
@@ -91,27 +91,13 @@ export const useWalletConnection = () => {
   }, [dydxAddressGraz]);
 
   // Wallet connection
-  // The saved wallet selection from the last browser session
-  const [connectedWallet, setConnectedWallet] = useLocalStorage<DisplayWallet | undefined>({
+  // The saved wallet connection from the last browser session
+  const [connectedWallet, setConnectedWallet] = useLocalStorage<WalletInfo | undefined>({
     key: LocalStorageKey.OnboardingSelectedWallet,
     defaultValue: undefined,
   });
   // The user's current wallet selection - default to last time's selection
-  const [selectedWallet, setSelectedWallet] = useState<DisplayWallet | undefined>(connectedWallet);
-
-  // const [walletType, setWalletType] = useLocalStorage<WalletType | undefined>({
-  //   key: LocalStorageKey.OnboardingSelectedWalletType,
-  //   defaultValue: undefined,
-  // });
-
-  // const [walletConnectionType, setWalletConnectionType] = useLocalStorage<
-  //   WalletConnectionType | undefined
-  // >({
-  //   key: LocalStorageKey.WalletConnectionType,
-  //   defaultValue: undefined,
-  // });
-
-  // Wallet connection
+  const [selectedWallet, setSelectedWallet] = useState<WalletInfo | undefined>(connectedWallet);
 
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
@@ -149,7 +135,7 @@ export const useWalletConnection = () => {
       forceConnect,
       isEvmAccountConnected,
     }: {
-      wallet: DisplayWallet | undefined;
+      wallet: WalletInfo | undefined;
       forceConnect?: boolean;
       isEvmAccountConnected?: boolean;
     }) => {
@@ -165,7 +151,7 @@ export const useWalletConnection = () => {
             await connectGraz({ chainInfo: DYDX_CHAIN_INFO, walletType: wallet.name });
           }
         } else if (wallet.connectorType === 'phantom') {
-          connectPhantom();
+          await connectPhantom();
         } else if (['mipd', 'walletConnect', 'coinbase'].includes(wallet.connectorType)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
@@ -173,7 +159,7 @@ export const useWalletConnection = () => {
             // TODO: add analytics to see how often this happens?
             if (!connector) return;
 
-            connectWagmi({ connector });
+            await connectWagmi({ connector });
           }
         }
       } catch (error) {
@@ -272,7 +258,7 @@ export const useWalletConnection = () => {
   ]);
 
   const selectWallet = useCallback(
-    async (wallet: DisplayWallet | undefined) => {
+    async (wallet: WalletInfo | undefined) => {
       if (wallet) {
         setSelectedWallet(undefined);
         await disconnectSelectedWallet();
@@ -288,6 +274,7 @@ export const useWalletConnection = () => {
               evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
             ),
           });
+          setConnectedWallet(wallet);
         } catch (error) {
           const { walletErrorType, message } = parseWalletError({
             error,
@@ -303,14 +290,21 @@ export const useWalletConnection = () => {
         await disconnectSelectedWallet();
       }
     },
-    [disconnectSelectedWallet, connectWallet, evmAddress, evmDerivedAddresses, stringGetter]
+    [
+      disconnectSelectedWallet,
+      connectWallet,
+      evmAddress,
+      evmDerivedAddresses,
+      setConnectedWallet,
+      stringGetter,
+    ]
   );
 
   // On page load, if testFlag.address is set, connect to the test wallet.
   useEffect(() => {
     (async () => {
       if (testFlags.addressOverride) {
-        setSelectedWallet({ connectorType: ConnectorType.Test, name: 'test' });
+        setSelectedWallet({ connectorType: ConnectorType.Test, name: WalletType.TestWallet });
       }
     })();
   }, []);

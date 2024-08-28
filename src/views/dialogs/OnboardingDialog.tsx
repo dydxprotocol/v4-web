@@ -25,7 +25,7 @@ import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
-import { DisplayWallet, WalletType } from '@/lib/wallet/types';
+import { WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
@@ -49,7 +49,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     setIsOpen?.(open);
   };
 
-  const onChooseWallet = (wallet: DisplayWallet) => {
+  const onChooseWallet = (wallet: WalletInfo) => {
     if (wallet.name === WalletType.Privy) {
       setIsOpenFromDialog(false);
     }

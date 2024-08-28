@@ -12,23 +12,12 @@ import {
   KeplrIcon,
   OkxWalletIcon,
   PhantomIcon,
+  WalletConnectIcon,
 } from '@/icons';
 
-import { DisplayWallet, WalletType } from '@/lib/wallet/types';
+import { WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
-
-// Wallet connection types
-
-export enum WalletConnectionType {
-  CoinbaseWalletSdk = 'coinbaseWalletSdk',
-  CosmosSigner = 'CosmosSigner',
-  Privy = 'Privy',
-  InjectedEip1193 = 'injectedEip1193',
-  WalletConnect2 = 'walletConnect2',
-  TestWallet = 'TestWallet',
-  Phantom = 'Phantom',
-}
 
 export enum WalletErrorType {
   // General
@@ -45,38 +34,6 @@ export enum WalletErrorType {
   // EIP specified errors
   EipResourceUnavailable,
 }
-
-type WalletConnectionTypeConfig = {
-  name: string;
-  wagmiConnectorId?: string;
-};
-
-export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectionTypeConfig> = {
-  [WalletConnectionType.CoinbaseWalletSdk]: {
-    name: 'Coinbase Wallet SDK',
-    wagmiConnectorId: 'coinbaseWallet',
-  },
-  [WalletConnectionType.InjectedEip1193]: {
-    name: 'injected EIP-1193 provider',
-    wagmiConnectorId: 'injected',
-  },
-  [WalletConnectionType.WalletConnect2]: {
-    name: 'WalletConnect 2.0',
-    wagmiConnectorId: 'walletConnect',
-  },
-  [WalletConnectionType.Phantom]: {
-    name: 'Phantom',
-  },
-  [WalletConnectionType.CosmosSigner]: {
-    name: 'CosmosSigner',
-  },
-  [WalletConnectionType.TestWallet]: {
-    name: 'TestWallet',
-  },
-  [WalletConnectionType.Privy]: {
-    name: 'Privy',
-  },
-};
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
   Metamask: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
@@ -101,67 +58,51 @@ type WalletConfig = {
   type: WalletType;
   stringKey: string;
   icon: string;
-  connectionTypes: WalletConnectionType[];
   matchesInjectedEip1193?: (provider: ExternalProvider & any) => boolean;
   walletconnect2Id?: string;
 };
 
-export const wallets: Record<DisplayWallet['name'], WalletConfig> = {
+export const wallets: Record<WalletInfo['name'], WalletConfig> = {
   [WalletType.OtherWallet]: {
     type: WalletType.OtherWallet,
     stringKey: STRING_KEYS.OTHER_WALLET,
     icon: GenericWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) =>
-      Object.entries(wallets).every(
-        ([walletType, walletConfig]) =>
-          walletType === WalletType.OtherWallet ||
-          !walletConfig.matchesInjectedEip1193 ||
-          !walletConfig.matchesInjectedEip1193(provider)
-      ),
   },
   [WalletType.CoinbaseWallet]: {
     type: WalletType.CoinbaseWallet,
     stringKey: STRING_KEYS.COINBASE_WALLET,
     icon: CoinbaseIcon,
-    connectionTypes: [
-      WalletConnectionType.CoinbaseWalletSdk,
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-    ],
-    matchesInjectedEip1193: (provider) => provider.isCoinbaseWallet, // provider.selectedProvider?.isCoinbaseWallet,
   },
   [WalletType.OkxWallet]: {
     type: WalletType.OkxWallet,
     stringKey: STRING_KEYS.OKX_WALLET,
     icon: OkxWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isOkxWallet,
     walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.OkxWallet,
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,
     stringKey: STRING_KEYS.KEPLR,
     icon: KeplrIcon,
-    connectionTypes: [WalletConnectionType.CosmosSigner],
   },
   [WalletType.TestWallet]: {
     type: WalletType.TestWallet,
     stringKey: STRING_KEYS.TEST_WALLET,
     icon: GenericWalletIcon,
-    connectionTypes: [WalletConnectionType.TestWallet],
   },
   [WalletType.Privy]: {
     type: WalletType.Privy,
     stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
     icon: EmailIcon,
-    connectionTypes: [WalletConnectionType.Privy],
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
     stringKey: STRING_KEYS.PHANTOM,
     icon: PhantomIcon,
-    connectionTypes: [WalletConnectionType.Phantom],
+  },
+  [WalletType.WalletConnect2]: {
+    type: WalletType.WalletConnect2,
+    stringKey: STRING_KEYS.WALLET_CONNECT_2,
+    icon: WalletConnectIcon,
   },
 };
 
@@ -189,13 +130,6 @@ export type WithInjectedWeb3Provider = {
 
 export type WithInjectedOkxWalletProvider = {
   okxwallet: InjectedWeb3Provider;
-};
-
-// Wallet connections
-
-export type WalletConnection = {
-  type: WalletConnectionType;
-  provider?: EIP1193Provider;
 };
 
 /**
@@ -270,6 +204,10 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
   ],
   features: [],
 };
+
+// Extension wallet EIP-6963 identifiers
+export const PHANTOM_MIPD_RDNS = 'app.phantom';
+export const OKX_MIPD_RDNS = 'com.okex.wallet';
 
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {
