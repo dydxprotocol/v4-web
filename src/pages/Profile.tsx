@@ -37,6 +37,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
+import { ConnectorType } from '@/lib/wallet/types';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
@@ -63,7 +64,7 @@ const Profile = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
-  const { evmAddress, dydxAddress, walletType } = useAccounts();
+  const { evmAddress, dydxAddress, connectedWallet } = useAccounts();
   const { chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
 
@@ -145,11 +146,15 @@ const Profile = () => {
           <h1 tw="font-extra-medium">
             {isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}
           </h1>
-          {isConnected && walletType ? (
+          {isConnected && connectedWallet ? (
             <$SubHeader>
               <$ConnectedIcon />
               <span>{stringGetter({ key: STRING_KEYS.CONNECTED_TO })}</span>
-              <span>{stringGetter({ key: wallets[walletType].stringKey })}</span>
+              <span>
+                {connectedWallet.connectorType === ConnectorType.Injected
+                  ? connectedWallet.name
+                  : stringGetter({ key: wallets[connectedWallet.name].stringKey })}
+              </span>
             </$SubHeader>
           ) : (
             <span>-</span>
