@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { DialogProps, HelpDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuConfig } from '@/constants/menus';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -85,7 +86,14 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
         params: {
           NAME_OF_DEPLOYER: deployerName,
           DEPLOYER_TERMS_AND_CONDITIONS: (
-            <Link isInline href={deployerTermsAndConditions}>
+            <Link
+              isInline
+              href={
+                deployerTermsAndConditions && deployerTermsAndConditions !== ''
+                  ? deployerTermsAndConditions
+                  : `${BASE_ROUTE}${AppRoute.Terms}`
+              }
+            >
               {stringGetter({ key: STRING_KEYS.DEPLOYER_TERMS_AND_CONDITIONS })}
             </Link>
           ),
