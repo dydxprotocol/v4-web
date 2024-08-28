@@ -193,7 +193,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         value: 'coinbase',
       });
     }
-    if (connectedWallet.connectorType === ConnectorType.Phantom) {
+    if (connectedWallet.connectorType === ConnectorType.PhantomSolana) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: 'solana',

@@ -41,7 +41,7 @@ export const ChooseWallet = ({
               key: STRING_KEYS.COULD_NOT_CONNECT,
               params: {
                 WALLET:
-                  selectedWallet.connectorType === ConnectorType.MIPD
+                  selectedWallet.connectorType === ConnectorType.Injected
                     ? selectedWallet.name
                     : stringGetter({
                         key: wallets[selectedWallet.name].stringKey,
@@ -62,7 +62,7 @@ export const ChooseWallet = ({
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
           >
-            {wallet.connectorType === ConnectorType.MIPD
+            {wallet.connectorType === ConnectorType.Injected
               ? wallet.name
               : stringGetter({ key: wallets[wallet.name].stringKey })}
           </$WalletButton>

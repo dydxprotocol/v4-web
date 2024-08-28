@@ -150,7 +150,7 @@ export const useWalletConnection = () => {
           if (!isConnectedGraz) {
             await connectGraz({ chainInfo: DYDX_CHAIN_INFO, walletType: wallet.name });
           }
-        } else if (wallet.connectorType === ConnectorType.Phantom) {
+        } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
           await connectPhantom();
         } else if (isWagmiConnectorType(wallet)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
@@ -239,7 +239,7 @@ export const useWalletConnection = () => {
           await reconnectWagmi({
             connectors: [connector],
           });
-        } else if (selectedWallet.connectorType === 'phantom' && !solAddress) {
+        } else if (selectedWallet.connectorType === ConnectorType.PhantomSolana && !solAddress) {
           await connectPhantom();
         }
       }

@@ -27,7 +27,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
         .map(
           (wallet) =>
             ({
-              connectorType: ConnectorType.MIPD,
+              connectorType: ConnectorType.Injected,
               icon: wallet.detail.info.icon,
               name: wallet.detail.info.name,
               rdns: wallet.detail.info.rdns,
@@ -36,7 +36,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
       (isTestnet || isDev) &&
         phantomDetected && {
-          connectorType: ConnectorType.Phantom,
+          connectorType: ConnectorType.PhantomSolana,
           name: WalletType.Phantom,
         },
 

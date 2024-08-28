@@ -13,26 +13,25 @@ export enum WalletType {
 }
 
 export enum ConnectorType {
-  MIPD = 'mipd',
+  Injected = 'injected',
   Coinbase = 'coinbase',
   WalletConnect = 'walletConnect',
   Cosmos = 'cosmos',
   Test = 'test',
   Privy = 'privy',
-  Phantom = 'phantom',
+  PhantomSolana = 'phantomSolana',
 }
 
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
   | ({
-      connectorType: ConnectorType.MIPD;
+      connectorType: ConnectorType.Injected;
     } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
   | {
-      // TODO: override existing ConnectorType enum
       connectorType:
         | ConnectorType.Coinbase
         | ConnectorType.WalletConnect
-        | ConnectorType.Phantom
+        | ConnectorType.PhantomSolana
         | ConnectorType.Privy;
       name: WalletType;
     }

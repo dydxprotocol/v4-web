@@ -212,7 +212,7 @@ export const resolveWagmiConnector = ({
   wallet: WalletInfo;
   walletConnectConfig: WalletConnectConfig;
 }) => {
-  if (wallet.connectorType === ConnectorType.MIPD) {
+  if (wallet.connectorType === ConnectorType.Injected) {
     return getMipdConnectorByRdns(wallet.rdns);
   }
 
@@ -233,7 +233,7 @@ export const resolveWagmiConnector = ({
 export function isWagmiConnectorType(wallet: WalletInfo | undefined): boolean {
   if (!wallet) return false;
 
-  return [ConnectorType.MIPD, ConnectorType.Coinbase, ConnectorType.WalletConnect].includes(
+  return [ConnectorType.Injected, ConnectorType.Coinbase, ConnectorType.WalletConnect].includes(
     wallet.connectorType
   );
 }

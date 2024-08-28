@@ -49,7 +49,7 @@ export const SourceSelectMenu = ({
   const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
   const CCTPDepositOnly =
-    connectedWallet?.connectorType === ConnectorType.Phantom ? true : initialCCTPDepositValue;
+    connectedWallet?.connectorType === ConnectorType.PhantomSolana ? true : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
