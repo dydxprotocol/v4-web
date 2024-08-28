@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 
 import { utils } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { DialogProps, NewMarketMessageDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -343,7 +342,7 @@ const $Tabs = styled(ToggleGroup)`
 ` as typeof ToggleGroup;
 
 const $Details = styled(Details)`
-  ${tw`[--details-item-height:1.5rem]`}
+  --details-item-height: 1.5rem;
 
   dt {
     width: max-content;
