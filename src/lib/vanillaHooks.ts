@@ -1,3 +1,5 @@
+import { assertNever } from './assertNever';
+
 type RunnableEffect = {
   type: 'runnable';
   callback: () => void | (() => void);
@@ -9,7 +11,18 @@ type RunnableEffect = {
 type RefEffect = { type: 'ref'; val: { current: any } };
 type MemoEffect = { type: 'memo'; value: any; guards: any[] };
 type StateEffect = { type: 'state'; set: (arg: any) => void; value: any };
-type Effect = RefEffect | RunnableEffect | StateEffect | MemoEffect;
+type SyncedExternalStoreEffect = {
+  type: 'externalStore';
+  value: any;
+  getSnapshot: () => any;
+  cleanup?: () => void;
+  subRef: (onChange: () => void) => () => void;
+  doSub: () => () => void;
+  cleaned: boolean;
+  hook: Function;
+};
+type Effect = RefEffect | RunnableEffect | StateEffect | MemoEffect | SyncedExternalStoreEffect;
+type PersistentEffect = RunnableEffect | SyncedExternalStoreEffect;
 
 type HookInfo<A extends any[] = any[], T = any> = {
   hook: (...args: A) => T;
@@ -28,22 +41,30 @@ type HookInfo<A extends any[] = any[], T = any> = {
 const hooks = (function hooks() {
   let info: HookInfo | null = null;
   let schedule: Set<HookInfo> = new Set();
-  const fx = new WeakMap<Function, Set<RunnableEffect>>();
-  const effects: RunnableEffect[] = [];
+  const fx = new WeakMap<Function, Set<PersistentEffect>>();
+  const effects: PersistentEffect[] = [];
   const layoutEffects: RunnableEffect[] = [];
 
   const basicRerunHook: HookInfo['handleInternalRerender'] = ({ args, context, hooked }) =>
     hooked.apply(context, args!);
 
-  const invoke = (effect: RunnableEffect): void => {
-    const { callback, cleanup, hook } = effect;
+  const invoke = (effect: PersistentEffect): void => {
+    const { cleanup, hook } = effect;
     if (isFunction(cleanup)) {
       fx.get(hook)?.delete(effect);
       cleanup();
     }
 
-    const newCleanup = callback();
-    effect.cleanup = newCleanup;
+    if (effect.type === 'runnable') {
+      const newCleanup = effect.callback();
+      effect.cleanup = newCleanup;
+    } else if (effect.type === 'externalStore') {
+      const newCleanup = effect.doSub();
+      effect.cleanup = newCleanup;
+    } else {
+      assertNever(effect);
+    }
+
     if (isFunction(effect.cleanup)) {
       fx.get(hook)?.add(effect);
     }
@@ -65,6 +86,7 @@ const hooks = (function hooks() {
     return value !== this[i];
   }
 
+  // also drops the external store subs
   const dropEffect = (hook: Function): void => {
     const theseEffects = fx.get(hook);
     if (theseEffects)
@@ -178,7 +200,7 @@ const hooks = (function hooks() {
   };
 
   const createEffect =
-    (stack: RunnableEffect[]) =>
+    (stack: PersistentEffect[]) =>
     (callback: () => void | (() => void), guards?: any[]): void => {
       const thisHookInfo = getInfo()!;
       const { index, state, hook } = thisHookInfo;
@@ -210,6 +232,53 @@ const hooks = (function hooks() {
 
   const getValue = <T>(value: T, f: ((value: T) => T) | T): T => (isFunction(f) ? f(value) : f);
 
+  const useSyncExternalStore = <T>(
+    subscribe: (onChange: () => void) => () => void,
+    getSnapshot: () => T
+  ): T => {
+    const thisHookInfo = getInfo()!;
+    const { index, state, hook } = thisHookInfo;
+    if (index === state.length) {
+      if (!fx.has(hook)) fx.set(hook, new Set());
+      state.push({
+        type: 'externalStore',
+        value: getSnapshot(),
+        getSnapshot,
+        subRef: undefined as any, // overrideing immediately below
+        doSub: undefined as any, // handled below
+        cleanup: undefined,
+        cleaned: false,
+        hook,
+      });
+    }
+
+    const thisState = state[thisHookInfo.index] as SyncedExternalStoreEffect;
+    thisState.getSnapshot = getSnapshot;
+    if (subscribe !== thisState.subRef) {
+      thisState.subRef = subscribe;
+      thisState.doSub = () => {
+        let killed = false;
+        const doUnsub = subscribe(() => {
+          if (killed) return;
+          const newVal = getSnapshot();
+          if (newVal !== thisState.value) {
+            thisState.value = newVal;
+            reschedule(thisHookInfo);
+          }
+        });
+        return () => {
+          killed = true;
+          doUnsub();
+        };
+      };
+      // queue sub for async execution
+      effects.push(thisState);
+    }
+
+    // eslint-disable-next-line no-plusplus
+    return (state[thisHookInfo.index++] as SyncedExternalStoreEffect).value;
+  };
+
   const useReducer = <S, A>(
     reducer: (state: S, action: A) => S,
     initialState: S | (() => S),
@@ -223,8 +292,11 @@ const hooks = (function hooks() {
         value: isFunction(init) ? init(initialState) : getValue(undefined, initialState),
         set: (value: A) => {
           const ef = state[index] as StateEffect;
-          ef.value = reducer(ef.value as S, value);
-          reschedule(thisHookInfo);
+          const newVal = reducer(ef.value as S, value);
+          if (ef.value !== newVal) {
+            ef.value = newVal;
+            reschedule(thisHookInfo);
+          }
         },
       });
     // eslint-disable-next-line no-plusplus
@@ -261,6 +333,7 @@ const hooks = (function hooks() {
     useReducer,
     useRef,
     useState,
+    useSyncExternalStore,
     wait,
   };
 })();
