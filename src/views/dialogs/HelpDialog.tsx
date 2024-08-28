@@ -120,7 +120,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
       slotFooter={
-        <div tw="grid gap-0.5">
+        <div tw="grid gap-1.5">
           {(maybeLatestCommit || maybeLatestVersion) && (
             <div tw="flex cursor-default select-text flex-col text-color-text-0">
               {maybeLatestCommit}
