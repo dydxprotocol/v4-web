@@ -142,17 +142,17 @@ export const useWalletConnection = () => {
       if (!wallet) return;
 
       try {
-        if (wallet.connectorType === 'privy') {
+        if (wallet.connectorType === ConnectorType.Privy) {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();
           }
-        } else if (wallet.connectorType === 'cosmos') {
+        } else if (wallet.connectorType === ConnectorType.Cosmos) {
           if (!isConnectedGraz) {
             await connectGraz({ chainInfo: DYDX_CHAIN_INFO, walletType: wallet.name });
           }
-        } else if (wallet.connectorType === 'phantom') {
+        } else if (wallet.connectorType === ConnectorType.Phantom) {
           await connectPhantom();
-        } else if (['mipd', 'walletConnect', 'coinbase'].includes(wallet.connectorType)) {
+        } else if (isWagmiConnectorType(wallet)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
             // This could happen in the mipd case if the user has uninstalled or disabled the injected wallet they've previously selected

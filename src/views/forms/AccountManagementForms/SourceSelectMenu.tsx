@@ -24,7 +24,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { WalletType } from '@/lib/wallet/types';
+import { ConnectorType, WalletType } from '@/lib/wallet/types';
 
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
@@ -49,7 +49,7 @@ export const SourceSelectMenu = ({
   const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
   const CCTPDepositOnly =
-    connectedWallet?.name === WalletType.Phantom ? true : initialCCTPDepositValue;
+    connectedWallet?.connectorType === ConnectorType.Phantom ? true : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =

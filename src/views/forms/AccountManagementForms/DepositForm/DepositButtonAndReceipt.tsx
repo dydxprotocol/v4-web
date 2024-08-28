@@ -72,7 +72,7 @@ export const DepositButtonAndReceipt = ({
   const connectWagmi = async () => {
     try {
       setRequireUserActionInWallet(false);
-      await connectWallet({ wallet: selectedWallet });
+      await connectWallet({ wallet: selectedWallet, forceConnect: true });
       setRequireUserActionInWallet(false);
     } catch (e) {
       setRequireUserActionInWallet(true);

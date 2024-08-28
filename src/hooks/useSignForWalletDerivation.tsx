@@ -10,7 +10,7 @@ import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { WalletInfo } from '@/lib/wallet/types';
+import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
 
 import { useEnvConfig } from './useEnvConfig';
 
@@ -44,7 +44,7 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
   }, [phantomSignMessage, signTypedData]);
 
   const signMessage = useCallback(async (): Promise<string> => {
-    if (wallet?.connectorType === 'phantom') {
+    if (wallet?.connectorType === ConnectorType.Phantom) {
       return signSolanaMessage();
     }
     return signEvmMessage();

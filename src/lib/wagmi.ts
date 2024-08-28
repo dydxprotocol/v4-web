@@ -52,7 +52,7 @@ import { getMipdConnectorByRdns } from '@/hooks/useMipdInjectedWallets';
 import { isTruthy } from './isTruthy';
 import { getLocalStorage } from './localStorage';
 import { validateAgainstAvailableEnvironments } from './network';
-import { WalletInfo } from './wallet/types';
+import { ConnectorType, WalletInfo } from './wallet/types';
 
 // Config
 
@@ -212,18 +212,18 @@ export const resolveWagmiConnector = ({
   wallet: WalletInfo;
   walletConnectConfig: WalletConnectConfig;
 }) => {
-  if (wallet.connectorType === 'mipd') {
+  if (wallet.connectorType === ConnectorType.MIPD) {
     return getMipdConnectorByRdns(wallet.rdns);
   }
 
-  if (wallet.connectorType === 'coinbase') {
+  if (wallet.connectorType === ConnectorType.Coinbase) {
     return coinbaseWalletConnector({
       appName: 'dYdX',
       reloadOnDisconnect: false,
     });
   }
 
-  if (wallet.connectorType === 'walletConnect') {
+  if (wallet.connectorType === ConnectorType.WalletConnect) {
     return walletConnectConnector(getWalletconnect2ConnectorOptions(walletConnectConfig));
   }
 
@@ -233,5 +233,7 @@ export const resolveWagmiConnector = ({
 export function isWagmiConnectorType(wallet: WalletInfo | undefined): boolean {
   if (!wallet) return false;
 
-  return ['mipd', 'coinbase', 'walletConnect'].includes(wallet.connectorType);
+  return [ConnectorType.MIPD, ConnectorType.Coinbase, ConnectorType.WalletConnect].includes(
+    wallet.connectorType
+  );
 }

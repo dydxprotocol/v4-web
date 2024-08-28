@@ -30,6 +30,7 @@ import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
 
+import { ConnectorType } from '@/lib/wallet/types';
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useLocalStorage } from './useLocalStorage';
@@ -275,7 +276,7 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
-      if (connectedWallet?.connectorType === 'test') {
+      if (connectedWallet?.connectorType === ConnectorType.Test) {
         // Get override values. Use the testFlags value if it exists, otherwise use the previously
         // saved value where possible. If neither exist, use a default garbage value.
         const addressOverride: DydxAddress =
@@ -309,7 +310,7 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (connectedWallet?.connectorType === 'privy' && authenticated && ready) {
+          if (connectedWallet?.connectorType === ConnectorType.Privy && authenticated && ready) {
             try {
               // Give Privy a second to finish the auth flow before getting the signature
               await sleep();

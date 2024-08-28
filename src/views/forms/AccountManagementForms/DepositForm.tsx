@@ -60,7 +60,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
-import { WalletType } from '@/lib/wallet/types';
+import { ConnectorType, WalletType } from '@/lib/wallet/types';
 
 import { NobleDeposit } from '../NobleDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
@@ -187,13 +187,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   useEffect(() => {
     if (!connectedWallet) return;
 
-    if (connectedWallet.name === WalletType.Privy) {
+    if (connectedWallet.connectorType === ConnectorType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (connectedWallet.name === WalletType.Phantom) {
+    if (connectedWallet.connectorType === ConnectorType.Phantom) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: 'solana',

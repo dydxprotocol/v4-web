@@ -49,7 +49,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
 
-      // No need to special-case a OKX WalletConnect option if the OKX extension wallet is already detected.
+      // No need to special-case an OKX WalletConnect option if the OKX extension wallet is already detected.
       // Note that OKX mobile app users can still connect through the generic WalletConnect option
       !okxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
 

@@ -62,7 +62,7 @@ export const ChooseWallet = ({
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
           >
-            {wallet.connectorType === 'mipd'
+            {wallet.connectorType === ConnectorType.MIPD
               ? wallet.name
               : stringGetter({ key: wallets[wallet.name].stringKey })}
           </$WalletButton>
