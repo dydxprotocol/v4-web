@@ -159,6 +159,7 @@ const itemLayoutVariants = {
     --stickyArea0-background: var(--details-item-backgroundColor);
 
     ${layoutMixins.spacedRow}
+    grid-template-columns: 1fr auto;
     gap: 0.5rem;
     align-items: center;
     padding: var(--details-item-vertical-padding, 0.5rem) 0;
