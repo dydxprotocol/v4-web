@@ -246,7 +246,7 @@ export enum MarketWindDownNotificationIds {
   MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
   MarketUpdateProposalRndr = 'market-update-proposal-rndr',
   MarketWindDownMatic = 'market-wind-down-matic',
-  MarketWindDownProposalMatic = 'market-wind-down-matic',
+  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic',
 }
 
 export enum FeedbackRequestNotificationIds {
