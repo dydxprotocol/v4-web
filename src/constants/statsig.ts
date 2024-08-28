@@ -17,4 +17,5 @@ export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
 export enum StatsigDynamicConfigs {
   dcMaxSafeBridgeFees = 'dc_max_safe_bridge_fees', // returns number
   dcHighestVolumeUsers = 'dc_highest_volume_users', // returns string[]
+  dcMaticProposalNotif = 'dc_matic_proposal_notif', // returns string
 }
