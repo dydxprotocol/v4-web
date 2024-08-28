@@ -4,12 +4,12 @@ import styled from 'styled-components';
 
 import { wallets } from '@/constants/wallets';
 
-import { WalletInfo } from '@/lib/wallet/types';
+import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
 
 import { Icon } from './Icon';
 
 export const WalletIcon = ({ wallet, size = '1em' }: { wallet: WalletInfo; size?: string }) => {
-  if (wallet.connectorType === 'mipd') {
+  if (wallet.connectorType === ConnectorType.Injected) {
     return <StyledImage src={wallet.icon} alt={wallet.name} size={size} />;
   }
 

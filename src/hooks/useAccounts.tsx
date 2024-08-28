@@ -29,8 +29,8 @@ import { isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
-
 import { ConnectorType } from '@/lib/wallet/types';
+
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useLocalStorage } from './useLocalStorage';
