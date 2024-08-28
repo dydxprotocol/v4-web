@@ -96,7 +96,7 @@ export const FooterDesktop = () => {
             {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
           </$FooterButton>
         )}
-        <$FooterButton size={ButtonSize.XSmall}>
+        <$FooterButton size={ButtonSize.XSmall} onClick={openHelpDialog}>
           {stringGetter({
             key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
             params: {
