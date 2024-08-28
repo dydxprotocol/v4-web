@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 import styled, { css } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
@@ -61,8 +59,6 @@ export const FooterDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.DEGRADED }),
         };
 
-  const openHelpDialog = useCallback(() => dispatch(openDialog(DialogTypes.Help())), [dispatch]);
-
   return (
     <$Footer>
       <$Row>
@@ -96,19 +92,19 @@ export const FooterDesktop = () => {
             {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
           </$FooterButton>
         )}
-        <$FooterButton size={ButtonSize.XSmall} onClick={openHelpDialog}>
+        <$FooterItem>
           {stringGetter({
             key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
             params: {
               NAME_OF_DEPLOYER: deployerName,
               LEARN_MORE_LINK: (
-                <Link onClick={openHelpDialog}>
+                <Link onClick={() => dispatch(openDialog(DialogTypes.Help()))}>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
                 </Link>
               ),
             },
           })}
-        </$FooterButton>
+        </$FooterItem>
       </$Row>
 
       {isDev && (
@@ -188,6 +184,15 @@ const $FooterButton = styled(Button)`
     cursor: default;
   }
 `;
+
+const $FooterItem = styled.div`
+  font: var(--font-mini-book);
+  color: var(--color-text-0);
+
+  display: inline-flex;
+  padding: 0 0.625rem;
+`;
+
 const $Details = styled(Details)`
   ${layoutMixins.scrollArea}
   font: var(--font-tiny-book);
