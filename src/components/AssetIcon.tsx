@@ -473,6 +473,7 @@ const assetIcons = {
   RLC: '/currencies/rlc.png',
   RNDR: '/currencies/rndr.png',
   RENDER: '/currencies/render.png',
+  RETARDIO: '/currencies/retardio.png',
   ROOT: '/currencies/root.png',
   ROSE: '/currencies/rose.png',
   ROUTE: '/currencies/route.png',
