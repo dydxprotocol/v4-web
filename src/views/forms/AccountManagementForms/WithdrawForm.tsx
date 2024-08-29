@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -65,7 +64,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { validateCosmosAddress } from '@/lib/addressUtils';
+import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
@@ -106,20 +105,17 @@ export const WithdrawForm = () => {
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
-  const isValidAddress = useMemo(() => {
-    if (toAddress) {
-      if (walletType === WalletType.Keplr) {
-        const prefix = GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
-          .bech32PrefixAccAddr;
-
-        if (prefix) {
-          return validateCosmosAddress(toAddress, prefix);
-        }
-      }
-      return isAddress(toAddress);
-    }
-    return false;
-  }, [chainIdStr, toAddress, walletType]);
+  const isValidDestinationAddress = useMemo(() => {
+    const grazChainPrefix =
+      GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config.bech32PrefixAccAddr ??
+      '';
+    const prefix = exchange ? 'noble' : grazChainPrefix;
+    return isValidAddress({
+      address: toAddress,
+      network: prefix ? 'cosmos' : 'evm',
+      prefix,
+    });
+  }, [exchange, toAddress, chainIdStr]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -356,7 +352,7 @@ export const WithdrawForm = () => {
         value: nobleChainId,
       });
     }
-  }, [walletType]);
+  }, [nobleChainId, walletType]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {
@@ -475,7 +471,7 @@ export const WithdrawForm = () => {
         }),
       };
 
-    if (!isValidAddress) {
+    if (!isValidDestinationAddress) {
       return {
         errorMessage: stringGetter({
           key: STRING_KEYS.ENTER_VALID_ADDRESS,
@@ -569,22 +565,18 @@ export const WithdrawForm = () => {
     stringGetter,
     summary,
     usdcWithdrawalCapacity,
-    isValidAddress,
+    isValidDestinationAddress,
   ]);
-
-  const isInvalidNobleAddress = Boolean(
-    exchange && toAddress && !validateCosmosAddress(toAddress, 'noble')
-  );
 
   const isDisabled =
     !!errorMessage ||
     !toToken ||
     (!chainIdStr && !exchange) ||
-    !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
     isLoading ||
-    isInvalidNobleAddress;
+    !isValidDestinationAddress;
+
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   return (
@@ -614,7 +606,7 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? (
+              {isValidDestinationAddress ? (
                 <Icon
                   iconName={IconName.Check}
                   tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
@@ -629,7 +621,7 @@ export const WithdrawForm = () => {
           onSelect={onSelectNetwork}
         />
       </div>
-      {isInvalidNobleAddress && (
+      {toAddress && Boolean(exchange) && !isValidDestinationAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
         </AlertMessage>
