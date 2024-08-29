@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import hooks from '../vanillaHooks';
+import hookifyHooks from '../vanillaHooks';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -10,9 +10,9 @@ function delay(ms: number): Promise<void> {
 
 describe('test hooks', () => {
   it('use effect and state', async () => {
-    const fn = hooks.hooked(() => {
-      const [state, setState] = hooks.useState(0);
-      hooks.useEffect(() => {
+    const fn = hookifyHooks.hooked(() => {
+      const [state, setState] = hookifyHooks.useState(0);
+      hookifyHooks.useEffect(() => {
         setTimeout(() => setState((s) => s + 1), 500);
       }, []);
       return state;
@@ -29,9 +29,9 @@ describe('test hooks', () => {
     const handleInternal = vi.fn().mockImplementation(() => {
       fn(1);
     });
-    const fn = hooks.hooked((arg: number) => {
-      const [state, setState] = hooks.useState(0);
-      hooks.useEffect(() => {
+    const fn = hookifyHooks.hooked((arg: number) => {
+      const [state, setState] = hookifyHooks.useState(0);
+      hookifyHooks.useEffect(() => {
         setTimeout(() => setState((s) => s + 1), 500);
       }, []);
       return state + arg;
@@ -70,8 +70,8 @@ describe('test hooks', () => {
     };
     const getStoreValue = () => storeValue;
 
-    const fn = hooks.hooked(() => {
-      const storeVal = hooks.useSyncExternalStore(addSub.sub, getStoreValue);
+    const fn = hookifyHooks.hooked(() => {
+      const storeVal = hookifyHooks.useSyncExternalStore(addSub.sub, getStoreValue);
 
       return storeVal + 1;
     });
@@ -104,7 +104,7 @@ describe('test hooks', () => {
     await delay(10);
     expect(fn()).toEqual(3);
 
-    hooks.dropEffect(fn);
+    hookifyHooks.dropEffect(fn);
     expect(subs.length).toEqual(1);
     await delay(10);
     expect(subs.length).toEqual(0);

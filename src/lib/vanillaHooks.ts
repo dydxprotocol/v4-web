@@ -24,13 +24,15 @@ type SyncedExternalStoreEffect = {
 type Effect = RefEffect | RunnableEffect | StateEffect | MemoEffect | SyncedExternalStoreEffect;
 type PersistentEffect = RunnableEffect | SyncedExternalStoreEffect;
 
+type RerunHookFn<A extends any[], T> = (params: {
+  hooked: (...args: A) => T;
+  context: any | null;
+  args: A | null;
+}) => void;
+
 type HookInfo<A extends any[] = any[], T = any> = {
   hook: (...args: A) => T;
-  handleInternalRerender: (params: {
-    hooked: (...args: A) => T;
-    context: any | null;
-    args: A | null;
-  }) => void;
+  handleInternalRerender: RerunHookFn<A, T>;
   context: any | null;
   args: A | null;
   queuedToExecute: boolean;
@@ -38,7 +40,7 @@ type HookInfo<A extends any[] = any[], T = any> = {
   state: Effect[];
 };
 
-const hooks = (function hooks() {
+const hookifyHooks = (function hooks() {
   let info: HookInfo | null = null;
   let schedule: Set<HookInfo> = new Set();
   const fx = new WeakMap<Function, Set<PersistentEffect>>();
@@ -108,11 +110,7 @@ const hooks = (function hooks() {
 
   const hooked = <A extends any[], T>(
     callback: (...args: A) => T,
-    handleInternalRerender: (params: {
-      hooked: (...args: A) => T;
-      context: any | null;
-      args: A | null;
-    }) => void = basicRerunHook
+    handleInternalRerender: RerunHookFn<A, T> = basicRerunHook
   ): ((...args: A) => T) => {
     const current: HookInfo<A, T> = {
       hook,
@@ -338,4 +336,4 @@ const hooks = (function hooks() {
   };
 })();
 
-export default hooks;
+export default hookifyHooks;

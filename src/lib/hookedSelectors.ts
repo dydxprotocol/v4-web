@@ -1,91 +1,159 @@
 import { useSyncExternalStore } from 'react';
 
-import { Action, Dispatch, createListenerMiddleware } from '@reduxjs/toolkit';
+import { Action, Dispatch, EnhancedStore, UnknownAction } from '@reduxjs/toolkit';
+import { isFunction } from 'lodash';
 
-import hooks from './vanillaHooks';
+import hookifyHooks from './vanillaHooks';
 
-type HookedSelector<RootStateType, ReturnType> = {
-  subscribe: (handle: (val: ReturnType) => void) => () => void;
-  getValue: () => ReturnType;
-  __hooked_selector__: true;
+type HookSub<Return> = (val: Return) => void;
+type Hookified<Return, Args extends any[]> = {
+  subscribe: (handle: HookSub<Return>) => () => void;
+  getLatestValue: () => Return | undefined;
+  call: (...args: Args) => Return;
+  tearDown: () => void;
 };
 
-interface IHookedSelectorArgs {
-  optimistic: boolean;
-}
-
-export function hookedSelectors<RootStateType, RootDispatchType extends Dispatch<Action>>() {
-  let allBaseSelectors = [];
-
-  type HookMeta<
-    ReturnType,
-    DepsType extends readonly (
-      | HookedSelector<RootStateType, any>
-      | ((arg: RootStateType) => any)
-    )[],
-  > = {
-    children: readonly HookedSelector<RootStateType, any>[];
-    deps: readonly HookedSelector<RootStateType, any>[];
-
-    mostRecentValue: ReturnType;
-    hooked: (...args: GetReturn<DepsType>) => ReturnType;
+export function hookify<Return, Args extends any[]>(
+  hookFn: (...args: Args) => Return
+): Hookified<Return, Args> {
+  let destroyed = false;
+  let mostRecentResult: Return | undefined;
+  let subs: HookSub<Return>[] = [];
+  const removeSub = (subFn: HookSub<Return>) => {
+    subs = subs.filter((s) => s !== subFn);
+  };
+  const addSub = (sub: HookSub<Return>) => {
+    if (destroyed) throw new Error('This hookified fn is tore down');
+    subs.push(sub);
+    return () => removeSub(sub);
+  };
+  const notifySubs = (val: Return) => {
+    if (destroyed) return;
+    subs.forEach((s) => s(val));
+  };
+  const getLatestValue = () => {
+    if (destroyed) throw new Error('This hookified fn is tore down');
+    return mostRecentResult;
   };
 
+  const hookified = hookifyHooks.hooked((...args: Args) => {
+    const value = hookFn(...args);
+    // todo custom equality fns
+    if (mostRecentResult !== value) {
+      mostRecentResult = value;
+      notifySubs(value);
+    }
+    return value;
+  });
+
+  return {
+    subscribe: addSub,
+    getLatestValue,
+    call: (...args: Args) => {
+      if (destroyed) throw new Error('This hookified fn is tore down');
+      return hookified(...args);
+    },
+    tearDown: () => {
+      destroyed = true;
+      subs = [];
+      hookifyHooks.dropEffect(hookified);
+    },
+  };
+}
+
+// for use in react
+export const useHookified = <ReturnType>(hookified: Hookified<ReturnType, any>) => {
+  return useSyncExternalStore(hookified.subscribe, hookified.getLatestValue);
+};
+// for use in other hookfied functions
+export const useHookifiedHf = <ReturnType>(hookified: Hookified<ReturnType, any>) => {
+  return hookifyHooks.useSyncExternalStore(hookified.subscribe, hookified.getLatestValue);
+};
+
+type HookedSelector<RootStateType, A extends Action, ReturnType> = {
+  subscribe: (handle: (val: ReturnType) => void) => () => void;
+  getValue: () => ReturnType;
+  dispatchValue: (
+    handle: (
+      dispatch: Dispatch<A>,
+      value: ReturnType
+    ) => HookedSelector<RootStateType, A, ReturnType>
+  ) => void;
+  tearDown: () => void;
+  __hooked_selector__: true;
+  __state_type__?: RootStateType;
+};
+
+export function hookedSelectors<RootStateType, A extends Action = UnknownAction>(
+  store: EnhancedStore<RootStateType, A>
+) {
   type GetReturn<T extends readonly any[]> = {
-    [K in keyof T]: T[K] extends HookedSelector<RootStateType, infer Ret>
+    [K in keyof T]: T[K] extends HookedSelector<RootStateType, A, infer Ret>
       ? Ret
       : T[K] extends (...args: any[]) => infer R
         ? R
         : never;
   };
 
+  const useAppSelectorHf = <T>(selector: (state: RootStateType) => T) => {
+    return hookifyHooks.useSyncExternalStore(store.subscribe, () => selector(store.getState()));
+  };
+
+  const useDispatchHf = () => store.dispatch;
+
+  const useHookedSelectorHf = <ReturnType>(
+    selector: HookedSelector<RootStateType, A, ReturnType>
+  ) => {
+    return hookifyHooks.useSyncExternalStore(selector.subscribe, selector.getValue);
+  };
+
+  const useHookedSelector = <ReturnType>(
+    selector: HookedSelector<RootStateType, A, ReturnType>
+  ) => {
+    return useSyncExternalStore(selector.subscribe, selector.getValue);
+  };
+
   const createHookedSelector = <
     ReturnType,
     DepsType extends readonly (
-      | HookedSelector<RootStateType, any>
+      | HookedSelector<RootStateType, A, any>
       | ((arg: RootStateType) => any)
     )[],
   >(
     deps: [...DepsType],
-    hookFn: (...args: GetReturn<DepsType>) => ReturnType,
-    opts?: IHookedSelectorArgs
-  ): HookedSelector<RootStateType, ReturnType> => {
-    const { optimistic } = opts ?? {};
+    hookFn: (...args: GetReturn<DepsType>) => ReturnType
+  ): HookedSelector<RootStateType, A, ReturnType> => {
+    // we just call the useX hooks for you...
+    const hooked = hookify(() => {
+      const args = deps.map((dep) => {
+        if (isFunction(dep)) {
+          return useAppSelectorHf(dep);
+        }
+        return useHookedSelectorHf(dep);
+      });
+      return hookFn(...(args as any));
+    });
 
-    const hooked = hooks.hooked(hookFn);
-    const metadata: HookMeta<ReturnType> = {};
-
-    const selector: HookedSelector<RootStateType, ReturnType> = {
+    const result: HookedSelector<RootStateType, A, ReturnType> = {
       __hooked_selector__: true,
-      getValue() {},
-      subscribe() {},
+      __state_type__: undefined,
+      getValue: () => hooked.getLatestValue()!,
+      dispatchValue: (listener) => {
+        hooked.subscribe((v) => listener(store.dispatch, v));
+        return result;
+      },
+      subscribe: hooked.subscribe,
+      tearDown: hooked.tearDown,
     };
-    return selector;
-  };
-
-  const cleanupHookedSelector = (selector: HookedSelector<RootStateType, any>): void => {};
-
-  const listenerMiddleware = createListenerMiddleware<RootStateType, RootDispatchType>();
-  listenerMiddleware.startListening({
-    predicate: () => true,
-    effect: (_someAction, { getState, dispatch }) => {},
-  });
-
-  const useHookedSelector = <ReturnType>(selector: HookedSelector<RootStateType, ReturnType>) => {
-    // we may be breaking invariant since getValue technically updates before subscribe in current implementation
-    // just test and see if it's okay
-    return useSyncExternalStore(selector.subscribe, selector.getValue);
+    return result;
   };
 
   return {
-    hookedSelectorMiddleware: listenerMiddleware,
     createHookedSelector,
-    cleanupHookedSelector,
     useHookedSelector,
+
+    useDispatchHf,
+    useHookedSelectorHf,
+    useAppSelectorHf,
   };
 }
-
-type TestState = { x: number; y: string };
-const { createHookedSelector } = hookedSelectors<TestState, Dispatch<Action>>();
-const r = createHookedSelector([(s) => s.x, (s) => s.y], (arg1, arg2) => arg1);
-const p = createHookedSelector([r, (s) => s.y], (arg1, arg2) => arg1);
