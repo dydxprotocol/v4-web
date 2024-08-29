@@ -30444,48 +30444,6 @@
       "cmcId": 17047
     }
   },
-  "CRPT": {
-    "title": "Add CRPT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CRPT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 597,
-      "ticker": "CRPT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Huobi",
-          "ticker": "crptusdt",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "CRPT-USDT",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Crypterium",
-      "referencePrice": 0.030896756357447815,
-      "cmcId": 2447
-    }
-  },
   "ANALOS": {
     "title": "Add ANALOS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ANALOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -31593,47 +31551,6 @@
       "assetName": "IguVerse",
       "referencePrice": 0.005774234656729339,
       "cmcId": 20349
-    }
-  },
-  "DOSE": {
-    "title": "Add DOSE-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOSE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 624,
-      "ticker": "DOSE-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Huobi",
-          "ticker": "doseusdt",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "DOSE-USDC",
-          "invert": false
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "DOSE",
-      "referencePrice": 0.0001641480902791939,
-      "cmcId": 12315
     }
   },
   "XCUR": {
@@ -34295,48 +34212,6 @@
       "assetName": "Lends",
       "referencePrice": 0.005937669614648027,
       "cmcId": 29395
-    }
-  },
-  "RANKER": {
-    "title": "Add RANKER-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RANKER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 688,
-      "ticker": "RANKER-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Huobi",
-          "ticker": "rankerusdt",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "RANKER-USDT",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "RankerDAO",
-      "referencePrice": 0.0003687094657411537,
-      "cmcId": 17849
     }
   },
   "CANDY": {
