@@ -11,7 +11,12 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  GRAZ_CHAINS,
+} from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -101,10 +106,16 @@ export const WithdrawForm = () => {
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const isValidDestinationAddress = useMemo(() => {
+    let prefix = exchange ? 'noble' : '';
+    if (walletType === WalletType.Keplr) {
+      prefix =
+        GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
+          .bech32PrefixAccAddr ?? '';
+    }
     return isValidAddress({
       address: toAddress,
-      network: exchange ? 'cosmos' : 'evm',
-      prefix: exchange ? 'noble' : '',
+      network: exchange || walletType === WalletType.Keplr ? 'cosmos' : 'evm',
+      prefix,
     });
   }, [toAddress, exchange]);
 
