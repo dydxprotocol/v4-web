@@ -42,7 +42,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
@@ -63,14 +62,8 @@ export const AccountMenu = () => {
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { usdcDenom } = useTokenConfigs();
-  const { nativeTokenBalance, balance: usdcBalance } = useAccountBalance({
-    chainId: selectedDydxChainId,
-    isCosmosChain: true,
-    addressOrDenom: usdcDenom,
-  });
+  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
