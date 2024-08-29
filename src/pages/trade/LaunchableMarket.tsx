@@ -15,7 +15,6 @@ import { DetachedSection } from '@/components/ContentSection';
 import { AccountInfo } from '@/views/AccountInfo';
 import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
@@ -24,16 +23,13 @@ import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
-import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
-import { TradeDialogTrigger } from './TradeDialogTrigger';
 import { TradeHeaderMobile } from './TradeHeaderMobile';
 
 const LaunchableMarket = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
 
@@ -45,23 +41,17 @@ const LaunchableMarket = () => {
 
   return isTablet ? (
     <$TradeLayoutMobile>
-      <TradeHeaderMobile />
+      <TradeHeaderMobile launchableMarketId={displayableTicker} />
 
       <div>
         <DetachedSection>
-          <MobileTopPanel />
+          <MobileTopPanel isViewingUnlaunchedMarket />
         </DetachedSection>
 
         <DetachedSection>
-          <HorizontalPanel />
-        </DetachedSection>
-
-        <DetachedSection>
-          <MobileBottomPanel />
+          <$LaunchMarketSidePanel launchableMarketId={displayableTicker} />
         </DetachedSection>
       </div>
-
-      {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
     <$TradeLayout
