@@ -23,6 +23,7 @@ import {
   INCENTIVES_SEASON_NOTIFICATION_ID,
   MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
+  MarketUpdateNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
@@ -68,7 +69,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues, useAllStatsigDynamicConfigValues } from './useStatsig';
+import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -299,6 +300,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const twitter200BVolumeExpirationDate = new Date('2024-08-16T23:59:59');
       const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
+      const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
+      const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
       const currentDate = new Date();
 
       useEffect(() => {
@@ -398,6 +401,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
             },
             []
           );
+        }
+
+        if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
+          trigger(MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier, {
+            icon: <AssetIcon symbol={chainTokenLabel} />,
+            title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
+            body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
+            toastSensitivity: 'foreground',
+            groupKey: MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+          });
         }
       }, [stringGetter]);
 
