@@ -15,7 +15,7 @@ import { Output, OutputType } from '@/components/Output';
 import { PortfolioCard } from '@/components/PortfolioCard';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getUserVault } from '@/state/vaultSelectors';
+import { getVaultAccount } from '@/state/vaultSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -25,14 +25,14 @@ type MaybeVaultPositionsPanelProps = {
   header: ReactNode;
 };
 
-type UserVault = ReturnType<typeof getUserVault>;
+type UserVault = ReturnType<typeof getVaultAccount>;
 
 export const MaybeVaultPositionsPanel = ({
   onViewVault,
   header,
   className,
 }: MaybeVaultPositionsPanelProps) => {
-  const userVault = useAppSelector(getUserVault);
+  const userVault = useAppSelector(getVaultAccount);
   const { isTablet } = useBreakpoints();
   if (!testFlags.enableVaults) return null;
   if (userVault == null && !isTablet) {
@@ -77,7 +77,7 @@ export const VaultPositionCard = ({ onViewVault, vault }: VaultPositionCardProps
       assetName={stringGetter({ key: STRING_KEYS.VAULT })}
       assetIcon={<img src="/dydx-chain.png" tw="h-1.5 w-1.5" />}
       detailLabel={stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE })}
-      detailValue={<Output type={OutputType.Fiat} value={vault?.userBalance} />}
+      detailValue={<Output type={OutputType.Fiat} value={vault?.balanceUsdc} />}
       actionSlot={
         <Link onClick={onViewVault} isAccent tw="font-small-book">
           {stringGetter({ key: STRING_KEYS.VIEW_VAULT })} <Icon iconName={IconName.Arrow} />

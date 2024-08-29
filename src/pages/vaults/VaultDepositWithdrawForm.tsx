@@ -31,7 +31,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { calculateCanViewAccount, calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getUserVault } from '@/state/vaultSelectors';
+import { getVaultAccount } from '@/state/vaultSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -62,7 +62,7 @@ export const VaultDepositWithdrawForm = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
 
-  const { userBalance } = useAppSelector(getUserVault) ?? {};
+  const { balanceUsdc: userBalance } = useAppSelector(getVaultAccount) ?? {};
   const { freeCollateral, marginUsage } = useAppSelector(getSubaccount) ?? {};
 
   const [selectedType, setSelectedType] = useState<'deposit' | 'withdraw'>(

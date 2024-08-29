@@ -76,17 +76,14 @@ type HookedSelector<RootStateType, A extends Action, ReturnType> = {
   subscribe: (handle: (val: ReturnType) => void) => () => void;
   getValue: () => ReturnType;
   dispatchValue: (
-    handle: (
-      dispatch: Dispatch<A>,
-      value: ReturnType
-    ) => HookedSelector<RootStateType, A, ReturnType>
-  ) => void;
+    handle: (dispatch: Dispatch<A>, value: ReturnType) => void
+  ) => HookedSelector<RootStateType, A, ReturnType>;
   tearDown: () => void;
   __hooked_selector__: true;
   __state_type__?: RootStateType;
 };
 
-export function hookedSelectors<RootStateType, A extends Action = UnknownAction>(
+export function hookedSelectors<RootStateType, DispatchType, A extends Action = UnknownAction>(
   store: EnhancedStore<RootStateType, A>,
   reactQueryClient: QueryClient
 ) {
@@ -105,7 +102,7 @@ export function hookedSelectors<RootStateType, A extends Action = UnknownAction>
     return hookifyHooks.useSyncExternalStore(store.subscribe, () => selector(store.getState()));
   };
 
-  const useDispatchHf = () => store.dispatch;
+  const useDispatchHf = () => store.dispatch as DispatchType;
 
   const useHookedSelectorHf = <ReturnType>(
     selector: HookedSelector<RootStateType, A, ReturnType>
@@ -146,11 +143,14 @@ export function hookedSelectors<RootStateType, A extends Action = UnknownAction>
       getValue: () => hooked.getLatestValue()!,
       dispatchValue: (listener) => {
         hooked.subscribe((v) => listener(store.dispatch, v));
+        listener(store.dispatch, result.getValue());
         return result;
       },
       subscribe: hooked.subscribe,
       tearDown: hooked.tearDown,
     };
+    // first run
+    hooked.call();
     return result;
   };
 

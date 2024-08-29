@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -20,19 +21,19 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { getVaultDetails } from '@/state/vaultSelectors';
+import { getVaultPositions } from '@/state/vaultSelectors';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
-type VaultTableRow = ReturnType<typeof getVaultDetails>['positions'][number];
+type VaultTableRow = NonNullable<ReturnType<typeof getVaultPositions>>[number];
 
 const VAULT_PAGE_SIZE = 50 as const;
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const vaultsData = useAppSelector(getVaultDetails)?.positions;
+  const vaultsData = useAppSelector(getVaultPositions) ?? EMPTY_ARR;
   const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
@@ -79,38 +80,47 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         },
         {
           columnKey: 'pnl',
-          getCellValue: (row) => row.thirtyDayPnl.absolute,
+          getCellValue: (row) => row.thirtyDayPnl?.absolute,
           label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
-          renderCell: ({ thirtyDayPnl }) => (
-            <TableCell
-              stacked
-              slotRight={
-                <div style={{ width: 50, height: 50 }} tw="ml-0.5">
-                  <SparklineChart
-                    data={thirtyDayPnl.sparklinePoints.map((elem, index) => ({
-                      x: index + 1,
-                      y: elem,
-                    }))}
-                    xAccessor={(datum) => datum.x}
-                    yAccessor={(datum) => datum.y}
-                    positive={thirtyDayPnl.absolute > 0}
-                  />
-                </div>
-              }
-            >
-              <$OutputSigned
-                sign={getNumberSign(thirtyDayPnl.absolute)}
-                value={thirtyDayPnl.absolute}
-                type={OutputType.Fiat}
-                fractionDigits={0}
-              />
-              <Output
-                value={thirtyDayPnl.percent}
-                type={OutputType.Percent}
-                showSign={ShowSign.Both}
-              />
-            </TableCell>
-          ),
+          renderCell: ({ thirtyDayPnl: thirtyDayPnlRaw }) => {
+            const thirtyDayPnl = thirtyDayPnlRaw ?? {
+              absolute: 0,
+              percent: 0,
+              sparklinePoints: [] as number[],
+            };
+            return (
+              <TableCell
+                stacked
+                slotRight={
+                  <div style={{ width: 50, height: 50 }} tw="ml-0.5">
+                    {thirtyDayPnl.sparklinePoints != null && (
+                      <SparklineChart
+                        data={thirtyDayPnl.sparklinePoints.map((elem, index) => ({
+                          x: index + 1,
+                          y: elem,
+                        }))}
+                        xAccessor={(datum) => datum.x}
+                        yAccessor={(datum) => datum.y}
+                        positive={(thirtyDayPnl.absolute ?? 0) > 0}
+                      />
+                    )}
+                  </div>
+                }
+              >
+                <$OutputSigned
+                  sign={getNumberSign(thirtyDayPnl.absolute)}
+                  value={thirtyDayPnl.absolute}
+                  type={OutputType.Fiat}
+                  fractionDigits={0}
+                />
+                <Output
+                  value={thirtyDayPnl.percent}
+                  type={OutputType.Percent}
+                  showSign={ShowSign.Both}
+                />
+              </TableCell>
+            );
+          },
         },
         {
           columnKey: 'margin',
@@ -132,7 +142,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       withInnerBorders
       withOuterBorder
       data={vaultsData}
-      getRowKey={(row) => row.marketId}
+      getRowKey={(row) => row.marketId ?? ''}
       label={stringGetter({ key: STRING_KEYS.VAULT })}
       onRowAction={(marketId: Key) =>
         navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })

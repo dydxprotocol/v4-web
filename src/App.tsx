@@ -3,7 +3,7 @@ import { lazy, Suspense, useMemo } from 'react';
 import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
@@ -51,6 +51,12 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { appQueryClient } from './state/appQueryClient';
+import {
+  loadedVaultAccount,
+  loadedVaultDetails,
+  loadedVaultPositions,
+} from './state/vaultsLifecycle';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -64,8 +70,6 @@ const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
-
-const queryClient = new QueryClient();
 
 const Content = () => {
   useInitializePage();
@@ -162,6 +166,10 @@ const Content = () => {
   );
 };
 
+// we need to import these in main so they don't get tree shaken / put in another bundle
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const dummyLifecyclesList = [loadedVaultDetails, loadedVaultPositions, loadedVaultAccount];
+
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   // eslint-disable-next-line react/display-name
   return ({ children }: { children: React.ReactNode }) => (
@@ -176,7 +184,7 @@ const providers = [
     config: privyConfig,
   }),
   wrapProvider(StatsigProvider),
-  wrapProvider(QueryClientProvider, { client: queryClient }),
+  wrapProvider(QueryClientProvider, { client: appQueryClient }),
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),

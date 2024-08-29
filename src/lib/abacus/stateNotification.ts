@@ -143,6 +143,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
                 .filter(isTruthy)
             ),
             update: !!marketIds,
+            raw: updatedState.marketsSummary?.markets,
           })
         );
       }
