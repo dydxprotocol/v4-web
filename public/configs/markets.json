@@ -5444,6 +5444,15 @@
         "websiteLink": "https://request.network/", 
         "whitepaperLink": "https://docs.request.network/"
     }, 
+    "RETARDIO-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/retardio/",
+        "name": "https://retardio.xyz/",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://retardio.com/",
+        "whitepaperLink": null
+    },
     "REVV-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/revv/", 
         "name": "REVV", 
