@@ -20,6 +20,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
   const {
     asset,
     createdAtMilliseconds,
+    displayId,
     fee,
     marketId,
     orderSide,
@@ -35,6 +36,11 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
       {
         key: 'market',
         label: stringGetter({ key: STRING_KEYS.MARKET }),
+        value: displayId,
+      },
+      {
+        key: 'market-id',
+        label: stringGetter({ key: STRING_KEYS.TICKER }),
         value: marketId,
       },
       {

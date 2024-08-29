@@ -3,7 +3,13 @@ import { useMemo } from 'react';
 import { groupBy } from 'lodash';
 import styled from 'styled-components';
 
-import { NotificationStatus } from '@/constants/notifications';
+import {
+  MAX_NUM_TOASTS,
+  NotificationCategoryPreferenceOrder,
+  NotificationStatus,
+  NotificationType,
+  NotificationTypeCategory,
+} from '@/constants/notifications';
 
 import { useNotifications } from '@/hooks/useNotifications';
 
@@ -16,8 +22,6 @@ type StyleProps = {
   className?: string;
 };
 
-const MAX_TOASTS = 10;
-
 export const NotificationsToastArea = ({ className }: StyleProps) => {
   const { notifications, getKey, getDisplayData, isMenuOpen } = useNotifications();
 
@@ -29,6 +33,16 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
           n1.timestamps[NotificationStatus.Triggered]! -
           n2.timestamps[NotificationStatus.Triggered]!
       )
+      // Sort by priority
+      .sort(
+        (n1, n2) =>
+          NotificationCategoryPreferenceOrder.indexOf(
+            NotificationTypeCategory[n1.type as NotificationType]
+          ) -
+          NotificationCategoryPreferenceOrder.indexOf(
+            NotificationTypeCategory[n2.type as NotificationType]
+          )
+      )
       .map((notification) => ({
         notification,
         key: getKey(notification),
@@ -38,7 +52,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
         ({ displayData, notification }) =>
           displayData && notification.status < NotificationStatus.Unseen
       )
-      .slice(-MAX_TOASTS);
+      .slice(-MAX_NUM_TOASTS);
     return groupBy(notificationMap, (notification) => notification.displayData?.groupKey);
   }, [notifications, getKey, getDisplayData]);
 

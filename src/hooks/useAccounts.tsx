@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
@@ -11,6 +10,7 @@ import {
   OnboardingState,
   SolDerivedAddresses,
 } from '@/constants/account';
+import { getNobleChainId } from '@/constants/graz';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   DydxAddress,
@@ -22,6 +22,7 @@ import {
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo, getHasSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
@@ -51,6 +52,7 @@ const useAccountsContext = () => {
   const dispatch = useAppDispatch();
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   // Wallet connection
   const {
@@ -63,7 +65,9 @@ const useAccountsContext = () => {
     signerWagmi,
     publicClientWagmi,
     dydxAddress: connectedDydxAddress,
-    signerGraz,
+    getCosmosOfflineSigner,
+    isConnectedGraz,
+    dydxAccountGraz,
   } = useWalletConnection();
 
   // EVM wallet connection
@@ -216,6 +220,7 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
+  const nobleChainId = getNobleChainId();
   const { indexerClient, getWalletFromSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
@@ -247,7 +252,9 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
+  const nobleAddress = useMemo(() => {
+    return localNobleWallet?.address;
+  }, [localNobleWallet]);
 
   const setWalletFromSignature = useCallback(
     async (signature: string) => {
@@ -296,11 +303,13 @@ const useAccountsContext = () => {
         setLocalDydxWallet(wallet);
 
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
-      } else if (connectedDydxAddress && signerGraz) {
-        dispatch(setOnboardingState(OnboardingState.WalletConnected));
+      } else if (connectedDydxAddress && isConnectedGraz) {
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz as OfflineSigner));
-          dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
+          if (dydxOfflineSigner) {
+            setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
+            dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          }
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
         }
@@ -366,25 +375,34 @@ const useAccountsContext = () => {
     solAddress,
     solDerivedAddresses,
     connectedDydxAddress,
-    signerGraz,
+    isConnectedGraz,
   ]);
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey, connectedWallet);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey]);
+  }, [localDydxWallet, hdKey, dydxAddress, connectedWallet]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
+      let nobleWallet: LocalWallet | undefined;
       if (hdKey?.mnemonic) {
-        const nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+      }
+
+      const nobleOfflineSigner = await getCosmosOfflineSigner(nobleChainId);
+      if (nobleOfflineSigner !== undefined) {
+        nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+      }
+
+      if (nobleWallet !== undefined) {
         abacusStateManager.setNobleWallet(nobleWallet);
         setLocalNobleWallet(nobleWallet);
       }
     };
     setNobleWallet();
-  }, [hdKey?.mnemonic]);
+  }, [hdKey?.mnemonic, getCosmosOfflineSigner, nobleChainId]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -459,9 +477,6 @@ const useAccountsContext = () => {
     // Wallet connection (sol)
     solAddress,
 
-    // Wallet connection (Cosmos)
-    signerGraz,
-
     setWalletFromSignature,
 
     // EVM → dYdX account derivation
@@ -477,6 +492,7 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+
     nobleAddress,
 
     // Onboarding state
@@ -487,5 +503,8 @@ const useAccountsContext = () => {
 
     // dydxClient Account methods
     getSubaccounts,
+
+    // cosmos account
+    dydxAccountGraz,
   };
 };

@@ -14,7 +14,7 @@ import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
 
-export const NobleDeposit = () => {
+export const CoinbaseDeposit = () => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const [hasTimedout, setHasTimedout] = useState(false);
   const stringGetter = useStringGetter();

@@ -50,7 +50,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   };
 
   const onChooseWallet = (wallet: WalletInfo) => {
-    if (wallet.name === WalletType.Privy) {
+    if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
       setIsOpenFromDialog(false);
     }
     selectWallet(wallet);

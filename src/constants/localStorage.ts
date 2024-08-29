@@ -6,6 +6,7 @@ export enum LocalStorageKey {
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
+  KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
 
   // Gas
@@ -44,5 +45,6 @@ export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.NotificationPreferences]: 'v2',
   [LocalStorageKey.TransferNotifications]: 'v1',
   [LocalStorageKey.Notifications]: 'v1',
+  [LocalStorageKey.KeplrCompliance]: 'v1',
   // TODO: version all localStorage keys
 };

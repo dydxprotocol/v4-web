@@ -5,10 +5,13 @@ import tw from 'twin.macro';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatSigFlags } from '@/constants/statsig';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -20,6 +23,9 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
+import { WalletType } from '@/lib/wallet/types';
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
@@ -30,8 +36,14 @@ type ElementProps = {
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type, depositOptions, withdrawalOptions, resources } =
-    useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const {
+    type,
+    depositOptions,
+    withdrawalOptions,
+    resources,
+    chain: chainIdStr,
+  } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
+  const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -39,6 +51,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
     [type, skipEnabled]
   );
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
@@ -62,6 +75,17 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
+      if (isKeplrWallet) {
+        if (chainIdStr === getNobleChainId()) {
+          return true;
+        }
+        if (chainIdStr === getOsmosisChainId()) {
+          return token.value === OSMO_USDC_IBC_DENOM;
+        }
+        if (chainIdStr === getNeutronChainId()) {
+          return token.value === NEUTRON_USDC_IBC_DENOM;
+        }
+      }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByDenom[token.value];

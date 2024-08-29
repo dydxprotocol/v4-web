@@ -9,6 +9,7 @@ import {
   getMapOfHighestFeeTokensByChainId,
   getMapOfLowestFeeTokensByChainId,
 } from '@/constants/cctp';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatSigFlags } from '@/constants/statsig';
@@ -20,6 +21,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -45,7 +47,7 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { connectedWallet } = useAccounts();
-
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
   const CCTPDepositOnly =
@@ -73,6 +75,7 @@ export const SourceSelectMenu = ({
     () => getMapOfHighestFeeTokensByChainId(type, skipEnabled),
     [type, skipEnabled]
   );
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -95,12 +98,16 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
+      if (isKeplrWallet) {
+        return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
+      }
       // only solana chains are supported on phantom
       if (
         connectedWallet?.name === WalletType.Phantom &&
         !chain.value.startsWith(solanaChainIdPrefix)
-      )
+      ) {
         return false;
+      }
       return true;
     })
     .filter((chain) => {
@@ -136,11 +143,12 @@ export const SourceSelectMenu = ({
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
-          group: 'exchanges',
-          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-          items: exchangeItems,
-        },
+        !isKeplrWallet &&
+          exchangeItems.length > 0 && {
+            group: 'exchanges',
+            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+            items: exchangeItems,
+          },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {

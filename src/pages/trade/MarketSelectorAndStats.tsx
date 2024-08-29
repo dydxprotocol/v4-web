@@ -9,11 +9,11 @@ import { MarketsDropdown } from '@/views/MarketsDropdown';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
 export const MarketSelectorAndStats = ({ className }: { className?: string }) => {
   const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   return (
     <$Container className={className}>

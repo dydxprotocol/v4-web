@@ -1,6 +1,5 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
 import type { ExternalProvider } from '@ethersproject/providers';
-import { type suggestChain } from 'graz';
 import { EIP1193Provider } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -154,56 +153,6 @@ export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEth
 export type EvmAddress = `0x${string}`;
 export type SolAddress = `${string}`;
 export type DydxAddress = `dydx${string}`;
-
-export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
-  rpc: 'https://dydx-testnet-archive.allthatnode.com:26657',
-  rest: 'https://dydx-testnet-archive.allthatnode.com:1317',
-  chainId: 'dydx-testnet-4',
-  chainName: 'dYdX Public Testnet',
-  chainSymbolImageUrl:
-    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet-4/chain.png',
-  bech32Config: {
-    bech32PrefixAccPub: 'dydxpub',
-    bech32PrefixValPub: 'dydxvaloperpub',
-    bech32PrefixAccAddr: 'dydx',
-    bech32PrefixConsPub: 'dydxvalconspub',
-    bech32PrefixValAddr: 'dydxvaloper',
-    bech32PrefixConsAddr: 'dydxvalcons',
-  },
-  bip44: {
-    coinType: 118,
-  },
-  stakeCurrency: {
-    coinDenom: 'DV4TNT',
-    coinDecimals: 18,
-    coinMinimalDenom: 'adv4tnt',
-  },
-  currencies: [
-    {
-      coinDenom: 'DV4TNT',
-      coinDecimals: 18,
-      coinMinimalDenom: 'adv4tnt',
-    },
-    {
-      coinDenom: 'USDC',
-      coinDecimals: 6,
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
-    },
-  ],
-  feeCurrencies: [
-    {
-      coinDenom: 'DV4TNT',
-      coinDecimals: 18,
-      coinMinimalDenom: 'adv4tnt',
-    },
-    {
-      coinDenom: 'USDC',
-      coinDecimals: 6,
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
-    },
-  ],
-  features: [],
-};
 
 // Extension wallet EIP-6963 identifiers
 export const PHANTOM_MIPD_RDNS = 'app.phantom';

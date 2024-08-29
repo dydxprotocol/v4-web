@@ -53,6 +53,7 @@ import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
+import { ConnectorType, WalletInfo } from '../wallet/types';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -273,11 +274,16 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, connectedWallet?: WalletInfo) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
+      if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
+        this.stateManager.cosmosWalletConnected = true;
+      } else {
+        this.stateManager.cosmosWalletConnected = false;
+      }
     }
   };
 

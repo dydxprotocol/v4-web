@@ -242,7 +242,7 @@ export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
       'hide_last_na_study_output',
       'dont_show_boolean_study_arguments',
       'hide_left_toolbar_by_default',
-      'keep_object_tree_widget_in_right_toolbar',
+      'hide_right_toolbar',
     ],
   };
 };
