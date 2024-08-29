@@ -36,6 +36,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -119,9 +120,18 @@ export const TradeForm = ({
 
   const { getNotificationPreferenceForType } = useNotifications();
 
-  const { inputAlert, alertContent, alertType, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
+  const {
+    inputAlert,
+    alertContent,
+    shortAlertContent,
+    alertType,
+    shouldPromptUserToPlaceLimitOrder,
+  } = useMemo(() => {
     let alertContentInner;
     let alertTypeInner = AlertType.Error;
+
+    let alertContentLink;
+    let alertContentLinkText;
 
     const inputAlertInner = getTradeInputAlert({
       abacusInputErrors: tradeErrors ?? [],
@@ -139,13 +149,25 @@ export const TradeForm = ({
     } else if (inputAlertInner) {
       alertContentInner = inputAlertInner.alertString;
       alertTypeInner = inputAlertInner.type;
+      alertContentLink = inputAlertInner.link;
+      alertContentLinkText = inputAlertInner.linkText;
     }
 
     const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
       (errorCode) => inputAlertInner?.code === errorCode
     );
     return {
-      alertContent: alertContentInner,
+      shortAlertContent: alertContentInner,
+      alertContent: alertContentInner && (
+        <$AlertContent>
+          {alertContentInner}
+          {alertContentLinkText && alertContentLink && (
+            <Link isInline href={alertContentLink}>
+              {alertContentLinkText}
+            </Link>
+          )}
+        </$AlertContent>
+      ),
       alertType: alertTypeInner,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
       inputAlert: inputAlertInner,
@@ -300,7 +322,7 @@ export const TradeForm = ({
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
         actionStringKey={inputAlert?.actionStringKey}
-        validationErrorString={alertContent}
+        validationErrorString={shortAlertContent}
         summary={summary ?? undefined}
         currentStep={currentStep}
         showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
@@ -437,6 +459,14 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
+
+const $AlertContent = styled.div`
+  display: inline-block;
+  a {
+    margin-left: 0.5ch;
+  }
+`;
+
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
