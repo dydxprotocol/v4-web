@@ -24,8 +24,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
-
 import { WalletType } from '@/lib/wallet/types';
+
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
