@@ -232,14 +232,14 @@ export const ClosePositionForm = ({
 
   const alertMessage = alertContent && (
     <AlertMessage type={alertType}>
-      <$AlertContent>
-        {alertContent}
+      <div tw="inline-block">
+        {alertContent}{' '}
         {alertContentLinkText && alertContentLink && (
           <Link isInline href={alertContentLink}>
             {alertContentLinkText}
           </Link>
         )}
-      </$AlertContent>
+      </div>
     </AlertMessage>
   );
 
@@ -395,13 +395,6 @@ const $ToggleGroup = styled(ToggleGroup)`
     > :last-child {
       flex-basis: 100%;
     }
-  }
-`;
-
-const $AlertContent = styled.div`
-  display: inline-block;
-  a {
-    margin-left: 0.5ch;
   }
 `;
 

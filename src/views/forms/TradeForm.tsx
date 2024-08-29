@@ -159,14 +159,14 @@ export const TradeForm = ({
     return {
       shortAlertContent: alertContentInner,
       alertContent: alertContentInner && (
-        <$AlertContent>
-          {alertContentInner}
+        <div tw="inline-block">
+          {alertContentInner}{' '}
           {alertContentLinkText && alertContentLink && (
             <Link isInline href={alertContentLink}>
               {alertContentLinkText}
             </Link>
           )}
-        </$AlertContent>
+        </div>
       ),
       alertType: alertTypeInner,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
@@ -459,13 +459,6 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
-
-const $AlertContent = styled.div`
-  display: inline-block;
-  a {
-    margin-left: 0.5ch;
-  }
-`;
 
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
