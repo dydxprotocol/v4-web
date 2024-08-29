@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 import { useEnsName } from 'wagmi';
@@ -13,6 +13,7 @@ import { wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -23,6 +24,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
@@ -59,6 +61,8 @@ const Profile = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const deployerName = useEnvConfig('deployerName');
 
   const onboardingState = useAppSelector(getOnboardingState);
   const isConnected = onboardingState !== OnboardingState.Disconnected;
@@ -165,9 +169,9 @@ const Profile = () => {
             </>
           );
           return href ? (
-            <Link to={href} key={key}>
+            <ReactLink to={href} key={key}>
               {action}
-            </Link>
+            </ReactLink>
           ) : (
             // eslint-disable-next-line jsx-a11y/label-has-associated-control
             <label key={key}>{action}</label>
@@ -255,6 +259,19 @@ const Profile = () => {
         />
       </$HistoryPanel>
       <LaunchIncentivesPanel tw="[grid-area:incentives]" />
+      <Panel tw="text-color-text-0 [grid-area:legal]">
+        {stringGetter({
+          key: STRING_KEYS.SITE_OPERATED_BY_SHORT,
+          params: {
+            NAME_OF_DEPLOYER: deployerName,
+            LEARN_MORE_LINK: (
+              <Link isInline onClick={() => dispatch(openDialog(DialogTypes.Help()))}>
+                {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+              </Link>
+            ),
+          },
+        })}
+      </Panel>
       <GovernancePanel tw="[grid-area:governance]" />
       <NewMarketsPanel tw="[grid-area:newMarkets]" />
     </$MobileProfileLayout>
@@ -281,7 +298,8 @@ const $MobileProfileLayout = styled.div`
     'rewards fees'
     'history history'
     'governance newMarkets'
-    'incentives incentives';
+    'incentives incentives'
+    'legal legal';
 
   @media ${breakpoints.mobile} {
     grid-template-areas:
@@ -294,7 +312,8 @@ const $MobileProfileLayout = styled.div`
       'history history'
       'governance governance'
       'newMarkets newMarkets'
-      'incentives incentives';
+      'incentives incentives'
+      'legal legal';
   }
 `;
 const $ProfileIcon = styled.div`
