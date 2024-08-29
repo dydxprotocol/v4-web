@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import hookifyHooks from '../vanillaHooks';
+import hookifyHooks from '../hookify/vanillaHooks';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {

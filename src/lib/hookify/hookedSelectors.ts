@@ -1,8 +1,10 @@
 import { useSyncExternalStore } from 'react';
 
 import { Action, Dispatch, EnhancedStore, UnknownAction } from '@reduxjs/toolkit';
+import { QueryClient, QueryObserver, useQuery } from '@tanstack/react-query';
 import { isFunction } from 'lodash';
 
+import { getUseBaseQuery } from './useBaseQuery';
 import hookifyHooks from './vanillaHooks';
 
 type HookSub<Return> = (val: Return) => void;
@@ -85,7 +87,8 @@ type HookedSelector<RootStateType, A extends Action, ReturnType> = {
 };
 
 export function hookedSelectors<RootStateType, A extends Action = UnknownAction>(
-  store: EnhancedStore<RootStateType, A>
+  store: EnhancedStore<RootStateType, A>,
+  reactQueryClient: QueryClient
 ) {
   type GetReturn<T extends readonly any[]> = {
     [K in keyof T]: T[K] extends HookedSelector<RootStateType, A, infer Ret>
@@ -94,6 +97,9 @@ export function hookedSelectors<RootStateType, A extends Action = UnknownAction>
         ? R
         : never;
   };
+
+  // types are technically a lie but close enough to work
+  const useQueryHf = getUseBaseQuery(reactQueryClient, QueryObserver) as typeof useQuery;
 
   const useAppSelectorHf = <T>(selector: (state: RootStateType) => T) => {
     return hookifyHooks.useSyncExternalStore(store.subscribe, () => selector(store.getState()));
@@ -153,6 +159,7 @@ export function hookedSelectors<RootStateType, A extends Action = UnknownAction>
     useHookedSelector,
 
     useDispatchHf,
+    useQueryHf,
     useHookedSelectorHf,
     useAppSelectorHf,
   };

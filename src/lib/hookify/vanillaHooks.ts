@@ -1,4 +1,4 @@
-import { assertNever } from './assertNever';
+import { assertNever } from '../assertNever';
 
 type RunnableEffect = {
   type: 'runnable';
