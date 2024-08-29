@@ -89,7 +89,6 @@ export const useWalletConnection = () => {
   const getCosmosOfflineSigner = useCallback(
     async (chainId: string) => {
       if (isConnectedGraz) {
-        // @ts-ignore .keplr is injected
         const keplr = window.keplr;
 
         const offlineSigner = await keplr?.getOfflineSigner(chainId);
@@ -163,7 +162,6 @@ export const useWalletConnection = () => {
             login();
           }
         } else if (wallet.connectorType === ConnectorType.Cosmos) {
-          // @ts-ignore .keplr is injected
           if (!window.keplr) {
             window.open('https://www.keplr.app/get', '_blank');
           } else if (!isConnectedGraz) {

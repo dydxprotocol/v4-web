@@ -153,6 +153,7 @@ export type DydxAddress = `dydx${string}`;
 // Extension wallet EIP-6963 identifiers
 export const PHANTOM_MIPD_RDNS = 'app.phantom';
 export const OKX_MIPD_RDNS = 'com.okex.wallet';
+export const KEPLR_MIPD_RDNS = 'app.keplr';
 
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {
