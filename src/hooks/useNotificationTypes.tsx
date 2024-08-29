@@ -471,14 +471,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
       const { contractLossMechanismLearnMore } = useURLConfigs();
 
-      const MATICWindDownProposalExpirationDate = '2024-09-04';
+      const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
       const MATICWindDownDate = MATICWindDownProposalExpirationDate;
-      const MATICWindDownExpirationDate = '2024-10-04';
+      const MATICWindDownExpirationDate = '2024-10-04T23:59:59.000Z';
       const MATICMarket = 'MATIC-USD';
 
       const currentDate = new Date();
       const outputDate = (
-        <Output tw="inline-block" type={OutputType.Date} value={MATICWindDownDate} />
+        <Output tw="inline-block" type={OutputType.DateTime} value={MATICWindDownDate} />
       );
 
       useEffect(() => {
