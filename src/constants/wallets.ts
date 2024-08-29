@@ -1,5 +1,4 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
-import type { ExternalProvider } from '@ethersproject/providers';
 import { EIP1193Provider } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -57,8 +56,6 @@ type WalletConfig = {
   type: WalletType;
   stringKey: string;
   icon: string;
-  matchesInjectedEip1193?: (provider: ExternalProvider & any) => boolean;
-  walletconnect2Id?: string;
 };
 
 export const wallets: Record<WalletInfo['name'], WalletConfig> = {
@@ -76,7 +73,6 @@ export const wallets: Record<WalletInfo['name'], WalletConfig> = {
     type: WalletType.OkxWallet,
     stringKey: STRING_KEYS.OKX_WALLET,
     icon: OkxWalletIcon,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.OkxWallet,
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,
