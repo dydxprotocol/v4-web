@@ -112,10 +112,10 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: exchange || walletType === WalletType.Keplr ? 'cosmos' : 'evm',
+      network: prefix ? 'cosmos' : 'evm',
       prefix,
     });
-  }, [exchange, walletType, toAddress, chainIdStr]);
+  }, [exchange, toAddress, chainIdStr]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
