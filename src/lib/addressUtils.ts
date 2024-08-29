@@ -1,4 +1,5 @@
 import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
+import { isAddress } from 'viem';
 
 /**
  *
@@ -36,4 +37,19 @@ export function validateCosmosAddress(address: string, prefix: string) {
     // If decoding fails, the address is not valid
     return false;
   }
+}
+
+type MultiChainAddress =
+  | { address?: string | null; network: 'cosmos'; prefix: string }
+  | { address?: string | null; network: 'evm' };
+
+// TODO: Add unit test once `isAddress` works with vitest
+export function isValidAddress(input: MultiChainAddress): boolean {
+  if (!input.address) return false;
+
+  if (input.network === 'evm') {
+    return isAddress(input.address, { strict: true }); // enable checksum matching
+  }
+
+  return validateCosmosAddress(input.address, input.prefix);
 }
