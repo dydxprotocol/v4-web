@@ -106,18 +106,16 @@ export const WithdrawForm = () => {
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const isValidDestinationAddress = useMemo(() => {
-    let prefix = exchange ? 'noble' : '';
-    if (walletType === WalletType.Keplr) {
-      prefix =
-        GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
-          .bech32PrefixAccAddr ?? '';
-    }
+    const grazChainPrefix =
+      GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config.bech32PrefixAccAddr ??
+      '';
+    const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
       network: exchange || walletType === WalletType.Keplr ? 'cosmos' : 'evm',
       prefix,
     });
-  }, [toAddress, exchange]);
+  }, [exchange, walletType, toAddress, chainIdStr]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
