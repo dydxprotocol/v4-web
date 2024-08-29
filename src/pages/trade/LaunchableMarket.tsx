@@ -23,6 +23,7 @@ import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
+import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
 import { TradeHeaderMobile } from './TradeHeaderMobile';
 
@@ -49,7 +50,11 @@ const LaunchableMarket = () => {
         </DetachedSection>
 
         <DetachedSection>
-          <$LaunchMarketSidePanel launchableMarketId={displayableTicker} />
+          <MobileBottomPanel isViewingUnlaunchedMarket />
+        </DetachedSection>
+
+        <DetachedSection>
+          <LaunchMarketSidePanel launchableMarketId={displayableTicker} />
         </DetachedSection>
       </div>
     </$TradeLayoutMobile>
