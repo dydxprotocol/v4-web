@@ -52,10 +52,12 @@ import {
   isMarketOrderType,
   isOrderStatusClearable,
 } from '@/lib/orders';
+import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
+import { CancelAllOrdersButton } from './OrdersTable/CancelAllOrdersButton';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 
 export enum OrdersTableColumnKey {
@@ -83,12 +85,14 @@ export type OrderTableRow = {
 
 const getOrdersTableColumnDef = ({
   key,
+  currentMarket,
   stringGetter,
   symbol = '',
   isAccountViewOnly,
   width,
 }: {
   key: OrdersTableColumnKey;
+  currentMarket?: string;
   dispatch: Dispatch;
   isTablet?: boolean;
   stringGetter: StringGetterFunction;
@@ -212,7 +216,13 @@ const getOrdersTableColumnDef = ({
       },
       [OrdersTableColumnKey.Actions]: {
         columnKey: 'cancelOrClear',
-        label: stringGetter({ key: STRING_KEYS.ACTION }),
+        label: testFlags.showCancelAll ? (
+          <CancelAllOrdersButton marketId={currentMarket} />
+        ) : (
+          stringGetter({
+            key: STRING_KEYS.ACTION,
+          })
+        ),
         isActionable: true,
         allowsSorting: false,
         renderCell: ({ id, status, orderFlags }) => (
@@ -397,6 +407,7 @@ export const OrdersTable = ({
       columns={columnKeys.map((key: OrdersTableColumnKey) =>
         getOrdersTableColumnDef({
           key,
+          currentMarket,
           dispatch,
           isTablet,
           stringGetter,
