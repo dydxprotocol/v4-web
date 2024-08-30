@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import _ from 'lodash';
 
 import {
   type AccountBalance,
@@ -24,9 +23,7 @@ import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
-  CANCEL_ALL_ORDERS_KEY,
   CancelOrderStatuses,
-  LocalCancelAllData,
   PlaceOrderStatuses,
   type LocalCancelOrderData,
   type LocalPlaceOrderData,
@@ -75,7 +72,6 @@ export type AccountState = {
   uncommittedOrderClientIds: string[];
   localPlaceOrders: LocalPlaceOrderData[];
   localCancelOrders: LocalCancelOrderData[];
-  localCancelAlls: Record<string, LocalCancelAllData>;
 
   restriction?: Nullable<UsageRestriction>;
   compliance?: Compliance;
@@ -115,7 +111,6 @@ const initialState: AccountState = {
   historicalPnlPeriod: undefined,
   localPlaceOrders: [],
   localCancelOrders: [],
-  localCancelAlls: {},
 
   // Restriction
   restriction: undefined,
@@ -162,7 +157,7 @@ export const accountSlice = createSlice({
                 : order
             )
           : state.localPlaceOrders,
-        localCancelOrders: hasNewFillUpdates
+        submittedCanceledOrders: hasNewFillUpdates
           ? state.localCancelOrders.filter((order) => !filledOrderIds.includes(order.orderId))
           : state.localCancelOrders,
       };
@@ -257,45 +252,22 @@ export const accountSlice = createSlice({
         canceledOrderIdsInPayload.includes(orderId) &&
         !state.localCancelOrders.map((order) => order.orderId).includes(orderId);
 
-      const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
-        const newCanceledOrderIds = _.intersection(batch.orderIds, canceledOrderIdsInPayload);
-        return _.uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
-      };
-
-      const cancelUpdates = canceledOrderIdsInPayload.length
-        ? {
-            localPlaceOrders: state.localPlaceOrders.map((order) =>
+      return {
+        ...state,
+        subaccount: action.payload,
+        hasUnseenOrderUpdates: hasNewOrderUpdates,
+        localPlaceOrders: canceledOrderIdsInPayload.length
+          ? state.localPlaceOrders.map((order) =>
+              order.submissionStatus !== PlaceOrderStatuses.Canceled &&
               order.orderId &&
-              canceledOrderIdsInPayload.includes(order.orderId) &&
               isOrderCanceledByBackend(order.orderId)
                 ? {
                     ...order,
                     submissionStatus: PlaceOrderStatuses.Canceled,
                   }
                 : order
-            ),
-            localCancelOrders: state.localCancelOrders.map((order) =>
-              canceledOrderIdsInPayload.includes(order.orderId)
-                ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
-                : order
-            ),
-            localCancelAlls: Object.fromEntries(
-              Object.entries(state.localCancelAlls).map(([marketId, batch]) => [
-                marketId,
-                {
-                  ...batch,
-                  canceledOrderIds: getNewCanceledOrderIds(batch),
-                },
-              ])
-            ),
-          }
-        : {};
-
-      return {
-        ...state,
-        subaccount: action.payload,
-        hasUnseenOrderUpdates: hasNewOrderUpdates,
-        ...cancelUpdates,
+            )
+          : state.localPlaceOrders,
       };
     },
     setChildSubaccount: (
@@ -400,55 +372,9 @@ export const accountSlice = createSlice({
     ) => {
       state.localCancelOrders = state.localCancelOrders.map((order) =>
         order.orderId === action.payload.orderId
-          ? {
-              ...order,
-              errorParams: action.payload.errorParams,
-            }
+          ? { ...order, errorParams: action.payload.errorParams }
           : order
       );
-    },
-    cancelAllSubmitted: (
-      state,
-      action: PayloadAction<{ marketId?: string; orderIds: string[] }>
-    ) => {
-      const { marketId, orderIds } = action.payload;
-      const cancelAllKey = marketId ?? CANCEL_ALL_ORDERS_KEY;
-
-      state.localCancelAlls[cancelAllKey] = {
-        key: cancelAllKey,
-        orderIds,
-      };
-
-      state.localCancelOrders = [
-        ...state.localCancelOrders,
-        ...orderIds.map((orderId) => ({
-          orderId,
-          submissionStatus: CancelOrderStatuses.Submitted,
-          isSubmittedThroughCancelAll: true, // track this to skip certain notifications
-        })),
-      ];
-    },
-    cancelAllOrderConfirmed: (state, action: PayloadAction<string>) => {
-      const orderId = action.payload;
-      const order = state.subaccount?.orders?.toArray()?.find((o) => o.id === orderId);
-      if (!order) return;
-
-      updateCancelAllOrderIds(state, orderId, 'canceledOrderIds', order.marketId);
-      cancelOrderConfirmed(orderId);
-    },
-    cancelAllOrderFailed: (
-      state,
-      action: PayloadAction<{
-        orderId: string;
-        errorParams?: ErrorParams;
-      }>
-    ) => {
-      const { orderId, errorParams } = action.payload;
-      const order = state.subaccount?.orders?.toArray()?.find((o) => o.id === orderId);
-      if (!order) return;
-
-      updateCancelAllOrderIds(state, orderId, 'failedOrderIds', order.marketId);
-      if (errorParams) cancelOrderFailed({ orderId, errorParams });
     },
   },
 });
@@ -482,37 +408,4 @@ export const {
   cancelOrderSubmitted,
   cancelOrderConfirmed,
   cancelOrderFailed,
-  cancelAllSubmitted,
-  cancelAllOrderConfirmed,
-  cancelAllOrderFailed,
 } = accountSlice.actions;
-
-// helper functions
-const updateCancelAllOrderIds = (
-  state: AccountState,
-  orderId: string,
-  key: 'canceledOrderIds' | 'failedOrderIds',
-  cancelAllKey: string
-) => {
-  const getNewOrderIds = (cancelAll: LocalCancelAllData) => {
-    const existingOrderIds = cancelAll[key] ?? [];
-    return cancelAll.orderIds.includes(orderId) && !existingOrderIds.includes(orderId)
-      ? [...existingOrderIds, orderId]
-      : existingOrderIds;
-  };
-
-  const updateKey = (currentKey: string) => ({
-    ...state.localCancelAlls[currentKey],
-    [key]: getNewOrderIds(state.localCancelAlls[currentKey]),
-  });
-
-  state.localCancelAlls = {
-    ...state.localCancelAlls,
-    ...(state.localCancelAlls[CANCEL_ALL_ORDERS_KEY] && {
-      [CANCEL_ALL_ORDERS_KEY]: updateKey(CANCEL_ALL_ORDERS_KEY),
-    }),
-    ...(state.localCancelAlls[cancelAllKey] && {
-      [cancelAllKey]: updateKey(cancelAllKey),
-    }),
-  };
-};
