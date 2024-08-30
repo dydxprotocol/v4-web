@@ -4,7 +4,12 @@ import { WalletType as CosmosWalletType } from 'graz';
 
 import { isDev, isTestnet } from '@/constants/networks';
 import { StatSigFlags } from '@/constants/statsig';
-import { KEPLR_MIPD_RDNS, OKX_MIPD_RDNS, PHANTOM_MIPD_RDNS } from '@/constants/wallets';
+import {
+  COINBASE_MIPD_RDNS,
+  KEPLR_MIPD_RDNS,
+  OKX_MIPD_RDNS,
+  PHANTOM_MIPD_RDNS,
+} from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { ConnectorType, WalletInfo, WalletType } from '@/lib/wallet/types';
@@ -25,12 +30,15 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
     return [
       ...injectedWallets
-        // Remove Keplr EVM support since Keplr Cosmos is supported
-        // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
         .filter(
           (wallet) =>
+            // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
             wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
-            wallet.detail.info.rdns !== KEPLR_MIPD_RDNS
+            // Remove Keplr EVM support since Keplr Cosmos is supported
+            wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
+            // Remove Coinbase injected support because the regular Coinbase connector already supports
+            // handling switching between injected/mobile/smart account
+            wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
         )
         .map(
           (wallet) =>
