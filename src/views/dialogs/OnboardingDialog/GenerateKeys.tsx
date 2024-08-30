@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -31,7 +31,6 @@ import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
-import { WalletType } from '@/lib/wallet/types';
 
 type ElementProps = {
   status: EvmDerivedAccountStatus;

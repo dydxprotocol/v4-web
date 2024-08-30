@@ -8,6 +8,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -25,7 +26,6 @@ import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
-import { WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';

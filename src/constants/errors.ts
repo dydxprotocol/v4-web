@@ -1,4 +1,4 @@
-import { ConnectorType } from '@/lib/wallet/types';
+import { ConnectorType } from '@/constants/wallets';
 
 import { STRING_KEYS } from './localization';
 

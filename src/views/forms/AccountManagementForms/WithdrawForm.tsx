@@ -29,6 +29,7 @@ import {
   USD_DECIMALS,
 } from '@/constants/numbers';
 import { StatSigFlags } from '@/constants/statsig';
+import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -68,7 +69,6 @@ import { track } from '@/lib/analytics/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { WalletType } from '@/lib/wallet/types';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';

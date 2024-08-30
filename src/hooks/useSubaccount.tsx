@@ -28,7 +28,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import {
   cancelOrderConfirmed,
@@ -48,7 +48,6 @@ import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
-import { WalletType } from '@/lib/wallet/types';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';

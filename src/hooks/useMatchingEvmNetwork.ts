@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useWallets } from '@privy-io/react-auth';
 import { useAccount, useSwitchChain } from 'wagmi';
 
-import { ConnectorType } from '@/lib/wallet/types';
+import { ConnectorType } from '@/constants/wallets';
 
 import { useWalletConnection } from './useWalletConnection';
 

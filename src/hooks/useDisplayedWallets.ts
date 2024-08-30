@@ -6,13 +6,15 @@ import { isDev, isTestnet } from '@/constants/networks';
 import { StatSigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
+  ConnectorType,
   KEPLR_MIPD_RDNS,
   OKX_MIPD_RDNS,
   PHANTOM_MIPD_RDNS,
+  WalletInfo,
+  WalletType,
 } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { ConnectorType, WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { useMipdInjectedWallets } from './useMipdInjectedWallets';
 import { useStatsigGateValue } from './useStatsig';

@@ -13,6 +13,7 @@ import {
 import { getNobleChainId } from '@/constants/graz';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  ConnectorType,
   DydxAddress,
   EvmAddress,
   PrivateInformation,
@@ -30,7 +31,6 @@ import { isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
-import { ConnectorType } from '@/lib/wallet/types';
 
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';

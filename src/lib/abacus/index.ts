@@ -47,13 +47,13 @@ import {
   CLEARED_TRIGGER_ORDER_INPUTS,
   TriggerFields,
 } from '@/constants/triggers';
+import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
-import { ConnectorType, WalletInfo } from '../wallet/types';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';

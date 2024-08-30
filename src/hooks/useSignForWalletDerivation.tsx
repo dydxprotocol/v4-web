@@ -3,14 +3,12 @@ import { useCallback } from 'react';
 import stableStringify from 'fast-json-stable-stringify';
 import { useSignTypedData } from 'wagmi';
 
-import { getSignTypedData } from '@/constants/wallets';
+import { ConnectorType, getSignTypedData, WalletInfo } from '@/constants/wallets';
 
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-
-import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
 
 import { useEnvConfig } from './useEnvConfig';
 

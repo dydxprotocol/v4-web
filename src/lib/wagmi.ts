@@ -45,14 +45,17 @@ import {
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS } from '@/constants/wallets';
+import {
+  ConnectorType,
+  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
+  WalletInfo,
+} from '@/constants/wallets';
 
 import { getMipdConnectorByRdns } from '@/hooks/useMipdInjectedWallets';
 
 import { isTruthy } from './isTruthy';
 import { getLocalStorage } from './localStorage';
 import { validateAgainstAvailableEnvironments } from './network';
-import { ConnectorType, WalletInfo } from './wallet/types';
 
 // Config
 

@@ -1,5 +1,6 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
-import { EIP1193Provider } from 'viem';
+import { WalletType as CosmosWalletType } from 'graz';
+import { EIP6963ProviderInfo } from 'mipd';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -12,8 +13,6 @@ import {
   PhantomIcon,
   WalletConnectIcon,
 } from '@/icons';
-
-import { WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 
@@ -51,6 +50,46 @@ const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
 export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
   WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS
 );
+
+export enum WalletType {
+  CoinbaseWallet = 'COINBASE_WALLET',
+  Keplr = CosmosWalletType.KEPLR,
+  OkxWallet = 'OKX_WALLET',
+  WalletConnect2 = 'WALLETCONNECT_2',
+  TestWallet = 'TEST_WALLET',
+  OtherWallet = 'OTHER_WALLET',
+  Privy = 'PRIVY',
+  Phantom = 'PHANTOM',
+}
+
+export enum ConnectorType {
+  Injected = 'injected',
+  Coinbase = 'coinbase',
+  WalletConnect = 'walletConnect',
+  Cosmos = 'cosmos',
+  Test = 'test',
+  Privy = 'privy',
+  PhantomSolana = 'phantomSolana',
+}
+
+// This is the type stored in localstorage, so it must consist of only serializable fields
+export type WalletInfo =
+  | ({
+      connectorType: ConnectorType.Injected;
+    } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
+  | {
+      connectorType:
+        | ConnectorType.Coinbase
+        | ConnectorType.WalletConnect
+        | ConnectorType.PhantomSolana
+        | ConnectorType.Privy;
+      name: WalletType;
+    }
+  | {
+      connectorType: ConnectorType.Cosmos;
+      name: CosmosWalletType;
+    }
+  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet };
 
 type WalletConfig = {
   type: WalletType;
@@ -99,32 +138,6 @@ export const wallets: Record<WalletInfo['name'], WalletConfig> = {
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
   },
-};
-
-// Injected EIP-1193 Providers
-export type InjectedEthereumProvider = EIP1193Provider;
-
-export type InjectedWeb3Provider = EIP1193Provider;
-
-export type InjectedCoinbaseWalletExtensionProvider = InjectedEthereumProvider & {
-  isMetaMask: true;
-  overrideIsMetaMask: true;
-  providerMap: Map<'MetaMask' | 'CoinbaseWallet', EIP1193Provider>;
-  providers: EIP1193Provider[];
-};
-
-export type WithInjectedEthereumProvider = {
-  ethereum: InjectedEthereumProvider;
-};
-
-export type WithInjectedWeb3Provider = {
-  web3: {
-    currentProvider: InjectedWeb3Provider;
-  };
-};
-
-export type WithInjectedOkxWalletProvider = {
-  okxwallet: InjectedWeb3Provider;
 };
 
 /**

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { wallets } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
@@ -17,8 +17,6 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
 import { WalletIcon } from '@/components/WalletIcon';
-
-import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
 
 export const ChooseWallet = ({
   onChooseWallet,

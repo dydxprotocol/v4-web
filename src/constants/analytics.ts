@@ -2,8 +2,7 @@ import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { StatSigFlags } from '@/constants/statsig';
-
-import { ConnectorType, WalletType } from '@/lib/wallet/types';
+import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';

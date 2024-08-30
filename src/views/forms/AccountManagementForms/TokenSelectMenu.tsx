@@ -10,6 +10,7 @@ import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constan
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatSigFlags } from '@/constants/statsig';
+import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
@@ -24,7 +25,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
-import { WalletType } from '@/lib/wallet/types';
 
 import { LowestFeesDecoratorText } from './LowestFeesText';
 

@@ -2,9 +2,7 @@ import { ElementType } from 'react';
 
 import styled from 'styled-components';
 
-import { wallets } from '@/constants/wallets';
-
-import { ConnectorType, WalletInfo } from '@/lib/wallet/types';
+import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { Icon } from './Icon';
 

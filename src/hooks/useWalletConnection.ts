@@ -19,7 +19,14 @@ import { EvmDerivedAddresses } from '@/constants/account';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
-import { type DydxAddress, type EvmAddress, SolAddress } from '@/constants/wallets';
+import {
+  ConnectorType,
+  type DydxAddress,
+  type EvmAddress,
+  SolAddress,
+  WalletInfo,
+  WalletType,
+} from '@/constants/wallets';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
@@ -31,7 +38,6 @@ import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { isWagmiConnectorType, resolveWagmiConnector } from '@/lib/wagmi';
 import { parseWalletError } from '@/lib/wallet';
-import { ConnectorType, WalletInfo, WalletType } from '@/lib/wallet/types';
 
 import { useStringGetter } from './useStringGetter';
 

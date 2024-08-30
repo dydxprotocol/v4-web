@@ -9,6 +9,7 @@ import {
   lastSuccessfulWebsocketRequestByOrigin,
 } from '@/constants/analytics';
 import { DialogTypesTypes } from '@/constants/dialogs';
+import { WalletInfo } from '@/constants/wallets';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getGeo, getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
@@ -19,7 +20,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
 import { getSelectedTradeType } from '@/lib/tradeData';
-import { WalletInfo } from '@/lib/wallet/types';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
