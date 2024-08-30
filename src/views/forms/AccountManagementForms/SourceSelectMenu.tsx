@@ -98,16 +98,17 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
+      // only cosmos chains are supported on kepler
       if (isKeplrWallet) {
         return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
       }
       // only solana chains are supported on phantom
-      if (
-        connectedWallet?.name === WalletType.Phantom &&
-        !chain.value.startsWith(solanaChainIdPrefix)
-      ) {
-        return false;
+      if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
+        return selectedDydxChainId !== chain.value && chain.value.startsWith(solanaChainIdPrefix);
       }
+      // other wallets do not support solana
+      if (chain.value.startsWith(solanaChainIdPrefix)) return false;
+
       return true;
     })
     .filter((chain) => {
