@@ -5043,6 +5043,15 @@
         "websiteLink": "https://www.pokt.network/",
         "whitepaperLink": "https://docs.pokt.network/home/"
     },
+    "POL-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polygon/",
+        "name": "Polygon",
+        "tags": [
+            "Layer 2"
+        ],
+        "websiteLink": "https://polygon.technology/",
+        "whitepaperLink": "https://polygon.technology/lightpaper-polygon.pdf"
+    },
     "POLC-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polkacity/",
         "name": "Polkacity",
