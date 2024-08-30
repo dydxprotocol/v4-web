@@ -1,4 +1,4 @@
-import { useEffect, useState, type ElementType } from 'react';
+import { useEffect, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -8,7 +8,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { WalletType, wallets } from '@/constants/wallets';
+import { WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -18,8 +18,8 @@ import breakpoints from '@/styles/breakpoints';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
-import { Icon } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
+import { WalletIcon } from '@/components/WalletIcon';
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
@@ -37,7 +37,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { selectWalletType, walletType } = useAccounts();
+  const { selectWallet, connectedWallet } = useAccounts();
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
@@ -49,11 +49,11 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     setIsOpen?.(open);
   };
 
-  const onChooseWallet = (wType: WalletType) => {
-    if ([WalletType.Privy, WalletType.Keplr].includes(wType)) {
+  const onChooseWallet = (wallet: WalletInfo) => {
+    if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
       setIsOpenFromDialog(false);
     }
-    selectWalletType(wType);
+    selectWallet(wallet);
   };
 
   return (
@@ -73,8 +73,8 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
           },
           [OnboardingSteps.KeyDerivation]: {
             slotIcon: {
-              [EvmDerivedAccountStatus.NotDerived]: walletType && (
-                <Icon iconComponent={wallets[walletType]?.icon as ElementType} />
+              [EvmDerivedAccountStatus.NotDerived]: connectedWallet && (
+                <WalletIcon wallet={connectedWallet} />
               ),
               [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
               [EvmDerivedAccountStatus.EnsuringDeterminism]: <$Ring withAnimation value={0.25} />,

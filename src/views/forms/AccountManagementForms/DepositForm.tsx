@@ -41,7 +41,7 @@ import {
   NumberSign,
 } from '@/constants/numbers';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
-import { type EvmAddress, WalletType } from '@/constants/wallets';
+import { ConnectorType, type EvmAddress, WalletType } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -116,7 +116,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     signerWagmi,
     publicClientWagmi,
     nobleAddress,
-    walletType,
+    connectedWallet,
     saveHasAcknowledgedTerms,
   } = useAccounts();
   const { getAccountBalance } = useDydxClient();
@@ -125,7 +125,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { addOrUpdateTransferNotification } = useLocalNotifications();
   const { signTransaction: signTransactionPhantom } = usePhantomWallet();
 
-  const isKeplrWallet = walletType === WalletType.Keplr;
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   const {
     requestPayload,
@@ -206,7 +206,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (dydxAddress) {
       // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
       // worth investigating a better fix on abacus
-      if (walletType === WalletType.Keplr && nobleAddress) {
+      if (connectedWallet?.name === WalletType.Keplr && nobleAddress) {
         abacusStateManager.setTransfersSourceAddress(nobleAddress);
       } else if (evmAddress) {
         abacusStateManager.setTransfersSourceAddress(evmAddress);
@@ -221,32 +221,34 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, evmAddress, nobleAddress, walletType, solAddress]);
+  }, [dydxAddress, evmAddress, nobleAddress, connectedWallet, solAddress]);
 
   useEffect(() => {
     if (error) onError?.();
   }, [error]);
 
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (!connectedWallet) return;
+
+    if (connectedWallet.connectorType === ConnectorType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (walletType === WalletType.Keplr) {
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.chain,
-        value: nobleChainId,
-      });
-    }
-    if (walletType === WalletType.Phantom) {
+    if (connectedWallet.connectorType === ConnectorType.PhantomSolana) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: 'solana',
       });
     }
-  }, [nobleAddress, nobleChainId, walletType]);
+    if (connectedWallet.connectorType === ConnectorType.Cosmos) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: nobleChainId,
+      });
+    }
+  }, [nobleAddress, nobleChainId, connectedWallet]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {
@@ -527,7 +529,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         let txHash: string | undefined;
-        if (walletType === WalletType.Phantom) {
+        if (connectedWallet?.name === WalletType.Phantom) {
           if (!requestPayload?.data) {
             throw new Error('Missing solana request payload');
           }

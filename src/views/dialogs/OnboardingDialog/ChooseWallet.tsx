@@ -1,11 +1,9 @@
-import { ElementType } from 'react';
-
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { WalletType, wallets } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
@@ -17,31 +15,35 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { WalletIcon } from '@/components/WalletIcon';
 
 export const ChooseWallet = ({
   onChooseWallet,
 }: {
-  onChooseWallet: (walletType: WalletType) => void;
+  onChooseWallet: (wallet: WalletInfo) => void;
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
 
   const displayedWallets = useDisplayedWallets();
 
-  const { selectedWalletType, selectedWalletError } = useAccounts();
+  const { selectedWallet, selectedWalletError } = useAccounts();
+
   return (
     <>
-      {selectedWalletType && selectedWalletError && (
+      {selectedWallet && selectedWalletError && (
         <$AlertMessage type={AlertType.Error}>
           <h4>
             {stringGetter({
               key: STRING_KEYS.COULD_NOT_CONNECT,
               params: {
-                WALLET: stringGetter({
-                  key: wallets[selectedWalletType].stringKey,
-                }),
+                WALLET:
+                  selectedWallet.connectorType === ConnectorType.Injected
+                    ? selectedWallet.name
+                    : stringGetter({
+                        key: wallets[selectedWallet.name].stringKey,
+                      }),
               },
             })}
           </h4>
@@ -50,20 +52,17 @@ export const ChooseWallet = ({
       )}
 
       <$Wallets>
-        {displayedWallets.map((walletType) => (
+        {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
-            key={walletType}
-            onClick={() => onChooseWallet(walletType)}
-            slotLeft={
-              <Icon
-                iconComponent={wallets[walletType].icon as ElementType}
-                tw="h-[1.5em] w-[1.5em]"
-              />
-            }
+            key={wallet.name}
+            onClick={() => onChooseWallet(wallet)}
+            slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
           >
-            {stringGetter({ key: wallets[walletType].stringKey })}
+            {wallet.connectorType === ConnectorType.Injected
+              ? wallet.name
+              : stringGetter({ key: wallets[wallet.name].stringKey })}
           </$WalletButton>
         ))}
       </$Wallets>
@@ -76,6 +75,7 @@ export const ChooseWallet = ({
     </>
   );
 };
+
 const $AlertMessage = styled(AlertMessage)`
   h4 {
     font: var(--font-small-medium);

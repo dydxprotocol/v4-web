@@ -1,43 +1,20 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
-import type { ExternalProvider } from '@ethersproject/providers';
-import { EIP1193Provider } from 'viem';
+import { WalletType as CosmosWalletType } from 'graz';
+import { EIP6963ProviderInfo } from 'mipd';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import {
-  BitkeepIcon,
-  BitpieIcon,
-  CloverWalletIcon,
-  Coin98Icon,
   CoinbaseIcon,
   EmailIcon,
   GenericWalletIcon,
-  HuobiIcon,
-  ImTokenIcon,
   KeplrIcon,
-  MathWalletIcon,
-  MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
-  RainbowIcon,
-  TokenPocketIcon,
-  TrustWalletIcon,
   WalletConnectIcon,
 } from '@/icons';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
-
-// Wallet connection types
-
-export enum WalletConnectionType {
-  CoinbaseWalletSdk = 'coinbaseWalletSdk',
-  CosmosSigner = 'CosmosSigner',
-  Privy = 'Privy',
-  InjectedEip1193 = 'injectedEip1193',
-  WalletConnect2 = 'walletConnect2',
-  TestWallet = 'TestWallet',
-  Phantom = 'Phantom',
-}
 
 export enum WalletErrorType {
   // General
@@ -53,63 +30,6 @@ export enum WalletErrorType {
 
   // EIP specified errors
   EipResourceUnavailable,
-}
-
-type WalletConnectionTypeConfig = {
-  name: string;
-  wagmiConnectorId?: string;
-};
-
-export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectionTypeConfig> = {
-  [WalletConnectionType.CoinbaseWalletSdk]: {
-    name: 'Coinbase Wallet SDK',
-    wagmiConnectorId: 'coinbaseWallet',
-  },
-  [WalletConnectionType.InjectedEip1193]: {
-    name: 'injected EIP-1193 provider',
-    wagmiConnectorId: 'injected',
-  },
-  [WalletConnectionType.WalletConnect2]: {
-    name: 'WalletConnect 2.0',
-    wagmiConnectorId: 'walletConnect',
-  },
-  [WalletConnectionType.Phantom]: {
-    name: 'Phantom',
-  },
-  [WalletConnectionType.CosmosSigner]: {
-    name: 'CosmosSigner',
-  },
-  [WalletConnectionType.TestWallet]: {
-    name: 'TestWallet',
-  },
-  [WalletConnectionType.Privy]: {
-    name: 'Privy',
-  },
-};
-
-// Wallets
-
-export enum WalletType {
-  BitKeep = 'BITKEEP',
-  BitPie = 'BITPIE',
-  CloverWallet = 'CLOVER_WALLET',
-  CoinbaseWallet = 'COINBASE_WALLET',
-  Coin98 = 'COIN98',
-  HuobiWallet = 'HUOBI_WALLET',
-  ImToken = 'IMTOKEN',
-  Keplr = 'KEPLR',
-  // Ledger = 'LEDGER',
-  MathWallet = 'MATH_WALLET',
-  MetaMask = 'METAMASK',
-  OkxWallet = 'OKX_WALLET',
-  Rainbow = 'RAINBOW_WALLET',
-  TokenPocket = 'TOKEN_POCKET',
-  TrustWallet = 'TRUST_WALLET',
-  WalletConnect2 = 'WALLETCONNECT_2',
-  TestWallet = 'TEST_WALLET',
-  OtherWallet = 'OTHER_WALLET',
-  Privy = 'PRIVY',
-  Phantom = 'PHANTOM',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -131,199 +51,93 @@ export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
   WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS
 );
 
+export enum WalletType {
+  CoinbaseWallet = 'COINBASE_WALLET',
+  Keplr = CosmosWalletType.KEPLR,
+  OkxWallet = 'OKX_WALLET',
+  WalletConnect2 = 'WALLETCONNECT_2',
+  TestWallet = 'TEST_WALLET',
+  OtherWallet = 'OTHER_WALLET',
+  Privy = 'PRIVY',
+  Phantom = 'PHANTOM',
+}
+
+export enum ConnectorType {
+  Injected = 'injected',
+  Coinbase = 'coinbase',
+  WalletConnect = 'walletConnect',
+  Cosmos = 'cosmos',
+  Test = 'test',
+  Privy = 'privy',
+  PhantomSolana = 'phantomSolana',
+}
+
+// This is the type stored in localstorage, so it must consist of only serializable fields
+export type WalletInfo =
+  | ({
+      connectorType: ConnectorType.Injected;
+    } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
+  | {
+      connectorType:
+        | ConnectorType.Coinbase
+        | ConnectorType.WalletConnect
+        | ConnectorType.PhantomSolana
+        | ConnectorType.Privy;
+      name: WalletType;
+    }
+  | {
+      connectorType: ConnectorType.Cosmos;
+      name: CosmosWalletType;
+    }
+  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet };
+
 type WalletConfig = {
   type: WalletType;
   stringKey: string;
   icon: string;
-  connectionTypes: WalletConnectionType[];
-  matchesInjectedEip1193?: (provider: ExternalProvider & any) => boolean;
-  walletconnect2Id?: string;
 };
 
-export const wallets: Record<WalletType, WalletConfig> = {
+export const wallets: Record<WalletInfo['name'], WalletConfig> = {
   [WalletType.OtherWallet]: {
     type: WalletType.OtherWallet,
     stringKey: STRING_KEYS.OTHER_WALLET,
     icon: GenericWalletIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      // WalletConnectionType.CoinbaseWalletSdk,
-      WalletConnectionType.WalletConnect2,
-    ],
-    matchesInjectedEip1193: (provider) =>
-      Object.entries(wallets).every(
-        ([walletType, walletConfig]) =>
-          walletType === WalletType.OtherWallet ||
-          !walletConfig.matchesInjectedEip1193 ||
-          !walletConfig.matchesInjectedEip1193(provider)
-      ),
-  },
-  [WalletType.BitKeep]: {
-    type: WalletType.BitKeep,
-    stringKey: STRING_KEYS.BITKEEP,
-    icon: BitkeepIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isBitKeep, // isBitKeepChrome, isBitEthereum
-  },
-  [WalletType.BitPie]: {
-    type: WalletType.BitPie,
-    stringKey: STRING_KEYS.BITPIE,
-    icon: BitpieIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isBitpie,
-  },
-  [WalletType.CloverWallet]: {
-    type: WalletType.CloverWallet,
-    stringKey: STRING_KEYS.CLOVER_WALLET,
-    icon: CloverWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isClover,
   },
   [WalletType.CoinbaseWallet]: {
     type: WalletType.CoinbaseWallet,
     stringKey: STRING_KEYS.COINBASE_WALLET,
     icon: CoinbaseIcon,
-    connectionTypes: [
-      WalletConnectionType.CoinbaseWalletSdk,
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-    ],
-    matchesInjectedEip1193: (provider) => provider.isCoinbaseWallet, // provider.selectedProvider?.isCoinbaseWallet,
-  },
-  [WalletType.Coin98]: {
-    type: WalletType.Coin98,
-    stringKey: STRING_KEYS.COIN98,
-    icon: Coin98Icon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isCoin98,
-  },
-  [WalletType.HuobiWallet]: {
-    type: WalletType.HuobiWallet,
-    stringKey: STRING_KEYS.HUOBI_WALLET,
-    icon: HuobiIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isHbWallet,
-  },
-  [WalletType.ImToken]: {
-    type: WalletType.ImToken,
-    stringKey: STRING_KEYS.IMTOKEN,
-    icon: ImTokenIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isImToken,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.imToken,
-  },
-  [WalletType.MathWallet]: {
-    type: WalletType.MathWallet,
-    stringKey: STRING_KEYS.MATH_WALLET,
-    icon: MathWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193],
-    matchesInjectedEip1193: (provider) => provider.isMathWallet,
-    walletconnect2Id: '7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26',
-  },
-  [WalletType.MetaMask]: {
-    type: WalletType.MetaMask,
-    stringKey: STRING_KEYS.METAMASK,
-    icon: MetaMaskIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) =>
-      Boolean(provider.isMetaMask) && !provider.overrideIsMetaMask,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
   },
   [WalletType.OkxWallet]: {
     type: WalletType.OkxWallet,
     stringKey: STRING_KEYS.OKX_WALLET,
     icon: OkxWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isOkxWallet,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.OkxWallet,
-  },
-  [WalletType.Rainbow]: {
-    type: WalletType.Rainbow,
-    stringKey: STRING_KEYS.RAINBOW_WALLET,
-    icon: RainbowIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isRainbowWallet,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Rainbow,
-  },
-  [WalletType.TokenPocket]: {
-    type: WalletType.TokenPocket,
-    stringKey: STRING_KEYS.TOKEN_POCKET,
-    icon: TokenPocketIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isTokenPocket,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.TokenPocket,
-  },
-  [WalletType.TrustWallet]: {
-    type: WalletType.TrustWallet,
-    stringKey: STRING_KEYS.TRUST_WALLET,
-    icon: TrustWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
-    matchesInjectedEip1193: (provider) => provider.isTrust,
-    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Trust,
-  },
-  [WalletType.WalletConnect2]: {
-    type: WalletType.WalletConnect2,
-    stringKey: STRING_KEYS.WALLET_CONNECT_2,
-    icon: WalletConnectIcon,
-    connectionTypes: [WalletConnectionType.WalletConnect2],
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,
     stringKey: STRING_KEYS.KEPLR,
     icon: KeplrIcon,
-    connectionTypes: [WalletConnectionType.CosmosSigner],
   },
   [WalletType.TestWallet]: {
     type: WalletType.TestWallet,
     stringKey: STRING_KEYS.TEST_WALLET,
     icon: GenericWalletIcon,
-    connectionTypes: [WalletConnectionType.TestWallet],
   },
   [WalletType.Privy]: {
     type: WalletType.Privy,
     stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
     icon: EmailIcon,
-    connectionTypes: [WalletConnectionType.Privy],
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
     stringKey: STRING_KEYS.PHANTOM,
     icon: PhantomIcon,
-    connectionTypes: [WalletConnectionType.Phantom],
   },
-};
-
-// Injected EIP-1193 Providers
-export type InjectedEthereumProvider = EIP1193Provider;
-
-export type InjectedWeb3Provider = EIP1193Provider;
-
-export type InjectedCoinbaseWalletExtensionProvider = InjectedEthereumProvider & {
-  isMetaMask: true;
-  overrideIsMetaMask: true;
-  providerMap: Map<'MetaMask' | 'CoinbaseWallet', EIP1193Provider>;
-  providers: EIP1193Provider[];
-};
-
-export type WithInjectedEthereumProvider = {
-  ethereum: InjectedEthereumProvider;
-};
-
-export type WithInjectedWeb3Provider = {
-  web3: {
-    currentProvider: InjectedWeb3Provider;
-  };
-};
-
-export type WithInjectedOkxWalletProvider = {
-  okxwallet: InjectedWeb3Provider;
-};
-
-// Wallet connections
-
-export type WalletConnection = {
-  type: WalletConnectionType;
-  provider?: EIP1193Provider;
+  [WalletType.WalletConnect2]: {
+    type: WalletType.WalletConnect2,
+    stringKey: STRING_KEYS.WALLET_CONNECT_2,
+    icon: WalletConnectIcon,
+  },
 };
 
 /**
@@ -348,6 +162,12 @@ export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEth
 export type EvmAddress = `0x${string}`;
 export type SolAddress = `${string}`;
 export type DydxAddress = `dydx${string}`;
+
+// Extension wallet EIP-6963 identifiers
+export const PHANTOM_MIPD_RDNS = 'app.phantom';
+export const OKX_MIPD_RDNS = 'com.okex.wallet';
+export const KEPLR_MIPD_RDNS = 'app.keplr';
+export const COINBASE_MIPD_RDNS = 'com.coinbase.wallet';
 
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {

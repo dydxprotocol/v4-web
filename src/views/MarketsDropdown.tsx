@@ -309,7 +309,7 @@ export const MarketsDropdown = memo(
                 </div>
               )}
               <p tw="row gap-0.5 text-color-text-0 font-small-book">
-                {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
+                {isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
                 <DropdownIcon isOpen={isOpen} />
               </p>
             </$TriggerContainer>

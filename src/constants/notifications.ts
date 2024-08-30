@@ -11,6 +11,7 @@ export enum NotificationType {
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
+  MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
 }
@@ -34,6 +35,7 @@ export const NotificationTypeCategory: {
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
 };
@@ -247,6 +249,10 @@ export enum MarketWindDownNotificationIds {
   MarketUpdateProposalRndr = 'market-update-proposal-rndr',
   MarketWindDownMatic = 'market-wind-down-matic',
   MarketWindDownProposalMatic = 'market-wind-down-proposal-matic',
+}
+
+export enum MarketUpdateNotificationIds {
+  MarketUpdateSolLiquidityTier = 'market-update-sol-liquidity-tier',
 }
 
 export enum FeedbackRequestNotificationIds {

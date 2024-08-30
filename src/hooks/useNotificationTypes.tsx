@@ -17,12 +17,11 @@ import {
 } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
 import {
-  CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
-  MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
+  MarketUpdateNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
@@ -68,7 +67,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues, useAllStatsigDynamicConfigValues } from './useStatsig';
+import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -296,8 +295,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
-      const twitter200BVolumeExpirationDate = new Date('2024-08-16T23:59:59');
-      const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
       const currentDate = new Date();
 
@@ -322,55 +319,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.DiscoveryProgram,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= twitter200BVolumeExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.Twitter200BVolume,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: STRING_KEYS.DISCOVERY_PROGRAM_TITLE,
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.DISCOVERY_PROGRAM_BODY,
-                params: {
-                  HERE_LINK: (
-                    <Link href="https://x.com/dYdX/status/1819342483794415784" isAccent isInline>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.Twitter200BVolume,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= incentivesExpirationDate) {
-          trigger(
-            INCENTIVES_SEASON_NOTIFICATION_ID,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
-                params: { SEASON_NUMBER: CURRENT_SEASON_NUMBER },
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
-                params: {
-                  PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
-                  DYDX_AMOUNT: MEDIAN_REWARDS_AMOUNT.DYDX,
-                  USDC_AMOUNT: MEDIAN_REWARDS_AMOUNT.USDC,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
             },
             []
           );
@@ -464,6 +412,35 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.MarketUpdate,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
+      const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
+      const currentDate = new Date();
+      const { chainTokenLabel } = useTokenConfigs();
+
+      useEffect(() => {
+        if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
+          trigger(
+            MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
+              body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
+              toastSensitivity: 'foreground',
+              groupKey: MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+            },
+            []
+          );
+        }
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.MarketWindDown,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
@@ -471,14 +448,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
       const { contractLossMechanismLearnMore } = useURLConfigs();
 
-      const MATICWindDownProposalExpirationDate = '2024-09-04';
+      const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
       const MATICWindDownDate = MATICWindDownProposalExpirationDate;
-      const MATICWindDownExpirationDate = '2024-10-04';
+      const MATICWindDownExpirationDate = '2024-10-04T23:59:59.000Z';
       const MATICMarket = 'MATIC-USD';
 
       const currentDate = new Date();
       const outputDate = (
-        <Output tw="inline-block" type={OutputType.Date} value={MATICWindDownDate} />
+        <Output tw="inline-block" type={OutputType.DateTime} value={MATICWindDownDate} />
       );
 
       useEffect(() => {

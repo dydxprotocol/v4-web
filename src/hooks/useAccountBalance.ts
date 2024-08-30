@@ -181,8 +181,9 @@ export const useAccountBalance = ({
       ? formatUnits(evmTokenBalance?.result, evmTokenDecimals?.result)
       : undefined;
 
+  // remove fee from usdc cosmos balance
   const cosmosBalance = cosmosQuery.data
-    ? parseFloat(cosmosQuery.data) - COSMOS_GAS_RESERVE
+    ? Math.max(parseFloat(cosmosQuery.data) - COSMOS_GAS_RESERVE, 0)
     : undefined;
 
   const solBalance = solanaToken?.data?.data.formatted;

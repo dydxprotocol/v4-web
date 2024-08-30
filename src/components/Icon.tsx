@@ -293,10 +293,11 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    size,
     ...props
-  }: ElementProps & StyleProps) =>
+  }: ElementProps & StyleProps & { size?: string }) =>
     Component ? <Component className={className} {...props} /> : null
 )`
-  width: 1em;
-  height: 1em;
+  width: ${({ size }) => size ?? '1em'};
+  height: ${({ size }) => size ?? '1em'};
 `;

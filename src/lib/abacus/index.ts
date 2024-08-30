@@ -47,7 +47,7 @@ import {
   CLEARED_TRIGGER_ORDER_INPUTS,
   TriggerFields,
 } from '@/constants/triggers';
-import { WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
@@ -274,12 +274,12 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, walletType?: WalletType) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, connectedWallet?: WalletInfo) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
-      if (walletType === WalletType.Keplr) {
+      if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.cosmosWalletConnected = true;
       } else {
         this.stateManager.cosmosWalletConnected = false;
