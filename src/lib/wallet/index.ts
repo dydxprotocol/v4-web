@@ -2,15 +2,7 @@ import { ResourceUnavailableRpcError } from 'viem';
 
 import { DydxError } from '@/constants/errors';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
-import {
-  WalletConnectionType,
-  WalletErrorType,
-  WalletType,
-  wallets,
-  type WalletConnection,
-} from '@/constants/wallets';
-
-import { detectInjectedEip1193Providers } from './providers';
+import { WalletErrorType } from '@/constants/wallets';
 
 // Formatting
 export const truncateAddress = (address?: string, prefix: string = 'dydx') => {
@@ -19,70 +11,6 @@ export const truncateAddress = (address?: string, prefix: string = 'dydx') => {
   const firstHalf = hash.slice(0, 4);
   const secondHalf = hash.slice(-4);
   return `${prefix}${firstHalf}...${secondHalf}`;
-};
-
-// Wallet connections
-export const getWalletConnection = ({
-  walletType,
-}: {
-  walletType: WalletType;
-}): WalletConnection | undefined => {
-  const walletConfig = wallets[walletType];
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const connectionType of walletConfig.connectionTypes) {
-    switch (connectionType) {
-      case WalletConnectionType.InjectedEip1193: {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const provider of detectInjectedEip1193Providers()) {
-          if (walletConfig.matchesInjectedEip1193?.(provider)) {
-            /* @ts-ignore */
-            provider.autoRefreshOnNetworkChange = false;
-
-            return {
-              type: WalletConnectionType.InjectedEip1193,
-              provider,
-            };
-          }
-        }
-        break;
-      }
-      case WalletConnectionType.WalletConnect2: {
-        return {
-          type: WalletConnectionType.WalletConnect2,
-        };
-      }
-      case WalletConnectionType.CoinbaseWalletSdk: {
-        return {
-          type: WalletConnectionType.CoinbaseWalletSdk,
-        };
-      }
-      case WalletConnectionType.CosmosSigner: {
-        return {
-          type: WalletConnectionType.CosmosSigner,
-        };
-      }
-      case WalletConnectionType.TestWallet: {
-        return {
-          type: WalletConnectionType.TestWallet,
-        };
-      }
-      case WalletConnectionType.Privy: {
-        return {
-          type: WalletConnectionType.Privy,
-        };
-      }
-      case WalletConnectionType.Phantom: {
-        return {
-          type: WalletConnectionType.Phantom,
-        };
-      }
-      default: {
-        continue;
-      }
-    }
-  }
-  return undefined;
 };
 
 const getWalletErrorType = ({ error }: { error: DydxError }) => {

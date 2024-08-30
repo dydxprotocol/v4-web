@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
-  WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
   useConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
@@ -19,14 +18,13 @@ import {
 import { EvmDerivedAddresses } from '@/constants/account';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { STRING_KEYS } from '@/constants/localization';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
+  ConnectorType,
   type DydxAddress,
   type EvmAddress,
   SolAddress,
-  WalletConnectionType,
-  wallets,
+  WalletInfo,
   WalletType,
 } from '@/constants/wallets';
 
@@ -38,8 +36,8 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
-import { resolveWagmiConnector } from '@/lib/wagmi';
-import { getWalletConnection, parseWalletError } from '@/lib/wallet';
+import { isWagmiConnectorType, resolveWagmiConnector } from '@/lib/wagmi';
+import { parseWalletError } from '@/lib/wallet';
 
 import { useStringGetter } from './useStringGetter';
 
@@ -115,20 +113,13 @@ export const useWalletConnection = () => {
   }, [dydxAddressGraz]);
 
   // Wallet connection
-
-  const [walletType, setWalletType] = useLocalStorage<WalletType | undefined>({
-    key: LocalStorageKey.OnboardingSelectedWalletType,
+  // The saved wallet connection from the last browser session
+  const [connectedWallet, setConnectedWallet] = useLocalStorage<WalletInfo | undefined>({
+    key: LocalStorageKey.OnboardingSelectedWallet,
     defaultValue: undefined,
   });
-
-  const [walletConnectionType, setWalletConnectionType] = useLocalStorage<
-    WalletConnectionType | undefined
-  >({
-    key: LocalStorageKey.WalletConnectionType,
-    defaultValue: undefined,
-  });
-
-  // Wallet connection
+  // The user's current wallet selection - default to last time's selection
+  const [selectedWallet, setSelectedWallet] = useState<WalletInfo | undefined>(connectedWallet);
 
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
 
@@ -161,56 +152,40 @@ export const useWalletConnection = () => {
 
   const connectWallet = useCallback(
     async ({
-      walletType: wType,
+      wallet,
       forceConnect,
       isEvmAccountConnected,
     }: {
-      walletType?: WalletType;
+      wallet: WalletInfo | undefined;
       forceConnect?: boolean;
       isEvmAccountConnected?: boolean;
     }) => {
-      if (!wType) return { walletType: wType, walletConnectionType };
-
-      const walletConnection = getWalletConnection({ walletType: wType });
+      if (!wallet) return;
 
       try {
-        if (!walletConnection) {
-          throw new Error('Onboarding: No wallet connection found.');
-        } else if (walletConnection.type === WalletConnectionType.Privy) {
+        if (wallet.connectorType === ConnectorType.Privy) {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();
           }
-        } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
-          const cosmosWalletType = {
-            [WalletType.Keplr as string]: CosmosWalletType.KEPLR,
-          }[wType];
-
-          if (!cosmosWalletType) {
-            throw new Error(`${stringGetter({ key: wallets[wType].stringKey })} was not found.`);
-          }
-
+        } else if (wallet.connectorType === ConnectorType.Cosmos) {
           if (!window.keplr) {
             window.open('https://www.keplr.app/get', '_blank');
           } else if (!isConnectedGraz) {
             await connectGraz({
               chainId: SUPPORTED_COSMOS_CHAINS,
-              walletType: cosmosWalletType,
+              walletType: wallet.name,
             });
           }
-        } else if (walletConnection.type === WalletConnectionType.TestWallet) {
-          saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
-        } else if (walletConnection.type === WalletConnectionType.Phantom) {
+        } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
           await connectPhantom();
-        } else {
-          // if account connected (via remember me), do not show wagmi popup until forceConnect
+        } else if (isWagmiConnectorType(wallet)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
-            await connectWagmi({
-              connector: resolveWagmiConnector({
-                walletType: wType,
-                walletConnection,
-                walletConnectConfig,
-              }),
-            });
+            const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
+            // This could happen in the mipd case if the user has uninstalled or disabled the injected wallet they've previously selected
+            // TODO: add analytics to see how often this happens?
+            if (!connector) return;
+
+            await connectWagmi({ connector });
           }
         }
       } catch (error) {
@@ -222,16 +197,11 @@ export const useWalletConnection = () => {
               // Currently the only usecase for this is piping in EIP specified error codes.
               // There's a nonzero chance of overlap so we should watch out for this
               code: error.code,
-              walletConnectionType: walletConnection?.type,
+              connectorType: wallet?.connectorType,
             }
           );
         }
       }
-
-      return {
-        walletType: wType,
-        walletConnectionType: walletConnection?.type,
-      };
     },
     [isConnectedGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login, connectPhantom]
   );
@@ -245,92 +215,80 @@ export const useWalletConnection = () => {
     if (isConnectedGraz) await disconnectGraz();
     if (authenticated) await logout();
     if (solAddressPhantom) await disconnectPhantom();
-  }, [isConnectedGraz, isConnectedWagmi, authenticated, solAddressPhantom, logout]);
+  }, [
+    saveEvmAddress,
+    saveDydxAddress,
+    saveSolAddress,
+    isConnectedWagmi,
+    disconnectWagmi,
+    isConnectedGraz,
+    disconnectGraz,
+    authenticated,
+    logout,
+    solAddressPhantom,
+    disconnectPhantom,
+  ]);
 
   // Wallet selection
-
-  const [selectedWalletType, setSelectedWalletType] = useState<WalletType | undefined>(walletType);
   const [selectedWalletError, setSelectedWalletError] = useState<string>();
 
   const disconnectSelectedWallet = useCallback(async () => {
-    setSelectedWalletType(undefined);
-    setWalletType(undefined);
-    setWalletConnectionType(undefined);
+    setConnectedWallet(undefined);
+    setSelectedWallet(undefined);
 
     await disconnectWallet();
-  }, [setSelectedWalletType, setWalletType, setWalletConnectionType, disconnectWallet]);
+  }, [setConnectedWallet, disconnectWallet]);
 
+  // Auto-reconnect to wallet from last browser session
   useEffect(() => {
     (async () => {
       setSelectedWalletError(undefined);
 
-      if (selectedWalletType) {
-        const walletConnection = getWalletConnection({ walletType: selectedWalletType });
-        setWalletType(selectedWalletType);
-        setWalletConnectionType(walletConnection?.type);
+      if (selectedWallet) {
         const isEvmAccountConnected =
           evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature;
-        if (
-          walletConnection &&
-          walletConnection.type !== WalletConnectionType.Privy &&
-          walletConnection.type !== WalletConnectionType.CosmosSigner &&
-          walletConnection.type !== WalletConnectionType.TestWallet &&
-          walletConnection.type !== WalletConnectionType.Phantom &&
-          !isConnectedWagmi &&
-          !isEvmAccountConnected
-        ) {
+        if (isWagmiConnectorType(selectedWallet) && !isConnectedWagmi && !isEvmAccountConnected) {
+          const connector = resolveWagmiConnector({ wallet: selectedWallet, walletConnectConfig });
+          if (!connector) return;
+
           await reconnectWagmi({
-            connectors: [
-              resolveWagmiConnector({
-                walletType: selectedWalletType,
-                walletConnection,
-                walletConnectConfig,
-              }),
-            ],
+            connectors: [connector],
           });
-        } else if (
-          walletConnection &&
-          walletConnection.type === WalletConnectionType.Phantom &&
-          !solAddress
-        ) {
+        } else if (selectedWallet.connectorType === ConnectorType.PhantomSolana && !solAddress) {
           await connectPhantom();
         }
       }
     })();
   }, [
-    selectedWalletType,
+    selectedWallet,
     signerWagmi,
     evmDerivedAddresses,
     evmAddress,
     reconnectWagmi,
-    setWalletType,
-    setWalletConnectionType,
     isConnectedWagmi,
     walletConnectConfig,
     connectPhantom,
     solAddress,
   ]);
 
-  const selectWalletType = useCallback(
-    async (wType: WalletType | undefined) => {
-      if (selectedWalletType) {
-        setSelectedWalletType(undefined);
+  const selectWallet = useCallback(
+    async (wallet: WalletInfo | undefined) => {
+      if (wallet) {
+        setSelectedWallet(undefined);
         await disconnectSelectedWallet();
         await new Promise(requestAnimationFrame);
       }
 
-      setSelectedWalletType(wType);
-      if (wType) {
+      setSelectedWallet(wallet);
+      if (wallet) {
         try {
-          const { walletConnectionType: wConnectionType } = await connectWallet({
-            walletType: wType,
+          await connectWallet({
+            wallet,
             isEvmAccountConnected: Boolean(
               evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
             ),
           });
-
-          setWalletType(wType);
-          setWalletConnectionType(wConnectionType);
+          setConnectedWallet(wallet);
         } catch (error) {
           const { walletErrorType, message } = parseWalletError({
             error,
@@ -347,13 +305,11 @@ export const useWalletConnection = () => {
       }
     },
     [
-      selectedWalletType,
       disconnectSelectedWallet,
       connectWallet,
       evmAddress,
       evmDerivedAddresses,
-      setWalletType,
-      setWalletConnectionType,
+      setConnectedWallet,
       stringGetter,
     ]
   );
@@ -362,19 +318,18 @@ export const useWalletConnection = () => {
   useEffect(() => {
     (async () => {
       if (testFlags.addressOverride) {
-        setSelectedWalletType(WalletType.TestWallet);
+        setSelectedWallet({ connectorType: ConnectorType.Test, name: WalletType.TestWallet });
       }
     })();
   }, []);
 
   return {
     // Wallet connection
-    walletType,
-    walletConnectionType,
+    connectedWallet,
 
     // Wallet selection
-    selectWalletType,
-    selectedWalletType,
+    selectWallet,
+    selectedWallet,
     selectedWalletError,
 
     // Wallet connection (EVM)
@@ -383,11 +338,8 @@ export const useWalletConnection = () => {
     signerWagmi,
     publicClientWagmi,
     isConnectedWagmi,
-    connectWallet: () =>
-      connectWallet({
-        walletType: selectedWalletType,
-        forceConnect: true,
-      }),
+    connectWallet,
+
     // Wallet connection (sol)
     solAddress,
 

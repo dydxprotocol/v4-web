@@ -29,7 +29,6 @@ import {
   type LocalPlaceOrderData,
   type TradeTypes,
 } from '@/constants/trade';
-import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { isOrderStatusCanceled } from '@/lib/orders';
@@ -42,7 +41,6 @@ export type AccountState = {
   stakingRewards?: StakingRewards;
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
-  walletType?: WalletType;
 
   subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
@@ -83,9 +81,6 @@ const initialState: AccountState = {
   // Wallet
   balances: undefined,
   wallet: undefined,
-  walletType: getLocalStorage<WalletType>({
-    key: LocalStorageKey.OnboardingSelectedWalletType,
-  }),
 
   // Subaccount
   subaccount: undefined,

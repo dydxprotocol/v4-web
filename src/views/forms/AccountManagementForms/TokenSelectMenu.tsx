@@ -43,7 +43,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     resources,
     chain: chainIdStr,
   } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
-  const { walletType } = useAccounts();
+  const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
@@ -51,7 +51,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
     [type, skipEnabled]
   );
-  const isKeplrWallet = walletType === WalletType.Keplr;
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??

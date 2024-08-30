@@ -71,10 +71,10 @@ export const useSubaccount = () => useContext(SubaccountContext);
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
   const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
-  const { walletType } = useAccounts();
+  const { connectedWallet } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
 
-  const isKeplr = walletType === WalletType.Keplr;
+  const isKeplr = connectedWallet?.name === WalletType.Keplr;
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({

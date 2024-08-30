@@ -1,7 +1,7 @@
 // Custom connectors
 import type { PrivyClientConfig } from '@privy-io/react-auth';
 import { createConfig } from '@privy-io/wagmi';
-import { EIP1193Provider, FallbackTransport, Transport, http, type Chain } from 'viem';
+import { FallbackTransport, Transport, http, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -40,19 +40,18 @@ import {
 import { fallback } from 'wagmi';
 import {
   coinbaseWallet as coinbaseWalletConnector,
-  injected as injectedConnector,
   walletConnect as walletConnectConnector,
 } from 'wagmi/connectors';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
+  ConnectorType,
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
-  WalletConnectionType,
-  wallets,
-  type WalletConnection,
-  type WalletType,
+  WalletInfo,
 } from '@/constants/wallets';
+
+import { getMipdConnectorByRdns } from '@/hooks/useMipdInjectedWallets';
 
 import { isTruthy } from './isTruthy';
 import { getLocalStorage } from './localStorage';
@@ -203,76 +202,41 @@ const getWalletconnect2ConnectorOptions = (
   },
 });
 
-const getConnectors = (
-  walletConnectConfig: WalletConnectConfig,
-  walletconnectionType: WalletConnectionType
-) => {
-  switch (walletconnectionType) {
-    case WalletConnectionType.CoinbaseWalletSdk: {
-      return coinbaseWalletConnector({
-        appName: 'dYdX',
-        reloadOnDisconnect: false,
-      });
-    }
-    case WalletConnectionType.InjectedEip1193: {
-      return injectedConnector();
-    }
-    case WalletConnectionType.WalletConnect2: {
-      return walletConnectConnector(getWalletconnect2ConnectorOptions(walletConnectConfig));
-    }
-    default: {
-      return injectedConnector();
-    }
-  }
-};
-
 export const config = createConfig({
   chains: [mainnet, ...WAGMI_SUPPORTED_CHAINS],
   transports: RPCTransports,
 });
 
-// Create a custom wagmi InjectedConnector using a specific injected EIP-1193 provider (instead of wagmi's default detection logic)
-const createInjectedConnectorWithProvider = (provider: EIP1193Provider) => {
-  return injectedConnector({
-    target: {
-      id: 'windowProvider',
-      name: 'Injected',
-      provider,
-    },
-  });
-};
-
-const createWalletConnect2ConnectorWithId = (
-  walletconnectId: string,
-  walletConnectConfig: WalletConnectConfig
-) => {
-  const walletconnect2ConnectorOptions = getWalletconnect2ConnectorOptions(walletConnectConfig);
-  return walletConnectConnector({
-    ...walletconnect2ConnectorOptions,
-    qrModalOptions: {
-      ...walletconnect2ConnectorOptions.qrModalOptions,
-      explorerRecommendedWalletIds: [walletconnectId],
-      explorerExcludedWalletIds: 'ALL',
-    },
-  });
-};
-
 // Custom connector from wallet selection
-
 export const resolveWagmiConnector = ({
-  walletType,
-  walletConnection,
+  wallet,
   walletConnectConfig,
 }: {
-  walletType: WalletType;
-  walletConnection: WalletConnection;
+  wallet: WalletInfo;
   walletConnectConfig: WalletConnectConfig;
 }) => {
-  const walletConfig = wallets[walletType];
+  if (wallet.connectorType === ConnectorType.Injected) {
+    return getMipdConnectorByRdns(wallet.rdns);
+  }
 
-  return walletConnection.type === WalletConnectionType.InjectedEip1193 && walletConnection.provider
-    ? createInjectedConnectorWithProvider(walletConnection.provider)
-    : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id
-      ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id, walletConnectConfig)
-      : getConnectors(walletConnectConfig, walletConnection.type);
+  if (wallet.connectorType === ConnectorType.Coinbase) {
+    return coinbaseWalletConnector({
+      appName: 'dYdX',
+      reloadOnDisconnect: false,
+    });
+  }
+
+  if (wallet.connectorType === ConnectorType.WalletConnect) {
+    return walletConnectConnector(getWalletconnect2ConnectorOptions(walletConnectConfig));
+  }
+
+  return undefined;
 };
+
+export function isWagmiConnectorType(wallet: WalletInfo | undefined): boolean {
+  if (!wallet) return false;
+
+  return [ConnectorType.Injected, ConnectorType.Coinbase, ConnectorType.WalletConnect].includes(
+    wallet.connectorType
+  );
+}

@@ -9,7 +9,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { wallets } from '@/constants/wallets';
+import { ConnectorType, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -67,7 +67,7 @@ const Profile = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
-  const { evmAddress, dydxAddress, walletType } = useAccounts();
+  const { evmAddress, dydxAddress, connectedWallet } = useAccounts();
   const { chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
 
@@ -149,11 +149,15 @@ const Profile = () => {
           <h1 tw="font-extra-medium">
             {isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}
           </h1>
-          {isConnected && walletType ? (
+          {isConnected && connectedWallet ? (
             <$SubHeader>
               <$ConnectedIcon />
               <span>{stringGetter({ key: STRING_KEYS.CONNECTED_TO })}</span>
-              <span>{stringGetter({ key: wallets[walletType].stringKey })}</span>
+              <span>
+                {connectedWallet.connectorType === ConnectorType.Injected
+                  ? connectedWallet.name
+                  : stringGetter({ key: wallets[connectedWallet.name].stringKey })}
+              </span>
             </$SubHeader>
           ) : (
             <span>-</span>

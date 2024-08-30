@@ -81,7 +81,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, walletType } = useAccounts();
+  const { dydxAddress, connectedWallet } = useAccounts();
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -134,7 +134,7 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
-    if (walletType === WalletType.Keplr && dydxAddress) {
+    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
       abacusStateManager.setTransfersSourceAddress(dydxAddress);
     }
 
@@ -146,7 +146,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, walletType]);
+  }, [dydxAddress, connectedWallet]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -340,19 +340,19 @@ export const WithdrawForm = () => {
   }, [freeCollateralBN, setWithdrawAmount]);
 
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (connectedWallet?.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (walletType === WalletType.Keplr) {
+    if (connectedWallet?.name === WalletType.Keplr) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: nobleChainId,
       });
     }
-  }, [nobleChainId, walletType]);
+  }, [connectedWallet, nobleChainId]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {

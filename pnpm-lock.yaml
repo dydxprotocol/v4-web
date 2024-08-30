@@ -251,6 +251,9 @@ dependencies:
   luxon:
     specifier: ^3.3.0
     version: 3.3.0
+  mipd:
+    specifier: ^0.0.7
+    version: 0.0.7(typescript@5.1.3)
   prometheus-query:
     specifier: ^3.4.0
     version: 3.4.0
