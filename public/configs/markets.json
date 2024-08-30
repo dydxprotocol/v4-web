@@ -2470,7 +2470,6 @@
         "whitepaperLink": "https://docs.fuse.io/"
     },
     "FWOG-USD": {
-        "coinMarketCapsLink": "https://dexscreener.com/solana/ab1eu2l1jr3nfeft85aud2zgksubam1kr8mr3um2sjwt",
         "name": "FWOG",
         "tags": [],
         "websiteLink": "https://fwogsol.xyz/",
@@ -5595,7 +5594,6 @@
         "whitepaperLink": "https://docs.rocketpool.net"
     },
     "RSNOOFI-USD": {
-        "coinMarketCapsLink": "https://dexscreener.com/solana/4fp4synbkisczqkwufpkcsxwfdbsvmktsnpbnlplyu9q",
         "name": "reddit dog",
         "tags": [],
         "websiteLink": "https://www.reddit.com/r/snoofi/",
