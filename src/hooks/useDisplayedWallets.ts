@@ -52,11 +52,10 @@ export const useDisplayedWallets = (): WalletInfo[] => {
             }) as WalletInfo
         ),
 
-      (isTestnet || isDev) &&
-        phantomDetected && {
-          connectorType: ConnectorType.PhantomSolana,
-          name: WalletType.Phantom,
-        },
+      phantomDetected && {
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      },
 
       keplrEnabled && {
         connectorType: ConnectorType.Cosmos,
