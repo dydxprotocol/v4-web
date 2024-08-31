@@ -1,23 +1,33 @@
 import { MouseEvent, useCallback, useState } from 'react';
 
+import { log } from 'console';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
 import { useInterval } from '@/hooks/useInterval';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { AlertMessage } from '@/components/AlertMessage';
+import { Button } from '@/components/Button';
 import { Collapsible } from '@/components/Collapsible';
+import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
+
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -41,7 +51,11 @@ export const TransferStatusNotification = ({
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
-  const { status, toAmount, isExchange } = transfer;
+  const { depositCurrentBalance } = useSubaccount();
+  const { addOrUpdateTransferNotification } = useLocalNotifications();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+
+  const { status, toAmount, isExchange, fromChainId, isSubaccountDepositCompleted } = transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -65,7 +79,11 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
-  const isComplete = status?.squidTransactionStatus === 'success' || isExchange;
+  const isCosmosDeposit =
+    SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') && fromChainId !== selectedDydxChainId;
+  const isComplete = isCosmosDeposit
+    ? isSubaccountDepositCompleted
+    : status?.squidTransactionStatus === 'success' || isExchange;
 
   const inProgressStatusString =
     type === TransferNotificationTypes.Deposit
@@ -85,44 +103,94 @@ export const TransferStatusNotification = ({
         ? STRING_KEYS.WITHDRAW_COMPLETE
         : inProgressStatusString;
 
+  const detailItems = [
+    {
+      key: 'amount',
+      label: 'Amount',
+      value: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      value: isComplete
+        ? stringGetter({ key: STRING_KEYS.CONFIRMED })
+        : stringGetter({ key: STRING_KEYS.AWAITING_CONFIRMATION }),
+    },
+  ];
+
+  const subaccountDeposit = useCallback(async () => {
+    try {
+      await depositCurrentBalance();
+      addOrUpdateTransferNotification({
+        ...transfer,
+        isSubaccountDepositCompleted: true,
+      });
+    } catch (e) {
+      log('TransferStatusNotification/subaccountDeposit', e);
+    }
+  }, [addOrUpdateTransferNotification, depositCurrentBalance, transfer]);
+
   const content = (
-    <>
-      <$Status>
-        {stringGetter({
-          key: statusString,
-          params: {
-            AMOUNT_USD: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
-            ESTIMATED_DURATION: (
-              <$InlineOutput
-                type={OutputType.Text}
-                value={formatSeconds(Math.max(secondsLeft || 0, 0))}
-              />
-            ),
-          },
-        })}
-      </$Status>
-      {hasError && (
-        <AlertMessage type={AlertType.Error}>
-          {stringGetter({
-            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: {
-              ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-            },
-          })}
-        </AlertMessage>
+    <div tw="flexColumn gap-0.5">
+      {isCosmosDeposit ? (
+        <>
+          <$Details items={detailItems} />
+          {!isToast && !isComplete && (
+            <Button
+              action={ButtonAction.Primary}
+              type={ButtonType.Button}
+              size={ButtonSize.Small}
+              onClick={subaccountDeposit}
+            >
+              {stringGetter({ key: STRING_KEYS.CONFIRM_DEPOSIT })}
+            </Button>
+          )}
+        </>
+      ) : (
+        <>
+          <$Status>
+            {stringGetter({
+              key: statusString,
+              params: {
+                AMOUNT_USD: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
+                ESTIMATED_DURATION: (
+                  <$InlineOutput
+                    type={OutputType.Text}
+                    value={formatSeconds(Math.max(secondsLeft || 0, 0))}
+                  />
+                ),
+              },
+            })}
+          </$Status>
+          {hasError && (
+            <AlertMessage type={AlertType.Error}>
+              {stringGetter({
+                key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                params: {
+                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                },
+              })}
+            </AlertMessage>
+          )}
+        </>
       )}
-    </>
+      {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
+        <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+      )}
+    </div>
   );
+
+  const transferIcon = isCosmosDeposit ? slotIcon : isToast && slotIcon;
 
   const transferNotif = (
     <Notification
       isToast={isToast}
       notification={notification}
-      slotIcon={isToast && slotIcon}
+      slotIcon={transferIcon}
       slotTitle={slotTitle}
       slotCustomContent={
         <div tw="flexColumn gap-0.5">
-          {!status && !isExchange ? (
+          {!status && !isExchange && !isCosmosDeposit ? (
             <>
               {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
               <div>
@@ -132,9 +200,13 @@ export const TransferStatusNotification = ({
           ) : (
             <>
               {content}
-              {!isComplete && <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>}
-              {!isToast && !isComplete && !hasError && (
-                <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+              {!isCosmosDeposit && !isComplete && (
+                <>
+                  <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
+                  {!isToast && !hasError && (
+                    <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+                  )}
+                </>
               )}
             </>
           )}
@@ -142,6 +214,7 @@ export const TransferStatusNotification = ({
       }
       slotAction={
         isToast &&
+        !isCosmosDeposit &&
         status && (
           <$Trigger
             isOpen={open}
@@ -216,4 +289,12 @@ const $Trigger = styled.button<{ isOpen?: boolean }>`
         rotate: -0.5turn;
       }
     `}
+`;
+
+const $Details = styled(Details)`
+  --details-item-vertical-padding: 0.2rem;
+
+  dd {
+    color: var(--color-text-2);
+  }
 `;

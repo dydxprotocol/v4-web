@@ -6,7 +6,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { OnboardingState } from '@/constants/account';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -17,7 +17,7 @@ import {
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
+import { DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -38,6 +38,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -64,13 +65,14 @@ export const AccountMenu = () => {
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
+
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
-  const { evmAddress, solAddress, walletType, dydxAddress, hdKey } = useAccounts();
+  const { evmAddress, solAddress, connectedWallet, dydxAddress, hdKey } = useAccounts();
 
   let address: string | undefined;
-  if (walletType === WalletType.Phantom) {
+  if (connectedWallet?.name === WalletType.Phantom) {
     address = truncateAddress(solAddress, '');
   } else {
     address = truncateAddress(evmAddress, '0x');
@@ -87,12 +89,19 @@ export const AccountMenu = () => {
 
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
+  const usedBalanceBN = MustBigNumber(usdcBalance);
+
+  const showConfirmPendingDeposit =
+    connectedWallet?.name === WalletType.Keplr &&
+    usedBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC) &&
+    usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
+
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
     walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
-    walletType === WalletType.Privy
+    connectedWallet?.name === WalletType.Privy
   ) {
     if (google) {
       walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
@@ -101,10 +110,10 @@ export const AccountMenu = () => {
     } else if (twitter) {
       walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
     } else {
-      walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+      walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
     }
-  } else if (walletType) {
-    walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+  } else if (connectedWallet) {
+    walletIcon = <WalletIcon wallet={connectedWallet} />;
   }
 
   return onboardingState === OnboardingState.Disconnected ? (
@@ -117,23 +126,27 @@ export const AccountMenu = () => {
             <$AddressRow>
               <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>
-                <WithTooltip
-                  slotTooltip={
-                    <dl>
-                      <dt>
-                        {stringGetter({
-                          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
-                          params: {
-                            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-                            EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
-                          },
-                        })}
-                      </dt>
-                    </dl>
-                  }
-                >
+                {connectedWallet && connectedWallet?.name !== WalletType.Keplr ? (
+                  <WithTooltip
+                    slotTooltip={
+                      <dl>
+                        <dt>
+                          {stringGetter({
+                            key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
+                            params: {
+                              DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+                              EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
+                            },
+                          })}
+                        </dt>
+                      </dl>
+                    }
+                  >
+                    <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
+                  </WithTooltip>
+                ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                </WithTooltip>
+                )}
                 <$Address>{truncateAddress(dydxAddress)}</$Address>
               </$Column>
               <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
@@ -147,18 +160,23 @@ export const AccountMenu = () => {
                 />
               </WithTooltip>
             </$AddressRow>
-            {walletType && walletType !== WalletType.Privy && (
-              <$AddressRow>
-                <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
-                  <Icon iconName={IconName.AddressConnector} tw="absolute top-[-1.625rem] h-1.75" />
-                  <Icon iconComponent={wallets[walletType].icon as ElementType} />
-                </div>
-                <$Column>
-                  <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                  <$Address>{address}</$Address>
-                </$Column>
-              </$AddressRow>
-            )}
+            {connectedWallet &&
+              connectedWallet.name !== WalletType.Privy &&
+              connectedWallet.name !== WalletType.Keplr && (
+                <$AddressRow>
+                  <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
+                    <Icon
+                      iconName={IconName.AddressConnector}
+                      tw="absolute top-[-1.625rem] h-1.75"
+                    />
+                    <WalletIcon wallet={connectedWallet} />
+                  </div>
+                  <$Column>
+                    <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
+                    <$Address>{address}</$Address>
+                  </$Column>
+                </$AddressRow>
+              )}
             <$Balances>
               <div>
                 <div>
@@ -222,6 +240,27 @@ export const AccountMenu = () => {
                 />
               </div>
             </$Balances>
+            {showConfirmPendingDeposit && (
+              <$ConfirmPendingDeposit>
+                You have a pending deposit
+                <br /> for confirmation
+                <$IconButton
+                  action={ButtonAction.Base}
+                  shape={ButtonShape.Square}
+                  iconName={IconName.Send}
+                  onClick={() =>
+                    dispatch(
+                      openDialog(
+                        DialogTypes.ConfirmPendingDeposit({
+                          usdcBalance:
+                            MustBigNumber(usdcBalance).toNumber() - AMOUNT_RESERVED_FOR_GAS_USDC,
+                        })
+                      )
+                    )
+                  }
+                />
+              </$ConfirmPendingDeposit>
+            )}
           </div>
         )
       }
@@ -428,6 +467,18 @@ const $Balances = styled.div`
       border-radius: 0 0 0.5rem 0.5rem;
     }
   }
+`;
+
+const $ConfirmPendingDeposit = styled.div`
+  ${layoutMixins.row}
+
+  justify-content: space-between;
+  box-shadow: 0 0 0 1px var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+
+  color: var(--color-text-1);
+  font-size: var(--fontSize-small);
 `;
 
 const $BalanceOutput = tw(Output)`text-medium`;

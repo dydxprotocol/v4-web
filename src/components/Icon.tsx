@@ -76,6 +76,7 @@ import {
   ShareIcon,
   ShowIcon,
   SocialXIcon,
+  SpeechBubbleIcon,
   StarIcon,
   SunIcon,
   TerminalIcon,
@@ -169,6 +170,7 @@ export enum IconName {
   Send = 'Send',
   Share = 'Share',
   Show = 'Show',
+  SpeechBubble = 'SpeechBubble',
   Star = 'Star',
   Sun = 'Sun',
   Terminal = 'Terminal',
@@ -260,6 +262,7 @@ const icons = {
   [IconName.Send]: SendIcon,
   [IconName.Share]: ShareIcon,
   [IconName.Show]: ShowIcon,
+  [IconName.SpeechBubble]: SpeechBubbleIcon,
   [IconName.Star]: StarIcon,
   [IconName.Sun]: SunIcon,
   [IconName.Terminal]: TerminalIcon,
@@ -290,10 +293,11 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    size,
     ...props
-  }: ElementProps & StyleProps) =>
+  }: ElementProps & StyleProps & { size?: string }) =>
     Component ? <Component className={className} {...props} /> : null
 )`
-  width: 1em;
-  height: 1em;
+  width: ${({ size }) => size ?? '1em'};
+  height: ${({ size }) => size ?? '1em'};
 `;

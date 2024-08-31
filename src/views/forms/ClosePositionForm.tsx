@@ -33,6 +33,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
@@ -118,11 +119,16 @@ export const ClosePositionForm = ({
   let alertContent;
   let alertType = AlertType.Error;
 
+  let alertContentLink;
+  let alertContentLinkText;
+
   if (closePositionError && !isErrorShownInOrderStatusToast) {
     alertContent = closePositionError;
   } else if (inputAlert) {
     alertContent = inputAlert.alertString;
     alertType = inputAlert.type;
+    alertContentLink = inputAlert.link;
+    alertContentLinkText = inputAlert.linkText;
   }
 
   useEffect(() => {
@@ -224,7 +230,18 @@ export const ClosePositionForm = ({
     });
   };
 
-  const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
+  const alertMessage = alertContent && (
+    <AlertMessage type={alertType}>
+      <div tw="inline-block">
+        {alertContent}{' '}
+        {alertContentLinkText && alertContentLink && (
+          <Link isInline href={alertContentLink}>
+            {alertContentLinkText}
+          </Link>
+        )}
+      </div>
+    </AlertMessage>
+  );
 
   const inputs = (
     <$InputsColumn>

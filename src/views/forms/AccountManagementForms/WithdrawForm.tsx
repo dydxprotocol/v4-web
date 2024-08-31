@@ -5,12 +5,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  GRAZ_CHAINS,
+} from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -45,7 +51,7 @@ import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType, formatNumberOutput } from '@/components/Output';
+import { formatNumberOutput, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -58,11 +64,10 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { validateCosmosAddress } from '@/lib/addressUtils';
+import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
-import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -76,6 +81,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
+  const { dydxAddress, connectedWallet } = useAccounts();
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -99,7 +105,17 @@ export const WithdrawForm = () => {
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
-  const isValidAddress = toAddress && isAddress(toAddress);
+  const isValidDestinationAddress = useMemo(() => {
+    const grazChainPrefix =
+      GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config.bech32PrefixAccAddr ??
+      '';
+    const prefix = exchange ? 'noble' : grazChainPrefix;
+    return isValidAddress({
+      address: toAddress,
+      network: prefix ? 'cosmos' : 'evm',
+      prefix,
+    });
+  }, [exchange, toAddress, chainIdStr]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -118,6 +134,10 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
+    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+      abacusStateManager.setTransfersSourceAddress(dydxAddress);
+    }
+
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
       value: TransferType.withdrawal.rawValue,
@@ -126,7 +146,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, []);
+  }, [dydxAddress, connectedWallet]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -156,7 +176,9 @@ export const WithdrawForm = () => {
   }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
-  const { dydxAddress } = useAccounts();
+  const nobleChainId = getNobleChainId();
+  const osmosisChainId = getOsmosisChainId();
+  const neutronChainId = getNeutronChainId();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -193,7 +215,6 @@ export const WithdrawForm = () => {
             })
           );
         } else {
-          const nobleChainId = getNobleChainId();
           const toChainId = exchange ? nobleChainId : chainIdStr || undefined;
 
           const notificationParams = {
@@ -318,33 +339,52 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
-  const { walletType } = useAccounts();
-
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (connectedWallet?.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-  }, [walletType]);
-
-  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
-    if (name) {
-      setWithdrawAmount('');
-      if (type === 'chain') {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.chain,
-          value: name,
-        });
-      } else {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.exchange,
-          value: name,
-        });
-      }
+    if (connectedWallet?.name === WalletType.Keplr) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: nobleChainId,
+      });
     }
-  }, []);
+  }, [connectedWallet, nobleChainId]);
+
+  const onSelectNetwork = useCallback(
+    (name: string, type: 'chain' | 'exchange') => {
+      if (name) {
+        setWithdrawAmount('');
+        if (type === 'chain') {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.chain,
+            value: name,
+          });
+          if (name === osmosisChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: OSMO_USDC_IBC_DENOM,
+            });
+          }
+          if (name === neutronChainId) {
+            abacusStateManager.setTransferValue({
+              field: TransferInputField.token,
+              value: NEUTRON_USDC_IBC_DENOM,
+            });
+          }
+        } else {
+          abacusStateManager.setTransferValue({
+            field: TransferInputField.exchange,
+            value: name,
+          });
+        }
+      }
+    },
+    [neutronChainId, osmosisChainId]
+  );
 
   const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
     if (selectedToken) {
@@ -430,6 +470,14 @@ export const WithdrawForm = () => {
           key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
         }),
       };
+
+    if (!isValidDestinationAddress) {
+      return {
+        errorMessage: stringGetter({
+          key: STRING_KEYS.ENTER_VALID_ADDRESS,
+        }),
+      };
+    }
 
     if (routeErrors) {
       const routeErrorMessageOverride = getRouteErrorMessageOverride(
@@ -517,21 +565,18 @@ export const WithdrawForm = () => {
     stringGetter,
     summary,
     usdcWithdrawalCapacity,
+    isValidDestinationAddress,
   ]);
-
-  const isInvalidNobleAddress = Boolean(
-    exchange && toAddress && !validateCosmosAddress(toAddress, 'noble')
-  );
 
   const isDisabled =
     !!errorMessage ||
     !toToken ||
     (!chainIdStr && !exchange) ||
-    !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
     isLoading ||
-    isInvalidNobleAddress;
+    !isValidDestinationAddress;
+
   const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   return (
@@ -561,7 +606,7 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? (
+              {isValidDestinationAddress ? (
                 <Icon
                   iconName={IconName.Check}
                   tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
@@ -576,7 +621,7 @@ export const WithdrawForm = () => {
           onSelect={onSelectNetwork}
         />
       </div>
-      {isInvalidNobleAddress && (
+      {toAddress && Boolean(exchange) && !isValidDestinationAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
         </AlertMessage>

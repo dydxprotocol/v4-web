@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import stableStringify from 'fast-json-stable-stringify';
 import { useSignTypedData } from 'wagmi';
 
-import { getSignTypedData, WalletType } from '@/constants/wallets';
+import { ConnectorType, getSignTypedData, WalletInfo } from '@/constants/wallets';
 
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 
@@ -12,7 +12,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { useEnvConfig } from './useEnvConfig';
 
-export default function useSignForWalletDerivation(walletType: WalletType | undefined) {
+export default function useSignForWalletDerivation(wallet: WalletInfo | undefined) {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const ethereumChainId = useEnvConfig('ethereumChainId');
   const chainId = Number(ethereumChainId);
@@ -42,11 +42,11 @@ export default function useSignForWalletDerivation(walletType: WalletType | unde
   }, [phantomSignMessage, signTypedData]);
 
   const signMessage = useCallback(async (): Promise<string> => {
-    if (walletType === WalletType.Phantom) {
+    if (wallet?.connectorType === ConnectorType.PhantomSolana) {
       return signSolanaMessage();
     }
     return signEvmMessage();
-  }, [signEvmMessage, signSolanaMessage, walletType]);
+  }, [signEvmMessage, signSolanaMessage, wallet?.connectorType]);
 
   return signMessage;
 }

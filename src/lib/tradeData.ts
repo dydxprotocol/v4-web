@@ -100,31 +100,35 @@ export const getTradeInputAlert = ({
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
-  const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type, code }) => {
-    const { action, text } = resources ?? {};
-    const { stringKey: actionStringKey } = action ?? {};
-    const { stringKey: alertStringKey, params: stringParams } = text ?? {};
+  const inputAlerts = abacusInputErrors.map(
+    ({ action: errorAction, resources, type, code, linkText: linkTextStringKey, link }) => {
+      const { action, text } = resources ?? {};
+      const { stringKey: actionStringKey } = action ?? {};
+      const { stringKey: alertStringKey, params: stringParams } = text ?? {};
 
-    const params =
-      stringParams?.toArray() &&
-      Object.fromEntries(
-        stringParams
-          .toArray()
-          .map(({ key, value, format }) => [
-            key,
-            formatErrorParam({ value, format, stepSizeDecimals, tickSizeDecimals }),
-          ])
-      );
+      const params =
+        stringParams?.toArray() &&
+        Object.fromEntries(
+          stringParams
+            .toArray()
+            .map(({ key, value, format }) => [
+              key,
+              formatErrorParam({ value, format, stepSizeDecimals, tickSizeDecimals }),
+            ])
+        );
 
-    return {
-      errorAction,
-      actionStringKey,
-      alertStringKey,
-      alertString: alertStringKey && stringGetter({ key: alertStringKey, params }),
-      type: type === ErrorType.warning ? AlertType.Warning : AlertType.Error,
-      code,
-    };
-  });
+      return {
+        errorAction,
+        actionStringKey,
+        alertStringKey,
+        alertString: alertStringKey && stringGetter({ key: alertStringKey, params }),
+        type: type === ErrorType.warning ? AlertType.Warning : AlertType.Error,
+        code,
+        linkText: linkTextStringKey && stringGetter({ key: linkTextStringKey }),
+        link,
+      };
+    }
+  );
 
   return inputAlerts?.[0];
 };

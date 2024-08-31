@@ -176,13 +176,13 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Market]: {
         columnKey: 'market',
-        getCellValue: (row) => row.id,
+        getCellValue: (row) => row.displayId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ id, asset, leverage }) => (
+        renderCell: ({ displayId, asset, leverage }) => (
           <MarketTableCell
             asset={asset}
-            marketId={id}
+            marketId={displayId}
             leverage={leverage?.current ?? undefined}
             isHighlighted
           />

@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -52,11 +51,11 @@ type ElementProps = {
 };
 
 const SIZE_PERCENT_OPTIONS = {
-  '5%': '0.05',
   '10%': '0.1',
   '25%': '0.25',
   '50%': '0.5',
   '75%': '0.75',
+  '100%': '1',
 };
 
 export const AdjustIsolatedMarginForm = ({
@@ -80,6 +79,13 @@ export const AdjustIsolatedMarginForm = ({
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({
+      value: marketId,
+      field: AdjustIsolatedMarginInputField.Market,
+    });
+  }, [marketId]);
+
+  useEffect(() => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
       value: childSubaccountNumber,
       field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
     });
@@ -94,7 +100,7 @@ export const AdjustIsolatedMarginForm = ({
     };
   }, [childSubaccountNumber]);
 
-  const setAmount = ({ floatValue }: NumberFormatValues) => {
+  const setAmount = ({ floatValue }: { floatValue?: number }) => {
     abacusStateManager.setAdjustIsolatedMarginValue({
       value: floatValue,
       field: AdjustIsolatedMarginInputField.Amount,
@@ -181,7 +187,7 @@ export const AdjustIsolatedMarginForm = ({
 
   const alertMessage = useMemo(() => {
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
-      if (MustBigNumber(amount).gte(MustBigNumber(crossFreeCollateral))) {
+      if (MustBigNumber(amount).gt(MustBigNumber(crossFreeCollateral))) {
         return {
           message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
           type: AlertType.Error,
@@ -416,7 +422,7 @@ export const AdjustIsolatedMarginForm = ({
         <$ToggleGroup
           items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
             label: key,
-            value: value.toString(),
+            value: MustBigNumber(value).toFixed(PERCENT_DECIMALS),
           }))}
           value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
           onValueChange={setPercent}
@@ -428,7 +434,7 @@ export const AdjustIsolatedMarginForm = ({
             type={InputType.Currency}
             label={formConfig.formLabel}
             value={amount}
-            onChange={setAmount}
+            onInput={setAmount}
           />
         </WithDetailsReceipt>
       </div>

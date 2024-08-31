@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, VersionedTransaction } from '@solana/web3.js';
 
 export function usePhantomWallet() {
   const [solAddress, setSolAddress] = useState('');
@@ -38,10 +38,18 @@ export function usePhantomWallet() {
     return resp.signature;
   }, []);
 
+  const signTransaction = useCallback(async (txBytes: Uint8Array): Promise<string> => {
+    const resp: { signature: string } = await (window as any).phantom.solana.signAndSendTransaction(
+      VersionedTransaction.deserialize(txBytes)
+    );
+    return resp.signature;
+  }, []);
+
   return {
-    solAddress,
     connect,
     disconnect,
     signMessage,
+    signTransaction,
+    solAddress,
   };
 }

@@ -12,7 +12,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
-import { DydxChainAsset } from '@/constants/wallets';
+import { DydxChainAsset, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -63,7 +63,7 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { dydxAddress } = useAccounts();
+  const { dydxAddress, connectedWallet } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -118,6 +118,10 @@ export const TransferForm = ({
   };
 
   useEffect(() => {
+    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+      abacusStateManager.setTransfersSourceAddress(dydxAddress);
+    }
+
     abacusStateManager.setTransferValue({
       value: TransferType.transferOut.rawValue,
       field: TransferInputField.type,

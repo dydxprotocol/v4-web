@@ -12,7 +12,7 @@ import {
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 import { shallowEqual } from 'react-redux';
-import { parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 
 import type {
   AccountBalance,
@@ -23,10 +23,12 @@ import type {
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import {
   cancelOrderConfirmed,
@@ -39,6 +41,7 @@ import {
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
@@ -68,7 +71,10 @@ export const useSubaccount = () => useContext(SubaccountContext);
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
   const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
+  const { connectedWallet } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
+
+  const isKeplr = connectedWallet?.name === WalletType.Keplr;
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({
@@ -105,7 +111,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         try {
           return await compositeClient?.depositToSubaccount(
             subaccountClient,
-            amount.toFixed(usdcDecimals)
+            amount.toFixed(usdcDecimals),
+            TransactionMemo.depositToSubaccount
           );
         } catch (error) {
           log('useSubaccount/depositToSubaccount', error);
@@ -122,7 +129,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         try {
           return await compositeClient?.withdrawFromSubaccount(
             subaccountClient,
-            amount.toFixed(usdcDecimals)
+            amount.toFixed(usdcDecimals),
+            TransactionMemo.withdrawFromSubaccount
           );
         } catch (error) {
           log('useSubaccount/withdrawFromSubaccount', error);
@@ -158,7 +166,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
               }),
             false,
             undefined,
-            undefined,
+            `${DEFAULT_TRANSACTION_MEMO} | transfer usdc to ${subaccountClient.address}`,
             Method.BroadcastTxCommit
           );
         } catch (error) {
@@ -233,15 +241,21 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           return await compositeClient.send(
             subaccountClient.wallet,
             () => Promise.resolve([msg, ibcMsg]),
-            false
+            false,
+            undefined,
+            TransactionMemo.withdrawFromAccount
           );
         } catch (error) {
+          // Reset the default options after the tx is sent.
+          if (isKeplr && window.keplr) {
+            window.keplr.defaultOptions = {};
+          }
           log('useSubaccount/sendSquidWithdrawFromSubaccount', error);
           throw error;
         }
       },
     }),
-    [compositeClient, usdcDecimals]
+    [compositeClient, isKeplr, usdcDecimals]
   );
 
   const [subaccountNumber] = useState(0);
@@ -289,10 +303,32 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {
-    if (usdcCoinBalance) {
+    if (usdcCoinBalance && !isKeplr) {
       rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance, rebalanceWalletFunds]);
+  }, [usdcCoinBalance, rebalanceWalletFunds, isKeplr]);
+
+  const [showDepositDialog, setShowDepositDialog] = useState(true);
+
+  useEffect(() => {
+    if (isKeplr && usdcCoinBalance) {
+      if (showDepositDialog) {
+        const balanceAmount = parseFloat(usdcCoinBalance.amount);
+        const usdcBalance = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC;
+        const shouldDeposit = usdcBalance > 0 && usdcBalance.toFixed(2) !== '0.00';
+        if (shouldDeposit) {
+          dispatch(
+            openDialog(
+              DialogTypes.ConfirmPendingDeposit({
+                usdcBalance,
+              })
+            )
+          );
+        }
+      }
+      setShowDepositDialog(false);
+    }
+  }, [isKeplr, usdcCoinBalance, showDepositDialog]);
 
   const deposit = useCallback(
     async (amount: number) => {
@@ -304,6 +340,22 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     },
     [subaccountClient, depositToSubaccount]
   );
+
+  const depositCurrentBalance = useCallback(async () => {
+    const currentBalance = (
+      await compositeClient?.validatorClient.get.getAccountBalance(dydxAddress as string, usdcDenom)
+    )?.amount;
+
+    if (!currentBalance) throw new Error('Failed to get current balance');
+
+    const balanceAmount = formatUnits(BigInt(currentBalance), usdcDecimals);
+
+    const depositAmount = parseFloat(balanceAmount) - AMOUNT_RESERVED_FOR_GAS_USDC;
+
+    if (depositAmount > 0) {
+      await deposit(depositAmount);
+    }
+  }, [usdcDecimals, compositeClient, dydxAddress, usdcDenom, deposit]);
 
   const withdraw = useCallback(
     async (amount: number) => {
@@ -352,10 +404,25 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!subaccountClient) {
         return undefined;
       }
+
+      // If the dYdX USDC balance is less than the amount to IBC transfer, the signature cannot be made,
+      // so disable the balance check only for this tx.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {
+          sign: {
+            disableBalanceCheck: true,
+          },
+        };
+      }
       const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
-      return hashFromTx(tx?.hash);
+
+      // Reset the default options after the tx is sent.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {};
+      }
+      return hashFromTx(tx.hash);
     },
-    [subaccountClient, sendSquidWithdrawFromSubaccount]
+    [subaccountClient, sendSquidWithdrawFromSubaccount, isKeplr]
   );
 
   const adjustIsolatedMarginOfPosition = useCallback(
@@ -788,6 +855,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     transfer,
     sendSquidWithdraw,
     adjustIsolatedMarginOfPosition,
+    depositCurrentBalance,
 
     // Trading Methods
     placeOrder,

@@ -11,12 +11,21 @@ type StyleProps = {
   className?: string;
 };
 
-export const TermsOfUseLink = ({ isInline = false, isAccent = false, className }: StyleProps) => {
+type ElementProps = {
+  hrefOverride?: string;
+};
+
+export const TermsOfUseLink = ({
+  hrefOverride,
+  isInline = false,
+  isAccent = false,
+  className,
+}: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
   return (
     <Link
-      href={`${BASE_ROUTE}${AppRoute.Terms}`}
+      href={hrefOverride ?? `${BASE_ROUTE}${AppRoute.Terms}`}
       isInline={isInline}
       isAccent={isAccent}
       className={className}

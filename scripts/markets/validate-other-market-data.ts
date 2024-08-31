@@ -653,39 +653,20 @@ function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<str
       continue;
     }
 
-    if (JSON.stringify(oldProposals[name].params) !== JSON.stringify(newProposal.params)) {
+    const oldParams = removeIdFromParams(oldProposals[name].params);
+    const newParams = removeIdFromParams(newProposal.params);
+    if (JSON.stringify(oldParams) !== JSON.stringify(newParams)) {
       marketsToValidate.add(name);
     }
   }
 
   return marketsToValidate;
 }
-function getAllMarketsToValidate(otherMarketsContent: string): Set<string> {
-  // Create a set to store all markets
-  const marketsToValidate = new Set<string>();
 
-  // Split the content by lines
-  const lines = otherMarketsContent.split('\n');
-
-  // Regex to find market lines
-  const marketRegex = /"([A-Z]+)": \{/;
-
-  // Iterate over each line to find all markets
-  lines.forEach(line => {
-    const match = line.trim().match(marketRegex);
-    if (match) {
-      marketsToValidate.add(match[1]);
-    }
-  });
-
-  // Log a message if no markets were found
-  if (marketsToValidate.size === 0) {
-    console.log('No markets to validate');
-  }
-
-  return marketsToValidate;
+function removeIdFromParams(params: any): any {
+  const { id, ...paramsWithoutId } = params;
+  return paramsWithoutId;
 }
-
 
 async function main(): Promise<void> {
   // Read new proposals.

@@ -22,7 +22,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-import { OutputType } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -60,14 +60,29 @@ export const NewMarketSelectionStep = ({
     return (
       <>
         <h2>
-          Launch a Market
+          {stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET })}
           <span tw="flex flex-row items-center text-small text-color-text-1">
-            <LightningBoltIcon tw="text-color-warning" /> Trade Instantly
+            <LightningBoltIcon tw="text-color-warning" />{' '}
+            {stringGetter({ key: STRING_KEYS.TRADE_INSTANTLY })}
           </span>
         </h2>
         <span tw="text-base text-color-text-0">
-          Select the market you’d like to launch and deposit $10,000 into MegaVault. Your deposit
-          will earn an estimated 34.56% APR (based on the last 30 days).
+          {stringGetter({
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            params: {
+              APR_PERCENTAGE: (
+                <Output
+                  type={OutputType.Percent}
+                  tw="inline-block text-color-success"
+                  value={0.3456}
+                />
+              ),
+              DEPOSIT_AMOUNT: (
+                <Output useGrouping type={OutputType.Fiat} tw="inline-block" value={10_000} />
+              ),
+              PAST_DAYS: 30,
+            },
+          })}
         </span>
       </>
     );
@@ -134,7 +149,7 @@ export const NewMarketSelectionStep = ({
           >
             <FormInput
               type={InputType.Currency}
-              label="Required Amount to Deposit"
+              label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"
               value="$10000"
             />
@@ -154,7 +169,7 @@ export const NewMarketSelectionStep = ({
                 state={{ isDisabled: !tickerToAdd }}
                 action={ButtonAction.Primary}
               >
-                Preview Launch
+                {stringGetter({ key: STRING_KEYS.PREVIEW_LAUNCH })}
               </Button>
             )}
           </WithReceipt>

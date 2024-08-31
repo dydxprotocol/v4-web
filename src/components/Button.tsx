@@ -68,7 +68,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
             {withContentOnLoading && slotLeft}
             {withContentOnLoading && children}
             {withContentOnLoading && slotRight}
-            <LoadingDots size={3} tw="pt-[0.5em]" />
+            <LoadingDots size={3} />
           </>
         ) : (
           <>

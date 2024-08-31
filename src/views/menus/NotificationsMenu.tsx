@@ -95,6 +95,18 @@ export const NotificationsMenu = ({
                   slotIcon={displayData.icon}
                   slotTitle={displayData.title}
                   slotDescription={displayData.body}
+                  slotAction={
+                    displayData.renderActionSlot ? (
+                      displayData.renderActionSlot({ isToast: false, notification })
+                    ) : displayData.actionDescription ? (
+                      <Button
+                        size={ButtonSize.Small}
+                        onClick={() => onNotificationAction(notification)}
+                      >
+                        {displayData.actionDescription}
+                      </Button>
+                    ) : undefined
+                  }
                   notification={notification}
                   withClose={displayData.withClose}
                 />

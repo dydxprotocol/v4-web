@@ -8,6 +8,7 @@ import tw from 'twin.macro';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
   STRING_KEYS,
   STRING_KEY_VALUES,
@@ -16,11 +17,11 @@ import {
 } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
 import {
-  CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
-  MEDIAN_REWARDS_AMOUNT,
   MarketLaunchNotificationIds,
+  MarketUpdateNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
@@ -29,7 +30,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -37,6 +38,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
@@ -65,7 +67,7 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
-import { useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -214,22 +216,32 @@ export const notificationTypes: NotificationTypeConfig[] = [
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
           const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
-          const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
-          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
-
           const transferType =
             type ??
             (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit);
 
-          const title = stringGetter({
-            key: {
-              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[transferType],
-          });
+          const isCosmosDeposit =
+            SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
+            fromChainId !== selectedDydxChainId;
+
+          const isFinished =
+            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+          const icon = isCosmosDeposit ? (
+            <$AssetIcon symbol="USDC" />
+          ) : (
+            <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
+          );
+
+          const title = isCosmosDeposit
+            ? stringGetter({ key: STRING_KEYS.CONFIRM_PENDING_DEPOSIT })
+            : stringGetter({
+                key: {
+                  deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+                  withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+                }[transferType],
+              });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
           // TODO: remove typeguards once skip implements estimatedrouteduration
@@ -267,7 +279,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -283,8 +295,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
-      const twitter200BVolumeExpirationDate = new Date('2024-08-16T23:59:59');
-      const incentivesExpirationDate = new Date('2024-08-16T23:59:59');
       const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
       const currentDate = new Date();
 
@@ -309,55 +319,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.DiscoveryProgram,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= twitter200BVolumeExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.Twitter200BVolume,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: STRING_KEYS.DISCOVERY_PROGRAM_TITLE,
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.DISCOVERY_PROGRAM_BODY,
-                params: {
-                  HERE_LINK: (
-                    <Link href="https://x.com/dYdX/status/1819342483794415784" isAccent isInline>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.Twitter200BVolume,
-            },
-            []
-          );
-        }
-
-        if (currentDate <= incentivesExpirationDate) {
-          trigger(
-            INCENTIVES_SEASON_NOTIFICATION_ID,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
-                params: { SEASON_NUMBER: CURRENT_SEASON_NUMBER },
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
-                params: {
-                  PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
-                  DYDX_AMOUNT: MEDIAN_REWARDS_AMOUNT.DYDX,
-                  USDC_AMOUNT: MEDIAN_REWARDS_AMOUNT.USDC,
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
             },
             []
           );
@@ -451,47 +412,114 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.MarketUpdate,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
+      const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
+      const currentDate = new Date();
+      const { chainTokenLabel } = useTokenConfigs();
+
+      useEffect(() => {
+        if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
+          trigger(
+            MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
+              body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
+              toastSensitivity: 'foreground',
+              groupKey: MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+            },
+            []
+          );
+        }
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.MarketWindDown,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
+      const { contractLossMechanismLearnMore } = useURLConfigs();
 
-      const { rndrParamProposal } = useURLConfigs();
+      const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
+      const MATICWindDownDate = MATICWindDownProposalExpirationDate;
+      const MATICWindDownExpirationDate = '2024-10-04T23:59:59.000Z';
+      const MATICMarket = 'MATIC-USD';
 
       const currentDate = new Date();
-
-      const RNDNProposalTriggerDate = new Date('2024-07-20T22:00:00.000Z');
-      const RNDNProposalExpireDate = new Date('2024-08-20T22:00:00.000Z');
-
-      const RNDRMarket = 'RNDR-USD';
+      const outputDate = (
+        <Output tw="inline-block" type={OutputType.DateTime} value={MATICWindDownDate} />
+      );
 
       useEffect(() => {
         if (
-          rndrParamProposal &&
-          currentDate >= RNDNProposalTriggerDate &&
-          currentDate <= RNDNProposalExpireDate
+          maticWindDownProposal &&
+          maticWindDownProposal !== '' &&
+          currentDate <= new Date(MATICWindDownProposalExpirationDate)
+        ) {
+          trigger(MarketWindDownNotificationIds.MarketWindDownProposalMatic, {
+            title: stringGetter({
+              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.TITLE',
+              params: {
+                MARKET: MATICMarket,
+              },
+            }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.BODY',
+              params: {
+                MARKET: MATICMarket,
+                DATE: outputDate,
+                HERE_LINK: (
+                  <Link isInline isAccent href={maticWindDownProposal}>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalMatic,
+          });
+        }
+      }, [stringGetter]);
+
+      useEffect(() => {
+        if (
+          maticWindDownProposal &&
+          maticWindDownProposal !== '' &&
+          contractLossMechanismLearnMore &&
+          currentDate >= new Date(MATICWindDownDate) &&
+          currentDate <= new Date(MATICWindDownExpirationDate)
         ) {
           trigger(
-            MarketWindDownNotificationIds.MarketUpdateProposalRndr,
+            MarketWindDownNotificationIds.MarketWindDownMatic,
             {
               title: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.TITLE',
+                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.TITLE',
                 params: {
-                  MARKET: RNDRMarket,
+                  MARKET: MATICMarket,
                 },
               }),
               body: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_PARAM_UPDATE.BODY',
+                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.BODY',
                 params: {
-                  MARKET: RNDRMarket,
+                  MARKET: MATICMarket,
+                  DATE: outputDate,
                   HERE_LINK: (
-                    <Link href={rndrParamProposal} isAccent isInline>
+                    <Link isInline isAccent href={contractLossMechanismLearnMore}>
                       {stringGetter({ key: STRING_KEYS.HERE })}
                     </Link>
                   ),
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: MarketWindDownNotificationIds.MarketUpdateProposalRndr,
+              groupKey: MarketWindDownNotificationIds.MarketWindDownMatic,
             },
             []
           );
@@ -653,8 +681,49 @@ export const notificationTypes: NotificationTypeConfig[] = [
       };
     },
   },
+  {
+    type: NotificationType.FeedbackRequest,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const { getInTouch } = useURLConfigs();
+      const stringGetter = useStringGetter();
+
+      const dynamicConfigs = useAllStatsigDynamicConfigValues();
+      const feedbackRequestWalletAddresses =
+        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+
+      useEffect(() => {
+        if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
+          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
+            icon: <Icon iconName={IconName.SpeechBubble} />,
+            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.FeedbackRequest,
+            toastDuration: Infinity,
+            withClose: false,
+            // our generate script only knows to generate string keys for title and body
+            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
+            renderActionSlot: () => (
+              <Link href={getInTouch} isAccent>
+                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+              </Link>
+            ),
+          });
+        }
+      }, [dydxAddress]);
+    },
+    useNotificationAction: () => {
+      const { getInTouch } = useURLConfigs();
+      return () => {
+        window.open(getInTouch, '_blank', 'noopener, noreferrer');
+      };
+    },
+  },
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;
+
+const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
 const $WarningIcon = tw(Icon)`text-color-warning`;
