@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { ORDER_SIDES, SubaccountOrder, TriggerOrdersInputField } from '@/constants/abacus';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
@@ -17,11 +17,13 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStringGetter } from '../useStringGetter';
+import { useSubaccount } from '../useSubaccount';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
 
@@ -58,6 +60,8 @@ export const useChartLines = ({
     getCurrentMarketOrders,
     shallowEqual
   );
+
+  const { placeTriggerOrders } = useSubaccount();
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -195,7 +199,18 @@ export const useChartLines = ({
     if (!currentMarketOrders) return;
 
     currentMarketOrders.forEach(
-      ({ id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent }) => {
+      ({
+        id,
+        type,
+        status,
+        side,
+        cancelReason,
+        size,
+        triggerPrice,
+        price,
+        trailingPercent,
+        marketId,
+      }) => {
         const key = id;
         const quantity = size.toString();
 
@@ -227,6 +242,38 @@ export const useChartLines = ({
               ?.chart()
               .createOrderLine({ disableUndo: false })
               .setPrice(formattedPrice)
+              .onMove(async () => {
+                if (!orderLine) return;
+
+                const oldPrice = formattedPrice;
+                const newPrice = orderLine.getPrice();
+
+                // TODO: do some validation here for new price
+
+                // Set the current market ID
+                abacusStateManager.setTriggerOrdersValue({
+                  field: TriggerOrdersInputField.marketId,
+                  value: marketId,
+                });
+                // Set trigger values for the current market
+                abacusStateManager.setTriggerOrdersValue({
+                  // TODO: deriver field based on current order type
+                  field: TriggerOrdersInputField.stopLossLimitPrice,
+                  value: newPrice,
+                });
+                orderLine.setPrice(newPrice);
+
+                placeTriggerOrders({
+                  onError: (err) => {
+                    console.log('error', err);
+                    orderLine.setPrice(oldPrice);
+                  },
+                  onSuccess: () => {
+                    console.log('success');
+                  },
+                });
+
+              })
               .setQuantity(quantity)
               .setText(orderString);
             if (orderLine) {
