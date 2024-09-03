@@ -223,6 +223,8 @@ export const resolveWagmiConnector = ({
     return coinbaseWalletConnector({
       appName: 'dYdX',
       reloadOnDisconnect: false,
+      // disable Coinbase Smart Wallet because dydx-client currently doesn't handle EIP-6492 signatures
+      preference: 'eoaOnly',
     });
   }
 
