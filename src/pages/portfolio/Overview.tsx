@@ -15,6 +15,7 @@ import { AttachedExpandingSection, DetachedSection } from '@/components/ContentS
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
@@ -51,6 +52,10 @@ export const Overview = () => {
     <div>
       <DetachedSection>
         <AccountDetailsAndHistory />
+      </DetachedSection>
+
+      <DetachedSection>
+        <AffiliatesBanner />
       </DetachedSection>
 
       <AttachedExpandingSection tw="mt-1">
