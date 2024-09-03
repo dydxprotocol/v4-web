@@ -6,6 +6,7 @@ import { ORDER_SIDES, SubaccountOrder, TriggerOrdersInputField } from '@/constan
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
+import { TriggerFields } from '@/constants/triggers';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
 import {
@@ -198,8 +199,8 @@ export const useChartLines = ({
     // currentMarketOrders, just with a cancelReason
     if (!currentMarketOrders) return;
 
-    currentMarketOrders.forEach(
-      ({
+    currentMarketOrders.forEach((order) => {
+      const {
         id,
         type,
         status,
@@ -210,84 +211,95 @@ export const useChartLines = ({
         price,
         trailingPercent,
         marketId,
-      }) => {
-        const key = id;
-        const quantity = size.toString();
+      } = order;
+      const key = id;
+      const quantity = size.toString();
 
-        const orderType = type.rawValue as OrderType;
-        const orderLabel = stringGetter({
-          key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
-        });
-        const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
+      const orderType = type.rawValue as OrderType;
+      const orderLabel = stringGetter({
+        key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
+      });
+      const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
-        const shouldShow = !cancelReason && isOrderStatusOpen(status);
-        const maybeOrderLine = chartLinesRef.current[key]?.line;
-        const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
-        if (!shouldShow) {
-          if (maybeOrderLine) {
-            maybeOrderLine.remove();
-            delete chartLinesRef.current[key];
+      const shouldShow = !cancelReason && isOrderStatusOpen(status);
+      const maybeOrderLine = chartLinesRef.current[key]?.line;
+      const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
+      if (!shouldShow) {
+        if (maybeOrderLine) {
+          maybeOrderLine.remove();
+          delete chartLinesRef.current[key];
+        }
+      } else {
+        if (maybeOrderLine) {
+          if (maybeOrderLine.getPrice() !== formattedPrice) {
+            maybeOrderLine.setPrice(formattedPrice);
+          }
+
+          if (maybeOrderLine.getQuantity() !== quantity) {
+            maybeOrderLine.setQuantity(quantity);
           }
         } else {
-          if (maybeOrderLine) {
-            if (maybeOrderLine.getPrice() !== formattedPrice) {
-              maybeOrderLine.setPrice(formattedPrice);
-            }
+          const orderLine = tvWidget
+            ?.chart()
+            .createOrderLine({ disableUndo: false })
+            // TODO: Use pending order's price if there is one
+            .setPrice(formattedPrice)
+            .onMove(async () => {
+              if (!orderLine) return;
 
-            if (maybeOrderLine.getQuantity() !== quantity) {
-              maybeOrderLine.setQuantity(quantity);
-            }
-          } else {
-            const orderLine = tvWidget
-              ?.chart()
-              .createOrderLine({ disableUndo: false })
-              .setPrice(formattedPrice)
-              .onMove(async () => {
-                if (!orderLine) return;
+              const oldPrice = formattedPrice;
+              const newPrice = orderLine.getPrice();
+              orderLine.setPrice(newPrice);
 
-                const oldPrice = formattedPrice;
-                const newPrice = orderLine.getPrice();
+              // TODO: do some validation here for new price
+              abacusStateManager.clearTriggerOrdersInputValues({ field: TriggerFields.All });
+              abacusStateManager.setTriggerOrdersValue({
+                field: TriggerOrdersInputField.marketId,
+                value: marketId,
+              });
+              abacusStateManager.setTriggerOrdersValue({
+                // TODO: deriver field based on current order type
+                field: TriggerOrdersInputField.stopLossOrderId,
+                value: id,
+              });
+              abacusStateManager.setTriggerOrdersValue({
+                field: TriggerOrdersInputField.stopLossOrderSize,
+                value: size,
+              });
+              abacusStateManager.setTriggerOrdersValue({
+                field: TriggerOrdersInputField.stopLossOrderType,
+                value: type.rawValue,
+              });
+              abacusStateManager.setTriggerOrdersValue({
+                field: TriggerOrdersInputField.stopLossPrice,
+                value: newPrice,
+              });
 
-                // TODO: do some validation here for new price
-
-                // Set the current market ID
-                abacusStateManager.setTriggerOrdersValue({
-                  field: TriggerOrdersInputField.marketId,
-                  value: marketId,
-                });
-                // Set trigger values for the current market
-                abacusStateManager.setTriggerOrdersValue({
-                  // TODO: deriver field based on current order type
-                  field: TriggerOrdersInputField.stopLossLimitPrice,
-                  value: newPrice,
-                });
-                orderLine.setPrice(newPrice);
-
-                placeTriggerOrders({
-                  onError: (err) => {
-                    console.log('error', err);
-                    orderLine.setPrice(oldPrice);
-                  },
-                  onSuccess: () => {
-                    console.log('success');
-                  },
-                });
-
-              })
-              .setQuantity(quantity)
-              .setText(orderString);
-            if (orderLine) {
-              const chartLine: ChartLine = {
-                line: orderLine,
-                chartLineType: ORDER_SIDES[side.name],
-              };
-              setLineColorsAndFont({ chartLine });
-              chartLinesRef.current[key] = chartLine;
-            }
+              // TODO: add current order and new price to pending orders cache
+              placeTriggerOrders({
+                onError: () => {
+                  orderLine.setPrice(oldPrice);
+                  // TODO: remove order from cache
+                },
+                onSuccess: () => {
+                  console.log('success');
+                  // TODO: remove order from cache
+                },
+              });
+            })
+            .setQuantity(quantity)
+            .setText(orderString);
+          if (orderLine) {
+            const chartLine: ChartLine = {
+              line: orderLine,
+              chartLineType: ORDER_SIDES[side.name],
+            };
+            setLineColorsAndFont({ chartLine });
+            chartLinesRef.current[key] = chartLine;
           }
         }
       }
-    );
+    });
   }, [setLineColorsAndFont, stringGetter, currentMarketOrders, tvWidget]);
 
   const clearChartLines = useCallback(() => {
