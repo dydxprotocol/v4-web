@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
+import { isMainnet } from '@/constants/networks';
 
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
@@ -72,7 +73,9 @@ export const DialogManager = () => {
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
-    FunkitDeposit: (args) => <FunkitDepositDialog {...args} />,
+    // Only show funkit deposit in production
+    FunkitDeposit: (args) =>
+      isMainnet ? <FunkitDepositDialog {...args} /> : <DepositDialog {...args} {...modalProps} />,
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
     ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,

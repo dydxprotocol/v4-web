@@ -45,11 +45,7 @@ import {
 } from 'wagmi/connectors';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import {
-  DEFAULT_APP_ENVIRONMENT,
-  ENVIRONMENT_CONFIG_MAP,
-  WALLETS_CONFIG_MAP,
-} from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
   ConnectorType,
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
@@ -210,8 +206,8 @@ const getWalletconnect2ConnectorOptions = (
 
 export const config = createFunkitWagmiConfig({
   appName: 'dYdX',
-  // TODO: Get from env
-  projectId: WALLETS_CONFIG_MAP['[mainnet chain id]'].walletconnect.v2.projectId,
+  // This is a static placeholder config. The actual projectId gets set during render time at `getWalletconnect2ConnectorOptions` where it is dynamically determined.
+  projectId: 'placeholderProjectId',
   chains: [mainnet, ...WAGMI_SUPPORTED_CHAINS],
   transports: RPCTransports,
 });
