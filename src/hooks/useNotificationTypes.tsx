@@ -215,7 +215,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
-          const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
+          const { id, fromChainId, toChainId, status, txHash, toAmount, type, isExchange } =
+            transfer;
           const transferType =
             type ??
             (fromChainId === selectedDydxChainId
@@ -224,7 +225,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           const isCosmosDeposit =
             SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
-            fromChainId !== selectedDydxChainId;
+            fromChainId !== selectedDydxChainId &&
+            toChainId === selectedDydxChainId;
 
           const isFinished =
             (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
