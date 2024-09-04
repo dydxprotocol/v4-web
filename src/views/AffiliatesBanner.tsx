@@ -1,15 +1,24 @@
 import { styled } from 'twin.macro';
 
+import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 export const AffiliatesBanner = () => {
+  const stringGetter = useStringGetter();
+  const { affiliateProgram } = useURLConfigs();
+
   const dispatch = useAppDispatch();
   return (
     <$Background tw="row m-1 justify-between gap-0.5 rounded-0.5 bg-color-layer-1 pl-1 pr-2">
@@ -19,12 +28,30 @@ export const AffiliatesBanner = () => {
           <div tw="row">
             <$Triangle />
             <div tw="inline-block rounded-0.5 bg-color-layer-6 px-1 py-0.5 font-bold text-color-text-2">
-              Earn up to $1,500/mo for each new trader
+              {stringGetter({
+                key: STRING_KEYS.EARN_FOR_EACH_TRADER,
+                params: { AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString() },
+              })}
             </div>
           </div>
           <div tw="ml-0.5">
-            Refer a friend and they can receive up to $550 in discounts. <br />
-            Want to view your earnings? Affiliates Program →
+            {stringGetter({
+              key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
+              params: {
+                AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
+              },
+            })}{' '}
+            <br />
+            {stringGetter({
+              key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
+              params: {
+                LINK: (
+                  <Link href={affiliateProgram} isInline isAccent>
+                    {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
+                  </Link>
+                ),
+              },
+            })}
           </div>
         </div>
       </div>
@@ -37,7 +64,7 @@ export const AffiliatesBanner = () => {
             dispatch(openDialog(DialogTypes.ShareAffiliate()));
           }}
         >
-          Invite Friends
+          {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
         </Button>
       </div>
     </$Background>

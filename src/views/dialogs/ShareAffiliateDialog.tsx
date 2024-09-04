@@ -2,16 +2,20 @@ import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
+import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
 
 import { triggerTwitterIntent } from '@/lib/twitter';
@@ -29,6 +33,7 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
+  const { affiliateProgram } = useURLConfigs();
 
   const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -42,11 +47,11 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
       triggerTwitterIntent({
         text: `${stringGetter({
-          key: STRING_KEYS.TWEET_MARKET_POSITION,
+          key: STRING_KEYS.TWEET_SHARE_AFFILIATES,
           params: {
-            MARKET: DUMMY_AFFILIATE_CODE,
+            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT,
           },
-        })}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        })}\n\n${affiliatesUrl}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
       });
     },
@@ -58,18 +63,31 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title="Invite Friends!"
-      description="Earn up to $1,500/mo for each new trader you refer. Your referral can save up to $550 in trading fees. Learn more"
+      title={stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+      description={stringGetter({
+        key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
+        params: {
+          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT,
+          AMOUNT_PER_MONTH: AFFILIATES_EARN_PER_MONTH,
+          LEARN_MORE_LINK: (
+            <Link href={affiliateProgram} isInline>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+            </Link>
+          ),
+        },
+      })}
     >
       <div tw="column gap-1">
         <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
           <div>
-            <div tw="text-small text-color-text-0">Affiliate Link</div>
+            <div tw="text-small text-color-text-0">
+              {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
+            </div>
             <div>{affiliatesUrl}</div>
           </div>
-          <Button action={ButtonAction.Primary} size={ButtonSize.Small}>
-            Copy Link
-          </Button>
+          <CopyButton action={ButtonAction.Primary} size={ButtonSize.Small} value={affiliatesUrl}>
+            {stringGetter({ key: STRING_KEYS.COPY_LINK })}
+          </CopyButton>
         </div>
         <div
           ref={(domNode) => {
