@@ -1,6 +1,8 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
+import { FunkitProvider } from '@funkit/connect';
+import '@funkit/connect/styles.css';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -49,6 +51,7 @@ import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { funkitConfig, funkitTheme } from './lib/funkit';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
 import breakpoints from './styles/breakpoints';
@@ -180,6 +183,11 @@ const providers = [
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
+  wrapProvider(FunkitProvider, {
+    funkitConfig,
+    theme: funkitTheme,
+    initialChain: config.chains[0].id,
+  }),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
@@ -239,10 +247,10 @@ const $Content = styled.div<{
         --page-currentFooterHeight: var(--page-footer-height-mobile);
       }
     `}
-  
+
     /* Rules */
     ${layoutMixins.contentContainer}
-  
+
     ${layoutMixins.scrollArea}
     --scrollArea-height: 100vh;
 

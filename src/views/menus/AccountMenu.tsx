@@ -1,5 +1,6 @@
 import { ElementType, memo } from 'react';
 
+import { useAccountModal } from '@funkit/connect';
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
@@ -61,6 +62,7 @@ export const AccountMenu = () => {
   const { complianceState } = useComplianceState();
 
   const dispatch = useAppDispatch();
+  const { openAccountModal: openFunkitAccountModal } = useAccountModal();
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -120,6 +122,7 @@ export const AccountMenu = () => {
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
   ) : (
     <$DropdownMenu
+      modal={false}
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
@@ -350,6 +353,23 @@ export const AccountMenu = () => {
               },
             ]
           : []),
+        // TODO: Needs discussion and update copy & icons if confirmed
+        // Potentially only show if user has ever done a funkit checkout before
+        ...(onboardingState === OnboardingState.AccountConnected
+          ? [
+              {
+                value: 'InstantDepositHistory',
+                icon:
+                  theme === AppTheme.Light ? (
+                    <Icon iconName={IconName.History} />
+                  ) : (
+                    <Icon iconName={IconName.History} />
+                  ),
+                label: '[TBD] Fun.xyz deposit history',
+                onSelect: () => openFunkitAccountModal?.(),
+              },
+            ]
+          : []),
         {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
@@ -388,7 +408,7 @@ const AssetActions = memo(
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Deposit(),
+            dialog: DialogTypes.FunkitDeposit(),
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
           },
