@@ -217,7 +217,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     if (!this.compositeClient || !this.localWallet)
       throw new Error('Missing compositeClient or localWallet');
 
-    console.log("placeOrderTransaction", params)
     try {
       const {
         subaccountNumber,

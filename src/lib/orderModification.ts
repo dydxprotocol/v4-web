@@ -108,7 +108,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     triggerPrice,
   } = order;
 
-  // subaccountNumber can be 0 -_-
+  // subaccountNumber can be 0 -.-
   if (subaccountNumber === undefined || subaccountNumber === null || !clientId) {
     return undefined;
   }
@@ -126,10 +126,10 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     reduceOnly,
     postOnly,
     timeInForce?.rawValue,
-    null, // execution,
+    null, // TODO(tinaszheng) investigate if `execution` is required,
     goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime),
     goodTilBlock,
-    null // marketInfo,
+    null // TODO(tinaszheng): get marketInfo from abacus,
   );
 };
 
