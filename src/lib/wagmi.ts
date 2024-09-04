@@ -210,8 +210,9 @@ const getWalletconnect2ConnectorOptions = (
 
 export const config = createFunkitWagmiConfig({
   appName: 'dYdX',
-  // TODO: Get from env
-  projectId: WALLETS_CONFIG_MAP['[mainnet chain id]'].walletconnect.v2.projectId,
+  // dydx already has wallet connection before checkout, dynamically based on network
+  // so we have a PLACEHOLDER here
+  projectId: 'PLACEHOLDER',
   chains: [mainnet, ...WAGMI_SUPPORTED_CHAINS],
   transports: RPCTransports,
 });
