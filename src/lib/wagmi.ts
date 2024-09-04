@@ -1,6 +1,6 @@
 // Custom connectors
+import { createFunkitWagmiConfig } from '@funkit/connect';
 import type { PrivyClientConfig } from '@privy-io/react-auth';
-import { createConfig } from '@privy-io/wagmi';
 import { FallbackTransport, Transport, http, type Chain } from 'viem';
 import {
   arbitrum,
@@ -36,6 +36,7 @@ import {
   polygonMumbai,
   scroll,
   sepolia,
+  zkSync,
 } from 'viem/chains';
 import { fallback } from 'wagmi';
 import {
@@ -44,7 +45,11 @@ import {
 } from 'wagmi/connectors';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import {
+  DEFAULT_APP_ENVIRONMENT,
+  ENVIRONMENT_CONFIG_MAP,
+  WALLETS_CONFIG_MAP,
+} from '@/constants/networks';
 import {
   ConnectorType,
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
@@ -92,6 +97,7 @@ const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   celoAlfajores,
   scroll,
   kava,
+  zkSync,
 ];
 
 enum ChainId {
@@ -202,7 +208,10 @@ const getWalletconnect2ConnectorOptions = (
   },
 });
 
-export const config = createConfig({
+export const config = createFunkitWagmiConfig({
+  appName: 'dYdX',
+  // TODO: Get from env
+  projectId: WALLETS_CONFIG_MAP['[mainnet chain id]'].walletconnect.v2.projectId,
   chains: [mainnet, ...WAGMI_SUPPORTED_CHAINS],
   transports: RPCTransports,
 });
