@@ -6,22 +6,33 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { VerticalSeparator } from '@/components/Separator';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
 import { MarketsDropdown } from '@/views/MarketsDropdown';
+import { UnlaunchedMarketStatsDetails } from '@/views/UnlaunchedMarketStatsDetails';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
-export const MarketSelectorAndStats = ({ className }: { className?: string }) => {
+export const MarketSelectorAndStats = ({
+  className,
+  launchableMarketId,
+}: {
+  className?: string;
+  launchableMarketId?: string;
+}) => {
   const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   return (
     <$Container className={className}>
-      <MarketsDropdown currentMarketId={currentMarketId} symbol={id} />
+      <MarketsDropdown
+        isViewingUnlaunchedMarket={!!launchableMarketId}
+        currentMarketId={launchableMarketId ?? currentMarketId}
+        symbol={id}
+      />
 
       <VerticalSeparator />
 
-      <MarketStatsDetails />
+      {launchableMarketId ? <UnlaunchedMarketStatsDetails /> : <MarketStatsDetails />}
     </$Container>
   );
 };

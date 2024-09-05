@@ -20,6 +20,7 @@ import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { LaunchMarketDialog } from '@/views/dialogs/LaunchMarketDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
@@ -80,6 +81,7 @@ export const DialogManager = () => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
+    LaunchMarket: (args) => <LaunchMarketDialog {...args} {...modalProps} />,
     ManageFunds: (args) => <ManageFundsDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
