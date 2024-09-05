@@ -1,4 +1,6 @@
 import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
+import { OrderExecution } from '@dydxprotocol/v4-client-js';
+import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 
 import {
   HumanReadableCancelOrderPayload,
@@ -9,7 +11,7 @@ import {
 
 import abacusStateManager from './abacus';
 import { isTruthy } from './isTruthy';
-import { isLimitOrderType, isStopLossOrder, isTakeProfitOrder } from './orders';
+import { isLimitOrderType, isMarketOrderType, isStopLossOrder, isTakeProfitOrder } from './orders';
 
 export const syncSLTPOrderToAbacusState = (
   order: SubaccountOrder,
@@ -99,7 +101,6 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     type,
     side,
     size,
-    clientId,
     timeInForce,
     goodTilBlock,
     goodTilBlockTime,
@@ -109,14 +110,14 @@ export const createPlaceOrderPayloadFromExistingOrder = (
   } = order;
 
   // subaccountNumber can be 0 -.-
-  if (subaccountNumber === undefined || subaccountNumber === null || !clientId) {
+  if (subaccountNumber === undefined || subaccountNumber === null) {
     return undefined;
   }
 
   return new Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload(
     subaccountNumber,
     marketId,
-    clientId,
+    generateRandomClientId(),
     type.rawValue,
     side.rawValue,
     newPrice,
@@ -126,7 +127,8 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     reduceOnly,
     postOnly,
     timeInForce?.rawValue,
-    null, // TODO(tinaszheng) investigate if `execution` is required,
+    // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
+    isMarketOrderType(type) ? OrderExecution.IOC : null,
     goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime),
     goodTilBlock,
     null // TODO(tinaszheng): get marketInfo from abacus,

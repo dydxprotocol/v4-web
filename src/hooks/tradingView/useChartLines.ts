@@ -4,12 +4,11 @@ import { uniqBy } from 'lodash';
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
 
-import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { AbacusOrderType, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
-import { TriggerFields } from '@/constants/triggers';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
 import {
@@ -33,13 +32,12 @@ import { MustBigNumber } from '@/lib/numbers';
 import {
   cancelOrderAsync,
   createPlaceOrderPayloadFromExistingOrder,
-  syncSLTPOrderToAbacusState,
 } from '@/lib/orderModification';
 import {
   isLimitOrderType,
   isOrderStatusOpen,
-  isStopLossOrder,
-  isTakeProfitOrder,
+  isStopMarketOrder,
+  isTakeProfitMarketOrder,
 } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
@@ -83,6 +81,9 @@ export const useChartLines = ({
   );
 
   const { placeTriggerOrders } = useSubaccount();
+
+  const canModifySLTPOrders = true; // useStatsigGateValue(StatSigFlags.ffSLTPModificationFromChart);
+  const canModifyLimitOrders = true; // useStatsigGateValue(StatSigFlags.ffLOModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -214,20 +215,25 @@ export const useChartLines = ({
     });
   }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
-  const pendingOrderAdjustmentsRef = useRef<{
+  // const pendingOrderAdjustmentsRef = useRef<{
+  //   [orderId: string]: { order: SubaccountOrder; newPrice: number };
+  // }>({});
+  const [pendingOrderAdjustments, setPendingOrderAdjustments] = useState<{
     [orderId: string]: { order: SubaccountOrder; newPrice: number };
   }>({});
 
   const removePendingOrderAdjustment = (orderId: string) => {
-    const { [orderId]: removed, ...withoutOrderId } = pendingOrderAdjustmentsRef.current;
-    pendingOrderAdjustmentsRef.current = withoutOrderId;
+    setPendingOrderAdjustments((prev) => {
+      const { [orderId]: removed, ...withoutOrderId } = prev;
+      return withoutOrderId;
+    });
   };
 
   const addPendingOrderAdjustment = (order: SubaccountOrder, newPrice: number) => {
-    pendingOrderAdjustmentsRef.current = {
-      ...pendingOrderAdjustmentsRef.current,
+    setPendingOrderAdjustments((prev) => ({
+      ...prev,
       [order.id]: { order, newPrice },
-    };
+    }));
   };
 
   const dispatch = useAppDispatch();
@@ -237,59 +243,91 @@ export const useChartLines = ({
 
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
-      orderLine.setPrice(newPrice);
 
       // TODO(tinaszheng): do some validation here for new price
+      // make sure the newPrice doesnt cross over the current price depending
+      // on the direction of the trade
 
       /* --- SL/TP modification ---- */
-      if (isStopLossOrder(order, true) || isTakeProfitOrder(order, true)) {
-        abacusStateManager.clearTriggerOrdersInputValues({ field: TriggerFields.All });
-        syncSLTPOrderToAbacusState(order, true, newPrice);
-        addPendingOrderAdjustment(order, newPrice);
+      // if (isStopMarketOrder(order) || isTakeProfitMarketOrder(order)) {
+      //   console.log('got here 1', order);
+      //   orderLine.setPrice(newPrice);
+      //   abacusStateManager.clearTriggerOrdersInputValues({ field: TriggerFields.All });
+      //   syncSLTPOrderToAbacusState(order, false, newPrice);
+      //   addPendingOrderAdjustment(order, newPrice);
 
-        placeTriggerOrders({
-          onError: () => {
-            orderLine.setPrice(oldPrice);
-            removePendingOrderAdjustment(order.id);
-          },
-          onSuccess: (data) => {
-            // onSuccess is called both when the previous order is canceled
-            // and when the new order is placed, and only remove the pending order
-            // from our cache once the new order is placed
-            if (data.placeOrderPayloads.length) {
-              removePendingOrderAdjustment(order.id);
-            }
-          },
-        });
-        return;
-      }
+      //   placeTriggerOrders({
+      //     onError: () => {
+      //       console.log('error!');
+      //       if (order.clientId) {
+      //         dispatch(
+      //           placeOrderFailed({
+      //             clientId: order.clientId,
+      //             errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+      //           })
+      //         );
+      //       }
+      //       orderLine.setPrice(oldPrice);
+      //       removePendingOrderAdjustment(order.id);
+      //     },
+      //     onSuccess: (data) => {
+      //       // If no order adjustment happened, then technically this is a failure case
+      //       if (!data.placeOrderPayloads.length && !data.cancelOrderPayloads.length) {
+      //         // TODO(tinaszheng): Local error toast here
+      //         orderLine.setPrice(oldPrice);
+      //         removePendingOrderAdjustment(order.id);
+      //         return;
+      //       }
+
+      //       // onSuccess is called both when the previous order is canceled
+      //       // and when the new order is placed, and only remove the pending order
+      //       // from our cache once the new order is placed
+      //       if (data.placeOrderPayloads.length) {
+      //         removePendingOrderAdjustment(order.id);
+      //       }
+      //     },
+      //   });
+      //   return;
+      // }
 
       /* --- Limit order modification ---- */
-      if (isLimitOrderType(order.type)) {
+      if (
+        isStopMarketOrder(order) ||
+        isTakeProfitMarketOrder(order) ||
+        isLimitOrderType(order.type)
+      ) {
+        orderLine.setPrice(newPrice);
         // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
         const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
         if (!orderPayload) {
           return;
         }
 
+        console.log("orderPayload", orderPayload);
+
         addPendingOrderAdjustment(order, newPrice);
         dispatch(cancelOrderSubmitted(order.id));
-        const { success: cancelSuccess } = await cancelOrderAsync(order.id);
+        const { success: cancelSuccess, parsingError } = await cancelOrderAsync(order.id);
         if (!cancelSuccess) {
+          console.log("cancel fail", parsingError)
           dispatch(
             cancelOrderFailed({
               orderId: order.id,
               errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
             })
           );
+          orderLine.setPrice(oldPrice);
+          removePendingOrderAdjustment(order.id);
           return;
         }
 
         dispatch(cancelOrderConfirmed(order.id));
 
         const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
+        console.log('res', res);
         const { error } = JSON.parse(res);
         if (error) {
+          console.log("place order error", error)
           dispatch(
             placeOrderFailed({
               clientId: orderPayload.clientId,
@@ -298,6 +336,7 @@ export const useChartLines = ({
           );
         } else {
           // TODO(tinaszheng): Investigate how to get submission success notification
+          console.log("dispatching placeOrderSubmitted", orderPayload.clientId)
           dispatch(
             placeOrderSubmitted({
               marketId: orderPayload.marketId,
@@ -316,13 +355,16 @@ export const useChartLines = ({
   const updateOrderLines = useCallback(() => {
     // We don't need to worry about clearing chart lines for cancelled market orders since they will persist in
     // currentMarketOrders, just with a cancelReason
-    if (!currentMarketOrders) return;
+    if (!currentMarketOrders) {
+      return;
+    }
 
-    const pendingOrderAdjustments = pendingOrderAdjustmentsRef.current;
+    // const pendingOrderAdjustments = pendingOrderAdjustmentsRef.current;
     const allOrders = uniqBy(
       [...currentMarketOrders, ...Object.values(pendingOrderAdjustments).map((a) => a.order)],
       (order) => order.id
     );
+    console.log('all orders', allOrders);
 
     allOrders.forEach((order) => {
       const { id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent } =
@@ -362,7 +404,6 @@ export const useChartLines = ({
             ?.chart()
             .createOrderLine({ disableUndo: false })
             .setPrice(formattedPrice)
-            .onMove(() => onMoveOrderLine(order, orderLine))
             .setQuantity(quantity)
             .setText(orderString);
           if (orderLine) {
@@ -373,10 +414,26 @@ export const useChartLines = ({
             setLineColorsAndFont({ chartLine });
             chartLinesRef.current[key] = chartLine;
           }
+          if (canModifySLTPOrders && (isStopMarketOrder(order) || isTakeProfitMarketOrder(order))) {
+            orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
+          }
+          if (canModifyLimitOrders && order.type.ordinal === AbacusOrderType.Limit.ordinal) {
+            orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
+          }
+          // TODO(tinaszheng): Enable modifying Stop Limit and Take Profit Limit order modification too
         }
       }
     });
-  }, [currentMarketOrders, stringGetter, tvWidget, setLineColorsAndFont, onMoveOrderLine]);
+  }, [
+    currentMarketOrders,
+    pendingOrderAdjustments,
+    stringGetter,
+    tvWidget,
+    canModifySLTPOrders,
+    canModifyLimitOrders,
+    setLineColorsAndFont,
+    onMoveOrderLine,
+  ]);
 
   const clearChartLines = useCallback(() => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {

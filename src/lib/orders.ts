@@ -108,6 +108,14 @@ export const isStopLossOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
 
+export const isStopMarketOrder = (order: SubaccountOrder) => {
+  return order.type.ordinal === AbacusOrderType.StopMarket.ordinal;
+};
+
+export const isTakeProfitMarketOrder = (order: SubaccountOrder) => {
+  return order.type.ordinal === AbacusOrderType.TakeProfitMarket.ordinal;
+};
+
 export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
   const validOrderTypes = isSlTpLimitOrdersEnabled
     ? [AbacusOrderType.TakeProfitLimit, AbacusOrderType.TakeProfitMarket]

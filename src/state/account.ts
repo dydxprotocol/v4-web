@@ -170,6 +170,7 @@ export const accountSlice = createSlice({
     },
     setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
       const { clientId, id } = action.payload ?? {};
+      console.log("setting latest order", clientId, id)
       state.latestOrder = action.payload;
 
       if (clientId) {

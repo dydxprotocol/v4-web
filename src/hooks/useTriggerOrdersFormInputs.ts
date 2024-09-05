@@ -11,7 +11,6 @@ import { getTriggerOrdersInputErrors } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { syncSLTPOrderToAbacusState } from '@/lib/orderModification';
 import { isLimitOrderType } from '@/lib/orders';
 
 export const useTriggerOrdersFormInputs = ({
@@ -43,24 +42,43 @@ export const useTriggerOrdersFormInputs = ({
   useEffect(() => {
     // Initialize trigger order data on mount
     if (stopLossOrder) {
-      syncSLTPOrderToAbacusState(stopLossOrder, true);
       [
+        {
+          field: TriggerOrdersInputField.stopLossOrderId,
+          value: stopLossOrder.id,
+          hasFormInput: false,
+        },
+        {
+          field: TriggerOrdersInputField.stopLossOrderSize,
+          value: stopLossOrder.size,
+          hasFormInput: false,
+        },
+        {
+          field: TriggerOrdersInputField.stopLossOrderType,
+          value: stopLossOrder.type.rawValue,
+          hasFormInput: false,
+        },
         {
           field: TriggerOrdersInputField.stopLossPrice,
           value: stopLossOrder.triggerPrice,
+          hasFormInput: true,
         },
         isLimitOrderType(stopLossOrder.type) && {
           field: TriggerOrdersInputField.stopLossLimitPrice,
           value: stopLossOrder.price,
+          hasFormInput: true,
         },
       ]
         .filter(isTruthy)
-        .forEach(({ field, value }) => {
-          dispatch(
-            setTriggerFormInputs({
-              [field.rawValue]: value?.toString(),
-            })
-          );
+        .forEach(({ field, value, hasFormInput }) => {
+          abacusStateManager.setTriggerOrdersValue({ field, value });
+          if (hasFormInput) {
+            dispatch(
+              setTriggerFormInputs({
+                [field.rawValue]: value?.toString(),
+              })
+            );
+          }
         });
     } else {
       abacusStateManager.setTriggerOrdersValue({
@@ -71,24 +89,43 @@ export const useTriggerOrdersFormInputs = ({
 
     if (takeProfitOrder) {
       // Initialize trigger order data on mount
-      syncSLTPOrderToAbacusState(takeProfitOrder, true);
       [
+        {
+          field: TriggerOrdersInputField.takeProfitOrderId,
+          value: takeProfitOrder.id,
+          hasFormInput: false,
+        },
+        {
+          field: TriggerOrdersInputField.takeProfitOrderSize,
+          value: takeProfitOrder.size,
+          hasFormInput: false,
+        },
+        {
+          field: TriggerOrdersInputField.takeProfitOrderType,
+          value: takeProfitOrder.type.rawValue,
+          hasFormInput: false,
+        },
         {
           field: TriggerOrdersInputField.takeProfitPrice,
           value: takeProfitOrder.triggerPrice,
+          hasFormInput: true,
         },
         isLimitOrderType(takeProfitOrder.type) && {
           field: TriggerOrdersInputField.takeProfitLimitPrice,
           value: takeProfitOrder.price,
+          hasFormInput: true,
         },
       ]
         .filter(isTruthy)
-        .forEach(({ field, value }) => {
-          dispatch(
-            setTriggerFormInputs({
-              [field.rawValue]: value?.toString(),
-            })
-          );
+        .forEach(({ field, value, hasFormInput }) => {
+          abacusStateManager.setTriggerOrdersValue({ field, value });
+          if (hasFormInput) {
+            dispatch(
+              setTriggerFormInputs({
+                [field.rawValue]: value?.toString(),
+              })
+            );
+          }
         });
     } else {
       abacusStateManager.setTriggerOrdersValue({

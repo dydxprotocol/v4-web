@@ -243,6 +243,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
 
+      console.log("client ID for composite client", clientId)
       // Place order
       const tx = await this.compositeClient?.placeOrder(
         subaccountClient,
