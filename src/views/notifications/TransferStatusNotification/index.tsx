@@ -177,6 +177,7 @@ export const TransferStatusNotification = ({
           )}
         </>
       )}
+      <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
       {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
         <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
       )}
@@ -201,17 +202,7 @@ export const TransferStatusNotification = ({
               </div>
             </>
           ) : (
-            <>
-              {content}
-              {!isCosmosDeposit && !isComplete && (
-                <>
-                  <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
-                  {!isToast && !hasError && (
-                    <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
-                  )}
-                </>
-              )}
-            </>
+            content
           )}
         </div>
       }
