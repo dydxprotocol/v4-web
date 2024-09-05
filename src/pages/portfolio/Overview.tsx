@@ -5,16 +5,19 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
+import { StatSigFlags } from '@/constants/statsig';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
@@ -29,6 +32,7 @@ export const Overview = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
+  const affiliatesEnabled = useStatsigGateValue(StatSigFlags.ffEnableAffiliates);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
@@ -52,6 +56,12 @@ export const Overview = () => {
       <DetachedSection>
         <AccountDetailsAndHistory />
       </DetachedSection>
+
+      {affiliatesEnabled && (
+        <DetachedSection>
+          <AffiliatesBanner />
+        </DetachedSection>
+      )}
 
       <AttachedExpandingSection tw="mt-1">
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
