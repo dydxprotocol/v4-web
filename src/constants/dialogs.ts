@@ -58,6 +58,7 @@ export type RateLimitDialogProps = { preventClose?: boolean };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
   marketId: string;
   assetId: string;
@@ -124,6 +125,7 @@ export const DialogTypes = unionize(
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
+    ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
     Stake: ofType<StakeDialogProps>(),
     StakingReward: ofType<StakingRewardDialogProps>(),

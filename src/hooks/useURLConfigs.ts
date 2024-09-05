@@ -43,6 +43,7 @@ export interface LinksConfigs {
   getInTouch?: string;
   deployerTermsAndConditions?: string;
   dydxLearnMore?: string;
+  affiliateProgram?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -89,5 +90,6 @@ export const useURLConfigs = (): LinksConfigs => {
     getInTouch: linksConfigs.getInTouch,
     deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
     dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
+    affiliateProgram: linksConfigs.affiliateProgram,
   };
 };

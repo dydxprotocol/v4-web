@@ -10,6 +10,7 @@ export enum StatSigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableEvmSwaps = 'ff_enable_evm_swaps',
   ffEnableKeplr = 'ff_enable_keplr',
+  ffEnableAffiliates = 'ff_enable_affiliates',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
