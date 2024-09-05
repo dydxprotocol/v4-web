@@ -30,11 +30,9 @@ const DetailsItem = ({ value, stat }: { value: number | null | undefined; stat: 
       return <$Output type={OutputType.Fiat} value={value} fractionDigits={USD_DECIMALS} />;
     }
     case MarketStats.SPOT_VOLUME_24H: {
-      // $ with no decimals
       return <$Output type={OutputType.Fiat} value={value} fractionDigits={USD_DECIMALS} />;
     }
     default: {
-      // Default renderer
       return <$Output type={OutputType.Text} value={value} />;
     }
   }
@@ -57,7 +55,7 @@ export const UnlaunchedMarketStatsDetails = ({ showMidMarketPrice = true }: Elem
 
   const labelMap = {
     [MarketStats.MARKET_CAP]: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
-    [MarketStats.SPOT_VOLUME_24H]: '24h Spot Volume',
+    [MarketStats.SPOT_VOLUME_24H]: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
   };
 
   return (

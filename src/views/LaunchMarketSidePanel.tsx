@@ -7,6 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
+import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
@@ -23,12 +24,25 @@ export const LaunchMarketSidePanel = ({
 
   const items = [
     {
-      title: 'Deposit to MegaVault',
-      body: 'Immediately launch a new market on dYdX Chain by depositing 10,000 USDC into MegaVault. Your deposit will earn an estimated 34.56% APR (based on the last 30 days).',
+      title: stringGetter({
+        key: STRING_KEYS.DEPOSIT_TO_DESTINATION,
+        params: { DESTINATION_CHAIN: 'MegaVault' },
+      }),
+      body: stringGetter({
+        key: STRING_KEYS.MARKET_LAUNCH_DETAILS_2,
+        params: {
+          DEPOSIT_AMOUNT: `${10_000} USDC`,
+          APR_PERCENTAGE: <Output type={OutputType.Percent} value={0.3456} />,
+          PAST_DAYS: 30,
+        },
+      }),
     },
     {
-      title: 'Trade',
-      body: `As soon as you launch ${launchableMarketId}, it will be available to trade.`,
+      title: stringGetter({ key: STRING_KEYS.TRADE }),
+      body: stringGetter({
+        key: STRING_KEYS.AVAILABLE_TO_TRADE_POST_LAUNCH,
+        params: { MARKET: launchableMarketId },
+      }),
     },
   ];
 
@@ -46,7 +60,12 @@ export const LaunchMarketSidePanel = ({
 
   return (
     <$Container className={className}>
-      <h2 tw="text-large text-color-text-2">{`Instantly launch ${launchableMarketId}`}</h2>
+      <h2 tw="text-large text-color-text-2">
+        {stringGetter({
+          key: STRING_KEYS.INSTANTLY_LAUNCH,
+          params: { MARKET: launchableMarketId },
+        })}
+      </h2>
       <div tw="flex flex-col gap-1">{steps}</div>
       <Button
         action={ButtonAction.Primary}
