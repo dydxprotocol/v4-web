@@ -215,25 +215,20 @@ export const useChartLines = ({
     });
   }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
-  // const pendingOrderAdjustmentsRef = useRef<{
-  //   [orderId: string]: { order: SubaccountOrder; newPrice: number };
-  // }>({});
-  const [pendingOrderAdjustments, setPendingOrderAdjustments] = useState<{
+  const pendingOrderAdjustmentsRef = useRef<{
     [orderId: string]: { order: SubaccountOrder; newPrice: number };
   }>({});
 
   const removePendingOrderAdjustment = (orderId: string) => {
-    setPendingOrderAdjustments((prev) => {
-      const { [orderId]: removed, ...withoutOrderId } = prev;
-      return withoutOrderId;
-    });
+    const { [orderId]: removed, ...withoutOrderId } = pendingOrderAdjustmentsRef.current;
+    pendingOrderAdjustmentsRef.current = withoutOrderId;
   };
 
   const addPendingOrderAdjustment = (order: SubaccountOrder, newPrice: number) => {
-    setPendingOrderAdjustments((prev) => ({
-      ...prev,
+    pendingOrderAdjustmentsRef.current = {
+      ...pendingOrderAdjustmentsRef.current,
       [order.id]: { order, newPrice },
-    }));
+    };
   };
 
   const dispatch = useAppDispatch();
@@ -327,6 +322,7 @@ export const useChartLines = ({
         console.log('res', res);
         const { error } = JSON.parse(res);
         if (error) {
+          // TODO: may have to manually remove the order line here
           console.log("place order error", error)
           dispatch(
             placeOrderFailed({
@@ -353,6 +349,7 @@ export const useChartLines = ({
   );
 
   const updateOrderLines = useCallback(() => {
+    const pendingOrderAdjustments = pendingOrderAdjustmentsRef.current;
     // We don't need to worry about clearing chart lines for cancelled market orders since they will persist in
     // currentMarketOrders, just with a cancelReason
     if (!currentMarketOrders) {
@@ -426,7 +423,6 @@ export const useChartLines = ({
     });
   }, [
     currentMarketOrders,
-    pendingOrderAdjustments,
     stringGetter,
     tvWidget,
     canModifySLTPOrders,
