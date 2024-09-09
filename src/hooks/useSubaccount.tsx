@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
-import type { Nullable } from '@dydxprotocol/v4-abacus';
+import { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   SubaccountClient,
   utils,
@@ -567,6 +567,22 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
+  const cancelAllOrders = useCallback(
+    (marketId?: string) => {
+      // this is for each single cancel transaction
+      const callback = () =>
+        // success: boolean,
+        // parsingError?: Nullable<ParsingError>,
+        // data?: Nullable<HumanReadableCancelOrderPayload>
+        {
+          // TODO(@aforaleka): Add this back to update local cancel all state for notifications
+        };
+
+      abacusStateManager.cancelAllOrders(marketId, callback);
+    },
+    [dispatch]
+  );
+
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
     async ({
@@ -861,6 +877,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     placeOrder,
     closePosition,
     cancelOrder,
+    cancelAllOrders,
     placeTriggerOrders,
 
     // Governance Methods

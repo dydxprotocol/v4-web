@@ -35,6 +35,8 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
+import { KeplrIcon } from '@/icons';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
@@ -345,6 +347,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
               },
               toastSensitivity: 'foreground',
               groupKey: MarketLaunchNotificationIds.TrumpWin,
+            },
+            []
+          );
+        }
+
+        if (featureFlags?.[StatSigFlags.ffEnableKeplr]) {
+          trigger(
+            ReleaseUpdateNotificationIds.KeplrSupport,
+            {
+              icon: <KeplrIcon />,
+              title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.KEPLR_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
             },
             []
           );

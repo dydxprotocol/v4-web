@@ -55,6 +55,10 @@ class TestFlags {
   get pml() {
     return !!this.queryParams.pml;
   }
+
+  get showCancelAll() {
+    return !!this.queryParams.cancelall;
+  }
 }
 
 export const testFlags = new TestFlags();
