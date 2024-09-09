@@ -17,44 +17,46 @@ type ElementProps = {
   marketId?: string;
 };
 
-export const CancelAllOrdersButton = ({ marketId }: ElementProps) => {
+export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
   const { cancelAllOrders } = useSubaccount();
   const dispatch = useDispatch();
   const hasCancelableOrders = useParameterizedSelector(calculateHasCancelableOrders, marketId);
 
-  const onCancelOrClearAll = useCallback(() => {
-    if (hasCancelableOrders) {
-      cancelAllOrders(marketId);
-    } else {
-      dispatch(clearAllOrders(marketId));
-    }
-  }, [dispatch, hasCancelableOrders, cancelAllOrders, marketId]);
+  const onCancelAll = useCallback(() => {
+    cancelAllOrders(marketId);
+  }, [cancelAllOrders, marketId]);
+
+  const onClearAll = useCallback(() => {
+    dispatch(clearAllOrders(marketId));
+  }, [dispatch, marketId]);
 
   // TODO(@aforaleka): Localize strings
   // TODO(@aforaleka): add cancel all confirmation dialog
-  return (
-    <$CancelAllButton
-      action={ButtonAction.Primary}
-      size={ButtonSize.XSmall}
-      onClick={onCancelOrClearAll}
-    >
-      {hasCancelableOrders ? 'Cancel All' : 'Clear All'}
+  return hasCancelableOrders ? (
+    <$CancelAllButton action={ButtonAction.Primary} size={ButtonSize.XSmall} onClick={onCancelAll}>
+      Cancel All
     </$CancelAllButton>
+  ) : (
+    <$ActionTextButton action={ButtonAction.Primary} size={ButtonSize.XSmall} onClick={onClearAll}>
+      Clear All
+    </$ActionTextButton>
   );
 };
 
-const $CancelAllButton = styled(Button)<{ disabled?: boolean }>`
+const $ActionTextButton = styled(Button)`
+  --button-textColor: initial;
   --button-height: var(--item-height);
-  --button-padding: 0;
-  --button-textColor: var(--color-accent);
+  --button-padding: 0 0.25rem;
   --button-backgroundColor: transparent;
   --button-border: none;
 
   pointer-events: auto;
+`;
 
+const $CancelAllButton = styled($ActionTextButton)<{ disabled?: boolean }>`
   ${({ disabled }) =>
-    disabled &&
+    !disabled &&
     css`
-      --button-textColor: initial;
+      --button-textColor: var(--color-accent);
     `}
 `;

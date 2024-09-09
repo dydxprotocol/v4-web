@@ -57,7 +57,7 @@ import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
-import { CancelAllOrdersButton } from './OrdersTable/CancelAllOrdersButton';
+import { CancelOrClearAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 
 export enum OrdersTableColumnKey {
@@ -217,7 +217,7 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.Actions]: {
         columnKey: 'cancelOrClear',
         label: testFlags.showCancelAll ? (
-          <CancelAllOrdersButton marketId={currentMarket} />
+          <CancelOrClearAllOrdersButton marketId={currentMarket} />
         ) : (
           stringGetter({
             key: STRING_KEYS.ACTION,
