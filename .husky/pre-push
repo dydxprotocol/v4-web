@@ -30,7 +30,7 @@ fi
 # Ensure the range is valid
 if [ -z "$range" ] || ! git rev-parse "$range" >/dev/null 2>&1; then
     echo "No valid commits to check or invalid range."
-    exit 0
+    exit 1
 fi
 
 # Get the list of unsigned commits in the range
