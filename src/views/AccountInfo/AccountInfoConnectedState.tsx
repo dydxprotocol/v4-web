@@ -90,7 +90,7 @@ export const AccountInfoConnectedState = () => {
               <>
                 <$Button
                   state={{ isDisabled: !dydxAccounts }}
-                  onClick={() => dispatch(openDialog(DialogTypes.FunkitDeposit()))}
+                  onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
                   shape={ButtonShape.Rectangle}
                   size={ButtonSize.XSmall}
                 >
@@ -116,7 +116,7 @@ export const AccountInfoConnectedState = () => {
         {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <$CornerButton
             state={{ isDisabled: !dydxAccounts }}
-            onClick={() => dispatch(openDialog(DialogTypes.FunkitDeposit()))}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
           >
             <div tw="inline-flex items-center rounded-[50%] bg-color-layer-3 p-[0.5em]">
               <Icon iconName={IconName.Transfer} />

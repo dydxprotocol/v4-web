@@ -70,7 +70,8 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getOnboardingGuards } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
+import { getDepositType } from '@/state/depositSelectors';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -81,6 +82,8 @@ import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
 
+import { useFunkitBuyNobleUsdc } from '@/hooks/useFunkitBuyNobleUsdc';
+import { DepositType, resetDepositType } from '@/state/deposit';
 import { CoinbaseDeposit } from '../CoinbaseDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { SourceSelectMenu } from './SourceSelectMenu';
@@ -174,6 +177,19 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     chainId: SUPPORTED_COSMOS_CHAINS,
     multiChain: true,
   });
+
+  // Funkit Deposit
+  const depositType = useAppSelector(getDepositType);
+  const startCheckout = useFunkitBuyNobleUsdc();
+  useEffect(() => {
+    if (depositType === DepositType.Funkit) {
+      dispatch(closeDialog());
+      startCheckout()
+    }
+    return () => {
+      dispatch(resetDepositType());
+    }
+  }, [])
 
   // Async Data
   const { balance } = useAccountBalance({

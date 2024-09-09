@@ -2,11 +2,12 @@ import { useCallback, useMemo } from 'react';
 
 import { useFunkitCheckout } from '@funkit/connect';
 
-import { DialogTypes } from '@/constants/dialogs';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
 
+import { DialogTypes } from '@/constants/dialogs';
+import { DepositType, resetDepositType, setDepositType } from '@/state/deposit';
+import { closeDialog, openDialog } from '@/state/dialogs';
 import { useAccounts } from './useAccounts';
 import { useFunkitThemeListener } from './useFunkitThemeListener';
 
@@ -23,13 +24,11 @@ export function useFunkitBuyNobleUsdc() {
   const { dydxAddress } = useAccounts();
   const config = useMemo(
     () => ({
-      onOpen: () => {
-        dispatch(closeDialog());
-      },
       onConfirmation: () => {
         // TODO: Handle the checkout confirmation (event listening / notification)
       },
       onDydxSwitch: () => {
+        dispatch(setDepositType(DepositType.Standard));
         dispatch(openDialog(DialogTypes.Deposit()));
       },
     }),

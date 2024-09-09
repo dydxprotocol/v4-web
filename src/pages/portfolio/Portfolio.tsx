@@ -231,7 +231,7 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() => dispatch(openDialog(DialogTypes.FunkitDeposit()))}
+                    onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>

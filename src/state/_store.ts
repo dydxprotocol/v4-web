@@ -7,6 +7,7 @@ import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
+import { depositSlice } from './deposit';
 import { dialogsSlice } from './dialogs';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
@@ -22,6 +23,7 @@ export const store = configureStore({
     app: appSlice.reducer,
     assets: assetsSlice.reducer,
     configs: configsSlice.reducer,
+    deposit: depositSlice.reducer,
     dialogs: dialogsSlice.reducer,
     inputs: inputsSlice.reducer,
     layout: layoutSlice.reducer,

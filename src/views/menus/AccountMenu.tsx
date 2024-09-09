@@ -408,7 +408,7 @@ const AssetActions = memo(
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.FunkitDeposit(),
+            dialog: DialogTypes.Deposit(),
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
           },
