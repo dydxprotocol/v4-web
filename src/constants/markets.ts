@@ -59,6 +59,7 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.RECENTLY_LISTED,
   },
   [MarketFilters.LAUNCHABLE]: {
+    label: STRING_KEYS.LAUNCHABLE,
     isNew: true,
   },
   [MarketFilters.PREDICTION_MARKET]: {

@@ -419,6 +419,10 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getMarketMap = useCallback(async () => {
+    return compositeClient?.validatorClient.get.getMarketMap();
+  }, [compositeClient]);
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -442,6 +446,7 @@ const useDydxClientContext = () => {
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
     getCandles: requestCandles,
+    getMarketMap,
     getMarketTickSize,
     getPerpetualMarketSparklines,
     screenAddresses,

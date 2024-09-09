@@ -44,7 +44,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const { filteredMarkets, marketFilters } = useMarketsData({ filter, searchFilter });
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(

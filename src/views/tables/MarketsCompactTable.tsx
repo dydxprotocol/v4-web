@@ -41,7 +41,10 @@ export const MarketsCompactTable = ({
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { filteredMarkets } = useMarketsData(filters);
+  const { filteredMarkets } = useMarketsData({
+    filter: filters,
+    onlyLaunchedMarkets: true,
+  });
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
     () =>

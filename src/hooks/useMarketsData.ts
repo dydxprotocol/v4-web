@@ -17,6 +17,7 @@ import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
+import { testFlags } from '@/lib/testFlags';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { useLaunchableMarkets } from './useLaunchableMarkets';
@@ -61,10 +62,15 @@ const filterFunctions = {
   },
 };
 
-export const useMarketsData = (
-  filter: MarketFilters = MarketFilters.ALL,
-  searchFilter?: string
-): {
+export const useMarketsData = ({
+  filter = MarketFilters.ALL,
+  searchFilter,
+  onlyLaunchedMarkets,
+}: {
+  filter?: MarketFilters;
+  searchFilter?: string;
+  onlyLaunchedMarkets?: boolean;
+}): {
   markets: MarketData[];
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
@@ -128,12 +134,16 @@ export const useMarketsData = (
         );
       });
 
+    if (onlyLaunchedMarkets) {
+      return listOfMarkets;
+    }
+
     launchableMarketsQuery.data?.forEach((market) => {
       const toPush: MarketData = safeAssign(
         {},
         {
           id: market.id,
-          assetId: getDisplayableAssetFromBaseAsset(market.ticker.currency_pair.Base),
+          assetId: getDisplayableAssetFromBaseAsset(market.ticker.currencyPair.base),
           displayId: getDisplayableTickerFromMarket(market.id),
           clobPairId: Infinity,
           effectiveInitialMarginFraction: null,
@@ -147,7 +157,7 @@ export const useMarketsData = (
           oraclePrice: null,
           priceChange24H: null,
           priceChange24HPercent: null,
-          tags: ['Launchable'],
+          tags: [MarketFilters.LAUNCHABLE],
           tickSizeDecimals: 0,
           trades24H: null,
           volume24H: 0,
@@ -181,14 +191,19 @@ export const useMarketsData = (
   }, [markets, searchFilter, filter]);
 
   const marketFilters = useMemo(
-    () => [
-      MarketFilters.ALL,
-      MarketFilters.NEW,
-      MarketFilters.LAUNCHABLE,
-      ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-        markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
-      ),
-    ],
+    () =>
+      [
+        MarketFilters.ALL,
+        MarketFilters.NEW,
+        testFlags.pml && MarketFilters.LAUNCHABLE,
+        ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
+          markets.some((market) =>
+            market.tags?.some(
+              (tag) => tag === marketFilter && ![MarketFilters.LAUNCHABLE].includes(marketFilter)
+            )
+          )
+        ),
+      ].filter(isTruthy),
     [markets]
   );
 
