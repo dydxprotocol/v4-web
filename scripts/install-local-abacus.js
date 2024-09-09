@@ -27,6 +27,9 @@ fatalExec(
 
 infoMessage('Vite dev server should have restarted automatically.');
 
+infoMessage('Starting continuous Abacus build.');
+fatalExec("cd ../v4-abacus && ./gradlew v4WebHotSwapTrigger --continuous");
+
 function nonFatalExec(cmd) {
   try {
     execSync(cmd, { stdio: 'inherit' });
