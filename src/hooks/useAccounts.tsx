@@ -247,10 +247,10 @@ const useAccountsContext = () => {
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
 
-  const dydxAddress = useMemo(
-    () => localDydxWallet?.address as DydxAddress | undefined,
-    [localDydxWallet]
-  );
+  const dydxAddress = useMemo(() => {
+    const address = localDydxWallet?.address as DydxAddress | undefined;
+    return address;
+  }, [localDydxWallet]);
 
   const nobleAddress = useMemo(() => {
     return localNobleWallet?.address;

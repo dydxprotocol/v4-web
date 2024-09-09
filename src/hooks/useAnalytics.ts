@@ -78,7 +78,7 @@ export const useAnalytics = () => {
     }
   }, [latestTag]);
 
-  // AnalyticsUserProperty.StatsigConfigs
+  // AnalyticsUserProperty.StatsigFlags
   useEffect(() => {
     identify(AnalyticsUserProperties.StatsigFlags(statsigConfig));
   }, [statsigConfig]);
