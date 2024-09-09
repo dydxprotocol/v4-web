@@ -14,7 +14,7 @@ remote_sha=$(git ls-remote origin "$branch" | awk '{print $1}' | head -n 1)
 echo "Remote sha: $remote_sha"
 
 # Get the SHA of the main branch on the remote
-main_sha=$(git ls-remote origin main | awk '{print $1}' | head -n 1)
+main_sha=$(git rev-parse main)
 echo "Main sha: $main_sha"
 
 if [ -z "$remote_sha" ]; then
