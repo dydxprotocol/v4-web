@@ -170,7 +170,6 @@ export const accountSlice = createSlice({
     },
     setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
       const { clientId, id } = action.payload ?? {};
-      console.log("setting latest order", clientId, id)
       state.latestOrder = action.payload;
 
       if (clientId) {
@@ -356,7 +355,7 @@ export const accountSlice = createSlice({
       state,
       action: PayloadAction<{ orderId: string; errorParams: ErrorParams }>
     ) => {
-      state.localCancelOrders.map((order) =>
+      state.localCancelOrders = state.localCancelOrders.map((order) =>
         order.orderId === action.payload.orderId
           ? { ...order, errorParams: action.payload.errorParams }
           : order

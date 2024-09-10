@@ -2,85 +2,10 @@ import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 
-import {
-  HumanReadableCancelOrderPayload,
-  ParsingError,
-  SubaccountOrder,
-  TriggerOrdersInputField,
-} from '@/constants/abacus';
+import { HumanReadableCancelOrderPayload, ParsingError, SubaccountOrder } from '@/constants/abacus';
 
 import abacusStateManager from './abacus';
-import { isTruthy } from './isTruthy';
-import { isLimitOrderType, isMarketOrderType, isStopLossOrder, isTakeProfitOrder } from './orders';
-
-export const syncSLTPOrderToAbacusState = (
-  order: SubaccountOrder,
-  isSlTpLimitOrdersEnabled: boolean,
-  priceOverride?: number
-) => {
-  abacusStateManager.setTriggerOrdersValue({
-    field: TriggerOrdersInputField.marketId,
-    value: order.marketId,
-  });
-
-  if (isStopLossOrder(order, isSlTpLimitOrdersEnabled)) {
-    [
-      {
-        field: TriggerOrdersInputField.stopLossOrderId,
-        value: order.id,
-      },
-      {
-        field: TriggerOrdersInputField.stopLossOrderSize,
-        value: order.size,
-      },
-      {
-        field: TriggerOrdersInputField.stopLossOrderType,
-        value: order.type.rawValue,
-      },
-      {
-        field: TriggerOrdersInputField.stopLossPrice,
-        value: priceOverride ?? order.triggerPrice,
-      },
-      isLimitOrderType(order.type) && {
-        field: TriggerOrdersInputField.stopLossLimitPrice,
-        value: order.price,
-      },
-    ]
-      .filter(isTruthy)
-      .forEach(({ field, value }) => {
-        abacusStateManager.setTriggerOrdersValue({ field, value });
-      });
-  }
-
-  if (isTakeProfitOrder(order, isSlTpLimitOrdersEnabled)) {
-    [
-      {
-        field: TriggerOrdersInputField.takeProfitOrderId,
-        value: order.id,
-      },
-      {
-        field: TriggerOrdersInputField.takeProfitOrderSize,
-        value: order.size,
-      },
-      {
-        field: TriggerOrdersInputField.takeProfitOrderType,
-        value: order.type.rawValue,
-      },
-      {
-        field: TriggerOrdersInputField.takeProfitPrice,
-        value: priceOverride ?? order.triggerPrice,
-      },
-      isLimitOrderType(order.type) && {
-        field: TriggerOrdersInputField.takeProfitLimitPrice,
-        value: order.price,
-      },
-    ]
-      .filter(isTruthy)
-      .forEach(({ field, value }) => {
-        abacusStateManager.setTriggerOrdersValue({ field, value });
-      });
-  }
-};
+import { isLimitOrderType, isMarketOrderType } from './orders';
 
 // Inverse of calculateGoodTilBlockTime in v4-client
 // https://github.com/dydxprotocol/v4-clients/blob/4227bd06a6f4503d863dcd99b3aba703cb94c40b/v4-client-js/src/clients/composite-client.ts#L253
@@ -88,6 +13,21 @@ const calculateGoodTilTimeInSeconds = (goodTilBlockTime: number) => {
   const futureMs = goodTilBlockTime * 1000;
   const nowMs = Date.now();
   return Math.round((futureMs - nowMs) / 1000);
+};
+
+const getMarketInfo = (marketId: string) => {
+  const market = abacusStateManager.stateManager.state?.market(marketId);
+  const v4Config = market?.configs?.v4;
+
+  if (!v4Config) return null;
+
+  return new Abacus.exchange.dydx.abacus.state.manager.PlaceOrderMarketInfo(
+    v4Config.clobPairId,
+    v4Config.atomicResolution,
+    v4Config.stepBaseQuantums,
+    v4Config.quantumConversionExponent,
+    v4Config.subticksPerTick
+  );
 };
 
 /* Copies an existing order into a PlaceOrder object */
@@ -106,6 +46,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     goodTilBlockTime,
     postOnly,
     reduceOnly,
+    price,
     triggerPrice,
   } = order;
 
@@ -114,14 +55,21 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     return undefined;
   }
 
+  const [orderPrice, orderTriggerPrice] = isLimitOrderType(order.type)
+    ? [newPrice, triggerPrice]
+    : [price, newPrice];
+
   return new Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload(
     subaccountNumber,
     marketId,
-    generateRandomClientId(),
+    // There's a problem with Abacus parsing client IDs that are full 32 bytes so dividing by 2 ensures that all
+    // client IDs generated here are < 32 bytes
+    // TODO: fix this in abacus
+    Math.floor(generateRandomClientId() / 2),
     type.rawValue,
     side.rawValue,
-    newPrice,
-    triggerPrice,
+    orderPrice,
+    orderTriggerPrice,
     size,
     null,
     reduceOnly,
@@ -131,7 +79,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     isMarketOrderType(type) ? OrderExecution.IOC : null,
     goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime),
     goodTilBlock,
-    null // TODO(tinaszheng): get marketInfo from abacus,
+    getMarketInfo(marketId)
   );
 };
 

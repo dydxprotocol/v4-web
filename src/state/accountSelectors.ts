@@ -198,7 +198,7 @@ export const getMarketOrders = createAppSelector(
 export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
-    !currentMarketId ? [] : marketOrders[currentMarketId]
+    !currentMarketId ? [] : marketOrders[currentMarketId] ?? []
 );
 
 /**
