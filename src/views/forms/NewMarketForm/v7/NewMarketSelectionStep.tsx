@@ -32,6 +32,8 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+
 type NewMarketSelectionStepProps = {
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
@@ -90,7 +92,9 @@ export const NewMarketSelectionStep = ({
         </span>
       </>
     );
-  }, [shouldHideTitleAndDescription]);
+  }, [shouldHideTitleAndDescription, stringGetter]);
+
+  const shortenedTicker = tickerToAdd ? getDisplayableTickerFromMarket(tickerToAdd) : tickerToAdd;
 
   return (
     <$Form
@@ -113,8 +117,10 @@ export const NewMarketSelectionStep = ({
                 items:
                   launchableMarkets.data?.map((launchableMarket) => ({
                     value: launchableMarket.id,
-                    label: launchableMarket.id,
-                    tag: launchableMarket.ticker.currency_pair.Base,
+                    label: getDisplayableTickerFromMarket(launchableMarket.id),
+                    tag: getDisplayableAssetFromBaseAsset(
+                      launchableMarket.ticker.currency_pair.Base
+                    ),
                     onSelect: () => {
                       setTickerToAdd(launchableMarket.id);
                     },
@@ -123,9 +129,9 @@ export const NewMarketSelectionStep = ({
             ]}
             label={stringGetter({ key: STRING_KEYS.MARKETS })}
           >
-            {tickerToAdd ? (
+            {shortenedTicker ? (
               <span tw="text-color-text-2">
-                {tickerToAdd} <Tag>{tickerToAdd}</Tag>
+                {shortenedTicker} <Tag>{shortenedTicker}</Tag>
               </span>
             ) : (
               `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
