@@ -35,6 +35,8 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
+import { KeplrIcon } from '@/icons';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
@@ -215,7 +217,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
-          const { id, fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
+          const { id, fromChainId, toChainId, status, txHash, toAmount, type, isExchange } =
+            transfer;
           const transferType =
             type ??
             (fromChainId === selectedDydxChainId
@@ -224,7 +227,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           const isCosmosDeposit =
             SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
-            fromChainId !== selectedDydxChainId;
+            fromChainId !== selectedDydxChainId &&
+            toChainId === selectedDydxChainId;
 
           const isFinished =
             (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
@@ -347,6 +351,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
+
+        if (featureFlags?.[StatSigFlags.ffEnableKeplr]) {
+          trigger(
+            ReleaseUpdateNotificationIds.KeplrSupport,
+            {
+              icon: <KeplrIcon />,
+              title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.KEPLR_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
       }, [stringGetter]);
 
       const { dydxAddress } = useAccounts();
@@ -356,6 +376,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
       });
 
       const { dydxRewards } = data ?? {};
+
+      useEffect(() => {
+        trigger(
+          INCENTIVES_SEASON_NOTIFICATION_ID,
+          {
+            icon: <Icon iconName={IconName.RewardStar} />,
+            title: stringGetter({
+              key: STRING_KEYS.INCENTIVES_SEASON_ENDED_TITLE,
+              params: { SEASON_NUMBER: 6 }, // last season, will just hardcode
+            }),
+            body: stringGetter({ key: STRING_KEYS.INCENTIVES_SEASON_ENDED_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
+          },
+          []
+        );
+      }, [stringGetter]);
 
       useEffect(() => {
         const rewards = dydxRewards ?? 0;

@@ -5,6 +5,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { MobileTabs } from '@/components/Tabs';
 import { MarketDetails } from '@/views/MarketDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
+import { UnlaunchedMarketStatsDetails } from '@/views/UnlaunchedMarketStatsDetails';
 
 enum InfoSection {
   Statistics = 'Statistics',
@@ -12,7 +13,11 @@ enum InfoSection {
   Vault = 'Vault',
 }
 
-export const MobileBottomPanel = () => {
+export const MobileBottomPanel = ({
+  isViewingUnlaunchedMarket,
+}: {
+  isViewingUnlaunchedMarket?: boolean;
+}) => {
   const stringGetter = useStringGetter();
 
   return (
@@ -22,7 +27,11 @@ export const MobileBottomPanel = () => {
         {
           value: InfoSection.Statistics,
           label: stringGetter({ key: STRING_KEYS.STATISTICS }),
-          content: <MarketStatsDetails showMidMarketPrice={false} />,
+          content: isViewingUnlaunchedMarket ? (
+            <UnlaunchedMarketStatsDetails showMidMarketPrice={false} />
+          ) : (
+            <MarketStatsDetails showMidMarketPrice={false} />
+          ),
         },
         {
           value: InfoSection.About,

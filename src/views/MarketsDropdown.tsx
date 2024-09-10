@@ -256,14 +256,22 @@ const MarketsDropdownContent = ({
 };
 
 export const MarketsDropdown = memo(
-  ({ currentMarketId, symbol = '' }: { currentMarketId?: string; symbol: string | null }) => {
+  ({
+    currentMarketId,
+    isViewingUnlaunchedMarket,
+    symbol = '',
+  }: {
+    currentMarketId?: string;
+    isViewingUnlaunchedMarket?: boolean;
+    symbol: string | null;
+  }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
 
     const leverageTag =
-      currentMarketId != null ? (
+      !isViewingUnlaunchedMarket && currentMarketId != null ? (
         <Tag>
           <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
         </Tag>
@@ -287,7 +295,16 @@ export const MarketsDropdown = memo(
               ) : (
                 <div tw="spacedRow gap-0.625">
                   <AssetIcon symbol={symbol} />
-                  <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  {isViewingUnlaunchedMarket ? (
+                    <div tw="flex flex-col text-start">
+                      <span tw="font-mini-book">Not Launched</span>
+                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                        {currentMarketId}
+                      </h2>
+                    </div>
+                  ) : (
+                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  )}
                   {leverageTag}
                 </div>
               )}

@@ -10,8 +10,8 @@ export enum StatSigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableEvmSwaps = 'ff_enable_evm_swaps',
   ffEnableKeplr = 'ff_enable_keplr',
-  ffSLTPModificationFromChart = 'ff_sltp_modification_from_chart',
-  ffLOModificationFromChart = 'ff_limit_order_modification_from_chart',
+  ffOrderModificationFromChart = 'ff_order_modification_from_chart',
+  ffEnableAffiliates = 'ff_enable_affiliates',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

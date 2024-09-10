@@ -1,71 +1,62 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
+import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
-import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
-import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
 import { AccountInfo } from '@/views/AccountInfo';
-import { TradeBox } from '@/views/TradeBox';
+import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
-import LaunchableMarket from './LaunchableMarket';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
 import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
-import { TradeDialogTrigger } from './TradeDialogTrigger';
 import { TradeHeaderMobile } from './TradeHeaderMobile';
-import { VerticalPanel } from './VerticalPanel';
 
-const TradePage = () => {
+const LaunchableMarket = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
-
-  const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const match = useMatch(`/${AppRoute.Trade}/:marketId`);
+  const { marketId } = match?.params ?? {};
+
+  const displayableTicker = useMemo(() => {
+    return getDisplayableTickerFromMarket(marketId ?? '');
+  }, [marketId]);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
-  usePageTitlePriceUpdates();
-  useTradeFormInputs();
-
-  if (isViewingUnlaunchedMarket) {
-    return <LaunchableMarket />;
-  }
-
   return isTablet ? (
     <$TradeLayoutMobile>
-      <TradeHeaderMobile />
+      <TradeHeaderMobile launchableMarketId={displayableTicker} />
 
       <div>
         <DetachedSection>
-          <MobileTopPanel />
+          <MobileTopPanel isViewingUnlaunchedMarket />
         </DetachedSection>
 
         <DetachedSection>
-          <HorizontalPanel />
+          <MobileBottomPanel isViewingUnlaunchedMarket />
         </DetachedSection>
 
         <DetachedSection>
-          <MobileBottomPanel />
+          <LaunchMarketSidePanel launchableMarketId={displayableTicker} />
         </DetachedSection>
       </div>
-
-      {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
     <$TradeLayout
@@ -74,20 +65,16 @@ const TradePage = () => {
       isHorizontalPanelOpen={isHorizontalPanelOpen}
     >
       <header tw="[grid-area:Top]">
-        <MarketSelectorAndStats />
+        <MarketSelectorAndStats launchableMarketId={displayableTicker} />
       </header>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
         <AccountInfo />
-        <TradeBox />
-      </$GridSection>
-
-      <$GridSection gridArea="Vertical">
-        <VerticalPanel tradeLayout={tradeLayout} />
+        <$LaunchMarketSidePanel launchableMarketId={displayableTicker} />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
-        <InnerPanel />
+        <InnerPanel isViewingUnlaunchedMarket />
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
@@ -97,7 +84,8 @@ const TradePage = () => {
   );
 };
 
-export default TradePage;
+export default LaunchableMarket;
+
 const $TradeLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
@@ -107,31 +95,31 @@ const $TradeLayout = styled.article<{
   // Constants
   /* prettier-ignore */
   --layout-default:
-    'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
+    'Top Top' auto
+    'Side Inner' minmax(0, 1fr)
+    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / var(--sidebar-width) 1fr;
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
-    'Side Vertical Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
+    'Side Top' auto
+    'Side Inner' minmax(0, 1fr)
+    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / var(--sidebar-width) 1fr;
 
   /* prettier-ignore */
   --layout-alternative:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
+    'Top Top' auto
+    'Inner Side' minmax(0, 1fr)
+    'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr var(--sidebar-width);
 
   /* prettier-ignore */
   --layout-alternative-desktopMedium:
-    'Vertical Top Side' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
+    'Top Side' auto
+    'Inner Side' minmax(0, 1fr)
+    'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr var(--sidebar-width);
 
   // Props/defaults
 
@@ -207,6 +195,11 @@ const $TradeLayoutMobile = styled.article`
     justify-content: start;
   }
 `;
+
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+`;
+
+const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
+  border-top: var(--border-width) solid var(--color-border);
 `;

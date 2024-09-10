@@ -217,6 +217,7 @@ export const useChartLines = ({
     });
   }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
+  // Cache for order modification that stores the new orders are still being submitted
   const pendingOrderAdjustmentsRef = useRef<{
     [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
   }>({});
