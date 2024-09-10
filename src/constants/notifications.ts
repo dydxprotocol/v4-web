@@ -228,7 +228,6 @@ export enum IncentivesDistributedNotificationIds {
   IncentivesDistributedS5 = 'incentives-distributed-s5',
 }
 
-export const MEDIAN_REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
 export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6Ended;
 
 export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
