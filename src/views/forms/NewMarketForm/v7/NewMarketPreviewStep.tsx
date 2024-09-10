@@ -29,6 +29,7 @@ type NewMarketPreviewStepProps = {
   onBack: () => void;
   onSuccess: (ticker: string) => void;
   receiptItems: DetailsItem[];
+  shouldHideTitleAndDescription?: boolean;
 };
 
 export const NewMarketPreviewStep = ({
@@ -36,6 +37,7 @@ export const NewMarketPreviewStep = ({
   onBack,
   onSuccess,
   receiptItems,
+  shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -61,7 +63,7 @@ export const NewMarketPreviewStep = ({
 
   const isDisabled = alertMessage !== null;
 
-  const heading = (
+  const heading = shouldHideTitleAndDescription ? null : (
     <>
       <h2>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</h2>
       <span tw="text-color-text-0">

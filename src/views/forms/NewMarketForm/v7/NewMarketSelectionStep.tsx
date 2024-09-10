@@ -37,6 +37,7 @@ type NewMarketSelectionStepProps = {
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
   receiptItems: DetailsItem[];
+  shouldHideTitleAndDescription?: boolean;
 };
 
 export const NewMarketSelectionStep = ({
@@ -44,6 +45,7 @@ export const NewMarketSelectionStep = ({
   setTickerToAdd,
   onConfirmMarket,
   receiptItems,
+  shouldHideTitleAndDescription,
 }: NewMarketSelectionStepProps) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
@@ -57,6 +59,8 @@ export const NewMarketSelectionStep = ({
   }, []);
 
   const formHeader = useMemo(() => {
+    if (shouldHideTitleAndDescription) return null;
+
     return (
       <>
         <h2>
@@ -86,7 +90,7 @@ export const NewMarketSelectionStep = ({
         </span>
       </>
     );
-  }, []);
+  }, [shouldHideTitleAndDescription]);
 
   return (
     <$Form

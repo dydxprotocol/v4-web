@@ -25,7 +25,7 @@
     "deploy:update-ipns": "node scripts/update-ipns.js",
     "deploy:update-dnslink": "node scripts/update-dnslink.js",
     "coverage": "vitest run --coverage",
-    "clean-install": "rm -rf node_modules/ && pnpm i",
+    "clean-install": "rm -rf node_modules/.vite && pnpm i",
     "preview": "vite preview",
     "install-local-abacus": "node scripts/install-local-abacus",
     "install-local-l10n": "pnpm link ../v4-localization && echo Linking... please remember to restart your dev server",
