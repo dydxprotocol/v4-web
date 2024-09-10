@@ -1,7 +1,7 @@
 /**
  *
  * @param fullBaseAsset contains base asset, occassionally accompanied (comma-separated) by dex and address. i.e. 'baseAsset,dex,address'
- * @param part
+ * @param part base, dex or address
  * @returns base asset or dex or address from the full base asset.
  */
 export const getDisplayableAssetFromBaseAsset = (
@@ -12,6 +12,21 @@ export const getDisplayableAssetFromBaseAsset = (
   if (part === 'dex') return dex;
   if (part === 'address') return address;
   return base;
+};
+
+/**
+ *
+ * @param ticker baseAsset-quoteAsset
+ * @param part base, dex or address
+ * @returns desired part of the base asset from ticker
+ */
+export const getDisplayableAssetFromTicker = (
+  ticker: string,
+  part?: 'base' | 'dex' | 'address' | 'full'
+): string => {
+  const [fullBaseAsset] = ticker.split('-');
+  if (part === 'full') return fullBaseAsset;
+  return getDisplayableAssetFromBaseAsset(fullBaseAsset, part);
 };
 
 /**

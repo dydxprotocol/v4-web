@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -23,13 +23,17 @@ import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 import { NewMarketPreviewStep as NewMarketPreviewStep2 } from './v7/NewMarketPreviewStep';
 import { NewMarketSelectionStep as NewMarketSelectionStep2 } from './v7/NewMarketSelectionStep';
 
-enum NewMarketFormStep {
+export enum NewMarketFormStep {
   SELECTION,
   PREVIEW,
   SUCCESS,
 }
 
-export const NewMarketForm = () => {
+export const NewMarketForm = ({
+  setFormStep,
+}: {
+  setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
+}) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
   const [tickerToAdd, setTickerToAdd] = useState<string>();
@@ -46,6 +50,12 @@ export const NewMarketForm = () => {
     const p = Math.floor(Math.log(Number(assetToAdd.meta.referencePrice)));
     return Math.abs(p - 3);
   }, [assetToAdd]);
+
+  useEffect(() => {
+    setFormStep?.(step);
+  }, [setFormStep, step]);
+
+  const shouldHideTitleAndDescription = setFormStep !== undefined;
 
   const receiptItems: DetailsItem[] = useMemo(() => {
     return [
@@ -92,8 +102,9 @@ export const NewMarketForm = () => {
             setStep(NewMarketFormStep.SUCCESS);
           }}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
-          ticker={tickerToAdd}
           receiptItems={receiptItems}
+          shouldHideTitleAndDescription={shouldHideTitleAndDescription}
+          ticker={tickerToAdd}
         />
       );
     }
@@ -103,9 +114,10 @@ export const NewMarketForm = () => {
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
         }}
-        setTickerToAdd={setTickerToAdd}
-        tickerToAdd={tickerToAdd}
         receiptItems={receiptItems}
+        setTickerToAdd={setTickerToAdd}
+        shouldHideTitleAndDescription={shouldHideTitleAndDescription}
+        tickerToAdd={tickerToAdd}
       />
     );
   }

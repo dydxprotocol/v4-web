@@ -32,11 +32,14 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+
 type NewMarketSelectionStepProps = {
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
   receiptItems: DetailsItem[];
+  shouldHideTitleAndDescription?: boolean;
 };
 
 export const NewMarketSelectionStep = ({
@@ -44,6 +47,7 @@ export const NewMarketSelectionStep = ({
   setTickerToAdd,
   onConfirmMarket,
   receiptItems,
+  shouldHideTitleAndDescription,
 }: NewMarketSelectionStepProps) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
@@ -57,12 +61,14 @@ export const NewMarketSelectionStep = ({
   }, []);
 
   const formHeader = useMemo(() => {
+    if (shouldHideTitleAndDescription) return null;
+
     return (
       <>
         <h2>
           {stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET })}
           <span tw="flex flex-row items-center text-small text-color-text-1">
-            <LightningBoltIcon tw="text-color-warning" />{' '}
+            <LightningBoltIcon tw="mr-0.25 text-color-warning" />{' '}
             {stringGetter({ key: STRING_KEYS.TRADE_INSTANTLY })}
           </span>
         </h2>
@@ -86,7 +92,9 @@ export const NewMarketSelectionStep = ({
         </span>
       </>
     );
-  }, []);
+  }, [shouldHideTitleAndDescription, stringGetter]);
+
+  const shortenedTicker = tickerToAdd ? getDisplayableTickerFromMarket(tickerToAdd) : tickerToAdd;
 
   return (
     <$Form
@@ -109,8 +117,10 @@ export const NewMarketSelectionStep = ({
                 items:
                   launchableMarkets.data?.map((launchableMarket) => ({
                     value: launchableMarket.id,
-                    label: launchableMarket.id,
-                    tag: launchableMarket.ticker.currency_pair.Base,
+                    label: getDisplayableTickerFromMarket(launchableMarket.id),
+                    tag: getDisplayableAssetFromBaseAsset(
+                      launchableMarket.ticker.currency_pair.Base
+                    ),
                     onSelect: () => {
                       setTickerToAdd(launchableMarket.id);
                     },
@@ -119,9 +129,9 @@ export const NewMarketSelectionStep = ({
             ]}
             label={stringGetter({ key: STRING_KEYS.MARKETS })}
           >
-            {tickerToAdd ? (
+            {shortenedTicker ? (
               <span tw="text-color-text-2">
-                {tickerToAdd} <Tag>{tickerToAdd}</Tag>
+                {shortenedTicker} <Tag>{shortenedTicker}</Tag>
               </span>
             ) : (
               `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
