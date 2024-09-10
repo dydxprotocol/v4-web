@@ -30,15 +30,6 @@ class AbacusLogger implements Omit<AbacusLoggingProtocol, '__doNotUseOrImplement
     }
     dd.info(message, parsedContext);
   }
-
-  ddInfo(tag: string, message: string, context?: {}) {
-    if (
-      import.meta.env.VITE_ENABLE_ABACUS_LOGGING ||
-      import.meta.env.VITE_ABACUS_LOG_LEVEL === 'info'
-    ) {
-      console.info(`${tag}: ${message}: ${context}`);
-    }
-  }
 }
 
 export default AbacusLogger;
