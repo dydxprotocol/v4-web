@@ -3078,69 +3078,6 @@
       "cmcId": 11840
     }
   },
-  "MATIC": {
-    "title": "Add MATIC-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MATIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 60,
-      "ticker": "MATIC-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Binance",
-          "ticker": "MATICUSDT",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Bitstamp",
-          "ticker": "MATIC/USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Bybit",
-          "ticker": "MATICUSDT",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "CoinbasePro",
-          "ticker": "MATIC-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Huobi",
-          "ticker": "maticusdt",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Kraken",
-          "ticker": "MATICUSD",
-          "invert": false
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Polygon",
-      "referencePrice": 0.3756032420139393,
-      "cmcId": 3890
-    }
-  },
   "VET": {
     "title": "Add VET-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a VET-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -9430,48 +9367,7 @@
       "referencePrice": 0.37793610442456904,
       "cmcId": 12220
     }
-  },
-  "ANT": {
-    "title": "Add ANT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ANT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 167,
-      "ticker": "ANT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Huobi",
-          "ticker": "antusdt",
-          "adjustByMarket": "USDT-USD",
-          "invert": false
-        },
-        {
-          "exchangeName": "Kraken",
-          "ticker": "ANTUSD",
-          "invert": false
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Aragon",
-      "referencePrice": 5.801237943078656,
-      "cmcId": 1680
-    }
-  },
+  }, 
   "MANTA": {
     "title": "Add MANTA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MANTA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
