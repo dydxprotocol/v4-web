@@ -39,8 +39,8 @@ dependencies:
     specifier: ^1.1.27
     version: 1.1.27
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.190
-    version: 1.1.190
+    specifier: ^1.1.191
+    version: 1.1.191
   '@emotion/is-prop-valid':
     specifier: ^1.3.0
     version: 1.3.0
@@ -3191,8 +3191,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.190:
-    resolution: {integrity: sha512-J20EXyTeONwnSPgHkpdZHqA4rml80DlcIV5TK03dA1/AaPIXnvccUxw3GF84144AGiqYvUZKugu4/UAi5RRSWg==}
+  /@dydxprotocol/v4-localization@1.1.191:
+    resolution: {integrity: sha512-UOP9rH9drdIX1Q3nQ303jX+DzGqaasVBSMl8/xFLQmnFQN4Eb8zdUeQpdlvz4HbT761piGO8EGsnExm4Byww0Q==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:

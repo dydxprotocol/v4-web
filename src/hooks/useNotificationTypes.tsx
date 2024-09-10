@@ -378,6 +378,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { dydxRewards } = data ?? {};
 
       useEffect(() => {
+        trigger(
+          INCENTIVES_SEASON_NOTIFICATION_ID,
+          {
+            icon: <Icon iconName={IconName.RewardStar} />,
+            title: stringGetter({
+              key: STRING_KEYS.INCENTIVES_SEASON_ENDED_TITLE,
+              params: { SEASON_NUMBER: 6 }, // last season, will just hardcode
+            }),
+            body: stringGetter({ key: STRING_KEYS.INCENTIVES_SEASON_ENDED_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
+          },
+          []
+        );
+      }, [stringGetter]);
+
+      useEffect(() => {
         const rewards = dydxRewards ?? 0;
         if (dydxAddress && status === 'success' && rewards > 0) {
           trigger(
