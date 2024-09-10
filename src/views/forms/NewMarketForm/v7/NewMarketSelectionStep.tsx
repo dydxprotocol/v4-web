@@ -68,7 +68,7 @@ export const NewMarketSelectionStep = ({
         <h2>
           {stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET })}
           <span tw="flex flex-row items-center text-small text-color-text-1">
-            <LightningBoltIcon tw="text-color-warning" />{' '}
+            <LightningBoltIcon tw="mr-0.25 text-color-warning" />{' '}
             {stringGetter({ key: STRING_KEYS.TRADE_INSTANTLY })}
           </span>
         </h2>
