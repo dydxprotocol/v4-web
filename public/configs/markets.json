@@ -1005,6 +1005,12 @@
         "websiteLink": "https://www.basedbrett.com/",
         "whitepaperLink": null
     },
+    "BRL-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/BRL-USD?hl=en",
+        "name": "Brazilian Real",
+        "tags": [
+        ]
+    },
     "BRISE-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitrise-token/",
         "name": "Bitgert",
@@ -2155,6 +2161,11 @@
         "tags": [],
         "websiteLink": "https://www.euler.finance/",
         "whitepaperLink": "https://docs.euler.finance/"
+    },
+    "EUR-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/EUR-USD?hl=en",
+        "name": "Euro",
+        "tags": []
     },
     "EURC-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/euro-coin/",
@@ -6593,6 +6604,12 @@
         "websiteLink": "https://tron.network/",
         "whitepaperLink": "https://tron.network/static/doc/white_paper_v_2_0.pdf"
     },
+    "TRY-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/TRY-USD?hl=en",
+        "name": "Turkish lira",
+        "tags": [
+        ]
+    },
     "TT-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/thundercore/",
         "name": "ThunderCore",
@@ -8109,5 +8126,54 @@
         ],
         "websiteLink": "https://bitbrawl.io/",
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitbrawl/"
+    },
+    "SCF-USD": {
+        "name": "Smoking Chicken Fish",
+        "tags": [],
+        "websiteLink": "https://smokingchickenfish.xyz",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/smoking-chicken-fish/"
+    },
+    "KOKO-USD": {
+        "name": "Koala AI",
+        "tags": [],
+        "websiteLink": "https://www.koalaai.vip/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/koala-ai/"
+    },
+    "RPK-USD": {
+        "name": "RepubliK",
+        "tags": [],
+        "websiteLink": "https://republik.gg/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/republik/",
+        "whitepaperLink": "https://republik.gg/whitepaper/introduction/"
+    },
+    "APES-USD": {
+        "name": "APES",
+        "tags": [],
+        "websiteLink": "https://apesgang.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/apes/"
+    },
+    "SHIT-USD": {
+        "name": "Shitcoin (SOL)",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://shitcoin.co/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/shitcoin-sol/"
+    },
+    "MINI-USD": {
+        "name": "mini",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "minimini.lol",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mini/"
+    },
+    "BUB-USD": {
+        "name": "Lil Bub",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://bubcat.onl/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/goodjobbub/"
     }
 }
