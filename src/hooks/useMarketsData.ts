@@ -20,38 +20,38 @@ import { orEmptyRecord } from '@/lib/typeUtils';
 
 const filterFunctions = {
   [MarketFilters.AI]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('AI');
+    return market.tags?.includes('AI');
   },
   [MarketFilters.ALL]: () => true,
   [MarketFilters.DEFI]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Defi');
+    return market.tags?.includes('Defi');
   },
   [MarketFilters.ENT]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('ENT');
+    return market.tags?.includes('ENT');
   },
   [MarketFilters.GAMING]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Gaming');
+    return market.tags?.includes('Gaming');
   },
   [MarketFilters.LAYER_1]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Layer 1');
+    return market.tags?.includes('Layer 1');
   },
   [MarketFilters.LAYER_2]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Layer 2');
+    return market.tags?.includes('Layer 2');
   },
   [MarketFilters.MEME]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Meme');
+    return market.tags?.includes('Meme');
   },
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
   [MarketFilters.NFT]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('NFT');
+    return market.tags?.includes('NFT');
   },
   [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('Prediction Market');
+    return market.tags?.includes('Prediction Market');
   },
   [MarketFilters.RWA]: (market: MarketData) => {
-    return market.asset.tags?.toArray().includes('RWA');
+    return market.tags?.includes('RWA');
   },
 };
 
@@ -71,7 +71,7 @@ export const useMarketsData = (
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {
-    return Object.values(allPerpetualMarkets)
+    const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
       .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
@@ -79,20 +79,49 @@ export const useMarketsData = (
           sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
         );
         const clobPairId = allPerpetualClobIds?.[marketData.id] ?? 0;
+        const {
+          assetId,
+          displayId,
+          id,
+          configs,
+          oraclePrice,
+          priceChange24H,
+          priceChange24HPercent,
+          perpetual,
+        } = marketData;
+        const { nextFundingRate, line, openInterest, openInterestUSDC, trades24H, volume24H } =
+          perpetual ?? {};
+        const { name, tags } = allAssets[assetId] ?? {};
+        const { effectiveInitialMarginFraction, initialMarginFraction, tickSizeDecimals } =
+          configs ?? {};
 
         return safeAssign(
           {},
           {
-            asset: allAssets[marketData.assetId] ?? {},
-            tickSizeDecimals: marketData.configs?.tickSizeDecimals,
-            isNew,
+            id,
+            assetId,
+            displayId,
             clobPairId,
-          },
-          marketData,
-          marketData.perpetual,
-          marketData.configs
+            effectiveInitialMarginFraction,
+            initialMarginFraction,
+            isNew,
+            line: line?.toArray(),
+            name,
+            nextFundingRate,
+            openInterest,
+            openInterestUSDC,
+            oraclePrice,
+            priceChange24H,
+            priceChange24HPercent,
+            tags: tags?.toArray(),
+            tickSizeDecimals,
+            trades24H,
+            volume24H,
+          }
         );
       });
+
+    return listOfMarkets;
   }, [allPerpetualClobIds, allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
 
   const filteredMarkets = useMemo(() => {
@@ -100,9 +129,9 @@ export const useMarketsData = (
 
     if (searchFilter) {
       return filtered.filter(
-        ({ asset, id }) =>
-          matchesSearchFilter(searchFilter, asset?.name) ||
-          matchesSearchFilter(searchFilter, asset?.id) ||
+        ({ assetId, id, name }) =>
+          matchesSearchFilter(searchFilter, name) ||
+          matchesSearchFilter(searchFilter, assetId) ||
           matchesSearchFilter(searchFilter, id)
       );
     }
@@ -114,7 +143,7 @@ export const useMarketsData = (
       MarketFilters.ALL,
       MarketFilters.NEW,
       ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-        markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
+        markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
       ),
     ],
     [markets]

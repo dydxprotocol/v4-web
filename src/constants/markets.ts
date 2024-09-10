@@ -1,15 +1,27 @@
-import { Asset, Nullable, PerpetualMarket } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 export type MarketData = {
-  asset: Asset;
-  tickSizeDecimals: Nullable<number>;
-  oneDaySparkline?: number[];
-  isNew?: boolean;
+  id: string;
+  assetId: string;
+  displayId: Nullable<string>;
   clobPairId: number;
-} & PerpetualMarket &
-  PerpetualMarket['perpetual'] &
-  PerpetualMarket['configs'];
+  effectiveInitialMarginFraction: Nullable<number>;
+  initialMarginFraction: Nullable<number>;
+  isNew?: boolean;
+  line?: Nullable<number[]>;
+  name?: Nullable<string>;
+  nextFundingRate?: Nullable<number>;
+  openInterest?: Nullable<number>;
+  openInterestUSDC?: Nullable<number>;
+  oraclePrice?: Nullable<number>;
+  priceChange24H?: Nullable<number>;
+  priceChange24HPercent?: Nullable<number>;
+  tickSizeDecimals?: Nullable<number>;
+  trades24H?: Nullable<number>;
+  volume24H?: Nullable<number>;
+  tags?: Nullable<string[]>;
+};
 
 export enum MarketSorting {
   GAINERS = 'gainers',
