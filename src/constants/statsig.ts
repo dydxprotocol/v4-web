@@ -11,6 +11,7 @@ export enum StatSigFlags {
   ffEnableEvmSwaps = 'ff_enable_evm_swaps',
   ffEnableKeplr = 'ff_enable_keplr',
   ffEnableAffiliates = 'ff_enable_affiliates',
+  ffIncentivesS6RewardsDistributed = 'ff_incentives_s6_rewards_distributed',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
