@@ -403,7 +403,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   proposalsRejected.proposals.map((proposal) => {
     allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_REJECTED);
     failedOrRejectedProposals.add(proposal.id);
-    console.log(`Proposal ${proposal.id} with title ${proposal.title} was rejected: ${proposal}`);
+    console.log(`Proposal ${proposal.id} with title ${proposal.title} was rejected`);
   })
 
   // Check which proposals failed.
@@ -415,7 +415,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   proposalsFailed.proposals.map((proposal) => {
     allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_FAILED);
     failedOrRejectedProposals.add(proposal.id);
-    console.log(`Proposal ${proposal.id} with title ${proposal.title} failed: ${proposal}`);
+    console.log(`Proposal ${proposal.id} with title ${proposal.title} failed due to: ${proposal.failedReason}`);
   })
 
   // Wait for prices to update.
