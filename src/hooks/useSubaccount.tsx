@@ -590,10 +590,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onSuccess,
     }: {
       onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (data: {
-        cancelOrderPayloads: HumanReadableCancelOrderPayload[];
-        placeOrderPayloads: HumanReadablePlaceOrderPayload[];
-      }) => void;
+      onSuccess?: () => void;
     } = {}) => {
       const callback = (
         success: boolean,
@@ -604,7 +601,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
 
         if (success) {
-          onSuccess?.({ cancelOrderPayloads, placeOrderPayloads });
+          onSuccess?.();
 
           cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
             dispatch(cancelOrderConfirmed(payload.orderId));
