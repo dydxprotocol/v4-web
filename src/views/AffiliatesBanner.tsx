@@ -1,3 +1,4 @@
+import { css } from 'styled-components';
 import { styled } from 'twin.macro';
 
 import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
@@ -12,16 +13,22 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getBackground, BackgroundType } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 export const AffiliatesBanner = () => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
 
-  const dispatch = useAppDispatch();
+  const background = useAppSelector(getBackground)(BackgroundType.Grid);
+
   return (
-    <$Background tw="row m-1 justify-between gap-0.5 rounded-0.5 bg-color-layer-1 pl-1 pr-2">
+    <$Background
+      backgroundImagePath={background}
+      tw="row m-1 justify-between gap-0.5 rounded-0.5 bg-color-layer-1 pl-1 pr-2"
+    >
       <div tw="row">
         <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-8" />
         <div tw="column items-start gap-0.5">
@@ -71,8 +78,11 @@ export const AffiliatesBanner = () => {
   );
 };
 
-const $Background = styled.div`
-  background-image: url('/grid-background.svg');
+const $Background = styled.div<{ backgroundImagePath: string }>`
+  ${({ backgroundImagePath }) => css`
+    background: url(${backgroundImagePath});
+  `}
+
   background-repeat: no-repeat;
   background-position-x: 100%;
   background-size: contain;

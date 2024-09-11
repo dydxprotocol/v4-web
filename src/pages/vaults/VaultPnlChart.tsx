@@ -20,7 +20,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getBackground, BackgroundType } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getVaultPnlHistory } from '@/state/vaultSelectors';
 
@@ -147,7 +147,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     setHoveredTime(datumTime ?? undefined);
   }, []);
 
-  const chartDotsBackground = useAppSelector(getChartDotBackground);
+  const chartDotsBackground = useAppSelector(getBackground)(BackgroundType.Dots);
   const { isMobile } = useBreakpoints();
 
   const onVisibleDataChange = useCallback((inRangeData: VaultPnlDatum[]) => {

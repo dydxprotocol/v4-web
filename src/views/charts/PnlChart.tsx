@@ -27,7 +27,7 @@ import {
   getSubaccountId,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getBackground, BackgroundType } from '@/state/configsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -79,7 +79,7 @@ export const PnlChart = ({
   const { equity } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
-  const chartDotsBackground = useAppSelector(getChartDotBackground);
+  const chartDotsBackground = useAppSelector(getBackground)(BackgroundType.Dots);
 
   // Chart data
   const pnlData = useAppSelector(getSubaccountHistoricalPnl, shallowEqual);
