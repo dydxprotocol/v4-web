@@ -39,12 +39,7 @@ import {
   cancelOrderAsync,
   createPlaceOrderPayloadFromExistingOrder,
 } from '@/lib/orderModification';
-import {
-  isLimitOrderType,
-  isOrderStatusOpen,
-  isStopMarketOrder,
-  isTakeProfitMarketOrder,
-} from '@/lib/orders';
+import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useStatsigGateValue } from '../useStatsig';
@@ -57,7 +52,7 @@ const ORDER_TYPES_MODIFICATION_ENABLED = [
   AbacusOrderType.Limit.ordinal,
 ] as number[];
 
-const canModifyOrderFromChart = (order: SubaccountOrder) => {
+const canModifyOrderTypeFromChart = (order: SubaccountOrder) => {
   return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type.ordinal);
 };
 
@@ -251,7 +246,7 @@ export const useChartLines = ({
 
   const onMoveOrderLine = useCallback(
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
-      if (!orderLine) return;
+      if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
 
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
@@ -260,64 +255,58 @@ export const useChartLines = ({
       // make sure the newPrice doesnt cross over the current price depending
       // on the direction of the trade
 
-      if (
-        isStopMarketOrder(order) ||
-        isTakeProfitMarketOrder(order) ||
-        isLimitOrderType(order.type)
-      ) {
-        orderLine.setPrice(newPrice);
-        // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
-        const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
-        if (!orderPayload) {
-          orderLine.setPrice(oldPrice);
-          return;
-        }
+      orderLine.setPrice(newPrice);
+      // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
+      const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
+      if (!orderPayload) {
+        orderLine.setPrice(oldPrice);
+        return;
+      }
 
-        addPendingOrderAdjustment(orderPayload, order.id);
+      addPendingOrderAdjustment(orderPayload, order.id);
 
-        // Dispatch both actions here so that the user sees both cancel + submitting notifications together
-        dispatch(cancelOrderSubmitted(order.id));
+      // Dispatch both actions here so that the user sees both cancel + submitting notifications together
+      dispatch(cancelOrderSubmitted(order.id));
+      dispatch(
+        placeOrderSubmitted({
+          marketId: orderPayload.marketId,
+          clientId: orderPayload.clientId,
+          orderType: orderPayload.type as TradeTypes,
+        })
+      );
+
+      const { success: cancelSuccess } = await cancelOrderAsync(order.id);
+      if (!cancelSuccess) {
         dispatch(
-          placeOrderSubmitted({
-            marketId: orderPayload.marketId,
-            clientId: orderPayload.clientId,
-            orderType: orderPayload.type as TradeTypes,
+          cancelOrderFailed({
+            orderId: order.id,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
           })
         );
+        dispatch(
+          placeOrderFailed({
+            clientId: orderPayload.clientId,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+          })
+        );
+        orderLine.setPrice(oldPrice);
+        removePendingOrderAdjustment(orderPayload.clientId);
+        return;
+      }
 
-        const { success: cancelSuccess } = await cancelOrderAsync(order.id);
-        if (!cancelSuccess) {
-          dispatch(
-            cancelOrderFailed({
-              orderId: order.id,
-              errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-            })
-          );
-          dispatch(
-            placeOrderFailed({
-              clientId: orderPayload.clientId,
-              errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-            })
-          );
-          orderLine.setPrice(oldPrice);
-          removePendingOrderAdjustment(orderPayload.clientId);
-          return;
-        }
+      dispatch(cancelOrderConfirmed(order.id));
 
-        dispatch(cancelOrderConfirmed(order.id));
-
-        const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
-        const { error } = JSON.parse(res);
-        if (error) {
-          orderLine.remove();
-          removePendingOrderAdjustment(orderPayload.clientId);
-          dispatch(
-            placeOrderFailed({
-              clientId: orderPayload.clientId,
-              errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-            })
-          );
-        }
+      const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
+      const { error } = JSON.parse(res);
+      if (error) {
+        orderLine.remove();
+        removePendingOrderAdjustment(orderPayload.clientId);
+        dispatch(
+          placeOrderFailed({
+            clientId: orderPayload.clientId,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+          })
+        );
       }
     },
     [dispatch]
@@ -392,7 +381,7 @@ export const useChartLines = ({
             setLineColorsAndFont({ chartLine });
             chartLinesRef.current[key] = chartLine;
           }
-          if (canModifyOrdersFromChart && canModifyOrderFromChart(order)) {
+          if (canModifyOrdersFromChart && canModifyOrderTypeFromChart(order)) {
             orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
           }
 
