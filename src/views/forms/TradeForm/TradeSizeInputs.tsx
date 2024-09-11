@@ -41,6 +41,7 @@ import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
+import { TradePercentSizeToggle } from './TradePercentSizeToggle';
 
 export const TradeSizeInputs = () => {
   const [showUSDCInput, setShowUSDCInput] = useState(false);
@@ -55,11 +56,17 @@ export const TradeSizeInputs = () => {
 
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData ?? {};
-  const { needsLeverage } = currentTradeInputOptions ?? {};
+  const {
+    size,
+    usdcSize,
+    leverage,
+    balancePercent,
+    input: lastEditedInput,
+  } = inputTradeSizeData ?? {};
+  const { needsBalancePercent, needsLeverage } = currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
-  const { amountInput, usdAmountInput, leverageInput } = useAppSelector(
+  const { amountInput, usdAmountInput, leverageInput, balancePercentInput } = useAppSelector(
     getTradeFormInputs,
     shallowEqual
   );
@@ -76,7 +83,10 @@ export const TradeSizeInputs = () => {
     if (lastEditedInput !== TradeSizeInput.Leverage || leverage == null) {
       dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
     }
-  }, [size, usdcSize, leverage, lastEditedInput, dispatch]);
+    if (lastEditedInput !== TradeSizeInput.BalancePercent || balancePercent == null) {
+      dispatch(setTradeFormInputs({ balancePercentInput: '' }));
+    }
+  }, [size, usdcSize, leverage, balancePercent, lastEditedInput, dispatch]);
 
   const onSizeInput = ({
     floatValue,
@@ -205,6 +215,14 @@ export const TradeSizeInputs = () => {
           leverageInputValue={leverageInput}
           setLeverageInputValue={(value: string) =>
             dispatch(setTradeFormInputs({ leverageInput: value }))
+          }
+        />
+      )}
+      {needsBalancePercent && (
+        <TradePercentSizeToggle
+          balancePercentValue={balancePercentInput}
+          setBalancePercentInputValue={(value: string) =>
+            dispatch(setTradeFormInputs({ balancePercentInput: value }))
           }
         />
       )}

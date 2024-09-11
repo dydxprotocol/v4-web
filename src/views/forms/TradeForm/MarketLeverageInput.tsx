@@ -3,7 +3,6 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
@@ -15,7 +14,6 @@ import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { PositionSideTag } from '@/components/PositionSideTag';
-import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -61,7 +59,6 @@ export const MarketLeverageInput = ({
   const maxLeverageFallback = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
   const maxLeverageBN = MustBigNumber(maxLeverage ?? maxLeverageFallback).abs();
 
-  const leverageOptions = maxLeverageBN.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
   const getSignedLeverage = (newLeverage: string | number) => {
@@ -95,17 +92,6 @@ export const MarketLeverageInput = ({
     });
   };
 
-  const updateLeverage = (newLeverage: string | number) => {
-    const newLeverageSigned = getSignedLeverage(newLeverage);
-
-    setLeverageInputValue(newLeverageSigned);
-
-    abacusStateManager.setTradeValue({
-      value: newLeverageSigned,
-      field: TradeInputField.leverage,
-    });
-  };
-
   const onLeverageSideToggle = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
 
@@ -121,57 +107,40 @@ export const MarketLeverageInput = ({
     });
   };
 
-  const formattedLeverageValue = leverageInputValue
-    ? ''
-    : MustBigNumber(leverageInputValue).toFixed(LEVERAGE_DECIMALS);
-
   return (
-    <>
-      <$InputContainer>
-        <$WithLabel
-          key="leverage"
-          label={
-            <>
-              <WithTooltip tooltip="leverage" side="right">
-                {stringGetter({ key: STRING_KEYS.LEVERAGE })}
-              </WithTooltip>
+    <$InputContainer>
+      <$WithLabel
+        key="leverage"
+        label={
+          <>
+            <WithTooltip tooltip="leverage" side="right">
+              {stringGetter({ key: STRING_KEYS.LEVERAGE })}
+            </WithTooltip>
 
-              <div onClick={onLeverageSideToggle} tw="cursor-pointer">
-                <PositionSideTag positionSide={leveragePosition} />
-              </div>
-            </>
-          }
-        >
-          <LeverageSlider
-            leverage={currentLeverage}
-            leverageInputValue={getSignedLeverage(leverageInputValue)}
-            maxLeverage={maxLeverageBN}
-            orderSide={orderSide}
-            positionSide={currentPositionSide}
-            setLeverageInputValue={setLeverageInputValue}
-          />
-        </$WithLabel>
-        <$InnerInputContainer>
-          <Input
-            onInput={onLeverageInput}
-            placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
-            type={InputType.Leverage}
-            value={leverageInputValue ?? ''}
-          />
-        </$InnerInputContainer>
-      </$InputContainer>
-
-      <$ToggleGroup
-        items={leverageOptions.map((leverageAmount: number) => ({
-          label: `${leverageAmount}×`,
-          value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
-          disabled: maxLeverageBN.lt(leverageAmount),
-        }))}
-        value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
-        onValueChange={updateLeverage}
-        shape={ButtonShape.Rectangle}
-      />
-    </>
+            <div onClick={onLeverageSideToggle} tw="cursor-pointer">
+              <PositionSideTag positionSide={leveragePosition} />
+            </div>
+          </>
+        }
+      >
+        <LeverageSlider
+          leverage={currentLeverage}
+          leverageInputValue={getSignedLeverage(leverageInputValue)}
+          maxLeverage={maxLeverageBN}
+          orderSide={orderSide}
+          positionSide={currentPositionSide}
+          setLeverageInputValue={setLeverageInputValue}
+        />
+      </$WithLabel>
+      <$InnerInputContainer>
+        <Input
+          onInput={onLeverageInput}
+          placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
+          type={InputType.Leverage}
+          value={leverageInputValue ?? ''}
+        />
+      </$InnerInputContainer>
+    </$InputContainer>
   );
 };
 const $InputContainer = styled.div`
@@ -206,7 +175,4 @@ const $InnerInputContainer = styled.div`
   @media ${breakpoints.tablet} {
     --input-height: 2.5rem;
   }
-`;
-const $ToggleGroup = styled(ToggleGroup)`
-  ${formMixins.inputToggleGroup}
 `;
