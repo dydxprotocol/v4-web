@@ -8,6 +8,7 @@ import {
   COINBASE_MIPD_RDNS,
   ConnectorType,
   KEPLR_MIPD_RDNS,
+  METAMASK_DOWNLOAD_LINK,
   OKX_MIPD_RDNS,
   PHANTOM_MIPD_RDNS,
   WalletInfo,
@@ -30,27 +31,37 @@ export const useDisplayedWallets = (): WalletInfo[] => {
     const okxDetected =
       injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === OKX_MIPD_RDNS) !== -1;
 
+    const enabledInjectedWallets = injectedWallets
+      .filter(
+        (wallet) =>
+          // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
+          wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
+          // Remove Keplr EVM support since Keplr Cosmos is supported
+          wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
+          // Remove Coinbase injected support because the regular Coinbase connector already supports
+          // handling switching between injected/mobile/smart account
+          wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
+      )
+      .map(
+        (wallet) =>
+          ({
+            connectorType: ConnectorType.Injected,
+            icon: wallet.detail.info.icon,
+            name: wallet.detail.info.name,
+            rdns: wallet.detail.info.rdns,
+          }) as WalletInfo
+      );
+
     return [
-      ...injectedWallets
-        .filter(
-          (wallet) =>
-            // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
-            wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
-            // Remove Keplr EVM support since Keplr Cosmos is supported
-            wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
-            // Remove Coinbase injected support because the regular Coinbase connector already supports
-            // handling switching between injected/mobile/smart account
-            wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
-        )
-        .map(
-          (wallet) =>
-            ({
-              connectorType: ConnectorType.Injected,
-              icon: wallet.detail.info.icon,
-              name: wallet.detail.info.name,
-              rdns: wallet.detail.info.rdns,
-            }) as WalletInfo
-        ),
+      // If the user does not have any injected wallets installed, show Metamask as the first option
+      // with a download link since it the recommended wallet
+      !enabledInjectedWallets.length && {
+        connectorType: ConnectorType.DownloadWallet,
+        name: WalletType.MetaMask,
+        downloadLink: METAMASK_DOWNLOAD_LINK,
+      },
+
+      ...enabledInjectedWallets,
 
       (isTestnet || isDev) &&
         phantomDetected && {
