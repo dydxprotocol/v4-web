@@ -39,7 +39,7 @@ export const TradePercentSizeToggle = ({
   };
 
   const formattedBalancePercentValue = balancePercentValue
-    ? MustBigNumber(balancePercentValue).abs().toFixed(PERCENT_DECIMALS) // sign agnostic
+    ? MustBigNumber(balancePercentValue).toFixed(PERCENT_DECIMALS)
     : '';
 
   return (

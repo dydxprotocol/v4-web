@@ -84,7 +84,11 @@ export const TradeSizeInputs = () => {
       dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
     }
     if (lastEditedInput !== TradeSizeInput.BalancePercent || balancePercent == null) {
-      dispatch(setTradeFormInputs({ balancePercentInput: '' }));
+      dispatch(
+        setTradeFormInputs({
+          balancePercentInput: balancePercent ? balancePercent.toString() : '',
+        })
+      );
     }
   }, [size, usdcSize, leverage, balancePercent, lastEditedInput, dispatch]);
 
