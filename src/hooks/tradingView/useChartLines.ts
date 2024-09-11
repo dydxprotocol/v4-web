@@ -49,6 +49,15 @@ import { getChartLineColors } from '@/lib/tradingView/utils';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
+const ORDER_TYPES_MODIFICATION_ENABLED = [
+  AbacusOrderType.StopMarket.ordinal,
+  AbacusOrderType.TakeProfitMarket.ordinal,
+  AbacusOrderType.Limit.ordinal,
+] as number[];
+
+const canModifyOrderFromChart = (order: SubaccountOrder) => {
+  return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type.ordinal);
+};
 
 /**
  * @description Hook to handle drawing chart lines
@@ -84,8 +93,7 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  const canModifySLTPOrders = true; // useStatsigGateValue(StatSigFlags.ffSLTPModificationFromChart);
-  const canModifyLimitOrders = true; // useStatsigGateValue(StatSigFlags.ffLOModificationFromChart);
+  const canModifyOrdersFromChart = true; // useStatsigGateValue(StatSigFlags.StatSigFlags);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -381,10 +389,7 @@ export const useChartLines = ({
             setLineColorsAndFont({ chartLine });
             chartLinesRef.current[key] = chartLine;
           }
-          if (canModifySLTPOrders && (isStopMarketOrder(order) || isTakeProfitMarketOrder(order))) {
-            orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
-          }
-          if (canModifyLimitOrders && order.type.ordinal === AbacusOrderType.Limit.ordinal) {
+          if (canModifyOrdersFromChart && canModifyOrderFromChart(order)) {
             orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
           }
 
@@ -401,8 +406,7 @@ export const useChartLines = ({
     currentMarketOrders,
     stringGetter,
     tvWidget,
-    canModifySLTPOrders,
-    canModifyLimitOrders,
+    canModifyOrdersFromChart,
     setLineColorsAndFont,
     onMoveOrderLine,
     dispatch,

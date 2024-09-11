@@ -648,11 +648,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        console.log("local place orders changed, inside useEffect")
         // eslint-disable-next-line no-restricted-syntax
         for (const localPlace of localPlaceOrders) {
           const key = localPlace.clientId.toString();
-          console.log("key", key, localPlace)
           trigger(
             key,
             {
