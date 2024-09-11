@@ -309,6 +309,7 @@ export const useChartLines = ({
         const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
         const { error } = JSON.parse(res);
         if (error) {
+          orderLine.remove();
           removePendingOrderAdjustment(orderPayload.clientId);
           dispatch(
             placeOrderFailed({
