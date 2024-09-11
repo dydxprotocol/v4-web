@@ -1,0 +1,52 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Get the current branch
+branch=$(git rev-parse --abbrev-ref HEAD)
+echo "Branch name: $branch"
+
+# Get the local SHA (the latest commit on the local branch)
+local_sha=$(git rev-parse "$branch")
+echo "Local sha: $local_sha"
+
+# Get the remote SHA (the latest commit on the remote branch, if it exists)
+remote_sha=$(git ls-remote origin "$branch" | awk '{print $1}' | head -n 1)
+echo "Remote sha: $remote_sha"
+
+# Get the SHA of the main branch on the remote
+main_sha=$(git rev-parse main)
+echo "Main sha: $main_sha"
+
+if [ -z "$remote_sha" ]; then
+    # If the remote branch doesn't exist (new branch)
+    range="$main_sha..$local_sha"
+    echo "Remote branch doesn't exist. Using range: $range"
+else
+    # Check the range between the remote and local branches
+    range="$remote_sha..$local_sha"
+    echo "Range of commits to check: $range"
+fi
+
+# Ensure the range is valid
+if [ -z "$range" ] || ! git rev-parse "$range" >/dev/null 2>&1; then
+    echo "No valid commits to check or invalid range."
+    exit 1
+fi
+
+# Get the list of unsigned commits in the range
+echo "Checking commits for signatures..."
+unsigned_commits=$(git rev-list --no-merges "$range" | while read commit; do
+    if ! git log --show-signature -1 "$commit" | grep -q "gpg: Signature made"; then
+        echo "Error, unsigned commit: $commit"
+        echo "$commit"
+    fi
+done)
+
+# If there are unsigned commits, reject the push
+if [ -n "$unsigned_commits" ]; then
+    echo "Error: The following commits are not signed:"
+    echo "$unsigned_commits"
+    exit 1
+fi
+
+# All
