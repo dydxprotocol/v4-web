@@ -226,12 +226,15 @@ export enum ReleaseUpdateNotificationIds {
 // Incentives Season
 export enum IncentivesDistributedNotificationIds {
   IncentivesDistributedS5 = 'incentives-distributed-s5',
+  IncentivesDistributedS6 = 'incentives-distributed-s6',
 }
 
 export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6Ended;
 
 export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
   switch (seasonId) {
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS6:
+      return 6;
     case IncentivesDistributedNotificationIds.IncentivesDistributedS5:
     default:
       return 5;
