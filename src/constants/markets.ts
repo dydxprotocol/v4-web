@@ -2,9 +2,15 @@ import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 export type MarketData = {
+  // Unique Market id (e.g. 'ETH-USD' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD')
   id: string;
+
+  // Base asset id (e.g. 'ETH' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45')
   assetId: string;
+
+  // Displayable Market id (e.g. 'ETH-USD' or 'BUFFI-USD')
   displayId: Nullable<string>;
+
   clobPairId: number;
   effectiveInitialMarginFraction: Nullable<number>;
   initialMarginFraction: Nullable<number>;
