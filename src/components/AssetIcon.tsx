@@ -300,6 +300,7 @@ const assetIcons = {
   HIGH: '/currencies/high.png',
   HIVE: '/currencies/hive.png',
   HLG: '/currencies/hlg.png',
+  HNT: '/currencies/hnt.png',
   HOOK: '/currencies/hook.png',
   HOT: '/currencies/hot.png',
   HOTCROSS: '/currencies/hotcross.png',
