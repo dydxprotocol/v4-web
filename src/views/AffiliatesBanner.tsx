@@ -9,6 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
@@ -27,7 +29,7 @@ export const AffiliatesBanner = () => {
   return (
     <$Background
       backgroundImagePath={background}
-      tw="row m-1 justify-between gap-0.5 rounded-0.5 bg-color-layer-1 pl-1 pr-2"
+      tw="row mb-1 mt-1 justify-between gap-0.5 bg-color-layer-1 pl-1 pr-2"
     >
       <div tw="row">
         <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-8" />
@@ -79,6 +81,9 @@ export const AffiliatesBanner = () => {
 };
 
 const $Background = styled.div<{ backgroundImagePath: string }>`
+  --color-border: transparent;
+  ${layoutMixins.withOuterBorderClipped}
+
   ${({ backgroundImagePath }) => css`
     background: url(${backgroundImagePath});
   `}

@@ -1,7 +1,11 @@
+import styled from 'styled-components';
+
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from '@/components/Link';
 
@@ -10,7 +14,7 @@ export const TelegramInviteBanner = () => {
   const { getInTouch } = useURLConfigs();
 
   return getInTouch ? (
-    <div tw="mb-1 mt-1 justify-between gap-0.5 rounded-0.5 bg-color-layer-5 pb-1 pl-1 pr-2 pt-1">
+    <$Banner tw="mb-1 bg-color-layer-5 p-1">
       {stringGetter({
         key: STRING_KEYS.TELEGRAM_INVITE_BANNER,
         params: {
@@ -21,6 +25,11 @@ export const TelegramInviteBanner = () => {
           ),
         },
       })}
-    </div>
+    </$Banner>
   ) : null;
 };
+
+const $Banner = styled.div`
+  --color-border: transparent;
+  ${layoutMixins.withOuterBorderClipped}
+`;
