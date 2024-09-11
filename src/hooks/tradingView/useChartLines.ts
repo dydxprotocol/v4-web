@@ -12,6 +12,7 @@ import {
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatSigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -46,6 +47,7 @@ import {
 } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
+import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
@@ -93,7 +95,7 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  const canModifyOrdersFromChart = true; // useStatsigGateValue(StatSigFlags.StatSigFlags);
+  const canModifyOrdersFromChart = useStatsigGateValue(StatSigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -225,7 +227,7 @@ export const useChartLines = ({
     });
   }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
-  // Cache for order modification that stores the new orders are still being submitted
+  // Cache for order modification that stores the new orders that are submitted but not yet placed
   const pendingOrderAdjustmentsRef = useRef<{
     [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
   }>({});
@@ -254,7 +256,7 @@ export const useChartLines = ({
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
 
-      // TODO(tinaszheng): do some validation here for new price
+      // TODO(tinaszheng): do validation here for new price
       // make sure the newPrice doesnt cross over the current price depending
       // on the direction of the trade
 
