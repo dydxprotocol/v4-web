@@ -319,7 +319,7 @@ export const useWalletConnection = () => {
   useEffect(() => {
     (async () => {
       if (testFlags.addressOverride) {
-        setSelectedWallet({ connectorType: ConnectorType.Test, name: WalletType.TestWallet });
+        setConnectedWallet({ connectorType: ConnectorType.Test, name: WalletType.TestWallet });
       }
     })();
   }, []);
