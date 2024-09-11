@@ -24,11 +24,16 @@ class AbacusLogger implements Omit<AbacusLoggingProtocol, '__doNotUseOrImplement
   }
 
   ddInfo(tag: string, message: string, context: string) {
-    const parsedContext = JSON.parse(context.toString());
-    if (import.meta.env.VITE_ABACUS_LOG_LEVEL === 'debug') {
-      console.log(`${tag} dd info: ${message}`, parsedContext);
+    try {
+      const parsedContext = JSON.parse(context);
+      if (import.meta.env.VITE_DATADOG_LOG_LEVEL === 'debug') {
+        console.log(`${tag} dd info: ${message}`, parsedContext);
+      }
+      dd.info(message, parsedContext);
+      // catch in case parsing context fails for some reason
+    } catch (err) {
+      dd.error('Error sending dd info', undefined, err);
     }
-    dd.info(message, parsedContext);
   }
 }
 
