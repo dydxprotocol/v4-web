@@ -57,7 +57,7 @@ export const NewMarketAgreement = ({
         </Button>
         <Button
           action={ButtonAction.Primary}
-          onClick={() => {
+          onClick={onAccept}
             onAccept();
           }}
           state={{ isDisabled: !hasAcknowledged }}
