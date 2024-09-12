@@ -230,7 +230,6 @@ export const useChartLines = ({
     };
   };
 
-
   const onMoveOrderLine = useCallback(
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
       if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
