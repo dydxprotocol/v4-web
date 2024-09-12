@@ -16,30 +16,27 @@ export const getAppTheme = (state: RootState): AppTheme => {
   }
 };
 
-export enum BackgroundType {
-  Dots = 'Dots',
-  Grid = 'Grid',
-}
-
-const BackgroundPaths = {
-  [BackgroundType.Dots]: {
-    [AppTheme.Dark]: '/chart-dots-background-dark.svg',
-    [AppTheme.Classic]: '/chart-dots-background-dark.svg',
-    [AppTheme.Light]: '/chart-dots-background-light.svg',
-  },
-  [BackgroundType.Grid]: {
-    [AppTheme.Dark]: '/grid-background-dark.svg',
-    [AppTheme.Classic]: '/grid-background-dark.svg',
-    [AppTheme.Light]: '/grid-background-light.svg',
-  },
+const ChartDotBackgrounds = {
+  [AppTheme.Dark]: '/chart-dots-background-dark.svg',
+  [AppTheme.Classic]: '/chart-dots-background-dark.svg',
+  [AppTheme.Light]: '/chart-dots-background-light.svg',
 };
 
-export const getBackground =
-  (state: RootState) =>
-  (background: BackgroundType): string => {
-    const appTheme = getAppTheme(state);
-    return BackgroundPaths[background][appTheme];
-  };
+const GridBackgrounds = {
+  [AppTheme.Dark]: '/grid-background-dark.svg',
+  [AppTheme.Classic]: '/grid-background-dark.svg',
+  [AppTheme.Light]: '/grid-background-light.svg',
+};
+
+export const getChartDotBackground = (state: RootState): string => {
+  const appTheme = getAppTheme(state);
+  return ChartDotBackgrounds[appTheme];
+};
+
+export const getGridBackground = (state: RootState): string => {
+  const appTheme = getAppTheme(state);
+  return GridBackgrounds[appTheme];
+};
 
 export const getAppColorMode = (state: RootState) => state.configs.appColorMode;
 

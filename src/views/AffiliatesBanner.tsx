@@ -16,7 +16,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getBackground, BackgroundType } from '@/state/configsSelectors';
+import { getGridBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 export const AffiliatesBanner = () => {
@@ -24,7 +24,7 @@ export const AffiliatesBanner = () => {
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
 
-  const background = useAppSelector(getBackground)(BackgroundType.Grid);
+  const background = useAppSelector(getGridBackground);
 
   return (
     <$Background

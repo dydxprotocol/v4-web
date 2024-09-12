@@ -20,7 +20,7 @@ import { Panel } from '@/components/Panel';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getBackground, BackgroundType } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { BigNumberish } from '@/lib/numbers';
@@ -34,7 +34,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
-  const chartDotsBackground = useAppSelector(getBackground)(BackgroundType.Dots);
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
   const openStakingRewardDialog = useCallback(

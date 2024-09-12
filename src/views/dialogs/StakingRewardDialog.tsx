@@ -28,7 +28,7 @@ import {
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getBackground, BackgroundType } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/configsSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
@@ -45,7 +45,7 @@ export const StakingRewardDialog = ({
 
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
 
-  const chartDotsBackground = useAppSelector(getBackground)(BackgroundType.Dots);
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
   const [error, setError] = useState<StakeButtonAlert>();
