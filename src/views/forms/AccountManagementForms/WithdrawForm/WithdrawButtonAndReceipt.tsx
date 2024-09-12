@@ -74,6 +74,7 @@ export const WithdrawButtonAndReceipt = ({
       X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
+  console.log('summary', summary);
   const submitButtonReceipt = [
     {
       key: 'expected-amount-received',
