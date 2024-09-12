@@ -74,7 +74,6 @@ export const WithdrawButtonAndReceipt = ({
       X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
     },
   });
-
   const submitButtonReceipt = [
     {
       key: 'expected-amount-received',
@@ -89,6 +88,23 @@ export const WithdrawButtonAndReceipt = ({
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
       ),
     },
+    typeof summary?.toAmountUSD === 'number' &&
+      !String(withdrawToken?.symbol).includes(usdcLabel) && {
+        key: 'expected-amount-received-usd',
+        label: (
+          <$RowWithGap>
+            {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
+            <Tag>USD</Tag>
+          </$RowWithGap>
+        ),
+        value: (
+          <Output
+            type={OutputType.Asset}
+            value={summary?.toAmountUSD}
+            fractionDigits={TOKEN_DECIMALS}
+          />
+        ),
+      },
     showExchangeRate && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
