@@ -248,7 +248,7 @@ export const getDydxDatafeed = (
       onRealtimeCallback,
       subscribeUID,
       onResetCacheNeededCallback,
-      lastBar: lastBarsCache.get(`${symbolInfo.full_name}/${RESOLUTION_MAP[resolution]}`),
+      lastBar: lastBarsCache.get(`${symbolInfo.symbol}/${RESOLUTION_MAP[resolution]}`),
     });
   },
 
