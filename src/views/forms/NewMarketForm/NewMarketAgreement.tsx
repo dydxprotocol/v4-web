@@ -58,8 +58,6 @@ export const NewMarketAgreement = ({
         <Button
           action={ButtonAction.Primary}
           onClick={onAccept}
-            onAccept();
-          }}
           state={{ isDisabled: !hasAcknowledged }}
         >
           {stringGetter({ key: STRING_KEYS.CONTINUE })}
