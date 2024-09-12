@@ -3,12 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
 
-import {
-  AbacusOrderType,
-  HumanReadablePlaceOrderPayload,
-  ORDER_SIDES,
-  SubaccountOrder,
-} from '@/constants/abacus';
+import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
@@ -37,6 +32,7 @@ import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   cancelOrderAsync,
+  canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
 } from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
@@ -46,15 +42,6 @@ import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
-const ORDER_TYPES_MODIFICATION_ENABLED = [
-  AbacusOrderType.StopMarket.ordinal,
-  AbacusOrderType.TakeProfitMarket.ordinal,
-  AbacusOrderType.Limit.ordinal,
-] as number[];
-
-const canModifyOrderTypeFromChart = (order: SubaccountOrder) => {
-  return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type.ordinal);
-};
 
 /**
  * @description Hook to handle drawing chart lines
@@ -75,6 +62,7 @@ export const useChartLines = ({
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
   const chartLinesRef = useRef<Record<string, ChartLine>>({});
 
@@ -242,7 +230,6 @@ export const useChartLines = ({
     };
   };
 
-  const dispatch = useAppDispatch();
 
   const onMoveOrderLine = useCallback(
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
@@ -255,13 +242,11 @@ export const useChartLines = ({
       // make sure the newPrice doesnt cross over the current price depending
       // on the direction of the trade
 
-      orderLine.setPrice(newPrice);
       // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
-      if (!orderPayload) {
-        orderLine.setPrice(oldPrice);
-        return;
-      }
+      if (!orderPayload) return;
+
+      orderLine.setPrice(newPrice);
 
       addPendingOrderAdjustment(orderPayload, order.id);
 
@@ -333,7 +318,7 @@ export const useChartLines = ({
       const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
       const pendingReplacementOrder = Object.values(pendingOrderAdjustments).find(
-        (adjustment) => adjustment.oldOrderId === order.id
+        (adjustment) => adjustment.oldOrderId === id
       );
       const replacementOrderPlaced = !!currentMarketOrders.find(
         (o) => o.clientId === pendingReplacementOrder?.orderPayload.clientId

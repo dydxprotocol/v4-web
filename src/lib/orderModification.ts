@@ -2,10 +2,26 @@ import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 
-import { HumanReadableCancelOrderPayload, ParsingError, SubaccountOrder } from '@/constants/abacus';
+import {
+  AbacusOrderType,
+  HumanReadableCancelOrderPayload,
+  ParsingError,
+  PlaceOrderMarketInfo,
+  SubaccountOrder,
+} from '@/constants/abacus';
 
 import abacusStateManager from './abacus';
 import { isLimitOrderType, isMarketOrderType } from './orders';
+
+const ORDER_TYPES_MODIFICATION_ENABLED = [
+  AbacusOrderType.StopMarket.ordinal,
+  AbacusOrderType.TakeProfitMarket.ordinal,
+  AbacusOrderType.Limit.ordinal,
+] as number[];
+
+export const canModifyOrderTypeFromChart = (order: SubaccountOrder) => {
+  return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type.ordinal);
+};
 
 // Inverse of calculateGoodTilBlockTime in v4-client
 // https://github.com/dydxprotocol/v4-clients/blob/4227bd06a6f4503d863dcd99b3aba703cb94c40b/v4-client-js/src/clients/composite-client.ts#L253
@@ -21,7 +37,7 @@ const getMarketInfo = (marketId: string) => {
 
   if (!v4Config) return null;
 
-  return new Abacus.exchange.dydx.abacus.state.manager.PlaceOrderMarketInfo(
+  return new PlaceOrderMarketInfo(
     v4Config.clobPairId,
     v4Config.atomicResolution,
     v4Config.stepBaseQuantums,
