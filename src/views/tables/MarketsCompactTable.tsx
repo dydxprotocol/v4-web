@@ -50,11 +50,17 @@ export const MarketsCompactTable = ({
           columnKey: 'market',
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ asset, effectiveInitialMarginFraction, initialMarginFraction }) => (
+          renderCell: ({
+            assetId,
+            effectiveInitialMarginFraction,
+            initialMarginFraction,
+            name,
+          }) => (
             <AssetTableCell
               stacked
-              asset={asset}
               configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+              name={name}
+              symbol={assetId}
             />
           ),
         },
@@ -117,14 +123,14 @@ export const MarketsCompactTable = ({
               columnKey: 'openInterest',
               allowsSorting: false,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-              renderCell: ({ asset, openInterestUSDC, openInterest }) => (
+              renderCell: ({ assetId, openInterestUSDC, openInterest }) => (
                 <$DetailsCell>
                   <$RecentlyListed>
                     <Output type={OutputType.CompactFiat} value={openInterestUSDC} />
                     <Output
                       type={OutputType.CompactNumber}
                       value={openInterest}
-                      slotRight={` ${asset.id}`}
+                      slotRight={` ${assetId}`}
                       tw="text-color-text-0 font-mini-medium"
                     />
                   </$RecentlyListed>
@@ -170,7 +176,7 @@ export const MarketsCompactTable = ({
     <$Table
       withInnerBorders
       data={sortedMarkets.slice(0, 3)}
-      getRowKey={(row) => row.market ?? ''}
+      getRowKey={(row) => row.id ?? ''}
       label="Markets"
       onRowAction={(market: Key) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
