@@ -52,7 +52,7 @@ export const NewMarketAgreement = ({
         label={stringGetter({ key: STRING_KEYS.I_HAVE_READ_AND_AGREE })}
       />
       <div tw="grid grid-cols-[1fr_2fr] gap-1">
-        <Button action={ButtonAction.Base} onClick={() => onCancel()}>
+        <Button action={ButtonAction.Base} onClick={onCancel}>
           {stringGetter({ key: STRING_KEYS.CANCEL })}
         </Button>
         <Button
