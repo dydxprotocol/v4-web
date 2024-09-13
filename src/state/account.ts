@@ -69,7 +69,7 @@ export type AccountState = {
   hasUnseenOrderUpdates: boolean;
   latestOrder?: Nullable<SubaccountOrder>;
   historicalPnlPeriod?: HistoricalPnlPeriods;
-  uncommittedOrderClientIds: number[];
+  uncommittedOrderClientIds: string[];
   localPlaceOrders: LocalPlaceOrderData[];
   localCancelOrders: LocalCancelOrderData[];
 
@@ -321,7 +321,7 @@ export const accountSlice = createSlice({
     },
     placeOrderSubmitted: (
       state,
-      action: PayloadAction<{ marketId: string; clientId: number; orderType: TradeTypes }>
+      action: PayloadAction<{ marketId: string; clientId: string; orderType: TradeTypes }>
     ) => {
       state.localPlaceOrders.push({
         ...action.payload,
@@ -331,7 +331,7 @@ export const accountSlice = createSlice({
     },
     placeOrderFailed: (
       state,
-      action: PayloadAction<{ clientId: number; errorParams: ErrorParams }>
+      action: PayloadAction<{ clientId: string; errorParams: ErrorParams }>
     ) => {
       state.localPlaceOrders = state.localPlaceOrders.map((order) =>
         order.clientId === action.payload.clientId
@@ -345,7 +345,7 @@ export const accountSlice = createSlice({
         (id) => id !== action.payload.clientId
       );
     },
-    placeOrderTimeout: (state, action: PayloadAction<number>) => {
+    placeOrderTimeout: (state, action: PayloadAction<string>) => {
       if (state.uncommittedOrderClientIds.includes(action.payload)) {
         placeOrderFailed({
           clientId: action.payload,

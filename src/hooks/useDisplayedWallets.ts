@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { WalletType as CosmosWalletType } from 'graz';
 
 import { isDev, isTestnet } from '@/constants/networks';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
   ConnectorType,
@@ -21,7 +21,7 @@ import { useMipdInjectedWallets } from './useMipdInjectedWallets';
 import { useStatsigGateValue } from './useStatsig';
 
 export const useDisplayedWallets = (): WalletInfo[] => {
-  const keplrEnabled = useStatsigGateValue(StatSigFlags.ffEnableKeplr);
+  const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr);
   const injectedWallets = useMipdInjectedWallets();
 
   return useMemo(() => {

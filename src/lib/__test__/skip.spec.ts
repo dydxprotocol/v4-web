@@ -4,7 +4,7 @@ import { TransferChainInfo } from '@/constants/abacus';
 import { SkipTransactionStatus } from '@/constants/skip';
 
 import abacusStateManager from '../abacus';
-import { formSkipStatusResponse } from '../squid';
+import { formSkipStatusResponse } from '../skip';
 import { depositFromUsdcEthPending, depositFromUsdcEthSuccess } from './fixtures/skipCctpDeposit';
 import { withdrawToUsdcEthPending, withdrawToUsdcEthSuccess } from './fixtures/skipCctpWithdrawal';
 import {

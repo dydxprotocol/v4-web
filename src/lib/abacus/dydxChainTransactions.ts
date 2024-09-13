@@ -251,7 +251,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         side as OrderSide,
         price,
         size,
-        clientId,
+        parseInt(clientId, 10),
         timeInForce as OrderTimeInForce,
         goodTilTimeInSeconds ?? 0,
         execution as OrderExecution,
@@ -301,7 +301,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     try {
       const tx = await this.compositeClient?.cancelRawOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
-        clientId,
+        parseInt(clientId, 10),
         orderFlags,
         clobPairId,
         goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,

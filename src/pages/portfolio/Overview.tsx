@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
-import { StatsigDynamicConfigs, StatSigFlags } from '@/constants/statsig';
+import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -42,7 +42,7 @@ export const Overview = () => {
     dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
-  const affiliatesEnabled = useStatsigGateValue(StatSigFlags.ffEnableAffiliates);
+  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
