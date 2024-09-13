@@ -7,6 +7,7 @@ import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -38,7 +39,6 @@ import {
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
-import { StatsigFlags } from '@/constants/statsig';
 import { useCustomNotification } from '../useCustomNotification';
 import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
@@ -241,6 +241,7 @@ export const useChartLines = ({
       const newPrice = orderLine.getPrice();
 
       if (!isNewOrderPriceValid(order, newPrice)) {
+        // TODO: Add final copy with localization here
         notify({
           title: 'Bad price!!!',
           body: 'Dont cross the book price pls',
