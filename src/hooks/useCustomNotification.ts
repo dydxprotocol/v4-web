@@ -2,7 +2,11 @@ import { useCallback } from 'react';
 
 import { uniqueId } from 'lodash';
 
-import { NotificationDisplayData, NotificationType } from '@/constants/notifications';
+import {
+  DEFAULT_TOAST_AUTO_CLOSE_MS,
+  NotificationDisplayData,
+  NotificationType,
+} from '@/constants/notifications';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { addCustomNotification } from '@/state/notifications';
@@ -15,7 +19,12 @@ export const useCustomNotification = () => {
       dispatch(
         addCustomNotification({
           id: uniqueId(),
-          displayData: { ...customNotification, groupKey: NotificationType.Custom },
+
+          displayData: {
+            toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+            groupKey: NotificationType.Custom,
+            ...customNotification,
+          },
         })
       );
     },
