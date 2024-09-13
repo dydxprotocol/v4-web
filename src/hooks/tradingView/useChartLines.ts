@@ -7,7 +7,6 @@ import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -34,11 +33,12 @@ import {
   cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
+  isNewOrderPriceValid,
 } from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
-import { useStatsigGateValue } from '../useStatsig';
+import { useCustomNotification } from '../useCustomNotification';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
@@ -78,7 +78,7 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  const canModifyOrdersFromChart = useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
+  const canModifyOrdersFromChart = true; // useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -230,6 +230,7 @@ export const useChartLines = ({
     };
   };
 
+  const notify = useCustomNotification();
   const onMoveOrderLine = useCallback(
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
       if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
@@ -237,9 +238,14 @@ export const useChartLines = ({
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
 
-      // TODO(tinaszheng): do validation here for new price
-      // make sure the newPrice doesnt cross over the current price depending
-      // on the direction of the trade
+      if (!isNewOrderPriceValid(order, newPrice)) {
+        notify({
+          title: 'Bad price!!!',
+          body: 'Dont cross the book price pls',
+        });
+        orderLine.setPrice(oldPrice);
+        return;
+      }
 
       // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);

@@ -109,3 +109,15 @@ export const cancelOrderAsync = (
     });
   });
 };
+
+export const isNewOrderPriceValid = (order: SubaccountOrder, newPrice: number) => {
+  const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
+    order.marketId
+  )?.midPrice;
+  if (!bookPrice) return true;
+
+  const oldPrice = order.triggerPrice ?? order.price;
+
+  // Ensure newPrice makes the order remain on the same side of bookPrice
+  return newPrice !== bookPrice && oldPrice - bookPrice > 0 === newPrice - bookPrice > 0;
+};
