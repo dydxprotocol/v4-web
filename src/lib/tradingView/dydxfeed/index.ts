@@ -5,13 +5,14 @@ import type {
   ErrorCallback,
   GetMarksCallback,
   HistoryCallback,
+  IBasicDataFeed,
   LibrarySymbolInfo,
   Mark,
   OnReadyCallback,
-  QuotesCallback,
   ResolutionString,
   ResolveCallback,
   SearchSymbolsCallback,
+  SubscribeBarsCallback,
   Timezone,
 } from 'public/tradingview/charting_library';
 
@@ -72,7 +73,7 @@ export const getDydxDatafeed = (
   },
   selectedLocale: SupportedLocales,
   stringGetter: StringGetterFunction
-) => ({
+): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
   },
@@ -239,21 +240,21 @@ export const getDydxDatafeed = (
   subscribeBars: (
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
-    onRealtimeCallback: QuotesCallback,
-    subscribeUID: string,
-    onResetCacheNeededCallback: () => void
+    onTick: SubscribeBarsCallback,
+    listenerGuid: string,
+    onResetCacheNeededCallback: Function
   ) => {
     subscribeOnStream({
       symbolInfo,
       resolution,
-      onRealtimeCallback,
-      subscribeUID,
+      onRealtimeCallback: onTick,
+      listenerGuid,
       onResetCacheNeededCallback,
       lastBar: lastBarsCache.get(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`),
     });
   },
 
-  unsubscribeBars: (subscriberUID: any) => {
+  unsubscribeBars: (subscriberUID: string) => {
     unsubscribeFromStream(subscriberUID);
   },
 });
