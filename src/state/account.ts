@@ -370,7 +370,7 @@ export const accountSlice = createSlice({
       state,
       action: PayloadAction<{ orderId: string; errorParams: ErrorParams }>
     ) => {
-      state.localCancelOrders.map((order) =>
+      state.localCancelOrders = state.localCancelOrders.map((order) =>
         order.orderId === action.payload.orderId
           ? { ...order, errorParams: action.payload.errorParams }
           : order

@@ -216,6 +216,7 @@ export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
 export type HumanReadableSubaccountTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
+export const PlaceOrderMarketInfo = Abacus.exchange.dydx.abacus.state.manager.PlaceOrderMarketInfo;
 
 export type OrderbookGroupings = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
 export const OrderbookGrouping = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
