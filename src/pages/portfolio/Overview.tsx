@@ -43,7 +43,6 @@ export const Overview = () => {
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
   const affiliatesEnabled = useStatsigGateValue(StatSigFlags.ffEnableAffiliates);
-  const { dydxAddress } = useAccounts();
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
