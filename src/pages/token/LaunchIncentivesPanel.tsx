@@ -21,7 +21,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { NewTag, TagSize } from '@/components/Tag';
+import { TagSize, WarningTag } from '@/components/Tag';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
@@ -64,7 +64,9 @@ const LaunchIncentivesTitle = () => {
           FOR_V4: <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
         },
       })}
-      <NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+      <WarningTag size={TagSize.Medium}>
+        {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_CONCLUDED })}
+      </WarningTag>
     </$Title>
   );
 };

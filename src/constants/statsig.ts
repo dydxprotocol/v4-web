@@ -10,7 +10,6 @@ export enum StatsigFlags {
   ffEnableKeplr = 'ff_enable_keplr',
   ffOrderModificationFromChart = 'ff_order_modification_from_chart',
   ffEnableAffiliates = 'ff_enable_affiliates',
-  ffIncentivesS6RewardsDistributed = 'ff_incentives_s6_rewards_distributed',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
