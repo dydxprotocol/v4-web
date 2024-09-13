@@ -59,6 +59,10 @@ class TestFlags {
   get showCancelAll() {
     return !!this.queryParams.cancelall;
   }
+
+  get referralCode() {
+    return this.queryParams.ref;
+  }
 }
 
 export const testFlags = new TestFlags();

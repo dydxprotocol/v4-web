@@ -73,7 +73,7 @@ export const Overview = () => {
         <AccountDetailsAndHistory />
       </DetachedSection>
 
-      {affiliatesEnabled && (
+      {affiliatesEnabled && dydxAddress && (
         <DetachedSection>
           <AffiliatesBanner />
         </DetachedSection>

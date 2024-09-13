@@ -56,6 +56,7 @@ export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
 export type PreferencesDialogProps = {};
 export type RateLimitDialogProps = { preventClose?: boolean };
+export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
@@ -124,6 +125,7 @@ export const DialogTypes = unionize(
     PredictionMarketIntro: ofType<PredictionMarketIntroDialogProps>(),
     Preferences: ofType<PreferencesDialogProps>(),
     RateLimit: ofType<RateLimitDialogProps>(),
+    Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
