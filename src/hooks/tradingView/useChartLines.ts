@@ -38,7 +38,9 @@ import {
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
+import { StatsigFlags } from '@/constants/statsig';
 import { useCustomNotification } from '../useCustomNotification';
+import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
@@ -78,7 +80,7 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  const canModifyOrdersFromChart = true; // useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
+  const canModifyOrdersFromChart = useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
