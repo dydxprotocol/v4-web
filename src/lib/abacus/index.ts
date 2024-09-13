@@ -40,7 +40,7 @@ import {
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 import {
   CLEARED_TRIGGER_LIMIT_INPUTS,
@@ -464,8 +464,8 @@ class AbacusStateManager {
    * You must define the property in abacus first, and then add to the enum.
    *
    */
-  setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
-    const { [StatSigFlags.ffSkipMigration]: useSkip = false, ...rest } = statsigConfig;
+  setStatsigConfigs = (statsigConfig: { [key in StatsigFlags]?: boolean }) => {
+    const { [StatsigFlags.ffSkipMigration]: useSkip = false, ...rest } = statsigConfig;
     StatsigConfig.useSkip = useSkip;
     Object.entries(rest).forEach(([k, v]) => {
       // This filters out any feature flags in the enum that are not part of the

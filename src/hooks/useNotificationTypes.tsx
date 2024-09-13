@@ -30,7 +30,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
+import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -113,7 +113,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           switch (abacusNotificationType) {
             case 'order': {
               const order = ordersById[id]?.[0];
-              const clientId: number | undefined = order?.clientId ?? undefined;
+              const clientId: string | undefined = order?.clientId ?? undefined;
               const localOrderExists =
                 clientId && localPlaceOrders.some((ordr) => ordr.clientId === clientId);
 
@@ -329,7 +329,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         if (
-          featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+          featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
         ) {
           trigger(
@@ -352,7 +352,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (featureFlags?.[StatSigFlags.ffEnableKeplr]) {
+        if (featureFlags?.[StatsigFlags.ffEnableKeplr]) {
           trigger(
             ReleaseUpdateNotificationIds.KeplrSupport,
             {

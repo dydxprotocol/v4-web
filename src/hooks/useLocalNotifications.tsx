@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import type { TransferNotifcation } from '@/constants/notifications';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
@@ -38,7 +38,7 @@ const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
   const { skip } = useEndpointsConfig();
-  const useSkip = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+  const useSkip = useStatsigGateValue(StatsigFlags.ffSkipMigration);
 
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];

@@ -3,7 +3,7 @@ import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
@@ -24,7 +24,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
   });
 
   if (
-    featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+    featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
     marketId === PREDICTION_MARKET.TRUMPWIN &&
     !hasSeenTradeFormMessageTrumpWin
   ) {

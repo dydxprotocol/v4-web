@@ -12,7 +12,7 @@ import {
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -64,7 +64,7 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
     EMPTY_ARR;
 
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+  const skipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
 
   const lowestFeeTokensByChainId = useMemo(
     () => getMapOfLowestFeeTokensByChainId(type, skipEnabled),

@@ -7,10 +7,10 @@ import {
 } from '@statsig/react-bindings';
 
 import {
-  StatSigFlags,
   StatsigConfigType,
   StatsigDynamicConfigType,
   StatsigDynamicConfigs,
+  StatsigFlags,
 } from '@/constants/statsig';
 
 import { initStatsigAsync } from '@/lib/statsig';
@@ -28,7 +28,7 @@ export const StatsigProvider = ({ children }: { children: React.ReactNode }) => 
   return <StatsigProviderInternal client={statsigClient}> {children} </StatsigProviderInternal>;
 };
 
-export const useStatsigGateValue = (gate: StatSigFlags) => {
+export const useStatsigGateValue = (gate: StatsigFlags) => {
   const { checkGate } = useStatsigClient();
   return checkGate(gate);
 };
@@ -46,7 +46,7 @@ export const useAllStatsigDynamicConfigValues = () => {
 export const useAllStatsigGateValues = () => {
   const { checkGate } = useStatsigClient();
   const allGateValues = useMemo(() => {
-    return Object.values(StatSigFlags).reduce((acc, gate) => {
+    return Object.values(StatsigFlags).reduce((acc, gate) => {
       return { ...acc, [gate]: checkGate(gate) };
     }, {} as StatsigConfigType);
   }, []);

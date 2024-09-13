@@ -2,7 +2,7 @@ import { StatsigClient } from '@statsig/js-client';
 import { merge } from 'lodash';
 
 import { STATSIG_ENVIRONMENT_TIER } from '@/constants/networks';
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
+import { StatsigConfigType, StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 
 import { log } from './telemetry';
 
@@ -45,7 +45,7 @@ export const initStatsigAsync = async () => {
  * @param gateId
  * @returns
  */
-const checkGateTyped = (client: StatsigClient, gateId: StatSigFlags) => {
+const checkGateTyped = (client: StatsigClient, gateId: StatsigFlags) => {
   return client.checkGate(gateId);
 };
 
@@ -60,7 +60,7 @@ const checkGateTyped = (client: StatsigClient, gateId: StatSigFlags) => {
 export const getStatsigConfigAsync = async (): Promise<StatsigConfigType> => {
   try {
     const client = await initStatsigAsync();
-    const gateValuesList = Object.values(StatSigFlags).map((gateId) => ({
+    const gateValuesList = Object.values(StatsigFlags).map((gateId) => ({
       [gateId]: checkGateTyped(client, gateId),
     }));
 

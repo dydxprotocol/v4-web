@@ -9,7 +9,7 @@ import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms'
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -45,7 +45,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
   const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+  const skipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
 
   const lowestFeeTokensByDenom = useMemo(
     () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),

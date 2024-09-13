@@ -1,5 +1,5 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { TransferType } from '../abacus';
 import { getLowestFeeChainNames } from '../cctp';
@@ -20,7 +20,7 @@ export const depositTooltips: TooltipStrings = {
       params: {
         LOWEST_FEE_TOKEN_NAMES: getLowestFeeChainNames(
           TransferType.deposit,
-          featureFlags?.[StatSigFlags.ffSkipMigration] ?? false
+          featureFlags?.[StatsigFlags.ffSkipMigration] ?? false
         ).join(', '),
       },
     }),

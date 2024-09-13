@@ -9,7 +9,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
@@ -67,7 +67,7 @@ export const WithdrawButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
-  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+  const isSkipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
 
   const showExchangeRate =
     (!isSkipEnabled && !exchange) ||

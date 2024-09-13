@@ -250,7 +250,7 @@ export const getOrderById = () =>
  */
 export const getOrderByClientId = () =>
   createAppSelector(
-    [getSubaccountOrders, (s, orderClientId: number) => orderClientId],
+    [getSubaccountOrders, (s, orderClientId: string) => orderClientId],
     (orders, orderClientId) => orders?.find((order) => order.clientId === orderClientId)
   );
 

@@ -169,7 +169,7 @@ export enum CancelOrderStatuses {
 
 export type LocalPlaceOrderData = {
   marketId: string;
-  clientId: number;
+  clientId: string;
   orderId?: string;
   orderType: TradeTypes;
   submissionStatus: PlaceOrderStatuses;

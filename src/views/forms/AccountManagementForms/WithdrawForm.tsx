@@ -28,7 +28,7 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -577,7 +577,7 @@ export const WithdrawForm = () => {
     isLoading ||
     !isValidDestinationAddress;
 
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+  const skipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
 
   return (
     <$Form onSubmit={onSubmit}>
