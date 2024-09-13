@@ -11,7 +11,6 @@ export enum AppRoute {
   Terms = '/terms',
   Privacy = '/privacy',
   LaunchMarket = '/launch-market',
-  Referral = '/r',
 }
 
 export enum MarketsRoute {

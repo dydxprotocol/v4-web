@@ -56,7 +56,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     },
   });
 
-  const affiliatesUrl = `${window.location.host}/r/${data?.referralCode}`;
+  const affiliatesUrl = `${window.location.host}?ref=${data?.referralCode}`;
 
   return (
     <Dialog

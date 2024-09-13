@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
@@ -36,13 +36,13 @@ import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
-import ReferralPage from '@/pages/ReferralPage';
 
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
+import { DialogTypes } from './constants/dialogs';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -52,6 +52,8 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { useAppDispatch } from './state/appTypes';
+import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -73,6 +75,7 @@ const Content = () => {
   useAnalytics();
   useCommandMenu();
 
+  const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -91,6 +94,12 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+
+  useEffect(() => {
+    if (testFlags.referralCode) {
+      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    }
+  }, [dispatch]);
 
   return (
     <>
@@ -143,10 +152,6 @@ const Content = () => {
               {testFlags.pml && <Route path={AppRoute.LaunchMarket} element={<LaunchMarket />} />}
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
-              <Route path={AppRoute.Referral}>
-                <Route index element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
-                <Route path=":refCode" element={<ReferralPage />} />
-              </Route>
               <Route
                 path="*"
                 element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
