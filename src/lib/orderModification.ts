@@ -78,10 +78,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
   return new Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload(
     subaccountNumber,
     marketId,
-    // There's a problem with Abacus parsing client IDs that are full 32 bytes so dividing by 2 ensures that all
-    // client IDs generated here are < 32 bytes
-    // TODO: fix this in abacus
-    Math.floor(generateRandomClientId() / 2),
+    generateRandomClientId().toString(),
     type.rawValue,
     side.rawValue,
     orderPrice,
