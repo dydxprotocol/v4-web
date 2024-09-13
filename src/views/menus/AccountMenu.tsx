@@ -286,8 +286,8 @@ export const AccountMenu = () => {
             icon: <Icon iconName={IconName.Giftbox} />,
             label: (
               <span>
-                {stringGetter({ key: STRING_KEYS.PREFERENCES })}{' '}
-                <Tag sign={TagSign.Positive}>Earn Fees</Tag>
+                {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}{' '}
+                <Tag sign={TagSign.Positive}>{stringGetter({ key: STRING_KEYS.EARN_FEES })}</Tag>
               </span>
             ),
             onSelect: () => {
