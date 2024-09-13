@@ -118,6 +118,6 @@ export const isNewOrderPriceValid = (order: SubaccountOrder, newPrice: number) =
 
   const oldPrice = order.triggerPrice ?? order.price;
 
-  // Ensure newPrice makes the order remain on the same side of bookPrice
+  // Ensure newPrice makes the order remain on the same side of the book
   return newPrice !== bookPrice && oldPrice - bookPrice > 0 === newPrice - bookPrice > 0;
 };
