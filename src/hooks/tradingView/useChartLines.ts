@@ -7,7 +7,7 @@ import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -78,7 +78,7 @@ export const useChartLines = ({
     shallowEqual
   );
 
-  const canModifyOrdersFromChart = useStatsigGateValue(StatSigFlags.ffOrderModificationFromChart);
+  const canModifyOrdersFromChart = useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -215,7 +215,7 @@ export const useChartLines = ({
     [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
   }>({});
 
-  const removePendingOrderAdjustment = (clientId: number) => {
+  const removePendingOrderAdjustment = (clientId: string) => {
     const { [clientId]: removed, ...withoutOrderId } = pendingOrderAdjustmentsRef.current;
     pendingOrderAdjustmentsRef.current = withoutOrderId;
   };
