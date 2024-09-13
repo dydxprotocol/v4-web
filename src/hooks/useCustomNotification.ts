@@ -19,7 +19,6 @@ export const useCustomNotification = () => {
       dispatch(
         addCustomNotification({
           id: uniqueId(),
-
           displayData: {
             toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
             groupKey: NotificationType.Custom,
