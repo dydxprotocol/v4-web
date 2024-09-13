@@ -28,7 +28,6 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
-import { StatsigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -37,7 +36,6 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -577,15 +575,11 @@ export const WithdrawForm = () => {
     isLoading ||
     !isValidDestinationAddress;
 
-  const skipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
-
   return (
     <$Form onSubmit={onSubmit}>
       <div tw="text-color-text-0">
         {stringGetter({
-          key: skipEnabled
-            ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
-            : STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
               <WithTooltip tooltip="lowest-fees">

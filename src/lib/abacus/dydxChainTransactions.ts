@@ -301,7 +301,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     try {
       const tx = await this.compositeClient?.cancelRawOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
-        clientId,
+        parseInt(clientId, 10),
         orderFlags,
         clobPairId,
         goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,

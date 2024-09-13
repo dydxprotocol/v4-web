@@ -12,12 +12,10 @@ import {
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
-import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -64,17 +62,9 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
     EMPTY_ARR;
 
-  const skipEnabled = useStatsigGateValue(StatsigFlags.ffSkipMigration);
+  const lowestFeeTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
 
-  const lowestFeeTokensByChainId = useMemo(
-    () => getMapOfLowestFeeTokensByChainId(type, skipEnabled),
-    [type, skipEnabled]
-  );
-
-  const highestFeeTokensByChainId = useMemo(
-    () => getMapOfHighestFeeTokensByChainId(type, skipEnabled),
-    [type, skipEnabled]
-  );
+  const highestFeeTokensByChainId = useMemo(() => getMapOfHighestFeeTokensByChainId(type), [type]);
   const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
