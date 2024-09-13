@@ -38,6 +38,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -275,6 +276,19 @@ export const AccountMenu = () => {
           ),
           onSelect: onRecoverKeys,
           separator: true,
+        },
+        onboardingState === OnboardingState.AccountConnected && {
+          value: 'Affiliates',
+          icon: <Icon iconName={IconName.Giftbox} />,
+          label: (
+            <span>
+              {stringGetter({ key: STRING_KEYS.PREFERENCES })}{' '}
+              <Tag sign={TagSign.Positive}>Earn Fees</Tag>
+            </span>
+          ),
+          onSelect: () => {
+            dispatch(openDialog(DialogTypes.ShareAffiliate()));
+          },
         },
         {
           value: 'Preferences',

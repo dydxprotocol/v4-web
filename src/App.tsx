@@ -36,6 +36,7 @@ import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
+import ReferralPage from '@/pages/ReferralPage';
 
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
@@ -142,6 +143,10 @@ const Content = () => {
               {testFlags.pml && <Route path={AppRoute.LaunchMarket} element={<LaunchMarket />} />}
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
+              <Route path={AppRoute.Referral}>
+                <Route index element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
+                <Route path=":refCode" element={<ReferralPage />} />
+              </Route>
               <Route
                 path="*"
                 element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}

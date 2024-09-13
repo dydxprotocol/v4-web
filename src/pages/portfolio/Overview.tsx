@@ -7,6 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 import { StatSigFlags } from '@/constants/statsig';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
@@ -33,6 +34,7 @@ export const Overview = () => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
   const affiliatesEnabled = useStatsigGateValue(StatSigFlags.ffEnableAffiliates);
+  const { dydxAddress } = useAccounts();
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
@@ -57,7 +59,7 @@ export const Overview = () => {
         <AccountDetailsAndHistory />
       </DetachedSection>
 
-      {affiliatesEnabled && (
+      {affiliatesEnabled && dydxAddress && (
         <DetachedSection>
           <AffiliatesBanner />
         </DetachedSection>
