@@ -86,6 +86,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 : stringGetter({
                     key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
                     params: {
+                      // TODO: make this configurable or get from API
                       AMOUNT_USD: '10K',
                     },
                   })}
