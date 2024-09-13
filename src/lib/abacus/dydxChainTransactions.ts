@@ -251,7 +251,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         side as OrderSide,
         price,
         size,
-        clientId,
+        parseInt(clientId, 10),
         timeInForce as OrderTimeInForce,
         goodTilTimeInSeconds ?? 0,
         execution as OrderExecution,

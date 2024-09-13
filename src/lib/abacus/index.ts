@@ -465,9 +465,7 @@ class AbacusStateManager {
    *
    */
   setStatsigConfigs = (statsigConfig: { [key in StatsigFlags]?: boolean }) => {
-    const { [StatsigFlags.ffSkipMigration]: useSkip = false, ...rest } = statsigConfig;
-    StatsigConfig.useSkip = useSkip;
-    Object.entries(rest).forEach(([k, v]) => {
+    Object.entries(statsigConfig).forEach(([k, v]) => {
       // This filters out any feature flags in the enum that are not part of the
       // kotlin statsig config object
       if (k in StatsigConfig) {
