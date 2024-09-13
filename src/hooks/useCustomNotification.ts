@@ -1,7 +1,5 @@
 import { useCallback } from 'react';
 
-import { uniqueId } from 'lodash';
-
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   NotificationDisplayData,
@@ -18,7 +16,7 @@ export const useCustomNotification = () => {
     (customNotification: Omit<NotificationDisplayData, 'groupKey'>) => {
       dispatch(
         addCustomNotification({
-          id: uniqueId(),
+          id: Date.now().toString(),
           displayData: {
             toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
             groupKey: NotificationType.Custom,
