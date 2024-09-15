@@ -281,8 +281,11 @@ class AbacusStateManager {
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.cosmosWalletConnected = true;
+      } else if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
+        this.stateManager.solanaWalletConnected = true;
       } else {
         this.stateManager.cosmosWalletConnected = false;
+        this.stateManager.solanaWalletConnected = false;
       }
     }
   };

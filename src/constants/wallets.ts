@@ -135,7 +135,7 @@ export const wallets: Record<WalletInfo['name'], WalletConfig> = {
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
-    stringKey: STRING_KEYS.PHANTOM,
+    stringKey: STRING_KEYS.PHANTOM_SOL,
     icon: PhantomIcon,
   },
   [WalletType.WalletConnect2]: {
