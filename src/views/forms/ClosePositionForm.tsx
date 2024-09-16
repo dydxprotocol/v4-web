@@ -59,6 +59,7 @@ import {
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
+import { testFlags } from '@/lib/testFlags';
 import { getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -323,14 +324,14 @@ export const ClosePositionForm = ({
         shape={ButtonShape.Rectangle}
       />
 
-      {enableLimitClose && (
+      {(enableLimitClose || testFlags.showLimitClose) && (
         <Collapsible
           slotTrigger={
             <Checkbox
               checked={useLimit}
               onCheckedChange={onUseLimitCheckedChange}
               id="limit-close"
-              label="Limit Close"
+              label="Limit Close (dev-only)"
               tw="my-0.25"
             />
           }
