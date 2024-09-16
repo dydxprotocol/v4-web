@@ -41,19 +41,19 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.asset?.id,
+          getCellValue: (row) => row.marketId, // todo lookup asset
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ asset, currentLeverageMultiple, currentPosition }) => (
+          renderCell: ({ marketId, currentLeverageMultiple, currentPosition }) => (
             <TableCell stacked slotLeft={<AssetIcon symbol={asset.id} tw="h-[2.5em]" />}>
               {asset.name}
               <div tw="row gap-0.25">
                 <$OutputSigned
                   value={
-                    currentPosition.asset < 0
+                    (currentPosition?.usdc ?? 0) < 0
                       ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
                       : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
                   }
-                  sign={getNumberSign(currentPosition.asset)}
+                  sign={getNumberSign(currentPosition?.usdc ?? 0)}
                   type={OutputType.Text}
                 />
                 @
@@ -64,7 +64,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         },
         {
           columnKey: 'size',
-          getCellValue: (row) => row.currentPosition.usdc,
+          getCellValue: (row) => row.currentPosition?.usdc,
           label: stringGetter({ key: STRING_KEYS.SIZE }),
           renderCell: ({ currentPosition, marketId, asset }) => (
             <TableCell stacked>
