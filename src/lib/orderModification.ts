@@ -125,7 +125,7 @@ export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPri
 export const getOrderModificationError = (
   order: SubaccountOrder,
   newPrice: number
-): string | null => {
+): { title: string; body?: string } | null => {
   const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
     order.marketId
   )?.midPrice;
@@ -135,21 +135,24 @@ export const getOrderModificationError = (
   if (isNewOrderPriceValid(bookPrice, oldPrice, newPrice)) return null;
 
   if (order.type.ordinal === AbacusOrderType.Limit.ordinal) {
-    return ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_LIMIT_PRICE_CROSS;
+    return {
+      title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_LIMIT_PRICE_CROSS,
+      body: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_USE_TRADE_FORM,
+    };
   }
 
   const isSell = isSellOrder(order);
 
   if (isStopLossOrder(order, false)) {
     return isSell
-      ? ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_HIGHER
-      : ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_LOWER;
+      ? { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_LOWER }
+      : { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_HIGHER };
   }
 
   if (isTakeProfitOrder(order, false)) {
     return isSell
-      ? ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_HIGHER
-      : ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_LOWER;
+      ? { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_HIGHER }
+      : { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_LOWER };
   }
 
   return null;
