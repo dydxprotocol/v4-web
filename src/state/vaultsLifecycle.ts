@@ -221,6 +221,7 @@ export const loadedVaultAccount = createHookedSelector([], () => {
       const parsedTransfers = VaultAccountCalculator.getTransfersBetweenResponse(transfers);
 
       if (parsedAccount == null || parsedTransfers == null) {
+        // todo can't return undefined here, just throw
         return undefined;
       }
       return VaultAccountCalculator.calculateUserVaultInfo(parsedAccount, parsedTransfers);

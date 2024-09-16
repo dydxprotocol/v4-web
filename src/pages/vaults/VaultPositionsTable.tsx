@@ -20,7 +20,7 @@ import { TableCell } from '@/components/Table/TableCell';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
+import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { getVaultPositions } from '@/state/vaultSelectors';
 
 import { getNumberSign } from '@/lib/numbers';
@@ -34,6 +34,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const navigate = useNavigate();
 
   const vaultsData = useAppSelector(getVaultPositions) ?? EMPTY_ARR;
+  const marketIdToAssetMetadataMap = useAppSelector(getMarketIdToAssetMetadataMap) ?? EMPTY_ARR;
   const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
@@ -43,37 +44,40 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           columnKey: 'market',
           getCellValue: (row) => row.marketId, // todo lookup asset
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ marketId, currentLeverageMultiple, currentPosition }) => (
-            <TableCell stacked slotLeft={<AssetIcon symbol={asset.id} tw="h-[2.5em]" />}>
-              {asset.name}
-              <div tw="row gap-0.25">
-                <$OutputSigned
-                  value={
-                    (currentPosition?.usdc ?? 0) < 0
-                      ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
-                      : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-                  }
-                  sign={getNumberSign(currentPosition?.usdc ?? 0)}
-                  type={OutputType.Text}
-                />
-                @
-                <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
-              </div>
-            </TableCell>
-          ),
+          renderCell: ({ marketId, currentLeverageMultiple, currentPosition }) => {
+            const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+            return (
+              <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
+                {asset?.name}
+                <div tw="row gap-0.25">
+                  <$OutputSigned
+                    value={
+                      (currentPosition?.usdc ?? 0) < 0
+                        ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
+                        : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+                    }
+                    sign={getNumberSign(currentPosition?.usdc ?? 0)}
+                    type={OutputType.Text}
+                  />
+                  @
+                  <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
+                </div>
+              </TableCell>
+            );
+          },
         },
         {
           columnKey: 'size',
           getCellValue: (row) => row.currentPosition?.usdc,
           label: stringGetter({ key: STRING_KEYS.SIZE }),
-          renderCell: ({ currentPosition, marketId, asset }) => (
+          renderCell: ({ currentPosition, marketId }) => (
             <TableCell stacked>
-              <Output value={currentPosition.usdc} type={OutputType.Fiat} fractionDigits={0} />
+              <Output value={currentPosition?.usdc} type={OutputType.Fiat} fractionDigits={0} />
               <Output
-                value={currentPosition.asset}
+                value={currentPosition?.asset}
                 type={OutputType.Asset}
-                tag={asset.id}
-                fractionDigits={marketsData[marketId]?.configs?.stepSizeDecimals}
+                tag={marketsData[marketId ?? '']?.assetId}
+                fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
               />
             </TableCell>
           ),
@@ -86,7 +90,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
             const thirtyDayPnl = thirtyDayPnlRaw ?? {
               absolute: 0,
               percent: 0,
-              sparklinePoints: [] as number[],
+              sparklinePoints: undefined,
             };
             return (
               <TableCell
@@ -95,7 +99,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   <div style={{ width: 50, height: 50 }} tw="ml-0.5">
                     {thirtyDayPnl.sparklinePoints != null && (
                       <SparklineChart
-                        data={thirtyDayPnl.sparklinePoints.map((elem, index) => ({
+                        data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
                           x: index + 1,
                           y: elem,
                         }))}
@@ -134,7 +138,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [marketsData, stringGetter]
+    [marketIdToAssetMetadataMap, marketsData, stringGetter]
   );
 
   return (
