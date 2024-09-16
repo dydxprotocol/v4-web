@@ -34,10 +34,12 @@ import {
   cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
+  isNewOrderPriceValid,
 } from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
+import { useCustomNotification } from '../useCustomNotification';
 import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
@@ -230,6 +232,7 @@ export const useChartLines = ({
     };
   };
 
+  const notify = useCustomNotification();
   const onMoveOrderLine = useCallback(
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
       if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
@@ -237,9 +240,15 @@ export const useChartLines = ({
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
 
-      // TODO(tinaszheng): do validation here for new price
-      // make sure the newPrice doesnt cross over the current price depending
-      // on the direction of the trade
+      if (!isNewOrderPriceValid(order, newPrice)) {
+        // TODO: Add final copy with localization here
+        notify({
+          title: 'Bad price!!!',
+          body: 'Dont cross the book price pls',
+        });
+        orderLine.setPrice(oldPrice);
+        return;
+      }
 
       // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);

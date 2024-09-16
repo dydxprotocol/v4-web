@@ -59,7 +59,7 @@ import {
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getAbacusNotifications } from '@/state/notificationsSelectors';
+import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
@@ -750,11 +750,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [dydxAddress]);
     },
+
     useNotificationAction: () => {
       const { getInTouch } = useURLConfigs();
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
+    },
+  },
+  {
+    type: NotificationType.Custom,
+    useTrigger: ({ trigger }) => {
+      const customNotifications = useAppSelector(getCustomNotifications);
+      useEffect(() => {
+        customNotifications.forEach((notification) => {
+          trigger(notification.id, notification.displayData);
+        });
+      }, [customNotifications, trigger]);
     },
   },
 ];

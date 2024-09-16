@@ -14,6 +14,7 @@ export enum NotificationType {
   MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
+  Custom = 'Custom', // custom notifications triggered by components eg user input errors
 }
 
 export enum NotificationCategoryPreferences {
@@ -38,6 +39,7 @@ export const NotificationTypeCategory: {
   [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -45,6 +47,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
+  NotificationType.Custom,
 ];
 
 export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
@@ -191,6 +194,11 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 
   withClose?: boolean; // Show close button for Notification
+};
+
+export type CustomNotification = {
+  id: string;
+  displayData: NotificationDisplayData;
 };
 
 export enum TransferNotificationTypes {
