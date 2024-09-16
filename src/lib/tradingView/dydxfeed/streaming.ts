@@ -1,8 +1,8 @@
 import type {
   Bar,
   LibrarySymbolInfo,
-  QuotesCallback,
   ResolutionString,
+  SubscribeBarsCallback,
 } from 'public/tradingview/charting_library';
 
 import { RESOLUTION_MAP } from '@/constants/candles';
@@ -15,22 +15,22 @@ export const subscribeOnStream = ({
   symbolInfo,
   resolution,
   onRealtimeCallback,
-  subscribeUID,
+  listenerGuid,
   lastBar,
 }: {
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
-  onRealtimeCallback: QuotesCallback;
-  subscribeUID: string;
-  onResetCacheNeededCallback: () => void;
+  onRealtimeCallback: SubscribeBarsCallback;
+  listenerGuid: string;
+  onResetCacheNeededCallback: Function;
   lastBar: Bar;
 }) => {
-  if (!symbolInfo.name) return;
+  if (!symbolInfo.ticker) return;
 
-  const channelId = `${symbolInfo.name}/${RESOLUTION_MAP[resolution]}`;
+  const channelId = `${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`;
 
   const handler = {
-    id: subscribeUID,
+    id: listenerGuid,
     callback: onRealtimeCallback,
   };
 
@@ -38,16 +38,16 @@ export const subscribeOnStream = ({
 
   if (subscriptionItem) {
     // already subscribed to the channel, use the existing subscription
-    subscriptionItem.handlers[subscribeUID] = handler;
+    subscriptionItem.handlers[listenerGuid] = handler;
     return;
   }
 
   subscriptionItem = {
-    subscribeUID,
+    subscribeUID: listenerGuid,
     resolution,
     lastBar,
     handlers: {
-      [subscribeUID]: handler,
+      [listenerGuid]: handler,
     },
   };
 
