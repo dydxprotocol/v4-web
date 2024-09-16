@@ -71,7 +71,9 @@ export const ProgramCard = ({
     </p>
   );
 
-  const buttonText = isVip ? 'Contact Support' : 'Apply now';
+  const buttonText = isVip
+    ? stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })
+    : stringGetter({ key: STRING_KEYS.APPLY_NOW });
 
   return (
     <$Container className={className}>
