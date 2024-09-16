@@ -306,7 +306,9 @@ export const AnalyticsEvents = unionize(
       errorMessage?: string;
       amount: string;
       chainId?: string;
-      assetId?: string;
+      assetaddress?: string;
+      assetSymbol?: string;
+      assetName?: string;
     }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
