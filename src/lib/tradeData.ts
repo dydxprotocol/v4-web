@@ -6,6 +6,7 @@ import {
   AbacusOrderTypes,
   ErrorType,
   ErrorFormat,
+  type ErrorFormatType,
   ValidationError,
   type AbacusOrderSides,
   type Nullable,
@@ -64,7 +65,7 @@ const formatErrorParam = ({
   tickSizeDecimals,
 }: {
   value: Nullable<string>;
-  format: Nullable<typeof ErrorFormat>;
+  format: Nullable<ErrorFormatType>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
