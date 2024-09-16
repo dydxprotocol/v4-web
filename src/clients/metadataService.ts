@@ -37,6 +37,13 @@ type MetadataServiceCandlesResponse = Record<
   }
 >;
 
+enum MetadataServicePath {
+  MARKET_MAP = 'market-map',
+  INFO = 'info',
+  PRICES = 'prices',
+  CANDLES = 'candles',
+}
+
 /**
  * MetadataServiceClient
  * @description client to fetch metadata info, prices, and candles
@@ -67,17 +74,17 @@ class MetadataServiceClient {
   }
 
   async getMarketmap(): Promise<Record<string, string>> {
-    return this._get('marketmap-map');
+    return this._get(MetadataServicePath.MARKET_MAP);
   }
 
   async getAssetInfo({ assets }: { assets?: string[] }): Promise<MetadataServiceInfoResponse> {
-    return this._post('info', {
+    return this._post(MetadataServicePath.INFO, {
       assets,
     });
   }
 
   async getAssetPrices({ assets }: { assets?: string[] }): Promise<MetadataServicePricesResponse> {
-    return this._post('prices', {
+    return this._post(MetadataServicePath.PRICES, {
       assets,
     });
   }
@@ -89,7 +96,7 @@ class MetadataServiceClient {
     assets?: string[];
     resolution: '1d' | '7d' | '30d';
   }): Promise<MetadataServiceCandlesResponse> {
-    return this._post('candles', {
+    return this._post(MetadataServicePath.CANDLES, {
       assets,
       resolution,
     });
