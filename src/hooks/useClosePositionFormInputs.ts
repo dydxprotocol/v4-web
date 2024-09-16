@@ -36,9 +36,9 @@ export const useClosePositionFormInputs = () => {
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
 
-  // when useLimit is toggled true, reset limit price input to use the mid price set in abacus
+  // when useLimit is toggled to true, set limit price input to use the mid price set in abacus
   useEffect(() => {
-    if (limitPrice)
+    if (useLimit && limitPrice)
       dispatch(setClosePositionFormInputs({ limitPriceInput: limitPrice.toString() }));
   }, [useLimit]);
 

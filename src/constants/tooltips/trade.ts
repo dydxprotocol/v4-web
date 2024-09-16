@@ -78,6 +78,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LEVERAGE_BODY }),
   }),
+  'limit-close': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_BODY }),
+  }),
   'limit-price': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_BODY }),

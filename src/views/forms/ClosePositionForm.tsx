@@ -296,7 +296,11 @@ export const ClosePositionForm = ({
               checked={useLimit}
               onCheckedChange={onUseLimitCheckedChange}
               id="limit-close"
-              label="Limit Close (dev-only)"
+              label={
+                <WithTooltip tooltip="limit-close" side="right">
+                  {stringGetter({ key: STRING_KEYS.LIMIT_CLOSE })}
+                </WithTooltip>
+              }
               tw="my-0.25"
             />
           }
