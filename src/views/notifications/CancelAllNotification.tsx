@@ -30,13 +30,12 @@ export const CancelAllNotification = ({
   const numCanceled = localCancelAll.canceledOrderIds?.length ?? 0;
   const numFailed = localCancelAll.failedOrderIds?.length ?? 0;
 
-  const ordersText = numOrders === 1 ? 'order' : 'orders';
   const { assetId } = marketData ?? {};
 
   // TODO(@aforaleka): localize these
   const slotTitle = isCancelForSingleMarket
-    ? `Canceling all ${ordersText} in ${localCancelAll.key}`
-    : `Canceling all ${ordersText}`;
+    ? `Canceling all orders in ${localCancelAll.key}`
+    : `Canceling all orders`;
 
   // Check if all orders have been confirmed canceled or failed
   const isCancellationConfirmed = numCanceled + numFailed >= numOrders;
