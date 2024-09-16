@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
+import tw from 'twin.macro';
 
 import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
@@ -10,6 +11,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
+
+import { Icon, IconName } from '@/components/Icon';
 
 import {
   cancelOrderConfirmed,
@@ -34,7 +37,7 @@ import {
   cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
-  isNewOrderPriceValid,
+  getOrderModificationError,
 } from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
@@ -240,11 +243,12 @@ export const useChartLines = ({
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
 
-      if (!isNewOrderPriceValid(order, newPrice)) {
-        // TODO: Add final copy with localization here
+      const priceError = getOrderModificationError(order, newPrice);
+      if (priceError) {
         notify({
-          title: 'Bad price!!!',
-          body: 'Dont cross the book price pls',
+          title: stringGetter({ key: priceError.title }),
+          body: priceError.body && stringGetter({ key: priceError.body }),
+          icon: <$WarningIcon iconName={IconName.Warning} />,
         });
         orderLine.setPrice(oldPrice);
         return;
@@ -302,7 +306,7 @@ export const useChartLines = ({
         );
       }
     },
-    [dispatch]
+    [dispatch, stringGetter, notify]
   );
 
   const updateOrderLines = useCallback(() => {
@@ -495,3 +499,5 @@ export const useChartLines = ({
 
   return { chartLines: chartLinesRef.current };
 };
+
+const $WarningIcon = tw(Icon)`text-color-warning`;
