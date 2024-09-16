@@ -22,6 +22,7 @@ import { Output, OutputType } from '@/components/Output';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { log } from '@/lib/telemetry';
 
 type NewMarketPreviewStepProps = {
@@ -29,6 +30,7 @@ type NewMarketPreviewStepProps = {
   onBack: () => void;
   onSuccess: (ticker: string) => void;
   receiptItems: DetailsItem[];
+  shouldHideTitleAndDescription?: boolean;
 };
 
 export const NewMarketPreviewStep = ({
@@ -36,6 +38,7 @@ export const NewMarketPreviewStep = ({
   onBack,
   onSuccess,
   receiptItems,
+  shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -61,7 +64,10 @@ export const NewMarketPreviewStep = ({
 
   const isDisabled = alertMessage !== null;
 
-  const heading = (
+  const baseAsset = getDisplayableAssetFromTicker(ticker);
+  const fullBaseAsset = getDisplayableAssetFromTicker(ticker, 'full');
+
+  const heading = shouldHideTitleAndDescription ? null : (
     <>
       <h2>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</h2>
       <span tw="text-color-text-0">
@@ -102,8 +108,8 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" symbol="ETH" />
-          <Output useGrouping type={OutputType.Text} value="ETH" />
+          <AssetIcon tw="h-2 w-2" symbol={fullBaseAsset} />
+          <Output useGrouping type={OutputType.Text} value={baseAsset} />
         </div>
       </div>
     </div>

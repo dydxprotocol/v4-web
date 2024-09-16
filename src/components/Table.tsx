@@ -209,9 +209,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     [getRowKey]
   );
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(
-    defaultSortDescriptor
-  );
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(defaultSortDescriptor ?? {});
   const items = useMemo(() => {
     return sortDescriptor?.column
       ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))

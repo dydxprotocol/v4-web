@@ -42,7 +42,8 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const stringGetter = useStringGetter();
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
-  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, walletType } = useAccounts();
+  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, connectedWallet } =
+    useAccounts();
 
   const [error, setError] = useState<string>();
 
@@ -92,7 +93,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signMessageAsync = useSignForWalletDerivation(walletType);
+  const signMessageAsync = useSignForWalletDerivation(connectedWallet);
 
   const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
 
@@ -156,7 +157,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       if (shouldRememberMe && staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
 
-        if (walletType === WalletType.Phantom) {
+        if (connectedWallet?.name === WalletType.Phantom) {
           saveSolSignature(encryptedSignature);
         } else {
           saveEvmSignature(encryptedSignature);
@@ -261,7 +262,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           }
           tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
-          {!isMatchingNetwork && walletType !== WalletType.Phantom ? (
+          {!isMatchingNetwork && connectedWallet?.name !== WalletType.Phantom ? (
             <Button
               action={ButtonAction.Primary}
               onClick={onClickSwitchNetwork}

@@ -29,10 +29,9 @@ import {
   type LocalPlaceOrderData,
   type TradeTypes,
 } from '@/constants/trade';
-import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { isOrderStatusCanceled } from '@/lib/orders';
+import { isOrderStatusCanceled, isOrderStatusClearable } from '@/lib/orders';
 
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
@@ -42,7 +41,6 @@ export type AccountState = {
   stakingRewards?: StakingRewards;
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
-  walletType?: WalletType;
 
   subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
@@ -71,7 +69,7 @@ export type AccountState = {
   hasUnseenOrderUpdates: boolean;
   latestOrder?: Nullable<SubaccountOrder>;
   historicalPnlPeriod?: HistoricalPnlPeriods;
-  uncommittedOrderClientIds: number[];
+  uncommittedOrderClientIds: string[];
   localPlaceOrders: LocalPlaceOrderData[];
   localCancelOrders: LocalCancelOrderData[];
 
@@ -83,9 +81,6 @@ const initialState: AccountState = {
   // Wallet
   balances: undefined,
   wallet: undefined,
-  walletType: getLocalStorage<WalletType>({
-    key: LocalStorageKey.OnboardingSelectedWalletType,
-  }),
 
   // Subaccount
   subaccount: undefined,
@@ -196,6 +191,21 @@ export const accountSlice = createSlice({
       ...state,
       clearedOrderIds: [...(state.clearedOrderIds ?? []), action.payload],
     }),
+    clearAllOrders: (state, action: PayloadAction<string | undefined>) => {
+      const marketId = action.payload;
+      const clearableOrderIds =
+        state.subaccount?.orders
+          ?.toArray()
+          .filter(
+            (order) =>
+              (!marketId || order.marketId === marketId) && isOrderStatusClearable(order.status)
+          )
+          .map((order) => order.id) ?? [];
+      return {
+        ...state,
+        clearedOrderIds: [...(state.clearedOrderIds ?? []), ...clearableOrderIds],
+      };
+    },
     setOnboardingGuard: (
       state,
       action: PayloadAction<{ guard: OnboardingGuard; value: boolean }>
@@ -311,7 +321,7 @@ export const accountSlice = createSlice({
     },
     placeOrderSubmitted: (
       state,
-      action: PayloadAction<{ marketId: string; clientId: number; orderType: TradeTypes }>
+      action: PayloadAction<{ marketId: string; clientId: string; orderType: TradeTypes }>
     ) => {
       state.localPlaceOrders.push({
         ...action.payload,
@@ -321,7 +331,7 @@ export const accountSlice = createSlice({
     },
     placeOrderFailed: (
       state,
-      action: PayloadAction<{ clientId: number; errorParams: ErrorParams }>
+      action: PayloadAction<{ clientId: string; errorParams: ErrorParams }>
     ) => {
       state.localPlaceOrders = state.localPlaceOrders.map((order) =>
         order.clientId === action.payload.clientId
@@ -335,7 +345,7 @@ export const accountSlice = createSlice({
         (id) => id !== action.payload.clientId
       );
     },
-    placeOrderTimeout: (state, action: PayloadAction<number>) => {
+    placeOrderTimeout: (state, action: PayloadAction<string>) => {
       if (state.uncommittedOrderClientIds.includes(action.payload)) {
         placeOrderFailed({
           clientId: action.payload,
@@ -360,7 +370,7 @@ export const accountSlice = createSlice({
       state,
       action: PayloadAction<{ orderId: string; errorParams: ErrorParams }>
     ) => {
-      state.localCancelOrders.map((order) =>
+      state.localCancelOrders = state.localCancelOrders.map((order) =>
         order.orderId === action.payload.orderId
           ? { ...order, errorParams: action.payload.errorParams }
           : order
@@ -375,6 +385,7 @@ export const {
   setTransfers,
   setLatestOrder,
   clearOrder,
+  clearAllOrders,
   setOnboardingGuard,
   setOnboardingState,
   setHistoricalPnl,

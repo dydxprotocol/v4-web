@@ -9,6 +9,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
+import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getOpenPositions } from '@/state/accountSelectors';
@@ -31,6 +32,7 @@ export const useCurrentMarketId = () => {
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
+  const launchableMarkets = useLaunchableMarkets();
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -54,6 +56,13 @@ export const useCurrentMarketId = () => {
     return marketId ?? lastViewedMarket;
   }, [hasMarketIds, marketId]);
 
+  const isViewingUnlaunchedMarket = useMemo(() => {
+    if (launchableMarkets.data == null) return false;
+    return launchableMarkets.data.some((market) => {
+      return market.id === marketId;
+    });
+  }, [marketId, launchableMarkets.data]);
+
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
     if (!hasMarketIds || !marketId) {
@@ -68,7 +77,7 @@ export const useCurrentMarketId = () => {
       }
     } else {
       // If v4_markets has been subscribed to, check if marketId is valid
-      if (!marketIds.includes(marketId)) {
+      if (!marketIds.includes(marketId) && !isViewingUnlaunchedMarket) {
         // If marketId is not valid (i.e. final settlement), navigate to markets page
         navigate(AppRoute.Markets, {
           replace: true,
@@ -95,13 +104,20 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
       }
     }
-  }, [hasMarketIds, marketId]);
+  }, [hasMarketIds, isViewingUnlaunchedMarket, marketId, navigate]);
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (hasMarketIds) {
+    if (isViewingUnlaunchedMarket) {
+      abacusStateManager.setMarket(DEFAULT_MARKETID);
+      abacusStateManager.setTradeValue({ value: null, field: null });
+    } else if (hasMarketIds) {
       abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
       abacusStateManager.setTradeValue({ value: null, field: null });
     }
-  }, [selectedNetwork, hasMarketIds, marketId]);
+  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketIds, marketId]);
+
+  return {
+    isViewingUnlaunchedMarket,
+  };
 };

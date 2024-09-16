@@ -40,14 +40,14 @@ import {
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 import {
   CLEARED_TRIGGER_LIMIT_INPUTS,
   CLEARED_TRIGGER_ORDER_INPUTS,
   TriggerFields,
 } from '@/constants/triggers';
-import { WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
@@ -274,12 +274,12 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, walletType?: WalletType) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey, connectedWallet?: WalletInfo) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
-      if (walletType === WalletType.Keplr) {
+      if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.cosmosWalletConnected = true;
       } else {
         this.stateManager.cosmosWalletConnected = false;
@@ -390,6 +390,15 @@ class AbacusStateManager {
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
 
+  cancelAllOrders = (
+    marketId: Nullable<string>,
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableCancelOrderPayload>
+    ) => void
+  ) => this.stateManager.cancelAllOrders(marketId, callback);
+
   adjustIsolatedMarginOfPosition = (
     callback: (
       success: boolean,
@@ -455,10 +464,8 @@ class AbacusStateManager {
    * You must define the property in abacus first, and then add to the enum.
    *
    */
-  setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
-    const { [StatSigFlags.ffSkipMigration]: useSkip = false, ...rest } = statsigConfig;
-    StatsigConfig.useSkip = useSkip;
-    Object.entries(rest).forEach(([k, v]) => {
+  setStatsigConfigs = (statsigConfig: { [key in StatsigFlags]?: boolean }) => {
+    Object.entries(statsigConfig).forEach(([k, v]) => {
       // This filters out any feature flags in the enum that are not part of the
       // kotlin statsig config object
       if (k in StatsigConfig) {

@@ -42,6 +42,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -153,7 +154,7 @@ export const NewMarketSelectionStep = ({
               filteredPotentialMarkets?.map((potentialMarket: NewMarketProposal) => ({
                 value: potentialMarket.baseAsset,
                 label: potentialMarket.meta.assetName,
-                tag: potentialMarket.params.ticker,
+                tag: getDisplayableTickerFromMarket(potentialMarket.params.ticker),
                 slotAfter: tickersFromProposals.has(potentialMarket.params.ticker) && (
                   <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.VOTING_LIVE })}</Tag>
                 ),
@@ -167,7 +168,8 @@ export const NewMarketSelectionStep = ({
       >
         {assetToAdd ? (
           <span tw="text-color-text-2">
-            {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
+            {assetToAdd.meta.assetName}{' '}
+            <Tag>{getDisplayableTickerFromMarket(assetToAdd.params.ticker)}</Tag>
           </span>
         ) : (
           `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`

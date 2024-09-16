@@ -13,13 +13,12 @@ import {
 import { getNobleChainId } from '@/constants/graz';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  ConnectorType,
   DydxAddress,
   EvmAddress,
   PrivateInformation,
   SolAddress,
   TEST_WALLET_EVM_ADDRESS,
-  WalletConnectionType,
-  WalletType,
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
@@ -57,10 +56,9 @@ const useAccountsContext = () => {
 
   // Wallet connection
   const {
-    walletType,
-    walletConnectionType,
-    selectWalletType,
-    selectedWalletType,
+    connectedWallet,
+    selectWallet,
+    selectedWallet,
     selectedWalletError,
     evmAddress,
     solAddress,
@@ -281,11 +279,11 @@ const useAccountsContext = () => {
     }
   }, [solAddress, dydxAddress]);
 
-  const signMessageAsync = useSignForWalletDerivation(walletType);
+  const signMessageAsync = useSignForWalletDerivation(connectedWallet);
 
   useEffect(() => {
     (async () => {
-      if (walletType === WalletType.TestWallet) {
+      if (connectedWallet?.connectorType === ConnectorType.Test) {
         // Get override values. Use the testFlags value if it exists, otherwise use the previously
         // saved value where possible. If neither exist, use a default garbage value.
         const addressOverride: DydxAddress =
@@ -321,7 +319,7 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
+          if (connectedWallet?.connectorType === ConnectorType.Privy && authenticated && ready) {
             try {
               // Give Privy a second to finish the auth flow before getting the signature
               await sleep();
@@ -382,9 +380,9 @@ const useAccountsContext = () => {
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey, walletType);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey, connectedWallet);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey, dydxAddress, walletType]);
+  }, [localDydxWallet, hdKey, dydxAddress, connectedWallet]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
@@ -459,17 +457,16 @@ const useAccountsContext = () => {
 
     // Disconnect EVM wallet
     forgetEvmSignature();
-    selectWalletType(undefined);
+    selectWallet(undefined);
   };
 
   return {
     // Wallet connection
-    walletType,
-    walletConnectionType,
+    connectedWallet,
 
     // Wallet selection
-    selectWalletType,
-    selectedWalletType,
+    selectWallet,
+    selectedWallet,
     selectedWalletError,
 
     // Wallet connection (EVM)

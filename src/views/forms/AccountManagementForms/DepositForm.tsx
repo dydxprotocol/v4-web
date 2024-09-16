@@ -41,7 +41,7 @@ import {
   NumberSign,
 } from '@/constants/numbers';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
-import { type EvmAddress, WalletType } from '@/constants/wallets';
+import { ConnectorType, type EvmAddress, WalletType } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -75,8 +75,9 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
+import { dd } from '@/lib/analytics/datadog';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
+import { NATIVE_TOKEN_ADDRESS } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
@@ -116,7 +117,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     signerWagmi,
     publicClientWagmi,
     nobleAddress,
-    walletType,
+    connectedWallet,
     saveHasAcknowledgedTerms,
   } = useAccounts();
   const { getAccountBalance } = useDydxClient();
@@ -125,7 +126,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { addOrUpdateTransferNotification } = useLocalNotifications();
   const { signTransaction: signTransactionPhantom } = usePhantomWallet();
 
-  const isKeplrWallet = walletType === WalletType.Keplr;
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   const {
     requestPayload,
@@ -206,7 +207,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (dydxAddress) {
       // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
       // worth investigating a better fix on abacus
-      if (walletType === WalletType.Keplr && nobleAddress) {
+      if (connectedWallet?.name === WalletType.Keplr && nobleAddress) {
         abacusStateManager.setTransfersSourceAddress(nobleAddress);
       } else if (evmAddress) {
         abacusStateManager.setTransfersSourceAddress(evmAddress);
@@ -221,32 +222,34 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, evmAddress, nobleAddress, walletType, solAddress]);
+  }, [dydxAddress, evmAddress, nobleAddress, connectedWallet, solAddress]);
 
   useEffect(() => {
     if (error) onError?.();
   }, [error]);
 
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (!connectedWallet) return;
+
+    if (connectedWallet.connectorType === ConnectorType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (walletType === WalletType.Keplr) {
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.chain,
-        value: nobleChainId,
-      });
-    }
-    if (walletType === WalletType.Phantom) {
+    if (connectedWallet.connectorType === ConnectorType.PhantomSolana) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: 'solana',
       });
     }
-  }, [nobleAddress, nobleChainId, walletType]);
+    if (connectedWallet.connectorType === ConnectorType.Cosmos) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: nobleChainId,
+      });
+    }
+  }, [nobleAddress, nobleChainId, connectedWallet]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {
@@ -494,21 +497,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
-      track(
-        AnalyticsEvents.TransferDepositFundsClick({
-          chainId: chainIdStr ?? undefined,
-          tokenAddress: sourceToken?.address ?? undefined,
-          tokenSymbol: sourceToken?.symbol ?? undefined,
-          slippage: slippage ?? undefined,
-          gasFee: summary?.gasFee ?? undefined,
-          bridgeFee: summary?.bridgeFee ?? undefined,
-          exchangeRate: summary?.exchangeRate ?? undefined,
-          estimatedRouteDuration: summary?.estimatedRouteDuration ?? undefined,
-          toAmount: summary?.toAmount ?? undefined,
-          toAmountMin: summary?.toAmountMin ?? undefined,
-          depositCTAString,
-        })
-      );
+      const transferDepositContext = {
+        chainId: chainIdStr ?? undefined,
+        tokenAddress: sourceToken?.address ?? undefined,
+        tokenSymbol: sourceToken?.symbol ?? undefined,
+        slippage: slippage ?? undefined,
+        gasFee: summary?.gasFee ?? undefined,
+        bridgeFee: summary?.bridgeFee ?? undefined,
+        exchangeRate: summary?.exchangeRate ?? undefined,
+        estimatedRouteDuration: summary?.estimatedRouteDuration ?? undefined,
+        toAmount: summary?.toAmount ?? undefined,
+        toAmountMin: summary?.toAmountMin ?? undefined,
+        depositCTAString,
+      };
+      track(AnalyticsEvents.TransferDepositFundsClick(transferDepositContext));
+      dd.info('Transfer deposit click', transferDepositContext);
       try {
         e.preventDefault();
         setIsLoading(true);
@@ -527,7 +530,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         let txHash: string | undefined;
-        if (walletType === WalletType.Phantom) {
+        if (connectedWallet?.name === WalletType.Phantom) {
           if (!requestPayload?.data) {
             throw new Error('Missing solana request payload');
           }
@@ -565,19 +568,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
-
-          onDeposit?.({
-            chainId: chainIdStr || undefined,
-            tokenAddress: sourceToken?.address || undefined,
-            tokenSymbol: sourceToken?.symbol || undefined,
-            slippage: slippage || undefined,
-            gasFee: summary?.gasFee || undefined,
-            bridgeFee: summary?.bridgeFee || undefined,
-            exchangeRate: summary?.exchangeRate || undefined,
-            estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-            toAmount: summary?.toAmount || undefined,
-            toAmountMin: summary?.toAmountMin || undefined,
-          });
+          const submittedTransferDepositContext = {
+            ...transferDepositContext,
+            txHash,
+          };
+          onDeposit?.(submittedTransferDepositContext);
+          dd.info('Transfer deposit submitted', submittedTransferDepositContext);
         }
       } catch (err) {
         log('DepositForm/onSubmit', err);
@@ -654,15 +650,18 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     if (routeErrors) {
-      track(
-        AnalyticsEvents.RouteError({
-          transferType: TransferType.deposit.name,
-          errorMessage: routeErrorMessage ?? undefined,
-          amount: debouncedAmount,
-          chainId: chainIdStr ?? undefined,
-          assetId: sourceToken?.toString(),
-        })
-      );
+      const routeErrorContext = {
+        transferType: TransferType.deposit.name,
+        errorMessage: routeErrorMessage ?? undefined,
+        amount: debouncedAmount,
+        chainId: chainIdStr ?? undefined,
+        assetAddress: sourceToken?.address ?? undefined,
+        assetSymbol: sourceToken?.symbol ?? undefined,
+        assetName: sourceToken?.name ?? undefined,
+        assetId: sourceToken?.toString() ?? undefined,
+      };
+      track(AnalyticsEvents.RouteError(routeErrorContext));
+      dd.info('Route error received', routeErrorContext);
       return routeErrorMessage
         ? stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,

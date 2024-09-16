@@ -9,12 +9,10 @@ import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms'
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
-import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DiffArrow } from '@/components/DiffArrow';
@@ -43,15 +41,11 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     resources,
     chain: chainIdStr,
   } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
-  const { walletType } = useAccounts();
+  const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const lowestFeeTokensByDenom = useMemo(
-    () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
-    [type, skipEnabled]
-  );
-  const isKeplrWallet = walletType === WalletType.Keplr;
+  const lowestFeeTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??

@@ -3,12 +3,12 @@ export enum LocalStorageKey {
   EvmAddress = 'dydx.EvmAddress',
   SolAddress = 'dydx.SolAddress',
   DydxAddress = 'dydx.DydxAddress',
-  OnboardingSelectedWalletType = 'dydx.OnboardingSelectedWalletType',
-  WalletConnectionType = 'dydx.WalletConnectionType',
+  OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
+  LatestReferrer = 'dydx.LatestReferrer',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',

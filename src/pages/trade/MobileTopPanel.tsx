@@ -22,6 +22,8 @@ import { LiveTrades } from '@/views/tables/LiveTrades';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
+
 enum Tab {
   Account = 'Account',
   Price = 'Price',
@@ -41,7 +43,11 @@ const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: Ic
   </Trigger>
 );
 
-export const MobileTopPanel = () => {
+export const MobileTopPanel = ({
+  isViewingUnlaunchedMarket,
+}: {
+  isViewingUnlaunchedMarket?: boolean;
+}) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
@@ -61,19 +67,19 @@ export const MobileTopPanel = () => {
       value: Tab.Price,
       icon: IconName.PriceChart,
     },
-    {
+    !isViewingUnlaunchedMarket && {
       content: <DepthChart stringGetter={stringGetter} selectedLocale={selectedLocale} />,
       label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
       value: Tab.Depth,
       icon: IconName.DepthChart,
     },
-    {
+    !isViewingUnlaunchedMarket && {
       content: <FundingChart selectedLocale={selectedLocale} />,
       label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
       value: Tab.Funding,
       icon: IconName.FundingChart,
     },
-    {
+    !isViewingUnlaunchedMarket && {
       content: (
         <$ScrollableTableContainer>
           <CanvasOrderbook histogramSide="right" layout="horizontal" hideHeader />
@@ -83,7 +89,7 @@ export const MobileTopPanel = () => {
       value: Tab.OrderBook,
       icon: IconName.Orderbook,
     },
-    {
+    !isViewingUnlaunchedMarket && {
       content: (
         <$ScrollableTableContainer>
           <LiveTrades histogramSide="left" />
@@ -93,7 +99,7 @@ export const MobileTopPanel = () => {
       value: Tab.LiveTrades,
       icon: IconName.Clock,
     },
-  ];
+  ].filter(isTruthy);
 
   return (
     <$Tabs

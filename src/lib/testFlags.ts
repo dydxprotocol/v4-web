@@ -55,6 +55,14 @@ class TestFlags {
   get pml() {
     return !!this.queryParams.pml;
   }
+
+  get showCancelAll() {
+    return !!this.queryParams.cancelall;
+  }
+
+  get referralCode() {
+    return this.queryParams.ref;
+  }
 }
 
 export const testFlags = new TestFlags();

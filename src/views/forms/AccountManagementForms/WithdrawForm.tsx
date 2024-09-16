@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
-import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -29,7 +28,6 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
-import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -38,7 +36,6 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -65,8 +62,9 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { validateCosmosAddress } from '@/lib/addressUtils';
+import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
+import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -82,7 +80,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, walletType } = useAccounts();
+  const { dydxAddress, connectedWallet } = useAccounts();
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -106,20 +104,17 @@ export const WithdrawForm = () => {
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
-  const isValidAddress = useMemo(() => {
-    if (toAddress) {
-      if (walletType === WalletType.Keplr) {
-        const prefix = GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config
-          .bech32PrefixAccAddr;
-
-        if (prefix) {
-          return validateCosmosAddress(toAddress, prefix);
-        }
-      }
-      return isAddress(toAddress);
-    }
-    return false;
-  }, [chainIdStr, toAddress, walletType]);
+  const isValidDestinationAddress = useMemo(() => {
+    const grazChainPrefix =
+      GRAZ_CHAINS.find((chain) => chain.chainId === chainIdStr)?.bech32Config.bech32PrefixAccAddr ??
+      '';
+    const prefix = exchange ? 'noble' : grazChainPrefix;
+    return isValidAddress({
+      address: toAddress,
+      network: prefix ? 'cosmos' : 'evm',
+      prefix,
+    });
+  }, [exchange, toAddress, chainIdStr]);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -138,7 +133,7 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
-    if (walletType === WalletType.Keplr && dydxAddress) {
+    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
       abacusStateManager.setTransfersSourceAddress(dydxAddress);
     }
 
@@ -150,7 +145,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, walletType]);
+  }, [dydxAddress, connectedWallet]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -252,21 +247,21 @@ export const WithdrawForm = () => {
             setWithdrawAmount('');
 
             addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-
-            track(
-              AnalyticsEvents.TransferWithdraw({
-                chainId: toChainId,
-                tokenAddress: toToken?.address || undefined,
-                tokenSymbol: toToken?.symbol || undefined,
-                slippage: slippage || undefined,
-                gasFee: summary?.gasFee || undefined,
-                bridgeFee: summary?.bridgeFee || undefined,
-                exchangeRate: summary?.exchangeRate || undefined,
-                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-                toAmount: summary?.toAmount || undefined,
-                toAmountMin: summary?.toAmountMin || undefined,
-              })
-            );
+            const transferWithdrawContext = {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
+              txHash,
+            };
+            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+            dd.info('Transfer withdraw submitted', transferWithdrawContext);
           } else {
             throw new Error('No transaction hash returned');
           }
@@ -344,19 +339,19 @@ export const WithdrawForm = () => {
   }, [freeCollateralBN, setWithdrawAmount]);
 
   useEffect(() => {
-    if (walletType === WalletType.Privy) {
+    if (connectedWallet?.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (walletType === WalletType.Keplr) {
+    if (connectedWallet?.name === WalletType.Keplr) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: nobleChainId,
       });
     }
-  }, [walletType]);
+  }, [connectedWallet, nobleChainId]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {
@@ -475,7 +470,7 @@ export const WithdrawForm = () => {
         }),
       };
 
-    if (!isValidAddress) {
+    if (!isValidDestinationAddress) {
       return {
         errorMessage: stringGetter({
           key: STRING_KEYS.ENTER_VALID_ADDRESS,
@@ -488,16 +483,18 @@ export const WithdrawForm = () => {
         routeErrors,
         routeErrorMessage
       );
-
-      track(
-        AnalyticsEvents.RouteError({
-          transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessageOverride ?? undefined,
-          amount: debouncedAmount,
-          chainId: chainIdStr ?? undefined,
-          assetId: toToken?.toString(),
-        })
-      );
+      const routeErrorContext = {
+        transferType: TransferType.withdrawal.name,
+        errorMessage: routeErrorMessageOverride ?? undefined,
+        amount: debouncedAmount,
+        chainId: chainIdStr ?? undefined,
+        assetAddress: toToken?.address ?? undefined,
+        assetSymbol: toToken?.symbol ?? undefined,
+        assetName: toToken?.name ?? undefined,
+        assetId: toToken?.toString() ?? undefined,
+      };
+      track(AnalyticsEvents.RouteError(routeErrorContext));
+      dd.info('Route error received', routeErrorContext);
       return {
         errorMessage: routeErrorMessageOverride
           ? stringGetter({
@@ -569,31 +566,23 @@ export const WithdrawForm = () => {
     stringGetter,
     summary,
     usdcWithdrawalCapacity,
-    isValidAddress,
+    isValidDestinationAddress,
   ]);
-
-  const isInvalidNobleAddress = Boolean(
-    exchange && toAddress && !validateCosmosAddress(toAddress, 'noble')
-  );
 
   const isDisabled =
     !!errorMessage ||
     !toToken ||
     (!chainIdStr && !exchange) ||
-    !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
     isLoading ||
-    isInvalidNobleAddress;
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
+    !isValidDestinationAddress;
 
   return (
     <$Form onSubmit={onSubmit}>
       <div tw="text-color-text-0">
         {stringGetter({
-          key: skipEnabled
-            ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
-            : STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
               <WithTooltip tooltip="lowest-fees">
@@ -614,7 +603,7 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? (
+              {isValidDestinationAddress ? (
                 <Icon
                   iconName={IconName.Check}
                   tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
@@ -629,7 +618,7 @@ export const WithdrawForm = () => {
           onSelect={onSelectNetwork}
         />
       </div>
-      {isInvalidNobleAddress && (
+      {toAddress && Boolean(exchange) && !isValidDestinationAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
         </AlertMessage>

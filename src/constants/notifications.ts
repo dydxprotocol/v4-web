@@ -11,8 +11,10 @@ export enum NotificationType {
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
+  MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
+  Custom = 'Custom', // custom notifications triggered by components eg user input errors
 }
 
 export enum NotificationCategoryPreferences {
@@ -34,8 +36,10 @@ export const NotificationTypeCategory: {
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -43,6 +47,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
+  NotificationType.Custom,
 ];
 
 export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
@@ -191,6 +196,11 @@ export type NotificationDisplayData = {
   withClose?: boolean; // Show close button for Notification
 };
 
+export type CustomNotification = {
+  id: string;
+  displayData: NotificationDisplayData;
+};
+
 export enum TransferNotificationTypes {
   Withdrawal = 'withdrawal',
   Deposit = 'deposit',
@@ -217,21 +227,21 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   DiscoveryProgram = 'discovery-program',
   Twitter200BVolume = 'twitter-200b-volume',
-  IncentivesS6 = 'incentives-s6',
+  IncentivesS6Ended = 'incentives-s6-ended',
+  KeplrSupport = 'keplr-support',
 }
 
 // Incentives Season
 export enum IncentivesDistributedNotificationIds {
-  IncentivesDistributedS5 = 'incentives-distributed-s5',
+  IncentivesDistributedS6 = 'incentives-distributed-s6',
 }
 
-export const CURRENT_SEASON_NUMBER = 6;
-export const MEDIAN_REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
-export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6;
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6Ended;
 
 export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
   switch (seasonId) {
-    case IncentivesDistributedNotificationIds.IncentivesDistributedS5:
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS6:
+      return 6;
     default:
       return 5;
   }
@@ -245,6 +255,12 @@ export enum MarketWindDownNotificationIds {
   MarketWindDownFetAgix = 'market-wind-down-fet-agix',
   MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
   MarketUpdateProposalRndr = 'market-update-proposal-rndr',
+  MarketWindDownMatic = 'market-wind-down-matic',
+  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic',
+}
+
+export enum MarketUpdateNotificationIds {
+  MarketUpdateSolLiquidityTier = 'market-update-sol-liquidity-tier',
 }
 
 export enum FeedbackRequestNotificationIds {

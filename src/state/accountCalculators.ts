@@ -4,10 +4,13 @@ import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
+  getSubaccountOpenOrders,
   getUnbondingDelegations,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
+
+import { isOrderStatusOpen } from '@/lib/orders';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -60,7 +63,7 @@ export const calculateIsAccountViewOnly = createAppSelector(
  */
 export const calculateHasUncommittedOrders = createAppSelector(
   [getUncommittedOrderClientIds],
-  (uncommittedOrderClientIds: number[]) => uncommittedOrderClientIds.length > 0
+  (uncommittedOrderClientIds: string[]) => uncommittedOrderClientIds.length > 0
 );
 
 /**
@@ -119,3 +122,16 @@ export const calculateSortedUnbondingDelegations = createAppSelector(
     return unbondingDelegations;
   }
 );
+
+export const calculateHasCancelableOrders = () =>
+  createAppSelector(
+    [getSubaccountOpenOrders, (s, marketId?: string) => marketId],
+    (openOrders, marketId) => {
+      // the extra isOrderStatusOpen check filter the order to also not be canceling / best effort canceled
+      return (
+        openOrders?.some(
+          (order) => (!marketId || order.marketId === marketId) && isOrderStatusOpen(order.status)
+        ) ?? false
+      );
+    }
+  );

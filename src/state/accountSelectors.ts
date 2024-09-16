@@ -15,6 +15,7 @@ import {
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import {
   getAverageFillPrice,
@@ -198,7 +199,7 @@ export const getMarketOrders = createAppSelector(
 export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
-    !currentMarketId ? [] : marketOrders[currentMarketId]
+    !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
 );
 
 /**
@@ -249,7 +250,7 @@ export const getOrderById = () =>
  */
 export const getOrderByClientId = () =>
   createAppSelector(
-    [getSubaccountOrders, (s, orderClientId: number) => orderClientId],
+    [getSubaccountOrders, (s, orderClientId: string) => orderClientId],
     (orders, orderClientId) => orders?.find((order) => order.clientId === orderClientId)
   );
 

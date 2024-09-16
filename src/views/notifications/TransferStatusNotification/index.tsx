@@ -55,7 +55,8 @@ export const TransferStatusNotification = ({
   const { addOrUpdateTransferNotification } = useLocalNotifications();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { status, toAmount, isExchange, fromChainId, isSubaccountDepositCompleted } = transfer;
+  const { status, toAmount, isExchange, fromChainId, toChainId, isSubaccountDepositCompleted } =
+    transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -80,7 +81,9 @@ export const TransferStatusNotification = ({
   useInterval({ callback: updateSecondsLeft });
 
   const isCosmosDeposit =
-    SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') && fromChainId !== selectedDydxChainId;
+    SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
+    fromChainId !== selectedDydxChainId &&
+    toChainId === selectedDydxChainId;
   const isComplete = isCosmosDeposit
     ? isSubaccountDepositCompleted
     : status?.squidTransactionStatus === 'success' || isExchange;
@@ -175,7 +178,10 @@ export const TransferStatusNotification = ({
         </>
       )}
       {!isToast && !isComplete && !hasError && !isCosmosDeposit && (
-        <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+        <>
+          <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
+          <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
+        </>
       )}
     </div>
   );
@@ -198,17 +204,7 @@ export const TransferStatusNotification = ({
               </div>
             </>
           ) : (
-            <>
-              {content}
-              {!isCosmosDeposit && !isComplete && (
-                <>
-                  <div>{stringGetter({ key: STRING_KEYS.KEEP_WINDOW_OPEN })}</div>
-                  {!isToast && !hasError && (
-                    <TransferStatusSteps status={status} type={type} tw="px-0 pb-0 pt-0.5" />
-                  )}
-                </>
-              )}
-            </>
+            content
           )}
         </div>
       }

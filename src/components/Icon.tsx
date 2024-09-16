@@ -71,6 +71,7 @@ import {
   PrivacyIcon,
   QrIcon,
   RewardStarIcon,
+  RocketIcon,
   SearchIcon,
   SendIcon,
   ShareIcon,
@@ -166,6 +167,7 @@ export enum IconName {
   Privacy = 'Privacy',
   Qr = 'Qr',
   RewardStar = 'RewardStar',
+  Rocket = 'Rocket',
   Search = 'Search',
   Send = 'Send',
   Share = 'Share',
@@ -258,6 +260,7 @@ const icons = {
   [IconName.Privacy]: PrivacyIcon,
   [IconName.Qr]: QrIcon,
   [IconName.RewardStar]: RewardStarIcon,
+  [IconName.Rocket]: RocketIcon,
   [IconName.Search]: SearchIcon,
   [IconName.Send]: SendIcon,
   [IconName.Share]: ShareIcon,
@@ -293,10 +296,11 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    size,
     ...props
-  }: ElementProps & StyleProps) =>
+  }: ElementProps & StyleProps & { size?: string }) =>
     Component ? <Component className={className} {...props} /> : null
 )`
-  width: 1em;
-  height: 1em;
+  width: ${({ size }) => size ?? '1em'};
+  height: ${({ size }) => size ?? '1em'};
 `;

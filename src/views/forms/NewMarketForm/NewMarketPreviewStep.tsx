@@ -41,6 +41,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -202,7 +203,7 @@ export const NewMarketPreviewStep = ({
         disabled
         label={stringGetter({ key: STRING_KEYS.MARKET })}
         type={InputType.Text}
-        value={ticker}
+        value={getDisplayableTickerFromMarket(ticker)}
       />
       <$WithDetailsReceipt
         side="bottom"

@@ -21,8 +21,9 @@ export const identify = (property: AnalyticsUserProperty) => {
   const customEvent = customIdentifyEvent({
     detail: { property: propertyTypeToLog, propertyValue: property.payload },
   });
-  dd.setContextProperty(propertyTypeToLog, property.payload);
-  dd.log(`set context item: ${propertyTypeToLog}`, dd.getContext());
+  const ddPropertyName = `user-property-${propertyTypeToLog}`;
+  dd.setContextProperty(ddPropertyName, property.payload);
+  dd.info(`set context item: ${ddPropertyName} to value ${property.payload}`, dd.getContext());
 
   globalThis.dispatchEvent(customEvent);
 };

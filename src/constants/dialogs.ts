@@ -39,6 +39,7 @@ export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
+export type LaunchMarketDialogProps = {};
 export type ManageFundsDialogProps = { selectedTransferType?: string };
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
@@ -55,9 +56,11 @@ export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
 export type PreferencesDialogProps = {};
 export type RateLimitDialogProps = { preventClose?: boolean };
+export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
   marketId: string;
   assetId: string;
@@ -110,6 +113,7 @@ export const DialogTypes = unionize(
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
+    LaunchMarket: ofType<LaunchMarketDialogProps>(),
     ManageFunds: ofType<ManageFundsDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
@@ -121,9 +125,11 @@ export const DialogTypes = unionize(
     PredictionMarketIntro: ofType<PredictionMarketIntroDialogProps>(),
     Preferences: ofType<PreferencesDialogProps>(),
     RateLimit: ofType<RateLimitDialogProps>(),
+    Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
+    ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
     Stake: ofType<StakeDialogProps>(),
     StakingReward: ofType<StakingRewardDialogProps>(),

@@ -6,7 +6,12 @@ import {
   useStatsigClient,
 } from '@statsig/react-bindings';
 
-import { StatSigFlags, StatsigConfigType, StatsigDynamicConfigs } from '@/constants/statsig';
+import {
+  StatsigConfigType,
+  StatsigDynamicConfigType,
+  StatsigDynamicConfigs,
+  StatsigFlags,
+} from '@/constants/statsig';
 
 import { initStatsigAsync } from '@/lib/statsig';
 
@@ -23,23 +28,25 @@ export const StatsigProvider = ({ children }: { children: React.ReactNode }) => 
   return <StatsigProviderInternal client={statsigClient}> {children} </StatsigProviderInternal>;
 };
 
-export const useStatsigGateValue = (gate: StatSigFlags) => {
+export const useStatsigGateValue = (gate: StatsigFlags) => {
   const { checkGate } = useStatsigClient();
   return checkGate(gate);
 };
 
-export const useStatsigDynamicConfigValue = (
-  configName: StatsigDynamicConfigs,
-  keyOverride: string = 'value'
-) => {
+export const useAllStatsigDynamicConfigValues = () => {
   const { getDynamicConfig } = useStatsigClient();
-  return getDynamicConfig(configName)?.get(keyOverride);
+  const allDynamicConfigValues = useMemo(() => {
+    return Object.values(StatsigDynamicConfigs).reduce((acc, gate) => {
+      return { ...acc, [gate]: getDynamicConfig(gate).get('value') };
+    }, {} as StatsigDynamicConfigType);
+  }, [getDynamicConfig]);
+  return allDynamicConfigValues;
 };
 
 export const useAllStatsigGateValues = () => {
   const { checkGate } = useStatsigClient();
   const allGateValues = useMemo(() => {
-    return Object.values(StatSigFlags).reduce((acc, gate) => {
+    return Object.values(StatsigFlags).reduce((acc, gate) => {
       return { ...acc, [gate]: checkGate(gate) };
     }, {} as StatsigConfigType);
   }, []);

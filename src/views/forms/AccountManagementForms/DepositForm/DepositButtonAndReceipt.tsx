@@ -8,12 +8,10 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
-import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -66,13 +64,14 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi, walletType, isConnectedGraz } = useWalletConnection();
+  const { connectWallet, isConnectedWagmi, connectedWallet, selectedWallet, isConnectedGraz } =
+    useWalletConnection();
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
     try {
       setRequireUserActionInWallet(false);
-      await connectWallet();
+      await connectWallet({ wallet: selectedWallet, forceConnect: true });
       setRequireUserActionInWallet(false);
     } catch (e) {
       setRequireUserActionInWallet(true);
@@ -106,13 +105,12 @@ export const DepositButtonAndReceipt = ({
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   const { usdcLabel } = useTokenConfigs();
-  const isSkipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   const sourceChainName =
     depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
-  const showExchangeRate = typeof summary?.exchangeRate === 'number' || !isSkipEnabled;
-  const showMinDepositAmount = typeof summary?.toAmountMin === 'number' || !isSkipEnabled;
+  const showExchangeRate = typeof summary?.exchangeRate === 'number';
+  const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
   const fallbackRouteDuration = stringGetter({
     key: STRING_KEYS.X_MINUTES_LOWERCASED,
     params: {
@@ -240,9 +238,7 @@ export const DepositButtonAndReceipt = ({
                         : Math.round(summary.estimatedRouteDuration / 60),
                   },
                 })
-              : isSkipEnabled
-                ? fallbackRouteDuration
-                : null
+              : fallbackRouteDuration
           }
         />
       ),
@@ -270,11 +266,11 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi && walletType !== WalletType.Phantom && !isConnectedGraz ? (
+      ) : !isConnectedWagmi && connectedWallet?.name !== WalletType.Phantom && !isConnectedGraz ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>
-      ) : !isMatchingNetwork && walletType !== WalletType.Phantom ? (
+      ) : !isMatchingNetwork && selectedWallet?.name !== WalletType.Phantom ? (
         <Button
           action={ButtonAction.Primary}
           onClick={switchNetwork}
