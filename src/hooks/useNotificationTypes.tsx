@@ -30,7 +30,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
+import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -59,7 +59,7 @@ import {
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getAbacusNotifications } from '@/state/notificationsSelectors';
+import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
@@ -113,7 +113,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           switch (abacusNotificationType) {
             case 'order': {
               const order = ordersById[id]?.[0];
-              const clientId: number | undefined = order?.clientId ?? undefined;
+              const clientId: string | undefined = order?.clientId ?? undefined;
               const localOrderExists =
                 clientId && localPlaceOrders.some((ordr) => ordr.clientId === clientId);
 
@@ -329,7 +329,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         if (
-          featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+          featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
         ) {
           trigger(
@@ -352,7 +352,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (featureFlags?.[StatSigFlags.ffEnableKeplr]) {
+        if (featureFlags?.[StatsigFlags.ffEnableKeplr]) {
           trigger(
             ReleaseUpdateNotificationIds.KeplrSupport,
             {
@@ -750,11 +750,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [dydxAddress]);
     },
+
     useNotificationAction: () => {
       const { getInTouch } = useURLConfigs();
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
+    },
+  },
+  {
+    type: NotificationType.Custom,
+    useTrigger: ({ trigger }) => {
+      const customNotifications = useAppSelector(getCustomNotifications);
+      useEffect(() => {
+        customNotifications.forEach((notification) => {
+          trigger(notification.id, notification.displayData);
+        });
+      }, [customNotifications, trigger]);
     },
   },
 ];

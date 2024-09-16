@@ -82,3 +82,9 @@ export const NewTag = styled(Tag)`
   color: var(--color-accent);
   text-transform: uppercase;
 `;
+
+export const WarningTag = styled(Tag)`
+  background-color: var(--color-layer-3);
+  color: var(--color-warning);
+  border: solid 1px var(--color-warning);
+`;

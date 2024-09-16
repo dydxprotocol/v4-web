@@ -15,15 +15,24 @@ import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
 
+type OnboardingTriggerButtonProps = {
+  onClick?: () => void;
+};
+
 type StyleProps = {
   className?: string;
   size?: ButtonSize;
 };
 
-export const OnboardingTriggerButton = ({ className, size = ButtonSize.Small }: StyleProps) => {
+export const OnboardingTriggerButton = ({
+  onClick,
+  className,
+  size = ButtonSize.Small,
+}: OnboardingTriggerButtonProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const openOnboardingDialog = () => {
+    onClick?.();
     track(
       AnalyticsEvents.OnboardingTriggerClick({
         state: onboardingState,

@@ -1,17 +1,15 @@
-export type StatsigConfigType = Record<StatSigFlags, boolean>;
+export type StatsigConfigType = Record<StatsigFlags, boolean>;
 
 /**
  * !README!:
  * If you are using a flag in abacus, you must add it to the abacus
  * StatsigConfig object first! Otherwise it won't be set in the StatsigConfig object
  */
-export enum StatSigFlags {
-  ffSkipMigration = 'ff_skip_migration',
-  ff_enable_limit_close = 'ff_enable_limit_close',
+export enum StatsigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableKeplr = 'ff_enable_keplr',
+  ffOrderModificationFromChart = 'ff_order_modification_from_chart',
   ffEnableAffiliates = 'ff_enable_affiliates',
-  ffIncentivesS6RewardsDistributed = 'ff_incentives_s6_rewards_distributed',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
