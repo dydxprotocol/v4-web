@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
-import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -22,6 +21,7 @@ import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
@@ -50,11 +50,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketId,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -108,13 +104,19 @@ export const ClosePositionForm = ({
 
   const {
     size: sizeData,
-    price,
     type,
     summary,
   } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
 
-  const { size, percent } = sizeData ?? {};
-  const { limitPrice } = price ?? {};
+  const {
+    amountInput,
+    limitPriceInput,
+    onAmountInput,
+    onLimitPriceInput,
+    setLimitPriceToMidPrice,
+  } = useClosePositionFormInputs();
+
+  const { percent } = sizeData ?? {};
   const useLimit = type === AbacusOrderType.Limit;
 
   const closePositionInputErrors = useAppSelector(getClosePositionInputErrors, shallowEqual);
@@ -178,19 +180,6 @@ export const ClosePositionForm = ({
     callback: onLastOrderIndexed,
   });
 
-  const onAmountInput = ({ floatValue }: { floatValue?: number }) => {
-    if (currentSize == null) return;
-
-    const closeAmount = MustBigNumber(floatValue)
-      .abs()
-      .toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
-
-    abacusStateManager.setClosePositionValue({
-      value: floatValue ? closeAmount : null,
-      field: ClosePositionInputField.size,
-    });
-  };
-
   const onSelectPercentage = (optionVal: string) => {
     abacusStateManager.setClosePositionValue({
       value: optionVal,
@@ -243,38 +232,14 @@ export const ClosePositionForm = ({
   };
 
   const onClearInputs = () => {
-    abacusStateManager.setClosePositionValue({
-      value: null,
-      field: ClosePositionInputField.percent,
-    });
-    abacusStateManager.setClosePositionValue({
-      value: null,
-      field: ClosePositionInputField.size,
-    });
+    abacusStateManager.clearClosePositionInputValues();
   };
-
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
-
-  const setLimitPriceToMidPrice = useCallback(() => {
-    if (!midMarketPrice) return;
-    abacusStateManager.setClosePositionValue({
-      value: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-      field: ClosePositionInputField.limitPrice,
-    });
-  }, [midMarketPrice, tickSizeDecimals]);
 
   const midMarketPriceButton = (
     <$MidPriceButton onClick={setLimitPriceToMidPrice} size={ButtonSize.XSmall}>
       {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
     </$MidPriceButton>
   );
-
-  const onLimitPriceInput = ({ value }: NumberFormatValues) => {
-    abacusStateManager.setClosePositionValue({
-      value,
-      field: ClosePositionInputField.limitPrice,
-    });
-  };
 
   const onUseLimitCheckedChange = (checked: Boolean) => {
     abacusStateManager.setClosePositionValue({
@@ -309,7 +274,7 @@ export const ClosePositionForm = ({
         decimals={stepSizeDecimals ?? TOKEN_DECIMALS}
         onInput={onAmountInput}
         type={InputType.Number}
-        value={size ?? ''}
+        value={amountInput}
         max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
         tw="w-full"
       />
@@ -350,9 +315,9 @@ export const ClosePositionForm = ({
               </>
             }
             onChange={onLimitPriceInput}
-            value={limitPrice ?? ''}
+            value={limitPriceInput}
             decimals={tickSizeDecimals ?? USD_DECIMALS}
-            slotRight={midMarketPrice ? midMarketPriceButton : undefined}
+            slotRight={setLimitPriceToMidPrice ? midMarketPriceButton : undefined}
           />
         </Collapsible>
       )}
@@ -384,7 +349,7 @@ export const ClosePositionForm = ({
       )}
 
       <$Footer>
-        {size != null && (
+        {amountInput != null && (
           <div tw="row justify-self-end px-0 py-0.5">
             <Button
               type={ButtonType.Reset}

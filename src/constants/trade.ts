@@ -156,7 +156,6 @@ export const CLEARED_SIZE_INPUTS = {
 };
 
 export const CLEARED_CLOSE_POSITION_INPUTS = {
-  amountInput: '',
   limitPriceInput: '',
 };
 

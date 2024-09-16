@@ -30,8 +30,8 @@ export interface InputsState {
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
   adjustIsolatedMarginInputs?: Nullable<AdjustIsolatedMarginInputs>;
+  closePositionFormInputs: ClosePositionFormInputs;
   closePositionInputs?: Nullable<ClosePositionInputs>;
-  closePositionFormInputs?: ClosePositionFormInputs;
   triggerFormInputs: TriggerFormInputs;
   triggerOrdersInputs?: Nullable<TriggerOrdersInputs>;
   transferInputs?: Nullable<TransferInputs>;
@@ -100,4 +100,5 @@ export const inputsSlice = createSlice({
   },
 });
 
-export const { setInputs, setTradeFormInputs, setTriggerFormInputs } = inputsSlice.actions;
+export const { setInputs, setTradeFormInputs, setClosePositionFormInputs, setTriggerFormInputs } =
+  inputsSlice.actions;
