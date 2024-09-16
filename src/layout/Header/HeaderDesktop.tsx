@@ -49,6 +49,11 @@ export const HeaderDesktop = () => {
       group: 'navigation',
       items: [
         {
+          value: 'AFFILIATES',
+          label: stringGetter({ key: STRING_KEYS.AFFILIATES }),
+          href: AppRoute.Affiliates,
+        },
+        {
           value: 'TRADE',
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
