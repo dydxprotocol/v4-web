@@ -100,6 +100,9 @@ export const AnalyticsEvents = unionize(
   {
     // App
     AppStart: ofType<{}>(),
+    HasAcknowledgedRouteWarning: ofType<{
+      routeWarningJSON: string | null | undefined;
+    }>(),
     NetworkStatus: ofType<{
       status: (typeof AbacusApiStatus)['name'];
       /** Last time indexer node was queried successfully */

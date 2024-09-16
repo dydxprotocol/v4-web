@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,6 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Checkbox } from '@/components/Checkbox';
 
+import { track } from '@/lib/analytics/analytics';
 import { log } from '@/lib/telemetry';
 
 type RouteWarningMessageProps = {
@@ -36,6 +38,16 @@ export const RouteWarningMessage = ({
   routeWarningJSON,
 }: RouteWarningMessageProps) => {
   const stringGetter = useStringGetter();
+  const onCheckAcknowledgeWarning = (acknowledged: boolean) => {
+    if (acknowledged) {
+      track(
+        AnalyticsEvents.HasAcknowledgedRouteWarning({
+          routeWarningJSON,
+        })
+      );
+    }
+    setHasAcknowledged(acknowledged);
+  };
   const { warningMessage, acknowledgementMessageStringKey } = useMemo(() => {
     if (!routeWarningJSON) return {};
     try {
@@ -49,6 +61,7 @@ export const RouteWarningMessage = ({
       return {};
     }
   }, [routeWarningJSON]);
+
   if (!warningMessage || !acknowledgementMessageStringKey) {
     setHasAcknowledged(false);
     return null;
@@ -58,7 +71,7 @@ export const RouteWarningMessage = ({
     <$AlertMessage type={AlertType.Warning}>
       <Checkbox
         checked={hasAcknowledged}
-        onCheckedChange={setHasAcknowledged}
+        onCheckedChange={onCheckAcknowledgeWarning}
         id="acknowledge-route-warning"
         label={stringGetter({
           key: acknowledgementMessageStringKey,
