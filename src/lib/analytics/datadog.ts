@@ -3,7 +3,7 @@ import { datadogLogs } from '@datadog/browser-logs';
 import { CURRENT_MODE } from '@/constants/networks';
 
 const CLIENT_TOKEN = import.meta.env.VITE_DATADOG_CLIENT_TOKEN;
-const SERVICE_NAME = import.meta.env.VITE_DATADOG_SERVICE_NAME ?? 'v4-web-frontend-unknown-source';
+const SERVICE_NAME = 'v4-web';
 const LOGGER_NAME = 'v4-web';
 const SITE_NAME = 'datadoghq.com';
 
@@ -21,7 +21,7 @@ if (CLIENT_TOKEN) {
 datadogLogs.createLogger(LOGGER_NAME);
 
 const datadogLogger = datadogLogs.getLogger(LOGGER_NAME)!!;
-datadogLogger.setContextProperty('dd_client_token', CLIENT_TOKEN);
+datadogLogger.setContextProperty('dd-client-token', CLIENT_TOKEN);
 
 /**
  * TODO: make a logger wrapper that enables us also log to the console
