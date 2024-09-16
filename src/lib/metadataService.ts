@@ -1,3 +1,5 @@
+import { log } from 'console';
+
 type MetadataServiceInfoResponse = Record<
   string,
   {
@@ -43,6 +45,10 @@ class MetadataServiceClient {
   private host: string;
 
   constructor(host: string) {
+    if (!host) {
+      log('MetadataServiceClient requires a host');
+    }
+
     this.host = host;
   }
 
@@ -53,13 +59,15 @@ class MetadataServiceClient {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(params),
-    })
-      .then((res) => res.json())
-      .then((data) => data);
+    }).then((res) => res.json());
+  }
+
+  _get(endpoint: string) {
+    return fetch(`${this.host}/${endpoint}`).then((res) => res.json());
   }
 
   async getMarketmap(): Promise<Record<string, string>> {
-    return this._post('marketmap-map');
+    return this._get('marketmap-map');
   }
 
   async getAssetInfo({ assets }: { assets?: string[] }): Promise<MetadataServiceInfoResponse> {
@@ -88,6 +96,6 @@ class MetadataServiceClient {
   }
 }
 
-const METADATA_URI: string = import.meta.env.VITE_METADATA_SERVICE_URI;
+const METADATA_URI: string = import.meta.env.VITE_METADATA_SERVICE_URI ?? '';
 const metadataClient = new MetadataServiceClient(METADATA_URI);
 export default metadataClient;
