@@ -7,8 +7,8 @@ export type StatsigConfigType = Record<StatSigFlags, boolean>;
  */
 export enum StatSigFlags {
   ffSkipMigration = 'ff_skip_migration',
+  ff_enable_limit_close = 'ff_enable_limit_close',
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
-  ffEnableEvmSwaps = 'ff_enable_evm_swaps',
   ffEnableKeplr = 'ff_enable_keplr',
   ffEnableAffiliates = 'ff_enable_affiliates',
   ffIncentivesS6RewardsDistributed = 'ff_incentives_s6_rewards_distributed',
