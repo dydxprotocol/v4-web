@@ -1,6 +1,7 @@
 import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
+import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
 import {
   AbacusOrderType,
@@ -11,7 +12,13 @@ import {
 } from '@/constants/abacus';
 
 import abacusStateManager from './abacus';
-import { isLimitOrderType, isMarketOrderType } from './orders';
+import {
+  isLimitOrderType,
+  isMarketOrderType,
+  isSellOrder,
+  isStopLossOrder,
+  isTakeProfitOrder,
+} from './orders';
 
 const ORDER_TYPES_MODIFICATION_ENABLED = [
   AbacusOrderType.StopMarket.ordinal,
@@ -110,14 +117,40 @@ export const cancelOrderAsync = (
   });
 };
 
-export const isNewOrderPriceValid = (order: SubaccountOrder, newPrice: number) => {
+export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPrice: number) => {
+  // Ensure newPrice makes the order remain on the same side of the book
+  return newPrice !== bookPrice && oldPrice - bookPrice > 0 === newPrice - bookPrice > 0;
+};
+
+export const getOrderModificationError = (
+  order: SubaccountOrder,
+  newPrice: number
+): string | null => {
   const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
     order.marketId
   )?.midPrice;
-  if (!bookPrice) return true;
+  if (!bookPrice) return null;
 
   const oldPrice = order.triggerPrice ?? order.price;
+  if (isNewOrderPriceValid(bookPrice, oldPrice, newPrice)) return null;
 
-  // Ensure newPrice makes the order remain on the same side of the book
-  return newPrice !== bookPrice && oldPrice - bookPrice > 0 === newPrice - bookPrice > 0;
+  if (order.type.ordinal === AbacusOrderType.Limit.ordinal) {
+    return ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_LIMIT_PRICE_CROSS;
+  }
+
+  const isSell = isSellOrder(order);
+
+  if (isStopLossOrder(order, false)) {
+    return isSell
+      ? ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_HIGHER
+      : ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_LOWER;
+  }
+
+  if (isTakeProfitOrder(order, false)) {
+    return isSell
+      ? ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_HIGHER
+      : ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_LOWER;
+  }
+
+  return null;
 };
