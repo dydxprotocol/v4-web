@@ -84,7 +84,7 @@ export const ProgramCard = ({
           <$Header className="align-center flex">
             <$Icon
               iconName={isVip ? IconName.CheckCircle : IconName.Rocket}
-              className={isVip ? 'text-color-success' : 'text-color-text-0'}
+              className={isVip ? 'text-color-success' : 'text-color-text-1'}
             />
             <h4 className="ml-0.5 text-color-text-2">{title}</h4>
           </$Header>
