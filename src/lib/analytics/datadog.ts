@@ -21,6 +21,7 @@ if (CLIENT_TOKEN) {
 datadogLogs.createLogger(LOGGER_NAME);
 
 const datadogLogger = datadogLogs.getLogger(LOGGER_NAME)!!;
+datadogLogger.setContextProperty('dd_client_token', CLIENT_TOKEN);
 
 /**
  * TODO: make a logger wrapper that enables us also log to the console
