@@ -7,6 +7,7 @@ import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { StatsigFlags } from '@/constants/statsig';
 import { TradeTypes } from '@/constants/trade';
 
 import { getIsAccountConnected } from '@/state/accountSelectors';
@@ -16,6 +17,7 @@ import { setTradeFormInputs } from '@/state/inputs';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 
+import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 export function useTradingViewLimitOrder(
@@ -23,7 +25,7 @@ export function useTradingViewLimitOrder(
 ): (unixTime: number, price: number) => ContextMenuItem[] {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const canDraftLimitOrders = true; // useStatsigGateValue(StatsigFlags.ffLimitOrdersFromChart);
+  const canDraftLimitOrders = useStatsigGateValue(StatsigFlags.ffLimitOrdersFromChart);
 
   // Every time we call tvChartWidget.onContextMenu, a new callback is _added_ and there is no way to remove previously
   // added menu options. So, instead of creating a new callback and calling .onContextMenu every time `isUserConnected` changes,
