@@ -1,4 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
 
 import {
@@ -17,6 +18,7 @@ import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
+import { MustBigNumber } from '@/lib/numbers';
 import {
   getAverageFillPrice,
   getHydratedTradingData,
@@ -343,20 +345,23 @@ export const getSubaccountOpenOrdersForCurrentMarket = createAppSelector(
 export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
   [getSubaccountOpenOrdersForCurrentMarket, getCurrentMarketOrderbook],
   (openOrders = [], book = undefined) => {
-    const tickSize = book?.grouping?.tickSize;
+    const tickSize = MustBigNumber(book?.grouping?.tickSize);
     const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
     openOrders.forEach((order: SubaccountOrder) => {
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (orderSizeBySideAndPrice[side] ??= {});
 
       const priceOrderbookLevel = (() => {
-        if (tickSize == null) {
+        if (tickSize.isEqualTo(0)) {
           return order.price;
         }
-        const tickLevelUnrounded = order.price / tickSize;
+        const tickLevelUnrounded = MustBigNumber(order.price).div(tickSize);
         const tickLevel =
-          side === OrderSide.BUY ? Math.floor(tickLevelUnrounded) : Math.ceil(tickLevelUnrounded);
-        return tickLevel * tickSize;
+          side === OrderSide.BUY
+            ? tickLevelUnrounded.decimalPlaces(0, BigNumber.ROUND_FLOOR)
+            : tickLevelUnrounded.decimalPlaces(0, BigNumber.ROUND_CEIL);
+
+        return tickLevel.times(tickSize).toNumber();
       })();
       byPrice[priceOrderbookLevel] = (byPrice[priceOrderbookLevel] ?? 0) + order.size;
     });
@@ -395,6 +400,11 @@ export const getLocalPlaceOrders = (state: RootState) => state.account.localPlac
  * @returns a list of locally canceled orders for the current FE session
  */
 export const getLocalCancelOrders = (state: RootState) => state.account.localCancelOrders;
+
+/**
+ * @returns a list of locally batch canceled orders for the current FE session
+ */
+export const getLocalCancelAlls = (state: RootState) => state.account.localCancelAlls;
 
 /**
  * @param orderId

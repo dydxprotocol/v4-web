@@ -4,7 +4,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
-import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
+import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
+import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
@@ -68,7 +69,10 @@ export const DialogManager = () => {
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
-    CancelPendingOrders: (args) => <CancelAllOrdersDialog {...args} {...modalProps} />,
+    CancelAllOrdersConfirmation: (args) => (
+      <CancelAllOrdersConfirmationDialog {...args} {...modalProps} />
+    ),
+    CancelPendingOrders: (args) => <CancelPendingOrdersDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
