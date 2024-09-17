@@ -5,6 +5,7 @@ import { CancelAllOrdersConfirmationDialogProps, DialogProps } from '@/constants
 import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -12,7 +13,10 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { RadioGroup } from '@/components/RadioGroup';
 
-import { calculateHasCancelableOrdersInOtherMarkets } from '@/state/accountCalculators';
+import {
+  calculateHasCancelableOrders,
+  calculateHasCancelableOrdersInOtherMarkets,
+} from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
@@ -29,9 +33,14 @@ export const CancelAllOrdersConfirmationDialog = ({
   const hasCancelableOrdersInOtherMarkets = useAppSelector(
     calculateHasCancelableOrdersInOtherMarkets
   );
+  const hasCancelableOrdersInCurrentMarket = useParameterizedSelector(
+    calculateHasCancelableOrders,
+    currentMarketId
+  );
 
-  const shouldCancelAllOrders =
-    cancelOption === CANCEL_ALL_ORDERS_KEY || !hasCancelableOrdersInOtherMarkets;
+  const shouldShowOptions =
+    marketIdOption && hasCancelableOrdersInOtherMarkets && hasCancelableOrdersInCurrentMarket;
+  const shouldCancelAllOrders = cancelOption === CANCEL_ALL_ORDERS_KEY || !shouldShowOptions;
 
   const onSubmit = useCallback(() => {
     cancelAllOrders(shouldCancelAllOrders ? undefined : marketIdOption);
@@ -42,7 +51,7 @@ export const CancelAllOrdersConfirmationDialog = ({
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.CONFIRM })}>
       <form onSubmit={onSubmit} tw="flex flex-col gap-0.75">
         <div>{stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS_CONFIRMATION })}</div>
-        {marketIdOption && hasCancelableOrdersInOtherMarkets && (
+        {shouldShowOptions && (
           <RadioGroup
             items={[
               {
