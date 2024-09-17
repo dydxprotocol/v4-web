@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -25,18 +27,35 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
   const { displayId, priceChange24H, priceChange24HPercent } =
     useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
-  const baseAsset = launchableMarketId ? getDisplayableAssetFromBaseAsset(launchableMarketId) : id;
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+
+  const assetRow = launchableAsset ? (
+    <div tw="inlineRow gap-[1ch]">
+      <img
+        src={launchableAsset.logo}
+        alt={launchableAsset.name}
+        tw="h-[2.5rem] w-[2.5rem] border-r-[50%]"
+      />
+      <$Name>
+        <h3>{launchableAsset.name}</h3>
+        <span>{getDisplayableAssetFromBaseAsset(launchableAsset.id)}</span>
+      </$Name>
+    </div>
+  ) : (
+    <div tw="inlineRow gap-[1ch]">
+      <AssetIcon symbol={id} tw="text-[2.5rem]" />
+      <$Name>
+        <h3>{name}</h3>
+        <span>{displayId}</span>
+      </$Name>
+    </div>
+  );
 
   return (
     <$Header>
       <BackButton onClick={() => navigate(AppRoute.Markets)} />
-      <div tw="inlineRow gap-[1ch]">
-        <AssetIcon symbol={baseAsset} tw="text-[2.5rem]" />
-        <$Name>
-          <h3>{name}</h3>
-          <span>{launchableMarketId ?? displayId}</span>
-        </$Name>
-      </div>
+
+      {assetRow}
 
       <$Right>
         <MidMarketPrice />

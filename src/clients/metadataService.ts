@@ -1,65 +1,11 @@
-import { log } from 'console';
+import {
+  MetadataServiceCandlesResponse,
+  MetadataServiceInfoResponse,
+  MetadataServicePath,
+  MetadataServicePricesResponse,
+} from '@/constants/assetMetadata';
 
-export type MetadataServiceInfoResponse = Record<
-  string,
-  {
-    name: string;
-    logo: string;
-    urls: {
-      website: string | null;
-      technical_doc: string | null;
-      cmc: string | null;
-    };
-    sector_tags: string[] | null;
-    exchanges: any[] | null;
-  }
->;
-
-export type MetadataServicePricesResponse = Record<
-  string,
-  {
-    price: number | null;
-    percent_change_24h: number | null;
-    volume_24h: number | null;
-    market_cap: number | null;
-  }
->;
-
-type MetadataServiceCandlesResponse = Record<
-  string,
-  {
-    time: string; // ISO date string
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-  }
->;
-
-export type MetadataServiceAsset = {
-  id: string;
-  name: string;
-  logo: string;
-  urls: {
-    website: string | null;
-    technicalDoc: string | null;
-    cmc: string | null;
-  };
-  sectorTags: string[] | null;
-  exchanges: any[] | null;
-  price: number | null;
-  percentChange24h: number | null;
-  volume24h: number | null;
-  marketCap: number | null;
-};
-
-enum MetadataServicePath {
-  MARKET_MAP = 'market-map',
-  INFO = 'info',
-  PRICES = 'prices',
-  CANDLES = 'candles',
-}
+import { log } from '@/lib/telemetry';
 
 /**
  * MetadataServiceClient
@@ -70,7 +16,7 @@ class MetadataServiceClient {
 
   constructor(host: string) {
     if (!host) {
-      log('MetadataServiceClient requires a host');
+      log('MetadataServiceClient', new Error('MetadataServiceClient requires a host'));
     }
 
     this.host = host;

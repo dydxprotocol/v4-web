@@ -1,16 +1,22 @@
 import { useMemo } from 'react';
 
-import metadataClient, { MetadataServiceAsset } from '@/clients/metadataService';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
+import {
+  MetadataServiceAsset,
+  MetadataServiceInfoResponse,
+  MetadataServicePricesResponse,
+} from '@/constants/assetMetadata';
 import { MOCK_INFO, MOCK_PRICES } from '@/constants/mockMetadata';
 import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { orEmptyRecord } from '@/lib/typeUtils';
+import metadataClient from '@/clients/metadataService';
+import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useLaunchableMarkets = () => {
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
@@ -39,7 +45,7 @@ export const useMetadataService = () => {
     queries: [
       {
         queryKey: ['marketMapInfo'],
-        queryFn: async () => {
+        queryFn: async (): Promise<MetadataServiceInfoResponse> => {
           return MOCK_INFO;
           return metadataClient.getAssetInfo();
         },
@@ -49,7 +55,7 @@ export const useMetadataService = () => {
       },
       {
         queryKey: ['marketMapPrice'],
-        queryFn: async () => {
+        queryFn: async (): Promise<MetadataServicePricesResponse> => {
           return MOCK_PRICES;
           return metadataClient.getAssetPrices();
         },
@@ -57,7 +63,7 @@ export const useMetadataService = () => {
       },
     ],
     combine: (results) => {
-      const info = orEmptyRecord(results[0].data);
+      const info = orEmptyObj(results[0].data);
       const prices = results[1].data;
       const data: Record<string, MetadataServiceAsset> = {};
 
@@ -92,24 +98,17 @@ export const useMetadataService = () => {
   return metadataQuery;
 };
 
-export const useMarketMapInfo = ({ assets }: { assets?: string[] }) => {
-  const info = useQuery({
-    queryKey: ['marketMapInfo', assets],
-    queryFn: async () => {
-      return metadataClient.getAssetInfo(assets);
-    },
-  });
+export const useMetadataServiceAssetFromId = (marketId?: string) => {
+  const metadataServiceData = useMetadataService();
 
-  return info;
-};
+  const launchableAsset = useMemo(() => {
+    if (!metadataServiceData.data || !marketId) {
+      return null;
+    }
 
-export const useMarketMapPrice = ({ assets }: { assets: string[] }) => {
-  const prices = useQuery({
-    queryKey: ['marketMapPrice', assets],
-    queryFn: async () => {
-      return metadataClient.getAssetPrices(assets);
-    },
-  });
+    const assetId = getAssetFromMarketId(marketId);
+    return metadataServiceData.data?.[assetId];
+  }, [metadataServiceData.data, marketId]);
 
-  return prices;
+  return launchableAsset;
 };

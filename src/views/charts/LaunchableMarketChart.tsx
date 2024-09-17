@@ -6,7 +6,7 @@ import tw from 'twin.macro';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useMetadataService } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LinkOutIcon } from '@/icons';
@@ -17,7 +17,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import { getAssetFromMarketId, getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 enum ChartResolution {
@@ -35,13 +35,8 @@ export const LaunchableMarketChart = ({
 }) => {
   const stringGetter = useStringGetter();
   const [resolution, setResolution] = useState(ChartResolution.DAY);
-  const metadataServiceData = useMetadataService();
-  const asset = ticker ? getAssetFromMarketId(ticker) : null;
-
-  const { id, marketCap, name, price, logo, urls } = orEmptyObj(
-    metadataServiceData?.data[asset ?? ''] ?? {}
-  );
-
+  const launchableAsset = useMetadataServiceAssetFromId(ticker);
+  const { id, marketCap, name, price, logo, urls } = orEmptyObj(launchableAsset);
   const websiteLink = urls?.website ?? undefined;
 
   if (!ticker) return null;

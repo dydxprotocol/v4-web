@@ -4,7 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useMetadataService } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -14,7 +14,6 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
-import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getDecimalsForNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -51,14 +50,9 @@ export const UnlaunchedMarketStatsDetails = ({
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const metadataServiceData = useMetadataService();
-  const assetId = getAssetFromMarketId(launchableMarketId);
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
 
-  const {
-    marketCap,
-    price,
-    volume24h: spotVolume24H,
-  } = orEmptyObj(metadataServiceData?.data[assetId]);
+  const { marketCap, price, volume24h: spotVolume24H } = orEmptyObj(launchableAsset);
 
   const fractionDigits = getDecimalsForNumber(price);
 
