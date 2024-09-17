@@ -12,6 +12,7 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { RadioGroup } from '@/components/RadioGroup';
 
+import { calculateHasCancelableOrdersInOtherMarkets } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
@@ -25,6 +26,10 @@ export const CancelAllOrdersConfirmationDialog = ({
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const marketIdOption = marketId ?? currentMarketId;
 
+  const hasCancelableOrdersInOtherMarkets = useAppSelector(
+    calculateHasCancelableOrdersInOtherMarkets
+  );
+
   const onSubmit = useCallback(() => {
     cancelAllOrders(cancelOption === CANCEL_ALL_ORDERS_KEY ? undefined : marketIdOption);
     setIsOpen?.(false);
@@ -34,7 +39,7 @@ export const CancelAllOrdersConfirmationDialog = ({
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.CONFIRM })}>
       <form onSubmit={onSubmit} tw="flex flex-col gap-0.75">
         <div>{stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS_CONFIRMATION })}</div>
-        {marketIdOption && (
+        {marketIdOption && hasCancelableOrdersInOtherMarkets && (
           <RadioGroup
             items={[
               {
@@ -45,7 +50,7 @@ export const CancelAllOrdersConfirmationDialog = ({
                 value: marketIdOption,
                 label: stringGetter({
                   key: STRING_KEYS.CANCEL_ALL_ORDERS_SINGLE_MARKET_OPTION,
-                  params: { marketId: marketIdOption },
+                  params: { MARKET_ID: marketIdOption },
                 }),
               },
             ]}
