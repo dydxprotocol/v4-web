@@ -33,6 +33,7 @@ import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
+import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -131,6 +132,7 @@ export const useTradingView = ({
     })();
   }, [marketId, hasPriceScaleInfo, getMarketTickSize]);
 
+  const tradingViewLimitOrder = useTradingViewLimitOrder(marketId);
   useEffect(() => {
     if (marketId && hasPriceScaleInfo) {
       const widgetOptions = getWidgetOptions();
@@ -157,8 +159,9 @@ export const useTradingView = ({
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
-      tvWidgetRef.current?.onChartReady(() => {
-        tvWidgetRef.current?.headerReady().then(() => {
+      tvChartWidget.onChartReady(() => {
+        tvChartWidget.onContextMenu(tradingViewLimitOrder);
+        tvChartWidget.headerReady().then(() => {
           if (tvWidgetRef.current) {
             // Order Lines
             initializeToggle({
@@ -240,6 +243,7 @@ export const useTradingView = ({
     setOrderbookCandlesToggleOn,
     orderbookCandlesToggleOn,
     tvWidgetRef,
+    tradingViewLimitOrder,
   ]);
 
   return { savedResolution };
