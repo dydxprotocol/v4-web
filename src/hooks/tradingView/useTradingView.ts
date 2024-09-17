@@ -133,6 +133,7 @@ export const useTradingView = ({
   }, [marketId, hasPriceScaleInfo, getMarketTickSize]);
 
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId);
+
   useEffect(() => {
     if (marketId && hasPriceScaleInfo) {
       const widgetOptions = getWidgetOptions();
@@ -160,8 +161,10 @@ export const useTradingView = ({
       tvWidgetRef.current = tvChartWidget;
 
       tvChartWidget.onChartReady(() => {
-        tvChartWidget.onContextMenu(tradingViewLimitOrder);
-        tvChartWidget.headerReady().then(() => {
+        // Initialize additional right-click-menu options
+        tvWidgetRef.current?.onContextMenu(tradingViewLimitOrder);
+
+        tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
             // Order Lines
             initializeToggle({
@@ -243,7 +246,6 @@ export const useTradingView = ({
     setOrderbookCandlesToggleOn,
     orderbookCandlesToggleOn,
     tvWidgetRef,
-    tradingViewLimitOrder,
   ]);
 
   return { savedResolution };
