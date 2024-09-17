@@ -31,7 +31,7 @@ export function useTradingViewLimitOrder(
 
   return useCallback(
     (_: number, price: number) => {
-      if (!canDraftLimitOrders || !userConnectedRef.current) return [];
+      if (!canDraftLimitOrders || !userConnectedRef.current || price < 0) return [];
 
       const bookPrice =
         marketId && abacusStateManager.stateManager.state?.marketOrderbook(marketId)?.midPrice;
