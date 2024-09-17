@@ -16,6 +16,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useLaunchableMarkets = () => {
@@ -69,6 +70,8 @@ export const useMetadataService = () => {
 
       Object.keys(info).forEach((key) => {
         if (info?.[key] && prices?.[key]) {
+          const tickSizeDecimals = getTickSizeDecimalsFromPrice(prices[key].price);
+
           data[key] = {
             id: key,
             name: info[key].name,
@@ -84,6 +87,7 @@ export const useMetadataService = () => {
             percentChange24h: prices[key].percent_change_24h,
             marketCap: prices[key].market_cap,
             volume24h: prices[key].volume_24h,
+            tickSizeDecimals,
           };
         }
       });

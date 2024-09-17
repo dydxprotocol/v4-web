@@ -50,6 +50,8 @@ export type MetadataServiceAsset = {
   percentChange24h: number | null;
   volume24h: number | null;
   marketCap: number | null;
+
+  tickSizeDecimals: number;
 };
 
 export enum MetadataServicePath {

@@ -14,7 +14,6 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
-import { getDecimalsForNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
@@ -49,12 +48,14 @@ export const UnlaunchedMarketStatsDetails = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
 
-  const { marketCap, price, volume24h: spotVolume24H } = orEmptyObj(launchableAsset);
-
-  const fractionDigits = getDecimalsForNumber(price);
+  const {
+    marketCap,
+    price,
+    tickSizeDecimals,
+    volume24h: spotVolume24H,
+  } = orEmptyObj(launchableAsset);
 
   const valueMap = {
     [MarketStats.MARKET_CAP]: marketCap,
@@ -70,7 +71,7 @@ export const UnlaunchedMarketStatsDetails = ({
     <$MarketDetailsItems>
       {showMidMarketPrice && (
         <$MidMarketPrice>
-          <Output type={OutputType.Fiat} value={price} fractionDigits={fractionDigits} />
+          <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
           <VerticalSeparator />
         </$MidMarketPrice>
       )}

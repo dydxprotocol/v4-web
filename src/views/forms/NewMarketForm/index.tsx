@@ -1,7 +1,8 @@
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
+import { shallowEqual } from 'react-redux';
+
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
@@ -14,8 +15,13 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
+import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
+
 import { isTruthy } from '@/lib/isTruthy';
+import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { NewMarketPreviewStep } from './NewMarketPreviewStep';
 import { NewMarketSelectionStep } from './NewMarketSelectionStep';
@@ -46,11 +52,11 @@ export const NewMarketForm = ({
 
   const { tickersFromProposals } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+  const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const { freeCollateral, marginUsage } = subAccount;
 
   const tickSizeDecimals = useMemo(() => {
-    if (!assetToAdd) return TOKEN_DECIMALS;
-    const p = Math.floor(Math.log(Number(assetToAdd.meta.referencePrice)));
-    return Math.abs(p - 3);
+    return getTickSizeDecimalsFromPrice(assetToAdd?.meta.referencePrice);
   }, [assetToAdd]);
 
   useEffect(() => {
@@ -78,12 +84,26 @@ export const NewMarketForm = ({
       {
         key: 'cross-margin-usage',
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-        value: <Output type={OutputType.Percent} value={0.3256} />,
+        value: (
+          <DiffOutput
+            withDiff
+            type={OutputType.Percent}
+            value={marginUsage?.current}
+            newValue={0.4}
+          />
+        ),
       },
       step === NewMarketFormStep.PREVIEW && {
         key: 'cross-free-collateral',
         label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-        value: <DiffOutput withDiff type={OutputType.Fiat} value={100000} newValue={88000} />,
+        value: (
+          <DiffOutput
+            withDiff
+            type={OutputType.Fiat}
+            value={freeCollateral?.current}
+            newValue={88000}
+          />
+        ),
       },
       {
         key: 'megavault-balance',
@@ -91,7 +111,7 @@ export const NewMarketForm = ({
         value: <Output type={OutputType.Fiat} value={10000} />,
       },
     ].filter(isTruthy);
-  }, [step, stringGetter]);
+  }, [freeCollateral?.current, marginUsage?.current, step, stringGetter]);
 
   /**
    * Permissionless Markets Flow

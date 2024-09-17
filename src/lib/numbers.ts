@@ -1,7 +1,6 @@
 import { BigNumber } from 'bignumber.js';
-import _ from 'lodash';
 
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
@@ -36,15 +35,11 @@ export const getFractionDigits = (unit?: BigNumberish | null) =>
   // n?.toString().match(/[.](\d*)/)?.[1].length ?? 0
   unit ? Math.max(Math.ceil(-Math.log10(Math.abs(+unit))), 0) : 0;
 
-export const getDecimalsForNumber = (num?: BigNumberish | null) => {
-  const value: string = MustBigNumber(num).toString();
-  const numParts = _.split(value, '.');
-
-  if (_.size(numParts) > 1) {
-    return _.size(_.last(numParts));
-  }
-
-  return 0;
+export const getTickSizeDecimalsFromPrice = (price?: BigNumberish | null) => {
+  if (!price) return TOKEN_DECIMALS;
+  const priceNum = MustBigNumber(price).toNumber();
+  const p = Math.floor(Math.log(priceNum));
+  return Math.abs(p - 3);
 };
 
 export const isNumber = (value: any): value is number =>

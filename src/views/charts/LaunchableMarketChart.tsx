@@ -36,7 +36,7 @@ export const LaunchableMarketChart = ({
   const stringGetter = useStringGetter();
   const [resolution, setResolution] = useState(ChartResolution.DAY);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
-  const { id, marketCap, name, price, logo, urls } = orEmptyObj(launchableAsset);
+  const { id, marketCap, name, price, logo, tickSizeDecimals, urls } = orEmptyObj(launchableAsset);
   const websiteLink = urls?.website ?? undefined;
 
   if (!ticker) return null;
@@ -78,7 +78,14 @@ export const LaunchableMarketChart = ({
               key: 'reference-price',
               label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
               tooltip: 'reference-price',
-              value: <Output type={OutputType.Fiat} tw="text-color-text-1" value={price} />,
+              value: (
+                <Output
+                  type={OutputType.Fiat}
+                  tw="text-color-text-1"
+                  value={price}
+                  fractionDigits={tickSizeDecimals}
+                />
+              ),
             },
           ]}
         />
