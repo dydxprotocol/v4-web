@@ -570,6 +570,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
+  // when marketId is provided, only cancel orders for that market, otherwise cancel globally
   const cancelAllOrders = useCallback(
     (marketId?: string) => {
       // this is for each single cancel transaction

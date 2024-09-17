@@ -30,10 +30,13 @@ export const CancelAllOrdersConfirmationDialog = ({
     calculateHasCancelableOrdersInOtherMarkets
   );
 
+  const shouldCancelAllOrders =
+    cancelOption === CANCEL_ALL_ORDERS_KEY || !hasCancelableOrdersInOtherMarkets;
+
   const onSubmit = useCallback(() => {
-    cancelAllOrders(cancelOption === CANCEL_ALL_ORDERS_KEY ? undefined : marketIdOption);
+    cancelAllOrders(shouldCancelAllOrders ? undefined : marketIdOption);
     setIsOpen?.(false);
-  }, [cancelAllOrders, cancelOption, marketIdOption, setIsOpen]);
+  }, [cancelAllOrders, marketIdOption, setIsOpen, shouldCancelAllOrders]);
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.CONFIRM })}>
