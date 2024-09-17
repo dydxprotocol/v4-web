@@ -1,27 +1,27 @@
 import { log } from 'console';
 
-type MetadataServiceInfoResponse = Record<
+export type MetadataServiceInfoResponse = Record<
   string,
   {
     name: string;
     logo: string;
     urls: {
-      website: string;
-      technical_doc: string;
-      cmc: string;
+      website: string | null;
+      technical_doc: string | null;
+      cmc: string | null;
     };
-    sector_tags: string[];
-    exchanges: string[];
+    sector_tags: string[] | null;
+    exchanges: any[] | null;
   }
 >;
 
-type MetadataServicePricesResponse = Record<
+export type MetadataServicePricesResponse = Record<
   string,
   {
-    price: number;
-    percent_change_24h: number;
-    volume_24h: number;
-    market_cap: number;
+    price: number | null;
+    percent_change_24h: number | null;
+    volume_24h: number | null;
+    market_cap: number | null;
   }
 >;
 
@@ -36,6 +36,23 @@ type MetadataServiceCandlesResponse = Record<
     volume: number;
   }
 >;
+
+export type MetadataServiceAsset = {
+  id: string;
+  name: string;
+  logo: string;
+  urls: {
+    website: string | null;
+    technicalDoc: string | null;
+    cmc: string | null;
+  };
+  sectorTags: string[] | null;
+  exchanges: any[] | null;
+  price: number | null;
+  percentChange24h: number | null;
+  volume24h: number | null;
+  marketCap: number | null;
+};
 
 enum MetadataServicePath {
   MARKET_MAP = 'market-map',
@@ -77,13 +94,13 @@ class MetadataServiceClient {
     return this._get(MetadataServicePath.MARKET_MAP);
   }
 
-  async getAssetInfo({ assets }: { assets?: string[] }): Promise<MetadataServiceInfoResponse> {
+  async getAssetInfo(assets?: string[]): Promise<MetadataServiceInfoResponse> {
     return this._post(MetadataServicePath.INFO, {
       assets,
     });
   }
 
-  async getAssetPrices({ assets }: { assets?: string[] }): Promise<MetadataServicePricesResponse> {
+  async getAssetPrices(assets?: string[]): Promise<MetadataServicePricesResponse> {
     return this._post(MetadataServicePath.PRICES, {
       assets,
     });

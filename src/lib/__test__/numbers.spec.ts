@@ -98,6 +98,7 @@ describe('getFractionDigits', () => {
     expect(getFractionDigits(0.005)).toEqual(3);
   });
   it('trims trailing 0s', () => {
+    // eslint-disable-next-line prettier/prettier
     expect(getFractionDigits(0.005)).toEqual(3);
   });
 });

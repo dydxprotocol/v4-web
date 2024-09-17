@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js';
+import _ from 'lodash';
 
 import { NumberSign } from '@/constants/numbers';
 
@@ -31,9 +32,20 @@ export const roundToNearestFactor = ({
   return MustBigNumber(number).div(factor).decimalPlaces(0, roundingMode).times(factor);
 };
 
-export const getFractionDigits = (unit?: BigNumber | number | string | null) =>
+export const getFractionDigits = (unit?: BigNumberish | null) =>
   // n?.toString().match(/[.](\d*)/)?.[1].length ?? 0
   unit ? Math.max(Math.ceil(-Math.log10(Math.abs(+unit))), 0) : 0;
+
+export const getDecimalsForNumber = (num?: BigNumberish | null) => {
+  const value: string = MustBigNumber(num).toString();
+  const numParts = _.split(value, '.');
+
+  if (_.size(numParts) > 1) {
+    return _.size(_.last(numParts));
+  }
+
+  return 0;
+};
 
 export const isNumber = (value: any): value is number =>
   typeof value === 'number' && !Number.isNaN(value);

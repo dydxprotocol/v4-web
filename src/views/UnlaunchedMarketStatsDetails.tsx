@@ -4,7 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useMarketMapInfo, useMarketMapPrice } from '@/hooks/useLaunchableMarkets';
+import { useMetadataService } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -14,7 +14,9 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
-import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { getDecimalsForNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   launchableMarketId: string;
@@ -49,22 +51,16 @@ export const UnlaunchedMarketStatsDetails = ({
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const marketInfo = useMarketMapInfo({
-    assets: [getDisplayableAssetFromTicker(launchableMarketId, 'full')],
-  });
+  const metadataServiceData = useMetadataService();
+  const assetId = getAssetFromMarketId(launchableMarketId);
 
-  const marketPrices = useMarketMapPrice({
-    assets: [getDisplayableAssetFromTicker(launchableMarketId)],
-  });
+  const {
+    marketCap,
+    price,
+    volume24h: spotVolume24H,
+  } = orEmptyObj(metadataServiceData?.data[assetId]);
 
-  console.log(marketInfo);
-  console.log(marketPrices);
-
-  // TODO: Replace with un launched market data
-  const { marketCap, spotVolume24H } = {
-    marketCap: 0,
-    spotVolume24H: 0,
-  };
+  const fractionDigits = getDecimalsForNumber(price);
 
   const valueMap = {
     [MarketStats.MARKET_CAP]: marketCap,
@@ -80,7 +76,7 @@ export const UnlaunchedMarketStatsDetails = ({
     <$MarketDetailsItems>
       {showMidMarketPrice && (
         <$MidMarketPrice>
-          <Output type={OutputType.Fiat} value={0.232} fractionDigits={3} />
+          <Output type={OutputType.Fiat} value={price} fractionDigits={fractionDigits} />
           <VerticalSeparator />
         </$MidMarketPrice>
       )}

@@ -31,8 +31,10 @@ export enum NewMarketFormStep {
 
 export const NewMarketForm = ({
   setFormStep,
+  updateTickerToAdd,
 }: {
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
+  updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
 }) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
@@ -54,6 +56,10 @@ export const NewMarketForm = ({
   useEffect(() => {
     setFormStep?.(step);
   }, [setFormStep, step]);
+
+  useEffect(() => {
+    updateTickerToAdd?.(tickerToAdd);
+  }, [updateTickerToAdd, tickerToAdd]);
 
   const shouldHideTitleAndDescription = setFormStep !== undefined;
 

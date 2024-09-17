@@ -13,6 +13,8 @@ import { Output, OutputType } from '@/components/Output';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+
 export const LaunchMarketSidePanel = ({
   className,
   launchableMarketId,
@@ -22,6 +24,7 @@ export const LaunchMarketSidePanel = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+  const baseAsset = launchableMarketId ? getDisplayableAssetFromBaseAsset(launchableMarketId) : '';
 
   const items = [
     {
@@ -50,7 +53,7 @@ export const LaunchMarketSidePanel = ({
       title: stringGetter({ key: STRING_KEYS.TRADE }),
       body: stringGetter({
         key: STRING_KEYS.AVAILABLE_TO_TRADE_POST_LAUNCH,
-        params: { MARKET: launchableMarketId },
+        params: { MARKET: baseAsset },
       }),
     },
   ];
@@ -72,7 +75,7 @@ export const LaunchMarketSidePanel = ({
       <h2 tw="text-large text-color-text-2">
         {stringGetter({
           key: STRING_KEYS.INSTANTLY_LAUNCH,
-          params: { MARKET: launchableMarketId },
+          params: { MARKET: baseAsset },
         })}
       </h2>
       <div tw="flex flex-col gap-1">{steps}</div>
