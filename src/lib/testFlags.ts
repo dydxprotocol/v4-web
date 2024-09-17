@@ -56,10 +56,6 @@ class TestFlags {
     return !!this.queryParams.pml;
   }
 
-  get showCancelAll() {
-    return !!this.queryParams.cancelall;
-  }
-
   get referralCode() {
     return this.queryParams.ref;
   }
