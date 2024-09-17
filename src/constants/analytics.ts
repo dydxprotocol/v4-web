@@ -267,6 +267,10 @@ export const AnalyticsEvents = unionize(
     TradingViewOrderModificationSuccess: ofType<{
       clientId: string;
     }>,
+    TradingViewLimitOrderDrafted: ofType<{
+      marketId: string;
+      price: number;
+    }>,
     // Notification
     NotificationAction: ofType<{
       type: string;

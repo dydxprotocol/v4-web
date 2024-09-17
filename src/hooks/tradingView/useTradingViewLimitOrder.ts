@@ -11,7 +11,9 @@ import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 
 export function useTradingViewLimitOrder(
   marketId?: string
@@ -41,6 +43,8 @@ export function useTradingViewLimitOrder(
       const formattedPrice = BigNumber(price).toFixed(USD_DECIMALS);
 
       const onDraftLimitOrder = () => {
+        track(AnalyticsEvents.TradingViewLimitOrderDrafted({ marketId, price }));
+
         // Allow user to keep their previous size input
         abacusStateManager.clearTradeInputValues({ shouldResetSize: false });
         abacusStateManager.setTradeValue({ field: TradeInputField.type, value: TradeTypes.LIMIT });
