@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
@@ -32,6 +33,7 @@ import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   cancelOrderAsync,
@@ -258,6 +260,14 @@ export const useChartLines = ({
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
       if (!orderPayload) return;
 
+      track(
+        AnalyticsEvents.TradingViewOrderModificationSubmitted({
+          ...orderPayload,
+          previousOrderClientId: order.clientId,
+          previousOrderPrice: oldPrice,
+        })
+      );
+
       orderLine.setPrice(newPrice);
 
       addPendingOrderAdjustment(orderPayload, order.id);
@@ -385,6 +395,9 @@ export const useChartLines = ({
           // Update pendingOrderAdjustmentRef here instead of a separate useEffect so that
           // adding the new chart line and removing from pendingOrderAdjustmentRef can happen atomically
           if (order.clientId && pendingOrderAdjustments[order.clientId]) {
+            track(
+              AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
+            );
             removePendingOrderAdjustment(order.clientId);
             dispatch(setLatestOrder(order));
           }
