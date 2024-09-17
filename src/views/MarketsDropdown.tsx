@@ -148,9 +148,9 @@ const MarketsDropdownContent = ({
     defaultValue: false,
   });
 
-  const currentDate = new Date();
-
   const slotTop = useMemo(() => {
+    const currentDate = new Date();
+
     if (
       !hasSeenElectionBannerTrumpWin &&
       featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
@@ -177,7 +177,6 @@ const MarketsDropdownContent = ({
 
     return null;
   }, [
-    currentDate,
     setHasSeenElectionBannerTrupmWin,
     hasSeenElectionBannerTrumpWin,
     stringGetter,
@@ -297,7 +296,9 @@ export const MarketsDropdown = memo(
                   <AssetIcon symbol={symbol} />
                   {isViewingUnlaunchedMarket ? (
                     <div tw="flex flex-col text-start">
-                      <span tw="font-mini-book">Not Launched</span>
+                      <span tw="font-mini-book">
+                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                      </span>
                       <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
                         {currentMarketId}
                       </h2>

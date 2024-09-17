@@ -180,4 +180,14 @@ export type LocalCancelOrderData = {
   orderId: string;
   submissionStatus: CancelOrderStatuses;
   errorParams?: ErrorParams;
+  isSubmittedThroughCancelAll?: boolean;
+};
+
+export const CANCEL_ALL_ORDERS_KEY = 'all';
+export type LocalCancelAllData = {
+  key: string;
+  orderIds: string[];
+  canceledOrderIds?: string[];
+  failedOrderIds?: string[];
+  errorParams?: ErrorParams;
 };
