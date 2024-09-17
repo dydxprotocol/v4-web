@@ -1,7 +1,10 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY, LocalCancelAllData } from '@/constants/trade';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
@@ -21,6 +24,7 @@ export const CancelAllNotification = ({
   localCancelAll,
   notification,
 }: NotificationProps & ElementProps) => {
+  const stringGetter = useStringGetter();
   const isCancelForSingleMarket = localCancelAll.key !== CANCEL_ALL_ORDERS_KEY;
   const marketData = useAppSelector(
     (s) => (isCancelForSingleMarket ? getMarketData(s, localCancelAll.key) : null),
@@ -32,24 +36,20 @@ export const CancelAllNotification = ({
 
   const { assetId } = marketData ?? {};
 
-  // TODO(@aforaleka): localize these
-  const slotTitle = isCancelForSingleMarket
-    ? `Canceling all orders in ${localCancelAll.key}`
-    : `Canceling all orders`;
-
   // Check if all orders have been confirmed canceled or failed
   const isCancellationConfirmed = numCanceled + numFailed >= numOrders;
   const orderStatusIcon = !isCancellationConfirmed ? (
     <LoadingSpinner tw="text-color-accent [--spinner-width:0.9375rem]" />
   ) : null;
 
-  // TODO(@aforaleka): localize these
   const customContent = (
     <$Details
       items={[
         {
           key: 'orders-canceled',
-          label: <span tw="row gap-[0.5ch]">Orders Canceled</span>,
+          label: (
+            <span tw="row gap-[0.5ch]">{stringGetter({ key: STRING_KEYS.ORDERS_CANCELED })}</span>
+          ),
           value: (
             <span>
               <$Highlighted>{numCanceled}</$Highlighted> / {numOrders}
@@ -65,7 +65,12 @@ export const CancelAllNotification = ({
       isToast={isToast}
       notification={notification}
       slotIcon={assetId ? <AssetIcon symbol={assetId} /> : null}
-      slotTitle={slotTitle}
+      slotTitle={stringGetter({
+        key: isCancelForSingleMarket
+          ? STRING_KEYS.CANCELING_ALL_ORDERS_IN_MARKET
+          : STRING_KEYS.CANCELING_ALL_ORDERS,
+        params: { MARKET_ID: localCancelAll.key },
+      })}
       slotTitleRight={orderStatusIcon}
       slotCustomContent={customContent}
     />

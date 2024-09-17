@@ -720,7 +720,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             cancelAll.key,
             {
               icon: null,
-              title: 'Cancel all orders',
+              title: stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS }),
               toastSensitivity: 'background',
               groupKey: cancelAll.key,
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
