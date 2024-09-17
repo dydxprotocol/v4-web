@@ -1,7 +1,7 @@
-import {
+import type {
+  MetadataServiceInfoResponse,
   MetadataServicePricesResponse,
-  type MetadataServiceInfoResponse,
-} from '@/clients/metadataService';
+} from '@/constants/assetMetadata';
 
 export const MOCK_PRICES: MetadataServicePricesResponse = {
   'AGRS,UNISWAP_V3,0X738865301A9B7DD80DC3666DD48CF034EC42BDDA': {
