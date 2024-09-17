@@ -150,7 +150,7 @@ export const NewMarketSelectionStep = ({
                   <DiffOutput
                     withDiff
                     type={OutputType.Fiat}
-                    value={freeCollateral.current}
+                    value={freeCollateral?.current}
                     newValue={88000}
                     fractionDigits={USD_DECIMALS}
                   />
