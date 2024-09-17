@@ -4,6 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useMarketMapInfo, useMarketMapPrice } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -13,7 +14,10 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
+import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+
 type ElementProps = {
+  launchableMarketId: string;
   showMidMarketPrice?: boolean;
 };
 
@@ -38,9 +42,23 @@ const DetailsItem = ({ value, stat }: { value: number | null | undefined; stat: 
   }
 };
 
-export const UnlaunchedMarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
+export const UnlaunchedMarketStatsDetails = ({
+  launchableMarketId,
+  showMidMarketPrice = true,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+
+  const marketInfo = useMarketMapInfo({
+    assets: [getDisplayableAssetFromTicker(launchableMarketId, 'full')],
+  });
+
+  const marketPrices = useMarketMapPrice({
+    assets: [getDisplayableAssetFromTicker(launchableMarketId)],
+  });
+
+  console.log(marketInfo);
+  console.log(marketPrices);
 
   // TODO: Replace with un launched market data
   const { marketCap, spotVolume24H } = {

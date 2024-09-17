@@ -57,11 +57,11 @@ export const useCurrentMarketId = () => {
   }, [hasMarketIds, marketId]);
 
   const isViewingUnlaunchedMarket = useMemo(() => {
-    if (launchableMarkets.data == null) return false;
+    if (launchableMarkets.data == null || !hasMarketIds) return false;
     return launchableMarkets.data.some((market) => {
       return market.id === marketId;
     });
-  }, [marketId, launchableMarkets.data]);
+  }, [hasMarketIds, marketId, launchableMarkets.data]);
 
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId

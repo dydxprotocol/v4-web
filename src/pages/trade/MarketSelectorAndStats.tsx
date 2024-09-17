@@ -32,7 +32,11 @@ export const MarketSelectorAndStats = ({
 
       <VerticalSeparator />
 
-      {launchableMarketId ? <UnlaunchedMarketStatsDetails /> : <MarketStatsDetails />}
+      {launchableMarketId ? (
+        <UnlaunchedMarketStatsDetails launchableMarketId={launchableMarketId} />
+      ) : (
+        <MarketStatsDetails />
+      )}
     </$Container>
   );
 };

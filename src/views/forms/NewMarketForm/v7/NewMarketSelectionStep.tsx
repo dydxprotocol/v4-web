@@ -118,9 +118,7 @@ export const NewMarketSelectionStep = ({
                   launchableMarkets.data?.map((launchableMarket) => ({
                     value: launchableMarket.id,
                     label: getDisplayableTickerFromMarket(launchableMarket.id),
-                    tag: getDisplayableAssetFromBaseAsset(
-                      launchableMarket.ticker.currency_pair.Base
-                    ),
+                    tag: getDisplayableAssetFromBaseAsset(launchableMarket.asset),
                     onSelect: () => {
                       setTickerToAdd(launchableMarket.id);
                     },
