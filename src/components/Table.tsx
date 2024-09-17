@@ -682,7 +682,7 @@ const $TableWrapper = styled.div<{
   --tableStickyRow-textColor: var(--color-text-0, inherit);
   --tableStickyRow-backgroundColor: inherit;
   --table-header-height: 2rem;
-  --table-footer-height: 2.75rem;
+  --table-footer-height: 0;
 
   --tableRow-hover-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: ;
