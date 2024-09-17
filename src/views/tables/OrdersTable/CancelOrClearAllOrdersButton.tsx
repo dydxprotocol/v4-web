@@ -33,7 +33,6 @@ export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
     }
   }, [dispatch, hasCancelableOrders, marketId]);
 
-  // TODO(@aforaleka): add cancel all confirmation dialog
   return (
     <$ActionTextButton
       action={ButtonAction.Primary}
