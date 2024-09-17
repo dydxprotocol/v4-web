@@ -12,6 +12,8 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
+import { getDisplayableTickerFromMarket } from '../assetUtils';
+
 const MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES = 10;
 
 const getOhlcValues = ({
@@ -117,7 +119,7 @@ const mapTradingViewChartBar = ({
 export const getSymbol = (marketId: string): TradingViewSymbol => ({
   description: marketId,
   exchange: 'dYdX',
-  full_name: marketId,
+  full_name: getDisplayableTickerFromMarket(marketId),
   symbol: marketId,
   type: 'crypto',
 });
