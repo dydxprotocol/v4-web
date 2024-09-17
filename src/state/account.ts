@@ -251,6 +251,12 @@ export const accountSlice = createSlice({
         .filter((order) => isOrderStatusCanceled(order.status))
         .map((order) => order.id);
 
+      // ignore locally canceled orders since it's intentional and already handled
+      // by local cancel tracking and notification
+      const isOrderCanceledByBackend = (orderId: string) =>
+        canceledOrderIdsInPayload.includes(orderId) &&
+        !state.localCancelOrders.map((order) => order.orderId).includes(orderId);
+
       const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
         const newCanceledOrderIds = _.intersection(batch.orderIds, canceledOrderIdsInPayload);
         return _.uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
@@ -259,7 +265,9 @@ export const accountSlice = createSlice({
       const cancelUpdates = canceledOrderIdsInPayload.length
         ? {
             localPlaceOrders: state.localPlaceOrders.map((order) =>
-              order.orderId && canceledOrderIdsInPayload.includes(order.orderId)
+              order.orderId &&
+              canceledOrderIdsInPayload.includes(order.orderId) &&
+              isOrderCanceledByBackend(order.orderId)
                 ? {
                     ...order,
                     submissionStatus: PlaceOrderStatuses.Canceled,
