@@ -397,6 +397,11 @@ export const getLocalPlaceOrders = (state: RootState) => state.account.localPlac
 export const getLocalCancelOrders = (state: RootState) => state.account.localCancelOrders;
 
 /**
+ * @returns a list of locally batch canceled orders for the current FE session
+ */
+export const getLocalCancelAlls = (state: RootState) => state.account.localCancelAlls;
+
+/**
  * @param orderId
  * @returns order details with the given orderId
  */
