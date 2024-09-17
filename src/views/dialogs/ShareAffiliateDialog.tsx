@@ -1,6 +1,5 @@
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -8,6 +7,7 @@ import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
 
+import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -19,8 +19,6 @@ import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
 
 import { triggerTwitterIntent } from '@/lib/twitter';
-
-const DUMMY_AFFILIATE_CODE = 'dummy_affiliate_code';
 
 const copyBlobToClipboard = async (blob: Blob | null) => {
   if (!blob) {
@@ -34,8 +32,9 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
+  const { data } = useAffiliatesInfo();
 
-  const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
+  const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
     onSuccess: copyBlobToClipboard,
   });
@@ -57,7 +56,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     },
   });
 
-  const affiliatesUrl = `${window.location.host}/r/${DUMMY_AFFILIATE_CODE}`;
+  const affiliatesUrl = `${window.location.host}?ref=${data?.referralCode}`;
 
   return (
     <Dialog
@@ -68,6 +67,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
         params: {
           AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT,
+          VIP_AMOUNT_USD: AFFILIATES_EARN_PER_MONTH,
           AMOUNT_PER_MONTH: AFFILIATES_EARN_PER_MONTH,
           LEARN_MORE_LINK: (
             <Link href={affiliateProgram} isInline>
@@ -81,13 +81,33 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
           <div>
             <div tw="text-small text-color-text-0">
-              {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
+              {data?.isVolumeEligible
+                ? stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })
+                : stringGetter({
+                    key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
+                    params: {
+                      // TODO: make this configurable or get from API
+                      AMOUNT_USD: '10K',
+                    },
+                  })}
             </div>
-            <div>{affiliatesUrl}</div>
+            <div>
+              {data?.isVolumeEligible
+                ? affiliatesUrl
+                : stringGetter({
+                    key: STRING_KEYS.YOUVE_TRADED,
+                    params: {
+                      // TODO: get the actual amount from the API
+                      AMOUNT_USD: '5K',
+                    },
+                  })}
+            </div>
           </div>
-          <CopyButton action={ButtonAction.Primary} size={ButtonSize.Small} value={affiliatesUrl}>
-            {stringGetter({ key: STRING_KEYS.COPY_LINK })}
-          </CopyButton>
+          {data?.isVolumeEligible && (
+            <CopyButton action={ButtonAction.Primary} size={ButtonSize.Small} value={affiliatesUrl}>
+              {stringGetter({ key: STRING_KEYS.COPY_LINK })}
+            </CopyButton>
+          )}
         </div>
         <div
           ref={(domNode) => {
@@ -123,37 +143,37 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         </div>
 
         <div tw="flex gap-1">
-          <$Action
-            action={ButtonAction.Secondary}
-            slotLeft={<Icon iconName={IconName.Copy} />}
-            onClick={() => {
-              convert();
-            }}
+          <Button
+            action={data?.isVolumeEligible ? ButtonAction.Base : ButtonAction.Primary}
+            slotLeft={<Icon iconName={IconName.Rocket} />}
             state={{
               isLoading: isCopying,
             }}
+            tw="flex-1"
+            href={affiliateProgram}
           >
-            {stringGetter({ key: STRING_KEYS.COPY })}
-          </$Action>
-          <$Action
-            action={ButtonAction.Primary}
-            slotLeft={<Icon iconName={IconName.SocialX} />}
-            onClick={() => {
-              convertShare();
-            }}
-            state={{
-              isLoading: isSharing,
-            }}
-          >
-            {stringGetter({ key: STRING_KEYS.SHARE })}
-          </$Action>
+            {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+          </Button>
+          {data?.isVolumeEligible && (
+            <Button
+              action={ButtonAction.Base}
+              slotLeft={<Icon iconName={IconName.SocialX} />}
+              onClick={() => {
+                convertShare();
+              }}
+              state={{
+                isLoading: isSharing,
+              }}
+              tw="flex-1 flex-grow-0 px-2"
+            >
+              {stringGetter({ key: STRING_KEYS.SHARE })}
+            </Button>
+          )}
         </div>
       </div>
     </Dialog>
   );
 };
-
-const $Action = tw(Button)`flex-1`;
 
 const $QrCode = styled(QrCode)`
   width: 7rem;

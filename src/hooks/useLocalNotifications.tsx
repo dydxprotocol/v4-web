@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import type { TransferNotifcation } from '@/constants/notifications';
-import { StatSigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
@@ -15,11 +14,10 @@ import {
   fetchTransferStatus,
   trackSkipTx,
   trackSkipTxWithTenacity,
-} from '@/lib/squid';
+} from '@/lib/skip';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
-import { useStatsigGateValue } from './useStatsig';
 
 const LocalNotificationsContext = createContext<
   ReturnType<typeof useLocalNotificationsContext> | undefined
@@ -38,7 +36,6 @@ const ERROR_COUNT_THRESHOLD = 3;
 
 const useLocalNotificationsContext = () => {
   const { skip } = useEndpointsConfig();
-  const useSkip = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
@@ -142,14 +139,11 @@ const useLocalNotificationsContext = () => {
             .map(async (transferNotification) => {
               const {
                 txHash,
-                toChainId,
                 fromChainId,
                 triggeredAt,
-                isCctp,
                 errorCount,
                 status: currentStatus,
                 isExchange,
-                requestId,
                 tracked,
               } = transferNotification;
 
@@ -171,7 +165,7 @@ const useLocalNotificationsContext = () => {
                     chainId: fromChainId,
                     baseUrl: skip,
                   };
-                  if (!tracked && useSkip) {
+                  if (!tracked) {
                     const { tx_hash: trackedTxHash } = await trackSkipTx(skipParams);
                     // if no tx hash was returned, transfer has not yet been tracked
                     if (!trackedTxHash) return transferNotification;
@@ -179,12 +173,8 @@ const useLocalNotificationsContext = () => {
                   }
                   const status = await fetchTransferStatus({
                     transactionId: txHash,
-                    toChainId,
                     fromChainId,
-                    isCctp,
-                    requestId,
                     baseUrl: skip,
-                    useSkip,
                   });
                   if (status) {
                     transferNotification.status = status;

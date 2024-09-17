@@ -1,15 +1,33 @@
-import { Asset, Nullable, PerpetualMarket } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 export type MarketData = {
-  asset: Asset;
-  tickSizeDecimals: Nullable<number>;
-  oneDaySparkline?: number[];
-  isNew?: boolean;
+  // Unique Market id (e.g. 'ETH-USD' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD')
+  id: string;
+
+  // Base asset id (e.g. 'ETH' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45')
+  assetId: string;
+
+  // Displayable Market id (e.g. 'ETH-USD' or 'BUFFI-USD')
+  displayId: Nullable<string>;
+
   clobPairId: number;
-} & PerpetualMarket &
-  PerpetualMarket['perpetual'] &
-  PerpetualMarket['configs'];
+  effectiveInitialMarginFraction: Nullable<number>;
+  initialMarginFraction: Nullable<number>;
+  isNew?: boolean;
+  line?: Nullable<number[]>;
+  name?: Nullable<string>;
+  nextFundingRate?: Nullable<number>;
+  openInterest?: Nullable<number>;
+  openInterestUSDC?: Nullable<number>;
+  oraclePrice?: Nullable<number>;
+  priceChange24H?: Nullable<number>;
+  priceChange24HPercent?: Nullable<number>;
+  tickSizeDecimals?: Nullable<number>;
+  trades24H?: Nullable<number>;
+  volume24H?: Nullable<number>;
+  tags?: Nullable<string[]>;
+};
 
 export enum MarketSorting {
   GAINERS = 'gainers',

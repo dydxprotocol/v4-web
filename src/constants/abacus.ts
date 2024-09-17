@@ -113,6 +113,9 @@ export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationErro
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
+export const ErrorFormat = Abacus.exchange.dydx.abacus.output.input.ErrorFormat;
+const errorFormats = [...ErrorFormat.values()] as const;
+export type ErrorFormatType = (typeof errorFormats)[number];
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
@@ -216,6 +219,7 @@ export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
 export type HumanReadableSubaccountTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
+export const PlaceOrderMarketInfo = Abacus.exchange.dydx.abacus.state.manager.PlaceOrderMarketInfo;
 
 export type OrderbookGroupings = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
 export const OrderbookGrouping = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;

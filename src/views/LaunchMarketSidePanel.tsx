@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 
@@ -31,8 +32,16 @@ export const LaunchMarketSidePanel = ({
       body: stringGetter({
         key: STRING_KEYS.MARKET_LAUNCH_DETAILS_2,
         params: {
-          DEPOSIT_AMOUNT: `${10_000} USDC`,
-          APR_PERCENTAGE: <Output type={OutputType.Percent} value={0.3456} />,
+          DEPOSIT_AMOUNT: (
+            <Output
+              tw="inline-block"
+              type={OutputType.Asset}
+              value={10_000}
+              slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
+              fractionDigits={0}
+            />
+          ),
+          APR_PERCENTAGE: <Output tw="inline-block" type={OutputType.Percent} value={0.3456} />,
           PAST_DAYS: 30,
         },
       }),

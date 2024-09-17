@@ -63,7 +63,7 @@ export const calculateIsAccountViewOnly = createAppSelector(
  */
 export const calculateHasUncommittedOrders = createAppSelector(
   [getUncommittedOrderClientIds],
-  (uncommittedOrderClientIds: number[]) => uncommittedOrderClientIds.length > 0
+  (uncommittedOrderClientIds: string[]) => uncommittedOrderClientIds.length > 0
 );
 
 /**

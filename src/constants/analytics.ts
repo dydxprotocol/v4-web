@@ -1,7 +1,7 @@
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
@@ -60,7 +60,7 @@ export const AnalyticsUserProperties = unionize(
     Geo: ofType<string | null>(),
 
     // StatSigFlags
-    StatsigFlags: ofType<{ [key in StatSigFlags]?: boolean }>(),
+    StatsigFlags: ofType<{ [key in StatsigFlags]?: boolean }>(),
 
     // Network
     Network: ofType<DydxNetwork>(),
@@ -257,6 +257,16 @@ export const AnalyticsEvents = unionize(
       validatorUrl: string;
     }>(),
 
+    // TradingView actions
+    TradingViewOrderModificationSubmitted: ofType<
+      HumanReadablePlaceOrderPayload & {
+        previousOrderClientId: string;
+        previousOrderPrice: string;
+      }
+    >,
+    TradingViewOrderModificationSuccess: ofType<{
+      clientId: string;
+    }>,
     // Notification
     NotificationAction: ofType<{
       type: string;
@@ -306,7 +316,9 @@ export const AnalyticsEvents = unionize(
       errorMessage?: string;
       amount: string;
       chainId?: string;
-      assetId?: string;
+      assetaddress?: string;
+      assetSymbol?: string;
+      assetName?: string;
     }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
