@@ -65,10 +65,12 @@ export const useMetadataService = () => {
           };
         }
       });
+
       return {
         data,
         isLoading: results.some((result) => result.isLoading),
         isError: results.some((result) => result.isError),
+        isSuccess: results.every((result) => result.isSuccess),
       };
     },
   });
@@ -109,7 +111,7 @@ export const useLaunchableMarkets = () => {
   }, [marketIds, metadataServiceData.data]);
 
   return {
-    isLoading: false,
+    ...metadataServiceData,
     data: filteredPotentialMarkets,
   };
 };

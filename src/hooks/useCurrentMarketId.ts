@@ -21,6 +21,7 @@ import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
@@ -31,8 +32,10 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const launchableMarkets = useLaunchableMarkets();
+  const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
+  const hasLoadedMarkets =
+    hasMarketIds && (launchableMarkets.isSuccess || launchableMarkets.isError);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -57,15 +60,15 @@ export const useCurrentMarketId = () => {
   }, [hasMarketIds, marketId]);
 
   const isViewingUnlaunchedMarket = useMemo(() => {
-    if (launchableMarkets.data == null || !hasMarketIds) return false;
+    if (!hasLoadedMarkets || !testFlags.pml) return false;
     return launchableMarkets.data.some((market) => {
       return market.id === marketId;
     });
-  }, [hasMarketIds, marketId, launchableMarkets.data]);
+  }, [hasLoadedMarkets, marketId, launchableMarkets.data]);
 
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
-    if (!hasMarketIds || !marketId) {
+    if (!hasLoadedMarkets || !marketId) {
       setLastViewedMarket(validId);
       dispatch(setCurrentMarketId(validId));
       dispatch(closeDialogInTradeBox());
@@ -104,7 +107,7 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
       }
     }
-  }, [hasMarketIds, isViewingUnlaunchedMarket, marketId, navigate]);
+  }, [hasLoadedMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
@@ -119,5 +122,6 @@ export const useCurrentMarketId = () => {
 
   return {
     isViewingUnlaunchedMarket,
+    hasLoadedMarkets,
   };
 };

@@ -13,12 +13,15 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { AccountInfo } from '@/views/AccountInfo';
 import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
+
+import { testFlags } from '@/lib/testFlags';
 
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
@@ -33,7 +36,7 @@ import { VerticalPanel } from './VerticalPanel';
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
 
-  const { isViewingUnlaunchedMarket } = useCurrentMarketId();
+  const { hasLoadedMarkets, isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
@@ -43,7 +46,11 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  if (isViewingUnlaunchedMarket) {
+  if (!hasLoadedMarkets && testFlags.pml) {
+    return <LoadingSpace id="trade-page" description="Loading Markets..." />;
+  }
+
+  if (isViewingUnlaunchedMarket && testFlags.pml) {
     return <LaunchableMarket />;
   }
 

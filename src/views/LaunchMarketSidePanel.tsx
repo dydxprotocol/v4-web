@@ -4,6 +4,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -24,7 +25,8 @@ export const LaunchMarketSidePanel = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const baseAsset = launchableMarketId ? getDisplayableAssetFromBaseAsset(launchableMarketId) : '';
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
 
   const items = [
     {
