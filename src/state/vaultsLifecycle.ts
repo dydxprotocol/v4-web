@@ -14,10 +14,11 @@ import {
 
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
-import hookifyHooks from '@/lib/hookify/vanillaHooks';
+import { useEffectHf, useMemoHf, useRefHf, useStateHf } from '@/lib/hookify/vanillaHooks';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { createHookedSelector, useQueryHf } from './appHookedSelectors';
+import { appQueryClient } from './appQueryClient';
 import { createAppSelector } from './appTypes';
 import {
   setVaultAccount,
@@ -32,10 +33,6 @@ function delay(ms: number): Promise<void> {
     setTimeout(resolve, ms);
   });
 }
-
-// type StripFunctions<T> = {
-//   [K in keyof T as T[K] extends Function ? never : K]: StripFunctions<T[K]>;
-// };
 
 async function placeholderFetchMegavaultHistory() {
   await delay(Math.random() * 2000);
@@ -182,14 +179,14 @@ const debouncedMarketsData = createHookedSelector(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (_marketsToIgnore) => {
     const markets = abacusStateManager.stateManager.state?.marketsSummary?.markets;
-    const latestMarkets = hookifyHooks.useRef(markets);
+    const latestMarkets = useRefHf(markets);
 
     // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
-    const [marketsToReturn, setMarketsToReturn] = hookifyHooks.useState<{
+    const [marketsToReturn, setMarketsToReturn] = useStateHf<{
       data: kollections.Map<string, PerpetualMarket> | undefined;
     }>({ data: undefined });
 
-    const throttledSync = hookifyHooks.useMemo(
+    const throttledSync = useMemoHf(
       () =>
         throttle(() => {
           setMarketsToReturn({
@@ -248,7 +245,7 @@ export const loadedVaultPositions = createHookedSelector(
       ...vaultQueryOptions,
     });
 
-    const calculatedPositions = hookifyHooks.useMemo(() => {
+    const calculatedPositions = useMemoHf(() => {
       if (
         vaultPositions?.data == null ||
         subvaultHistories?.data == null ||
@@ -270,9 +267,15 @@ export const loadedVaultPositions = createHookedSelector(
   dispatch(setVaultPositions(value));
 });
 
+const vaultAccountQueryKey = ['vaultAccount'];
+
+export function forceRefreshVaultAccount() {
+  appQueryClient.invalidateQueries({ queryKey: vaultAccountQueryKey, exact: true });
+}
+
 export const loadedVaultAccount = createHookedSelector([], () => {
   const { data: accountVault } = useQueryHf({
-    queryKey: ['vaultAccount'],
+    queryKey: vaultAccountQueryKey,
     queryFn: async () => {
       const [acc, transfers] = await Promise.all([
         placeholderFetchVaultAccount(),
@@ -297,9 +300,9 @@ export const loadedVaultAccount = createHookedSelector([], () => {
 });
 
 function useDebounceHf<T>(value: T, delayMs?: number): T {
-  const [debouncedValue, setDebouncedValue] = hookifyHooks.useState<T>(value);
+  const [debouncedValue, setDebouncedValue] = useStateHf<T>(value);
 
-  hookifyHooks.useEffect(() => {
+  useEffectHf(() => {
     const timer = setTimeout(() => setDebouncedValue(value), delayMs ?? 500);
 
     return () => {

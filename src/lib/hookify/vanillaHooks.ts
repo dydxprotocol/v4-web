@@ -337,3 +337,13 @@ const hookifyHooks = (function hooks() {
 })();
 
 export default hookifyHooks;
+export const useCallbackHf = hookifyHooks.useCallback;
+export const useContextHf = hookifyHooks.useContext;
+export const useEffectHf = hookifyHooks.useEffect;
+export const useLayoutEffectHf = hookifyHooks.useLayoutEffect;
+export const useMemoHf = hookifyHooks.useMemo;
+export const useReducerHf = hookifyHooks.useReducer;
+export const useRefHf = hookifyHooks.useRef;
+export const useStateHf = hookifyHooks.useState;
+export const useSyncExternalStoreHf = hookifyHooks.useSyncExternalStore;
+export const createContextHf = hookifyHooks.createContext;

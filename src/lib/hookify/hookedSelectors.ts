@@ -5,7 +5,7 @@ import { QueryClient, QueryObserver, useQuery } from '@tanstack/react-query';
 import { isFunction } from 'lodash';
 
 import { getUseBaseQuery } from './useBaseQuery';
-import hookifyHooks from './vanillaHooks';
+import hookifyHooks, { useSyncExternalStoreHf } from './vanillaHooks';
 
 type HookSub<Return> = (val: Return) => void;
 
@@ -114,7 +114,7 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
   const useQueryHf = getUseBaseQuery(reactQueryClient, QueryObserver) as typeof useQuery;
 
   const useAppSelectorHf = <T>(selector: (state: RootStateType) => T) => {
-    return hookifyHooks.useSyncExternalStore(store.subscribe, () => selector(store.getState()));
+    return useSyncExternalStoreHf(store.subscribe, () => selector(store.getState()));
   };
 
   const useDispatchHf = () => store.dispatch as DispatchType;
@@ -123,7 +123,7 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
     selector: HookedSelector<RootStateType, A, ReturnType>
   ) => {
     selector.start();
-    return hookifyHooks.useSyncExternalStore(selector.subscribe, selector.getValue);
+    return useSyncExternalStoreHf(selector.subscribe, selector.getValue);
   };
 
   const useHookedSelector = <ReturnType>(

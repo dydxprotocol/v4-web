@@ -7,7 +7,7 @@ import {
   notifyManager,
 } from '@tanstack/react-query';
 
-import hookifyHooks from './vanillaHooks';
+import { useCallbackHf, useEffectHf, useStateHf, useSyncExternalStoreHf } from './vanillaHooks';
 
 // This file is very similar to the one from the react-query codebase but changed to always use hookify hooks rather than react
 // sadly, this will probably need to be updated when we bump react-query major versions
@@ -21,15 +21,15 @@ export const getUseBaseQuery =
     // Make sure results are optimistically set in fetching state before subscribing or updating options
     defaultedOptions._optimisticResults = 'optimistic';
 
-    const [observer] = hookifyHooks.useState(
+    const [observer] = useStateHf(
       () =>
         new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions)
     );
 
     const result = observer.getOptimisticResult(defaultedOptions);
 
-    hookifyHooks.useSyncExternalStore(
-      hookifyHooks.useCallback(
+    useSyncExternalStoreHf(
+      useCallbackHf(
         (onStoreChange) => {
           const unsubscribe = observer.subscribe(notifyManager.batchCalls(onStoreChange));
 
@@ -44,7 +44,7 @@ export const getUseBaseQuery =
       () => observer.getCurrentResult()
     );
 
-    hookifyHooks.useEffect(() => {
+    useEffectHf(() => {
       // Do not notify on updates because of changes in the options because
       // these changes should already be reflected in the optimistic result.
       observer.setOptions(defaultedOptions, { listeners: false });
