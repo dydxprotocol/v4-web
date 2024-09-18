@@ -409,3 +409,6 @@ export enum AbacusInputTypes {
   Trade = 'trade',
   TriggerOrders = 'triggerOrders',
 }
+
+export const AbacusWalletConnectionType =
+  Abacus.exchange.dydx.abacus.state.model.WalletConnectionType;

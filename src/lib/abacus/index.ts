@@ -282,6 +282,8 @@ class AbacusStateManager {
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.walletConnectionType = AbacusWalletConnectionType.Cosmos;
+      } else if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
+        this.stateManager.walletConnectionType = AbacusWalletConnectionType.Solana;
       } else {
         this.stateManager.walletConnectionType = AbacusWalletConnectionType.Ethereum;
       }
