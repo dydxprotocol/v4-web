@@ -12,42 +12,43 @@ import { TradeTypes } from '@/constants/trade';
 import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
-import { getMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useStringGetter } from '../useStringGetter';
 
 export function useTradingViewLimitOrder(
-  marketId?: string
+  marketId?: string,
+  tickSizeDecimals?: number | null
 ): (unixTime: number, price: number) => ContextMenuItem[] {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const canDraftLimitOrders = true; // useStatsigGateValue(StatsigFlags.ffLimitOrdersFromChart);
-  const { tickSizeDecimals } = orEmptyObj(
-    useAppSelector((s) => (marketId ? getMarketConfig(s, marketId) : null))
-  );
 
   // Every time we call tvChartWidget.onContextMenu, a new callback is _added_ and there is no way to remove previously
-  // added menu options. So, instead of creating a new callback and calling .onContextMenu every time `isUserConnected`
-  // or `tickSizeDecimals` changes, only pass in one stable callback on chart load that refers to updated values through a ref
+  // added menu options. So, instead of creating a new callback and calling .onContextMenu every time these state variable
+  // change, only pass in one stable callback on chart load that refers to updated state values through a ref
   const isUserConnected = useAppSelector(getIsAccountConnected);
   const userConnectedRef = useRef(isUserConnected);
+  const marketIdRef = useRef(marketId);
   const tickSizeDecimalsRef = useRef(tickSizeDecimals);
 
   useEffect(() => {
     userConnectedRef.current = isUserConnected;
+    marketIdRef.current = marketId;
     tickSizeDecimalsRef.current = tickSizeDecimals;
-  }, [isUserConnected, tickSizeDecimals]);
+  }, [isUserConnected, marketId, tickSizeDecimals]);
 
   return useCallback(
     (_: number, price: number) => {
-      if (!canDraftLimitOrders || !userConnectedRef.current || price < 0) return [];
+      if (!canDraftLimitOrders || !userConnectedRef.current || price < 0 || !marketIdRef.current) {
+        return [];
+      }
 
-      const bookPrice =
-        marketId && abacusStateManager.stateManager.state?.marketOrderbook(marketId)?.midPrice;
+      const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
+        marketIdRef.current
+      )?.midPrice;
       if (!bookPrice) return [];
 
       const [side, textKey] =
@@ -58,14 +59,19 @@ export function useTradingViewLimitOrder(
       const formattedPrice = BigNumber(price).toFixed(tickSizeDecimalsRef.current ?? USD_DECIMALS);
 
       const onDraftLimitOrder = () => {
-        track(AnalyticsEvents.TradingViewLimitOrderDrafted({ marketId, price }));
-
         // Allow user to keep their previous size input
         abacusStateManager.clearTradeInputValues({ shouldResetSize: false });
         abacusStateManager.setTradeValue({ field: TradeInputField.type, value: TradeTypes.LIMIT });
         abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side.rawValue });
 
         dispatch(setTradeFormInputs({ limitPriceInput: formattedPrice }));
+
+        track(
+          AnalyticsEvents.TradingViewLimitOrderDrafted({
+            marketId: marketIdRef.current,
+            price: formattedPrice,
+          })
+        );
       };
 
       return [
@@ -76,6 +82,6 @@ export function useTradingViewLimitOrder(
         },
       ];
     },
-    [canDraftLimitOrders, dispatch, marketId, stringGetter]
+    [canDraftLimitOrders, dispatch, stringGetter]
   );
 }

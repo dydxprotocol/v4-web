@@ -269,7 +269,7 @@ export const AnalyticsEvents = unionize(
     }>,
     TradingViewLimitOrderDrafted: ofType<{
       marketId: string;
-      price: number;
+      price: string;
     }>,
     // Notification
     NotificationAction: ofType<{

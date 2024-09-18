@@ -8,7 +8,6 @@ import {
   TradingTerminalWidgetOptions,
   widget as Widget,
 } from 'public/tradingview/';
-import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
@@ -22,10 +21,11 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from '../useDydxClient';
 import { useLocalStorage } from '../useLocalStorage';
@@ -73,7 +73,6 @@ export const useTradingView = ({
   const appColorMode = useAppSelector(getAppColorMode);
 
   const marketId = useAppSelector(getCurrentMarketId);
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
@@ -86,10 +85,15 @@ export const useTradingView = ({
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
 
-  const [initialPriceScale, setInitialPriceScale] = useState<number | null>(null);
-
-  const hasMarkets = marketIds.length > 0;
-  const hasPriceScaleInfo = initialPriceScale !== null || hasMarkets;
+  const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
+    [marketId: string]: number | undefined;
+  }>({});
+  const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
+    useAppSelector(getCurrentMarketConfig)
+  );
+  const tickSizeDecimals = marketId
+    ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
+    : tickSizeDecimalsAbacus;
 
   const initializeToggle = useCallback(
     ({
@@ -122,22 +126,26 @@ export const useTradingView = ({
     // we only need tick size from current market for the price scale settings
     // if markets haven't been loaded via abacus, get the current market info from indexer
     (async () => {
-      if (marketId && !hasPriceScaleInfo) {
+      if (marketId && !tickSizeDecimals) {
         const marketTickSize = await getMarketTickSize(marketId);
-        const priceScale = BigNumber(10).exponentiatedBy(
-          BigNumber(marketTickSize).decimalPlaces() ?? 2
-        );
-        setInitialPriceScale(priceScale.toNumber());
+        setTickSizeDecimalsIndexer((prev) => ({
+          ...prev,
+          [marketId]: BigNumber(marketTickSize).decimalPlaces() ?? undefined,
+        }));
       }
     })();
-  }, [marketId, hasPriceScaleInfo, getMarketTickSize]);
+  }, [marketId, tickSizeDecimals, getMarketTickSize]);
 
-  const tradingViewLimitOrder = useTradingViewLimitOrder(marketId);
+  const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && hasPriceScaleInfo) {
+    if (marketId && tickSizeDecimals) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+
+      const initialPriceScale = BigNumber(10)
+        .exponentiatedBy(tickSizeDecimals ?? 2)
+        .toNumber();
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
@@ -237,7 +245,7 @@ export const useTradingView = ({
     selectedLocale,
     selectedNetwork,
     !!marketId,
-    hasPriceScaleInfo,
+    !!tickSizeDecimals,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
     buySellMarksToggleRef,
