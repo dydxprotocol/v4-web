@@ -57,11 +57,11 @@ export const LaunchableMarketChart = ({
   return (
     <$LaunchableMarketChartContainer className={className}>
       <$ChartContainerHeader tw="flex flex-row items-center justify-between">
-        <div tw="flex flex-row items-center gap-0.5">
+        <div tw="mr-0.5 flex flex-row items-center gap-0.5">
           <img tw="h-2.5 w-2.5" src={logo} alt={name} />
           <h2 tw="flex flex-row items-center gap-[0.5ch] text-extra text-color-text-1">
             <Link href={websiteLink}>
-              <span tw="max-w-[16rem] overflow-y-auto whitespace-nowrap">{name}</span>
+              <span>{name}</span>
               <LinkOutIcon tw="h-1.25 w-1.25" />
             </Link>
           </h2>

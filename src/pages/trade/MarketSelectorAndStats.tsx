@@ -31,7 +31,7 @@ export const MarketSelectorAndStats = ({
   return (
     <$Container className={className}>
       <MarketsDropdown
-        isViewingUnlaunchedMarket={!!launchableMarketId}
+        launchableMarketId={launchableMarketId}
         currentMarketId={displayableId ?? currentMarketId}
         symbol={id}
       />

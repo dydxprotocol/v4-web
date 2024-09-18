@@ -8,7 +8,6 @@ import {
   MetadataServiceInfoResponse,
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
-import { MOCK_INFO } from '@/constants/mockMetadata';
 import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -18,35 +17,12 @@ import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
-export const useLaunchableMarkets = () => {
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
-
-  const filteredPotentialMarkets: { id: string; asset: string }[] = useMemo(() => {
-    const assets = Object.keys(MOCK_INFO).map((asset) => {
-      return {
-        id: `${asset}-USD`,
-        asset,
-      };
-    });
-
-    return assets.filter(({ id }) => {
-      return !marketIds.includes(id);
-    });
-  }, [marketIds]);
-
-  return {
-    isLoading: false,
-    data: filteredPotentialMarkets,
-  };
-};
-
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
     queries: [
       {
         queryKey: ['marketMapInfo'],
         queryFn: async (): Promise<MetadataServiceInfoResponse> => {
-          // return MOCK_INFO;
           return metadataClient.getAssetInfo();
         },
         refetchOnMount: false,
@@ -56,7 +32,6 @@ export const useMetadataService = () => {
       {
         queryKey: ['marketMapPrice'],
         queryFn: async (): Promise<MetadataServicePricesResponse> => {
-          // return MOCK_PRICES;
           return metadataClient.getAssetPrices();
         },
         refetchInterval: timeUnits.minute * 5,
@@ -114,4 +89,27 @@ export const useMetadataServiceAssetFromId = (marketId?: string) => {
   }, [metadataServiceData.data, marketId]);
 
   return launchableAsset;
+};
+
+export const useLaunchableMarkets = () => {
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const metadataServiceData = useMetadataService();
+
+  const filteredPotentialMarkets: { id: string; asset: string }[] = useMemo(() => {
+    const assets = Object.keys(metadataServiceData.data).map((asset) => {
+      return {
+        id: `${asset}-USD`,
+        asset,
+      };
+    });
+
+    return assets.filter(({ id }) => {
+      return !marketIds.includes(id);
+    });
+  }, [marketIds, metadataServiceData.data]);
+
+  return {
+    isLoading: false,
+    data: filteredPotentialMarkets,
+  };
 };
