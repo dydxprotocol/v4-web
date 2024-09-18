@@ -17,7 +17,6 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useLaunchableMarkets = () => {
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
@@ -64,11 +63,11 @@ export const useMetadataService = () => {
       },
     ],
     combine: (results) => {
-      const info = orEmptyObj(results[0].data);
+      const info = results[0].data;
       const prices = results[1].data;
       const data: Record<string, MetadataServiceAsset> = {};
 
-      Object.keys(info).forEach((key) => {
+      Object.keys(info ?? {}).forEach((key) => {
         if (info?.[key] && prices?.[key]) {
           const tickSizeDecimals = getTickSizeDecimalsFromPrice(prices[key].price);
 
