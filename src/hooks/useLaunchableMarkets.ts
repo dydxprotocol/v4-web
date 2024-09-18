@@ -8,7 +8,7 @@ import {
   MetadataServiceInfoResponse,
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
-import { MOCK_INFO, MOCK_PRICES } from '@/constants/mockMetadata';
+import { MOCK_INFO } from '@/constants/mockMetadata';
 import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -46,7 +46,7 @@ export const useMetadataService = () => {
       {
         queryKey: ['marketMapInfo'],
         queryFn: async (): Promise<MetadataServiceInfoResponse> => {
-          return MOCK_INFO;
+          // return MOCK_INFO;
           return metadataClient.getAssetInfo();
         },
         refetchOnMount: false,
@@ -56,7 +56,7 @@ export const useMetadataService = () => {
       {
         queryKey: ['marketMapPrice'],
         queryFn: async (): Promise<MetadataServicePricesResponse> => {
-          return MOCK_PRICES;
+          // return MOCK_PRICES;
           return metadataClient.getAssetPrices();
         },
         refetchInterval: timeUnits.minute * 5,
