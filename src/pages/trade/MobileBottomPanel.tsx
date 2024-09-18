@@ -13,11 +13,7 @@ enum InfoSection {
   Vault = 'Vault',
 }
 
-export const MobileBottomPanel = ({
-  isViewingUnlaunchedMarket,
-}: {
-  isViewingUnlaunchedMarket?: boolean;
-}) => {
+export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const stringGetter = useStringGetter();
 
   return (
@@ -27,8 +23,11 @@ export const MobileBottomPanel = ({
         {
           value: InfoSection.Statistics,
           label: stringGetter({ key: STRING_KEYS.STATISTICS }),
-          content: isViewingUnlaunchedMarket ? (
-            <UnlaunchedMarketStatsDetails showMidMarketPrice={false} />
+          content: launchableMarketId ? (
+            <UnlaunchedMarketStatsDetails
+              launchableMarketId={launchableMarketId}
+              showMidMarketPrice={false}
+            />
           ) : (
             <MarketStatsDetails showMidMarketPrice={false} />
           ),

@@ -44,7 +44,7 @@ const LaunchableMarket = () => {
         </DetachedSection>
 
         <DetachedSection>
-          <MobileBottomPanel isViewingUnlaunchedMarket />
+          <MobileBottomPanel launchableMarketId={marketId} />
         </DetachedSection>
 
         <DetachedSection>
