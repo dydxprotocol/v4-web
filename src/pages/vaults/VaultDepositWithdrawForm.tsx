@@ -55,9 +55,8 @@ type VaultDepositWithdrawFormProps = {
   onSuccess?: () => void;
 };
 
-function ex<T>(fn: () => T): T {
-  return fn();
-}
+// execute
+const ex = <T,>(fn: () => T) => fn();
 
 export const VaultDepositWithdrawForm = ({
   initialType,
