@@ -207,6 +207,7 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
   };
 
   return {
+    // core function for creating an unitialized hooked selector bound to our state and query observer instance
     createHookedSelector,
 
     // from react, get hooked selector value
@@ -214,10 +215,12 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
 
     // hooks for use in hookified selectors:
 
-    // get dispatch
-    useDispatchHf,
     // react useQuery equivalent
     useQueryHf,
+
+    // everything below here should probably never be used. Instead, use dependencies and .dispatchValue()
+    // get dispatch
+    useDispatchHf,
     // use hooked selector value
     useHookedSelectorHf,
     // use root state selector value
