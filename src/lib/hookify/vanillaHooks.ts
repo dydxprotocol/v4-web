@@ -258,7 +258,7 @@ const hookifyHooks = (function hooks() {
         let killed = false;
         const doUnsub = subscribe(() => {
           if (killed) return;
-          const newVal = getSnapshot();
+          const newVal = thisState.getSnapshot();
           if (newVal !== thisState.value) {
             thisState.value = newVal;
             reschedule(thisHookInfo);
