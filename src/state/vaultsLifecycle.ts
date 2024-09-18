@@ -12,6 +12,7 @@ import {
   VaultFormData,
 } from '@/constants/abacus';
 
+import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
 import hookifyHooks from '@/lib/hookify/vanillaHooks';
 import { MustBigNumber } from '@/lib/numbers';
@@ -176,9 +177,11 @@ export const loadedVaultDetails = createHookedSelector([], () => {
 const MAX_UPDATE_SPEED_MS = 1000 * 60; // one per minute
 
 const debouncedMarketsData = createHookedSelector(
-  // second argument is just to cause this to rerender when the first actually changes since it is reference equal forever
-  [(state) => state.perpetuals.rawMarkets, (state) => state.perpetuals.markets],
-  (markets) => {
+  // argument is just to cause this to rerender when the markets change, we don't use that value
+  [(state) => state.perpetuals.markets],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (_marketsToIgnore) => {
+    const markets = abacusStateManager.stateManager.state?.marketsSummary?.markets;
     const latestMarkets = hookifyHooks.useRef(markets);
 
     // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
@@ -196,10 +199,8 @@ const debouncedMarketsData = createHookedSelector(
       []
     );
 
-    if (markets !== latestMarkets.current) {
-      latestMarkets.current = markets;
-      throttledSync();
-    }
+    latestMarkets.current = markets;
+    throttledSync();
 
     // if markets is null and we have non-null, force set it
     if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {

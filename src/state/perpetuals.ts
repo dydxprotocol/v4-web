@@ -1,4 +1,3 @@
-import { kollections } from '@dydxprotocol/v4-abacus';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import merge from 'lodash/merge';
 
@@ -27,7 +26,6 @@ export interface PerpetualsState {
   candles: Record<string, CandleDataByMarket>;
   liveTrades?: Record<string, MarketTrade[]>;
   markets?: Record<string, PerpetualMarket>;
-  rawMarkets?: Nullable<kollections.Map<string, PerpetualMarket>>;
   orderbooks?: Record<string, MarketOrderbook>;
   orderbooksMap?: Record<
     string,
@@ -105,7 +103,6 @@ export const perpetualsSlice = createSlice({
       action: PayloadAction<{
         markets: Record<string, PerpetualMarket>;
         update?: boolean;
-        raw: Nullable<kollections.Map<string, PerpetualMarket>>;
       }>
     ) => {
       return {
@@ -113,7 +110,6 @@ export const perpetualsSlice = createSlice({
         markets: action.payload.update
           ? merge({}, state.markets, action.payload.markets)
           : action.payload.markets,
-        rawMarkets: action.payload.raw,
       };
     },
     setOrderbook: (

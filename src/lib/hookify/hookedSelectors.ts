@@ -8,14 +8,25 @@ import { getUseBaseQuery } from './useBaseQuery';
 import hookifyHooks from './vanillaHooks';
 
 type HookSub<Return> = (val: Return) => void;
+
+// wraps a function in vanilla hooks and returns an interface that lets users
+// set the arguments with call() and subscribe to all return values with subscribe()
 type Hookified<Return, Args extends any[]> = {
+  // callback whenever the return value changes for any reason
   subscribe: (handle: HookSub<Return>) => () => void;
+
+  // will return undefined if never called or destroyed
   getLatestValue: () => Return | undefined;
+
+  // sets the arguments and returns the first return value after running with these args
+  // further triggered changes available via subscribe()
   call: (...args: Args) => Return;
+
+  // once torn down, cannot be restarted
   tearDown: () => void;
 };
 
-export function hookify<Return, Args extends any[]>(
+function hookify<Return, Args extends any[]>(
   hookFn: (...args: Args) => Return
 ): Hookified<Return, Args> {
   let destroyed = false;
@@ -63,30 +74,30 @@ export function hookify<Return, Args extends any[]>(
   };
 }
 
-// for use in react
-export const useHookified = <ReturnType>(hookified: Hookified<ReturnType, any>) => {
-  return useSyncExternalStore(hookified.subscribe, hookified.getLatestValue);
-};
-// for use in other hookfied functions
-export const useHookifiedHf = <ReturnType>(hookified: Hookified<ReturnType, any>) => {
-  return hookifyHooks.useSyncExternalStore(hookified.subscribe, hookified.getLatestValue);
-};
-
+// a hooked selector is a function that uses hooks and has a set of dependencies which
+// are either other hookified selectors or selectors on the root store/state
 type HookedSelector<RootStateType, A extends Action, ReturnType> = {
   // must call either subscribe or start to begin the selector
-  subscribe: (handle: (val: ReturnType) => void) => () => void;
   start: () => void;
-  // turn it off and tear down any subscriptions/effects. this operation is permanent, start won't restart.
+  subscribe: (handle: (val: ReturnType) => void) => () => void;
+
+  // turn it off and tear down any subscriptions/effects. This operation is permanent, start won't restart.
   tearDown: () => void;
 
+  // returns the latest value, does not trigger refresh or rerun the function
   getValue: () => ReturnType;
+
+  // shortcut for dispatching the return value of the selector back to the state
   dispatchValue: (
     handle: (dispatch: Dispatch<A>, value: ReturnType) => void
   ) => HookedSelector<RootStateType, A, ReturnType>;
+
+  // internal state/type preservation
   __hooked_selector__: true;
   __state_type__?: RootStateType;
 };
 
+// initialize a set of hooked selector helper functions with a given store and react query client
 export function hookedSelectors<RootStateType, DispatchType, A extends Action = UnknownAction>(
   store: EnhancedStore<RootStateType, A>,
   reactQueryClient: QueryClient
@@ -197,11 +208,19 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
 
   return {
     createHookedSelector,
+
+    // from react, get hooked selector value
     useHookedSelector,
 
+    // hooks for use in hookified selectors:
+
+    // get dispatch
     useDispatchHf,
+    // react useQuery equivalent
     useQueryHf,
+    // use hooked selector value
     useHookedSelectorHf,
+    // use root state selector value
     useAppSelectorHf,
   };
 }

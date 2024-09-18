@@ -9,6 +9,8 @@ import {
 
 import hookifyHooks from './vanillaHooks';
 
+// This file is forked from the react-query codebase and only changed to always use hookify hooks rather than react
+// sadly, this will probably need to be updated (by re-forking getUseBaseQuery or equivalent) when we bump react-query major versions
 export const getUseBaseQuery =
   (client: QueryClient, Observer: typeof QueryObserver) =>
   <TQueryFnData, TError, TData, TQueryData, TQueryKey extends QueryKey>(
