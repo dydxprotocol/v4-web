@@ -412,6 +412,7 @@ export const accountSlice = createSlice({
       action: PayloadAction<{ marketId?: string; orderIds: string[] }>
     ) => {
       const { marketId, orderIds } = action.payload;
+      // when marketId is undefined, it means cancel all orders globally
       const cancelAllKey = marketId ?? CANCEL_ALL_ORDERS_KEY;
 
       state.localCancelAlls[cancelAllKey] = {

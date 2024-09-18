@@ -15,7 +15,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { CancelAllOrdersInMarketForm } from '../forms/CancelAllOrdersInMarketForm';
 
-export const CancelAllOrdersDialog = ({
+export const CancelPendingOrdersDialog = ({
   setIsOpen,
   marketId,
 }: DialogProps<CancelPendingOrdersDialogProps>) => {

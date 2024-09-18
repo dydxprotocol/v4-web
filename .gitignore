@@ -37,4 +37,6 @@ public/datafeed
 !public/tradingview/custom-styles.css 
 !public/tradingview/colors.css
 
+# Local Library Development
 local-abacus-hash
+local-client-js-hash

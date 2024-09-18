@@ -4,16 +4,17 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { Button } from '@/components/Button';
 
 import { clearAllOrders } from '@/state/account';
 import { calculateHasCancelableOrders } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
 
 type ElementProps = {
   marketId?: string;
@@ -22,18 +23,16 @@ type ElementProps = {
 export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { cancelAllOrders } = useSubaccount();
   const hasCancelableOrders = useParameterizedSelector(calculateHasCancelableOrders, marketId);
 
   const onClearOrCancelAll = useCallback(() => {
     if (hasCancelableOrders) {
-      cancelAllOrders(marketId);
+      dispatch(openDialog(DialogTypes.CancelAllOrdersConfirmation({ marketId })));
     } else {
       dispatch(clearAllOrders(marketId));
     }
-  }, [cancelAllOrders, dispatch, hasCancelableOrders, marketId]);
+  }, [dispatch, hasCancelableOrders, marketId]);
 
-  // TODO(@aforaleka): add cancel all confirmation dialog
   return (
     <$ActionTextButton
       action={ButtonAction.Primary}

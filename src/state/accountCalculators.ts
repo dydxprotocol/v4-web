@@ -12,6 +12,8 @@ import { createAppSelector } from '@/state/appTypes';
 
 import { isOrderStatusOpen } from '@/lib/orders';
 
+import { getCurrentMarketId } from './perpetualsSelectors';
+
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
   (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
@@ -135,3 +137,11 @@ export const calculateHasCancelableOrders = () =>
       );
     }
   );
+
+export const calculateHasCancelableOrdersInOtherMarkets = createAppSelector(
+  [getSubaccountOpenOrders, getCurrentMarketId],
+  (openOrders, marketId) =>
+    marketId !== undefined &&
+    (openOrders?.some((order) => order.marketId !== marketId && isOrderStatusOpen(order.status)) ??
+      false)
+);
