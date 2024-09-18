@@ -18,7 +18,7 @@ import {
 } from '@dydxprotocol/v4-client-js';
 import {
   PerpetualMarketType
-} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { readFileSync } from 'fs';
 import Long from 'long';
 import { Proposal, retry, sleep, voteOnProposals } from './help';
