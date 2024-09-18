@@ -56,7 +56,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@datadog/browser-logs": "^5.23.3",
     "@dydxprotocol/v4-abacus": "1.11.6",
-    "@dydxprotocol/v4-client-js": "file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.3.3.tgz",
+    "@dydxprotocol/v4-client-js": "1.3.2",
     "@dydxprotocol/v4-localization": "^1.1.199",
     "@dydxprotocol/v4-proto": "^6.0.1",
     "@emotion/is-prop-valid": "^1.3.0",
