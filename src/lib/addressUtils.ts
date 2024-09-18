@@ -1,4 +1,5 @@
 import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
+import { PublicKey } from '@solana/web3.js';
 import { isAddress } from 'viem';
 
 /**
@@ -41,7 +42,8 @@ export function validateCosmosAddress(address: string, prefix: string) {
 
 type MultiChainAddress =
   | { address?: string | null; network: 'cosmos'; prefix: string }
-  | { address?: string | null; network: 'evm' };
+  | { address?: string | null; network: 'evm' }
+  | { address?: string | null; network: 'solana' };
 
 // TODO: Add unit test once `isAddress` works with vitest
 export function isValidAddress(input: MultiChainAddress): boolean {
@@ -49,6 +51,17 @@ export function isValidAddress(input: MultiChainAddress): boolean {
 
   if (input.network === 'evm') {
     return isAddress(input.address, { strict: true }); // enable checksum matching
+  }
+
+  if (input.network === 'solana') {
+    try {
+      // Generating a publickey will demonstrate if an address is valid
+      // eslint-disable-next-line no-new
+      new PublicKey(input.address);
+      return true;
+    } catch (_e) {
+      return false;
+    }
   }
 
   return validateCosmosAddress(input.address, input.prefix);
