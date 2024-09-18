@@ -57,6 +57,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { getTradeInputAlert } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
@@ -99,14 +100,15 @@ export const ClosePositionForm = ({
 
   const market = useAppSelector(getCurrentMarketId);
   const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+    useAppSelector(getCurrentMarketConfig, shallowEqual)
+  );
 
   const {
     size: sizeData,
     type,
     summary,
-  } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
+  } = orEmptyObj(useAppSelector(getInputClosePositionData, shallowEqual));
 
   const {
     amountInput,

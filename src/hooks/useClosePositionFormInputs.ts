@@ -16,6 +16,7 @@ import {
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useClosePositionFormInputs = () => {
   const closePositionFormInputValues = useAppSelector(getClosePositionFormInputs, shallowEqual);
@@ -26,13 +27,15 @@ export const useClosePositionFormInputs = () => {
     size: sizeData,
     price,
     type,
-  } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
+  } = orEmptyObj(useAppSelector(getInputClosePositionData, shallowEqual));
+
   const useLimit = type === AbacusOrderType.Limit;
   const { size } = sizeData ?? {};
   const { limitPrice } = price ?? {};
 
-  const { stepSizeDecimals, tickSizeDecimals } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+    useAppSelector(getCurrentMarketConfig, shallowEqual)
+  );
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
 
