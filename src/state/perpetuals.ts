@@ -100,18 +100,13 @@ export const perpetualsSlice = createSlice({
     }),
     setMarkets: (
       state: PerpetualsState,
-      action: PayloadAction<{
-        markets: Record<string, PerpetualMarket>;
-        update?: boolean;
-      }>
-    ) => {
-      return {
-        ...state,
-        markets: action.payload.update
-          ? merge({}, state.markets, action.payload.markets)
-          : action.payload.markets,
-      };
-    },
+      action: PayloadAction<{ markets: Record<string, PerpetualMarket>; update?: boolean }>
+    ) => ({
+      ...state,
+      markets: action.payload.update
+        ? merge({}, state.markets, action.payload.markets)
+        : action.payload.markets,
+    }),
     setOrderbook: (
       state: PerpetualsState,
       action: PayloadAction<{ orderbook?: Nullable<MarketOrderbook>; marketId: string }>
