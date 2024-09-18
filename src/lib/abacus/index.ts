@@ -21,6 +21,7 @@ import type {
 import {
   AbacusAppConfig,
   AbacusHelper,
+  AbacusWalletConnectionType,
   AdjustIsolatedMarginInputField,
   ApiData,
   AsyncAbacusStateManager,
@@ -36,7 +37,6 @@ import {
   TransferType,
   TriggerOrdersInputField,
   UIImplementations,
-  AbacusWalletConnectionType,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';

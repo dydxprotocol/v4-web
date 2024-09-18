@@ -55,6 +55,8 @@ export function isValidAddress(input: MultiChainAddress): boolean {
 
   if (input.network === 'solana') {
     try {
+      // Generating a publickey will demonstrate if an address is valid
+      // eslint-disable-next-line no-new
       new PublicKey(input.address);
       return true;
     } catch (_e) {
