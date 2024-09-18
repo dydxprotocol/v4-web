@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { WalletType as CosmosWalletType } from 'graz';
 
-import { isDev, isTestnet } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
