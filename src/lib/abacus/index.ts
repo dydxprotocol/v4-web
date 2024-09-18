@@ -36,6 +36,7 @@ import {
   TransferType,
   TriggerOrdersInputField,
   UIImplementations,
+  WalletConnectionType,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -280,9 +281,9 @@ class AbacusStateManager {
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
-        this.stateManager.cosmosWalletConnected = true;
+        this.stateManager.walletConnectionType = WalletConnectionType.Cosmos;
       } else {
-        this.stateManager.cosmosWalletConnected = false;
+        this.stateManager.walletConnectionType = WalletConnectionType.Ethereum;
       }
     }
   };
