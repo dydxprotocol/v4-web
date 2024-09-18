@@ -155,6 +155,10 @@ export const CLEARED_SIZE_INPUTS = {
   leverageInput: '',
 };
 
+export const CLEARED_CLOSE_POSITION_INPUTS = {
+  limitPriceInput: '',
+};
+
 export enum PlaceOrderStatuses {
   Submitted = 0,
   Placed = 1,
