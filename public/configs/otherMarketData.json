@@ -2318,10 +2318,10 @@
     "params": {
       "id": 46,
       "ticker": "POL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10,
       "minPriceChange": 800,
-      "minExchanges": 1,
+      "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2358,7 +2358,7 @@
           "invert": false
         }
       ],
-      "liquidityTier": 4,
+      "liquidityTier": 1,
       "atomicResolution": -5,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
