@@ -1009,6 +1009,7 @@
         "coinMarketCapsLink": "https://www.google.com/finance/quote/BRL-USD?hl=en",
         "name": "Brazilian Real",
         "tags": [
+            "FX"
         ]
     },
     "BRISE-USD": {
@@ -1591,7 +1592,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/multi-collateral-dai/",
         "name": "Dai",
         "tags": [
-            "Defi"
+            "Defi",
+            "FX"
         ],
         "websiteLink": "https://makerdao.com/",
         "whitepaperLink": null
@@ -2165,12 +2167,16 @@
     "EUR-USD": {
         "coinMarketCapsLink": "https://www.google.com/finance/quote/EUR-USD?hl=en",
         "name": "Euro",
-        "tags": []
+        "tags": [
+            "FX"
+        ]
     },
     "EURC-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/euro-coin/",
         "name": "EURC",
-        "tags": [],
+        "tags": [
+            "FX"
+        ],
         "websiteLink": "https://www.circle.com",
         "whitepaperLink": null
     },
@@ -6608,6 +6614,7 @@
         "coinMarketCapsLink": "https://www.google.com/finance/quote/TRY-USD?hl=en",
         "name": "Turkish lira",
         "tags": [
+            "FX"
         ]
     },
     "TT-USD": {
