@@ -91,9 +91,10 @@ export const useTradingView = ({
   const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
     useAppSelector(getCurrentMarketConfig)
   );
-  const tickSizeDecimals = marketId
-    ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
-    : tickSizeDecimalsAbacus;
+  const tickSizeDecimals =
+    (marketId
+      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
+      : tickSizeDecimalsAbacus) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -126,7 +127,7 @@ export const useTradingView = ({
     // we only need tick size from current market for the price scale settings
     // if markets haven't been loaded via abacus, get the current market info from indexer
     (async () => {
-      if (marketId && !tickSizeDecimals) {
+      if (marketId && tickSizeDecimals === undefined) {
         const marketTickSize = await getMarketTickSize(marketId);
         setTickSizeDecimalsIndexer((prev) => ({
           ...prev,
@@ -139,7 +140,7 @@ export const useTradingView = ({
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && tickSizeDecimals) {
+    if (marketId && tickSizeDecimals !== undefined) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
@@ -245,7 +246,7 @@ export const useTradingView = ({
     selectedLocale,
     selectedNetwork,
     !!marketId,
-    !!tickSizeDecimals,
+    tickSizeDecimals !== undefined,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
     buySellMarksToggleRef,
