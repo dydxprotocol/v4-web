@@ -264,7 +264,7 @@ export const AffiliatesLeaderboard = ({
                 <TableCell className="align-center flex text-color-text-1 font-medium-book">
                   {rank}
                   {accountStats?.rank && rank === accountStats.rank && (
-                    <Tag color={TagColor.Accent}>You</Tag>
+                    <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
                   )}
                 </TableCell>
               ),
@@ -282,13 +282,14 @@ export const AffiliatesLeaderboard = ({
               ),
             },
             {
-              columnKey: 'ref-fees',
-              label: stringGetter({ key: STRING_KEYS.FEES_REFERRED }),
+              columnKey: 'total-earnings',
+              label: stringGetter({ key: STRING_KEYS.TOTAL_EARNINGS }),
               allowsSorting: false,
-              renderCell: ({ referredFees }) => (
-                <$NumberOutput type={OutputType.CompactFiat} value={referredFees} />
+
+              renderCell: ({ totalEarnings }) => (
+                <$EarningsOutput type={OutputType.CompactFiat} value={totalEarnings} />
               ),
-            } as ColumnDef<IAffiliateStats>,
+            },
             {
               columnKey: 'ref-vol',
               label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
@@ -298,15 +299,16 @@ export const AffiliatesLeaderboard = ({
                 <$NumberOutput type={OutputType.CompactFiat} value={referredVolume} />
               ),
             } as ColumnDef<IAffiliateStats>,
-            {
-              columnKey: 'total-earnings',
-              label: stringGetter({ key: STRING_KEYS.TOTAL_EARNINGS }),
-              allowsSorting: false,
 
-              renderCell: ({ totalEarnings }) => (
-                <$EarningsOutput type={OutputType.CompactFiat} value={totalEarnings} />
+            {
+              columnKey: 'ref-fees',
+              label: stringGetter({ key: STRING_KEYS.FEES_REFERRED }),
+              allowsSorting: false,
+              renderCell: ({ referredFees }) => (
+                <$NumberOutput type={OutputType.CompactFiat} value={referredFees} />
               ),
-            },
+            } as ColumnDef<IAffiliateStats>,
+
             {
               columnKey: 'total-referred-users',
               label: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
