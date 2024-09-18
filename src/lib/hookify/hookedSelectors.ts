@@ -73,12 +73,16 @@ export const useHookifiedHf = <ReturnType>(hookified: Hookified<ReturnType, any>
 };
 
 type HookedSelector<RootStateType, A extends Action, ReturnType> = {
+  // must call either subscribe or start to begin the selector
   subscribe: (handle: (val: ReturnType) => void) => () => void;
+  start: () => void;
+  // turn it off and tear down any subscriptions/effects. this operation is permanent, start won't restart.
+  tearDown: () => void;
+
   getValue: () => ReturnType;
   dispatchValue: (
     handle: (dispatch: Dispatch<A>, value: ReturnType) => void
   ) => HookedSelector<RootStateType, A, ReturnType>;
-  tearDown: () => void;
   __hooked_selector__: true;
   __state_type__?: RootStateType;
 };
@@ -107,6 +111,7 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
   const useHookedSelectorHf = <ReturnType>(
     selector: HookedSelector<RootStateType, A, ReturnType>
   ) => {
+    selector.start();
     return hookifyHooks.useSyncExternalStore(selector.subscribe, selector.getValue);
   };
 
@@ -126,8 +131,12 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
     deps: [...DepsType],
     hookFn: (...args: GetReturn<DepsType>) => ReturnType
   ): HookedSelector<RootStateType, A, ReturnType> => {
-    // we just call the useX hooks for you...
+    let running = false;
+    let destroyed = false;
+    let dispatchListenersToAdd: Array<(dispatch: Dispatch<A>, value: ReturnType) => void> = [];
+
     const hooked = hookify(() => {
+      // we just call the useX hooks for you...
       const args = deps.map((dep) => {
         if (isFunction(dep)) {
           return useAppSelectorHf(dep);
@@ -137,20 +146,52 @@ export function hookedSelectors<RootStateType, DispatchType, A extends Action = 
       return hookFn(...(args as any));
     });
 
+    const init = () => {
+      if (running || destroyed) {
+        return;
+      }
+      running = true;
+      // first call
+      hooked.call();
+      dispatchListenersToAdd.forEach((listener) => {
+        hooked.subscribe((v) => listener(store.dispatch, v));
+        listener(store.dispatch, result.getValue());
+      });
+      dispatchListenersToAdd = [];
+    };
+
     const result: HookedSelector<RootStateType, A, ReturnType> = {
       __hooked_selector__: true,
       __state_type__: undefined,
-      getValue: () => hooked.getLatestValue()!,
+      getValue: () => {
+        if (!running) {
+          throw new Error('Called getValue before initializing');
+        }
+        return hooked.getLatestValue()!;
+      },
       dispatchValue: (listener) => {
-        hooked.subscribe((v) => listener(store.dispatch, v));
-        listener(store.dispatch, result.getValue());
+        if (running) {
+          hooked.subscribe((v) => listener(store.dispatch, v));
+          listener(store.dispatch, result.getValue());
+        } else {
+          dispatchListenersToAdd.push(listener);
+        }
         return result;
       },
-      subscribe: hooked.subscribe,
-      tearDown: hooked.tearDown,
+      subscribe: (arg) => {
+        init();
+        return hooked.subscribe(arg);
+      },
+      start: () => init(),
+      tearDown: () => {
+        if (!running || destroyed) {
+          throw new Error('Hooked Selector was already shut down');
+        }
+        running = false;
+        destroyed = true;
+        return hooked.tearDown();
+      },
     };
-    // first run
-    hooked.call();
     return result;
   };
 

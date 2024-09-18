@@ -55,13 +55,6 @@ import LaunchMarket from './pages/LaunchMarket';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch } from './state/appTypes';
 import { openDialog } from './state/dialogs';
-import {
-  loadedVaultAccount,
-  loadedVaultDetails,
-  loadedVaultPositions,
-  vaultFormSlippage,
-  vaultFormValidation,
-} from './state/vaultsLifecycle';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -177,16 +170,6 @@ const Content = () => {
     </>
   );
 };
-
-// we need to import these in main so they don't get tree shaken / put in another bundle
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const dummyLifecyclesList = [
-  loadedVaultDetails,
-  loadedVaultPositions,
-  loadedVaultAccount,
-  vaultFormSlippage,
-  vaultFormValidation,
-];
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   // eslint-disable-next-line react/display-name
