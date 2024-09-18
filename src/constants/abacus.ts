@@ -72,9 +72,6 @@ export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.St
 export const AsyncAbacusStateManager =
   Abacus.exchange.dydx.abacus.state.v2.manager.AsyncAbacusStateManagerV2;
 
-export const AbacusWalletConnectionType =
-  Abacus.exchange.dydx.abacus.state.model.WalletConnectionType;
-
 // ------ Parsing Errors ------ //
 export type ParsingError = Abacus.exchange.dydx.abacus.responses.ParsingError;
 export type ParsingErrors = kollections.List<ParsingError>;
