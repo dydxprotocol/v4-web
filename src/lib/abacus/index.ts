@@ -42,7 +42,11 @@ import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
-import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
+import {
+  CLEARED_CLOSE_POSITION_INPUTS,
+  CLEARED_SIZE_INPUTS,
+  CLEARED_TRADE_INPUTS,
+} from '@/constants/trade';
 import {
   CLEARED_TRIGGER_LIMIT_INPUTS,
   CLEARED_TRIGGER_ORDER_INPUTS,
@@ -51,7 +55,11 @@ import {
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
+import {
+  setClosePositionFormInputs,
+  setTradeFormInputs,
+  setTriggerFormInputs,
+} from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
@@ -112,6 +120,8 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
+    appConfigs.staticTyping = import.meta.env.MODE !== 'production';
+
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
@@ -189,8 +199,11 @@ class AbacusStateManager {
   }: {
     shouldFocusOnTradeInput?: boolean;
   } = {}) => {
+    this.store?.dispatch(setClosePositionFormInputs(CLEARED_CLOSE_POSITION_INPUTS));
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.percent });
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.size });
+    this.setClosePositionValue({ value: null, field: ClosePositionInputField.limitPrice });
+    this.setClosePositionValue({ value: false, field: ClosePositionInputField.useLimit });
 
     if (shouldFocusOnTradeInput) {
       this.clearTradeInputValues({ shouldResetSize: true });
