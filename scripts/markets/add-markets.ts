@@ -8,19 +8,17 @@ Usage:
 Example (add 10 markets on staging):
   $ pnpx tsx scripts/markets/add-markets.ts staging 10
 */
-
 import {
   CompositeClient,
   IndexerConfig,
   LocalWallet as LocalWalletType,
   Network,
-  ValidatorConfig
+  ValidatorConfig,
 } from '@dydxprotocol/v4-client-js';
-import {
-  PerpetualMarketType
-} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { PerpetualMarketType } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { readFileSync } from 'fs';
 import Long from 'long';
+
 import { Proposal, retry, sleep, voteOnProposals } from './help';
 
 const LocalWalletModule = await import(
@@ -132,19 +130,12 @@ const ENV_CONFIG = {
     indexerRestEndpoint: 'https://indexer.v4staging.dydx.exchange',
     indexerWsEndpoint: 'wss://indexer.v4staging.dydx.exchange',
   },
-}
+};
 
-async function addMarkets(
-  env: Env,
-  numMarkets: number,
-  proposals: Proposal[],
-): Promise<void> {
+async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): Promise<void> {
   // Initialize client and wallets.
   const config = ENV_CONFIG[env];
-  const indexerConfig = new IndexerConfig(
-    config.indexerRestEndpoint,
-    config.indexerWsEndpoint,
-  );
+  const indexerConfig = new IndexerConfig(config.indexerRestEndpoint, config.indexerWsEndpoint);
   const validatorConfig = new ValidatorConfig(
     config.validatorEndpoint,
     config.chainId,
@@ -156,7 +147,7 @@ async function addMarkets(
       CHAINTOKEN_DECIMALS: 18,
     },
     undefined,
-    'Client Example',
+    'Client Example'
   );
   const network = new Network(env, indexerConfig, validatorConfig);
 
@@ -193,7 +184,7 @@ async function addMarkets(
         break;
       }
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1; 
+      const proposalId: number = i + j + 1;
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -223,7 +214,7 @@ async function addMarkets(
           },
           proposal.title,
           proposal.summary,
-          MIN_DEPOSIT,
+          MIN_DEPOSIT
         )
       );
       console.log(`Proposed market ${marketId} with ticker ${proposal.params.ticker}`);
@@ -261,15 +252,11 @@ async function main(): Promise<void> {
 
   // Read proposals.
   const proposals: Record<string, Proposal> = JSON.parse(
-    readFileSync('public/configs/otherMarketData.json', 'utf8'),
+    readFileSync('public/configs/otherMarketData.json', 'utf8')
   );
 
   // Add markets.
-  await addMarkets(
-    env,
-    numMarkets,
-    Object.values(proposals),
-  );
+  await addMarkets(env, numMarkets, Object.values(proposals));
 }
 
 main()

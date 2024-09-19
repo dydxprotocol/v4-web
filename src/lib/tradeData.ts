@@ -5,6 +5,8 @@ import {
   AbacusOrderSide,
   AbacusOrderTypes,
   ErrorType,
+  ErrorFormat,
+  type ErrorFormatType,
   ValidationError,
   type AbacusOrderSides,
   type Nullable,
@@ -63,22 +65,26 @@ const formatErrorParam = ({
   tickSizeDecimals,
 }: {
   value: Nullable<string>;
-  format?: Nullable<string>;
+  format: Nullable<ErrorFormatType>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
   switch (format) {
-    case 'percent': {
+    case ErrorFormat.Percent: {
       const percentBN = MustBigNumber(value);
       return `${percentBN.times(100).toFixed(PERCENT_DECIMALS)}%`;
     }
-    case 'size': {
+    case ErrorFormat.Size: {
       const sizeBN = MustBigNumber(value);
       return sizeBN.toFixed(stepSizeDecimals ?? 0);
     }
-    case 'price': {
+    case ErrorFormat.Price: {
       const dollarBN = MustBigNumber(value);
       return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
+    }
+    case ErrorFormat.UsdcPrice: {
+      const dollarBN = MustBigNumber(value);
+      return `$${dollarBN.toFixed(USD_DECIMALS)}`;
     }
     default: {
       return value ?? '';

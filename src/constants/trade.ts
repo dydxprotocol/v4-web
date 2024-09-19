@@ -157,6 +157,10 @@ export const CLEARED_SIZE_INPUTS = {
   balancePercentInput: '',
 };
 
+export const CLEARED_CLOSE_POSITION_INPUTS = {
+  limitPriceInput: '',
+};
+
 export enum PlaceOrderStatuses {
   Submitted = 0,
   Placed = 1,
@@ -181,5 +185,15 @@ export type LocalPlaceOrderData = {
 export type LocalCancelOrderData = {
   orderId: string;
   submissionStatus: CancelOrderStatuses;
+  errorParams?: ErrorParams;
+  isSubmittedThroughCancelAll?: boolean;
+};
+
+export const CANCEL_ALL_ORDERS_KEY = 'all';
+export type LocalCancelAllData = {
+  key: string;
+  orderIds: string[];
+  canceledOrderIds?: string[];
+  failedOrderIds?: string[];
   errorParams?: ErrorParams;
 };

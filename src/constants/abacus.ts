@@ -113,6 +113,9 @@ export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationErro
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
+export const ErrorFormat = Abacus.exchange.dydx.abacus.output.input.ErrorFormat;
+const errorFormats = [...ErrorFormat.values()] as const;
+export type ErrorFormatType = (typeof errorFormats)[number];
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
@@ -383,3 +386,6 @@ export enum AbacusInputTypes {
   Trade = 'trade',
   TriggerOrders = 'triggerOrders',
 }
+
+export const AbacusWalletConnectionType =
+  Abacus.exchange.dydx.abacus.state.model.WalletConnectionType;

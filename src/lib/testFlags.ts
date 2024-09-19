@@ -60,6 +60,10 @@ class TestFlags {
     return !!this.queryParams.cancelall;
   }
 
+  get showLimitClose() {
+    return !!this.queryParams.limitclose;
+  }
+
   get referralCode() {
     return this.queryParams.ref;
   }

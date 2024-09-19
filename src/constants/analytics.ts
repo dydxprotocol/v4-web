@@ -257,6 +257,20 @@ export const AnalyticsEvents = unionize(
       validatorUrl: string;
     }>(),
 
+    // TradingView actions
+    TradingViewOrderModificationSubmitted: ofType<
+      HumanReadablePlaceOrderPayload & {
+        previousOrderClientId: string;
+        previousOrderPrice: string;
+      }
+    >,
+    TradingViewOrderModificationSuccess: ofType<{
+      clientId: string;
+    }>,
+    TradingViewLimitOrderDrafted: ofType<{
+      marketId: string;
+      price: string;
+    }>,
     // Notification
     NotificationAction: ofType<{
       type: string;

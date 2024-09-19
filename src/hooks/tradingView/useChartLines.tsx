@@ -2,14 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
+import tw from 'twin.macro';
 
 import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
+
+import { Icon, IconName } from '@/components/Icon';
 
 import {
   cancelOrderConfirmed,
@@ -29,12 +33,13 @@ import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
-  isNewOrderPriceValid,
+  getOrderModificationError,
 } from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
@@ -240,11 +245,12 @@ export const useChartLines = ({
       const oldPrice = order.triggerPrice ?? order.price;
       const newPrice = orderLine.getPrice();
 
-      if (!isNewOrderPriceValid(order, newPrice)) {
-        // TODO: Add final copy with localization here
+      const priceError = getOrderModificationError(order, newPrice);
+      if (priceError) {
         notify({
-          title: 'Bad price!!!',
-          body: 'Dont cross the book price pls',
+          title: stringGetter({ key: priceError.title }),
+          body: priceError.body && stringGetter({ key: priceError.body }),
+          icon: <$WarningIcon iconName={IconName.Warning} />,
         });
         orderLine.setPrice(oldPrice);
         return;
@@ -253,6 +259,14 @@ export const useChartLines = ({
       // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
       if (!orderPayload) return;
+
+      track(
+        AnalyticsEvents.TradingViewOrderModificationSubmitted({
+          ...orderPayload,
+          previousOrderClientId: order.clientId,
+          previousOrderPrice: oldPrice,
+        })
+      );
 
       orderLine.setPrice(newPrice);
 
@@ -302,7 +316,7 @@ export const useChartLines = ({
         );
       }
     },
-    [dispatch]
+    [dispatch, stringGetter, notify]
   );
 
   const updateOrderLines = useCallback(() => {
@@ -381,6 +395,9 @@ export const useChartLines = ({
           // Update pendingOrderAdjustmentRef here instead of a separate useEffect so that
           // adding the new chart line and removing from pendingOrderAdjustmentRef can happen atomically
           if (order.clientId && pendingOrderAdjustments[order.clientId]) {
+            track(
+              AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
+            );
             removePendingOrderAdjustment(order.clientId);
             dispatch(setLatestOrder(order));
           }
@@ -495,3 +512,5 @@ export const useChartLines = ({
 
   return { chartLines: chartLinesRef.current };
 };
+
+const $WarningIcon = tw(Icon)`text-color-warning`;

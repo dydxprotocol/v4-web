@@ -31,6 +31,9 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import {
+  cancelAllOrderConfirmed,
+  cancelAllOrderFailed,
+  cancelAllSubmitted,
   cancelOrderConfirmed,
   cancelOrderFailed,
   cancelOrderSubmitted,
@@ -567,17 +570,32 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
+  // when marketId is provided, only cancel orders for that market, otherwise cancel globally
   const cancelAllOrders = useCallback(
     (marketId?: string) => {
       // this is for each single cancel transaction
-      const callback = () =>
-        // success: boolean,
-        // parsingError?: Nullable<ParsingError>,
-        // data?: Nullable<HumanReadableCancelOrderPayload>
-        {
-          // TODO(@aforaleka): Add this back to update local cancel all state for notifications
-        };
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableCancelOrderPayload>
+      ) => {
+        if (success) {
+          if (data?.orderId) dispatch(cancelAllOrderConfirmed(data.orderId));
+        } else {
+          const errorParams = getValidErrorParamsFromParsingError(parsingError);
+          if (data?.orderId) {
+            dispatch(
+              cancelAllOrderFailed({
+                orderId: data.orderId,
+                errorParams,
+              })
+            );
+          }
+        }
+      };
 
+      const orderIds = abacusStateManager.getCancelableOrderIds(marketId);
+      dispatch(cancelAllSubmitted({ marketId, orderIds }));
       abacusStateManager.cancelAllOrders(marketId, callback);
     },
     [dispatch]

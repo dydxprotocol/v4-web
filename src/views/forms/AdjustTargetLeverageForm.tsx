@@ -30,6 +30,7 @@ import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { getLeverageOptionsForMaxLeverage } from '@/lib/leverage';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -98,11 +99,13 @@ export const AdjustTargetLeverageForm = ({
       </$InputContainer>
 
       <$ToggleGroup
-        items={[1, 2, 3, 5, 10].map((leverageAmount: number) => ({
-          label: `${leverageAmount}×`,
-          value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
-          disabled: leverageAmount > maxLeverage,
-        }))}
+        items={getLeverageOptionsForMaxLeverage(MustBigNumber(maxLeverage)).map(
+          (leverageAmount: number) => ({
+            label: `${leverageAmount}×`,
+            value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
+            disabled: leverageAmount > maxLeverage,
+          })
+        )}
         value={leverageBN.abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={(value: string) => setLeverage(value)}
         shape={ButtonShape.Rectangle}

@@ -56,8 +56,8 @@ export const MarketLeverageInput = ({
   });
 
   const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
-  const maxLeverageFallback = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
-  const maxLeverageBN = MustBigNumber(maxLeverage ?? maxLeverageFallback).abs();
+  const maxMarketLeverageBN = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+  const maxLeverageBN = MustBigNumber(maxLeverage ?? maxMarketLeverageBN).abs();
 
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
