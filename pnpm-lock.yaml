@@ -2737,7 +2737,7 @@ packages:
   /@cosmjs/json-rpc@0.32.2:
     resolution: {integrity: sha512-lan2lOgmz4yVE/HR8eCOSiII/1OudIulk8836koyIDCsPEpt6eKBuctnAD168vABGArKccLAo7Mr2gy9nrKrOQ==}
     dependencies:
-      '@cosmjs/stream': 0.32.3
+      '@cosmjs/stream': 0.32.2
       xstream: 11.14.0
     dev: false
 
@@ -2835,7 +2835,7 @@ packages:
   /@cosmjs/socket@0.32.2:
     resolution: {integrity: sha512-Qc8jaw4uSBJm09UwPgkqe3g9TBFx4ZR9HkXpwT6Z9I+6kbLerXPR0Gy3NSJFSUgxIfTpO8O1yqoWAyf0Ay17Mw==}
     dependencies:
-      '@cosmjs/stream': 0.32.3
+      '@cosmjs/stream': 0.32.2
       isomorphic-ws: 4.0.1(ws@7.5.9)
       ws: 7.5.9
       xstream: 11.14.0
@@ -2864,7 +2864,7 @@ packages:
       '@cosmjs/encoding': 0.31.3
       '@cosmjs/math': 0.31.3
       '@cosmjs/proto-signing': 0.31.3
-      '@cosmjs/stream': 0.31.3
+      '@cosmjs/stream': 0.31.0
       '@cosmjs/tendermint-rpc': 0.31.3
       '@cosmjs/utils': 0.31.3
       cosmjs-types: 0.8.0
@@ -2934,6 +2934,12 @@ packages:
       - bufferutil
       - debug
       - utf-8-validate
+    dev: false
+
+  /@cosmjs/stream@0.31.0:
+    resolution: {integrity: sha512-Y+aSHwhHkLGIaQOdqRob+yga2zr9ifl9gZDKD+B7+R5pdWN5f2TTDhYWxA6YZcZ6xRmfr7u8a7tDh7iYLC/zKA==}
+    dependencies:
+      xstream: 11.14.0
     dev: false
 
   /@cosmjs/stream@0.31.3:
