@@ -100,7 +100,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     withdrawFromSubaccount,
     transferFromSubaccountToAddress,
     transferNativeToken,
-    sendSquidWithdrawFromSubaccount,
+    sendSkipWithdrawFromSubaccount,
   } = useMemo(
     () => ({
       depositToSubaccount: async ({
@@ -213,7 +213,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
       },
 
-      sendSquidWithdrawFromSubaccount: async ({
+      sendSkipWithdrawFromSubaccount: async ({
         subaccountClient,
         amount,
         payload,
@@ -235,7 +235,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
-                ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+                ? // Signer expects BigInt but the payload types the value as string
                   BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
                 : undefined,
             },
@@ -253,7 +253,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           if (isKeplr && window.keplr) {
             window.keplr.defaultOptions = {};
           }
-          log('useSubaccount/sendSquidWithdrawFromSubaccount', error);
+          log('useSubaccount/sendSkipWithdrawFromSubaccount', error);
           throw error;
         }
       },
@@ -385,7 +385,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken, usdcDenom]
   );
 
-  const sendSquidWithdraw = useCallback(
+  const sendSkipWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
       const cctpWithdraw = () => {
         return new Promise<string>((resolve, reject) => {
@@ -417,7 +417,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           },
         };
       }
-      const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      const tx = await sendSkipWithdrawFromSubaccount({ subaccountClient, amount, payload });
 
       // Reset the default options after the tx is sent.
       if (isKeplr && window.keplr) {
@@ -425,7 +425,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       }
       return hashFromTx(tx.hash);
     },
-    [subaccountClient, sendSquidWithdrawFromSubaccount, isKeplr]
+    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
   );
 
   const adjustIsolatedMarginOfPosition = useCallback(
@@ -887,7 +887,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Transfer Methods
     transfer,
-    sendSquidWithdraw,
+    sendSkipWithdraw,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
 

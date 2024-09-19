@@ -30,7 +30,6 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
-  OnboardingConfig,
   StatsigConfig,
   TradeInputField,
   TransferInputField,
@@ -120,7 +119,6 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
     appConfigs.staticTyping = testFlags.enableStaticTyping;
 
     this.stateManager = new AsyncAbacusStateManager(

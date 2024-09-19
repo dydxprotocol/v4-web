@@ -81,7 +81,7 @@ export const WithdrawForm = () => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { dydxAddress, connectedWallet } = useAccounts();
-  const { sendSquidWithdraw } = useSubaccount();
+  const { sendSkipWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
@@ -236,7 +236,7 @@ export const WithdrawForm = () => {
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
-          const txHash = await sendSquidWithdraw(
+          const txHash = await sendSkipWithdraw(
             debouncedAmountBN.toNumber(),
             requestPayload.data,
             isCctp

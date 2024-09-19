@@ -8,9 +8,6 @@ overrides:
   follow-redirects: 1.15.3
 
 dependencies:
-  '@0xsquid/sdk':
-    specifier: ^1.10.0
-    version: 1.10.0
   '@cosmjs/amino':
     specifier: ^0.32.1
     version: 0.32.2

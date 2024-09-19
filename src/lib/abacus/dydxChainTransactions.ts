@@ -398,7 +398,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...params.msg,
           timeoutTimestamp: params.msg.timeoutTimestamp
-            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+            ? // Skip returns timeoutTimestamp as Long, but the signer expects BigInt
               BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
             : undefined,
         },
@@ -458,7 +458,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...parsedIbcPayload.msg,
           timeoutTimestamp: parsedIbcPayload.msg.timeoutTimestamp
-            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+            ? // Skip returns timeoutTimestamp as Long, but the signer expects BigInt
               BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
             : undefined,
         },

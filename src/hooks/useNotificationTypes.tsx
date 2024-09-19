@@ -210,7 +210,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.SquidTransfer,
+    type: NotificationType.SkipTransfer,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
@@ -233,7 +233,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             toChainId === selectedDydxChainId;
 
           const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+            (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
             <$AssetIcon symbol="USDC" />
           ) : (
@@ -280,7 +280,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
               toastSensitivity: 'foreground',
-              groupKey: NotificationType.SquidTransfer,
+              groupKey: NotificationType.SkipTransfer,
             },
             [isFinished]
           );
