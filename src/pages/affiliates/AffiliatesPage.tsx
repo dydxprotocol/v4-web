@@ -62,7 +62,7 @@ export const AffiliatesPage: React.FC = () => {
   // Mocked user status data
   const userStatus = {
     isAffiliate: true,
-    isVip: false,
+    isVip: true,
   };
 
   useEffect(() => {

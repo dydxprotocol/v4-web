@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import axios from 'axios';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -189,19 +190,27 @@ export const AffiliatesLeaderboard = ({
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
   const [affiliates, setAffiliates] = useState<IAffiliateStats[]>([]);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
-  const [offset, setOffset] = useState(0);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchAffiliateStats();
-  }, [epochFilter, offset]);
+  }, [page]);
 
   const fetchAffiliateStats = async () => {
-    // fetch account stats
-    setAffiliates(data.slice(0, offset + 3));
+    const response = await axios.post('http://localhost:3000/v1/leaderboard/search', {
+      pagination: {
+        page,
+        pageSize: 10, // Amount of entities to load
+      },
+    });
+
+    setAffiliates([...affiliates, ...response.data.results]);
+    setTotal(response.data.total);
   };
 
   const handleLoadMore = () => {
-    setOffset(offset + 3);
+    setPage((prev) => prev + 1);
   };
 
   const columns = useMemo<ColumnDef<IAffiliateStats>[]>(
@@ -348,13 +357,15 @@ export const AffiliatesLeaderboard = ({
           className={className}
         />
       </div>
-      <Button
-        action={ButtonAction.Secondary}
-        className="notTablet:mx-auto"
-        onClick={handleLoadMore}
-      >
-        {stringGetter({ key: STRING_KEYS.LOAD_MORE })}
-      </Button>
+      {affiliates.length < total && (
+        <Button
+          action={ButtonAction.Secondary}
+          className="notTablet:mx-auto"
+          onClick={handleLoadMore}
+        >
+          {stringGetter({ key: STRING_KEYS.LOAD_MORE })}
+        </Button>
+      )}
     </div>
   );
 };
