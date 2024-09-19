@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 
-import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
+import { Validator } from '@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
