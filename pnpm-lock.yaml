@@ -58,7 +58,7 @@ dependencies:
     version: 5.5.3
   '@keplr-wallet/types':
     specifier: ^0.12.121
-    version: 0.12.125
+    version: 0.12.121
   '@privy-io/react-auth':
     specifier: ^1.73.0
     version: 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.1.3)
@@ -2837,11 +2837,11 @@ packages:
       '@types/bn.js': 5.1.5
       '@types/elliptic': 6.4.18
       '@types/ethereumjs-util': 5.2.0
-      '@types/node': 10.12.18
+      '@types/node': 10.17.60
       bignumber.js: 9.1.1
-      elliptic: 6.5.7
+      elliptic: 6.5.5
       ethereumjs-util: 5.2.1
-      io-ts: 2.0.1(fp-ts@2.16.9)
+      io-ts: 2.0.1(fp-ts@2.16.8)
       web3-eth-abi: 1.3.6
       web3-utils: 1.3.6
     transitivePeerDependencies:
@@ -3249,7 +3249,7 @@ packages:
       '@cosmjs/utils': 0.27.1
       bip39: 3.1.0
       bn.js: 5.2.1
-      elliptic: 6.5.4
+      elliptic: 6.5.5
       js-sha3: 0.8.0
       libsodium-wrappers: 0.7.13
       ripemd160: 2.0.2
@@ -3282,7 +3282,7 @@ packages:
       '@cosmjs/utils': 0.31.3
       '@noble/hashes': 1.4.0
       bn.js: 5.2.1
-      elliptic: 6.5.4
+      elliptic: 6.5.5
       libsodium-wrappers-sumo: 0.7.11
     dev: false
 
@@ -5794,8 +5794,8 @@ packages:
         integrity: sha512-CPycrXnBy7+l6qUlOROIt4jXCSdpyTfIJHzDaI5zzBAKxRKFCPx+4LzOb0ZEhZvs8m328f+tfCnWUqngCBPWkA==,
       }
     dependencies:
-      '@keplr-wallet/crypto': 0.12.125
-      '@keplr-wallet/types': 0.12.125
+      '@keplr-wallet/crypto': 0.12.121
+      '@keplr-wallet/types': 0.12.121
       buffer: 6.0.3
       delay: 4.4.1
     dev: false
@@ -5807,12 +5807,12 @@ packages:
       }
     dependencies:
       '@ethersproject/address': 5.7.0
-      '@keplr-wallet/common': 0.12.125
-      '@keplr-wallet/crypto': 0.12.125
-      '@keplr-wallet/proto-types': 0.12.125
-      '@keplr-wallet/simple-fetch': 0.12.125
-      '@keplr-wallet/types': 0.12.125
-      '@keplr-wallet/unit': 0.12.125
+      '@keplr-wallet/common': 0.12.121
+      '@keplr-wallet/crypto': 0.12.121
+      '@keplr-wallet/proto-types': 0.12.121
+      '@keplr-wallet/simple-fetch': 0.12.121
+      '@keplr-wallet/types': 0.12.121
+      '@keplr-wallet/unit': 0.12.121
       bech32: 1.1.4
       buffer: 6.0.3
       long: 4.0.0
@@ -5831,7 +5831,7 @@ packages:
       bs58check: 2.1.2
       buffer: 6.0.3
       crypto-js: 4.1.1
-      elliptic: 6.5.4
+      elliptic: 6.5.5
       sha.js: 2.4.11
     dev: false
 
@@ -5918,7 +5918,7 @@ packages:
         integrity: sha512-zshS9bd9Y9FJY7d54ZqrUUXY1BAFhD1ClLyeGpeXGk0SSOPPmHk6/j2f14Uk6zUZzb5iAtloBTZ4g2fGdQIiSQ==,
       }
     dependencies:
-      '@keplr-wallet/types': 0.12.125
+      '@keplr-wallet/types': 0.12.121
       big-integer: 1.6.52
       utility-types: 3.10.0
     dev: false
@@ -6010,8 +6010,8 @@ packages:
     dependencies:
       '@cosmjs/amino': 0.31.3
       '@leapwallet/cosmos-social-login-core': 0.0.1
-      '@usecapsule/cosmjs-v0-integration': 1.10.0(@cosmjs/amino@0.31.3)(@cosmjs/encoding@0.32.2)(@cosmjs/proto-signing@0.32.2)(fp-ts@2.16.9)
-      '@usecapsule/web-sdk': 1.12.0(fp-ts@2.16.9)
+      '@usecapsule/cosmjs-v0-integration': 1.10.0(@cosmjs/amino@0.31.3)(@cosmjs/encoding@0.32.2)(@cosmjs/proto-signing@0.32.2)(fp-ts@2.16.8)
+      '@usecapsule/web-sdk': 1.12.0(fp-ts@2.16.8)
       long: 5.2.3
     transitivePeerDependencies:
       - '@cosmjs/encoding'
@@ -6028,7 +6028,7 @@ packages:
     dependencies:
       '@cosmjs/amino': 0.31.3
       '@cosmjs/proto-signing': 0.31.3
-      typescript: 5.5.4
+      typescript: 5.5.3
     dev: false
 
   /@lit-labs/ssr-dom-shim@1.1.2:
@@ -12801,7 +12801,7 @@ packages:
         integrity: sha512-9Yzl1it9G6EgrDZP3ItWolxVUfgd9M8weY6rNTepObyntIRy9GrkqEXPA4uXwLljaPXNo6ezxs3+jQ2u4pXaWQ==,
       }
     dependencies:
-      '@celo/utils': 3.2.0(fp-ts@2.16.9)
+      '@celo/utils': 3.2.0(fp-ts@2.16.8)
       '@usecapsule/user-management-client': 1.7.0
       base64url: 3.0.1
       buffer: 6.0.3
@@ -12825,7 +12825,7 @@ packages:
       '@cosmjs/amino': 0.31.3
       '@cosmjs/encoding': 0.32.2
       '@cosmjs/proto-signing': 0.32.2
-      '@usecapsule/core-sdk': 1.10.0(fp-ts@2.16.9)
+      '@usecapsule/core-sdk': 1.10.0(fp-ts@2.16.8)
     transitivePeerDependencies:
       - debug
       - fp-ts
@@ -12838,7 +12838,7 @@ packages:
       }
     dependencies:
       axios: 1.6.7
-      qs: 6.13.0
+      qs: 6.12.3
     transitivePeerDependencies:
       - debug
     dev: false
@@ -12849,7 +12849,7 @@ packages:
         integrity: sha512-AOU1/rNp7bIBjLMsBcjEppGw3iklH3Go9fJAgxKvUO084ge27VC2NZEoSth0dKlpN4b+MHwKWGhzk+IUa//hzw==,
       }
     dependencies:
-      '@usecapsule/core-sdk': 1.10.0(fp-ts@2.16.9)
+      '@usecapsule/core-sdk': 1.10.0(fp-ts@2.16.8)
       '@usecapsule/user-management-client': 1.7.0
       assert: 2.1.0
       base64url: 3.0.1
@@ -13641,13 +13641,6 @@ packages:
       events: 3.3.0
     dev: false
 
-  /@walletconnect/jsonrpc-types@1.0.3:
-    resolution: {integrity: sha512-iIQ8hboBl3o5ufmJ8cuduGad0CQm3ZlsHtujv9Eu16xq89q+BG7Nh5VLxxUgmtpnrePgFkTwXirCTkwJH1v+Yw==}
-    dependencies:
-      keyvaluestorage-interface: 1.0.0
-      tslib: 1.14.1
-    dev: false
-
   /@walletconnect/jsonrpc-types@1.0.4:
     resolution:
       {
@@ -13665,7 +13658,7 @@ packages:
       }
     dependencies:
       '@walletconnect/environment': 1.0.1
-      '@walletconnect/jsonrpc-types': 1.0.3
+      '@walletconnect/jsonrpc-types': 1.0.4
       tslib: 1.14.1
     dev: false
 
@@ -16191,7 +16184,7 @@ packages:
       browserify-rsa: 4.1.0
       create-hash: 1.2.0
       create-hmac: 1.1.7
-      elliptic: 6.5.7
+      elliptic: 6.5.5
       hash-base: 3.0.4
       inherits: 2.0.4
       parse-asn1: 5.1.7
@@ -17392,7 +17385,7 @@ packages:
       }
     dependencies:
       bn.js: 4.12.0
-      elliptic: 6.5.7
+      elliptic: 6.5.5
     dev: true
 
   /create-hash@1.2.0:
@@ -19715,7 +19708,7 @@ packages:
       }
     dependencies:
       bn.js: 4.12.0
-      elliptic: 6.5.7
+      elliptic: 6.5.5
       xhr-request-promise: 0.1.3
     dev: false
 
@@ -19800,7 +19793,7 @@ packages:
     dependencies:
       bn.js: 4.12.0
       create-hash: 1.2.0
-      elliptic: 6.5.7
+      elliptic: 6.5.5
       ethereum-cryptography: 0.1.3
       ethjs-util: 0.1.6
       rlp: 2.2.7
@@ -21190,11 +21183,11 @@ packages:
       '@cosmjs/proto-signing': 0.32.2
       '@cosmjs/stargate': 0.32.2
       '@cosmjs/tendermint-rpc': 0.32.2
-      '@cosmsnap/snapper': 0.1.32
+      '@cosmsnap/snapper': 0.1.31
       '@dao-dao/cosmiframe': 0.1.0(@cosmjs/amino@0.32.2)(@cosmjs/proto-signing@0.32.2)
-      '@keplr-wallet/cosmos': 0.12.125
-      '@keplr-wallet/types': 0.12.125
-      '@leapwallet/cosmos-social-login-capsule-provider': 0.0.39(@cosmjs/encoding@0.32.2)(@cosmjs/proto-signing@0.32.2)(fp-ts@2.16.9)
+      '@keplr-wallet/cosmos': 0.12.121
+      '@keplr-wallet/types': 0.12.121
+      '@leapwallet/cosmos-social-login-capsule-provider': 0.0.39(@cosmjs/encoding@0.32.2)(@cosmjs/proto-signing@0.32.2)(fp-ts@2.16.8)
       '@metamask/providers': 12.0.0
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)
       '@terra-money/station-connector': 1.1.4(@cosmjs/amino@0.32.2)(axios@1.6.7)
@@ -21206,7 +21199,7 @@ packages:
       cosmos-directory-client: 0.0.6
       long: 4.0.0
       react: 18.2.0
-      zustand: 4.5.5(@types/react@18.3.3)(react@18.2.0)
+      zustand: 4.5.4(@types/react@18.3.3)(react@18.2.0)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -22166,7 +22159,7 @@ packages:
     peerDependencies:
       fp-ts: ^2.0.0
     dependencies:
-      fp-ts: 2.16.9
+      fp-ts: 2.16.8
     dev: false
 
   /ioredis@5.3.2:
@@ -26466,7 +26459,7 @@ packages:
       string_decoder: 1.3.0
       timers-browserify: 2.0.12
       tty-browserify: 0.0.1
-      url: 0.11.4
+      url: 0.11.3
       util: 0.12.5
       vm-browserify: 1.1.2
     dev: true
@@ -31190,8 +31183,8 @@ packages:
       bindings: 1.5.0
       bn.js: 4.12.0
       create-hmac: 1.1.7
-      elliptic: 6.5.4
-      nan: 2.18.0
+      elliptic: 6.5.5
+      nan: 2.20.0
     dev: false
 
   /tinybench@2.9.0:
@@ -32151,7 +32144,7 @@ packages:
       }
     dependencies:
       punycode: 1.4.1
-      qs: 6.13.0
+      qs: 6.12.3
     dev: true
 
   /use-callback-ref@1.3.0(@types/react@18.3.3)(react@18.2.0):
@@ -32229,14 +32222,6 @@ packages:
       {
         integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==,
       }
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.2.0
-    dev: false
-
-  /use-sync-external-store@1.2.2(react@18.2.0):
-    resolution: {integrity: sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -34075,7 +34060,7 @@ packages:
     dependencies:
       '@types/react': 18.3.3
       react: 18.2.0
-      use-sync-external-store: 1.2.2(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
   /zwitch@2.0.4:
