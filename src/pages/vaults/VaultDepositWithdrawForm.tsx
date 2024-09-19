@@ -43,6 +43,7 @@ import {
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 // errors we don't want to show aggressive visual cues about, just disable submit
 const lightErrorKeys = new Set<string>([
@@ -51,7 +52,7 @@ const lightErrorKeys = new Set<string>([
 ] satisfies VaultFormValidationErrorType['name'][]);
 
 type VaultDepositWithdrawFormProps = {
-  initialType?: 'deposit' | 'withdraw';
+  initialType?: 'DEPOSIT' | 'WITHDRAW';
   onSuccess?: () => void;
 };
 
@@ -71,23 +72,25 @@ export const VaultDepositWithdrawForm = ({
   const { amount, confirmationStep, slippageAck, operation, validationResponse } =
     useAppSelector(getVaultForm) ?? {};
 
-  const { balanceUsdc: userBalance } = useAppSelector(getVaultAccount) ?? {};
-  const { freeCollateral, marginUsage } = useAppSelector(getSubaccount) ?? {};
+  const { balanceUsdc: userBalance } = orEmptyObj(useAppSelector(getVaultAccount));
+  const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting] = useState(false);
 
-  const freeCollateralUpdated = validationResponse?.summaryData.freeCollateral;
-  const marginUsageUpdated = validationResponse?.summaryData.marginUsage;
-  const userBalanceUpdated = validationResponse?.summaryData.vaultBalance;
-  const slippagePercent = validationResponse?.summaryData.estimatedSlippage;
-  const estimatedWithdrawalAmount = validationResponse?.summaryData.estimatedAmountReceived;
+  const {
+    freeCollateral: freeCollateralUpdated,
+    estimatedAmountReceived: estimatedWithdrawalAmount,
+    estimatedSlippage: slippagePercent,
+    vaultBalance: userBalanceUpdated,
+    marginUsage: marginUsageUpdated,
+  } = orEmptyObj(validationResponse?.summaryData);
 
   // save initial type to state if it is provided
   useEffect(() => {
     if (initialType == null) {
       return;
     }
-    dispatch(setVaultFormOperation(initialType === 'deposit' ? 'DEPOSIT' : 'WITHDRAW'));
+    dispatch(setVaultFormOperation(initialType));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

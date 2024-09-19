@@ -35,7 +35,7 @@ function hookify<Return, Args extends any[]>(
   const removeSub = (subFn: HookSub<Return>) => {
     subs = subs.filter((s) => s !== subFn);
   };
-  const addSub = (sub: HookSub<Return>) => {
+  const subscribe = (sub: HookSub<Return>) => {
     if (destroyed) throw new Error('This hookified fn is tore down');
     subs.push(sub);
     return () => removeSub(sub);
@@ -60,7 +60,7 @@ function hookify<Return, Args extends any[]>(
   });
 
   return {
-    subscribe: addSub,
+    subscribe,
     getLatestValue,
     call: (...args: Args) => {
       if (destroyed) throw new Error('This hookified fn is tore down');

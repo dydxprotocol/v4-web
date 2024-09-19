@@ -62,7 +62,7 @@ const VaultPage = () => {
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.Deposit} />}
             onClick={() =>
-              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'deposit' })))
+              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'DEPOSIT' })))
             }
           >
             {stringGetter({ key: STRING_KEYS.DEPOSIT })}
@@ -72,7 +72,7 @@ const VaultPage = () => {
             action={ButtonAction.Secondary}
             slotLeft={<Icon iconName={IconName.Withdraw} />}
             onClick={() =>
-              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'withdraw' })))
+              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'WITHDRAW' })))
             }
           >
             {stringGetter({ key: STRING_KEYS.WITHDRAW })}

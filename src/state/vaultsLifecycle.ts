@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
 import {
+  Nullable,
   PerpetualMarket,
   VaultAccountCalculator,
   VaultCalculator,
@@ -183,14 +184,14 @@ const debouncedMarketsData = createHookedSelector(
 
     // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
     const [marketsToReturn, setMarketsToReturn] = useStateHf<{
-      data: kollections.Map<string, PerpetualMarket> | undefined;
+      data: Nullable<kollections.Map<string, PerpetualMarket>>;
     }>({ data: undefined });
 
     const throttledSync = useMemoHf(
       () =>
         throttle(() => {
           setMarketsToReturn({
-            data: latestMarkets.current ?? undefined,
+            data: latestMarkets.current,
           });
         }, MAX_UPDATE_SPEED_MS),
       []
@@ -205,7 +206,7 @@ const debouncedMarketsData = createHookedSelector(
         setMarketsToReturn((state) => {
           // if it got set by someone else, don't bother
           if (state.data == null || state.data.size === 0) {
-            return { data: latestMarkets.current ?? undefined };
+            return { data: latestMarkets.current };
           }
           return state;
         });
@@ -352,37 +353,41 @@ export const vaultFormSlippage = createHookedSelector(
     return slippageResp?.data;
   }
 ).dispatchValue((dispatch, value) => {
-  dispatch(setVaultFormSlippageResponse(value ?? undefined));
+  dispatch(setVaultFormSlippageResponse(value));
 });
+
+const selectVaultFormStateExceptAmount = createAppSelector(
+  [
+    (state) => state.vaults.vaultForm.operation,
+    (state) => state.vaults.vaultForm.slippageAck,
+    (state) => state.vaults.vaultForm.confirmationStep,
+    (state) => state.vaults.vaultForm.slippageResponse,
+  ],
+  (operation, slippageAck, confirmationStep, slippageResponse) => ({
+    operation,
+    slippageAck,
+    confirmationStep,
+    slippageResponse,
+  })
+);
+
+const selectSubaccountStateForVaults = createAppSelector(
+  [
+    (state) => state.account.subaccount?.marginUsage?.current,
+    (state) => state.account.subaccount?.freeCollateral?.current,
+  ],
+  (marginUsage, freeCollateral) => ({
+    marginUsage,
+    freeCollateral,
+  })
+);
 
 export const vaultFormValidation = createHookedSelector(
   [
     vaultFormAmountDebounced,
-    createAppSelector(
-      [
-        (state) => state.vaults.vaultForm.operation,
-        (state) => state.vaults.vaultForm.slippageAck,
-        (state) => state.vaults.vaultForm.confirmationStep,
-        (state) => state.vaults.vaultForm.slippageResponse,
-      ],
-      (operation, slippageAck, confirmationStep, slippageResponse) => ({
-        operation,
-        slippageAck,
-        confirmationStep,
-        slippageResponse,
-      })
-    ),
+    selectVaultFormStateExceptAmount,
     (state) => state.vaults.vaultAccount,
-    createAppSelector(
-      [
-        (state) => state.account.subaccount?.marginUsage?.current,
-        (state) => state.account.subaccount?.freeCollateral?.current,
-      ],
-      (marginUsage, freeCollateral) => ({
-        marginUsage,
-        freeCollateral,
-      })
-    ),
+    selectSubaccountStateForVaults,
   ],
   (
     amount,
@@ -402,18 +407,19 @@ export const vaultFormValidation = createHookedSelector(
         accountInfo,
       ],
       queryFn: async () => {
+        const vaultFormInfo = new VaultFormData(
+          operationStringToVaultFormAction(operation),
+          amount != null ? MustBigNumber(amount).toNumber() : undefined,
+          slippageAck,
+          confirmationStep
+        );
+        const vaultFormAccountInfo = new VaultFormAccountData(
+          accountInfo.marginUsage,
+          accountInfo.freeCollateral
+        );
         const parsedSlippage = VaultDepositWithdrawFormValidator.validateVaultForm(
-          new VaultFormData(
-            operation === 'DEPOSIT'
-              ? VaultFormAction.DEPOSIT
-              : operation === 'WITHDRAW'
-                ? VaultFormAction.WITHDRAW
-                : assertNever(operation),
-            amount != null ? MustBigNumber(amount).toNumber() : undefined,
-            slippageAck,
-            confirmationStep
-          ),
-          new VaultFormAccountData(accountInfo.marginUsage, accountInfo.freeCollateral),
+          vaultFormInfo,
+          vaultFormAccountInfo,
           vaultAccount,
           slippageResponse
         );
@@ -425,5 +431,13 @@ export const vaultFormValidation = createHookedSelector(
     return validationResponse?.data;
   }
 ).dispatchValue((dispatch, value) => {
-  dispatch(setVaultFormValidationResponse(value ?? undefined));
+  dispatch(setVaultFormValidationResponse(value));
 });
+
+function operationStringToVaultFormAction(operation: 'DEPOSIT' | 'WITHDRAW') {
+  return operation === 'DEPOSIT'
+    ? VaultFormAction.DEPOSIT
+    : operation === 'WITHDRAW'
+      ? VaultFormAction.WITHDRAW
+      : assertNever(operation);
+}

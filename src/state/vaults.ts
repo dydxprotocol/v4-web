@@ -14,13 +14,13 @@ export interface VaultForm {
   operation: 'DEPOSIT' | 'WITHDRAW';
   slippageAck: boolean;
   confirmationStep: boolean;
-  slippageResponse: VaultDepositWithdrawSlippageResponse | undefined;
-  validationResponse: VaultFormValidationResult | undefined;
+  slippageResponse: Nullable<VaultDepositWithdrawSlippageResponse>;
+  validationResponse: Nullable<VaultFormValidationResult>;
 }
 export interface VaultsState {
-  vaultDetails: VaultDetails | undefined;
-  vaultPositions: VaultPositions | undefined;
-  vaultAccount: VaultAccount | undefined;
+  vaultDetails: Nullable<VaultDetails>;
+  vaultPositions: Nullable<VaultPositions>;
+  vaultAccount: Nullable<VaultAccount>;
   vaultForm: VaultForm;
 }
 
@@ -43,13 +43,13 @@ export const vaultsSlice = createSlice({
   initialState,
   reducers: {
     setVaultDetails: (state, action: PayloadAction<Nullable<VaultDetails>>) => {
-      state.vaultDetails = action.payload ?? undefined;
+      state.vaultDetails = action.payload;
     },
     setVaultPositions: (state, action: PayloadAction<Nullable<VaultPositions>>) => {
-      state.vaultPositions = action.payload ?? undefined;
+      state.vaultPositions = action.payload;
     },
     setVaultAccount: (state, action: PayloadAction<Nullable<VaultAccount>>) => {
-      state.vaultAccount = action.payload ?? undefined;
+      state.vaultAccount = action.payload;
     },
     setVaultFormAmount: (state, action: PayloadAction<string>) => {
       state.vaultForm.amount = action.payload;
