@@ -28,12 +28,12 @@ export type TransactionDataParams = {
 export type TransferDirection = 'from' | 'to';
 
 export type SkipStatusResponse = {
-  axelarTransactionUrl: string | undefined;
-  latestRouteStatusSummary: RouteStatusSummary;
-  routeStatus: RouteStatus[];
-  toChain: SkipTransactionStatus | undefined;
-  fromChain: SkipTransactionStatus | undefined;
-  error: string | undefined;
+  axelarTransactionUrl?: string | undefined;
+  latestRouteStatusSummary?: RouteStatusSummary;
+  routeStatus?: RouteStatus[];
+  toChain?: SkipTransactionStatus | undefined;
+  fromChain?: SkipTransactionStatus | undefined;
+  error?: string | undefined;
 };
 
 export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;

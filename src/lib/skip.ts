@@ -10,7 +10,7 @@ import {
 
 import {
   RouteStatus,
-  RouteStatusString,
+  RouteStatusSummary,
   SkipStatusResponse,
   SkipTransactionStatus,
   TransactionDataParams,
@@ -105,7 +105,7 @@ class TransactionData {
   }
 }
 
-const getRouteStatusSummaryFromState = (state: string | undefined): RouteStatusString => {
+const getRouteStatusSummaryFromState = (state: string | undefined): RouteStatusSummary => {
   if (!state) return undefined;
   if (state.includes('SUCCESS') || state.includes('RECEIVED')) return 'success';
   return 'ongoing';
@@ -114,7 +114,7 @@ const getRouteStatusSummaryFromState = (state: string | undefined): RouteStatusS
 const getRouteStatusSummaryFromStateAndDirection = (
   state: string | undefined,
   transferDirection: TransferDirection
-): RouteStatusString => {
+): RouteStatusSummary => {
   if (!state) return undefined;
   //        If state is not unknown, it means the FROM tx succeeded
   if (!state.includes('UNKNOWN') && transferDirection === 'from') return 'success';
