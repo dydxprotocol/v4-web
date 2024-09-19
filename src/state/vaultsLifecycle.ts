@@ -150,10 +150,30 @@ async function placeholderFetchVaultAccountTransfers() {
   return JSON.stringify(baseObj);
 }
 
+function useDebounceHf<T>(value: T, delayMs?: number): T {
+  const [debouncedValue, setDebouncedValue] = useStateHf<T>(value);
+
+  useEffectHf(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delayMs ?? 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delayMs]);
+
+  return debouncedValue;
+}
+
+// it's illegal to return undefined from use query so we just wrap results in a data object
+function wrapNullable<T>(data: T | undefined | null): { data: T | null | undefined } {
+  return { data };
+}
+
 const vaultQueryOptions = {
   staleTime: 1000 * 60,
   refetchInterval: 1000 * 60 * 2,
 };
+
 export const loadedVaultDetails = createHookedSelector([], () => {
   const { data: vaultDetails } = useQueryHf({
     queryKey: ['vaultDetails'],
@@ -216,11 +236,6 @@ const debouncedMarketsData = createHookedSelector(
     return marketsToReturn;
   }
 );
-
-// it's illegal to return undefined from use query so we just wrap results in a data object
-function wrapNullable<T>(data: T | undefined | null): { data: T | null | undefined } {
-  return { data };
-}
 
 export const loadedVaultPositions = createHookedSelector(
   [debouncedMarketsData],
@@ -299,20 +314,6 @@ export const loadedVaultAccount = createHookedSelector([], () => {
 }).dispatchValue((dispatch, value) => {
   dispatch(setVaultAccount(value));
 });
-
-function useDebounceHf<T>(value: T, delayMs?: number): T {
-  const [debouncedValue, setDebouncedValue] = useStateHf<T>(value);
-
-  useEffectHf(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delayMs ?? 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delayMs]);
-
-  return debouncedValue;
-}
 
 const vaultFormAmountDebounced = createHookedSelector(
   [(state) => state.vaults.vaultForm.amount],
