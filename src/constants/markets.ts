@@ -51,6 +51,7 @@ export enum MarketFilters {
   ENT = 'Entertainment',
 }
 
+// ORDER IS INTENTIONAL
 export const MARKET_FILTER_OPTIONS: Record<
   MarketFilters,
   {
@@ -64,13 +65,14 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.NEW]: {
     label: STRING_KEYS.RECENTLY_LISTED,
   },
-  [MarketFilters.PREDICTION_MARKET]: {
-    label: STRING_KEYS.PREDICTION_MARKET,
-    isNew: true,
+  [MarketFilters.MEME]: {
+    label: STRING_KEYS.MEME,
   },
-  [MarketFilters.FX]: {
-    label: STRING_KEYS.FOREX,
-    isNew: true,
+  [MarketFilters.AI]: {
+    label: STRING_KEYS.AI,
+  },
+  [MarketFilters.DEFI]: {
+    label: STRING_KEYS.DEFI,
   },
   [MarketFilters.LAYER_1]: {
     label: STRING_KEYS.LAYER_1,
@@ -78,26 +80,25 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.LAYER_2]: {
     label: STRING_KEYS.LAYER_2,
   },
-  [MarketFilters.DEFI]: {
-    label: STRING_KEYS.DEFI,
-  },
-  [MarketFilters.AI]: {
-    label: STRING_KEYS.AI,
-  },
-  [MarketFilters.NFT]: {
-    label: STRING_KEYS.NFT,
+  [MarketFilters.RWA]: {
+    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
   },
   [MarketFilters.GAMING]: {
     label: STRING_KEYS.GAMING,
   },
-  [MarketFilters.MEME]: {
-    label: STRING_KEYS.MEME,
+  [MarketFilters.FX]: {
+    label: STRING_KEYS.FOREX,
+    isNew: true,
   },
-  [MarketFilters.RWA]: {
-    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  [MarketFilters.NFT]: {
+    label: STRING_KEYS.NFT,
   },
   [MarketFilters.ENT]: {
     label: STRING_KEYS.ENTERTAINMENT,
+  },
+  [MarketFilters.PREDICTION_MARKET]: {
+    label: STRING_KEYS.PREDICTION_MARKET,
+    isNew: true,
   },
 };
 

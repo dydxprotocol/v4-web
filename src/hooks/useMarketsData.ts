@@ -27,7 +27,7 @@ const filterFunctions = {
     return market.tags?.includes('Defi');
   },
   [MarketFilters.ENT]: (market: MarketData) => {
-    return market.tags?.includes('ENT');
+    return market.tags?.includes('Entertainment');
   },
   [MarketFilters.FX]: (market: MarketData) => {
     return market.tags?.includes('FX');
