@@ -13,6 +13,7 @@ export const objectKeys = <T extends object>(t: T) => Object.keys(t) as Array<ke
 // and the result is typed correctly by the type system
 export const safeAssign = Object.assign;
 
+// it's lodash.pick() except you are forced to provide valid keys of the object, no going off rails
 export const safePick: <T extends object, U extends keyof T>(
   t: T,
   ...args: Array<U>
