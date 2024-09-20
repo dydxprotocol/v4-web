@@ -12,11 +12,11 @@ if (!userAgent.includes('pnpm')) {
 const userAgentParts = userAgent.split(' ');
 const pnpmInfo = userAgentParts.find((part) => part.startsWith('pnpm/'));
 const pnpmVersion = pnpmInfo ? pnpmInfo.split('/')[1] : '';
-const requiredVersion = '8.6.6'; // Change to your required version
+const requiredMajorVersion = '8'; // Change to your required version
 
-if (pnpmVersion !== requiredVersion) {
+if (!pnpmVersion.startsWith(`${requiredMajorVersion}.`)) {
   console.error(
-    `Error: This project requires pnpm version ${requiredVersion}, but you're using ${pnpmVersion}`
+    `Error: This project requires pnpm version ${requiredMajorVersion}, but you're using ${pnpmVersion}`
   );
   process.exit(1);
 }
