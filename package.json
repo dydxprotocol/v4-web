@@ -40,7 +40,7 @@
     "tag": "node scripts/generate-tag.js",
     "test": "VITE_DISABLE_STATSIG=true vitest run",
     "tsc": "tsc",
-    "postinstall": "tar -xzC public -f tradingview/tradingview.tgz",
+    "postinstall": "echo prashan",
     "prepare": "husky",
     "commitlint": "commitlint --edit",
     "wdio": "wdio run ./wdio.conf.ts"
