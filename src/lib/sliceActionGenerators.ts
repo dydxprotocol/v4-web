@@ -13,6 +13,9 @@ type SubSetterActionHandlers<
   ) => void;
 };
 
+// Given an initial state object which has all properties (no optional properties excluded please),
+// generate a setProperty action for each property on the state
+// so { x: 1, y: 1 } turns into { setX, setY } actions which just set the property
 export function generateTypedSetterActions<
   BaseState extends object,
   SubState extends object = BaseState,
