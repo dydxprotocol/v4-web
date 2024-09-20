@@ -1,7 +1,9 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { range } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
+
+import { generateTypedSetterActions } from '@/lib/sliceActionGenerators';
 
 export interface VaultsState {
   vaultDetails: VaultDetails;
@@ -98,10 +100,8 @@ export const vaultsSlice = createSlice({
   name: 'Vaults',
   initialState,
   reducers: {
-    setVault: (state: VaultsState, action: PayloadAction<VaultDetails>) => {
-      state.vaultDetails = action.payload;
-    },
+    ...generateTypedSetterActions(initialState),
   },
 });
 
-export const { setVault } = vaultsSlice.actions;
+export const { setVaultDetails } = vaultsSlice.actions;
