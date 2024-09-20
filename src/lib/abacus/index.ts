@@ -30,7 +30,6 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
-  OnboardingConfig,
   StatsigConfig,
   TradeInputField,
   TransferInputField,
