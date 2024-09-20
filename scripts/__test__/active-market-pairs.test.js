@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, Mock } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fetchActiveMarketPairs } from '../markets/active-market-pairs';
 
-global.fetch = vi.fn() as Mock;
+global.fetch = vi.fn();
 
 describe('fetchActiveMarketPairs', () => {
   it('should return only active market pairs', async () => {
@@ -23,7 +23,7 @@ describe('fetchActiveMarketPairs', () => {
       pagination: {}
     };
 
-    (fetch as Mock).mockImplementation((url: string) => ({
+    fetch.mockImplementation((url) => ({
       status: 200,
       json: async () => {
         if (url.includes('market')) {
@@ -32,7 +32,7 @@ describe('fetchActiveMarketPairs', () => {
         if (url.includes('clob_pair')) {
           return url.includes('pagination.key=page2')
             ? mockClobPairsPage2
-            : mockClobPairsPage1
+            : mockClobPairsPage1;
         }
         return {};
       }
