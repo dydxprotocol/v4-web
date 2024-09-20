@@ -1,3 +1,5 @@
+import { pick } from 'lodash';
+
 /** Object.entries() with key types preserved */
 export const objectEntries = <T extends object>(t: T) =>
   Object.entries(t) as { [K in keyof T]: [K, T[K]] }[keyof T][];
@@ -10,3 +12,8 @@ export const objectKeys = <T extends object>(t: T) => Object.keys(t) as Array<ke
 // can be safely splatted like {...someObject}. Object.assign is slightly slower but guarantees all the properties will get copied
 // and the result is typed correctly by the type system
 export const safeAssign = Object.assign;
+
+export const safePick: <T extends object, U extends keyof T>(
+  t: T,
+  ...args: Array<U>
+) => Pick<T, U> = pick;

@@ -1,6 +1,8 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 import { type Asset } from '@/constants/abacus';
+
+import { generateTypedSetterActions } from '@/lib/sliceActionGenerators';
 
 export interface AssetsState {
   assets?: Record<string, Asset>;
@@ -14,10 +16,7 @@ export const assetsSlice = createSlice({
   name: 'Assets',
   initialState,
   reducers: {
-    setAssets: (state: AssetsState, action: PayloadAction<Record<string, Asset>>) => ({
-      ...state,
-      assets: action.payload,
-    }),
+    ...generateTypedSetterActions(initialState),
   },
 });
 

@@ -34,7 +34,9 @@ import {
 } from '@/constants/trade';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { safePick } from '@/lib/objectHelpers';
 import { isOrderStatusCanceled, isOrderStatusClearable } from '@/lib/orders';
+import { generateTypedSetterActions } from '@/lib/sliceActionGenerators';
 
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
@@ -221,10 +223,6 @@ export const accountSlice = createSlice({
         [action.payload.guard]: action.payload.value,
       },
     }),
-    setOnboardingState: (state, action: PayloadAction<OnboardingState>) => ({
-      ...state,
-      onboardingState: action.payload,
-    }),
     setHistoricalPnl: (state, action: PayloadAction<Nullable<SubAccountHistoricalPNLs>>) => {
       if (action.payload) {
         state.historicalPnl = action.payload;
@@ -232,9 +230,6 @@ export const accountSlice = createSlice({
     },
     setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
       state.restriction = action.payload;
-    },
-    setCompliance: (state, action: PayloadAction<Compliance>) => {
-      state.compliance = action.payload;
     },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       const existingOrderIds = state.subaccount?.orders
@@ -313,10 +308,6 @@ export const accountSlice = createSlice({
 
       state.childSubaccounts = childSubaccountsCopy;
     },
-    setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
-      ...state,
-      wallet: action.payload,
-    }),
     viewedFills: (state, action: PayloadAction<string | undefined>) => {
       if (!action.payload) {
         // viewed fills for all markets
@@ -329,24 +320,20 @@ export const accountSlice = createSlice({
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
     },
-    setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
-      state.balances = action.payload;
-    },
-    setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
-      state.stakingBalances = action.payload;
-    },
-    setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
-      state.stakingDelegations = action.payload;
-    },
-    setUnbondingDelegations: (state, action: PayloadAction<UnbondingDelegation[]>) => {
-      state.unbondingDelegations = action.payload;
-    },
-    setStakingRewards: (state, action: PayloadAction<StakingRewards>) => {
-      state.stakingRewards = action.payload;
-    },
-    setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
-      state.tradingRewards = action.payload;
-    },
+    ...generateTypedSetterActions(
+      safePick(
+        initialState,
+        'onboardingState',
+        'compliance',
+        'wallet',
+        'balances',
+        'stakingBalances',
+        'stakingDelegations',
+        'unbondingDelegations',
+        'stakingRewards',
+        'tradingRewards'
+      )
+    ),
     placeOrderSubmitted: (
       state,
       action: PayloadAction<{ marketId: string; clientId: string; orderType: TradeTypes }>

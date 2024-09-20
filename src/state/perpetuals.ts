@@ -13,8 +13,9 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { objectKeys } from '@/lib/objectHelpers';
+import { objectKeys, safePick } from '@/lib/objectHelpers';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
+import { generateTypedSetterActions } from '@/lib/sliceActionGenerators';
 
 interface CandleDataByMarket {
   data: Record<string, Candle[]>;
@@ -55,12 +56,7 @@ export const perpetualsSlice = createSlice({
   name: 'Perpetuals',
   initialState,
   reducers: {
-    setMarketFilter: (state: PerpetualsState, action: PayloadAction<MarketFilters>) => {
-      state.marketFilter = action.payload;
-    },
-    setCurrentMarketId: (state: PerpetualsState, action: PayloadAction<string>) => {
-      state.currentMarketId = action.payload;
-    },
+    ...generateTypedSetterActions(safePick(initialState, 'marketFilter', 'currentMarketId')),
     setCandles: (
       state: PerpetualsState,
       action: PayloadAction<{ candles: Candle[]; marketId: string; resolution: string }>

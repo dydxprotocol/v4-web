@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 import { AbacusApiState } from '@/constants/abacus';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -6,6 +6,7 @@ import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks'
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
+import { generateTypedSetterActions } from '@/lib/sliceActionGenerators';
 
 export interface AppState {
   apiState: AbacusApiState | undefined;
@@ -33,25 +34,9 @@ export const appSlice = createSlice({
       ...state,
       pageLoaded: true,
     }),
-    initializeWebsocket: (state: AppState) => state,
-    setApiState: (state: AppState, action: PayloadAction<AbacusApiState>) => ({
-      ...state,
-      apiState: action.payload,
-    }),
-    setSelectedNetwork: (state: AppState, action: PayloadAction<DydxNetwork>) => ({
-      ...state,
-      selectedNetwork: action.payload,
-    }),
-    setInitializationError: (state: AppState, action: PayloadAction<string>) => {
-      state.initializationError = action.payload;
-    },
+    ...generateTypedSetterActions(initialState),
   },
 });
 
-export const {
-  initializeLocalization,
-  initializeWebsocket,
-  setApiState,
-  setSelectedNetwork,
-  setInitializationError,
-} = appSlice.actions;
+export const { initializeLocalization, setApiState, setSelectedNetwork, setInitializationError } =
+  appSlice.actions;
