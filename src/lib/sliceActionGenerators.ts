@@ -1,5 +1,7 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { upperFirst } from 'lodash';
+// todo remove this when we upgrade typescript to 5.4 or whenever NoInfer is added
+import { NoInfer } from 'react-redux';
 
 type SubSetterActionHandlers<
   T extends object,
