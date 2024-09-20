@@ -10,16 +10,17 @@ import { Input, InputType, type InputProps } from '@/components/Input';
 
 type ElementProps = {
   onTextChange?: (value: string) => void;
+  className?: string;
 };
 
 export type SearchInputProps = ElementProps & InputProps;
 
-export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => {
+export const SearchInput = ({ placeholder, onTextChange, className }: SearchInputProps) => {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <$Search>
+    <$Search className={className}>
       <$Icon iconName={IconName.Search} />
       <Input
         autoFocus
