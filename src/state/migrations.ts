@@ -1,7 +1,6 @@
 import { createMigrate, MigrationManifest, PersistedState, PersistMigrate } from 'redux-persist';
 import { MigrationConfig } from 'redux-persist/lib/createMigrate';
 
-
 function parseStorageItem(data: string | null) {
   if (!data) return undefined;
 
