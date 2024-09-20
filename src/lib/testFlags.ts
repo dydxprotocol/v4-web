@@ -67,6 +67,10 @@ class TestFlags {
   get referralCode() {
     return this.queryParams.ref;
   }
+
+  get enableStaticTyping() {
+    return !!this.queryParams.statictyping;
+  }
 }
 
 export const testFlags = new TestFlags();
