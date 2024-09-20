@@ -18,6 +18,7 @@ import { assertNever } from '@/lib/assertNever';
 import { useEffectHf, useMemoHf, useRefHf, useStateHf } from '@/lib/hookify/vanillaHooks';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { calculateCanViewAccount } from './accountCalculators';
 import { createHookedSelector, useQueryHf } from './appHookedSelectors';
 import { appQueryClient } from './appQueryClient';
 import { createAppSelector } from './appTypes';
@@ -39,7 +40,7 @@ async function placeholderFetchMegavaultHistory() {
   await delay(Math.random() * 2000);
 
   const baseObj = {
-    vaultOfVaultsPnl: [
+    megavaultPnl: [
       {
         id: '1',
         createdAt: '0',
@@ -60,7 +61,7 @@ async function placeholderFetchSubvaultHistory() {
   return JSON.stringify({
     vaultsPnl: [
       {
-        marketId: 'BTC-USD',
+        ticker: 'BTC-USD',
         historicalPnl: [
           {
             id: '1',
@@ -83,7 +84,7 @@ async function placeholderFetchMegavaultPositions() {
   return JSON.stringify({
     positions: [
       {
-        market: 'BTC-USD',
+        ticker: 'BTC-USD',
         assetPosition: {
           side: 'LONG',
           size: '100',
@@ -376,10 +377,12 @@ const selectSubaccountStateForVaults = createAppSelector(
   [
     (state) => state.account.subaccount?.marginUsage?.current,
     (state) => state.account.subaccount?.freeCollateral?.current,
+    calculateCanViewAccount,
   ],
-  (marginUsage, freeCollateral) => ({
+  (marginUsage, freeCollateral, canViewAccount) => ({
     marginUsage,
     freeCollateral,
+    canViewAccount,
   })
 );
 
@@ -416,7 +419,8 @@ export const vaultFormValidation = createHookedSelector(
         );
         const vaultFormAccountInfo = new VaultFormAccountData(
           accountInfo.marginUsage,
-          accountInfo.freeCollateral
+          accountInfo.freeCollateral,
+          accountInfo.canViewAccount
         );
         const parsedSlippage = VaultDepositWithdrawFormValidator.validateVaultForm(
           vaultFormInfo,

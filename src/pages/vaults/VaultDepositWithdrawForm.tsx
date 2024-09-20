@@ -4,7 +4,6 @@ import { NumberFormatValues } from 'react-number-format';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { ErrorType, VaultFormValidationErrorType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -40,16 +39,12 @@ import {
   setVaultFormSlippageAck,
 } from '@/state/vaults';
 
-import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 // errors we don't want to show aggressive visual cues about, just disable submit
-const lightErrorKeys = new Set<string>([
-  'ACCOUNT_DATA_MISSING',
-  'AMOUNT_EMPTY',
-] satisfies VaultFormValidationErrorType['name'][]);
+const lightErrorKeys = new Set<string>(['ACCOUNT_DATA_MISSING', 'AMOUNT_EMPTY']);
 
 type VaultDepositWithdrawFormProps = {
   initialType?: 'DEPOSIT' | 'WITHDRAW';
@@ -108,83 +103,34 @@ export const VaultDepositWithdrawForm = ({
     () =>
       validationResponse?.errors.toArray().map((error) => {
         const errorStrings: { long?: string | JSX.Element; short?: string } = ex(() => {
-          switch (error.type.name) {
-            case 'ACCOUNT_DATA_MISSING':
-              if (!canViewAccount) {
-                return {
-                  short: stringGetter({ key: STRING_KEYS.CONNECT_WALLET }),
-                };
-              }
-              // todo this could also be because account data is loading
-              return {
-                short: stringGetter({ key: STRING_KEYS.NOT_ALLOWED }),
-              };
-            case 'AMOUNT_EMPTY':
-              return {
-                short:
-                  operation === 'DEPOSIT'
-                    ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_DEPOSIT })
-                    : stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_WITHDRAW }),
-              };
-            case 'DEPOSIT_TOO_HIGH':
-              return {
-                long: stringGetter({ key: STRING_KEYS.DEPOSIT_TOO_HIGH }),
-                short: stringGetter({ key: STRING_KEYS.MODIFY_SIZE_FIELD }),
-              };
-            case 'WITHDRAW_TOO_HIGH':
-              return {
-                long: stringGetter({ key: STRING_KEYS.WITHDRAW_TOO_HIGH }),
-                short: stringGetter({ key: STRING_KEYS.MODIFY_SIZE_FIELD }),
-              };
-            case 'WITHDRAWING_LOCKED_BALANCE':
-              return {
-                long: stringGetter({ key: STRING_KEYS.WITHDRAW_TOO_HIGH }),
-                short: stringGetter({ key: STRING_KEYS.MODIFY_SIZE_FIELD }),
-              };
-            case 'MUST_ACK_SLIPPAGE':
-              return {
-                short: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_HIGH_SLIPPAGE }),
-              };
-            case 'SLIPPAGE_TOO_HIGH':
-              return {
-                long: (
-                  <span>
-                    {stringGetter({
-                      key: STRING_KEYS.SLIPPAGE_WARNING,
-                      params: {
-                        AMOUNT: <$InlineOutput value={slippagePercent} type={OutputType.Percent} />,
-                        LINK: (
-                          <Link href={vaultsLearnMore} withIcon isInline>
-                            {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
-                          </Link>
-                        ),
-                      },
-                    })}
-                  </span>
-                ),
-              };
-            // essentially internal errors...
-            case 'SLIPPAGE_RESPONSE_MISSING':
-              return {};
-            case 'SLIPPAGE_RESPONSE_WRONG_SHARES':
-              return {};
-            case 'VAULT_ACCOUNT_MISSING':
-              return {};
-            default:
-              assertNever(error.type.name);
+          const longKey = error.resources.text?.stringKey;
+          const shortKey = error.resources.title?.stringKey;
+          const long = longKey != null ? stringGetter({ key: longKey }) : undefined;
+          const short = shortKey != null ? stringGetter({ key: shortKey }) : undefined;
+          if (error.code === 'SLIPPAGE_TOO_HIGH') {
+            return {
+              long: (
+                <span>
+                  {stringGetter({
+                    key: STRING_KEYS.SLIPPAGE_WARNING,
+                    params: {
+                      AMOUNT: <$InlineOutput value={slippagePercent} type={OutputType.Percent} />,
+                      LINK: (
+                        <Link href={vaultsLearnMore} withIcon isInline>
+                          {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
+                        </Link>
+                      ),
+                    },
+                  })}
+                </span>
+              ),
+            };
           }
-          return {};
+          return { long, short };
         });
         return safeAssign({}, error, errorStrings);
       }),
-    [
-      canViewAccount,
-      operation,
-      slippagePercent,
-      stringGetter,
-      validationResponse?.errors,
-      vaultsLearnMore,
-    ]
+    [slippagePercent, stringGetter, validationResponse?.errors, vaultsLearnMore]
   );
 
   const onSubmitInputForm = () => {
@@ -307,16 +253,15 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorsPreventingSubmit =
-    errors?.filter((e) => e.severity.rawValue === ErrorType.error.rawValue) ?? [];
+  const errorsPreventingSubmit = errors?.filter((e) => e.type.name === 'error') ?? [];
   const hasInputErrors = validationResponse == null || errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
     ?.filter((e) => e.long != null)
     .map((alertMessage) => (
       <AlertMessage
-        key={alertMessage.type.name}
-        type={alertMessage.severity.name === 'error' ? AlertType.Error : AlertType.Warning}
+        key={alertMessage.code}
+        type={alertMessage.type.name === 'error' ? AlertType.Error : AlertType.Warning}
       >
         {alertMessage.long}
       </AlertMessage>
@@ -383,7 +328,7 @@ export const VaultDepositWithdrawForm = ({
             isLoading: isSubmitting,
           }}
           slotLeft={
-            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.type.name)) != null ? (
+            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
               <$WarningIcon iconName={IconName.Warning} />
             ) : undefined
           }
@@ -466,7 +411,7 @@ export const VaultDepositWithdrawForm = ({
             isLoading: isSubmitting,
           }}
           slotLeft={
-            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.type.name)) != null ? (
+            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
               <$WarningIcon iconName={IconName.Warning} />
             ) : undefined
           }
