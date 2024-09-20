@@ -1,7 +1,6 @@
 import { createMigrate, MigrationManifest, PersistedState, PersistMigrate } from 'redux-persist';
 import { MigrationConfig } from 'redux-persist/lib/createMigrate';
 
-import { LocalStorageKey } from '@/constants/localStorage';
 
 function parseStorageItem(data: string | null) {
   if (!data) return undefined;
@@ -24,12 +23,10 @@ export function customCreateMigrate(
     }
 
     // Get all old localStorage items here
-    const oldTvChartConfig = parseStorageItem(
-      localStorage.getItem(LocalStorageKey.TradingViewChartConfig)
-    );
+    const oldTvChartConfig = parseStorageItem(localStorage.getItem('dydx.TradingViewChartConfig'));
 
     // Remove (now) unused localStorage items
-    localStorage.removeItem(LocalStorageKey.TradingViewChartConfig);
+    localStorage.removeItem('dydx.TradingViewChartConfig');
 
     const initializedState = {
       tradingView: {

@@ -21,8 +21,8 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
-import { updateChartConfig } from '@/state/tradingview';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
@@ -78,11 +78,6 @@ export const useTradingView = ({
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
-
-  // const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
-  //   key: LocalStorageKey.TradingViewChartConfig,
-  //   defaultValue: undefined,
-  // });
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
 
@@ -231,7 +226,6 @@ export const useTradingView = ({
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
           tvWidgetRef?.current?.save((chartConfig: object) => {
-            console.log('updating chartConfig', chartConfig);
             dispatch(updateChartConfig(chartConfig));
           })
         );
