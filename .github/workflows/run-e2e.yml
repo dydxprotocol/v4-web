@@ -36,10 +36,9 @@ jobs:
 
       - name: Install dependencies
         if: steps.check_env.outputs.should_run_tests == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          pnpm install --loglevel warn
+          pnpm install --loglevel warn --ignore-scripts
+          tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
       - name: Run e2e tests
         if: steps.check_env.outputs.should_run_tests == 'true'
@@ -48,4 +47,4 @@ jobs:
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           E2E_ENVIRONMENT_PASSWORD: ${{ secrets.E2E_ENVIRONMENT_PASSWORD }}
           E2E_ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
-        run: pnpm run wdio
+        run: pnpm exec wdio run ./wdio.conf.ts
