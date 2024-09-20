@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
@@ -11,24 +11,24 @@ import {
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getTvChartConfig } from '@/state/tradingViewSelectors';
+import { updateChartConfig } from '@/state/tradingview';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from '../useDydxClient';
-import { useLocalStorage } from '../useLocalStorage';
 import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
@@ -66,6 +66,7 @@ export const useTradingView = ({
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
+  const dispatch = useAppDispatch();
 
   const { group, decimal } = useLocaleSeparators();
 
@@ -78,12 +79,17 @@ export const useTradingView = ({
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
-  const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
-    key: LocalStorageKey.TradingViewChartConfig,
-    defaultValue: undefined,
-  });
+  // const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
+  //   key: LocalStorageKey.TradingViewChartConfig,
+  //   defaultValue: undefined,
+  // });
 
-  const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
+  const savedTvChartConfig = useAppSelector(getTvChartConfig);
+
+  const savedResolution = useMemo(
+    () => getSavedResolution({ savedConfig: savedTvChartConfig }),
+    [savedTvChartConfig]
+  );
 
   const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
     [marketId: string]: number | undefined;
@@ -224,7 +230,10 @@ export const useTradingView = ({
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
+          tvWidgetRef?.current?.save((chartConfig: object) => {
+            console.log('updating chartConfig', chartConfig);
+            dispatch(updateChartConfig(chartConfig));
+          })
         );
 
         setIsChartReady(true);
