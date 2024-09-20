@@ -42,7 +42,7 @@ const persistConfig = {
   version: 0,
   storage,
   whitelist: ['tradingView'],
-  migrate: customCreateMigrate({}, { debug: process.env.NODE_ENV !== 'production' }),
+  migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
