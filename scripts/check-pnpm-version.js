@@ -1,3 +1,22 @@
+import { readFileSync } from 'fs';
+import path from 'path';
+
+// Read package.json to get the required package manager version
+const packageJsonPath = path.resolve(process.cwd(), 'package.json');
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+
+const packageManager = packageJson.packageManager ?? '';
+const pnpmVersionFromPackageJson = packageManager.startsWith('pnpm@')
+  ? packageManager.split('@')[1]
+  : null;
+
+const requiredMajorPnpmVersion = pnpmVersionFromPackageJson[0];
+
+if (!requiredMajorPnpmVersion) {
+  console.error('Error: Could not find pnpm version in package.json');
+  process.exit(1);
+}
+
 // Get the user agent (package manager) that initiated the install
 const userAgent = process.env.npm_config_user_agent ?? '';
 console.log('userAgent', userAgent);
@@ -12,11 +31,10 @@ if (!userAgent.includes('pnpm')) {
 const userAgentParts = userAgent.split(' ');
 const pnpmInfo = userAgentParts.find((part) => part.startsWith('pnpm/'));
 const pnpmVersion = pnpmInfo ? pnpmInfo.split('/')[1] : '';
-const requiredMajorVersion = '8'; // Change to your required version
 
-if (!pnpmVersion.startsWith(`${requiredMajorVersion}.`)) {
+if (!pnpmVersion.startsWith(`${requiredMajorPnpmVersion}.`)) {
   console.error(
-    `Error: This project requires pnpm version ${requiredMajorVersion}, but you're using ${pnpmVersion}`
+    `Error: This project requires major pnpm version ${requiredMajorPnpmVersion}, but you're using ${pnpmVersion}`
   );
   process.exit(1);
 }
