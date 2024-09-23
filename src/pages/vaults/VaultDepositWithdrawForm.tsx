@@ -31,13 +31,14 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { calculateCanViewAccount, calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getVaultAccount, getVaultForm } from '@/state/vaultSelectors';
+import { getVaultForm } from '@/state/vaultSelectors';
 import {
   setVaultFormAmount,
   setVaultFormConfirmationStep,
   setVaultFormOperation,
   setVaultFormSlippageAck,
 } from '@/state/vaults';
+import { useLoadedVaultAccount, useVaultFormValidationResponse } from '@/state/vaultsLifecycle';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
@@ -64,10 +65,10 @@ export const VaultDepositWithdrawForm = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
 
-  const { amount, confirmationStep, slippageAck, operation, validationResponse } =
-    useAppSelector(getVaultForm) ?? {};
+  const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
+  const validationResponse = useVaultFormValidationResponse();
 
-  const { balanceUsdc: userBalance } = orEmptyObj(useAppSelector(getVaultAccount));
+  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount());
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting] = useState(false);

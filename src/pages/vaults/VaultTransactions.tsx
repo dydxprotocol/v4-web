@@ -17,12 +17,12 @@ import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getVaultAccountTransfers } from '@/state/vaultSelectors';
+import { useLoadedVaultAccountTransfers } from '@/state/vaultsLifecycle';
 
 export const VaultTransactionsCard = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const [showHistory, setShowHistory] = useState(false);
-  const transactions = useAppSelector(getVaultAccountTransfers) ?? EMPTY_ARR;
+  const transactions = useLoadedVaultAccountTransfers() ?? EMPTY_ARR;
 
   return (
     <div className={className} tw="rounded-[0.7rem] border border-solid border-color-border">
@@ -59,7 +59,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
 const $ShowHideHistoryButton = styled(Button)``;
 const VaultTransactionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const transactions = useAppSelector(getVaultAccountTransfers) ?? EMPTY_ARR;
+  const transactions = useAppSelector(useLoadedVaultAccountTransfers) ?? EMPTY_ARR;
 
   const columns = useMemo<ColumnDef<VaultTransfer>[]>(
     () =>

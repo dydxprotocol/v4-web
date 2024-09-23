@@ -14,8 +14,7 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { PortfolioCard } from '@/components/PortfolioCard';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getVaultAccount } from '@/state/vaultSelectors';
+import { useLoadedVaultAccount } from '@/state/vaultsLifecycle';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -25,14 +24,14 @@ type MaybeVaultPositionsPanelProps = {
   header: ReactNode;
 };
 
-type UserVault = ReturnType<typeof getVaultAccount>;
+type UserVault = ReturnType<typeof useLoadedVaultAccount>;
 
 export const MaybeVaultPositionsPanel = ({
   onViewVault,
   header,
   className,
 }: MaybeVaultPositionsPanelProps) => {
-  const userVault = useAppSelector(getVaultAccount);
+  const userVault = useLoadedVaultAccount();
   const { isTablet } = useBreakpoints();
   if (!testFlags.enableVaults) return null;
   if (userVault == null && !isTablet) {

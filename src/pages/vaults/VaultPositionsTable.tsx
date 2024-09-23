@@ -3,6 +3,7 @@ import { Key, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { VaultPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -21,19 +22,23 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { getVaultPositions } from '@/state/vaultSelectors';
+import { useLoadedVaultPositions } from '@/state/vaultsLifecycle';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
-type VaultTableRow = NonNullable<ReturnType<typeof getVaultPositions>>[number];
+type VaultTableRow = VaultPosition;
 
 const VAULT_PAGE_SIZE = 50 as const;
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
-  const vaultsData = useAppSelector(getVaultPositions) ?? EMPTY_ARR;
+  const vaultsDataRaw = useLoadedVaultPositions();
+  const vaultsData = useMemo(
+    () => vaultsDataRaw?.positions?.toArray() ?? EMPTY_ARR,
+    [vaultsDataRaw?.positions]
+  );
   const marketIdToAssetMetadataMap = useAppSelector(getMarketIdToAssetMetadataMap) ?? EMPTY_ARR;
   const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
 

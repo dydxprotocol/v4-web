@@ -1,4 +1,7 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import { kollections } from '@dydxprotocol/v4-abacus';
+import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
@@ -15,20 +18,11 @@ import {
 
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
-import { useEffectHf, useMemoHf, useRefHf, useStateHf } from '@/lib/hookify/vanillaHooks';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { calculateCanViewAccount } from './accountCalculators';
-import { createHookedSelector, useQueryHf } from './appHookedSelectors';
 import { appQueryClient } from './appQueryClient';
-import { createAppSelector } from './appTypes';
-import {
-  setVaultAccount,
-  setVaultDetails,
-  setVaultFormSlippageResponse,
-  setVaultFormValidationResponse,
-  setVaultPositions,
-} from './vaults';
+import { createAppSelector, useAppSelector } from './appTypes';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -152,9 +146,9 @@ async function placeholderFetchVaultAccountTransfers() {
 }
 
 function useDebounceHf<T>(value: T, delayMs?: number): T {
-  const [debouncedValue, setDebouncedValue] = useStateHf<T>(value);
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  useEffectHf(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setDebouncedValue(value), delayMs ?? 500);
 
     return () => {
@@ -175,8 +169,8 @@ const vaultQueryOptions = {
   refetchInterval: 1000 * 60 * 2,
 };
 
-export const loadedVaultDetails = createHookedSelector([], () => {
-  const { data: vaultDetails } = useQueryHf({
+export const useLoadedVaultDetails = () => {
+  const { data: vaultDetails } = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
       return wrapNullable(
@@ -189,100 +183,95 @@ export const loadedVaultDetails = createHookedSelector([], () => {
   });
 
   return vaultDetails?.data;
-}).dispatchValue((dispatch, value) => {
-  dispatch(setVaultDetails(value));
-});
+};
+
+export const useVaultPnlHistory = () => {
+  const details = useLoadedVaultDetails();
+  return useMemo(() => details?.history?.toArray(), [details?.history]);
+};
 
 const MAX_UPDATE_SPEED_MS = 1000 * 60; // one per minute
 
-const debouncedMarketsData = createHookedSelector(
-  // argument is just to cause this to rerender when the markets change, we don't use that value
-  [(state) => state.perpetuals.markets],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (_marketsToIgnore) => {
-    const markets = abacusStateManager.stateManager.state?.marketsSummary?.markets;
-    const latestMarkets = useRefHf(markets);
+// A reference to raw abacus markets map that updates only when the data goes from empty to full and once per minute
+// Note that this will cause the component to re-render a lot since we have to subscribe to redux markets which changes often
+// I don't know how else to ensure we catch the 0->1 aka empty to filled update
+const useDebouncedMarketsData = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
+  const _marketsOnlyHereToTriggerRerenders = useAppSelector((state) => state.perpetuals.markets);
 
-    // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
-    const [marketsToReturn, setMarketsToReturn] = useStateHf<{
-      data: Nullable<kollections.Map<string, PerpetualMarket>>;
-    }>({ data: undefined });
+  const markets = abacusStateManager.stateManager.state?.marketsSummary?.markets;
+  const latestMarkets = useRef(markets);
+  latestMarkets.current = markets;
 
-    const throttledSync = useMemoHf(
-      () =>
-        throttle(() => {
-          setMarketsToReturn({
-            data: latestMarkets.current,
-          });
-        }, MAX_UPDATE_SPEED_MS),
-      []
-    );
+  // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
+  const [marketsToReturn, setMarketsToReturn] = useState<{
+    data: Nullable<kollections.Map<string, PerpetualMarket>>;
+  }>({ data: latestMarkets.current });
 
-    latestMarkets.current = markets;
-    throttledSync();
-
-    // if markets is null and we have non-null, force set it
-    if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {
-      if (latestMarkets.current != null && latestMarkets.current.size > 0) {
-        setMarketsToReturn((state) => {
-          // if it got set by someone else, don't bother
-          if (state.data == null || state.data.size === 0) {
-            return { data: latestMarkets.current };
-          }
-          return state;
+  const throttledSync = useMemo(
+    () =>
+      throttle(() => {
+        setMarketsToReturn({
+          data: latestMarkets.current,
         });
-      }
+      }, MAX_UPDATE_SPEED_MS),
+    []
+  );
+
+  // update once per minute
+  throttledSync();
+
+  // if markets is null and we have non-null, force update it
+  if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {
+    if (latestMarkets.current != null && latestMarkets.current.size > 0) {
+      setMarketsToReturn((state) => {
+        // if it got set by someone else, don't bother
+        if (state.data == null || state.data.size === 0) {
+          return { data: latestMarkets.current };
+        }
+        return state;
+      });
     }
-
-    return marketsToReturn;
   }
-);
 
-export const loadedVaultPositions = createHookedSelector(
-  [debouncedMarketsData],
-  (marketsMapRaw) => {
-    const marketsMap = marketsMapRaw.data;
-    const { data: subvaultHistories } = useQueryHf({
-      queryKey: ['subvaultHistories'],
-      queryFn: async () => {
-        return wrapNullable(
-          VaultCalculator.getSubvaultHistoricalPnlResponse(await placeholderFetchSubvaultHistory())
-        );
-      },
-      ...vaultQueryOptions,
-    });
+  return marketsToReturn;
+};
 
-    const { data: vaultPositions } = useQueryHf({
-      queryKey: ['vaultPositions'],
-      queryFn: async () => {
-        return wrapNullable(
-          VaultCalculator.getVaultPositionsResponse(await placeholderFetchMegavaultPositions())
-        );
-      },
-      ...vaultQueryOptions,
-    });
-
-    const calculatedPositions = useMemoHf(() => {
-      if (
-        vaultPositions?.data == null ||
-        subvaultHistories?.data == null ||
-        marketsMap == null ||
-        marketsMap.size === 0
-      ) {
-        return undefined;
-      }
-      return VaultCalculator.calculateVaultPositions(
-        vaultPositions.data,
-        subvaultHistories.data,
-        marketsMap
+export const useLoadedVaultPositions = () => {
+  const marketsMap = useDebouncedMarketsData().data;
+  const { data: subvaultHistories } = useQuery({
+    queryKey: ['subvaultHistories'],
+    queryFn: async () => {
+      return wrapNullable(
+        VaultCalculator.getSubvaultHistoricalPnlResponse(await placeholderFetchSubvaultHistory())
       );
-    }, [subvaultHistories, vaultPositions, marketsMap]);
+    },
+    ...vaultQueryOptions,
+  });
 
-    return calculatedPositions;
-  }
-).dispatchValue((dispatch, value) => {
-  dispatch(setVaultPositions(value));
-});
+  const { data: vaultPositions } = useQuery({
+    queryKey: ['vaultPositions'],
+    queryFn: async () => {
+      return wrapNullable(
+        VaultCalculator.getVaultPositionsResponse(await placeholderFetchMegavaultPositions())
+      );
+    },
+    ...vaultQueryOptions,
+  });
+
+  const calculatedPositions = useMemo(() => {
+    if (vaultPositions?.data == null || marketsMap == null || marketsMap.size === 0) {
+      return undefined;
+    }
+    return VaultCalculator.calculateVaultPositions(
+      vaultPositions.data,
+      subvaultHistories?.data,
+      marketsMap
+    );
+  }, [subvaultHistories, vaultPositions, marketsMap]);
+
+  return calculatedPositions;
+};
 
 const vaultAccountQueryKey = ['vaultAccount'];
 
@@ -290,8 +279,8 @@ export function forceRefreshVaultAccount() {
   appQueryClient.invalidateQueries({ queryKey: vaultAccountQueryKey, exact: true });
 }
 
-export const loadedVaultAccount = createHookedSelector([], () => {
-  const { data: accountVault } = useQueryHf({
+export const useLoadedVaultAccount = () => {
+  const { data: accountVault } = useQuery({
     queryKey: vaultAccountQueryKey,
     queryFn: async () => {
       const [acc, transfers] = await Promise.all([
@@ -312,64 +301,64 @@ export const loadedVaultAccount = createHookedSelector([], () => {
     ...vaultQueryOptions,
   });
   return accountVault?.data;
-}).dispatchValue((dispatch, value) => {
-  dispatch(setVaultAccount(value));
-});
+};
 
-const vaultFormAmountDebounced = createHookedSelector(
-  [(state) => state.vaults.vaultForm.amount],
-  (amount) => {
-    return useDebounceHf(amount, 500);
-  }
-);
+export const useLoadedVaultAccountTransfers = () => {
+  const account = useLoadedVaultAccount();
+  return useMemo(() => account?.vaultTransfers?.toArray(), [account?.vaultTransfers]);
+};
 
-export const vaultFormSlippage = createHookedSelector(
-  [
-    vaultFormAmountDebounced,
-    (state) => state.vaults.vaultForm.operation,
-    (state) => state.vaults.vaultAccount,
-  ],
-  (amount, operation, vaultBalance) => {
-    const { data: slippageResp } = useQueryHf({
-      queryKey: ['vaultSlippage', amount, operation],
-      queryFn: async () => {
-        if (operation === 'DEPOSIT' || amount.trim() === '') {
-          return wrapNullable(undefined);
-        }
-        const sharesToWithdraw = MustBigNumber(amount).div(
-          // usdc / share to determine share value
-          MustBigNumber(vaultBalance?.balanceUsdc).div(MustBigNumber(vaultBalance?.balanceShares))
-        );
-        const slippage = await placeholderFetchVaultFormSlippage(
-          sharesToWithdraw.decimalPlaces(0, BigNumber.ROUND_FLOOR).toNumber(),
-          MustBigNumber(amount).times(0.96145).toNumber()
-        );
+const useVaultFormAmountDebounced = () => {
+  const amount = useAppSelector((state) => state.vaults.vaultForm.amount);
+  return useDebounceHf(amount, 500);
+};
 
-        const parsedSlippage =
-          VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(slippage);
+export const useVaultFormSlippage = () => {
+  const amount = useVaultFormAmountDebounced();
+  const operation = useAppSelector((state) => state.vaults.vaultForm.operation);
+  const vaultBalance = useLoadedVaultAccount();
 
-        return wrapNullable(parsedSlippage);
-      },
-      ...vaultQueryOptions,
-    });
-    return slippageResp?.data;
-  }
-).dispatchValue((dispatch, value) => {
-  dispatch(setVaultFormSlippageResponse(value));
-});
+  const { data: slippageResp } = useQuery({
+    queryKey: [
+      'vaultSlippage',
+      amount,
+      operation,
+      vaultBalance?.balanceUsdc,
+      vaultBalance?.balanceShares,
+    ],
+    queryFn: async () => {
+      if (operation === 'DEPOSIT' || amount.trim() === '') {
+        return wrapNullable(undefined);
+      }
+      const sharesToWithdraw = MustBigNumber(amount).div(
+        // usdc / share to determine share value
+        MustBigNumber(vaultBalance?.balanceUsdc).div(MustBigNumber(vaultBalance?.balanceShares))
+      );
+      const slippage = await placeholderFetchVaultFormSlippage(
+        sharesToWithdraw.decimalPlaces(0, BigNumber.ROUND_FLOOR).toNumber(),
+        MustBigNumber(amount).times(0.96145).toNumber()
+      );
+
+      const parsedSlippage =
+        VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(slippage);
+
+      return wrapNullable(parsedSlippage);
+    },
+    ...vaultQueryOptions,
+  });
+  return slippageResp?.data;
+};
 
 const selectVaultFormStateExceptAmount = createAppSelector(
   [
     (state) => state.vaults.vaultForm.operation,
     (state) => state.vaults.vaultForm.slippageAck,
     (state) => state.vaults.vaultForm.confirmationStep,
-    (state) => state.vaults.vaultForm.slippageResponse,
   ],
-  (operation, slippageAck, confirmationStep, slippageResponse) => ({
+  (operation, slippageAck, confirmationStep) => ({
     operation,
     slippageAck,
     confirmationStep,
-    slippageResponse,
   })
 );
 
@@ -386,58 +375,47 @@ const selectSubaccountStateForVaults = createAppSelector(
   })
 );
 
-export const vaultFormValidation = createHookedSelector(
-  [
-    vaultFormAmountDebounced,
-    selectVaultFormStateExceptAmount,
-    (state) => state.vaults.vaultAccount,
-    selectSubaccountStateForVaults,
-  ],
-  (
-    amount,
-    { operation, slippageAck, confirmationStep, slippageResponse },
-    vaultAccount,
-    accountInfo
-  ) => {
-    const { data: validationResponse } = useQueryHf({
-      queryKey: [
-        'vaultFormValidation',
-        amount,
-        operation,
-        slippageAck,
-        confirmationStep,
-        slippageResponse?.toString(),
-        vaultAccount?.toString(),
-        accountInfo,
-      ],
-      queryFn: async () => {
-        const vaultFormInfo = new VaultFormData(
-          operationStringToVaultFormAction(operation),
-          amount != null ? MustBigNumber(amount).toNumber() : undefined,
-          slippageAck,
-          confirmationStep
-        );
-        const vaultFormAccountInfo = new VaultFormAccountData(
-          accountInfo.marginUsage,
-          accountInfo.freeCollateral,
-          accountInfo.canViewAccount
-        );
-        const parsedSlippage = VaultDepositWithdrawFormValidator.validateVaultForm(
-          vaultFormInfo,
-          vaultFormAccountInfo,
-          vaultAccount,
-          slippageResponse
-        );
+export const useVaultFormValidationResponse = () => {
+  const { operation, slippageAck, confirmationStep } = useAppSelector(
+    selectVaultFormStateExceptAmount
+  );
+  const accountInfo = useAppSelector(selectSubaccountStateForVaults);
+  const amount = useVaultFormAmountDebounced();
+  const slippageResponse = useVaultFormSlippage();
+  const vaultAccount = useLoadedVaultAccount();
 
-        return wrapNullable(parsedSlippage);
-      },
-      ...vaultQueryOptions,
-    });
-    return validationResponse?.data;
-  }
-).dispatchValue((dispatch, value) => {
-  dispatch(setVaultFormValidationResponse(value));
-});
+  const vaultFormInfo = useMemo(
+    () =>
+      new VaultFormData(
+        operationStringToVaultFormAction(operation),
+        amount != null ? MustBigNumber(amount).toNumber() : undefined,
+        slippageAck,
+        confirmationStep
+      ),
+    [operation, amount, slippageAck, confirmationStep]
+  );
+  const vaultFormAccountInfo = useMemo(
+    () =>
+      new VaultFormAccountData(
+        accountInfo.marginUsage,
+        accountInfo.freeCollateral,
+        accountInfo.canViewAccount
+      ),
+    [accountInfo.marginUsage, accountInfo.freeCollateral, accountInfo.canViewAccount]
+  );
+  const validationResponse = useMemo(
+    () =>
+      VaultDepositWithdrawFormValidator.validateVaultForm(
+        vaultFormInfo,
+        vaultFormAccountInfo,
+        vaultAccount,
+        slippageResponse
+      ),
+    [vaultFormInfo, vaultFormAccountInfo, vaultAccount, slippageResponse]
+  );
+
+  return validationResponse;
+};
 
 function operationStringToVaultFormAction(operation: 'DEPOSIT' | 'WITHDRAW') {
   return operation === 'DEPOSIT'

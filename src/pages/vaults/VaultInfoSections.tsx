@@ -18,8 +18,11 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getVaultAccount, getVaultDetails, getVaultPositions } from '@/state/vaultSelectors';
+import {
+  useLoadedVaultAccount,
+  useLoadedVaultDetails,
+  useLoadedVaultPositions,
+} from '@/state/vaultsLifecycle';
 
 import { getNumberSign } from '@/lib/numbers';
 
@@ -27,7 +30,7 @@ import { VaultPositionsTable } from './VaultPositionsTable';
 
 const EmptyValue = () => <span tw="text-color-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
-  const myVaultMetadata = useAppSelector(getVaultAccount);
+  const myVaultMetadata = useLoadedVaultAccount();
   const stringGetter = useStringGetter();
   const items = [
     {
@@ -96,7 +99,7 @@ export const VaultDescription = ({ className }: { className?: string }) => {
 };
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const numPositions = useAppSelector(getVaultPositions)?.length ?? 0;
+  const numPositions = useLoadedVaultPositions()?.positions?.size;
 
   return (
     <div className={className}>
@@ -115,7 +118,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
+  const { thirtyDayReturnPercent, totalValue } = useLoadedVaultDetails() ?? {};
 
   const detailItems = [
     {

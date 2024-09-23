@@ -22,14 +22,14 @@ import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getVaultPnlHistory } from '@/state/vaultSelectors';
+import { useVaultPnlHistory } from '@/state/vaultsLifecycle';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 
 type VaultPnlChartProps = { className?: string };
 
-type VaultPnlDatum = NonNullable<ReturnType<typeof getVaultPnlHistory>>[number] & {
+type VaultPnlDatum = NonNullable<ReturnType<typeof useVaultPnlHistory>>[number] & {
   index: number;
 };
 
@@ -44,7 +44,7 @@ const TIME_RANGES = [
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
-  const vaultPnl = useAppSelector(getVaultPnlHistory) ?? EMPTY_ARR;
+  const vaultPnl = useVaultPnlHistory() ?? EMPTY_ARR;
 
   const [selectedChart, setSelectedChart] = useState<EquityOrPnl>('pnl');
   const [visibleTimeRange, setVisibleTimeRange] = useState<[number, number] | undefined>(undefined);
