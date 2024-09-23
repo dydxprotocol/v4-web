@@ -37,15 +37,16 @@ export const MarketFilter = ({
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
 
   return (
     <$MarketFilter $compactLayout={compactLayout}>
-      <SearchInput
+      <$SearchInput
         placeholder={stringGetter({ key: searchPlaceholderKey })}
         onTextChange={onSearchTextChange}
       />
 
-      <div tw="row">
+      <div tw="row overflow-x-scroll">
         <$ToggleGroupContainer $compactLayout={compactLayout}>
           <$ToggleGroup
             items={Object.values(filters).map((value) => ({
@@ -60,7 +61,7 @@ export const MarketFilter = ({
           />
         </$ToggleGroupContainer>
 
-        {hasPotentialMarketsData && !hideNewMarketButton && (
+        {showProposeButton && (
           <Button
             onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
             size={ButtonSize.Small}
@@ -124,3 +125,7 @@ const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
   padding-right: var(--toggle-group-paddingRight);
 ` as typeof ToggleGroup;
+
+const $SearchInput = styled(SearchInput)`
+  min-width: 12rem;
+`;

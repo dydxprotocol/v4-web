@@ -62,6 +62,7 @@ import {
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
+import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -118,7 +119,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.staticTyping = import.meta.env.MODE !== 'production';
+    appConfigs.staticTyping = testFlags.enableStaticTyping;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
