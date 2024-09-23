@@ -35,7 +35,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { KeplrIcon } from '@/icons';
+import { KeplrIcon, PhantomIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -369,6 +369,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
+
+        trigger(
+          ReleaseUpdateNotificationIds.PhantomSupport,
+          {
+            icon: <PhantomIcon />,
+            title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
+            body: stringGetter({
+              key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+          },
+          []
+        );
       }, [stringGetter]);
 
       const { dydxAddress } = useAccounts();
