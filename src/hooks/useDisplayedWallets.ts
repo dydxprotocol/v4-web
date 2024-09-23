@@ -51,6 +51,13 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           }) as WalletInfo
       );
 
+    if (phantomDetected) {
+      enabledInjectedWallets.splice(1, 0, {
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      });
+    }
+
     return [
       // If the user does not have any injected wallets installed, show Metamask as the first option
       // with a download link since it the recommended wallet
@@ -61,11 +68,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       },
 
       ...enabledInjectedWallets,
-
-      phantomDetected && {
-        connectorType: ConnectorType.PhantomSolana,
-        name: WalletType.Phantom,
-      },
 
       keplrEnabled && {
         connectorType: ConnectorType.Cosmos,
