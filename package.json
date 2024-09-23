@@ -21,6 +21,7 @@
     "build:inject-smartbanner": "node scripts/inject-smartbanner.js",
     "build:set-last-commit-and-tag": "sh scripts/set-last-commit-and-tag.sh",
     "build:generate-entry-points": "node scripts/generate-entry-points.js",
+    "build:generate-sitemap": "node scripts/generate-sitemap.js",
     "assets": "node scripts/check-assets.js",
     "deploy:ipfs": "node scripts/upload-ipfs.js --verbose",
     "deploy:update-ipns": "node scripts/update-ipns.js",
