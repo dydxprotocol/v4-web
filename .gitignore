@@ -13,7 +13,7 @@ dist
 dist-ssr
 *.local
 *.key
-.env
+.env 
 
 index.html
 entry_points/
@@ -36,6 +36,8 @@ public/datafeed
 # Don't ignore custom styling
 !public/tradingview/custom-styles.css 
 !public/tradingview/colors.css
+!public/tradingview/custom-styles-deprecated.css 
+!public/tradingview/colors-deprecated.css
 
 # Local Library Development
 local-abacus-hash
