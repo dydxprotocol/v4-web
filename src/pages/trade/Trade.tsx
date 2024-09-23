@@ -2,8 +2,6 @@ import { useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { TradeLayouts } from '@/constants/layout';
-
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
@@ -18,7 +16,6 @@ import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
-import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
@@ -35,7 +32,6 @@ const TradePage = () => {
 
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
-  const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
@@ -68,11 +64,7 @@ const TradePage = () => {
       {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
-    <$TradeLayout
-      ref={tradePageRef}
-      tradeLayout={tradeLayout}
-      isHorizontalPanelOpen={isHorizontalPanelOpen}
-    >
+    <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
       <header tw="[grid-area:Top]">
         <MarketSelectorAndStats />
       </header>
@@ -83,7 +75,7 @@ const TradePage = () => {
       </$GridSection>
 
       <$GridSection gridArea="Vertical">
-        <VerticalPanel tradeLayout={tradeLayout} />
+        <VerticalPanel />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
@@ -99,7 +91,6 @@ const TradePage = () => {
 
 export default TradePage;
 const $TradeLayout = styled.article<{
-  tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
 }>`
   --horizontalPanel-height: 18rem;
@@ -142,23 +133,11 @@ const $TradeLayout = styled.article<{
     --layout: var(--layout-default-desktopMedium);
   }
 
-  ${({ tradeLayout }) =>
-    ({
-      [TradeLayouts.Default]: null,
-      [TradeLayouts.Alternative]: css`
-        --layout: var(--layout-alternative);
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-      `,
-      [TradeLayouts.Reverse]: css`
-        direction: rtl;
+  direction: rtl;
 
-        > * {
-          direction: initial;
-        }
-      `,
-    })[tradeLayout]}
+  > * {
+    direction: initial;
+  }
 
   ${({ isHorizontalPanelOpen }) =>
     !isHorizontalPanelOpen &&

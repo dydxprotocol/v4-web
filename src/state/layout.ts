@@ -1,21 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { TradeLayouts } from '@/constants/layout';
-import { LocalStorageKey } from '@/constants/localStorage';
-
-import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
-
 export interface LayoutState {
-  selectedTradeLayout: TradeLayouts;
   isSidebarOpen: boolean;
 }
 
 const initialState = {
   isSidebarOpen: true,
-  selectedTradeLayout: getLocalStorage({
-    key: LocalStorageKey.SelectedTradeLayout,
-    defaultValue: TradeLayouts.Reverse,
-  }),
 };
 
 export const layoutSlice = createSlice({
@@ -26,11 +16,7 @@ export const layoutSlice = createSlice({
       ...state,
       isSidebarOpen: payload,
     }),
-    setSelectedTradeLayout: (state: LayoutState, { payload }: PayloadAction<TradeLayouts>) => {
-      setLocalStorage({ key: LocalStorageKey.SelectedTradeLayout, value: payload });
-      state.selectedTradeLayout = payload;
-    },
   },
 });
 
-export const { setIsSidebarOpen, setSelectedTradeLayout } = layoutSlice.actions;
+export const { setIsSidebarOpen } = layoutSlice.actions;
