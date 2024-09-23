@@ -51,7 +51,8 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           }) as WalletInfo
       );
 
-    // Phantom wallet must be in the 2nd slot.
+    // If Phantom wallet is detected, it must be in the 2nd slot.
+    // If there are no injected wallets, splice will just put it as the only item in the array.
     if (phantomDetected) {
       enabledInjectedWallets.splice(1, 0, {
         connectorType: ConnectorType.PhantomSolana,
