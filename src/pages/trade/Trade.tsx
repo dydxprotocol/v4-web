@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
+import { TradeLayouts } from '@/constants/layout';
+
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
@@ -16,6 +18,7 @@ import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
@@ -32,6 +35,7 @@ const TradePage = () => {
 
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
+  const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
@@ -64,7 +68,11 @@ const TradePage = () => {
       {canAccountTrade && <TradeDialogTrigger />}
     </$TradeLayoutMobile>
   ) : (
-    <$TradeLayout ref={tradePageRef} isHorizontalPanelOpen={isHorizontalPanelOpen}>
+    <$TradeLayout
+      ref={tradePageRef}
+      tradeLayout={tradeLayout}
+      isHorizontalPanelOpen={isHorizontalPanelOpen}
+    >
       <header tw="[grid-area:Top]">
         <MarketSelectorAndStats />
       </header>
@@ -75,7 +83,7 @@ const TradePage = () => {
       </$GridSection>
 
       <$GridSection gridArea="Vertical">
-        <VerticalPanel />
+        <VerticalPanel tradeLayout={tradeLayout} />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
@@ -91,6 +99,7 @@ const TradePage = () => {
 
 export default TradePage;
 const $TradeLayout = styled.article<{
+  tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
 }>`
   --horizontalPanel-height: 18rem;
@@ -99,33 +108,18 @@ const $TradeLayout = styled.article<{
   /* prettier-ignore */
   --layout-default:
     'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
+    'Inner Vertical Side' minmax(0, 1fr)
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
-    'Side Vertical Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
-  --layout-alternative:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
+    'Top Vertical Side' auto
+    'Inner Vertical Side' minmax(0, 1fr)
     'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  /* prettier-ignore */
-  --layout-alternative-desktopMedium:
-    'Vertical Top Side' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
+    / 1fr minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
 
   // Props/defaults
-
   --layout: var(--layout-default);
 
   // Variants
@@ -133,11 +127,16 @@ const $TradeLayout = styled.article<{
     --layout: var(--layout-default-desktopMedium);
   }
 
-  direction: rtl;
-
-  > * {
-    direction: initial;
-  }
+  ${({ tradeLayout }) =>
+    ({
+      [TradeLayouts.Default]: null,
+      [TradeLayouts.Reverse]: css`
+        direction: rtl;
+        > * {
+          direction: initial;
+        }
+      `,
+    })[tradeLayout]}
 
   ${({ isHorizontalPanelOpen }) =>
     !isHorizontalPanelOpen &&

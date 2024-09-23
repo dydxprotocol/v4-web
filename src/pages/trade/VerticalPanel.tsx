@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEADER_HEIGHT, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
@@ -14,7 +15,12 @@ enum Tab {
   Trades = 'Trades',
 }
 
-export const VerticalPanel = () => {
+const HISTOGRAM_SIDES_BY_LAYOUT = {
+  [TradeLayouts.Default]: 'right',
+  [TradeLayouts.Reverse]: 'left',
+} as const;
+
+export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Orderbook);
   const [rowsPerSide, setRowsPerSide] = useState<number | undefined>(undefined);
@@ -64,14 +70,19 @@ export const VerticalPanel = () => {
       items={[
         {
           asChild: true,
-          content: <CanvasOrderbook histogramSide="right" rowsPerSide={rowsPerSide} />,
+          content: (
+            <CanvasOrderbook
+              histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]}
+              rowsPerSide={rowsPerSide}
+            />
+          ),
           label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),
           value: Tab.Orderbook,
           forceMount: true,
           ref: canvasOrderbookRef,
         },
         {
-          content: <LiveTrades histogramSide="right" />,
+          content: <LiveTrades histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]} />,
           label: stringGetter({ key: STRING_KEYS.TRADES }),
           value: Tab.Trades,
         },
