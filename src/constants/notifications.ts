@@ -1,11 +1,9 @@
-import { StatusResponse } from '@0xsquid/sdk';
-
 import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
-  SquidTransfer = 'SquidTransfer',
+  SkipTransfer = 'SkipTransfer',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
@@ -30,7 +28,7 @@ export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
-  [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
@@ -216,7 +214,7 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   isCctp?: boolean;
   errorCount?: number;
-  status?: StatusResponse | SkipStatusResponse;
+  status?: SkipStatusResponse;
   isExchange?: boolean;
   requestId?: string;
   tracked?: boolean;
