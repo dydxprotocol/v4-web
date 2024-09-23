@@ -13,7 +13,7 @@ dist
 dist-ssr
 *.local
 *.key
-.env 
+.env
 
 index.html
 entry_points/
