@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { WalletType as CosmosWalletType } from 'graz';
 
-import { isDev, isTestnet } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
@@ -52,6 +51,15 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           }) as WalletInfo
       );
 
+    // If Phantom wallet is detected, it must be in the 2nd slot.
+    // If there are no injected wallets, splice will just put it as the only item in the array.
+    if (phantomDetected) {
+      enabledInjectedWallets.splice(1, 0, {
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      });
+    }
+
     return [
       // If the user does not have any injected wallets installed, show Metamask as the first option
       // with a download link since it the recommended wallet
@@ -62,12 +70,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       },
 
       ...enabledInjectedWallets,
-
-      (isTestnet || isDev) &&
-        phantomDetected && {
-          connectorType: ConnectorType.PhantomSolana,
-          name: WalletType.Phantom,
-        },
 
       keplrEnabled && {
         connectorType: ConnectorType.Cosmos,

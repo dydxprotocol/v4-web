@@ -89,6 +89,13 @@ const useAccountsContext = () => {
     }
 
     setPreviousEvmAddress(evmAddress);
+    // TODO: create a better pattern than this.
+    // We only want to set the source evm address if the evm address changes
+    // OR when our connection state changes.
+    // The evm address can be cached via local storage, so it won't change when we reconnect
+    // But the hasSubAccount value will become true once you reconnect
+    // This allows us to trigger a state update and make sure abacus knows the source address
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [evmAddress, hasSubAccount]);
 
   const { ready, authenticated } = usePrivy();
@@ -206,7 +213,13 @@ const useAccountsContext = () => {
     }
 
     setPreviousSolAddress(solAddress);
-  }, [solAddress]);
+    // We only want to set the source sol address if the sol address changes
+    // OR when our connection state changes.
+    // The sol address can be cached via local storage, so it won't change when we reconnect
+    // But the hasSubAccount value will become true once you reconnect
+    // This allows us to trigger a state update and make sure abacus knows the source address
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [solAddress, hasSubAccount]);
 
   const decryptSignature = (encryptedSignature: string | undefined) => {
     const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
