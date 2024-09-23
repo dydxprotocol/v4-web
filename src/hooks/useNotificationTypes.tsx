@@ -370,19 +370,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        trigger(
-          ReleaseUpdateNotificationIds.PhantomSupport,
-          {
-            icon: <PhantomIcon />,
-            title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
-            body: stringGetter({
-              key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
-            }),
-            toastSensitivity: 'foreground',
-            groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
-          },
-          []
-        );
+        const phantomNotificationExpirationDate = new Date('2024-10-07T15:00:29.517926238Z');
+
+        if (currentDate < phantomNotificationExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.PhantomSupport,
+            {
+              icon: <PhantomIcon />,
+              title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
       }, [stringGetter]);
 
       const { dydxAddress } = useAccounts();
