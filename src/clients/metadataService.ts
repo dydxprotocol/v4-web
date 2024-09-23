@@ -1,4 +1,5 @@
 import {
+  MetadataServiceCandleResolutions,
   MetadataServiceCandlesResponse,
   MetadataServiceInfoResponse,
   MetadataServicePath,
@@ -57,7 +58,7 @@ class MetadataServiceClient {
     resolution,
   }: {
     assets?: string[];
-    resolution: '1d' | '7d' | '30d';
+    resolution: MetadataServiceCandleResolutions;
   }): Promise<MetadataServiceCandlesResponse> {
     return this._post(MetadataServicePath.CANDLES, {
       assets,

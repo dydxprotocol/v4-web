@@ -60,3 +60,5 @@ export enum MetadataServicePath {
   PRICES = 'prices',
   CANDLES = 'candles',
 }
+
+export type MetadataServiceCandleResolutions = '1d' | '7d' | '30d';

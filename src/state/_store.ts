@@ -9,6 +9,7 @@ import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { inputsSlice } from './inputs';
+import { launchableMarketsSlice } from './launchableMarkets';
 import { layoutSlice } from './layout';
 import { localizationSlice } from './localization';
 import localizationMiddleware from './localizationMiddleware';
@@ -24,6 +25,7 @@ export const store = configureStore({
     configs: configsSlice.reducer,
     dialogs: dialogsSlice.reducer,
     inputs: inputsSlice.reducer,
+    launchableMarkets: launchableMarketsSlice.reducer,
     layout: layoutSlice.reducer,
     localization: localizationSlice.reducer,
     notifications: notificationsSlice.reducer,
