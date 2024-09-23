@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fetchActiveMarketPairs } from './markets/active-market-pairs.ts';
+import { fetchActiveMarketPairs } from './markets/active-market-pairs.js';
 
 console.log('Generating sitemap...');
 
