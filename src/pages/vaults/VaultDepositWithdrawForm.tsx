@@ -10,6 +10,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+import { useLoadedVaultAccount, useVaultFormValidationResponse } from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -38,7 +39,6 @@ import {
   setVaultFormOperation,
   setVaultFormSlippageAck,
 } from '@/state/vaults';
-import { useLoadedVaultAccount, useVaultFormValidationResponse } from '@/state/vaultsLifecycle';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';

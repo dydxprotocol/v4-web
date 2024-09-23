@@ -13,6 +13,7 @@ import { timeUnits } from '@/constants/time';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useVaultPnlHistory } from '@/hooks/vaultsHooks';
 
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -22,7 +23,6 @@ import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { useVaultPnlHistory } from '@/state/vaultsLifecycle';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';

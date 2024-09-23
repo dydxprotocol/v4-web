@@ -9,6 +9,11 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import {
+  useLoadedVaultAccount,
+  useLoadedVaultDetails,
+  useLoadedVaultPositions,
+} from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -17,12 +22,6 @@ import { BackButton } from '@/components/BackButton';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
-
-import {
-  useLoadedVaultAccount,
-  useLoadedVaultDetails,
-  useLoadedVaultPositions,
-} from '@/state/vaultsLifecycle';
 
 import { getNumberSign } from '@/lib/numbers';
 

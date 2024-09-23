@@ -10,6 +10,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -22,7 +23,6 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { useLoadedVaultPositions } from '@/state/vaultsLifecycle';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';

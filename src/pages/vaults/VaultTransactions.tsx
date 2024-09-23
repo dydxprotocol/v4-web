@@ -8,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultAccountTransfers } from '@/hooks/vaultsHooks';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -17,7 +18,6 @@ import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
 import { useAppSelector } from '@/state/appTypes';
-import { useLoadedVaultAccountTransfers } from '@/state/vaultsLifecycle';
 
 export const VaultTransactionsCard = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();

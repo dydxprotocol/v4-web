@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultAccount } from '@/hooks/vaultsHooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -13,8 +14,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { PortfolioCard } from '@/components/PortfolioCard';
-
-import { useLoadedVaultAccount } from '@/state/vaultsLifecycle';
 
 import { testFlags } from '@/lib/testFlags';
 

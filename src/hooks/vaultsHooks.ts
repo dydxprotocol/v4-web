@@ -20,9 +20,9 @@ import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { calculateCanViewAccount } from './accountCalculators';
-import { appQueryClient } from './appQueryClient';
-import { createAppSelector, useAppSelector } from './appTypes';
+import { calculateCanViewAccount } from '../state/accountCalculators';
+import { appQueryClient } from '../state/appQueryClient';
+import { createAppSelector, useAppSelector } from '../state/appTypes';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
