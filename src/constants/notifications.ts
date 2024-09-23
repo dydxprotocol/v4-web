@@ -229,6 +229,7 @@ export enum ReleaseUpdateNotificationIds {
   Twitter200BVolume = 'twitter-200b-volume',
   IncentivesS6Ended = 'incentives-s6-ended',
   KeplrSupport = 'keplr-support',
+  PhantomSupport = 'phantom-support',
 }
 
 // Incentives Season

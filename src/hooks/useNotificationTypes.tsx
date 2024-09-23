@@ -35,7 +35,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { KeplrIcon } from '@/icons';
+import { KeplrIcon, PhantomIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -362,6 +362,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
               title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
               body: stringGetter({
                 key: STRING_KEYS.KEPLR_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
+
+        const phantomNotificationExpirationDate = new Date('2024-10-07T15:00:29.517926238Z');
+
+        if (currentDate < phantomNotificationExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.PhantomSupport,
+            {
+              icon: <PhantomIcon />,
+              title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
