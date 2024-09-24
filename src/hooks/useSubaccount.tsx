@@ -579,8 +579,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         data?: Nullable<HumanReadableCancelOrderPayload>
       ) => {
         const matchedOrder = orders?.find((order) => order.id === data?.orderId);
-        // confirmed does not necessarily mean short term orders are successfully canceled
-        // therefore we only update the canceled orders count from indexer response
+        // ##OrderOnlyConfirmedCancelViaIndexer: success here does not necessarily mean orders are successfully canceled,
+        // we use indexer response as source of truth on whether the order is actually canceled
         if (!success) {
           const errorParams = getValidErrorParamsFromParsingError(parsingError);
           if (matchedOrder) {
@@ -619,6 +619,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
 
         if (success) {
+          // #OrderOnlyConfirmedCancelViaIndexer
+          // even though trigger orders are probably confirmed canceled, we use indexer as source of truth to trigger order status toast
           onSuccess?.();
         } else {
           const errorParams = getValidErrorParamsFromParsingError(parsingError);
