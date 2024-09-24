@@ -108,33 +108,18 @@ const $TradeLayout = styled.article<{
   /* prettier-ignore */
   --layout-default:
     'Top Top Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
+    'Inner Vertical Side' minmax(0, 1fr)
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
-    'Side Vertical Top' auto
-    'Side Vertical Inner' minmax(0, 1fr)
-    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
-
-  /* prettier-ignore */
-  --layout-alternative:
-    'Top Top Top' auto
-    'Vertical Inner Side' minmax(0, 1fr)
+    'Top Vertical Side' auto
+    'Inner Vertical Side' minmax(0, 1fr)
     'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
-
-  /* prettier-ignore */
-  --layout-alternative-desktopMedium:
-    'Vertical Top Side' auto
-    'Vertical Inner Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
+    / 1fr minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
 
   // Props/defaults
-
   --layout: var(--layout-default);
 
   // Variants
@@ -145,15 +130,8 @@ const $TradeLayout = styled.article<{
   ${({ tradeLayout }) =>
     ({
       [TradeLayouts.Default]: null,
-      [TradeLayouts.Alternative]: css`
-        --layout: var(--layout-alternative);
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-      `,
       [TradeLayouts.Reverse]: css`
         direction: rtl;
-
         > * {
           direction: initial;
         }

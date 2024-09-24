@@ -34,6 +34,7 @@ export enum AppColorMode {
 export enum OtherPreference {
   DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
   GasToken = 'GasToken',
+  ReverseLayout = 'ReverseLayout',
 }
 
 export interface ConfigsState {
