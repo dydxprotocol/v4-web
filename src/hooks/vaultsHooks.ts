@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
@@ -15,14 +15,17 @@ import {
   VaultFormAction,
   VaultFormData,
 } from '@/constants/abacus';
+import { timeUnits } from '@/constants/time';
+
+import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
+import { selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { calculateCanViewAccount } from '../state/accountCalculators';
 import { appQueryClient } from '../state/appQueryClient';
-import { createAppSelector, useAppSelector } from '../state/appTypes';
+import { useAppSelector } from '../state/appTypes';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -164,13 +167,19 @@ function wrapNullable<T>(data: T | undefined | null): { data: T | null | undefin
   return { data };
 }
 
+function mapNullableQueryResult<T>(
+  res: Omit<UseQueryResult<{ data: T }>, 'refetch'>
+): Omit<UseQueryResult<T | undefined>, 'refetch'> {
+  return { ...res, data: res.data?.data };
+}
+
 const vaultQueryOptions = {
-  staleTime: 1000 * 60,
-  refetchInterval: 1000 * 60 * 2,
+  staleTime: timeUnits.minute,
+  refetchInterval: timeUnits.minute * 2,
 };
 
 export const useLoadedVaultDetails = () => {
-  const { data: vaultDetails } = useQuery({
+  const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
       return wrapNullable(
@@ -181,16 +190,15 @@ export const useLoadedVaultDetails = () => {
     },
     ...vaultQueryOptions,
   });
-
-  return vaultDetails?.data;
+  return mapNullableQueryResult(vaultDetailsResult);
 };
 
 export const useVaultPnlHistory = () => {
   const details = useLoadedVaultDetails();
-  return useMemo(() => details?.history?.toArray(), [details?.history]);
+  return useMemo(() => details.data?.history?.toArray(), [details.data?.history]);
 };
 
-const MAX_UPDATE_SPEED_MS = 1000 * 60; // one per minute
+const MAX_UPDATE_SPEED_MS = timeUnits.minute;
 
 // A reference to raw abacus markets map that updates only when the data goes from empty to full and once per minute
 // Note that this will cause the component to re-render a lot since we have to subscribe to redux markets which changes often
@@ -224,12 +232,12 @@ const useDebouncedMarketsData = () => {
   // if markets is null and we have non-null, force update it
   if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {
     if (latestMarkets.current != null && latestMarkets.current.size > 0) {
-      setMarketsToReturn((state) => {
+      setMarketsToReturn((prev) => {
         // if it got set by someone else, don't bother
-        if (state.data == null || state.data.size === 0) {
+        if (prev.data == null || prev.data.size === 0) {
           return { data: latestMarkets.current };
         }
-        return state;
+        return prev;
       });
     }
   }
@@ -280,7 +288,7 @@ export function forceRefreshVaultAccount() {
 }
 
 export const useLoadedVaultAccount = () => {
-  const { data: accountVault } = useQuery({
+  const accountVaultQueryResult = useQuery({
     queryKey: vaultAccountQueryKey,
     queryFn: async () => {
       const [acc, transfers] = await Promise.all([
@@ -300,12 +308,12 @@ export const useLoadedVaultAccount = () => {
     },
     ...vaultQueryOptions,
   });
-  return accountVault?.data;
+  return mapNullableQueryResult(accountVaultQueryResult);
 };
 
 export const useLoadedVaultAccountTransfers = () => {
   const account = useLoadedVaultAccount();
-  return useMemo(() => account?.vaultTransfers?.toArray(), [account?.vaultTransfers]);
+  return useMemo(() => account.data?.vaultTransfers?.toArray(), [account.data?.vaultTransfers]);
 };
 
 const useVaultFormAmountDebounced = () => {
@@ -316,9 +324,9 @@ const useVaultFormAmountDebounced = () => {
 export const useVaultFormSlippage = () => {
   const amount = useVaultFormAmountDebounced();
   const operation = useAppSelector((state) => state.vaults.vaultForm.operation);
-  const vaultBalance = useLoadedVaultAccount();
+  const vaultBalance = useLoadedVaultAccount().data;
 
-  const { data: slippageResp } = useQuery({
+  const slippageQueryResult = useQuery({
     queryKey: [
       'vaultSlippage',
       amount,
@@ -346,34 +354,8 @@ export const useVaultFormSlippage = () => {
     },
     ...vaultQueryOptions,
   });
-  return slippageResp?.data;
+  return mapNullableQueryResult(slippageQueryResult);
 };
-
-const selectVaultFormStateExceptAmount = createAppSelector(
-  [
-    (state) => state.vaults.vaultForm.operation,
-    (state) => state.vaults.vaultForm.slippageAck,
-    (state) => state.vaults.vaultForm.confirmationStep,
-  ],
-  (operation, slippageAck, confirmationStep) => ({
-    operation,
-    slippageAck,
-    confirmationStep,
-  })
-);
-
-const selectSubaccountStateForVaults = createAppSelector(
-  [
-    (state) => state.account.subaccount?.marginUsage?.current,
-    (state) => state.account.subaccount?.freeCollateral?.current,
-    calculateCanViewAccount,
-  ],
-  (marginUsage, freeCollateral, canViewAccount) => ({
-    marginUsage,
-    freeCollateral,
-    canViewAccount,
-  })
-);
 
 export const useVaultFormValidationResponse = () => {
   const { operation, slippageAck, confirmationStep } = useAppSelector(
@@ -381,14 +363,14 @@ export const useVaultFormValidationResponse = () => {
   );
   const accountInfo = useAppSelector(selectSubaccountStateForVaults);
   const amount = useVaultFormAmountDebounced();
-  const slippageResponse = useVaultFormSlippage();
-  const vaultAccount = useLoadedVaultAccount();
+  const slippageResponse = useVaultFormSlippage().data;
+  const vaultAccount = useLoadedVaultAccount().data;
 
   const vaultFormInfo = useMemo(
     () =>
       new VaultFormData(
         operationStringToVaultFormAction(operation),
-        amount != null ? MustBigNumber(amount).toNumber() : undefined,
+        amount != null && amount.trim().length > 0 ? MustBigNumber(amount).toNumber() : undefined,
         slippageAck,
         confirmationStep
       ),

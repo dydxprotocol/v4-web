@@ -23,14 +23,14 @@ type MaybeVaultPositionsPanelProps = {
   header: ReactNode;
 };
 
-type UserVault = ReturnType<typeof useLoadedVaultAccount>;
+type UserVault = ReturnType<typeof useLoadedVaultAccount>['data'];
 
 export const MaybeVaultPositionsPanel = ({
   onViewVault,
   header,
   className,
 }: MaybeVaultPositionsPanelProps) => {
-  const userVault = useLoadedVaultAccount();
+  const userVault = useLoadedVaultAccount().data;
   const { isTablet } = useBreakpoints();
   if (!testFlags.enableVaults) return null;
   if (userVault == null && !isTablet) {

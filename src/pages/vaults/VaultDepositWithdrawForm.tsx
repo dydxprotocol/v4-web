@@ -68,7 +68,7 @@ export const VaultDepositWithdrawForm = ({
   const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
 
-  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount());
+  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting] = useState(false);

@@ -24,12 +24,13 @@ import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 
 import { getNumberSign } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { VaultPositionsTable } from './VaultPositionsTable';
 
 const EmptyValue = () => <span tw="text-color-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
-  const myVaultMetadata = useLoadedVaultAccount();
+  const myVaultMetadata = useLoadedVaultAccount().data;
   const stringGetter = useStringGetter();
   const items = [
     {
@@ -117,7 +118,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = useLoadedVaultDetails() ?? {};
+  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {
