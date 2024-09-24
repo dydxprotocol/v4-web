@@ -16,7 +16,7 @@ import {
   TOOLTIP_STRING_KEYS,
   type StringGetterFunction,
 } from '@/constants/localization';
-import { isDev } from '@/constants/networks';
+import { isDev, isMainnet } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
@@ -373,7 +373,7 @@ export const AccountMenu = () => {
           : []),
         // TODO: Needs discussion and update copy & icons if confirmed
         // Potentially only show if user has ever done a funkit checkout before
-        ...(onboardingState === OnboardingState.AccountConnected
+        ...(isMainnet && onboardingState === OnboardingState.AccountConnected
           ? [
               {
                 value: 'InstantDepositHistory',
@@ -384,7 +384,7 @@ export const AccountMenu = () => {
                     <Icon iconName={IconName.History} />
                   ),
                 label: '[TBD] Fun.xyz deposit history',
-                onSelect: () => openFunkitAccountModal?.(),
+                onSelect: () => openFunkitAccountModal?.('checkouts'),
               },
             ]
           : []),
