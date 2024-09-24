@@ -38,7 +38,6 @@ export function useFunkitBuyNobleUsdc() {
     await beginCheckout({
       modalTitle: 'Deposit',
       iconSrc: TOKEN_ICON_SRC,
-      actionsParams: [],
       targetChain: TOKEN_CONTRACT_CHAIN_ID,
       targetAsset: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
       targetAssetAmount: DEFAULT_USDC_AMT,

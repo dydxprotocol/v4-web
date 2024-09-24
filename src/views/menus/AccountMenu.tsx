@@ -384,6 +384,7 @@ export const AccountMenu = () => {
                     <Icon iconName={IconName.History} />
                   ),
                 label: '[TBD] Fun.xyz deposit history',
+                // @ts-expect-error
                 onSelect: () => openFunkitAccountModal?.('checkouts'),
               },
             ]
