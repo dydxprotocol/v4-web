@@ -28,6 +28,7 @@
     "deploy:update-dnslink": "node scripts/update-dnslink.js",
     "coverage": "vitest run --coverage",
     "clean-install": "rm -rf node_modules/.vite && pnpm i",
+    "preinstall": "node scripts/check-pnpm-version.js",
     "preview": "vite preview",
     "install-local-abacus": "node scripts/install-local-abacus",
     "install-local-client-js": "node scripts/install-local-client-js",
