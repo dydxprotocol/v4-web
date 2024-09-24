@@ -87,7 +87,7 @@ export type TriggersDialogProps = {
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };
 export type UnstakeDialogProps = {};
-export type VaultDepositWithdrawDialogProps = { initialType?: 'deposit' | 'withdraw' };
+export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';

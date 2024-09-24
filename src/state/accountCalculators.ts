@@ -145,3 +145,16 @@ export const calculateHasCancelableOrdersInOtherMarkets = createAppSelector(
     (openOrders?.some((order) => order.marketId !== marketId && isOrderStatusOpen(order.status)) ??
       false)
 );
+
+export const selectSubaccountStateForVaults = createAppSelector(
+  [
+    (state) => state.account.subaccount?.marginUsage?.current,
+    (state) => state.account.subaccount?.freeCollateral?.current,
+    calculateCanViewAccount,
+  ],
+  (marginUsage, freeCollateral, canViewAccount) => ({
+    marginUsage,
+    freeCollateral,
+    canViewAccount,
+  })
+);

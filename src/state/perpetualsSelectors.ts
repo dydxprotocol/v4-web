@@ -1,3 +1,5 @@
+import { mapValues } from 'lodash';
+
 import { Nullable } from '@/constants/abacus';
 import { Candle, TradingViewChartBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
@@ -202,6 +204,13 @@ export const getCurrentMarketNextFundingRate = createAppSelector(
   (marketData) => marketData?.perpetual?.nextFundingRate
 );
 
+export const getMarketIdToAssetMetadataMap = createAppSelector(
+  [(state: RootState) => state.perpetuals.markets, (state: RootState) => state.assets.assets],
+  (markets, assets) => {
+    const mapping = mapValues(markets ?? {}, (v) => assets?.[v.assetId]);
+    return mapping;
+  }
+);
 /**
  * @returns Specified market's max leverage
  */
