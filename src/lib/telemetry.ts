@@ -2,8 +2,9 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { isDev } from '@/constants/networks';
 
 import { track } from './analytics/analytics';
+import { dd } from './analytics/datadog';
 
-export const log = (location: string, error: Error, metadata?: any) => {
+export const log = (location: string, error: Error, metadata?: object) => {
   if (isDev) {
     // eslint-disable-next-line no-console
     console.warn('telemetry/log:', { location, error, metadata });
@@ -24,6 +25,8 @@ export const log = (location: string, error: Error, metadata?: any) => {
       metadata,
     })
   );
+
+  dd.error(`[Error] ${location}`, metadata, error);
 
   globalThis.dispatchEvent(customEvent);
 };

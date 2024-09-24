@@ -398,7 +398,8 @@ const useDydxClientContext = () => {
   }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
-    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
+    // The perpetualId is 0 (parent subaccount number)
+    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus(0);
   }, [compositeClient]);
 
   const getWithdrawalCapacityByDenom = useCallback(

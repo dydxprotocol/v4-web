@@ -1,26 +1,51 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
+import tw from 'twin.macro';
 
-import { ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
+import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
+import { StatsigFlags } from '@/constants/statsig';
+import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
+import { Icon, IconName } from '@/components/Icon';
+
+import {
+  cancelOrderConfirmed,
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
+  setLatestOrder,
+} from '@/state/account';
 import {
   getCurrentMarketOrders,
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
+import {
+  cancelOrderAsync,
+  canModifyOrderTypeFromChart,
+  createPlaceOrderPayloadFromExistingOrder,
+  getOrderModificationError,
+} from '@/lib/orderModification';
 import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
+import { useCustomNotification } from '../useCustomNotification';
+import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
@@ -44,6 +69,7 @@ export const useChartLines = ({
   const [lastMarket, setLastMarket] = useState<string | undefined>(undefined);
 
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
   const chartLinesRef = useRef<Record<string, ChartLine>>({});
 
@@ -58,6 +84,8 @@ export const useChartLines = ({
     getCurrentMarketOrders,
     shallowEqual
   );
+
+  const canModifyOrdersFromChart = useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -189,59 +217,202 @@ export const useChartLines = ({
     });
   }, [stringGetter, currentMarketId, currentMarketPositionData, maybeDrawPositionLine]);
 
+  // Cache for order modification that stores the new orders that are submitted but not yet placed
+  const pendingOrderAdjustmentsRef = useRef<{
+    [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
+  }>({});
+
+  const removePendingOrderAdjustment = (clientId: string) => {
+    const { [clientId]: removed, ...withoutOrderId } = pendingOrderAdjustmentsRef.current;
+    pendingOrderAdjustmentsRef.current = withoutOrderId;
+  };
+
+  const addPendingOrderAdjustment = (
+    orderPayload: HumanReadablePlaceOrderPayload,
+    oldOrderId: string
+  ) => {
+    pendingOrderAdjustmentsRef.current = {
+      ...pendingOrderAdjustmentsRef.current,
+      [orderPayload.clientId]: { orderPayload, oldOrderId },
+    };
+  };
+
+  const notify = useCustomNotification();
+  const onMoveOrderLine = useCallback(
+    async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
+      if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
+
+      const oldPrice = order.triggerPrice ?? order.price;
+      const newPrice = orderLine.getPrice();
+
+      const priceError = getOrderModificationError(order, newPrice);
+      if (priceError) {
+        notify({
+          title: stringGetter({ key: priceError.title }),
+          body: priceError.body && stringGetter({ key: priceError.body }),
+          icon: <$WarningIcon iconName={IconName.Warning} />,
+        });
+        orderLine.setPrice(oldPrice);
+        return;
+      }
+
+      // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
+      const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
+      if (!orderPayload) return;
+
+      track(
+        AnalyticsEvents.TradingViewOrderModificationSubmitted({
+          ...orderPayload,
+          previousOrderClientId: order.clientId,
+          previousOrderPrice: oldPrice,
+        })
+      );
+
+      orderLine.setPrice(newPrice);
+
+      addPendingOrderAdjustment(orderPayload, order.id);
+
+      // Dispatch both actions here so that the user sees both cancel + submitting notifications together
+      dispatch(cancelOrderSubmitted(order.id));
+      dispatch(
+        placeOrderSubmitted({
+          marketId: orderPayload.marketId,
+          clientId: orderPayload.clientId,
+          orderType: orderPayload.type as TradeTypes,
+        })
+      );
+
+      const { success: cancelSuccess } = await cancelOrderAsync(order.id);
+      if (!cancelSuccess) {
+        dispatch(
+          cancelOrderFailed({
+            orderId: order.id,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+          })
+        );
+        dispatch(
+          placeOrderFailed({
+            clientId: orderPayload.clientId,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+          })
+        );
+        orderLine.setPrice(oldPrice);
+        removePendingOrderAdjustment(orderPayload.clientId);
+        return;
+      }
+
+      dispatch(cancelOrderConfirmed(order.id));
+
+      const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
+      const { error } = JSON.parse(res);
+      if (error) {
+        orderLine.remove();
+        removePendingOrderAdjustment(orderPayload.clientId);
+        dispatch(
+          placeOrderFailed({
+            clientId: orderPayload.clientId,
+            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+          })
+        );
+      }
+    },
+    [dispatch, stringGetter, notify]
+  );
+
   const updateOrderLines = useCallback(() => {
+    const pendingOrderAdjustments = pendingOrderAdjustmentsRef.current;
     // We don't need to worry about clearing chart lines for cancelled market orders since they will persist in
     // currentMarketOrders, just with a cancelReason
-    if (!currentMarketOrders) return;
+    if (!currentMarketOrders) {
+      return;
+    }
 
-    currentMarketOrders.forEach(
-      ({ id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent }) => {
-        const key = id;
-        const quantity = size.toString();
+    currentMarketOrders.forEach((order) => {
+      const { id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent } =
+        order;
+      const key = id;
+      const quantity = size.toString();
 
-        const orderType = type.rawValue as OrderType;
-        const orderLabel = stringGetter({
-          key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
-        });
-        const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
+      const orderType = type.rawValue as OrderType;
+      const orderLabel = stringGetter({
+        key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
+      });
+      const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
-        const shouldShow = !cancelReason && isOrderStatusOpen(status);
-        const maybeOrderLine = chartLinesRef.current[key]?.line;
-        const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
-        if (!shouldShow) {
-          if (maybeOrderLine) {
-            maybeOrderLine.remove();
-            delete chartLinesRef.current[key];
+      const pendingReplacementOrder = Object.values(pendingOrderAdjustments).find(
+        (adjustment) => adjustment.oldOrderId === id
+      );
+      const replacementOrderPlaced = !!currentMarketOrders.find(
+        (o) => o.clientId === pendingReplacementOrder?.orderPayload.clientId
+      );
+
+      // For orders that are modified on the chart, keep showing the canceled order (with the new price) until the new order is successfully placed
+      const shouldShow =
+        (!!pendingReplacementOrder && !replacementOrderPlaced) ||
+        (!cancelReason && isOrderStatusOpen(status));
+
+      const maybeOrderLine = chartLinesRef.current[key]?.line;
+
+      const pendingReplacementOrderPrice =
+        pendingReplacementOrder?.orderPayload.triggerPrice ??
+        pendingReplacementOrder?.orderPayload.price;
+      const formattedPrice = MustBigNumber(
+        pendingReplacementOrderPrice ?? triggerPrice ?? price
+      ).toNumber();
+      if (!shouldShow) {
+        if (maybeOrderLine) {
+          maybeOrderLine.remove();
+          delete chartLinesRef.current[key];
+        }
+      } else {
+        if (maybeOrderLine) {
+          if (maybeOrderLine.getPrice() !== formattedPrice) {
+            maybeOrderLine.setPrice(formattedPrice);
+          }
+
+          if (maybeOrderLine.getQuantity() !== quantity) {
+            maybeOrderLine.setQuantity(quantity);
           }
         } else {
-          if (maybeOrderLine) {
-            if (maybeOrderLine.getPrice() !== formattedPrice) {
-              maybeOrderLine.setPrice(formattedPrice);
-            }
+          const orderLine = tvWidget
+            ?.chart()
+            .createOrderLine({ disableUndo: false })
+            .setPrice(formattedPrice)
+            .setQuantity(quantity)
+            .setText(orderString);
+          if (orderLine) {
+            const chartLine: ChartLine = {
+              line: orderLine,
+              chartLineType: ORDER_SIDES[side.name],
+            };
+            setLineColorsAndFont({ chartLine });
+            chartLinesRef.current[key] = chartLine;
+          }
+          if (canModifyOrdersFromChart && canModifyOrderTypeFromChart(order)) {
+            orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
+          }
 
-            if (maybeOrderLine.getQuantity() !== quantity) {
-              maybeOrderLine.setQuantity(quantity);
-            }
-          } else {
-            const orderLine = tvWidget
-              ?.chart()
-              .createOrderLine({ disableUndo: false })
-              .setPrice(formattedPrice)
-              .setQuantity(quantity)
-              .setText(orderString);
-            if (orderLine) {
-              const chartLine: ChartLine = {
-                line: orderLine,
-                chartLineType: ORDER_SIDES[side.name],
-              };
-              setLineColorsAndFont({ chartLine });
-              chartLinesRef.current[key] = chartLine;
-            }
+          // Update pendingOrderAdjustmentRef here instead of a separate useEffect so that
+          // adding the new chart line and removing from pendingOrderAdjustmentRef can happen atomically
+          if (order.clientId && pendingOrderAdjustments[order.clientId]) {
+            track(
+              AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
+            );
+            removePendingOrderAdjustment(order.clientId);
+            dispatch(setLatestOrder(order));
           }
         }
       }
-    );
-  }, [setLineColorsAndFont, stringGetter, currentMarketOrders, tvWidget]);
+    });
+  }, [
+    currentMarketOrders,
+    stringGetter,
+    tvWidget,
+    canModifyOrdersFromChart,
+    setLineColorsAndFont,
+    onMoveOrderLine,
+    dispatch,
+  ]);
 
   const clearChartLines = useCallback(() => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {
@@ -341,3 +512,5 @@ export const useChartLines = ({
 
   return { chartLines: chartLinesRef.current };
 };
+
+const $WarningIcon = tw(Icon)`text-color-warning`;

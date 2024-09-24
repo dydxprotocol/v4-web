@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'dydxprotocol/v4-chain'
-          ref: '5e7bf529424a55d69edbaedf6c8a52674e06d0c1'
+          ref: '725ad716cbe9e9aebf2472e877fe2a71e8a63d87'
           path: 'v4-chain'
 
       - name: Start v4 localnet

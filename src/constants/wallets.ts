@@ -9,6 +9,7 @@ import {
   EmailIcon,
   GenericWalletIcon,
   KeplrIcon,
+  MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
   WalletConnectIcon,
@@ -60,10 +61,13 @@ export enum WalletType {
   OtherWallet = 'OTHER_WALLET',
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
+  MetaMask = 'METAMASK',
 }
 
 export enum ConnectorType {
   Injected = 'injected',
+  // Not a real connector type, but a link to download the wallet for those who don't have it installed
+  DownloadWallet = 'downloadWallet',
   Coinbase = 'coinbase',
   WalletConnect = 'walletConnect',
   Cosmos = 'cosmos',
@@ -89,7 +93,8 @@ export type WalletInfo =
       connectorType: ConnectorType.Cosmos;
       name: CosmosWalletType;
     }
-  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet };
+  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
+  | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string };
 
 type WalletConfig = {
   type: WalletType;
@@ -130,13 +135,18 @@ export const wallets: Record<WalletInfo['name'], WalletConfig> = {
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,
-    stringKey: STRING_KEYS.PHANTOM,
+    stringKey: STRING_KEYS.PHANTOM_SOL,
     icon: PhantomIcon,
   },
   [WalletType.WalletConnect2]: {
     type: WalletType.WalletConnect2,
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
+  },
+  [WalletType.MetaMask]: {
+    type: WalletType.MetaMask,
+    stringKey: STRING_KEYS.METAMASK,
+    icon: MetaMaskIcon,
   },
 };
 
@@ -168,6 +178,10 @@ export const PHANTOM_MIPD_RDNS = 'app.phantom';
 export const OKX_MIPD_RDNS = 'com.okex.wallet';
 export const KEPLR_MIPD_RDNS = 'app.keplr';
 export const COINBASE_MIPD_RDNS = 'com.coinbase.wallet';
+export const METAMASK_MIPD_RDNS = 'io.metamask';
+
+export const METAMASK_DOWNLOAD_LINK = 'https://metamask.io/download/';
+export const KEPLR_DOWNLOAD_LINK = 'https://www.keplr.app/get';
 
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {

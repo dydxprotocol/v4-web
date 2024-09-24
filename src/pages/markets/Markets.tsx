@@ -7,7 +7,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -35,7 +35,7 @@ const Markets = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   const marketsPageBanner = useMemo(() => {
-    if (featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi]) {
+    if (featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi]) {
       return (
         <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
           <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>

@@ -5,7 +5,8 @@ import { isMainnet } from '@/constants/networks';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
-import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
+import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
+import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
@@ -22,6 +23,7 @@ import { FunkitDepositDialog } from '@/views/dialogs/FunkitDepositDialog';
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { LaunchMarketDialog } from '@/views/dialogs/LaunchMarketDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
@@ -32,9 +34,11 @@ import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketIntroDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
+import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
+import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
@@ -67,7 +71,10 @@ export const DialogManager = () => {
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
-    CancelPendingOrders: (args) => <CancelAllOrdersDialog {...args} {...modalProps} />,
+    CancelAllOrdersConfirmation: (args) => (
+      <CancelAllOrdersConfirmationDialog {...args} {...modalProps} />
+    ),
+    CancelPendingOrders: (args) => <CancelPendingOrdersDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
@@ -84,6 +91,7 @@ export const DialogManager = () => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
+    LaunchMarket: (args) => <LaunchMarketDialog {...args} {...modalProps} />,
     ManageFunds: (args) => <ManageFundsDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
@@ -95,9 +103,11 @@ export const DialogManager = () => {
     PredictionMarketIntro: (args) => <PredictionMarketIntroDialog {...args} {...modalProps} />,
     Preferences: (args) => <PreferencesDialog {...args} {...modalProps} />,
     RateLimit: (args) => <RateLimitDialog {...args} {...modalProps} />,
+    Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
     SelectMarginMode: (args) => <SelectMarginModeDialog {...args} {...modalProps} />,
+    ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
     Stake: (args) => <StakeDialog {...args} {...modalProps} />,
     StakingReward: (args) => <StakingRewardDialog {...args} {...modalProps} />,

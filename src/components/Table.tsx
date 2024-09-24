@@ -209,9 +209,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     [getRowKey]
   );
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(
-    defaultSortDescriptor
-  );
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(defaultSortDescriptor ?? {});
   const items = useMemo(() => {
     return sortDescriptor?.column
       ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
@@ -684,7 +682,7 @@ const $TableWrapper = styled.div<{
   --tableStickyRow-textColor: var(--color-text-0, inherit);
   --tableStickyRow-backgroundColor: inherit;
   --table-header-height: 2rem;
-  --table-footer-height: 2.75rem;
+  --table-footer-height: 0rem;
 
   --tableRow-hover-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: ;

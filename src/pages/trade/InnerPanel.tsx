@@ -16,6 +16,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { isTruthy } from '@/lib/isTruthy';
 
 enum Tab {
   Price = 'Price',
@@ -24,7 +25,11 @@ enum Tab {
   Details = 'Details',
 }
 
-export const InnerPanel = () => {
+export const InnerPanel = ({
+  isViewingUnlaunchedMarket,
+}: {
+  isViewingUnlaunchedMarket?: boolean;
+}) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
@@ -41,7 +46,7 @@ export const InnerPanel = () => {
           label: stringGetter({ key: STRING_KEYS.PRICE_CHART_SHORT }),
           value: Tab.Price,
         },
-        {
+        !isViewingUnlaunchedMarket && {
           content: (
             <DepthChart
               onChartClick={({ side, price, size }) => {
@@ -62,7 +67,7 @@ export const InnerPanel = () => {
           label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
           value: Tab.Depth,
         },
-        {
+        !isViewingUnlaunchedMarket && {
           content: <FundingChart selectedLocale={selectedLocale} />,
           label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
           value: Tab.Funding,
@@ -72,7 +77,7 @@ export const InnerPanel = () => {
           label: stringGetter({ key: STRING_KEYS.DETAILS }),
           value: Tab.Details,
         },
-      ]}
+      ].filter(isTruthy)}
       slotToolbar={<MarketLinks />}
       withTransitions={false}
     />

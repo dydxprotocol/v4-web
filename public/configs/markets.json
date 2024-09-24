@@ -72,7 +72,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ac-milan-fan-token/",
         "name": "AC Milan Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/",
@@ -456,7 +455,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/argentinefootballassociationfantoken/",
         "name": "Argentine Football Association Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://socios.com",
@@ -561,7 +559,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/atletico-de-madrid-fan-token/",
         "name": "Atletico De Madrid Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/atletico-de-madrid/",
@@ -712,7 +709,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/fc-barcelona-fan-token/",
         "name": "FC Barcelona Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://chiliz.com",
@@ -1005,6 +1001,13 @@
         "websiteLink": "https://www.basedbrett.com/",
         "whitepaperLink": null
     },
+    "BRL-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/BRL-USD?hl=en",
+        "name": "Brazilian Real",
+        "tags": [
+            "FX"
+        ]
+    },
     "BRISE-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitrise-token/",
         "name": "Bitgert",
@@ -1282,7 +1285,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/manchester-city-fan-token/",
         "name": "Manchester City Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com",
@@ -1585,7 +1587,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/multi-collateral-dai/",
         "name": "Dai",
         "tags": [
-            "Defi"
+            "Defi",
+            "FX"
         ],
         "websiteLink": "https://makerdao.com/",
         "whitepaperLink": null
@@ -2156,10 +2159,19 @@
         "websiteLink": "https://www.euler.finance/",
         "whitepaperLink": "https://docs.euler.finance/"
     },
+    "EUR-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/EUR-USD?hl=en",
+        "name": "Euro",
+        "tags": [
+            "FX"
+        ]
+    },
     "EURC-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/euro-coin/",
         "name": "EURC",
-        "tags": [],
+        "tags": [
+            "FX"
+        ],
         "websiteLink": "https://www.circle.com",
         "whitepaperLink": null
     },
@@ -2678,7 +2690,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/topgoal/",
         "name": "TopGoal",
         "tags": [
-            "Entertainment",
             "NFT",
             "Entertainment"
         ],
@@ -3270,7 +3281,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/juventus-fan-token/",
         "name": "Juventus Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/juventus/",
@@ -4628,7 +4638,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/og-fan-token/",
         "name": "OG Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/og/",
@@ -5201,7 +5210,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/paris-saint-germain-fan-token/",
         "name": "Paris Saint-Germain Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/paris-saint-germain/",
@@ -5465,7 +5473,7 @@
         "tags": [
             "Meme"
         ],
-        "websiteLink": "https://retardio.com/",
+        "websiteLink": "https://retardio.xyz/",
         "whitepaperLink": null
     },
     "REVV-USD": {
@@ -6592,6 +6600,13 @@
         ],
         "websiteLink": "https://tron.network/",
         "whitepaperLink": "https://tron.network/static/doc/white_paper_v_2_0.pdf"
+    },
+    "TRY-USD": {
+        "coinMarketCapsLink": "https://www.google.com/finance/quote/TRY-USD?hl=en",
+        "name": "Turkish lira",
+        "tags": [
+            "FX"
+        ]
     },
     "TT-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/thundercore/",
@@ -8109,5 +8124,54 @@
         ],
         "websiteLink": "https://bitbrawl.io/",
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitbrawl/"
+    },
+    "SCF-USD": {
+        "name": "Smoking Chicken Fish",
+        "tags": [],
+        "websiteLink": "https://smokingchickenfish.xyz",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/smoking-chicken-fish/"
+    },
+    "KOKO-USD": {
+        "name": "Koala AI",
+        "tags": [],
+        "websiteLink": "https://www.koalaai.vip/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/koala-ai/"
+    },
+    "RPK-USD": {
+        "name": "RepubliK",
+        "tags": [],
+        "websiteLink": "https://republik.gg/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/republik/",
+        "whitepaperLink": "https://republik.gg/whitepaper/introduction/"
+    },
+    "APES-USD": {
+        "name": "APES",
+        "tags": [],
+        "websiteLink": "https://apesgang.io/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/apes/"
+    },
+    "SHIT-USD": {
+        "name": "Shitcoin (SOL)",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://shitcoin.co/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/shitcoin-sol/"
+    },
+    "MINI-USD": {
+        "name": "mini",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "minimini.lol",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mini/"
+    },
+    "BUB-USD": {
+        "name": "Lil Bub",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://bubcat.onl/",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/goodjobbub/"
     }
 }

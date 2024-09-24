@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 
 import { WalletType as CosmosWalletType } from 'graz';
 
-import { isDev, isTestnet } from '@/constants/networks';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
   ConnectorType,
   KEPLR_MIPD_RDNS,
+  METAMASK_DOWNLOAD_LINK,
   OKX_MIPD_RDNS,
   PHANTOM_MIPD_RDNS,
   WalletInfo,
@@ -20,7 +20,7 @@ import { useMipdInjectedWallets } from './useMipdInjectedWallets';
 import { useStatsigGateValue } from './useStatsig';
 
 export const useDisplayedWallets = (): WalletInfo[] => {
-  const keplrEnabled = useStatsigGateValue(StatSigFlags.ffEnableKeplr);
+  const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr);
   const injectedWallets = useMipdInjectedWallets();
 
   return useMemo(() => {
@@ -30,33 +30,46 @@ export const useDisplayedWallets = (): WalletInfo[] => {
     const okxDetected =
       injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === OKX_MIPD_RDNS) !== -1;
 
-    return [
-      ...injectedWallets
-        .filter(
-          (wallet) =>
-            // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
-            wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
-            // Remove Keplr EVM support since Keplr Cosmos is supported
-            wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
-            // Remove Coinbase injected support because the regular Coinbase connector already supports
-            // handling switching between injected/mobile/smart account
-            wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
-        )
-        .map(
-          (wallet) =>
-            ({
-              connectorType: ConnectorType.Injected,
-              icon: wallet.detail.info.icon,
-              name: wallet.detail.info.name,
-              rdns: wallet.detail.info.rdns,
-            }) as WalletInfo
-        ),
+    const enabledInjectedWallets = injectedWallets
+      .filter(
+        (wallet) =>
+          // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
+          wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
+          // Remove Keplr EVM support since Keplr Cosmos is supported
+          wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
+          // Remove Coinbase injected support because the regular Coinbase connector already supports
+          // handling switching between injected/mobile/smart account
+          wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
+      )
+      .map(
+        (wallet) =>
+          ({
+            connectorType: ConnectorType.Injected,
+            icon: wallet.detail.info.icon,
+            name: wallet.detail.info.name,
+            rdns: wallet.detail.info.rdns,
+          }) as WalletInfo
+      );
 
-      (isTestnet || isDev) &&
-        phantomDetected && {
-          connectorType: ConnectorType.PhantomSolana,
-          name: WalletType.Phantom,
-        },
+    // If Phantom wallet is detected, it must be in the 2nd slot.
+    // If there are no injected wallets, splice will just put it as the only item in the array.
+    if (phantomDetected) {
+      enabledInjectedWallets.splice(1, 0, {
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      });
+    }
+
+    return [
+      // If the user does not have any injected wallets installed, show Metamask as the first option
+      // with a download link since it the recommended wallet
+      !enabledInjectedWallets.length && {
+        connectorType: ConnectorType.DownloadWallet,
+        name: WalletType.MetaMask,
+        downloadLink: METAMASK_DOWNLOAD_LINK,
+      },
+
+      ...enabledInjectedWallets,
 
       keplrEnabled && {
         connectorType: ConnectorType.Cosmos,

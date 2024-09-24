@@ -15,6 +15,7 @@ export interface LinksConfigs {
   foundation?: string;
   governanceLearnMore?: string;
   help?: string;
+  vaultLearnMore?: string;
   initialMarginFractionLearnMore?: string;
   isolatedMarginLearnMore?: string;
   keplrDashboard?: string;
@@ -43,6 +44,7 @@ export interface LinksConfigs {
   getInTouch?: string;
   deployerTermsAndConditions?: string;
   dydxLearnMore?: string;
+  affiliateProgram?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -59,6 +61,7 @@ export const useURLConfigs = (): LinksConfigs => {
     foundation: linksConfigs.foundation ?? FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
     help: linksConfigs.help ?? FALLBACK_URL,
+    vaultLearnMore: linksConfigs.vaultLearnMore ?? FALLBACK_URL,
     initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore ?? FALLBACK_URL,
     isolatedMarginLearnMore: linksConfigs.isolatedMarginLearnMore ?? FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard ?? FALLBACK_URL,
@@ -89,5 +92,6 @@ export const useURLConfigs = (): LinksConfigs => {
     getInTouch: linksConfigs.getInTouch,
     deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
     dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
+    affiliateProgram: linksConfigs.affiliateProgram,
   };
 };

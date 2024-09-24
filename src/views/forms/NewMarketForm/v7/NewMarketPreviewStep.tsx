@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,16 +18,17 @@ import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
-
+import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { log } from '@/lib/telemetry';
+
+import { NewMarketAgreement } from '../NewMarketAgreement';
 
 type NewMarketPreviewStepProps = {
   ticker: string;
   onBack: () => void;
   onSuccess: (ticker: string) => void;
   receiptItems: DetailsItem[];
+  shouldHideTitleAndDescription?: boolean;
 };
 
 export const NewMarketPreviewStep = ({
@@ -36,12 +36,13 @@ export const NewMarketPreviewStep = ({
   onBack,
   onSuccess,
   receiptItems,
+  shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const [errorMessage, setErrorMessage] = useState();
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAgreement, setShowAgreement] = useState(false);
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -61,7 +62,10 @@ export const NewMarketPreviewStep = ({
 
   const isDisabled = alertMessage !== null;
 
-  const heading = (
+  const baseAsset = getDisplayableAssetFromTicker(ticker);
+  const fullBaseAsset = getDisplayableAssetFromTicker(ticker, 'full');
+
+  const heading = shouldHideTitleAndDescription ? null : (
     <>
       <h2>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</h2>
       <span tw="text-color-text-0">
@@ -102,8 +106,8 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" symbol="ETH" />
-          <Output useGrouping type={OutputType.Text} value="ETH" />
+          <AssetIcon tw="h-2 w-2" symbol={fullBaseAsset} />
+          <Output useGrouping type={OutputType.Text} value={baseAsset} />
         </div>
       </div>
     </div>
@@ -151,13 +155,7 @@ export const NewMarketPreviewStep = ({
         e.preventDefault();
 
         if (!hasAcceptedTerms) {
-          dispatch(
-            openDialog(
-              DialogTypes.NewMarketAgreement({
-                acceptTerms: () => setHasAcceptedTerms(true),
-              })
-            )
-          );
+          setShowAgreement(true);
         } else {
           setIsLoading(true);
           setErrorMessage(undefined);
@@ -173,31 +171,43 @@ export const NewMarketPreviewStep = ({
         }
       }}
     >
-      {heading}
+      {showAgreement ? (
+        <NewMarketAgreement
+          onAccept={() => {
+            setHasAcceptedTerms(true);
+            setShowAgreement(false);
+          }}
+          onCancel={() => setShowAgreement(false)}
+        />
+      ) : (
+        <>
+          {heading}
 
-      {launchVisualization}
+          {launchVisualization}
 
-      {liquidityTier}
+          {liquidityTier}
 
-      {alertMessage}
+          {alertMessage}
 
-      <Details
-        items={receiptItems}
-        tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
-      />
+          <Details
+            items={receiptItems}
+            tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
+          />
 
-      <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
-        <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
-        <Button
-          type={ButtonType.Submit}
-          action={ButtonAction.Primary}
-          state={{ isDisabled, isLoading }}
-        >
-          {hasAcceptedTerms
-            ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
-            : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
-        </Button>
-      </div>
+          <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
+            <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
+            <Button
+              type={ButtonType.Submit}
+              action={ButtonAction.Primary}
+              state={{ isDisabled, isLoading }}
+            >
+              {hasAcceptedTerms
+                ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
+                : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
+            </Button>
+          </div>
+        </>
+      )}
     </$Form>
   );
 };

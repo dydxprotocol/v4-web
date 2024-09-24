@@ -21,6 +21,7 @@ import type {
 import {
   AbacusAppConfig,
   AbacusHelper,
+  AbacusWalletConnectionType,
   AdjustIsolatedMarginInputField,
   ApiData,
   AsyncAbacusStateManager,
@@ -29,7 +30,6 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
-  OnboardingConfig,
   StatsigConfig,
   TradeInputField,
   TransferInputField,
@@ -40,8 +40,12 @@ import {
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
-import { StatSigFlags } from '@/constants/statsig';
-import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
+import { StatsigFlags } from '@/constants/statsig';
+import {
+  CLEARED_CLOSE_POSITION_INPUTS,
+  CLEARED_SIZE_INPUTS,
+  CLEARED_TRADE_INPUTS,
+} from '@/constants/trade';
 import {
   CLEARED_TRIGGER_LIMIT_INPUTS,
   CLEARED_TRIGGER_ORDER_INPUTS,
@@ -50,10 +54,15 @@ import {
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import { setTradeFormInputs, setTriggerFormInputs } from '@/state/inputs';
+import {
+  setClosePositionFormInputs,
+  setTradeFormInputs,
+  setTriggerFormInputs,
+} from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
+import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -110,7 +119,8 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
+    appConfigs.staticTyping = testFlags.enableStaticTyping;
+
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
@@ -155,7 +165,7 @@ class AbacusStateManager {
   clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
     const state = this.store?.getState();
 
-    const { needsTriggerPrice, needsTrailingPercent, needsLeverage, needsLimitPrice } =
+    const { needsTriggerPrice, needsTrailingPercent, needsLimitPrice } =
       (state && getInputTradeOptions(state)) ?? {};
 
     if (needsTrailingPercent) {
@@ -172,15 +182,21 @@ class AbacusStateManager {
     this.store?.dispatch(setTradeFormInputs(CLEARED_TRADE_INPUTS));
 
     if (shouldResetSize) {
-      this.setTradeValue({ value: null, field: TradeInputField.size });
-      this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
-
-      if (needsLeverage) {
-        this.setTradeValue({ value: null, field: TradeInputField.leverage });
-      }
-
-      this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
+      this.clearTradeInputSizeValues();
     }
+  };
+
+  clearTradeInputSizeValues = () => {
+    const state = this.store?.getState();
+    const { needsLeverage } = (state && getInputTradeOptions(state)) ?? {};
+    this.setTradeValue({ value: null, field: TradeInputField.size });
+    this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
+
+    if (needsLeverage) {
+      this.setTradeValue({ value: null, field: TradeInputField.leverage });
+    }
+
+    this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
   };
 
   clearClosePositionInputValues = ({
@@ -188,8 +204,11 @@ class AbacusStateManager {
   }: {
     shouldFocusOnTradeInput?: boolean;
   } = {}) => {
+    this.store?.dispatch(setClosePositionFormInputs(CLEARED_CLOSE_POSITION_INPUTS));
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.percent });
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.size });
+    this.setClosePositionValue({ value: null, field: ClosePositionInputField.limitPrice });
+    this.setClosePositionValue({ value: false, field: ClosePositionInputField.useLimit });
 
     if (shouldFocusOnTradeInput) {
       this.clearTradeInputValues({ shouldResetSize: true });
@@ -280,9 +299,11 @@ class AbacusStateManager {
       this.chainTransactions.setLocalWallet(localWallet);
       if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
-        this.stateManager.cosmosWalletConnected = true;
+        this.stateManager.walletConnectionType = AbacusWalletConnectionType.Cosmos;
+      } else if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
+        this.stateManager.walletConnectionType = AbacusWalletConnectionType.Solana;
       } else {
-        this.stateManager.cosmosWalletConnected = false;
+        this.stateManager.walletConnectionType = AbacusWalletConnectionType.Ethereum;
       }
     }
   };
@@ -390,6 +411,21 @@ class AbacusStateManager {
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
 
+  cancelAllOrders = (
+    marketId: Nullable<string>,
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableCancelOrderPayload>
+    ) => void
+  ) => this.stateManager.cancelAllOrders(marketId, callback);
+
+  getCancelableOrderIds = (marketId: Nullable<string>): string[] =>
+    this.stateManager
+      .cancelAllOrdersPayload(marketId)
+      ?.payloads?.toArray()
+      ?.map((p) => p.orderId) ?? [];
+
   adjustIsolatedMarginOfPosition = (
     callback: (
       success: boolean,
@@ -455,10 +491,8 @@ class AbacusStateManager {
    * You must define the property in abacus first, and then add to the enum.
    *
    */
-  setStatsigConfigs = (statsigConfig: { [key in StatSigFlags]?: boolean }) => {
-    const { [StatSigFlags.ffSkipMigration]: useSkip = false, ...rest } = statsigConfig;
-    StatsigConfig.useSkip = useSkip;
-    Object.entries(rest).forEach(([k, v]) => {
+  setStatsigConfigs = (statsigConfig: { [key in StatsigFlags]?: boolean }) => {
+    Object.entries(statsigConfig).forEach(([k, v]) => {
       // This filters out any feature flags in the enum that are not part of the
       // kotlin statsig config object
       if (k in StatsigConfig) {

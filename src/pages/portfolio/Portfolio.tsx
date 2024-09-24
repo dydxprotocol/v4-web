@@ -26,7 +26,6 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
@@ -115,6 +114,7 @@ const PortfolioPage = () => {
               />
             }
           />
+          {/* TODO - TRCL-1693
           <Route
             path={HistoryRoute.Payments}
             element={
@@ -123,7 +123,7 @@ const PortfolioPage = () => {
                 withOuterBorder={isNotTablet}
               />
             }
-          />
+          /> */}
         </Route>
         <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
       </Routes>

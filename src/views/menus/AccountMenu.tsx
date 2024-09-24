@@ -18,6 +18,7 @@ import {
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -25,6 +26,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -39,6 +41,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -60,6 +63,7 @@ export const AccountMenu = () => {
   const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
+  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
 
   const dispatch = useAppDispatch();
   const { openAccountModal: openFunkitAccountModal } = useAccountModal();
@@ -279,6 +283,20 @@ export const AccountMenu = () => {
           onSelect: onRecoverKeys,
           separator: true,
         },
+        affiliatesEnabled &&
+          onboardingState === OnboardingState.AccountConnected && {
+            value: 'Affiliates',
+            icon: <Icon iconName={IconName.Giftbox} />,
+            label: (
+              <span>
+                {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}{' '}
+                <Tag sign={TagSign.Positive}>{stringGetter({ key: STRING_KEYS.EARN_FEES })}</Tag>
+              </span>
+            ),
+            onSelect: () => {
+              dispatch(openDialog(DialogTypes.ShareAffiliate()));
+            },
+          },
         {
           value: 'Preferences',
           icon: <Icon iconName={IconName.Gear} />,

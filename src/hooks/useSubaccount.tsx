@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
-import type { Nullable } from '@dydxprotocol/v4-abacus';
+import { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   SubaccountClient,
   utils,
@@ -31,6 +31,9 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import {
+  cancelAllOrderConfirmed,
+  cancelAllOrderFailed,
+  cancelAllSubmitted,
   cancelOrderConfirmed,
   cancelOrderFailed,
   cancelOrderSubmitted,
@@ -97,7 +100,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     withdrawFromSubaccount,
     transferFromSubaccountToAddress,
     transferNativeToken,
-    sendSquidWithdrawFromSubaccount,
+    sendSkipWithdrawFromSubaccount,
   } = useMemo(
     () => ({
       depositToSubaccount: async ({
@@ -210,7 +213,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
       },
 
-      sendSquidWithdrawFromSubaccount: async ({
+      sendSkipWithdrawFromSubaccount: async ({
         subaccountClient,
         amount,
         payload,
@@ -232,7 +235,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
-                ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+                ? // Signer expects BigInt but the payload types the value as string
                   BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
                 : undefined,
             },
@@ -250,7 +253,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           if (isKeplr && window.keplr) {
             window.keplr.defaultOptions = {};
           }
-          log('useSubaccount/sendSquidWithdrawFromSubaccount', error);
+          log('useSubaccount/sendSkipWithdrawFromSubaccount', error);
           throw error;
         }
       },
@@ -382,7 +385,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken, usdcDenom]
   );
 
-  const sendSquidWithdraw = useCallback(
+  const sendSkipWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
       const cctpWithdraw = () => {
         return new Promise<string>((resolve, reject) => {
@@ -414,7 +417,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           },
         };
       }
-      const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      const tx = await sendSkipWithdrawFromSubaccount({ subaccountClient, amount, payload });
 
       // Reset the default options after the tx is sent.
       if (isKeplr && window.keplr) {
@@ -422,7 +425,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       }
       return hashFromTx(tx.hash);
     },
-    [subaccountClient, sendSquidWithdrawFromSubaccount, isKeplr]
+    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
   );
 
   const adjustIsolatedMarginOfPosition = useCallback(
@@ -563,6 +566,37 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
+    },
+    [dispatch]
+  );
+
+  // when marketId is provided, only cancel orders for that market, otherwise cancel globally
+  const cancelAllOrders = useCallback(
+    (marketId?: string) => {
+      // this is for each single cancel transaction
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableCancelOrderPayload>
+      ) => {
+        if (success) {
+          if (data?.orderId) dispatch(cancelAllOrderConfirmed(data.orderId));
+        } else {
+          const errorParams = getValidErrorParamsFromParsingError(parsingError);
+          if (data?.orderId) {
+            dispatch(
+              cancelAllOrderFailed({
+                orderId: data.orderId,
+                errorParams,
+              })
+            );
+          }
+        }
+      };
+
+      const orderIds = abacusStateManager.getCancelableOrderIds(marketId);
+      dispatch(cancelAllSubmitted({ marketId, orderIds }));
+      abacusStateManager.cancelAllOrders(marketId, callback);
     },
     [dispatch]
   );
@@ -853,7 +887,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Transfer Methods
     transfer,
-    sendSquidWithdraw,
+    sendSkipWithdraw,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
 
@@ -861,6 +895,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     placeOrder,
     closePosition,
     cancelOrder,
+    cancelAllOrders,
     placeTriggerOrders,
 
     // Governance Methods

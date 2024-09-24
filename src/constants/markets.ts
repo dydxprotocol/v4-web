@@ -1,15 +1,33 @@
-import { Asset, Nullable, PerpetualMarket } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 export type MarketData = {
-  asset: Asset;
-  tickSizeDecimals: Nullable<number>;
-  oneDaySparkline?: number[];
-  isNew?: boolean;
+  // Unique Market id (e.g. 'ETH-USD' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD')
+  id: string;
+
+  // Base asset id (e.g. 'ETH' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45')
+  assetId: string;
+
+  // Displayable Market id (e.g. 'ETH-USD' or 'BUFFI-USD')
+  displayId: Nullable<string>;
+
   clobPairId: number;
-} & PerpetualMarket &
-  PerpetualMarket['perpetual'] &
-  PerpetualMarket['configs'];
+  effectiveInitialMarginFraction: Nullable<number>;
+  initialMarginFraction: Nullable<number>;
+  isNew?: boolean;
+  line?: Nullable<number[]>;
+  name?: Nullable<string>;
+  nextFundingRate?: Nullable<number>;
+  openInterest?: Nullable<number>;
+  openInterestUSDC?: Nullable<number>;
+  oraclePrice?: Nullable<number>;
+  priceChange24H?: Nullable<number>;
+  priceChange24HPercent?: Nullable<number>;
+  tickSizeDecimals?: Nullable<number>;
+  trades24H?: Nullable<number>;
+  volume24H?: Nullable<number>;
+  tags?: Nullable<string[]>;
+};
 
 export enum MarketSorting {
   GAINERS = 'gainers',
@@ -21,6 +39,7 @@ export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
   PREDICTION_MARKET = 'Prediction Market',
+  FX = 'FX',
   LAYER_1 = 'Layer 1',
   LAYER_2 = 'Layer 2',
   DEFI = 'Defi',
@@ -32,6 +51,7 @@ export enum MarketFilters {
   ENT = 'Entertainment',
 }
 
+// ORDER IS INTENTIONAL
 export const MARKET_FILTER_OPTIONS: Record<
   MarketFilters,
   {
@@ -45,9 +65,14 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.NEW]: {
     label: STRING_KEYS.RECENTLY_LISTED,
   },
-  [MarketFilters.PREDICTION_MARKET]: {
-    label: STRING_KEYS.PREDICTION_MARKET,
-    isNew: true,
+  [MarketFilters.MEME]: {
+    label: STRING_KEYS.MEME,
+  },
+  [MarketFilters.AI]: {
+    label: STRING_KEYS.AI,
+  },
+  [MarketFilters.DEFI]: {
+    label: STRING_KEYS.DEFI,
   },
   [MarketFilters.LAYER_1]: {
     label: STRING_KEYS.LAYER_1,
@@ -55,26 +80,25 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.LAYER_2]: {
     label: STRING_KEYS.LAYER_2,
   },
-  [MarketFilters.DEFI]: {
-    label: STRING_KEYS.DEFI,
-  },
-  [MarketFilters.AI]: {
-    label: STRING_KEYS.AI,
-  },
-  [MarketFilters.NFT]: {
-    label: STRING_KEYS.NFT,
+  [MarketFilters.RWA]: {
+    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
   },
   [MarketFilters.GAMING]: {
     label: STRING_KEYS.GAMING,
   },
-  [MarketFilters.MEME]: {
-    label: STRING_KEYS.MEME,
+  [MarketFilters.FX]: {
+    label: STRING_KEYS.FOREX,
+    isNew: true,
   },
-  [MarketFilters.RWA]: {
-    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  [MarketFilters.NFT]: {
+    label: STRING_KEYS.NFT,
   },
   [MarketFilters.ENT]: {
     label: STRING_KEYS.ENTERTAINMENT,
+  },
+  [MarketFilters.PREDICTION_MARKET]: {
+    label: STRING_KEYS.PREDICTION_MARKET,
+    isNew: true,
   },
 };
 

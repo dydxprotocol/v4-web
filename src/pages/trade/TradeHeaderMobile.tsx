@@ -15,23 +15,26 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const TradeHeaderMobile = () => {
+export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const { name, id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const navigate = useNavigate();
 
   const { displayId, priceChange24H, priceChange24HPercent } =
     useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
+  const baseAsset = launchableMarketId ? getDisplayableAssetFromBaseAsset(launchableMarketId) : id;
+
   return (
     <$Header>
       <BackButton onClick={() => navigate(AppRoute.Markets)} />
       <div tw="inlineRow gap-[1ch]">
-        <AssetIcon symbol={id} tw="text-[2.5rem]" />
+        <AssetIcon symbol={baseAsset} tw="text-[2.5rem]" />
         <$Name>
           <h3>{name}</h3>
-          <span>{displayId}</span>
+          <span>{launchableMarketId ?? displayId}</span>
         </$Name>
       </div>
 

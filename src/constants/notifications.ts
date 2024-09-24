@@ -1,11 +1,9 @@
-import { StatusResponse } from '@0xsquid/sdk';
-
 import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
-  SquidTransfer = 'SquidTransfer',
+  SkipTransfer = 'SkipTransfer',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
@@ -14,6 +12,7 @@ export enum NotificationType {
   MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
+  Custom = 'Custom', // custom notifications triggered by components eg user input errors
 }
 
 export enum NotificationCategoryPreferences {
@@ -29,7 +28,7 @@ export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
-  [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
@@ -38,6 +37,7 @@ export const NotificationTypeCategory: {
   [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -45,6 +45,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
+  NotificationType.Custom,
 ];
 
 export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
@@ -193,6 +194,11 @@ export type NotificationDisplayData = {
   withClose?: boolean; // Show close button for Notification
 };
 
+export type CustomNotification = {
+  id: string;
+  displayData: NotificationDisplayData;
+};
+
 export enum TransferNotificationTypes {
   Withdrawal = 'withdrawal',
   Deposit = 'deposit',
@@ -208,7 +214,7 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   isCctp?: boolean;
   errorCount?: number;
-  status?: StatusResponse | SkipStatusResponse;
+  status?: SkipStatusResponse;
   isExchange?: boolean;
   requestId?: string;
   tracked?: boolean;
@@ -219,21 +225,22 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   DiscoveryProgram = 'discovery-program',
   Twitter200BVolume = 'twitter-200b-volume',
-  IncentivesS6 = 'incentives-s6',
+  IncentivesS6Ended = 'incentives-s6-ended',
+  KeplrSupport = 'keplr-support',
+  PhantomSupport = 'phantom-support',
 }
 
 // Incentives Season
 export enum IncentivesDistributedNotificationIds {
-  IncentivesDistributedS5 = 'incentives-distributed-s5',
+  IncentivesDistributedS6 = 'incentives-distributed-s6',
 }
 
-export const CURRENT_SEASON_NUMBER = 6;
-export const MEDIAN_REWARDS_AMOUNT = { DYDX: 52, USDC: 63 };
-export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6;
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6Ended;
 
 export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
   switch (seasonId) {
-    case IncentivesDistributedNotificationIds.IncentivesDistributedS5:
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS6:
+      return 6;
     default:
       return 5;
   }

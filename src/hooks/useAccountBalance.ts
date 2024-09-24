@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
+import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
@@ -16,6 +17,8 @@ import {
 import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
 import { EvmAddress } from '@/constants/wallets';
 
+import { useSolanaConnection } from '@/hooks/useSolanaConnection';
+
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -25,7 +28,6 @@ import { MustBigNumber } from '@/lib/numbers';
 import { useAccounts } from './useAccounts';
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useEnvConfig } from './useEnvConfig';
-import { useSolanaTokenBalance } from './useSolanaBalance';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type UseAccountBalanceProps = {
@@ -39,8 +41,9 @@ type UseAccountBalanceProps = {
 };
 
 /**
- * 0xSquid uses this 0x address as the chain's default token.
- * @todo We will need to add additional logic here if we 'useAccountBalance' on non-Squid related forms.
+ * cosmjs uses this 0x address as the chain's native token.
+ * skip does not, but we add this value in order to be able to send payloads to cosmjs
+ * @todo We may need to add additional logic here if we 'useAccountBalance' on forms that do not follow this format.
  */
 export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
@@ -104,8 +107,6 @@ export const useAccountBalance = ({
     },
   });
 
-  const solanaToken = useSolanaTokenBalance({ address: solAddress, token: addressOrDenom });
-
   const cosmosAddress = useMemo(() => {
     if (chainId === selectedDydxChainId) {
       return dydxAddress;
@@ -160,9 +161,61 @@ export const useAccountBalance = ({
   ]);
 
   const cosmosQuery = useQuery({
-    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && addressOrDenom),
-    queryKey: ['accountBalances', chainId, cosmosAddress, addressOrDenom],
+    enabled: Boolean(isSolanaChain && dydxAddress && solAddress && addressOrDenom),
+    queryKey: ['accountBalances', chainId, solAddress, addressOrDenom],
     queryFn: cosmosQueryFn,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: 10_000,
+    staleTime: 10_000,
+  });
+
+  const connection = useSolanaConnection();
+  const solanaQueryFn = useCallback(async (): Promise<{ data: { formatted: string } }> => {
+    try {
+      const address = solAddress;
+      const token = addressOrDenom;
+      if (!address || !token) {
+        throw new Error('Account or token address is not present');
+      }
+      const owner = new PublicKey(address);
+      const mint = new PublicKey(token);
+      const response = await connection.getParsedTokenAccountsByOwner(owner, { mint });
+
+      // An array of all of the owner's associated token accounts for the `mint`.
+      const accounts = response.value;
+
+      // The owner has no associated token accounts open for the
+      // specified token mint, and therefore, their balance is zero.
+      if (accounts.length === 0)
+        return {
+          data: {
+            formatted: '0',
+          },
+        };
+
+      // Select the associated token account owned by the user with the highest amount
+      const largestAccount = accounts.reduce((largest, current) => {
+        const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount;
+        const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount;
+        return currentBalance >= largestBalance ? current : largest;
+      }, accounts[0]);
+
+      return {
+        data: {
+          formatted: largestAccount.account.data.parsed.info.tokenAmount.uiAmountString as string,
+        },
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch Solana balance: ${error.message}`);
+    }
+  }, [solAddress, addressOrDenom, connection]);
+
+  const solanaQuery = useQuery({
+    enabled: Boolean(isSolanaChain && dydxAddress && solAddress && addressOrDenom),
+    queryKey: ['accountBalancesSol', chainId, solAddress, addressOrDenom],
+    queryFn: solanaQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
@@ -186,7 +239,7 @@ export const useAccountBalance = ({
     ? Math.max(parseFloat(cosmosQuery.data) - COSMOS_GAS_RESERVE, 0)
     : undefined;
 
-  const solBalance = solanaToken?.data?.data.formatted;
+  const solBalance = solanaQuery?.data?.data.formatted;
 
   const balance = isCosmosChain ? cosmosBalance : isSolanaChain ? solBalance : evmBalance;
 
@@ -206,17 +259,21 @@ export const useAccountBalance = ({
     isQueryFetching = cosmosQuery.isFetching;
   }
   if (isSolanaChain) {
-    queryStatus = solanaToken.status;
-    isQueryFetching = solanaToken.isFetching;
+    queryStatus = solanaQuery.status;
+    isQueryFetching = solanaQuery.isFetching;
   }
 
   return {
-    balance,
+    balance: balance?.toString(),
     nativeTokenBalance,
     nativeStakingBalance,
     usdcBalance,
     queryStatus,
     isQueryFetching,
-    refetchQuery: isCosmosChain ? cosmosQuery.refetch : evmNative.refetch,
+    refetchQuery: isCosmosChain
+      ? cosmosQuery.refetch
+      : isSolanaChain
+        ? solanaQuery.refetch
+        : evmNative.refetch,
   };
 };

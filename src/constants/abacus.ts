@@ -113,6 +113,9 @@ export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationErro
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
+export const ErrorFormat = Abacus.exchange.dydx.abacus.output.input.ErrorFormat;
+const errorFormats = [...ErrorFormat.values()] as const;
+export type ErrorFormatType = (typeof errorFormats)[number];
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
@@ -216,6 +219,7 @@ export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
 export type HumanReadableSubaccountTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
+export const PlaceOrderMarketInfo = Abacus.exchange.dydx.abacus.state.manager.PlaceOrderMarketInfo;
 
 export type OrderbookGroupings = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
 export const OrderbookGrouping = Abacus.exchange.dydx.abacus.state.manager.OrderbookGrouping;
@@ -238,6 +242,24 @@ export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
 export const ComplianceStatus = Abacus.exchange.dydx.abacus.output.ComplianceStatus;
 export const ComplianceAction = Abacus.exchange.dydx.abacus.output.ComplianceAction;
 export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
+
+// Vaults
+
+export type VaultDetails = Abacus.exchange.dydx.abacus.functional.vault.VaultDetails;
+export type VaultPositions = Abacus.exchange.dydx.abacus.functional.vault.VaultPositions;
+export type VaultAccount = Abacus.exchange.dydx.abacus.functional.vault.VaultAccount;
+export type VaultTransfer = Abacus.exchange.dydx.abacus.functional.vault.VaultTransfer;
+export type VaultPosition = Abacus.exchange.dydx.abacus.functional.vault.VaultPosition;
+export const VaultFormData = Abacus.exchange.dydx.abacus.functional.vault.VaultFormData;
+export const VaultFormAction = Abacus.exchange.dydx.abacus.functional.vault.VaultFormAction;
+export const VaultFormAccountData =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultFormAccountData;
+export type VaultDepositWithdrawSlippageResponse =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultDepositWithdrawSlippageResponse;
+export type VaultFormValidationResult =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultFormValidationResult;
+export const { VaultCalculator, VaultAccountCalculator, VaultDepositWithdrawFormValidator } =
+  Abacus.exchange.dydx.abacus.functional.vault;
 
 // ------ Api data ------ //
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
@@ -382,3 +404,6 @@ export enum AbacusInputTypes {
   Trade = 'trade',
   TriggerOrders = 'triggerOrders',
 }
+
+export const AbacusWalletConnectionType =
+  Abacus.exchange.dydx.abacus.state.model.WalletConnectionType;

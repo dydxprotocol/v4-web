@@ -8,7 +8,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -148,12 +148,12 @@ const MarketsDropdownContent = ({
     defaultValue: false,
   });
 
-  const currentDate = new Date();
-
   const slotTop = useMemo(() => {
+    const currentDate = new Date();
+
     if (
       !hasSeenElectionBannerTrumpWin &&
-      featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+      featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
       currentDate < new Date('2024-11-06T23:59:59')
     ) {
       return (
@@ -177,7 +177,6 @@ const MarketsDropdownContent = ({
 
     return null;
   }, [
-    currentDate,
     setHasSeenElectionBannerTrupmWin,
     hasSeenElectionBannerTrumpWin,
     stringGetter,
@@ -256,14 +255,22 @@ const MarketsDropdownContent = ({
 };
 
 export const MarketsDropdown = memo(
-  ({ currentMarketId, symbol = '' }: { currentMarketId?: string; symbol: string | null }) => {
+  ({
+    currentMarketId,
+    isViewingUnlaunchedMarket,
+    symbol = '',
+  }: {
+    currentMarketId?: string;
+    isViewingUnlaunchedMarket?: boolean;
+    symbol: string | null;
+  }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
 
     const leverageTag =
-      currentMarketId != null ? (
+      !isViewingUnlaunchedMarket && currentMarketId != null ? (
         <Tag>
           <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
         </Tag>
@@ -287,7 +294,18 @@ export const MarketsDropdown = memo(
               ) : (
                 <div tw="spacedRow gap-0.625">
                   <AssetIcon symbol={symbol} />
-                  <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  {isViewingUnlaunchedMarket ? (
+                    <div tw="flex flex-col text-start">
+                      <span tw="font-mini-book">
+                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                      </span>
+                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                        {currentMarketId}
+                      </h2>
+                    </div>
+                  ) : (
+                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  )}
                   {leverageTag}
                 </div>
               )}

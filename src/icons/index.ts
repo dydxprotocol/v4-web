@@ -60,6 +60,7 @@ export { default as PrivacyIcon } from './privacy.svg';
 export { default as ProfileIcon } from './profile.svg';
 export { default as QrIcon } from './qr.svg';
 export { default as RewardStarIcon } from './reward-star.svg';
+export { default as RocketIcon } from './rocket.svg';
 export { default as SearchIcon } from './search.svg';
 export { default as SendIcon } from './send.svg';
 export { default as ShareIcon } from './share.svg';

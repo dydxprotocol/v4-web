@@ -5,16 +5,14 @@ import tw from 'twin.macro';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
-import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM, SOLANA_USDC_DENOM } from '@/constants/denoms';
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
-import { StatSigFlags } from '@/constants/statsig';
-import { WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DiffArrow } from '@/components/DiffArrow';
@@ -45,13 +43,10 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
   const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
 
-  const lowestFeeTokensByDenom = useMemo(
-    () => getMapOfLowestFeeTokensByDenom(type, skipEnabled),
-    [type, skipEnabled]
-  );
+  const lowestFeeTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
   const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
+  const isPhantomWallet = connectedWallet?.connectorType === ConnectorType.PhantomSolana;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
@@ -85,6 +80,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         if (chainIdStr === getNeutronChainId()) {
           return token.value === NEUTRON_USDC_IBC_DENOM;
         }
+      }
+      if (type === TransferType.deposit && isPhantomWallet) {
+        return token.value === SOLANA_USDC_DENOM;
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
