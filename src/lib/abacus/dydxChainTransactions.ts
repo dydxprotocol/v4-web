@@ -38,10 +38,8 @@ import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-// TODO Fix cycle
-// eslint-disable-next-line import/no-cycle
-import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
+import { placeOrderTimeout } from '@/state/localOrders';
 
 import { dd } from '../analytics/datadog';
 import { signComplianceSignature, signComplianceSignatureKeplr } from '../compliance';

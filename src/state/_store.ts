@@ -10,6 +10,7 @@ import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
+import { localOrdersSlice } from './localOrders';
 import { localizationSlice } from './localization';
 import localizationMiddleware from './localizationMiddleware';
 import { notificationsSlice } from './notifications';
@@ -26,6 +27,7 @@ export const store = configureStore({
     inputs: inputsSlice.reducer,
     layout: layoutSlice.reducer,
     localization: localizationSlice.reducer,
+    localOrders: localOrdersSlice.reducer,
     notifications: notificationsSlice.reducer,
     perpetuals: perpetualsSlice.reducer,
     vaults: vaultsSlice.reducer,

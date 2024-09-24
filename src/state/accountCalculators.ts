@@ -6,7 +6,6 @@ import {
   getSubaccountId,
   getSubaccountOpenOrders,
   getUnbondingDelegations,
-  getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
@@ -58,14 +57,6 @@ export const calculateIsAccountViewOnly = createAppSelector(
   [getOnboardingState, calculateCanViewAccount],
   (onboardingState: OnboardingState, canViewAccountInfo: boolean) =>
     onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
-);
-
-/**
- * @description calculate whether the subaccount has uncommitted positions
- */
-export const calculateHasUncommittedOrders = createAppSelector(
-  [getUncommittedOrderClientIds],
-  (uncommittedOrderClientIds: string[]) => uncommittedOrderClientIds.length > 0
 );
 
 /**

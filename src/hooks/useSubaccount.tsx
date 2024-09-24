@@ -30,21 +30,19 @@ import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
-import {
-  cancelAllOrderConfirmed,
-  cancelAllOrderFailed,
-  cancelAllSubmitted,
-  cancelOrderConfirmed,
-  cancelOrderFailed,
-  cancelOrderSubmitted,
-  placeOrderFailed,
-  placeOrderSubmitted,
-  setHistoricalPnl,
-  setSubaccount,
-} from '@/state/account';
-import { getBalances } from '@/state/accountSelectors';
+import { clearSubaccountState } from '@/state/account';
+import { getBalances, getSubaccountOrders } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import {
+  cancelAllOrderFailed,
+  cancelAllSubmitted,
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  clearLocalOrders,
+  placeOrderFailed,
+  placeOrderSubmitted,
+} from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
@@ -275,8 +273,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const dydxAddress = localDydxWallet?.address as DydxAddress;
 
   useEffect(() => {
-    dispatch(setSubaccount(undefined));
-    dispatch(setHistoricalPnl([]));
+    dispatch(clearSubaccountState());
+    dispatch(clearLocalOrders());
   }, [dispatch, dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //
@@ -550,7 +548,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
-          dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
           const errorParams = getValidErrorParamsFromParsingError(parsingError);
@@ -570,6 +567,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
+  const orders = useAppSelector(getSubaccountOrders, shallowEqual);
+
   // when marketId is provided, only cancel orders for that market, otherwise cancel globally
   const cancelAllOrders = useCallback(
     (marketId?: string) => {
@@ -579,14 +578,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableCancelOrderPayload>
       ) => {
-        if (success) {
-          if (data?.orderId) dispatch(cancelAllOrderConfirmed(data.orderId));
-        } else {
+        const matchedOrder = orders?.find((order) => order.id === data?.orderId);
+        // ##OrderOnlyConfirmedCancelViaIndexer: success here does not necessarily mean orders are successfully canceled,
+        // we use indexer response as source of truth on whether the order is actually canceled
+        if (!success) {
           const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          if (data?.orderId) {
+          if (matchedOrder) {
             dispatch(
               cancelAllOrderFailed({
-                orderId: data.orderId,
+                order: matchedOrder,
                 errorParams,
               })
             );
@@ -598,7 +598,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       dispatch(cancelAllSubmitted({ marketId, orderIds }));
       abacusStateManager.cancelAllOrders(marketId, callback);
     },
-    [dispatch]
+    [dispatch, orders]
   );
 
   // ------ Trigger Orders Methods ------ //
@@ -619,11 +619,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
 
         if (success) {
+          // #OrderOnlyConfirmedCancelViaIndexer
+          // even though trigger orders are probably confirmed canceled, we use indexer as source of truth to trigger order status toast
           onSuccess?.();
-
-          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
-            dispatch(cancelOrderConfirmed(payload.orderId));
-          });
         } else {
           const errorParams = getValidErrorParamsFromParsingError(parsingError);
           onError?.(errorParams);
