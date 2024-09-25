@@ -11,11 +11,9 @@ import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLaunchableTvChartResolution } from '@/state/launchableMarkets';
+import { getSelectedResolutionForUnlaunchedMarket } from '@/state/launchableMarketsSelectors';
 import { setTvChartResolution } from '@/state/perpetuals';
-import {
-  getSelectedResolutionForMarket,
-  getSelectedResolutionForUnlaunchedMarket,
-} from '@/state/perpetualsSelectors';
+import { getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
 
 /**
  * @description Hook to handle changing markets and setting chart resolution

@@ -20,7 +20,7 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { type RootStore } from '@/state/_store';
 import { setLaunchableMarketCandles } from '@/state/launchableMarkets';
-import { getMetadataServiceBarsForPriceChart } from '@/state/perpetualsSelectors';
+import { getMetadataServiceBarsForPriceChart } from '@/state/launchableMarketsSelectors';
 
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
