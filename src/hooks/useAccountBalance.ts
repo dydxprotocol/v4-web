@@ -41,8 +41,9 @@ type UseAccountBalanceProps = {
 };
 
 /**
- * 0xSquid uses this 0x address as the chain's default token.
- * @todo We will need to add additional logic here if we 'useAccountBalance' on non-Squid related forms.
+ * cosmjs uses this 0x address as the chain's native token.
+ * skip does not, but we add this value in order to be able to send payloads to cosmjs
+ * @todo We may need to add additional logic here if we 'useAccountBalance' on forms that do not follow this format.
  */
 export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
@@ -160,8 +161,8 @@ export const useAccountBalance = ({
   ]);
 
   const cosmosQuery = useQuery({
-    enabled: Boolean(isSolanaChain && dydxAddress && solAddress && addressOrDenom),
-    queryKey: ['accountBalances', chainId, solAddress, addressOrDenom],
+    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && addressOrDenom),
+    queryKey: ['accountBalances', chainId, cosmosAddress, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

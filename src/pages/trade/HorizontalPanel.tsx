@@ -28,7 +28,6 @@ import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
-  calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
@@ -40,6 +39,7 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
@@ -94,7 +94,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
   );
-  const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
+  const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(

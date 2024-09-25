@@ -90,26 +90,12 @@ const $TradeLayout = styled.article<{
   /* prettier-ignore */
   --layout-default:
     'Top Top' auto
-    'Side Inner' minmax(0, 1fr)
-    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) 1fr;
-
-  /* prettier-ignore */
-  --layout-default-desktopMedium:
-    'Side Top' auto
-    'Side Inner' minmax(0, 1fr)
-    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) 1fr;
-
-  /* prettier-ignore */
-  --layout-alternative:
-    'Top Top' auto
     'Inner Side' minmax(0, 1fr)
     'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / 1fr var(--sidebar-width);
 
   /* prettier-ignore */
-  --layout-alternative-desktopMedium:
+  --layout-default-desktopMedium:
     'Top Side' auto
     'Inner Side' minmax(0, 1fr)
     'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
@@ -127,15 +113,8 @@ const $TradeLayout = styled.article<{
   ${({ tradeLayout }) =>
     ({
       [TradeLayouts.Default]: null,
-      [TradeLayouts.Alternative]: css`
-        --layout: var(--layout-alternative);
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-      `,
       [TradeLayouts.Reverse]: css`
         direction: rtl;
-
         > * {
           direction: initial;
         }

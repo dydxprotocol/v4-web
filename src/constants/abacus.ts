@@ -243,6 +243,24 @@ export const ComplianceStatus = Abacus.exchange.dydx.abacus.output.ComplianceSta
 export const ComplianceAction = Abacus.exchange.dydx.abacus.output.ComplianceAction;
 export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
 
+// Vaults
+
+export type VaultDetails = Abacus.exchange.dydx.abacus.functional.vault.VaultDetails;
+export type VaultPositions = Abacus.exchange.dydx.abacus.functional.vault.VaultPositions;
+export type VaultAccount = Abacus.exchange.dydx.abacus.functional.vault.VaultAccount;
+export type VaultTransfer = Abacus.exchange.dydx.abacus.functional.vault.VaultTransfer;
+export type VaultPosition = Abacus.exchange.dydx.abacus.functional.vault.VaultPosition;
+export const VaultFormData = Abacus.exchange.dydx.abacus.functional.vault.VaultFormData;
+export const VaultFormAction = Abacus.exchange.dydx.abacus.functional.vault.VaultFormAction;
+export const VaultFormAccountData =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultFormAccountData;
+export type VaultDepositWithdrawSlippageResponse =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultDepositWithdrawSlippageResponse;
+export type VaultFormValidationResult =
+  Abacus.exchange.dydx.abacus.functional.vault.VaultFormValidationResult;
+export const { VaultCalculator, VaultAccountCalculator, VaultDepositWithdrawFormValidator } =
+  Abacus.exchange.dydx.abacus.functional.vault;
+
 // ------ Api data ------ //
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
 

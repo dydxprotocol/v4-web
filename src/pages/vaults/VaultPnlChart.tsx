@@ -13,6 +13,7 @@ import { timeUnits } from '@/constants/time';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useVaultPnlHistory } from '@/hooks/vaultsHooks';
 
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -22,13 +23,15 @@ import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getVaultPnlHistory } from '@/state/vaultSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
 
 type VaultPnlChartProps = { className?: string };
 
-type VaultPnlDatum = NonNullable<ReturnType<typeof getVaultPnlHistory>>[number] & { index: number };
+type VaultPnlDatum = NonNullable<ReturnType<typeof useVaultPnlHistory>>[number] & {
+  index: number;
+};
 
 type EquityOrPnl = 'equity' | 'pnl';
 
@@ -41,21 +44,21 @@ const TIME_RANGES = [
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
-  const vaultPnl = useAppSelector(getVaultPnlHistory) ?? EMPTY_ARR;
+  const vaultPnl = useVaultPnlHistory() ?? EMPTY_ARR;
 
   const [selectedChart, setSelectedChart] = useState<EquityOrPnl>('pnl');
   const [visibleTimeRange, setVisibleTimeRange] = useState<[number, number] | undefined>(undefined);
   const [hoveredTime, setHoveredTime] = useState<number | undefined>(undefined);
 
   const data = useMemo(
-    () => vaultPnl.map((v, index) => ({ ...v, index })),
+    () => vaultPnl.map((v, index) => safeAssign({}, v, { index })),
     // need to churn reference so chart updates axes
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [vaultPnl, selectedChart]
   );
 
   const timeUnitsToRender = useMemo(() => {
-    const dataRange = data.length > 1 ? data[data.length - 1].date - data[0].date : 0;
+    const dataRange = data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 0;
     return TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3).map((t) => ({
       value: t.value,
       label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
@@ -84,7 +87,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         .filter(
           (v) =>
             visibleTimeRange == null ||
-            (v.date >= visibleTimeRange[0] && v.date <= visibleTimeRange[1])
+            ((v.date ?? 0) >= visibleTimeRange[0] && (v.date ?? 0) <= visibleTimeRange[1])
         ),
     [data, visibleTimeRange]
   );
@@ -92,8 +95,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     () =>
       pointsInView
         // remove stuff after hover
-        .filter((v) => hoveredTime == null || v.date <= hoveredTime)
-        .map((v) => (selectedChart === 'equity' ? v.equity : v.totalPnl)),
+        .filter((v) => hoveredTime == null || (v.date ?? 0) <= hoveredTime)
+        .map((v) => (selectedChart === 'equity' ? v.equity ?? 0 : v.totalPnl ?? 0)),
     [hoveredTime, pointsInView, selectedChart]
   );
   const atLeastOnePoint = relevantDataPoints.length > 0;
@@ -107,9 +110,9 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     : undefined;
   const pnlDiffPercent = atLeastTwoPoints ? (pnlDiff ?? 0) / relevantDataPoints[0] : undefined;
 
-  const xAccessorFunc = useCallback((datum: VaultPnlDatum) => datum?.date, []);
+  const xAccessorFunc = useCallback((datum: VaultPnlDatum) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(
-    (datum: VaultPnlDatum) => (selectedChart === 'pnl' ? datum?.totalPnl : datum?.equity),
+    (datum: VaultPnlDatum) => (selectedChart === 'pnl' ? datum?.totalPnl ?? 0 : datum?.equity ?? 0),
     [selectedChart]
   );
 
@@ -153,7 +156,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const onVisibleDataChange = useCallback((inRangeData: VaultPnlDatum[]) => {
     setVisibleTimeRange(
       inRangeData.length > 1
-        ? [inRangeData[0].date, inRangeData[inRangeData.length - 1].date]
+        ? [inRangeData[0].date ?? 0, inRangeData[inRangeData.length - 1].date ?? 0]
         : undefined
     );
   }, []);

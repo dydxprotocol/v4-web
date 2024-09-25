@@ -9,6 +9,11 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import {
+  useLoadedVaultAccount,
+  useLoadedVaultDetails,
+  useLoadedVaultPositions,
+} from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -18,46 +23,41 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getUserVault, getVaultDetails } from '@/state/vaultSelectors';
-
 import { getNumberSign } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { VaultPositionsTable } from './VaultPositionsTable';
 
 const EmptyValue = () => <span tw="text-color-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
-  const myVaultMetadata = useAppSelector(getUserVault);
+  const myVaultMetadata = useLoadedVaultAccount().data;
   const stringGetter = useStringGetter();
   const items = [
     {
       key: 'balance',
       label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
       value:
-        myVaultMetadata == null || myVaultMetadata.userBalance === 0 ? (
+        myVaultMetadata == null || myVaultMetadata.balanceUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <Output value={myVaultMetadata?.userBalance} type={OutputType.Fiat} />
+          <Output value={myVaultMetadata?.balanceUsdc} type={OutputType.Fiat} />
         ),
     },
     {
       key: 'pnl',
       label: stringGetter({ key: STRING_KEYS.YOUR_ALL_TIME_PNL }),
       value:
-        myVaultMetadata == null || myVaultMetadata?.userReturn.absolute === 0 ? (
+        myVaultMetadata == null ||
+        myVaultMetadata?.allTimeReturnUsdc == null ||
+        myVaultMetadata?.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn.absolute)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc)}>
             <div tw="row gap-0.5">
               <Output
-                value={myVaultMetadata?.userReturn.absolute}
+                value={myVaultMetadata?.allTimeReturnUsdc}
                 type={OutputType.Fiat}
                 fractionDigits={0}
-              />
-              <Output
-                value={myVaultMetadata?.userReturn.percent}
-                type={OutputType.Percent}
-                withParentheses
               />
             </div>
           </$ColoredReturn>
@@ -99,7 +99,7 @@ export const VaultDescription = ({ className }: { className?: string }) => {
 };
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
+  const numPositions = useLoadedVaultPositions()?.positions?.size;
 
   return (
     <div className={className}>
@@ -118,7 +118,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
+  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {

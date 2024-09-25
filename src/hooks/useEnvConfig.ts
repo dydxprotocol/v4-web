@@ -10,7 +10,6 @@ interface EnvironmentConfig {
   chainName: string;
   chainLogo: string;
   deployerName: string;
-  squidIntegratorId: string;
   rewardsHistoryStartDateMs: string;
 }
 

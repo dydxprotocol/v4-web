@@ -53,7 +53,7 @@ export const TradeFormInputs = () => {
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || limitPriceInput) return;
+    if (!midMarketPrice || !needsLimitPrice || limitPriceInput !== '') return;
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),

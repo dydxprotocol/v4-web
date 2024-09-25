@@ -71,6 +71,10 @@ class TestFlags {
   get enableStaticTyping() {
     return !!this.queryParams.statictyping;
   }
+
+  get uiRefresh() {
+    return !!this.queryParams.uirefresh;
+  }
 }
 
 export const testFlags = new TestFlags();

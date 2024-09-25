@@ -8,9 +8,6 @@ overrides:
   follow-redirects: 1.15.3
 
 dependencies:
-  '@0xsquid/sdk':
-    specifier: ^1.10.0
-    version: 1.10.0
   '@cosmjs/amino':
     specifier: ^0.32.1
     version: 0.32.2
@@ -33,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.11.6
-    version: 1.11.6
+    specifier: 1.11.13
+    version: 1.11.13
   '@dydxprotocol/v4-client-js':
     specifier: 1.3.7
     version: 1.3.7
@@ -287,6 +284,9 @@ dependencies:
   react-stately:
     specifier: ^3.23.0
     version: 3.23.0(react@18.2.0)
+  redux-persist:
+    specifier: ^6.0.0
+    version: 6.0.0(react@18.2.0)(redux@5.0.1)
   reselect:
     specifier: ^5.1.0
     version: 5.1.0
@@ -519,20 +519,6 @@ devDependencies:
     version: 4.5.4(node-fetch@3.3.2)
 
 packages:
-
-  /@0xsquid/sdk@1.10.0:
-    resolution: {integrity: sha512-NKxHYB+g/TMPY+XmCHs+LuhyfbhH4KvAbGpVBOBPXM9Q5FsKcKrDJpTd5YnGYCLF9B3qXAzVTR0XhiC73GmOOA==}
-    dependencies:
-      '@cosmjs/encoding': 0.31.0
-      '@cosmjs/stargate': 0.31.0
-      axios: 0.27.2
-      cosmjs-types: 0.8.0
-      ethers: 5.7.2
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
 
   /@adraffy/ens-normalize@1.10.0:
     resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
@@ -2695,14 +2681,6 @@ packages:
       readonly-date: 1.0.0
     dev: false
 
-  /@cosmjs/encoding@0.31.0:
-    resolution: {integrity: sha512-NYGQDRxT7MIRSlcbAezwxK0FqnaSPKCH7O32cmfpHNWorFxhy9lwmBoCvoe59Kd0HmArI4h+NGzLEfX3OLnA4Q==}
-    dependencies:
-      base64-js: 1.5.1
-      bech32: 1.1.4
-      readonly-date: 1.0.0
-    dev: false
-
   /@cosmjs/encoding@0.31.3:
     resolution: {integrity: sha512-6IRtG0fiVYwyP7n+8e54uTx2pLYijO48V3t9TLiROERm5aUAIzIlz6Wp0NYaI5he9nh1lcEGJ1lkquVKFw3sUg==}
     dependencies:
@@ -2856,27 +2834,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@cosmjs/stargate@0.31.0:
-    resolution: {integrity: sha512-GYhk9lzZPj/QmYHC0VV/4AMoRzVcOP+EnB1YZCoWlBdLuVmpBYKRagJqWIrIwdk1E0gF2ZoESd2TYfdh1fqIpg==}
-    dependencies:
-      '@confio/ics23': 0.6.8
-      '@cosmjs/amino': 0.31.3
-      '@cosmjs/encoding': 0.31.3
-      '@cosmjs/math': 0.31.3
-      '@cosmjs/proto-signing': 0.31.3
-      '@cosmjs/stream': 0.31.0
-      '@cosmjs/tendermint-rpc': 0.31.3
-      '@cosmjs/utils': 0.31.3
-      cosmjs-types: 0.8.0
-      long: 4.0.0
-      protobufjs: 6.11.4
-      xstream: 11.14.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
   /@cosmjs/stargate@0.31.3:
     resolution: {integrity: sha512-53NxnzmB9FfXpG4KjOUAYAvWLYKdEmZKsutcat/u2BrDXNZ7BN8jim/ENcpwXfs9/Og0K24lEIdvA4gsq3JDQw==}
     dependencies:
@@ -2934,12 +2891,6 @@ packages:
       - bufferutil
       - debug
       - utf-8-validate
-    dev: false
-
-  /@cosmjs/stream@0.31.0:
-    resolution: {integrity: sha512-Y+aSHwhHkLGIaQOdqRob+yga2zr9ifl9gZDKD+B7+R5pdWN5f2TTDhYWxA6YZcZ6xRmfr7u8a7tDh7iYLC/zKA==}
-    dependencies:
-      xstream: 11.14.0
     dev: false
 
   /@cosmjs/stream@0.31.3:
@@ -3074,8 +3025,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.11.6:
-    resolution: {integrity: sha512-s0MjkjIXS4Y1awSf/fG/Sg+Eed/tzOtInAuJhTyjQZT8AalzLWYVK6PRG7P4iKxS1gQsGeKcKxVD8PoItvwXtg==}
+  /@dydxprotocol/v4-abacus@1.11.13:
+    resolution: {integrity: sha512-DpULIql3DW8aKLt4doo4KgxQvHHd7ge3soJ7UClsRvyKE8Qabh1AZ/Q+MNq+1BSVoKr0Nmo5YDrDkkJk2i0gNw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -21751,6 +21702,19 @@ packages:
     resolution: {integrity: sha512-Hl/tuV2VDgWgCSEeWMLwxLZqX7OK59eU1guxXsRKTAyeYimivsKdtcV4fu3r710tpG5GmDKDhQ0HSZLExnNmyQ==}
     dependencies:
       balanced-match: 1.0.2
+    dev: false
+
+  /redux-persist@6.0.0(react@18.2.0)(redux@5.0.1):
+    resolution: {integrity: sha512-71LLMbUq2r02ng2We9S215LtPu3fY0KgaGE0k8WRgl6RkqxtGfl7HUozz1Dftwsb0D/5mZ8dwAaPbtnzfvbEwQ==}
+    peerDependencies:
+      react: '>=16'
+      redux: '>4.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      redux: 5.0.1
     dev: false
 
   /redux-thunk@3.1.0(redux@5.0.1):
