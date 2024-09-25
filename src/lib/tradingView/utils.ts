@@ -167,13 +167,9 @@ export const getHistorySlice = ({
 export const getHistorySlice2 = ({
   bars,
   fromMs,
-  toMs,
-  firstDataRequest,
 }: {
   bars?: TradingViewBar[];
   fromMs: number;
-  toMs: number;
-  firstDataRequest: boolean;
 }): TradingViewBar[] => {
   if (!bars) {
     return [];
