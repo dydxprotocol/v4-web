@@ -52,18 +52,22 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
         sideOffset={8}
       >
         <$DownloadLinksInPopover>
-          <$AppLink
-            type={ButtonType.Link}
-            href={googlePlayStoreUrl ?? undefined}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.GooglePlay}
-          />
-          <$AppLink
-            type={ButtonType.Link}
-            href={appleAppStoreUrl ?? undefined}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.Apple}
-          />
+          {googlePlayStoreUrl && (
+            <$AppLink
+              type={ButtonType.Link}
+              href={googlePlayStoreUrl ?? undefined}
+              shape={ButtonShape.Rectangle}
+              iconName={IconName.GooglePlay}
+            />
+          )}
+          {appleAppStoreUrl && (
+            <$AppLink
+              type={ButtonType.Link}
+              href={appleAppStoreUrl ?? undefined}
+              shape={ButtonShape.Rectangle}
+              iconName={IconName.Apple}
+            />
+          )}
         </$DownloadLinksInPopover>
       </Popover>
       <VerticalSeparator />
