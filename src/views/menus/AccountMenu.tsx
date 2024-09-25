@@ -1,6 +1,6 @@
 import { ElementType, memo } from 'react';
 
-import { useAccountModal } from '@funkit/connect';
+import { useAccountModal, SelectedHomeTab } from '@funkit/connect';
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
@@ -384,8 +384,7 @@ export const AccountMenu = () => {
                     <Icon iconName={IconName.History} />
                   ),
                 label: '[TBD] Fun.xyz deposit history',
-                // @ts-expect-error
-                onSelect: () => openFunkitAccountModal?.('checkouts'),
+                onSelect: () => openFunkitAccountModal?.(SelectedHomeTab.CHECKOUTS),
               },
             ]
           : []),

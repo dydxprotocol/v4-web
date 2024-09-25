@@ -48,8 +48,8 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@funkit/connect':
-    specifier: 3.1.0
-    version: 3.1.0(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.12)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@2.16.2)(wagmi@2.10.9)
+    specifier: 3.1.1
+    version: 3.1.1(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.12)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@2.16.2)(wagmi@2.10.9)
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
@@ -4451,10 +4451,11 @@ packages:
       big.js: 6.2.2
     dev: false
 
-  /@funkit/connect@3.1.0(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.12)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@2.16.2)(wagmi@2.10.9):
-    resolution: {integrity: sha512-4AK6tqnZ8by4b0pIL7Qh4c5VDOgVLVpNqKnToZ/62R8kdh15UhJfDTJbzOOtaaLZ4JZpijHgfP3LhFIlgThrmQ==}
+  /@funkit/connect@3.1.1(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.12)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@2.16.2)(wagmi@2.10.9):
+    resolution: {integrity: sha512-Cvr1Nx3MPDmsFcb+doRs05FcXLrA2+gVbNsqCn+bT+ljIx19qycVjItjJs5X3l7Wu2R+x7KkMKZ1aA/kYhejWQ==}
     engines: {node: '>=18'}
     peerDependencies:
+      '@tanstack/react-query': '>=5.0.0'
       react: '>=18'
       react-dom: '>=18'
       viem: 2.x
@@ -4467,7 +4468,7 @@ packages:
       '@meshconnect/web-link-sdk': 2.1.1
       '@moonpay/moonpay-react': 1.8.0(react@18.2.0)
       '@privy-io/js-sdk-core': 0.21.1
-      '@tanstack/react-query': 5.56.2(react@18.2.0)
+      '@tanstack/react-query': 5.37.1(react@18.2.0)
       '@types/uuid': 9.0.8
       '@vanilla-extract/css': 1.15.3(babel-plugin-macros@3.1.0)
       '@vanilla-extract/dynamic': 2.1.0
@@ -4761,7 +4762,7 @@ packages:
       '@injectivelabs/utils': 1.14.11(google-protobuf@3.21.2)
       '@metamask/eth-sig-util': 4.0.1
       '@noble/curves': 1.4.0
-      axios: 1.6.7
+      axios: 1.7.7
       bech32: 2.0.0
       bip39: 3.1.0
       cosmjs-types: 0.9.0
@@ -4792,7 +4793,7 @@ packages:
     resolution: {integrity: sha512-f34yWpFYXNdqruBJo6cbR7hKW5xn6lWENR49zk/PA3CDiQjs9ywVcVofWGyOGnpKQvAOzfF75yQgRc7tqL71lw==}
     requiresBuild: true
     dependencies:
-      axios: 1.6.7
+      axios: 1.7.7
       bignumber.js: 9.1.1
       link-module-alias: 1.2.0
       shx: 0.3.4
@@ -4836,7 +4837,7 @@ packages:
     dependencies:
       '@injectivelabs/exceptions': 1.14.11(google-protobuf@3.21.2)
       '@injectivelabs/ts-types': 1.14.11
-      axios: 1.6.7
+      axios: 1.7.7
       bignumber.js: 9.1.1
       http-status-codes: 2.3.0
       link-module-alias: 1.2.0
@@ -5587,7 +5588,7 @@ packages:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@noble/hashes': 1.4.0
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
       '@types/debug': 4.1.12
       debug: 4.3.4(supports-color@5.5.0)
       pony-cause: 2.1.10
@@ -8422,7 +8423,7 @@ packages:
       chalk: 4.1.2
       execa: 5.1.1
       fast-glob: 3.3.2
-      fast-xml-parser: 4.4.0
+      fast-xml-parser: 4.4.1
       logkitty: 0.7.1
     transitivePeerDependencies:
       - encoding
@@ -8435,7 +8436,7 @@ packages:
       chalk: 4.1.2
       execa: 5.1.1
       fast-glob: 3.3.2
-      fast-xml-parser: 4.4.0
+      fast-xml-parser: 4.4.1
       ora: 5.4.1
     transitivePeerDependencies:
       - encoding
@@ -9560,7 +9561,7 @@ packages:
     dependencies:
       '@noble/hashes': 1.2.0
       '@noble/secp256k1': 1.7.1
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
     dev: false
 
   /@scure/bip32@1.3.1:
@@ -9568,7 +9569,7 @@ packages:
     dependencies:
       '@noble/curves': 1.1.0
       '@noble/hashes': 1.3.3
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
     dev: false
 
   /@scure/bip32@1.3.2:
@@ -9591,7 +9592,7 @@ packages:
     resolution: {integrity: sha512-t+wDck2rVkh65Hmv280fYdVdY25J9YeEUIgn2LG1WM6gxFkGzcksoDiUkWVpVp3Oex9xGC68JU2dSbUfwZ2jPg==}
     dependencies:
       '@noble/hashes': 1.2.0
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
     dev: false
 
   /@scure/bip39@1.2.1:
@@ -10630,10 +10631,6 @@ packages:
     resolution: {integrity: sha512-BteWYEPUcucEu3NBcDAgKuI4U25R9aPrHSP6YSf2NvaD2pSlIQTdqOfLRsxH9WdRYg7k0Uom35Uacb6nvbIMJg==}
     dev: false
 
-  /@tanstack/query-core@5.56.2:
-    resolution: {integrity: sha512-gor0RI3/R5rVV3gXfddh1MM+hgl0Z4G7tj6Xxpq6p2I03NGPaJ8dITY9Gz05zYYb/EJq9vPas/T4wn9EaDPd4Q==}
-    dev: false
-
   /@tanstack/react-query@4.36.1(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0):
     resolution: {integrity: sha512-y7ySVHFyyQblPl3J3eQBWpXZkliroki3ARnBKsdJchlgt7yJLRDUcf4B8soufgiYt3pEQIkBWBx1N9/ZPIeUWw==}
     peerDependencies:
@@ -10659,15 +10656,6 @@ packages:
       react: ^18.0.0
     dependencies:
       '@tanstack/query-core': 5.36.1
-      react: 18.2.0
-    dev: false
-
-  /@tanstack/react-query@5.56.2(react@18.2.0):
-    resolution: {integrity: sha512-SR0GzHVo6yzhN72pnRhkEFRAHMsUo5ZPzAxfTMvUxFIDVS6W9LYUp6nXW3fcHVdg0ZJl8opSH85jqahvm6DSVg==}
-    peerDependencies:
-      react: ^18 || ^19
-    dependencies:
-      '@tanstack/query-core': 5.56.2
       react: 18.2.0
     dev: false
 
@@ -11461,7 +11449,7 @@ packages:
   /@usecapsule/user-management-client@1.7.0:
     resolution: {integrity: sha512-9ZkRnw38YlIYMi0YeaPnsNhBIIwhrI7ZJQv+Qjg/+lMxW8IhBelS1O7Yseum9H3SS1YsTOhhDlWDoNT54fn9Kw==}
     dependencies:
-      axios: 1.6.7
+      axios: 1.7.7
       qs: 6.12.3
     transitivePeerDependencies:
       - debug
@@ -14651,15 +14639,9 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /clsx@2.1.0:
-    resolution: {integrity: sha512-m3iNNWpd9rl3jvvcBnu70ylMdrXt8Vlq4HYadnU5fwcOtvkSQWPmj7amUcDT2qYI7risszBjI5AUIUox9D16pg==}
-    engines: {node: '>=6'}
-    dev: true
-
   /clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
-    dev: false
 
   /cluster-key-slot@1.1.2:
     resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
@@ -17159,13 +17141,6 @@ packages:
 
   /fast-stable-stringify@1.0.0:
     resolution: {integrity: sha512-wpYMUmFu5f00Sm0cj2pfivpmawLZ0NKdviQ4w9zJeR8JVtOpOxHmLaJuj0vxvGqMJQWyP/COUkF75/57OKyRag==}
-    dev: false
-
-  /fast-xml-parser@4.4.0:
-    resolution: {integrity: sha512-kLY3jFlwIYwBNDojclKsNAC12sfD6NwW74QB2CoNGPvtVxjliYehVunB3HYyNi+n4Tt1dAcgwYvmKF/Z18flqg==}
-    hasBin: true
-    dependencies:
-      strnum: 1.0.5
     dev: false
 
   /fast-xml-parser@4.4.1:
@@ -22708,7 +22683,7 @@ packages:
       react: '>=16.0.0'
     dependencies:
       '@types/prismjs': 1.26.3
-      clsx: 2.1.0
+      clsx: 2.1.1
       react: 18.2.0
     dev: true
 
