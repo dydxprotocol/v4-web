@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         if: steps.check_env.outputs.should_run_tests == 'true'
         run: |
-          pnpm install --loglevel warn --ignore-scripts
+          pnpm install --loglevel warn --ignore-scripts --frozen-lockfile
           tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
       - name: Run e2e tests
