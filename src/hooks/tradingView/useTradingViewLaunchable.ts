@@ -7,9 +7,9 @@ import {
   TradingTerminalWidgetOptions,
   widget as Widget,
 } from 'public/tradingview/';
+import { useDispatch } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
@@ -17,13 +17,14 @@ import { store } from '@/state/_store';
 import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
+import { updateLaunchableMarketsChartConfig } from '@/state/tradingView';
+import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { getLaunchableMarketDatafeed } from '@/lib/tradingView/launchableMarketFeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 import { useMetadataServiceAssetFromId } from '../useLaunchableMarkets';
-import { useLocalStorage } from '../useLocalStorage';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -37,15 +38,13 @@ export const useTradingViewLaunchable = ({
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
   marketId: string;
 }) => {
+  const dispatch = useDispatch();
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
 
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
-    key: LocalStorageKey.TradingViewChartConfigLaunchable,
-    defaultValue: undefined,
-  });
+  const savedTvChartConfig = useAppSelector((s) => getTvChartConfig(s, true));
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig }) ?? undefined;
   const launchableAsset = useMetadataServiceAssetFromId(marketId);
@@ -73,7 +72,9 @@ export const useTradingViewLaunchable = ({
 
       tvChartWidget.onChartReady(() => {
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
+          tvWidgetRef?.current?.save((chartConfig: object) => {
+            dispatch(updateLaunchableMarketsChartConfig(chartConfig));
+          })
         );
 
         setIsChartReady(true);
@@ -88,12 +89,13 @@ export const useTradingViewLaunchable = ({
   }, [
     appColorMode,
     appTheme,
+    dispatch,
     marketId,
     savedResolution,
     savedTvChartConfig,
     selectedLocale,
     setIsChartReady,
-    setTvChartConfig,
+    tickSizeDecimals,
     tvWidgetRef,
   ]);
 
