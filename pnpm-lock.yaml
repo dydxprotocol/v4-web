@@ -284,6 +284,9 @@ dependencies:
   react-stately:
     specifier: ^3.23.0
     version: 3.23.0(react@18.2.0)
+  redux-persist:
+    specifier: ^6.0.0
+    version: 6.0.0(react@18.2.0)(redux@5.0.1)
   reselect:
     specifier: ^5.1.0
     version: 5.1.0
@@ -21699,6 +21702,19 @@ packages:
     resolution: {integrity: sha512-Hl/tuV2VDgWgCSEeWMLwxLZqX7OK59eU1guxXsRKTAyeYimivsKdtcV4fu3r710tpG5GmDKDhQ0HSZLExnNmyQ==}
     dependencies:
       balanced-match: 1.0.2
+    dev: false
+
+  /redux-persist@6.0.0(react@18.2.0)(redux@5.0.1):
+    resolution: {integrity: sha512-71LLMbUq2r02ng2We9S215LtPu3fY0KgaGE0k8WRgl6RkqxtGfl7HUozz1Dftwsb0D/5mZ8dwAaPbtnzfvbEwQ==}
+    peerDependencies:
+      react: '>=16'
+      redux: '>4.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      redux: 5.0.1
     dev: false
 
   /redux-thunk@3.1.0(redux@5.0.1):
