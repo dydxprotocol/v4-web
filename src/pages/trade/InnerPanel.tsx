@@ -10,8 +10,8 @@ import { MarketDetails } from '@/views/MarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
-import { TvChart } from '@/views/charts/TvChart';
-import { TvChartLaunchable } from '@/views/charts/TvChartLaunchable';
+import { TvChart } from '@/views/charts/TradingView/TvChart';
+import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
