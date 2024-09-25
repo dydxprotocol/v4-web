@@ -8,11 +8,12 @@ import { parseStorageItem } from './utils';
  */
 export function migration0(state: PersistedState) {
   if (!state) {
-    throw new Error('initial state is undefined');
+    throw new Error('state must be defined');
   }
 
   const oldTvChartConfig = parseStorageItem(localStorage.getItem('dydx.TradingViewChartConfig'));
   localStorage.removeItem('dydx.TradingViewChartConfig');
+
   return {
     ...state,
     tradingView: {
