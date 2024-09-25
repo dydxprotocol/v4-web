@@ -86,18 +86,7 @@ export const useTradingViewLaunchable = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [
-    appColorMode,
-    appTheme,
-    dispatch,
-    marketId,
-    savedResolution,
-    savedTvChartConfig,
-    selectedLocale,
-    setIsChartReady,
-    tickSizeDecimals,
-    tvWidgetRef,
-  ]);
+  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tickSizeDecimals, tvWidgetRef]);
 
   return { savedResolution };
 };
