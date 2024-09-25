@@ -93,7 +93,7 @@ export const HeaderDesktop = () => {
             {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
-              label: stringGetter({ key: STRING_KEYS.DOCUMENTATION }),
+              label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
               href: documentation,
             },
             {
@@ -210,6 +210,7 @@ const $Header = styled.header`
       var(--sidebar-width) - var(--logo-width) - var(--border-width)
     )
     var(--border-width) 1fr var(--border-width) auto;
+  z-index: 2;
 
   @media ${breakpoints.tablet} {
     --trigger-height: 3rem;

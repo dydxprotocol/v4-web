@@ -1,11 +1,11 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { FunkitProvider } from '@funkit/connect';
 import '@funkit/connect/styles.css';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
@@ -44,6 +44,7 @@ import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
+import { DialogTypes } from './constants/dialogs';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -54,6 +55,9 @@ import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { funkitConfig, funkitTheme } from './lib/funkit';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { appQueryClient } from './state/appQueryClient';
+import { useAppDispatch } from './state/appTypes';
+import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -68,13 +72,12 @@ const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
 
-const queryClient = new QueryClient();
-
 const Content = () => {
   useInitializePage();
   useAnalytics();
   useCommandMenu();
 
+  const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -93,6 +96,12 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+
+  useEffect(() => {
+    if (testFlags.referralCode) {
+      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    }
+  }, [dispatch]);
 
   return (
     <>
@@ -179,7 +188,7 @@ const providers = [
     config: privyConfig,
   }),
   wrapProvider(StatsigProvider),
-  wrapProvider(QueryClientProvider, { client: queryClient }),
+  wrapProvider(QueryClientProvider, { client: appQueryClient }),
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),

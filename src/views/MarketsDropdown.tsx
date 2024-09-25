@@ -8,7 +8,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
-import { StatSigFlags } from '@/constants/statsig';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -148,12 +148,12 @@ const MarketsDropdownContent = ({
     defaultValue: false,
   });
 
-  const currentDate = new Date();
-
   const slotTop = useMemo(() => {
+    const currentDate = new Date();
+
     if (
       !hasSeenElectionBannerTrumpWin &&
-      featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+      featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
       currentDate < new Date('2024-11-06T23:59:59')
     ) {
       return (
@@ -177,7 +177,6 @@ const MarketsDropdownContent = ({
 
     return null;
   }, [
-    currentDate,
     setHasSeenElectionBannerTrupmWin,
     hasSeenElectionBannerTrumpWin,
     stringGetter,
@@ -297,7 +296,9 @@ export const MarketsDropdown = memo(
                   <AssetIcon symbol={symbol} />
                   {isViewingUnlaunchedMarket ? (
                     <div tw="flex flex-col text-start">
-                      <span tw="font-mini-book">Not Launched</span>
+                      <span tw="font-mini-book">
+                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                      </span>
                       <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
                         {currentMarketId}
                       </h2>

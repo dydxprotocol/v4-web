@@ -55,6 +55,26 @@ class TestFlags {
   get pml() {
     return !!this.queryParams.pml;
   }
+
+  get showCancelAll() {
+    return !!this.queryParams.cancelall;
+  }
+
+  get showLimitClose() {
+    return !!this.queryParams.limitclose;
+  }
+
+  get referralCode() {
+    return this.queryParams.ref;
+  }
+
+  get enableStaticTyping() {
+    return !!this.queryParams.statictyping;
+  }
+
+  get uiRefresh() {
+    return !!this.queryParams.uirefresh;
+  }
 }
 
 export const testFlags = new TestFlags();

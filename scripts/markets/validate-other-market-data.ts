@@ -12,13 +12,13 @@ import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
-  ProposalStatus
+  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
+import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
 import {
   Perpetual,
   PerpetualMarketType,
-} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
-import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
+} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -33,7 +33,8 @@ const LocalWalletModule = await import(
 );
 const LocalWallet = LocalWalletModule.default;
 
-const PATH_TO_OLD_PROPOSALS = 'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
+const PATH_TO_OLD_PROPOSALS =
+  'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
 const PATH_TO_PROPOSALS = 'public/configs/otherMarketData.json';
 // TODO: Query MIN_DEPOSIT and VOTING_PERIOD_SECONDS from chain.
 const MIN_DEPOSIT = '10000000';
@@ -330,7 +331,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1; 
+      const proposalId: number = i + j + 1;
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -370,7 +371,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       );
 
       // Record proposed market.
-      marketsProposed.set(marketId, proposal);
+      marketsProposed.set(marketId, { ...proposal, id: Long.fromNumber(proposalId) });
       proposalIds.push(proposalId);
     }
 
@@ -401,9 +402,13 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   );
   console.log(`${proposalsRejected.proposals.length} proposals rejected`);
   proposalsRejected.proposals.map((proposal) => {
-    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_REJECTED);
+    allErrors.set(
+      `Proposal ${proposal.id} with title ${proposal.title}`,
+      ValidationError.PROPOSAL_REJECTED
+    );
     failedOrRejectedProposals.add(proposal.id);
-  })
+    console.log(`Proposal ${proposal.id} with title ${proposal.title} was rejected`);
+  });
 
   // Check which proposals failed.
   console.log('\nChecking which proposals failed...');
@@ -412,9 +417,15 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   );
   console.log(`${proposalsFailed.proposals.length} proposals failed`);
   proposalsFailed.proposals.map((proposal) => {
-    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_FAILED);
+    allErrors.set(
+      `Proposal ${proposal.id} with title ${proposal.title}`,
+      ValidationError.PROPOSAL_FAILED
+    );
     failedOrRejectedProposals.add(proposal.id);
-  })
+    console.log(
+      `Proposal ${proposal.id} with title ${proposal.title} failed due to: ${proposal.failedReason}`
+    );
+  });
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
@@ -549,36 +560,66 @@ function makePrometheusRateQuery(
     });
 }
 
-function validatePrice(price: MarketPrice, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validatePrice(
+  price: MarketPrice,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (price.exponent !== proposal.params.priceExponent) {
-    allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_EXPONENT_MISMATCH);
+    allErrors.set(
+      `Price ${price.id.toString()} with ticker ${ticker}`,
+      ValidationError.PRICE_EXPONENT_MISMATCH
+    );
   }
   if (price.price.isZero()) {
     allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_ZERO);
   }
 }
 
-function validateClobPair(clobPair: ClobPair, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validateClobPair(
+  clobPair: ClobPair,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (clobPair.quantumConversionExponent !== proposal.params.quantumConversionExponent) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_QCE_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_QCE_MISMATCH
+    );
   }
   if (!clobPair.stepBaseQuantums.equals(proposal.params.stepBaseQuantums)) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SBQ_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_SBQ_MISMATCH
+    );
   }
   if (clobPair.subticksPerTick !== proposal.params.subticksPerTick) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SPT_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_SPT_MISMATCH
+    );
   }
 }
 
-function validatePerpetual(perpetual: Perpetual, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validatePerpetual(
+  perpetual: Perpetual,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (perpetual.params!.atomicResolution !== proposal.params.atomicResolution) {
-    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_AR_MISMATCH);
+    allErrors.set(
+      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
+      ValidationError.PERP_AR_MISMATCH
+    );
   }
   if (perpetual.params!.liquidityTier !== proposal.params.liquidityTier) {
-    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_LT_MISMATCH);
+    allErrors.set(
+      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
+      ValidationError.PERP_LT_MISMATCH
+    );
   }
 }
 
@@ -601,7 +642,7 @@ function validateParamsSchema(proposal: Proposal): void {
             exchangeName: { type: 'string' },
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
-            invert: {type: 'boolean', nullable: true },
+            invert: { type: 'boolean', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
@@ -670,7 +711,9 @@ function removeIdFromParams(params: any): any {
 
 async function main(): Promise<void> {
   // Read new proposals.
-  const newProposals: Record<string, Proposal> = JSON.parse(readFileSync(PATH_TO_PROPOSALS, 'utf8'));
+  const newProposals: Record<string, Proposal> = JSON.parse(
+    readFileSync(PATH_TO_PROPOSALS, 'utf8')
+  );
 
   // Validate JSON schema of all proposals.
   console.log('Validating JSON schema of all proposals...\n');
@@ -691,9 +734,7 @@ async function main(): Promise<void> {
   if (proposalsToValidate.size === 0) {
     return;
   }
-  await validateAgainstLocalnet(
-    Array.from(proposalsToValidate).map((name) => newProposals[name])
-  );
+  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]));
 
   console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
 }

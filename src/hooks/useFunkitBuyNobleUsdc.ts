@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react';
 
 import { useFunkitCheckout } from '@funkit/connect';
 
-
 import { useAppDispatch } from '@/state/appTypes';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -39,7 +38,6 @@ export function useFunkitBuyNobleUsdc() {
     await beginCheckout({
       modalTitle: 'Deposit',
       iconSrc: TOKEN_ICON_SRC,
-      actionsParams: [],
       targetChain: TOKEN_CONTRACT_CHAIN_ID,
       targetAsset: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
       targetAssetAmount: DEFAULT_USDC_AMT,

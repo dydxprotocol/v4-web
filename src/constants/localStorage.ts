@@ -8,6 +8,7 @@ export enum LocalStorageKey {
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
+  LatestReferrer = 'dydx.LatestReferrer',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
@@ -46,5 +47,6 @@ export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.TransferNotifications]: 'v1',
   [LocalStorageKey.Notifications]: 'v1',
   [LocalStorageKey.KeplrCompliance]: 'v1',
+  [LocalStorageKey.SelectedTradeLayout]: 'v1',
   // TODO: version all localStorage keys
 };

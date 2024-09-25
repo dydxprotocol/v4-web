@@ -127,6 +127,15 @@ Edit `vercel.json` and configure the `rewrites` configuration option. It is an a
 
 Note: The first matching rule takes precedence over anything defined afterwards in the array.
 
+## Part 6: Configure sitemap generation (optional)
+
+1. Edit `public/configs/sitemap.json`. Provide the base site URL and the list of static URLs that you wish to appear in the sitemap.
+2. Edit the deploy command and ensure that `node scripts/generate-sitemap.js` is run before `pnpm run build`.
+
+The sitemap will be generated at build time.
+It will contain the static URLs as well as up-to-date URLs for market pairs.
+The market pairs are evaluated by inspecting an appropriate REST API of a full node.
+
 # Testing
 
 ## Unit testing
@@ -177,6 +186,41 @@ git restore main pnpm-lock.yaml
 Then run `pnpm install`
 
 **Remember to revert to remote abacus before making a PR.**
+
+# Local Client-js Development
+
+## Directory structure
+
+Our tooling assumes that the [v4-clients repo](https://github.com/dydxprotocol/v4-clients) is checked out alongside v4-web:
+
+```
+--- parent folder
+ |___ v4-web
+ |___ v4-clients
+```
+
+## Using your local v4-clients repo
+
+Whenever you have changes in v4-clients that you'd like to test in your local v4-web branch, use the following command:
+
+```
+pnpm run install-local-client-js --clean
+```
+
+The `--clean` option will uninstall the package first, **it is not needed on subsequent runs.**
+
+## Reverting to remote clients
+
+Revert any changes to @dydxprotocol/v4-clients in package.json and pnpm-lock.yaml. If you haven't made any other package changes, you can use:
+
+```
+git restore main package.json
+git restore main pnpm-lock.yaml
+```
+
+Then run `pnpm install`
+
+**Remember to revert to remote v4-clients before making a PR.**
 
 # Local Localization (l10n) Development
 

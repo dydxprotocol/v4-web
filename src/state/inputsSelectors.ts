@@ -173,3 +173,9 @@ export const useTradeFormData = () => {
  * @returns Tradeform Input states for display. Abacus inputs should track these values.
  */
 export const getTradeFormInputs = (state: RootState) => state.inputs.tradeFormInputs;
+
+/**
+ * @returns ClosePositionForm Input states for display
+ */
+export const getClosePositionFormInputs = (state: RootState) =>
+  state.inputs.closePositionFormInputs;

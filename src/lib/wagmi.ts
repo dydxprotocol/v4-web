@@ -45,7 +45,11 @@ import {
 } from 'wagmi/connectors';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import {
+  DEFAULT_APP_ENVIRONMENT,
+  ENVIRONMENT_CONFIG_MAP,
+  WALLETS_CONFIG_MAP,
+} from '@/constants/networks';
 import {
   ConnectorType,
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,

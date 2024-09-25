@@ -155,6 +155,10 @@ export const CLEARED_SIZE_INPUTS = {
   leverageInput: '',
 };
 
+export const CLEARED_CLOSE_POSITION_INPUTS = {
+  limitPriceInput: '',
+};
+
 export enum PlaceOrderStatuses {
   Submitted = 0,
   Placed = 1,
@@ -169,7 +173,7 @@ export enum CancelOrderStatuses {
 
 export type LocalPlaceOrderData = {
   marketId: string;
-  clientId: number;
+  clientId: string;
   orderId?: string;
   orderType: TradeTypes;
   submissionStatus: PlaceOrderStatuses;
@@ -179,5 +183,15 @@ export type LocalPlaceOrderData = {
 export type LocalCancelOrderData = {
   orderId: string;
   submissionStatus: CancelOrderStatuses;
+  errorParams?: ErrorParams;
+  isSubmittedThroughCancelAll?: boolean;
+};
+
+export const CANCEL_ALL_ORDERS_KEY = 'all';
+export type LocalCancelAllData = {
+  key: string;
+  orderIds: string[];
+  canceledOrderIds?: string[];
+  failedOrderIds?: string[];
   errorParams?: ErrorParams;
 };

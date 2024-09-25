@@ -28,7 +28,6 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
-import { StatSigFlags } from '@/constants/statsig';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -37,7 +36,6 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useRestrictions } from '@/hooks/useRestrictions';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -66,6 +64,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
+import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -82,7 +81,7 @@ export const WithdrawForm = () => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { dydxAddress, connectedWallet } = useAccounts();
-  const { sendSquidWithdraw } = useSubaccount();
+  const { sendSkipWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
@@ -112,7 +111,7 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: prefix ? 'cosmos' : 'evm',
+      network: chainIdStr === 'solana' ? 'solana' : prefix ? 'cosmos' : 'evm',
       prefix,
     });
   }, [exchange, toAddress, chainIdStr]);
@@ -237,7 +236,7 @@ export const WithdrawForm = () => {
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
-          const txHash = await sendSquidWithdraw(
+          const txHash = await sendSkipWithdraw(
             debouncedAmountBN.toNumber(),
             requestPayload.data,
             isCctp
@@ -248,21 +247,21 @@ export const WithdrawForm = () => {
             setWithdrawAmount('');
 
             addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-
-            track(
-              AnalyticsEvents.TransferWithdraw({
-                chainId: toChainId,
-                tokenAddress: toToken?.address || undefined,
-                tokenSymbol: toToken?.symbol || undefined,
-                slippage: slippage || undefined,
-                gasFee: summary?.gasFee || undefined,
-                bridgeFee: summary?.bridgeFee || undefined,
-                exchangeRate: summary?.exchangeRate || undefined,
-                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-                toAmount: summary?.toAmount || undefined,
-                toAmountMin: summary?.toAmountMin || undefined,
-              })
-            );
+            const transferWithdrawContext = {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
+              txHash,
+            };
+            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+            dd.info('Transfer withdraw submitted', transferWithdrawContext);
           } else {
             throw new Error('No transaction hash returned');
           }
@@ -484,16 +483,18 @@ export const WithdrawForm = () => {
         routeErrors,
         routeErrorMessage
       );
-
-      track(
-        AnalyticsEvents.RouteError({
-          transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessageOverride ?? undefined,
-          amount: debouncedAmount,
-          chainId: chainIdStr ?? undefined,
-          assetId: toToken?.toString(),
-        })
-      );
+      const routeErrorContext = {
+        transferType: TransferType.withdrawal.name,
+        errorMessage: routeErrorMessageOverride ?? undefined,
+        amount: debouncedAmount,
+        chainId: chainIdStr ?? undefined,
+        assetAddress: toToken?.address ?? undefined,
+        assetSymbol: toToken?.symbol ?? undefined,
+        assetName: toToken?.name ?? undefined,
+        assetId: toToken?.toString() ?? undefined,
+      };
+      track(AnalyticsEvents.RouteError(routeErrorContext));
+      dd.info('Route error received', routeErrorContext);
       return {
         errorMessage: routeErrorMessageOverride
           ? stringGetter({
@@ -577,15 +578,11 @@ export const WithdrawForm = () => {
     isLoading ||
     !isValidDestinationAddress;
 
-  const skipEnabled = useStatsigGateValue(StatSigFlags.ffSkipMigration);
-
   return (
     <$Form onSubmit={onSubmit}>
       <div tw="text-color-text-0">
         {stringGetter({
-          key: skipEnabled
-            ? STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP
-            : STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
               <WithTooltip tooltip="lowest-fees">

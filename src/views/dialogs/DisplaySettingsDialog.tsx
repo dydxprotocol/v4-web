@@ -24,6 +24,8 @@ import {
 } from '@/state/configs';
 import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettingsDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -41,26 +43,47 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
   };
 
   const themePanels = () => {
+    const { uiRefresh } = testFlags;
     return (
       <$AppThemeRoot value={currentThemeSetting}>
-        {[
-          {
-            themeSetting: AppTheme.Classic,
-            label: STRING_KEYS.CLASSIC_DARK,
-          },
-          {
-            themeSetting: AppThemeSystemSetting.System,
-            label: STRING_KEYS.SYSTEM,
-          },
-          {
-            themeSetting: AppTheme.Dark,
-            label: STRING_KEYS.DARK,
-          },
-          {
-            themeSetting: AppTheme.Light,
-            label: STRING_KEYS.LIGHT,
-          },
-        ].map(({ themeSetting, label }) => {
+        {(uiRefresh
+          ? [
+              {
+                themeSetting: AppTheme.Dark,
+                label: STRING_KEYS.DARK,
+              },
+              {
+                themeSetting: AppTheme.Light,
+                label: STRING_KEYS.LIGHT,
+              },
+              {
+                themeSetting: AppTheme.Classic,
+                label: STRING_KEYS.CLASSIC_DARK,
+              },
+              {
+                themeSetting: AppThemeSystemSetting.System,
+                label: STRING_KEYS.SYSTEM,
+              },
+            ]
+          : [
+              {
+                themeSetting: AppTheme.Classic,
+                label: STRING_KEYS.CLASSIC_DARK,
+              },
+              {
+                themeSetting: AppThemeSystemSetting.System,
+                label: STRING_KEYS.SYSTEM,
+              },
+              {
+                themeSetting: AppTheme.Dark,
+                label: STRING_KEYS.DARK,
+              },
+              {
+                themeSetting: AppTheme.Light,
+                label: STRING_KEYS.LIGHT,
+              },
+            ]
+        ).map(({ themeSetting, label }) => {
           const theme =
             themeSetting === AppThemeSystemSetting.System
               ? globalThis.matchMedia('(prefers-color-scheme: dark)').matches

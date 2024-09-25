@@ -5,12 +5,14 @@ import type {
   ErrorCallback,
   GetMarksCallback,
   HistoryCallback,
+  IBasicDataFeed,
   LibrarySymbolInfo,
   Mark,
   OnReadyCallback,
   ResolutionString,
   ResolveCallback,
   SearchSymbolsCallback,
+  SubscribeBarsCallback,
   Timezone,
 } from 'public/tradingview/charting_library';
 
@@ -71,7 +73,7 @@ export const getDydxDatafeed = (
   },
   selectedLocale: SupportedLocales,
   stringGetter: StringGetterFunction
-) => ({
+): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
   },
@@ -126,10 +128,10 @@ export const getDydxDatafeed = (
     const colorMode = getAppColorMode(store.getState());
 
     const [fromMs, toMs] = [fromSeconds * 1000, toSeconds * 1000];
-    const market = getMarketData(store.getState(), symbolInfo.name);
+    const market = getMarketData(store.getState(), symbolInfo.ticker!);
     if (!market) return;
 
-    const fills = getMarketFills(store.getState())[symbolInfo.name] ?? [];
+    const fills = getMarketFills(store.getState())[symbolInfo.ticker!] ?? [];
     const inRangeFills = fills.filter(
       (fill) => fill.createdAtMilliseconds >= fromMs && fill.createdAtMilliseconds <= toMs
     );
@@ -176,7 +178,7 @@ export const getDydxDatafeed = (
     try {
       const currentMarketBars = getPerpetualBarsForPriceChart(orderbookCandlesToggleOn)(
         store.getState(),
-        symbolInfo.name,
+        symbolInfo.ticker!,
         resolution
       );
 
@@ -196,14 +198,14 @@ export const getDydxDatafeed = (
         const earliestCachedBarTime = cachedBars?.[cachedBars.length - 1]?.time;
 
         fetchedCandles = await getCandlesForDatafeed({
-          marketId: symbolInfo.name,
+          marketId: symbolInfo.ticker!,
           resolution,
           fromMs,
           toMs: earliestCachedBarTime || toMs,
         });
 
         store.dispatch(
-          setCandles({ candles: fetchedCandles, marketId: symbolInfo.name, resolution })
+          setCandles({ candles: fetchedCandles, marketId: symbolInfo.ticker!, resolution })
         );
       }
 
@@ -221,7 +223,7 @@ export const getDydxDatafeed = (
       }
 
       if (firstDataRequest) {
-        lastBarsCache.set(`${symbolInfo.name}/${RESOLUTION_MAP[resolution]}`, {
+        lastBarsCache.set(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`, {
           ...bars[bars.length - 1],
         });
       }
@@ -236,23 +238,23 @@ export const getDydxDatafeed = (
   },
 
   subscribeBars: (
-    symbolInfo: any,
-    resolution: any,
-    onRealtimeCallback: any,
-    subscribeUID: any,
-    onResetCacheNeededCallback: any
+    symbolInfo: LibrarySymbolInfo,
+    resolution: ResolutionString,
+    onTick: SubscribeBarsCallback,
+    listenerGuid: string,
+    onResetCacheNeededCallback: Function
   ) => {
     subscribeOnStream({
       symbolInfo,
       resolution,
-      onRealtimeCallback,
-      subscribeUID,
+      onRealtimeCallback: onTick,
+      listenerGuid,
       onResetCacheNeededCallback,
-      lastBar: lastBarsCache.get(`${symbolInfo.full_name}/${RESOLUTION_MAP[resolution]}`),
+      lastBar: lastBarsCache.get(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`),
     });
   },
 
-  unsubscribeBars: (subscriberUID: any) => {
+  unsubscribeBars: (subscriberUID: string) => {
     unsubscribeFromStream(subscriberUID);
   },
 });

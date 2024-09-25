@@ -12,6 +12,9 @@ import { Themes } from '@/styles/themes';
 
 import { AppTheme, type AppColorMode } from '@/state/configs';
 
+import { getDisplayableTickerFromMarket } from '../assetUtils';
+import { testFlags } from '../testFlags';
+
 const MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES = 10;
 
 const getOhlcValues = ({
@@ -117,7 +120,7 @@ const mapTradingViewChartBar = ({
 export const getSymbol = (marketId: string): TradingViewSymbol => ({
   description: marketId,
   exchange: 'dYdX',
-  full_name: marketId,
+  full_name: getDisplayableTickerFromMarket(marketId),
   symbol: marketId,
   type: 'crypto',
 });
@@ -220,11 +223,15 @@ export const getWidgetOverrides = ({
 
 export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
   Pick<TradingTerminalWidgetOptions, 'container'> => {
+  const { uiRefresh } = testFlags;
+
   return {
     // debug: true,
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
-    custom_css_url: '/tradingview/custom-styles.css',
+    custom_css_url: uiRefresh
+      ? '/tradingview/custom-styles.css'
+      : '/tradingview/custom-styles-deprecated.css',
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: [

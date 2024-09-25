@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 
+import { VaultTransfer } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultAccountTransfers } from '@/hooks/vaultsHooks';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -15,14 +17,10 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getUserVault } from '@/state/vaultSelectors';
-import { VaultTransaction } from '@/state/vaults';
-
 export const VaultTransactionsCard = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const [showHistory, setShowHistory] = useState(false);
-  const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
+  const transactions = useLoadedVaultAccountTransfers() ?? EMPTY_ARR;
 
   return (
     <div className={className} tw="rounded-[0.7rem] border border-solid border-color-border">
@@ -59,9 +57,9 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
 const $ShowHideHistoryButton = styled(Button)``;
 const VaultTransactionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const transactions = useAppSelector(getUserVault)?.transactionHistory ?? EMPTY_ARR;
+  const transactions = useLoadedVaultAccountTransfers() ?? EMPTY_ARR;
 
-  const columns = useMemo<ColumnDef<VaultTransaction>[]>(
+  const columns = useMemo<ColumnDef<VaultTransfer>[]>(
     () =>
       [
         {
@@ -83,14 +81,16 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
         },
         {
           columnKey: 'action',
-          getCellValue: (row) => row.type,
+          getCellValue: (row) => row.type?.name,
           label: stringGetter({ key: STRING_KEYS.ACTION }),
           renderCell: ({ type }) => (
             <Output
               value={
-                type === 'deposit'
+                type?.name === 'DEPOSIT'
                   ? stringGetter({ key: STRING_KEYS.DEPOSIT })
-                  : stringGetter({ key: STRING_KEYS.WITHDRAW })
+                  : type?.name === 'WITHDRAWAL'
+                    ? stringGetter({ key: STRING_KEYS.WITHDRAW })
+                    : undefined
               }
               type={OutputType.Text}
             />
@@ -102,14 +102,14 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
           label: stringGetter({ key: STRING_KEYS.AMOUNT }),
           renderCell: ({ amountUsdc }) => <Output value={amountUsdc} type={OutputType.Fiat} />,
         },
-      ] satisfies ColumnDef<VaultTransaction>[],
+      ] satisfies ColumnDef<VaultTransfer>[],
     [stringGetter]
   );
   return (
     <$Table
       withInnerBorders
       data={transactions}
-      getRowKey={(row) => row.id}
+      getRowKey={(row) => row.id ?? ''}
       label={stringGetter({ key: STRING_KEYS.VAULT })}
       defaultSortDescriptor={{
         column: 'time',

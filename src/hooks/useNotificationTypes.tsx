@@ -30,12 +30,12 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatSigFlags, StatsigDynamicConfigs } from '@/constants/statsig';
+import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { KeplrIcon } from '@/icons';
+import { KeplrIcon, PhantomIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -43,6 +43,7 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
+import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -51,6 +52,7 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import {
+  getLocalCancelAlls,
   getLocalCancelOrders,
   getLocalPlaceOrders,
   getSubaccountFills,
@@ -59,7 +61,7 @@ import {
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getAbacusNotifications } from '@/state/notificationsSelectors';
+import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
@@ -113,7 +115,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           switch (abacusNotificationType) {
             case 'order': {
               const order = ordersById[id]?.[0];
-              const clientId: number | undefined = order?.clientId ?? undefined;
+              const clientId: string | undefined = order?.clientId ?? undefined;
               const localOrderExists =
                 clientId && localPlaceOrders.some((ordr) => ordr.clientId === clientId);
 
@@ -208,7 +210,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.SquidTransfer,
+    type: NotificationType.SkipTransfer,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
@@ -231,7 +233,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             toChainId === selectedDydxChainId;
 
           const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+            (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
             <$AssetIcon symbol="USDC" />
           ) : (
@@ -278,7 +280,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
               toastSensitivity: 'foreground',
-              groupKey: NotificationType.SquidTransfer,
+              groupKey: NotificationType.SkipTransfer,
             },
             [isFinished]
           );
@@ -329,7 +331,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         if (
-          featureFlags?.[StatSigFlags.ffShowPredictionMarketsUi] &&
+          featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
         ) {
           trigger(
@@ -352,7 +354,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (featureFlags?.[StatSigFlags.ffEnableKeplr]) {
+        if (featureFlags?.[StatsigFlags.ffEnableKeplr]) {
           trigger(
             ReleaseUpdateNotificationIds.KeplrSupport,
             {
@@ -360,6 +362,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
               title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
               body: stringGetter({
                 key: STRING_KEYS.KEPLR_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
+
+        const phantomNotificationExpirationDate = new Date('2024-10-07T15:00:29.517926238Z');
+
+        if (currentDate < phantomNotificationExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.PhantomSupport,
+            {
+              icon: <PhantomIcon />,
+              title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
@@ -376,6 +396,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
       });
 
       const { dydxRewards } = data ?? {};
+
+      useEffect(() => {
+        trigger(
+          INCENTIVES_SEASON_NOTIFICATION_ID,
+          {
+            icon: <Icon iconName={IconName.RewardStar} />,
+            title: stringGetter({
+              key: STRING_KEYS.INCENTIVES_SEASON_ENDED_TITLE,
+              params: { SEASON_NUMBER: 6 }, // last season, will just hardcode
+            }),
+            body: stringGetter({ key: STRING_KEYS.INCENTIVES_SEASON_ENDED_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
+          },
+          []
+        );
+      }, [stringGetter]);
 
       useEffect(() => {
         const rewards = dydxRewards ?? 0;
@@ -627,6 +664,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
       const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
+      const localCancelAlls = useAppSelector(getLocalCancelAlls, shallowEqual);
+
       const allOrders = useAppSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
@@ -663,6 +702,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
           if (!existingOrder) return;
 
+          // skip if this is from a cancel all operation and isn't an error
+          if (localCancel.isSubmittedThroughCancelAll && !localCancel.errorParams) return;
+
           // share same notification with existing local order if exists
           // so that canceling a local order will not add an extra notification
           const key = (existingOrder.clientId ?? localCancel.orderId).toString();
@@ -688,6 +730,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [localCancelOrders]);
+
+      useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const cancelAll of Object.values(localCancelAlls)) {
+          trigger(
+            cancelAll.key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS }),
+              toastSensitivity: 'background',
+              groupKey: cancelAll.key,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <CancelAllNotification
+                  isToast={isToast}
+                  localCancelAll={cancelAll}
+                  notification={notification}
+                />
+              ),
+            },
+            [cancelAll.canceledOrderIds, cancelAll.failedOrderIds, cancelAll.errorParams],
+            true
+          );
+        }
+      }, [localCancelAlls]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
@@ -733,11 +800,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [dydxAddress]);
     },
+
     useNotificationAction: () => {
       const { getInTouch } = useURLConfigs();
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
+    },
+  },
+  {
+    type: NotificationType.Custom,
+    useTrigger: ({ trigger }) => {
+      const customNotifications = useAppSelector(getCustomNotifications);
+      useEffect(() => {
+        customNotifications.forEach((notification) => {
+          trigger(notification.id, notification.displayData);
+        });
+      }, [customNotifications, trigger]);
     },
   },
 ];

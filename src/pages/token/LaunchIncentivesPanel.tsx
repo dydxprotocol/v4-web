@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -22,13 +21,11 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
-import { NewTag, TagSize } from '@/components/Tag';
+import { TagSize, WarningTag } from '@/components/Tag';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
-
-import { wrapAndLogError } from '@/lib/asyncUtils';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
@@ -67,7 +64,9 @@ const LaunchIncentivesTitle = () => {
           FOR_V4: <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FOR_V4 })}</span>,
         },
       })}
-      <NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+      <WarningTag size={TagSize.Medium}>
+        {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_CONCLUDED })}
+      </WarningTag>
     </$Title>
   );
 };
@@ -76,36 +75,7 @@ const EstimatedRewards = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
 
-  const { data: seasonNumber } = useQuery({
-    queryKey: ['chaos_labs_season_number'],
-    queryFn: wrapAndLogError(
-      async () => {
-        const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
-          method: 'POST',
-          headers: {
-            'apollographql-client-name': 'dydx-v4',
-            'content-type': 'application/json',
-            protocol: 'dydx-v4',
-          },
-          body: JSON.stringify({
-            operationName: 'TradingSeasons',
-            variables: {},
-            query: `query TradingSeasons {
-        tradingSeasons {
-          label
-        }
-      }`,
-          }),
-        });
-        const seasons = (await resp.json())?.data?.tradingSeasons;
-        return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
-      },
-      'LaunchIncentives/fetchSeasonNumber',
-      true
-    ),
-  });
-
-  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });
+  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress });
   const { incentivePoints } = data ?? {};
 
   return (
@@ -113,14 +83,9 @@ const EstimatedRewards = () => {
       <$EstimatedRewardsCardContent>
         <div>
           <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
-          {seasonNumber !== undefined && (
-            <span tw="text-color-text-1 font-small-book">
-              {stringGetter({
-                key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
-                params: { SEASON_NUMBER: seasonNumber },
-              })}
-            </span>
-          )}
+          <span tw="text-color-text-1 font-small-book">
+            {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_TOTAL_REWARDS })}
+          </span>
         </div>
 
         <$Points>
@@ -134,7 +99,7 @@ const EstimatedRewards = () => {
         </$Points>
       </$EstimatedRewardsCardContent>
 
-      <img src="/rewards-stars.svg" tw="relative float-right h-auto w-[5.25rem]" />
+      <img src="/rewards-stars.svg" tw="relative float-right mb-1.5 h-auto w-[5.25rem]" />
     </$EstimatedRewardsCard>
   );
 };
