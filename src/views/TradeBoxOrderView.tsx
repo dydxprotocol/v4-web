@@ -39,10 +39,10 @@ export const TradeBoxOrderView = () => {
     <div tw="flex min-h-full flex-col gap-0.25 pt-0.875">
       <$TopActionsRow>
         <$MarginAndLeverageButtons>
-          <MarginModeSelector openInTradeBox />
+          <$MarginModeSelector openInTradeBox />
           <TargetLeverageButton />
         </$MarginAndLeverageButtons>
-        <TradeSideToggle />
+        <$TradeSideToggle />
       </$TopActionsRow>
       <$Tabs
         key={selectedTradeType}
@@ -84,20 +84,32 @@ const $MarginAndLeverageButtons = styled.div`
 
   abbr,
   button {
-    width: 100%;
+    // width: 100%;
     height: 2.5rem;
+    flex: 1;
+    min-width: 1px;
   }
 `;
 
+const $TradeSideToggle = styled(TradeSideToggle)``;
+
 const $TopActionsRow = styled.div`
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
+  // display: grid;
+  // grid-auto-flow: column;
 
   padding-left: 1rem;
   padding-right: 1rem;
+
+  > * {
+    min-width: 1px;
+    flex: 1 1 1px;
+  }
 
   @media ${breakpoints.tablet} {
     grid-auto-columns: var(--orderbox-column-width) 1fr;
     gap: var(--form-input-gap);
   }
 `;
+
+const $MarginModeSelector = styled(MarginModeSelector)``;

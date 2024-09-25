@@ -10,6 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -74,6 +76,8 @@ const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
     flex: 1;
     z-index: 1;
     outline: none;
+
+    ${layoutMixins.textTruncate}
   }
 
   &::before {

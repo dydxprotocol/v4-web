@@ -78,7 +78,9 @@ const $TradeBox = styled.section`
   ${layoutMixins.container}
   z-index: 0;
 
-  ${layoutMixins.stack}
+  // ${layoutMixins.stack}
+
+  flex: 1 1 1px;
 `;
 
 const $Dialog = styled(Dialog)`

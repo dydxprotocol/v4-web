@@ -909,6 +909,7 @@ export const layoutMixins = {
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
     white-space: nowrap;
     min-width: 1px;
   `,

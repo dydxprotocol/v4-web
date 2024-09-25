@@ -9,6 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -42,13 +44,13 @@ export const MarginModeSelector = ({
   }, [dispatch, openInTradeBox]);
 
   return needsMarginMode ? (
-    <Button onClick={handleClick} className={className}>
+    <$Button onClick={handleClick} className={className}>
       {marginMode &&
         stringGetter({
           key: MARGIN_MODE_STRINGS[marginMode.rawValue],
         })}
       <Icon iconName={IconName.Triangle} tw="ml-[0.5ch] rotate-[0.75turn] text-[0.4375rem]" />
-    </Button>
+    </$Button>
   ) : (
     <$WarningTooltip
       className={className}
@@ -64,16 +66,21 @@ export const MarginModeSelector = ({
         </div>
       }
     >
-      <Button disabled>
+      <$Button disabled>
         {marginMode &&
           stringGetter({
             key: MARGIN_MODE_STRINGS[marginMode.rawValue],
           })}
-      </Button>
+      </$Button>
     </$WarningTooltip>
   );
 };
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
   border: 1px solid ${({ theme }) => theme.warning}30;
+  gap: 0.5rem;
+`;
+
+const $Button = styled(Button)`
+  ${layoutMixins.textTruncate}
 `;
