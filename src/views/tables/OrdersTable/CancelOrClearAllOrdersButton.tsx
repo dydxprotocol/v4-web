@@ -46,7 +46,7 @@ export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
 };
 
 const $ActionTextButton = styled(Button)<{ isHighlighted?: boolean }>`
-  --button-textColor: ${({ isHighlighted }) => (isHighlighted ? 'var(--color-accent)' : 'initial')};
+  --button-textColor: ${({ isHighlighted }) => (isHighlighted ? 'var(--color-red)' : 'initial')};
   --button-height: var(--item-height);
   --button-padding: 0 0.25rem;
   --button-backgroundColor: transparent;

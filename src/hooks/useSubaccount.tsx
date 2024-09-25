@@ -40,6 +40,7 @@ import {
   cancelOrderFailed,
   cancelOrderSubmitted,
   clearLocalOrders,
+  closeAllPositionsSubmitted,
   placeOrderFailed,
   placeOrderSubmitted,
 } from '@/state/localOrders';
@@ -601,6 +602,36 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch, orders]
   );
 
+  const closeAllPositions = useCallback(() => {
+    // this is for each single close position / place order transaction
+    const callback = (
+      success: boolean,
+      parsingError?: Nullable<ParsingError>,
+      data?: Nullable<HumanReadablePlaceOrderPayload>
+    ) => {
+      if (!success) {
+        const errorParams = getValidErrorParamsFromParsingError(parsingError);
+        if (data?.clientId !== undefined) {
+          dispatch(
+            placeOrderFailed({
+              clientId: data.clientId,
+              errorParams,
+            })
+          );
+        }
+      }
+    };
+
+    const payload = abacusStateManager.closeAllPositions(callback);
+    if (payload) {
+      dispatch(
+        closeAllPositionsSubmitted(
+          payload.payloads.toArray().map((orderPayload) => orderPayload.clientId)
+        )
+      );
+    }
+  }, [dispatch]);
+
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
     async ({
@@ -892,6 +923,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Trading Methods
     placeOrder,
     closePosition,
+    closeAllPositions,
     cancelOrder,
     cancelAllOrders,
     placeTriggerOrders,

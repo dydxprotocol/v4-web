@@ -44,6 +44,7 @@ import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
+import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -58,6 +59,7 @@ import { openDialog } from '@/state/dialogs';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
+  getLocalCloseAllPositions,
   getLocalPlaceOrders,
 } from '@/state/localOrdersSelectors';
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
@@ -664,6 +666,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
       const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
       const localCancelAlls = useAppSelector(getLocalCancelAlls, shallowEqual);
+      const localCloseAllPositions = useAppSelector(getLocalCloseAllPositions, shallowEqual);
 
       const allOrders = useAppSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
@@ -754,6 +757,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [localCancelAlls]);
+
+      useEffect(() => {
+        if (!localCloseAllPositions) return;
+        const localCloseAllKey = localCloseAllPositions.submittedOrderClientIds.join('-');
+        // eslint-disable-next-line no-restricted-syntax
+        trigger(
+          localCloseAllKey,
+          {
+            icon: null,
+            title: stringGetter({ key: STRING_KEYS.CLOSE_ALL_POSITIONS }),
+            toastSensitivity: 'background',
+            groupKey: localCloseAllKey,
+            toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+            renderCustomBody: ({ isToast, notification }) => (
+              <CloseAllPositionsNotification
+                isToast={isToast}
+                localCloseAllPositions={localCloseAllPositions}
+                notification={notification}
+              />
+            ),
+          },
+          [localCloseAllPositions],
+          true
+        );
+      }, [localCloseAllPositions]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
