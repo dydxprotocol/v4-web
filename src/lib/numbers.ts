@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js';
 
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
@@ -31,9 +31,16 @@ export const roundToNearestFactor = ({
   return MustBigNumber(number).div(factor).decimalPlaces(0, roundingMode).times(factor);
 };
 
-export const getFractionDigits = (unit?: BigNumber | number | string | null) =>
+export const getFractionDigits = (unit?: BigNumberish | null) =>
   // n?.toString().match(/[.](\d*)/)?.[1].length ?? 0
   unit ? Math.max(Math.ceil(-Math.log10(Math.abs(+unit))), 0) : 0;
+
+export const getTickSizeDecimalsFromPrice = (price?: BigNumberish | null) => {
+  if (!price) return TOKEN_DECIMALS;
+  const priceNum = MustBigNumber(price).toNumber();
+  const p = Math.floor(Math.log(priceNum));
+  return Math.abs(p - 3);
+};
 
 export const isNumber = (value: any): value is number =>
   typeof value === 'number' && !Number.isNaN(value);

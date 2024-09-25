@@ -6,15 +6,19 @@ import tw from 'twin.macro';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LinkOutIcon } from '@/icons';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 enum ChartResolution {
   DAY = 'day',
@@ -22,15 +26,26 @@ enum ChartResolution {
   MONTH = 'month',
 }
 
-export const LaunchableMarketChart = ({ className }: { className?: string }) => {
+export const LaunchableMarketChart = ({
+  className,
+  ticker,
+}: {
+  className?: string;
+  ticker?: string;
+}) => {
   const stringGetter = useStringGetter();
   const [resolution, setResolution] = useState(ChartResolution.DAY);
+  const launchableAsset = useMetadataServiceAssetFromId(ticker);
+  const { id, marketCap, name, price, logo, tickSizeDecimals, urls } = orEmptyObj(launchableAsset);
+  const websiteLink = urls?.website ?? undefined;
+
+  if (!ticker) return null;
 
   const items = [
     {
       key: 'market-cap',
       label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
-      value: <Output type={OutputType.CompactFiat} tw="text-color-text-1" value={1232604.23} />,
+      value: <Output type={OutputType.CompactFiat} tw="text-color-text-1" value={marketCap} />,
     },
     {
       key: 'max-leverage',
@@ -42,15 +57,17 @@ export const LaunchableMarketChart = ({ className }: { className?: string }) => 
   return (
     <$LaunchableMarketChartContainer className={className}>
       <$ChartContainerHeader tw="flex flex-row items-center justify-between">
-        <div tw="flex flex-row items-center gap-0.5">
-          <AssetIcon tw="h-2.5 w-2.5" symbol="ETH" />
+        <div tw="mr-0.5 flex flex-row items-center gap-0.5">
+          <img tw="h-2.5 w-2.5 rounded-[50%]" src={logo} alt={name} />
           <h2 tw="flex flex-row items-center gap-[0.5ch] text-extra text-color-text-1">
-            Ethereum
-            <LinkOutIcon tw="h-1.25 w-1.25" />
+            <Link href={websiteLink}>
+              <span>{name}</span>
+              <LinkOutIcon tw="h-1.25 w-1.25" />
+            </Link>
           </h2>
         </div>
 
-        <Tag>ETH</Tag>
+        {id && <Tag>{getDisplayableAssetFromBaseAsset(id)}</Tag>}
       </$ChartContainerHeader>
 
       <div tw="flex flex-row justify-between">
@@ -61,7 +78,14 @@ export const LaunchableMarketChart = ({ className }: { className?: string }) => 
               key: 'reference-price',
               label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
               tooltip: 'reference-price',
-              value: <Output type={OutputType.Fiat} tw="text-color-text-1" value={2604.23} />,
+              value: (
+                <Output
+                  type={OutputType.Fiat}
+                  tw="text-color-text-1"
+                  value={price}
+                  fractionDigits={tickSizeDecimals}
+                />
+              ),
             },
           ]}
         />

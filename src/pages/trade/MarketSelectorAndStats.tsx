@@ -12,6 +12,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+
 export const MarketSelectorAndStats = ({
   className,
   launchableMarketId,
@@ -22,17 +24,25 @@ export const MarketSelectorAndStats = ({
   const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
+  const displayableId = launchableMarketId
+    ? getDisplayableTickerFromMarket(launchableMarketId)
+    : launchableMarketId;
+
   return (
     <$Container className={className}>
       <MarketsDropdown
-        isViewingUnlaunchedMarket={!!launchableMarketId}
-        currentMarketId={launchableMarketId ?? currentMarketId}
+        launchableMarketId={launchableMarketId}
+        currentMarketId={displayableId ?? currentMarketId}
         symbol={id}
       />
 
       <VerticalSeparator />
 
-      {launchableMarketId ? <UnlaunchedMarketStatsDetails /> : <MarketStatsDetails />}
+      {launchableMarketId ? (
+        <UnlaunchedMarketStatsDetails launchableMarketId={launchableMarketId} />
+      ) : (
+        <MarketStatsDetails />
+      )}
     </$Container>
   );
 };

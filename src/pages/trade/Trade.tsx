@@ -20,6 +20,8 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import LaunchableMarket from './LaunchableMarket';
@@ -43,7 +45,7 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  if (isViewingUnlaunchedMarket) {
+  if (isViewingUnlaunchedMarket && testFlags.pml) {
     return <LaunchableMarket />;
   }
 

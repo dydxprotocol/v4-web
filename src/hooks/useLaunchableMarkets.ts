@@ -1,127 +1,117 @@
 import { useMemo } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
+
+import {
+  MetadataServiceAsset,
+  MetadataServiceInfoResponse,
+  MetadataServicePricesResponse,
+} from '@/constants/assetMetadata';
+import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { getTickerFromMarketmapId } from '@/lib/assetUtils';
+import metadataClient from '@/clients/metadataService';
+import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
-import { useSelectedNetwork } from './useSelectedNetwork';
-
-type MarketMapTicker = {
-  currency_pair: {
-    Base: string;
-    Quote: string;
-  };
-  decimals: string;
-  min_provider_count: string;
-  enabled: boolean;
-  metadata_JSON?: string;
-};
-
-type MarketMapProviderConfigs = {
-  name: string;
-  off_chain_ticker: string;
-  normalize_by_pair?: {
-    Base: string;
-    Quote: string;
-  };
-  invert: boolean;
-  metadata_JSON: string;
-};
-
-export type MarketMapResponse = {
-  chain_id: string;
-  last_updated: string;
-  market_map: {
-    markets: Record<
-      string,
+export const useMetadataService = () => {
+  const metadataQuery = useQueries({
+    queries: [
       {
-        ticker: MarketMapTicker;
-        provider_configs: MarketMapProviderConfigs[];
-      }
-    >;
-  };
-};
-
-export type HydratedMarketMap = MarketMapResponse['market_map']['markets'][string] & { id: string };
-
-const MOCK_MARKETMAP_DATA = {
-  chain_id: '1',
-  last_updated: '2021-10-12T00:00:00Z',
-  market_map: {
-    markets: {
-      'BAG,raydium,D8r8XTuCrUhLheWeGXSwC3G92RhASficV3YA7B2XWcLv/USD': {
-        ticker: {
-          currency_pair: {
-            Base: 'BAG,raydium,D8r8XTuCrUhLheWeGXSwC3G92RhASficV3YA7B2XWcLv',
-            Quote: 'USD',
-          },
-          decimals: '12',
-          min_provider_count: '1',
-          enabled: false,
-          metadata_JSON:
-            '{"reference_price":1767877746,"liquidity":205137,"aggregate_ids":[{"venue":"coinmarketcap","ID":"30088"}]}',
+        queryKey: ['marketMapInfo'],
+        queryFn: async (): Promise<MetadataServiceInfoResponse> => {
+          return metadataClient.getAssetInfo();
         },
-        provider_configs: [
-          {
-            name: 'raydium_api',
-            off_chain_ticker:
-              'BAG,raydium,D8r8XTuCrUhLheWeGXSwC3G92RhASficV3YA7B2XWcLv/SOL,raydium,So11111111111111111111111111111111111111112',
-            normalize_by_pair: {
-              Base: 'SOL',
-              Quote: 'USD',
-            },
-            invert: false,
-            metadata_JSON:
-              '{"base_token_vault":{"token_vault_address":"7eLwyCqfhxKLsKeFwcN4JdfspKK22rSC4uQHNy3zWNPB","token_decimals":9},"quote_token_vault":{"token_vault_address":"Cr7Yo8Uf5f8pzMsY3ZwgDFNx85nb3UDvPfQxuWG4acxc","token_decimals":9},"amm_info_address":"Bv7mM5TwLxsukrRrwzEc6TFAj22GAdVCcH5ViAZFNZC","open_orders_address":"Du6ZaABu8cxmCAvwoGMixZgZuw57cCQc8xE8yRenaxL4"}',
-          },
-        ],
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
       },
-    },
-  },
-};
+      {
+        queryKey: ['marketMapPrice'],
+        queryFn: async (): Promise<MetadataServicePricesResponse> => {
+          return metadataClient.getAssetPrices();
+        },
+        refetchInterval: timeUnits.minute * 5,
+      },
+    ],
+    combine: (results) => {
+      const info = results[0].data;
+      const prices = results[1].data;
+      const data: Record<string, MetadataServiceAsset> = {};
 
-export const useMarketMap = () => {
-  const { selectedNetwork } = useSelectedNetwork();
+      Object.keys(info ?? {}).forEach((key) => {
+        if (info?.[key] && prices?.[key]) {
+          const tickSizeDecimals = getTickSizeDecimalsFromPrice(prices[key].price);
 
-  const launchableMarkets = useQuery({
-    enabled: selectedNetwork === 'dydxprotocol-staging',
-    queryKey: ['launchableMarkets', selectedNetwork],
-    queryFn: async () => {
-      return fetch('https://validator.v4staging.dydx.exchange:1317/slinky/marketmap/v1/marketmap')
-        .then((res) => res.json())
-        .then((data) => data as MarketMapResponse);
+          data[key] = {
+            id: key,
+            name: info[key].name,
+            logo: info[key].logo,
+            urls: {
+              website: info[key].urls.website,
+              technicalDoc: info[key].urls.technical_doc,
+              cmc: info[key].urls.cmc,
+            },
+            sectorTags: info[key].sector_tags,
+            exchanges: info[key].exchanges,
+            price: prices[key].price,
+            percentChange24h: prices[key].percent_change_24h,
+            marketCap: prices[key].market_cap,
+            volume24h: prices[key].volume_24h,
+            tickSizeDecimals,
+          };
+        }
+      });
+
+      return {
+        data,
+        isLoading: results.some((result) => result.isLoading),
+        isError: results.some((result) => result.isError),
+        isSuccess: results.every((result) => result.isSuccess),
+      };
     },
   });
 
-  return launchableMarkets;
+  return metadataQuery;
+};
+
+export const useMetadataServiceAssetFromId = (marketId?: string) => {
+  const metadataServiceData = useMetadataService();
+
+  const launchableAsset = useMemo(() => {
+    if (!metadataServiceData.data || !marketId) {
+      return null;
+    }
+
+    const assetId = getAssetFromMarketId(marketId);
+    return metadataServiceData.data?.[assetId];
+  }, [metadataServiceData.data, marketId]);
+
+  return launchableAsset;
 };
 
 export const useLaunchableMarkets = () => {
-  const launchableMarkets = useMarketMap();
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const metadataServiceData = useMetadataService();
 
-  const filteredPotentialMarkets: HydratedMarketMap[] = useMemo(() => {
-    const marketMap = (launchableMarkets.data ?? MOCK_MARKETMAP_DATA)?.market_map?.markets;
-    if (!marketMap) {
-      return [];
-    }
+  const filteredPotentialMarkets: { id: string; asset: string }[] = useMemo(() => {
+    const assets = Object.keys(metadataServiceData.data).map((asset) => {
+      return {
+        id: `${asset}-USD`,
+        asset,
+      };
+    });
 
-    return Object.entries(marketMap)
-      .map(([id, data]) => ({
-        id: getTickerFromMarketmapId(id),
-        ...data,
-      }))
-      .filter(({ id }) => {
-        return !marketIds.includes(id);
-      });
-  }, [launchableMarkets.data, marketIds]);
+    return assets.filter(({ id }) => {
+      return !marketIds.includes(id);
+    });
+  }, [marketIds, metadataServiceData.data]);
 
   return {
-    ...launchableMarkets,
+    ...metadataServiceData,
     data: filteredPotentialMarkets,
   };
 };
