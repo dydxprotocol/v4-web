@@ -40,7 +40,7 @@
     "lint": "eslint --ext .ts,.tsx src/",
     "fix-lint": "eslint --fix --ext .ts,.tsx src/",
     "tag": "node scripts/generate-tag.js",
-    "test": "VITE_DISABLE_STATSIG=true vitest run",
+    "test": "vitest run",
     "tsc": "tsc",
     "postinstall": "tar -xzC public -f tradingview/tradingview.tgz",
     "prepare": "husky",
