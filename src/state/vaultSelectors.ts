@@ -1,5 +1,17 @@
 import { RootState } from './_store';
+import { createAppSelector } from './appTypes';
 
-export const getVaultDetails = (s: RootState) => s.vaults.vaultDetails;
-export const getUserVault = (s: RootState) => s.vaults.userVault;
-export const getVaultPnlHistory = (s: RootState) => s.vaults.vaultHistory?.pnlAndEquityDataPoints;
+export const getVaultForm = (s: RootState) => s.vaults.vaultForm;
+
+export const selectVaultFormStateExceptAmount = createAppSelector(
+  [
+    (state) => state.vaults.vaultForm.operation,
+    (state) => state.vaults.vaultForm.slippageAck,
+    (state) => state.vaults.vaultForm.confirmationStep,
+  ],
+  (operation, slippageAck, confirmationStep) => ({
+    operation,
+    slippageAck,
+    confirmationStep,
+  })
+);

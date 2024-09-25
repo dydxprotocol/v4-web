@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import styled, { keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -45,10 +47,18 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
-type LoadingSpaceProps = { className?: string; id: string };
-export const LoadingSpace: React.FC<LoadingSpaceProps> = ({ className, id }: LoadingSpaceProps) => (
+type LoadingSpaceProps = { className?: string; description?: ReactNode; id: string };
+
+export const LoadingSpace: React.FC<LoadingSpaceProps> = ({
+  className,
+  description,
+  id,
+}: LoadingSpaceProps) => (
   <$LoadingSpaceContainer className={className}>
-    <LoadingSpinner id={id} />
+    <div tw="flex flex-col justify-center text-center align-middle">
+      <LoadingSpinner id={id} />
+      {description && <span tw="mt-1">{description}</span>}
+    </div>
   </$LoadingSpaceContainer>
 );
 const $LoadingSpaceContainer = styled.div`

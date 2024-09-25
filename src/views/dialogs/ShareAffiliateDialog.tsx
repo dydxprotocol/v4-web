@@ -128,11 +128,11 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               },
               dotsOptions: {
                 type: 'dots',
-                color: ColorToken.DarkGray12,
+                color: ColorToken.DarkGray13,
               },
               cornersSquareOptions: {
                 type: 'extra-rounded',
-                color: ColorToken.DarkGray12,
+                color: ColorToken.DarkGray13,
               },
               imageOptions: {
                 margin: 0,

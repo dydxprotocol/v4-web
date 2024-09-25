@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { getLatestOrderClientId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getLatestOrderClientId } from '@/state/localOrdersSelectors';
 
 /**
  * @description This hook will fire a callback when the latest order has been updated to a non-pending state from the Indexer.

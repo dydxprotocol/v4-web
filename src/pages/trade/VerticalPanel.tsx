@@ -16,9 +16,8 @@ enum Tab {
 }
 
 const HISTOGRAM_SIDES_BY_LAYOUT = {
-  [TradeLayouts.Default]: 'left',
-  [TradeLayouts.Alternative]: 'right',
-  [TradeLayouts.Reverse]: 'right',
+  [TradeLayouts.Default]: 'right',
+  [TradeLayouts.Reverse]: 'left',
 } as const;
 
 export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {

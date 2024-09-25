@@ -35,7 +35,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { KeplrIcon } from '@/icons';
+import { KeplrIcon, PhantomIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -51,16 +51,15 @@ import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotifi
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
+import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
   getLocalPlaceOrders,
-  getSubaccountFills,
-  getSubaccountOrders,
-} from '@/state/accountSelectors';
-import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+} from '@/state/localOrdersSelectors';
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -210,7 +209,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.SquidTransfer,
+    type: NotificationType.SkipTransfer,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
@@ -233,7 +232,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             toChainId === selectedDydxChainId;
 
           const isFinished =
-            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
+            (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
             <$AssetIcon symbol="USDC" />
           ) : (
@@ -280,7 +279,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
               toastSensitivity: 'foreground',
-              groupKey: NotificationType.SquidTransfer,
+              groupKey: NotificationType.SkipTransfer,
             },
             [isFinished]
           );
@@ -362,6 +361,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
               title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
               body: stringGetter({
                 key: STRING_KEYS.KEPLR_SUPPORT_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
+
+        const phantomNotificationExpirationDate = new Date('2024-10-07T15:00:29.517926238Z');
+
+        if (currentDate < phantomNotificationExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.PhantomSupport,
+            {
+              icon: <PhantomIcon />,
+              title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.KeplrSupport,

@@ -86,7 +86,7 @@ export const TransferStatusNotification = ({
     toChainId === selectedDydxChainId;
   const isComplete = isCosmosDeposit
     ? isSubaccountDepositCompleted
-    : status?.squidTransactionStatus === 'success' || isExchange;
+    : status?.latestRouteStatusSummary === 'success' || isExchange;
 
   const inProgressStatusString =
     type === TransferNotificationTypes.Deposit

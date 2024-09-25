@@ -1,11 +1,12 @@
-import { StatusResponse } from '@0xsquid/sdk';
-
 import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
-  SquidTransfer = 'SquidTransfer',
+  // Until we have migrations enabled, we need to keep underlying values the same
+  // So the notifications don't get retriggered
+  // It's pretty scary getting a bunch of unexpected withdrawal notifications
+  SkipTransfer = 'SquidTransfer',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
@@ -30,7 +31,7 @@ export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
-  [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
@@ -216,7 +217,7 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   isCctp?: boolean;
   errorCount?: number;
-  status?: StatusResponse | SkipStatusResponse;
+  status?: SkipStatusResponse;
   isExchange?: boolean;
   requestId?: string;
   tracked?: boolean;
@@ -229,6 +230,7 @@ export enum ReleaseUpdateNotificationIds {
   Twitter200BVolume = 'twitter-200b-volume',
   IncentivesS6Ended = 'incentives-s6-ended',
   KeplrSupport = 'keplr-support',
+  PhantomSupport = 'phantom-support',
 }
 
 // Incentives Season

@@ -16,20 +16,19 @@ import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart'
 import { Icon, IconName } from '@/components/Icon';
 
 import {
-  cancelOrderConfirmed,
-  cancelOrderFailed,
-  cancelOrderSubmitted,
-  placeOrderFailed,
-  placeOrderSubmitted,
-  setLatestOrder,
-} from '@/state/account';
-import {
   getCurrentMarketOrders,
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import {
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
+  setLatestOrder,
+} from '@/state/localOrders';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -300,8 +299,6 @@ export const useChartLines = ({
         removePendingOrderAdjustment(orderPayload.clientId);
         return;
       }
-
-      dispatch(cancelOrderConfirmed(order.id));
 
       const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
       const { error } = JSON.parse(res);
