@@ -75,6 +75,10 @@ class TestFlags {
   get uiRefresh() {
     return !!this.queryParams.uirefresh;
   }
+
+  get useTimestampNonce() {
+    return !!this.queryParams.timestampnonce;
+  }
 }
 
 export const testFlags = new TestFlags();

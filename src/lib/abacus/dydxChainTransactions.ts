@@ -46,6 +46,7 @@ import { signComplianceSignature, signComplianceSignatureKeplr } from '../compli
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
+import { testFlags } from '../testFlags';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
@@ -140,7 +141,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastPollIntervalMs: 3_000,
               broadcastTimeoutMs: 60_000,
             },
-            DEFAULT_TRANSACTION_MEMO
+            DEFAULT_TRANSACTION_MEMO,
+            testFlags.useTimestampNonce
           )
         )
       );
