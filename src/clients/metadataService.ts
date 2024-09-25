@@ -54,14 +54,14 @@ class MetadataServiceClient {
   }
 
   async getCandles({
-    assets,
+    asset,
     resolution,
   }: {
-    assets?: string[];
+    asset: string;
     resolution: MetadataServiceCandleResolutions;
   }): Promise<MetadataServiceCandlesResponse> {
     return this._post(MetadataServicePath.CANDLES, {
-      assets,
+      assets: [asset],
       resolution,
     });
   }

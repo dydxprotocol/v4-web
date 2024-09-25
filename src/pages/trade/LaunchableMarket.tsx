@@ -68,7 +68,7 @@ const LaunchableMarket = () => {
       </$GridSection>
 
       <$GridSection gridArea="Inner">
-        <InnerPanel isViewingUnlaunchedMarket />
+        <InnerPanel launchableMarketId={marketId} />
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">

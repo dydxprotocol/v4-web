@@ -28,7 +28,7 @@ export const useTradingViewTheme = ({
   tvWidget,
   isWidgetReady,
 }: {
-  chartLines: Record<string, ChartLine>;
+  chartLines?: Record<string, ChartLine>;
   tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
 }) => {
@@ -83,22 +83,24 @@ export const useTradingViewTheme = ({
           });
         }
 
-        // Necessary to update existing chart lines
-        Object.values(chartLines).forEach(({ chartLineType, line }) => {
-          const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-            getChartLineColors({ chartLineType, appTheme, appColorMode });
+        if (chartLines) {
+          // Necessary to update existing chart lines
+          Object.values(chartLines).forEach(({ chartLineType, line }) => {
+            const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
+              getChartLineColors({ chartLineType, appTheme, appColorMode });
 
-          if (maybeQuantityColor) {
-            line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
-          }
+            if (maybeQuantityColor) {
+              line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+            }
 
-          line
-            .setQuantityBorderColor(borderColor)
-            .setBodyBackgroundColor(backgroundColor)
-            .setBodyBorderColor(borderColor)
-            .setBodyTextColor(textColor)
-            .setQuantityTextColor(textButtonColor);
-        });
+            line
+              .setQuantityBorderColor(borderColor)
+              .setBodyBackgroundColor(backgroundColor)
+              .setBodyBorderColor(borderColor)
+              .setBodyTextColor(textColor)
+              .setQuantityTextColor(textButtonColor);
+          });
+        }
       });
     }
   }, [appTheme, appColorMode, isWidgetReady]);

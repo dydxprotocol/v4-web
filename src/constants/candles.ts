@@ -1,5 +1,6 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
+import { MetadataServiceCandleResolutions } from './assetMetadata';
 import { timeUnits } from './time';
 
 export interface Candle {
@@ -18,7 +19,7 @@ export interface Candle {
   orderbookMidPriceClose?: string;
 }
 
-interface TradingViewBar {
+export interface TradingViewBar {
   // Properties corresponding to the TradingView.Bar interface, used by library for rendering
   time: number;
   low: number;
@@ -85,6 +86,18 @@ export const RESOLUTION_MAP = {
   '240': CandleResolution.FOUR_HOURS,
   '1D': CandleResolution.ONE_DAY,
 } as Record<ResolutionString, CandleResolution>;
+
+export const LAUNCHABLE_MARKETS_RESOLUTION_MAP = {
+  '60': '1d',
+  '240': '7d',
+  '1D': '30d',
+} as Record<ResolutionString, MetadataServiceCandleResolutions>;
+
+export const LAUNCHABLE_MARKET_RESOLUTION_CONFIGS = {
+  '60': { defaultRange: timeUnits.day },
+  '240': { defaultRange: 7 * timeUnits.day },
+  '1D': { defaultRange: 30 * timeUnits.day },
+} as Record<ResolutionString, { defaultRange: number }>;
 
 export const DEFAULT_RESOLUTION = '1D';
 

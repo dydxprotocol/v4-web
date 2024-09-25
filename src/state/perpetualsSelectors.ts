@@ -186,6 +186,15 @@ export const getPerpetualBarsForPriceChart = (orderbookCandlesToggleOn: boolean)
     (candles): TradingViewChartBar[] => candles.map(mapCandle(orderbookCandlesToggleOn))
   );
 
+export const getMetadataServiceBarsForPriceChart = (
+  state: RootState,
+  marketId: string,
+  resolution: string
+) => state.launchableMarkets.candles?.[marketId]?.data?.[resolution] ?? EMPTY_ARR;
+
+export const getSelectedResolutionForUnlaunchedMarket = (state: RootState, marketId: string) =>
+  state.launchableMarkets.candles?.[marketId]?.selectedResolution;
+
 /**
  *
  * @param marketId

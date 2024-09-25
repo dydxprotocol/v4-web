@@ -32,7 +32,7 @@ export type MetadataServiceCandlesResponse = Record<
     low: number;
     close: number;
     volume: number;
-  }
+  }[]
 >;
 
 export type MetadataServiceAsset = {

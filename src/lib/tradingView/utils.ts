@@ -4,7 +4,13 @@ import {
   TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
 
-import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
+import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
+import {
+  Candle,
+  TradingViewBar,
+  TradingViewChartBar,
+  TradingViewSymbol,
+} from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
@@ -46,6 +52,17 @@ const getOhlcValues = ({
     high: useOrderbookCandles ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
     open: useOrderbookCandles ? orderbookOpen : tradeOpen,
     close: useOrderbookCandles ? orderbookClose : tradeClose,
+  };
+};
+
+export const mapCandles2 = (candle: MetadataServiceCandlesResponse[string][number]) => {
+  return {
+    time: new Date(candle.time).getTime(),
+    open: candle.open,
+    close: candle.close,
+    high: candle.high,
+    low: candle.low,
+    volume: candle.volume,
   };
 };
 
@@ -146,6 +163,24 @@ export const getHistorySlice = ({
     .filter(({ time }) => time >= fromMs);
 };
 
+export const getHistorySlice2 = ({
+  bars,
+  fromMs,
+  toMs,
+  firstDataRequest,
+}: {
+  bars?: TradingViewBar[];
+  fromMs: number;
+  toMs: number;
+  firstDataRequest: boolean;
+}): TradingViewBar[] => {
+  if (!bars) {
+    return [];
+  }
+
+  return bars.filter(({ time }) => time >= fromMs);
+};
+
 export const getChartLineColors = ({
   appTheme,
   appColorMode,
@@ -223,7 +258,7 @@ export const getWidgetOverrides = ({
 export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
   Pick<TradingTerminalWidgetOptions, 'container'> => {
   return {
-    // debug: true,
+    debug: true,
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',
@@ -259,5 +294,5 @@ export const getSavedResolution = ({ savedConfig }: { savedConfig?: object }): s
     (source: { type: string; state: { interval: string | null } }) => source.type === 'MainSeries'
   )?.state?.interval;
 
-  return savedResolution ?? null;
+  return savedResolution ?? undefined;
 };

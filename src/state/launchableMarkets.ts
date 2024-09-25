@@ -1,11 +1,14 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { MetadataServiceCandleResolutions } from '@/constants/assetMetadata';
-import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import type { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
+import { LAUNCHABLE_MARKETS_RESOLUTION_MAP, TradingViewBar } from '@/constants/candles';
+
+import { objectKeys } from '@/lib/objectHelpers';
+import { mapCandles2 } from '@/lib/tradingView/utils';
 
 interface CandleDataByMarket {
-  data: Record<string, Candle[]>;
-  selectedResolution: MetadataServiceCandleResolutions;
+  data: Record<string, TradingViewBar[]>;
+  selectedResolution: string;
 }
 
 export interface LaunchableMarketsState {
@@ -23,9 +26,9 @@ export const launchableMarketsSlice = createSlice({
     setLaunchableMarketCandles: (
       state: LaunchableMarketsState,
       action: PayloadAction<{
-        candles: Candle[];
+        candles: MetadataServiceCandlesResponse[string];
         marketId: string;
-        resolution: MetadataServiceCandleResolutions;
+        resolution: string;
       }>
     ) => {
       const { candles, marketId, resolution } = action.payload;
@@ -34,7 +37,10 @@ export const launchableMarketsSlice = createSlice({
         ? { ...state.candles[marketId], selectedResolution: resolution }
         : {
             data: Object.fromEntries(
-              Object.keys(RESOLUTION_MAP).map((resolutionString: string) => [resolutionString, []])
+              Object.keys(LAUNCHABLE_MARKETS_RESOLUTION_MAP).map((resolutionString: string) => [
+                resolutionString,
+                [],
+              ])
             ),
             selectedResolution: resolution,
           };
@@ -44,15 +50,42 @@ export const launchableMarketsSlice = createSlice({
       candleState.data[resolution] = [
         ...existingCandles,
         ...(existingCandles.length
-          ? candles.filter(
-              ({ startedAt }) => startedAt < existingCandles[existingCandles.length - 1].startedAt
-            )
-          : candles),
+          ? candles
+              .filter(({ time }) => {
+                const timestamp = new Date(time);
+                const existingTimestamp = new Date(
+                  existingCandles[existingCandles.length - 1].time
+                );
+                return timestamp < existingTimestamp;
+              })
+              .map(mapCandles2)
+          : candles.map(mapCandles2)),
       ];
+
+      state.candles[marketId] = candleState;
+    },
+    setLaunchableTvChartResolution: (
+      state: LaunchableMarketsState,
+      action: PayloadAction<{ marketId: string; resolution: string }>
+    ) => {
+      const { marketId, resolution } = action.payload;
+
+      const candleState = state.candles[marketId]
+        ? { ...state.candles[marketId], selectedResolution: resolution }
+        : {
+            data: Object.fromEntries(
+              objectKeys(LAUNCHABLE_MARKETS_RESOLUTION_MAP).map((resolutionString) => [
+                resolutionString,
+                [],
+              ])
+            ),
+            selectedResolution: resolution,
+          };
 
       state.candles[marketId] = candleState;
     },
   },
 });
 
-export const { setLaunchableMarketCandles } = launchableMarketsSlice.actions;
+export const { setLaunchableMarketCandles, setLaunchableTvChartResolution } =
+  launchableMarketsSlice.actions;

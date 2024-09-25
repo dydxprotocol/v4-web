@@ -2,33 +2,47 @@ import { useEffect } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
-import { DEFAULT_MARKETID } from '@/constants/markets';
+import {
+  DEFAULT_RESOLUTION,
+  LAUNCHABLE_MARKET_RESOLUTION_CONFIGS,
+  RESOLUTION_CHART_CONFIGS,
+} from '@/constants/candles';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setLaunchableTvChartResolution } from '@/state/launchableMarkets';
 import { setTvChartResolution } from '@/state/perpetuals';
-import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
+import {
+  getSelectedResolutionForMarket,
+  getSelectedResolutionForUnlaunchedMarket,
+} from '@/state/perpetualsSelectors';
 
 /**
  * @description Hook to handle changing markets and setting chart resolution
  */
 
 export const useChartMarketAndResolution = ({
+  currentMarketId,
+  isViewingUnlaunchedMarket,
   tvWidget,
   isWidgetReady,
   savedResolution,
 }: {
+  currentMarketId: string;
+  isViewingUnlaunchedMarket?: boolean;
+  launchableMarketId?: string;
   tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
   savedResolution?: ResolutionString;
 }) => {
   const dispatch = useAppDispatch();
 
-  const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
-
   const selectedResolution: string =
-    useAppSelector((s) => getSelectedResolutionForMarket(s, currentMarketId)) ?? DEFAULT_RESOLUTION;
+    useAppSelector((s) =>
+      isViewingUnlaunchedMarket
+        ? getSelectedResolutionForUnlaunchedMarket(s, currentMarketId)
+        : getSelectedResolutionForMarket(s, currentMarketId)
+    ) ?? DEFAULT_RESOLUTION;
 
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
   const chartResolution = chart?.resolution?.();
@@ -49,23 +63,48 @@ export const useChartMarketAndResolution = ({
   useEffect(() => {
     if (chartResolution) {
       if (chartResolution !== selectedResolution) {
-        dispatch(setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution }));
+        if (isViewingUnlaunchedMarket) {
+          dispatch(
+            setLaunchableTvChartResolution({
+              marketId: currentMarketId,
+              resolution: chartResolution,
+            })
+          );
+        } else {
+          dispatch(
+            setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution })
+          );
+        }
       }
 
       setVisibleRangeForResolution({ resolution: chartResolution });
     }
-  }, [currentMarketId, chartResolution, selectedResolution]);
+  }, [currentMarketId, chartResolution, isViewingUnlaunchedMarket, selectedResolution]);
 
   const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
     // Different resolutions have different timeframes to display data efficiently.
-    const { defaultRange } = RESOLUTION_CHART_CONFIGS[resolution];
+    if (isViewingUnlaunchedMarket) {
+      if (LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution]) {
+        const { defaultRange } = LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution];
 
-    // from/to values converted to epoch seconds
-    const newRange = {
-      from: (Date.now() - defaultRange) / 1000,
-      to: Date.now() / 1000,
-    };
+        // from/to values converted to epoch seconds
+        const newRange = {
+          from: (Date.now() - defaultRange) / 1000,
+          to: Date.now() / 1000,
+        };
 
-    tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
+        tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
+      }
+    } else {
+      const { defaultRange } = RESOLUTION_CHART_CONFIGS[resolution];
+
+      // from/to values converted to epoch seconds
+      const newRange = {
+        from: (Date.now() - defaultRange) / 1000,
+        to: Date.now() / 1000,
+      };
+
+      tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
+    }
   };
 };

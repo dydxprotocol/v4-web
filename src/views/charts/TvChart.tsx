@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import type { ResolutionString } from 'public/tradingview/charting_library';
 import styled, { css } from 'styled-components';
 
+import { DEFAULT_MARKETID } from '@/constants/markets';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
@@ -17,8 +18,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
+import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+
 export const TvChart = () => {
   const [isChartReady, setIsChartReady] = useState(false);
+  const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
   const tvWidgetRef = useRef<TvWidget | null>(null);
   const tvWidget = tvWidgetRef.current;
@@ -54,6 +59,7 @@ export const TvChart = () => {
     setIsChartReady,
   });
   useChartMarketAndResolution({
+    currentMarketId,
     tvWidget,
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
