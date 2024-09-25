@@ -19,8 +19,17 @@ import {
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import { useMipdInjectedWallets } from './useMipdInjectedWallets';
+import { MipdInjectedWallet, useMipdInjectedWallets } from './useMipdInjectedWallets';
 import { useStatsigGateValue } from './useStatsig';
+
+const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
+  return {
+    connectorType: ConnectorType.Injected,
+    icon: wallet.detail.info.icon,
+    name: wallet.detail.info.name,
+    rdns: wallet.detail.info.rdns,
+  } as WalletInfo;
+};
 
 export const useDisplayedWallets = (): WalletInfo[] => {
   const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr);
@@ -40,7 +49,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
     const enabledInjectedWallets = injectedWallets
       .filter(
         (wallet) =>
-          // Remove Metamask. We will show it no matter what at the front of
+          // Remove Metamask. We will always show it at the first spot regardless of detection
           wallet.detail.info.rdns !== METAMASK_MIPD_RDNS &&
           // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
           wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
@@ -50,23 +59,10 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           // handling switching between injected/mobile/smart account
           wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
       )
-      .map(
-        (wallet) =>
-          ({
-            connectorType: ConnectorType.Injected,
-            icon: wallet.detail.info.icon,
-            name: wallet.detail.info.name,
-            rdns: wallet.detail.info.rdns,
-          }) as WalletInfo
-      );
+      .map(getWalletInfoFromInjectedWallet);
 
     const metamaskWallet = injectedMetaMask
-      ? {
-          connectorType: ConnectorType.Injected,
-          icon: injectedMetaMask.detail.info.icon,
-          name: injectedMetaMask.detail.info.name,
-          rdns: injectedMetaMask.detail.info.rdns,
-        }
+      ? getWalletInfoFromInjectedWallet(injectedMetaMask)
       : {
           connectorType: ConnectorType.DownloadWallet,
           name: WalletType.MetaMask,
