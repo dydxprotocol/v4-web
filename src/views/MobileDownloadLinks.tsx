@@ -1,20 +1,29 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonShape, ButtonType } from '@/constants/buttons';
+import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { IconName } from '@/components/Icon';
+import { headerMixins } from '@/styles/headerMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
+
+import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
+import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
+import { Popover, TriggerType } from '@/components/Popover';
 import { VerticalSeparator } from '@/components/Separator';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
   const stringGetter = useStringGetter();
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
+  const { uiRefresh } = testFlags;
 
   if (!appleAppStoreUrl && !googlePlayStoreUrl) return null;
 
@@ -36,7 +45,29 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
     );
   }
 
-  return (
+  return uiRefresh ? (
+    <Popover
+      triggerType={TriggerType.MobileDownloadTrigger}
+      align="center"
+      slotTrigger={<$IconButton iconName={IconName.Mobile} shape={ButtonShape.Square} />}
+      sideOffset={8}
+    >
+      <$DownloadLinksInPopover>
+        <$AppLink
+          type={ButtonType.Link}
+          href={googlePlayStoreUrl}
+          shape={ButtonShape.Rectangle}
+          iconName={IconName.GooglePlay}
+        />
+        <$AppLink
+          type={ButtonType.Link}
+          href={appleAppStoreUrl}
+          shape={ButtonShape.Rectangle}
+          iconName={IconName.Apple}
+        />
+      </$DownloadLinksInPopover>
+    </Popover>
+  ) : (
     <>
       <div tw="flex flex-row items-center gap-0.5">
         <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
@@ -88,4 +119,18 @@ const $AppLink = styled(IconButton)`
   svg {
     fill: var(--color-white);
   }
+`;
+
+const $IconButton = styled(IconButton)`
+  ${headerMixins.button}
+  --button-border: none;
+  --button-icon-size: 1rem;
+  --button-padding: 0 0.25em;
+`;
+
+const $DownloadLinksInPopover = styled.div`
+  ${popoverMixins.popover}
+  display: flex;
+  gap: 0.5rem;
+  --popover-padding: 0.5rem 0.5rem;
 `;

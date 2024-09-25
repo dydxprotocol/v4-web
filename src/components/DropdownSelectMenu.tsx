@@ -32,6 +32,7 @@ type ElementProps<MenuItemValue extends string> = {
 
 type StyleProps = {
   align?: 'center' | 'start' | 'end';
+  orientation?: 'vertical' | 'horizontal';
   hideIcon?: boolean;
   sideOffset?: number;
   className?: string;
@@ -53,6 +54,7 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
     );
   })(),
   align = 'start',
+  orientation = 'vertical',
   hideIcon,
   sideOffset = 1,
   className,
@@ -77,7 +79,8 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
       </$Trigger>
       <Portal>
         <$Content align={align} sideOffset={sideOffset} className={className}>
-          <RadioGroup
+          <$RadioGroup
+            orientation={orientation}
             value={value}
             onValueChange={
               onValueChange != null
@@ -115,7 +118,7 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
                 </$RadioItem>
               )
             )}
-          </RadioGroup>
+          </$RadioGroup>
         </$Content>
       </Portal>
     </Root>
@@ -146,6 +149,11 @@ const $Content = styled(Content)`
   ${popoverMixins.popover}
   ${popoverMixins.popoverAnimation}
 `;
+
+const $RadioGroup = styled(RadioGroup)<{orientation: 'horizontal' | 'vertical'}>`
+  display: flex;
+  flex-direction: row;
+`
 
 const $RadioItem = styled(RadioItem)`
   ${popoverMixins.item}

@@ -41,7 +41,8 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults;
+    return true;
+    // return !!this.queryParams.vaults;
   }
 
   get referrer() {
@@ -53,7 +54,8 @@ class TestFlags {
   }
 
   get pml() {
-    return !!this.queryParams.pml;
+    return true;
+    // return !!this.queryParams.pml;
   }
 
   get showCancelAll() {

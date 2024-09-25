@@ -22,7 +22,7 @@ export const useMobileAppUrl = () => {
   }, []);
 
   return {
-    appleAppStoreUrl,
-    googlePlayStoreUrl,
+    appleAppStoreUrl : "google.com",
+    googlePlayStoreUrl: "google.com",
   };
 };
