@@ -163,7 +163,7 @@ export const TransferHistoryTable = ({
           {canAccountTrade ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+              onClick={() => dispatch(openDialog(DialogTypes.FunkitDeposit()))}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
             </Button>
