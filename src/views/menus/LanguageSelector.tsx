@@ -6,7 +6,6 @@ import { headerMixins } from '@/styles/headerMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedLocale } from '@/state/localization';

@@ -17,7 +17,6 @@ import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
@@ -42,7 +41,11 @@ export const HeaderDesktop = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { chainTokenLabel } = useTokenConfigs();
-  const { enableVaults: showVaults, pml: showLaunchMarkets, uiRefresh: uiRefreshEnabled } = testFlags;
+  const {
+    enableVaults: showVaults,
+    pml: showLaunchMarkets,
+    uiRefresh: uiRefreshEnabled,
+  } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -174,22 +177,27 @@ export const HeaderDesktop = () => {
 
       <VerticalSeparator />
 
-      <$NavigationMenu items={navItems} orientation="horizontal" />
+      <$NavigationScrollBar>
+        <$NavigationMenu items={navItems} orientation="horizontal" />
+      </$NavigationScrollBar>
 
       <div role="separator" />
 
       <$NavAfter>
         {uiRefreshEnabled && (
           <>
-            <$LaunchMarketButton
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              action={ButtonAction.Navigation}
-              onClick={() => navigate(AppRoute.LaunchMarket)}
-            >
-              {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
-            </$LaunchMarketButton>
+            {showLaunchMarkets && (
+              <$LaunchMarketButton
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                action={ButtonAction.Navigation}
+                onClick={() => navigate(AppRoute.LaunchMarket)}
+              >
+                {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
+              </$LaunchMarketButton>
+            )}
             <Button
+              tw="mr-[0.5em]"
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={ButtonAction.Primary}
@@ -203,7 +211,6 @@ export const HeaderDesktop = () => {
 
         <MobileDownloadLinks />
 
-        {uiRefreshEnabled && <VerticalSeparator />}
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
@@ -275,6 +282,10 @@ const $Header = styled.header<{
   }
 `;
 
+const $NavigationScrollBar = styled.div`
+  ${layoutMixins.scrollAreaFade}
+`;
+
 const $NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
@@ -322,6 +333,7 @@ const $LogoLink = styled(Link)`
 
 const $NavAfter = styled.div`
   ${layoutMixins.row}
+
   justify-self: end;
   padding: 0 0.75rem;
 

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
@@ -10,14 +10,12 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { headerMixins } from '@/styles/headerMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
-import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
-import { Icon, IconName } from '@/components/Icon';
+import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Popover, TriggerType } from '@/components/Popover';
 import { VerticalSeparator } from '@/components/Separator';
 
-import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
@@ -46,27 +44,30 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
   }
 
   return uiRefresh ? (
-    <Popover
-      triggerType={TriggerType.MobileDownloadTrigger}
-      align="center"
-      slotTrigger={<$IconButton iconName={IconName.Mobile} shape={ButtonShape.Square} />}
-      sideOffset={8}
-    >
-      <$DownloadLinksInPopover>
-        <$AppLink
-          type={ButtonType.Link}
-          href={googlePlayStoreUrl}
-          shape={ButtonShape.Rectangle}
-          iconName={IconName.GooglePlay}
-        />
-        <$AppLink
-          type={ButtonType.Link}
-          href={appleAppStoreUrl}
-          shape={ButtonShape.Rectangle}
-          iconName={IconName.Apple}
-        />
-      </$DownloadLinksInPopover>
-    </Popover>
+    <>
+      <Popover
+        triggerType={TriggerType.MobileDownloadTrigger}
+        align="center"
+        slotTrigger={<$IconButton iconName={IconName.Mobile} shape={ButtonShape.Square} />}
+        sideOffset={8}
+      >
+        <$DownloadLinksInPopover>
+          <$AppLink
+            type={ButtonType.Link}
+            href={googlePlayStoreUrl ?? undefined}
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.GooglePlay}
+          />
+          <$AppLink
+            type={ButtonType.Link}
+            href={appleAppStoreUrl ?? undefined}
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.Apple}
+          />
+        </$DownloadLinksInPopover>
+      </Popover>
+      <VerticalSeparator />
+    </>
   ) : (
     <>
       <div tw="flex flex-row items-center gap-0.5">
