@@ -323,7 +323,7 @@ const $LogoLink = styled(Link)`
 const $NavAfter = styled.div`
   ${layoutMixins.row}
   justify-self: end;
-  padding: 0 0.75rem 0 0;
+  padding: 0 0.75rem;
 
   gap: 0.5rem;
 
