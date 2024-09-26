@@ -25,7 +25,9 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { exportCSV } from '@/lib/csv';
+import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 interface ExportHistoryDropdownProps {
   className?: string;
@@ -336,7 +338,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             />
           ),
           value: 'trades',
-          onSelect: (e) => e.preventDefault(),
+          onSelect: (e: Event) => e.preventDefault(),
         },
         {
           label: (
@@ -351,9 +353,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             />
           ),
           value: 'transfers',
-          onSelect: (e) => e.preventDefault(),
+          onSelect: (e: Event) => e.preventDefault(),
         },
-        {
+        testFlags.enableVaults && {
           label: (
             <Checkbox
               label={stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}
@@ -371,7 +373,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             />
           ),
           value: 'vault-transfers',
-          onSelect: (e) => e.preventDefault(),
+          onSelect: (e: Event) => e.preventDefault(),
         },
         {
           label: (
@@ -393,7 +395,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           value: 'download',
           onSelect: exportData,
         },
-      ]}
+      ].filter(isTruthy)}
       triggerOptions={{
         disabled: !isAccountConnected,
       }}

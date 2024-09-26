@@ -13,9 +13,13 @@ import { AttachedExpandingSection } from '@/components/ContentSection';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { ExportHistoryDropdown } from '@/views/ExportHistoryDropdown';
 
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
+
 export const History = () => {
   const stringGetter = useStringGetter();
   const { isNotTablet } = useBreakpoints();
+  const { enableVaults } = testFlags;
 
   return (
     <AttachedExpandingSection>
@@ -38,7 +42,7 @@ export const History = () => {
                   href: HistoryRoute.Transfers,
                   tag: 'USDC',
                 },
-                {
+                enableVaults && {
                   value: HistoryRoute.VaultTransfers,
                   label: <h3>{stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}</h3>,
                   href: HistoryRoute.VaultTransfers,
@@ -50,7 +54,7 @@ export const History = () => {
                 //   label: <h3>{stringGetter({ key: STRING_KEYS.PAYMENTS })}</h3>,
                 //   href: HistoryRoute.Payments,
                 // },
-              ],
+              ].filter(isTruthy),
             },
           ]}
         />
