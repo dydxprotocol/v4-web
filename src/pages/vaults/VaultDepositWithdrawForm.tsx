@@ -157,8 +157,8 @@ export const VaultDepositWithdrawForm = ({
     try {
       const { submissionData } = validationResponse;
       if (operation === 'DEPOSIT') {
-        const amount = submissionData?.deposit?.amount;
-        if (amount == null) {
+        const cachedAmount = submissionData?.deposit?.amount;
+        if (cachedAmount == null) {
           notify({
             title: 'Unable to submit Megavault Deposit transaction',
             body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
@@ -167,9 +167,9 @@ export const VaultDepositWithdrawForm = ({
           console.error('Somehow got to submission with empty amount in validation response');
           return;
         }
-        const result = await depositToMegavault(amount);
+        const result = await depositToMegavault(cachedAmount);
         notify({
-          title: `$${amount} Megavault Deposit successful!`,
+          title: `$${cachedAmount} Megavault Deposit successful!`,
         });
         // eslint-disable-next-line no-console
         console.log('Deposit', result);

@@ -58,7 +58,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   );
 
   const timeUnitsToRender = useMemo(() => {
-    const dataRange = data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 0;
+    const dataRange =
+      data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 7 * timeUnits.day;
     return TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3).map((t) => ({
       value: t.value,
       label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
