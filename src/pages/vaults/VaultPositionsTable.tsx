@@ -159,7 +159,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       withOuterBorder
       data={vaultsData}
       getRowKey={(row) => row.marketId ?? ''}
-      label={stringGetter({ key: STRING_KEYS.VAULT })}
+      label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       onRowAction={(marketId: Key) =>
         navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
       }

@@ -72,7 +72,7 @@ export const VaultPositionCard = ({ onViewVault, vault }: VaultPositionCardProps
 
   return (
     <PortfolioCard
-      assetName={stringGetter({ key: STRING_KEYS.VAULT })}
+      assetName={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       assetIcon={<img src="/dydx-chain.png" tw="h-1.5 w-1.5" />}
       detailLabel={stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE })}
       detailValue={<Output type={OutputType.Fiat} value={vault?.balanceUsdc} />}
