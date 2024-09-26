@@ -75,7 +75,7 @@ const Content = () => {
   useCommandMenu();
 
   const dispatch = useAppDispatch();
-  const { isTablet, isNotTablet, isNotMobile } = useBreakpoints();
+  const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
@@ -161,7 +161,7 @@ const Content = () => {
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        {isNotMobile && <NotificationsToastArea tw="z-[2] [grid-area:Main]" />}
+        <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
 
         <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
