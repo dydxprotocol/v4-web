@@ -150,6 +150,7 @@ export const VaultDepositWithdrawForm = ({
     if (isSubmitting) {
       return;
     }
+    setIsSubmitting(true);
     try {
       const { submissionData } = validationResponse;
       if (operation === 'DEPOSIT') {
