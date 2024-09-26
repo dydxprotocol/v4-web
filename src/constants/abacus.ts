@@ -250,6 +250,7 @@ export type VaultPositions = Abacus.exchange.dydx.abacus.functional.vault.VaultP
 export type VaultAccount = Abacus.exchange.dydx.abacus.functional.vault.VaultAccount;
 export type VaultTransfer = Abacus.exchange.dydx.abacus.functional.vault.VaultTransfer;
 export type VaultPosition = Abacus.exchange.dydx.abacus.functional.vault.VaultPosition;
+export type VaultShareUnlock = Abacus.exchange.dydx.abacus.functional.vault.VaultShareUnlock;
 export const VaultFormData = Abacus.exchange.dydx.abacus.functional.vault.VaultFormData;
 export const VaultFormAction = Abacus.exchange.dydx.abacus.functional.vault.VaultFormAction;
 export const VaultFormAccountData =
