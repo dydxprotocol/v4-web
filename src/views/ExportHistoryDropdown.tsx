@@ -11,6 +11,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultAccountTransfers } from '@/hooks/vaultsHooks';
 
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
@@ -39,6 +40,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const { requestAllAccountFills, requestAllAccountTransfers } = useDydxClient();
   const [checkedTrades, setCheckedTrades] = useState(true);
   const [checkedTransfers, setCheckedTransfers] = useState(true);
+  const [checkedVaultTransfers, setCheckedVaultTransfers] = useState(false);
   const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
     useLocaleSeparators();
 
@@ -210,6 +212,63 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     selectedLocale,
   ]);
 
+  const allVaultTransfers = useLoadedVaultAccountTransfers();
+  const exportVaultTransfers = useCallback(async () => {
+    if (dydxAddress && subaccountNumber !== undefined && allVaultTransfers != null) {
+      const transfers = allVaultTransfers;
+      const csvTransfers = transfers.map((transfer) => {
+        const amount = formatNumberOutput(transfer.amountUsdc, OutputType.Fiat, {
+          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+          groupSeparator: LOCALE_GROUP_SEPARATOR,
+          selectedLocale,
+        });
+
+        return {
+          time:
+            transfer.timestampMs == null
+              ? ''
+              : new Date(transfer.timestampMs).toLocaleString(selectedLocale, {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                }),
+          action: transfer.type?.name ?? '',
+          amount,
+          id: transfer.id,
+        };
+      });
+
+      exportCSV(csvTransfers, {
+        filename: 'vault-transfers',
+        columnHeaders: [
+          {
+            key: 'time',
+            displayLabel: stringGetter({ key: STRING_KEYS.TIME }),
+          },
+          {
+            key: 'action',
+            displayLabel: stringGetter({ key: STRING_KEYS.ACTION }),
+          },
+          {
+            key: 'amount',
+            displayLabel: stringGetter({ key: STRING_KEYS.AMOUNT }),
+          },
+          {
+            key: 'id',
+            displayLabel: stringGetter({ key: STRING_KEYS.TRANSACTION }),
+          },
+        ],
+      });
+    }
+  }, [
+    dydxAddress,
+    subaccountNumber,
+    allVaultTransfers,
+    stringGetter,
+    LOCALE_DECIMAL_SEPARATOR,
+    LOCALE_GROUP_SEPARATOR,
+    selectedLocale,
+  ]);
+
   const { mutate: mutateExportTrades, isPending: isPendingExportTrades } = useMutation({
     mutationFn: exportTrades,
   });
@@ -217,6 +276,11 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const { mutate: mutateExportTransfers, isPending: isPendingExportTransfers } = useMutation({
     mutationFn: exportTransfers,
   });
+
+  const { mutate: mutateExportVaultTransfers, isPending: isPendingExportVaultTransfers } =
+    useMutation({
+      mutationFn: exportVaultTransfers,
+    });
 
   const exportData = useCallback(
     (e: Event) => {
@@ -230,6 +294,10 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         mutateExportTransfers();
       }
 
+      if (checkedVaultTransfers) {
+        mutateExportVaultTransfers();
+      }
+
       track(
         AnalyticsEvents.ExportDownloadClick({
           trades: checkedTrades,
@@ -237,7 +305,14 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         })
       );
     },
-    [checkedTrades, checkedTransfers, mutateExportTrades, mutateExportTransfers]
+    [
+      checkedTrades,
+      checkedTransfers,
+      checkedVaultTransfers,
+      mutateExportTrades,
+      mutateExportTransfers,
+      mutateExportVaultTransfers,
+    ]
   );
 
   return (
@@ -280,10 +355,33 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         },
         {
           label: (
+            <Checkbox
+              label={stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}
+              checked={checkedVaultTransfers}
+              disabled={allVaultTransfers == null || allVaultTransfers.length === 0}
+              onCheckedChange={() => {
+                setCheckedVaultTransfers(!checkedVaultTransfers);
+
+                track(
+                  AnalyticsEvents.ExportVaultTransfersCheckboxClick({
+                    value: !checkedVaultTransfers,
+                  })
+                );
+              }}
+            />
+          ),
+          value: 'vault-transfers',
+          onSelect: (e) => e.preventDefault(),
+        },
+        {
+          label: (
             <Button
               state={{
-                isDisabled: !checkedTrades && !checkedTransfers,
-                isLoading: isPendingExportTrades || isPendingExportTransfers,
+                isDisabled: !checkedTrades && !checkedTransfers && !checkedVaultTransfers,
+                isLoading:
+                  isPendingExportTrades ||
+                  isPendingExportTransfers ||
+                  isPendingExportVaultTransfers,
               }}
               action={ButtonAction.Primary}
               size={ButtonSize.XSmall}

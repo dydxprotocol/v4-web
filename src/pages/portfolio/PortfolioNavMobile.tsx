@@ -53,8 +53,8 @@ export const PortfolioNavMobile = () => {
     },
     {
       value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.VaultTransfers}`,
-      label: 'Vault Transfers',
-      description: 'Transfers to and from the MegaVault',
+      label: stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS }),
+      description: stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS_DESCRIPTION }),
     },
     // TODO: TRCL-1693 - re-enable when Payments are ready
     // {

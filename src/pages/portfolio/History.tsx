@@ -40,7 +40,7 @@ export const History = () => {
                 },
                 {
                   value: HistoryRoute.VaultTransfers,
-                  label: <h3>MegaVault Transfers</h3>,
+                  label: <h3>{stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}</h3>,
                   href: HistoryRoute.VaultTransfers,
                   tag: 'USDC',
                 },
