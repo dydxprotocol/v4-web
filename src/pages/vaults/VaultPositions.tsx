@@ -36,6 +36,9 @@ export const MaybeVaultPositionsPanel = ({
   if (userVault == null && !isTablet) {
     return null;
   }
+  if (userVault?.balanceUsdc != null && userVault.balanceUsdc < 0.01) {
+    return null;
+  }
 
   return (
     <div className={className}>
