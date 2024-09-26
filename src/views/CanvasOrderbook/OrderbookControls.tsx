@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { clamp } from 'lodash';
-import { shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
@@ -13,6 +13,8 @@ import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
+import { DisplayUnit, setDisplayUnit } from '@/state/configs';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -20,18 +22,17 @@ import abacusStateManager from '@/lib/abacus';
 type OrderbookControlsProps = {
   className?: string;
   assetName?: string;
-  selectedUnit: 'fiat' | 'asset';
-  setSelectedUnit(val: 'fiat' | 'asset'): void;
   grouping: Nullable<MarketOrderbookGrouping>;
 };
 
-export const OrderbookControls = ({
-  className,
-  assetName,
-  selectedUnit,
-  setSelectedUnit,
-  grouping,
-}: OrderbookControlsProps) => {
+export const OrderbookControls = ({ className, assetName, grouping }: OrderbookControlsProps) => {
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const dispatch = useDispatch();
+  const onToggleDisplayUnit = useCallback(() => {
+    const newDisplayUnit = displayUnit === DisplayUnit.Asset ? DisplayUnit.Fiat : DisplayUnit.Asset;
+    dispatch(setDisplayUnit(newDisplayUnit));
+  }, [dispatch, displayUnit]);
+
   const modifyScale = useCallback(
     (direction: number) => {
       const start = grouping?.multiplier.ordinal ?? 0;
@@ -73,12 +74,12 @@ export const OrderbookControls = ({
         </div>
         <ToggleGroup
           items={[
-            { label: assetName ?? '', value: 'asset' as const },
-            { label: 'USD', value: 'fiat' as const },
+            { label: assetName ?? '', value: DisplayUnit.Asset },
+            { label: 'USD', value: DisplayUnit.Fiat },
           ]}
           shape={ButtonShape.Rectangle}
-          value={selectedUnit}
-          onValueChange={setSelectedUnit}
+          value={displayUnit}
+          onValueChange={onToggleDisplayUnit}
         />
       </div>
     </$OrderbookControlsContainer>

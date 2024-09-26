@@ -37,6 +37,11 @@ export enum OtherPreference {
   ReverseLayout = 'ReverseLayout',
 }
 
+export enum DisplayUnit {
+  Asset = 'asset',
+  Fiat = 'fiat',
+}
+
 export interface ConfigsState {
   appThemeSetting: AppThemeSetting;
   appColorMode: AppColorMode;
@@ -46,6 +51,7 @@ export interface ConfigsState {
   network?: NetworkConfigs;
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
+  displayUnit: DisplayUnit;
 }
 
 const { uiRefresh } = testFlags;
@@ -70,6 +76,10 @@ const initialState: ConfigsState = {
   defaultToAllMarketsInPositionsOrdersFills: getLocalStorage({
     key: LocalStorageKey.DefaultToAllMarketsInPositionsOrdersFills,
     defaultValue: true,
+  }),
+  displayUnit: getLocalStorage({
+    key: LocalStorageKey.SelectedDisplayUnit,
+    defaultValue: DisplayUnit.Asset,
   }),
 };
 
@@ -103,6 +113,10 @@ export const configsSlice = createSlice({
       setLocalStorage({ key: LocalStorageKey.HasSeenLaunchIncentives, value: true });
       state.hasSeenLaunchIncentives = true;
     },
+    setDisplayUnit: (state: ConfigsState, { payload }: PayloadAction<DisplayUnit>) => {
+      setLocalStorage({ key: LocalStorageKey.SelectedDisplayUnit, value: payload });
+      state.displayUnit = payload;
+    },
   },
 });
 
@@ -112,4 +126,5 @@ export const {
   setAppColorMode,
   setConfigs,
   markLaunchIncentivesSeen,
+  setDisplayUnit,
 } = configsSlice.actions;

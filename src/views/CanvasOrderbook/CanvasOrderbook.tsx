@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -20,6 +20,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import {
@@ -131,7 +132,7 @@ export const CanvasOrderbook = forwardRef(
       [currentInput, tickSizeDecimals]
     );
 
-    const [displayUnit, setDisplayUnit] = useState<'fiat' | 'asset'>('asset');
+    const displayUnit = useAppSelector(getSelectedDisplayUnit);
 
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
       data: asksSlice,
@@ -202,14 +203,7 @@ export const CanvasOrderbook = forwardRef(
     return (
       <div ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          {!hideHeader && (
-            <OrderbookControls
-              assetName={id}
-              selectedUnit={displayUnit}
-              setSelectedUnit={setDisplayUnit}
-              grouping={currentGrouping}
-            />
-          )}
+          {!hideHeader && <OrderbookControls assetName={id} grouping={currentGrouping} />}
           {!hideHeader && (
             <OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
