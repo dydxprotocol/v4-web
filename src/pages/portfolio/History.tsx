@@ -38,6 +38,12 @@ export const History = () => {
                   href: HistoryRoute.Transfers,
                   tag: 'USDC',
                 },
+                {
+                  value: HistoryRoute.VaultTransfers,
+                  label: <h3>MegaVault Transfers</h3>,
+                  href: HistoryRoute.VaultTransfers,
+                  tag: 'USDC',
+                },
                 // TODO - TRCL-1693 -
                 // {
                 //   value: HistoryRoute.Payments,

@@ -34,6 +34,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
+import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
 
 const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
@@ -113,6 +114,10 @@ const PortfolioPage = () => {
                 withOuterBorder={isNotTablet}
               />
             }
+          />
+          <Route
+            path={HistoryRoute.VaultTransfers}
+            element={<VaultTransactionsTable withOuterBorders />}
           />
           {/* TODO - TRCL-1693
           <Route
