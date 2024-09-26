@@ -9,8 +9,13 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-import { useLoadedVaultAccount, useVaultFormValidationResponse } from '@/hooks/vaultsHooks';
+import {
+  useForceRefreshVaultAccount,
+  useLoadedVaultAccount,
+  useVaultFormValidationResponse,
+} from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -40,6 +45,7 @@ import {
   setVaultFormSlippageAck,
 } from '@/state/vaults';
 
+import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -71,7 +77,7 @@ export const VaultDepositWithdrawForm = ({
   const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
-  const [isSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     freeCollateral: freeCollateralUpdated,
@@ -138,16 +144,60 @@ export const VaultDepositWithdrawForm = ({
     dispatch(setVaultFormConfirmationStep(true));
   };
 
-  const onSubmitConfirmForm = () => {
-    // TODO tell abacus and respond
-    onSuccess?.();
+  const { depositToMegavault, withdrawFromMegavault } = useSubaccount();
+  const forceRefreshVaultAccount = useForceRefreshVaultAccount();
+  const onSubmitConfirmForm = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    try {
+      const { submissionData } = validationResponse;
+      if (operation === 'DEPOSIT') {
+        if (submissionData?.deposit?.amount == null) {
+          // eslint-disable-next-line no-console
+          console.error('Somehow got to submission with empty amount in validation response');
+          return;
+        }
+        const result = await depositToMegavault(submissionData?.deposit?.amount);
+        // eslint-disable-next-line no-console
+        console.log('Deposit', result);
+      } else if (operation === 'WITHDRAW') {
+        if (
+          submissionData?.withdraw?.shares == null ||
+          submissionData?.withdraw?.minAmount == null
+        ) {
+          // eslint-disable-next-line no-console
+          console.error('Somehow got to submission with empty data in validation response');
+          return;
+        }
+        const result = await withdrawFromMegavault(
+          submissionData?.withdraw?.shares,
+          submissionData?.withdraw?.minAmount
+        );
+        // eslint-disable-next-line no-console
+        console.log('Withdraw', result);
+      } else {
+        assertNever(operation);
+      }
+      setOperation('DEPOSIT');
+      setAmountState('');
+      dispatch(setVaultFormConfirmationStep(false));
+      // TODO tell abacus and respond
+      onSuccess?.();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error submitting megavault transaction', e);
+    } finally {
+      forceRefreshVaultAccount();
+      setIsSubmitting(false);
+    }
   };
 
   const onClickMax = () => {
     if (operation === 'DEPOSIT') {
-      setAmountState(`${freeCollateral ?? ''}`);
+      setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
     } else {
-      setAmountState(`${userBalance ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userBalance ?? 0)) / 100 ?? ''}`);
     }
   };
 
@@ -325,7 +375,7 @@ export const VaultDepositWithdrawForm = ({
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
           state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
             isLoading: isSubmitting,
           }}
           slotLeft={
@@ -408,7 +458,7 @@ export const VaultDepositWithdrawForm = ({
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
           state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
             isLoading: isSubmitting,
           }}
           slotLeft={

@@ -47,6 +47,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
+import DydxChainTransactions from '@/lib/abacus/dydxChainTransactions';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -879,6 +880,43 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, compositeClient]
   );
 
+  const getVaultAccountInfo = useCallback(async () => {
+    const result = await compositeClient?.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
+    if (result == null) {
+      return result;
+    }
+    return new DydxChainTransactions().parseToPrimitives(result);
+  }, [compositeClient?.validatorClient.get, dydxAddress]);
+
+  const depositToMegavault = useCallback(
+    async (amount: number) => {
+      if (subaccountClient == null) {
+        return undefined;
+      }
+      return compositeClient?.depositToMegavault(
+        subaccountClient,
+        amount,
+        Method.BroadcastTxCommit
+      );
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const withdrawFromMegavault = useCallback(
+    async (shares: number, minAmount: number) => {
+      if (subaccountClient == null) {
+        return undefined;
+      }
+      return compositeClient?.withdrawFromMegavault(
+        subaccountClient,
+        shares,
+        minAmount,
+        Method.BroadcastTxCommit
+      );
+    },
+    [compositeClient, subaccountClient]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -908,5 +946,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getUndelegateFee,
     withdrawReward,
     getWithdrawRewardFee,
+
+    // vaults
+    getVaultAccountInfo,
+    depositToMegavault,
+    withdrawFromMegavault,
   };
 };

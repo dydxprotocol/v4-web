@@ -26,6 +26,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import DydxChainTransactions from '@/lib/abacus/dydxChainTransactions';
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -167,6 +168,73 @@ const useDydxClientContext = () => {
       return [];
     }
   };
+
+  const getMegavaultHistoricalPnl = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getMegavaultHistoricalPnl();
+    } catch (error) {
+      log('useDydxClient/getMegavaultHistoricalPnl', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getMegavaultPositions = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getMegavaultPositions();
+    } catch (error) {
+      log('useDydxClient/getMegavaultPositions', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getVaultsHistoricalPnl = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getVaultsHistoricalPnl();
+    } catch (error) {
+      log('useDydxClient/getVaultsHistoricalPnl', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getAllAccountTransfersBetween = useCallback(
+    async (
+      sourceAddress: string,
+      sourceSubaccountNumber: string,
+      recipientAddress: string,
+      recipientSubaccountNumber: string
+    ) => {
+      try {
+        return await indexerClient.account.getTransfersBetween(
+          sourceAddress,
+          sourceSubaccountNumber,
+          recipientAddress,
+          recipientSubaccountNumber
+        );
+      } catch (error) {
+        log('useDydxClient/getAllAccountTransfersBetween', error);
+        return undefined;
+      }
+    },
+    [indexerClient.account]
+  );
+
+  const getVaultWithdrawInfo = useCallback(
+    async (shares: number) => {
+      try {
+        const result = await compositeClient?.validatorClient.get.getMegavaultWithdrawalInfo(
+          BigInt(shares)
+        );
+        if (result == null) {
+          return result;
+        }
+        return new DydxChainTransactions().parseToPrimitives(result);
+      } catch (error) {
+        log('useDydxClient/getVaultWithdrawInfo', error);
+        return undefined;
+      }
+    },
+    [compositeClient?.validatorClient.get]
+  );
 
   const requestAllAccountFills = async (address: string, subaccountNumber: number) => {
     try {
@@ -450,5 +518,12 @@ const useDydxClientContext = () => {
     getWithdrawalCapacityByDenom,
     getValidators,
     getAccountBalance,
+
+    // vault methods
+    getMegavaultHistoricalPnl,
+    getMegavaultPositions,
+    getVaultsHistoricalPnl,
+    getAllAccountTransfersBetween,
+    getVaultWithdrawInfo,
   };
 };

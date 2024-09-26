@@ -47,9 +47,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.marketId, // todo lookup asset
+          getCellValue: (row) => row.marketId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ marketId, currentLeverageMultiple, currentPosition }) => {
+          renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
             return (
               <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
@@ -57,15 +57,22 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 <div tw="row gap-0.25">
                   <$OutputSigned
                     value={
-                      (currentPosition?.usdc ?? 0) < 0
+                      (currentLeverageMultiple ?? 0) < 0
                         ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
                         : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
                     }
-                    sign={getNumberSign(currentPosition?.usdc ?? 0)}
+                    sign={getNumberSign(currentLeverageMultiple ?? 0)}
                     type={OutputType.Text}
                   />
                   @
-                  <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
+                  <Output
+                    type={OutputType.Multiple}
+                    value={
+                      currentLeverageMultiple != null
+                        ? Math.abs(currentLeverageMultiple)
+                        : undefined
+                    }
+                  />
                 </div>
               </TableCell>
             );
@@ -157,7 +164,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
       }
       defaultSortDescriptor={{
-        column: 'size',
+        column: 'margin',
         direction: 'descending',
       }}
       columns={columns}
