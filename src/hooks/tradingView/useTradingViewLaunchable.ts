@@ -65,6 +65,7 @@ export const useTradingViewLaunchable = ({
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
         auto_save_delay: 1,
+        disabled_features: [...(widgetOptions?.disabled_features ?? []), 'chart_scroll'],
       };
 
       const tvChartWidget = new Widget(options);

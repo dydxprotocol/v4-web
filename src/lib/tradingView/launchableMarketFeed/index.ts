@@ -1,13 +1,12 @@
-/* eslint-disable no-console */
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { DateTime } from 'luxon';
 import type {
   DatafeedConfiguration,
   ErrorCallback,
+  GetMarksCallback,
   HistoryCallback,
   IBasicDataFeed,
   LibrarySymbolInfo,
+  Mark,
   OnReadyCallback,
   ResolutionString,
   ResolveCallback,
@@ -60,9 +59,9 @@ export const getLaunchableMarketDatafeed = (
   },
 
   searchSymbols: (
-    userInput: string,
-    exchange: string,
-    symbolType: string,
+    _userInput: string,
+    _exchange: string,
+    _symbolType: string,
     onResultReadyCallback: SearchSymbolsCallback
   ) => {
     onResultReadyCallback([]);
@@ -80,7 +79,7 @@ export const getLaunchableMarketDatafeed = (
       type: symbolItem.type,
       exchange: 'dYdX',
       listed_exchange: 'dYdX',
-      has_intraday: false,
+      has_intraday: true,
       has_daily: true,
 
       minmov: 1,
@@ -97,6 +96,16 @@ export const getLaunchableMarketDatafeed = (
     setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
   },
 
+  getMarks: async (
+    symbolInfo: LibrarySymbolInfo,
+    fromSeconds: number,
+    toSeconds: number,
+    onDataCallback: GetMarksCallback<Mark>,
+    _resolution: ResolutionString
+  ) => {
+    onDataCallback([]);
+  },
+
   getBars: async (
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
@@ -110,17 +119,10 @@ export const getLaunchableMarketDatafeed = (
     onErrorCallback: ErrorCallback
   ) => {
     if (!symbolInfo) return;
-    console.log('GET BARSSSSSS');
+
     const asset = getAssetFromMarketId(symbolInfo.ticker!);
-
-    const { from, to, firstDataRequest } = periodParams;
+    const { from } = periodParams;
     const fromMs = from * 1000;
-    let toMs = to * 1000;
-
-    // Add 1ms to the toMs to ensure that today's candle is included
-    if (firstDataRequest && resolution === '1D') {
-      toMs += 1;
-    }
 
     try {
       const currentMarketBars = getMetadataServiceBarsForPriceChart(
@@ -133,8 +135,6 @@ export const getLaunchableMarketDatafeed = (
       const cachedBars = getHistorySlice2({
         bars: currentMarketBars,
         fromMs,
-        toMs,
-        firstDataRequest,
       });
 
       if (!cachedBars.length) {
@@ -157,15 +157,12 @@ export const getLaunchableMarketDatafeed = (
 
           const bars = [...(fetchedCandles?.map(mapCandles2) ?? [])];
 
-          console.log('1', bars);
-
           onHistoryCallback(bars, {
             noData: false,
           });
         }
       } else {
         if (cachedBars[cachedBars.length - 1].time < fromMs) {
-          console.log('2', cachedBars[cachedBars.length - 1].time, fromMs);
           onHistoryCallback([], {
             noData: true,
           });
@@ -182,25 +179,12 @@ export const getLaunchableMarketDatafeed = (
   },
 
   subscribeBars: (
-    symbolInfo: LibrarySymbolInfo,
-    resolution: ResolutionString,
-    onTick: SubscribeBarsCallback,
-    listenerGuid: string,
-    onResetCacheNeededCallback: Function
-  ) => {
-    // subscribeOnStream({
-    //   symbolInfo,
-    //   resolution,
-    //   onRealtimeCallback: onTick,
-    //   listenerGuid,
-    //   onResetCacheNeededCallback,
-    //   lastBar: lastBarsCache.get(
-    //     `${symbolInfo.ticker}/${LAUNCHABLE_MARKETS_RESOLUTION_MAP[resolution]}`
-    //   ),
-    // });
-  },
+    _symbolInfo: LibrarySymbolInfo,
+    _resolution: ResolutionString,
+    _onTick: SubscribeBarsCallback,
+    _listenerGuid: string,
+    _onResetCacheNeededCallback: Function
+  ) => {},
 
-  unsubscribeBars: (subscriberUID: string) => {
-    // unsubscribeFromStream(subscriberUID);
-  },
+  unsubscribeBars: (_subscriberUID: string) => {},
 });
