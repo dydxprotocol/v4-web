@@ -220,6 +220,7 @@ export const accountSlice = createSlice({
         // viewed fills for all markets
         state.unseenFillsCountPerMarket = {};
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [action.payload]: unseenCount, ...remaining } = state.unseenFillsCountPerMarket;
         state.unseenFillsCountPerMarket = remaining;
       }
