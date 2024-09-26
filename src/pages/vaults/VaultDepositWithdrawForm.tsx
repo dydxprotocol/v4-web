@@ -203,7 +203,6 @@ export const VaultDepositWithdrawForm = ({
       setAmountState('');
       dispatch(setVaultFormConfirmationStep(false));
 
-      // TODO tell abacus and respond
       onSuccess?.();
     } catch (e) {
       // eslint-disable-next-line no-console

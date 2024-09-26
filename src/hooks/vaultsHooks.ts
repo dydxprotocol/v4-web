@@ -74,7 +74,7 @@ export const useLoadedVaultDetails = () => {
 
 export const useVaultPnlHistory = () => {
   const details = useLoadedVaultDetails();
-  return useMemo(() => details.data?.history?.toArray(), [details.data?.history]);
+  return useMemo(() => details.data?.history?.toArray().reverse(), [details.data?.history]);
 };
 
 const MAX_UPDATE_SPEED_MS = timeUnits.minute;
