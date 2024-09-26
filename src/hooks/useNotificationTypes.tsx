@@ -51,16 +51,15 @@ import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotifi
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
+import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
   getLocalPlaceOrders,
-  getSubaccountFills,
-  getSubaccountOrders,
-} from '@/state/accountSelectors';
-import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+} from '@/state/localOrdersSelectors';
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 

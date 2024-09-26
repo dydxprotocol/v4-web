@@ -161,8 +161,8 @@ export const useAccountBalance = ({
   ]);
 
   const cosmosQuery = useQuery({
-    enabled: Boolean(isSolanaChain && dydxAddress && solAddress && addressOrDenom),
-    queryKey: ['accountBalances', chainId, solAddress, addressOrDenom],
+    enabled: Boolean(isCosmosChain && dydxAddress && cosmosAddress && addressOrDenom),
+    queryKey: ['accountBalances', chainId, cosmosAddress, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

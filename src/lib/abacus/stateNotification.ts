@@ -24,7 +24,6 @@ import {
   setFills,
   setFundingPayments,
   setHistoricalPnl,
-  setLatestOrder,
   setRestrictionType,
   setStakingBalances,
   setStakingDelegations,
@@ -39,6 +38,7 @@ import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
+import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
@@ -165,6 +165,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             childSubaccountUpdate[subaccountId] = subaccountData;
           } else {
             dispatch(setSubaccount(subaccountData));
+            dispatch(updateOrders(subaccountData?.orders?.toArray() ?? []));
           }
         }
 
@@ -174,6 +175,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             childSubaccountUpdate[subaccountId] = { ...childSubaccountUpdate[subaccountId], fills };
           } else {
             dispatch(setFills(fills));
+            dispatch(updateFilledOrders(fills));
           }
         }
 

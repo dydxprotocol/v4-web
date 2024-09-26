@@ -4,6 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -13,7 +14,10 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
 type ElementProps = {
+  launchableMarketId: string;
   showMidMarketPrice?: boolean;
 };
 
@@ -38,15 +42,20 @@ const DetailsItem = ({ value, stat }: { value: number | null | undefined; stat: 
   }
 };
 
-export const UnlaunchedMarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
+export const UnlaunchedMarketStatsDetails = ({
+  launchableMarketId,
+  showMidMarketPrice = true,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
 
-  // TODO: Replace with un launched market data
-  const { marketCap, spotVolume24H } = {
-    marketCap: 0,
-    spotVolume24H: 0,
-  };
+  const {
+    marketCap,
+    price,
+    tickSizeDecimals,
+    volume24h: spotVolume24H,
+  } = orEmptyObj(launchableAsset);
 
   const valueMap = {
     [MarketStats.MARKET_CAP]: marketCap,
@@ -62,7 +71,7 @@ export const UnlaunchedMarketStatsDetails = ({ showMidMarketPrice = true }: Elem
     <$MarketDetailsItems>
       {showMidMarketPrice && (
         <$MidMarketPrice>
-          <Output type={OutputType.Fiat} value={0.232} fractionDigits={3} />
+          <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
           <VerticalSeparator />
         </$MidMarketPrice>
       )}

@@ -3,7 +3,10 @@ import { SkipStatusResponse } from './skip';
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
-  SkipTransfer = 'SkipTransfer',
+  // Until we have migrations enabled, we need to keep underlying values the same
+  // So the notifications don't get retriggered
+  // It's pretty scary getting a bunch of unexpected withdrawal notifications
+  SkipTransfer = 'SquidTransfer',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',

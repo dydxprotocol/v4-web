@@ -157,12 +157,6 @@ export const getSubaccountOrders = createAppSelector(
 
 /**
  * @param state
- * @returns latestOrder of the currently connected subaccount throughout this session
- */
-export const getLatestOrder = (state: RootState) => state.account?.latestOrder;
-
-/**
- * @param state
  * @returns list of order ids that user has cleared and should be hidden
  */
 export const getSubaccountClearedOrderIds = (state: RootState) => state.account.clearedOrderIds;
@@ -368,43 +362,6 @@ export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
     return orderSizeBySideAndPrice;
   }
 );
-
-/**
- * @returns the clientId of the latest order
- */
-export const getLatestOrderClientId = createAppSelector(
-  [getLatestOrder],
-  (order) => order?.clientId
-);
-
-/**
- * @returns the rawValue status of the latest order
- */
-export const getLatestOrderStatus = createAppSelector(
-  [getLatestOrder],
-  (order) => order?.status.rawValue
-);
-
-/**
- * @returns a list of clientIds belonging to uncommmited orders
- */
-export const getUncommittedOrderClientIds = (state: RootState) =>
-  state.account.uncommittedOrderClientIds;
-
-/**
- * @returns a list of locally placed orders for the current FE session
- */
-export const getLocalPlaceOrders = (state: RootState) => state.account.localPlaceOrders;
-
-/**
- * @returns a list of locally canceled orders for the current FE session
- */
-export const getLocalCancelOrders = (state: RootState) => state.account.localCancelOrders;
-
-/**
- * @returns a list of locally batch canceled orders for the current FE session
- */
-export const getLocalCancelAlls = (state: RootState) => state.account.localCancelAlls;
 
 /**
  * @param orderId

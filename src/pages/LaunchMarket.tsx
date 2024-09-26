@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -15,14 +17,15 @@ const LaunchMarket = () => {
   const stringGetter = useStringGetter();
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.ADD_A_MARKET }));
+  const [tickerToAdd, setTickerToAdd] = useState<string>();
 
   return (
     <$Page>
       <$Content>
         <$FormContainer>
-          <NewMarketForm />
+          <NewMarketForm updateTickerToAdd={setTickerToAdd} />
         </$FormContainer>
-        <LaunchableMarketChart />
+        <LaunchableMarketChart ticker={tickerToAdd} />
       </$Content>
     </$Page>
   );

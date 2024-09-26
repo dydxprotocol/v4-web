@@ -1,5 +1,6 @@
 import { css, keyframes } from 'styled-components';
 
+import { headerMixins } from './headerMixins';
 import { layoutMixins } from './layoutMixins';
 
 export const popoverMixins = {
@@ -71,6 +72,13 @@ export const popoverMixins = {
 
     display: grid;
     overflow: hidden;
+  `,
+
+  mobileDownloadTrigger: css`
+    ${headerMixins.button}
+    --trigger-backgroundColor: transparent;
+    --trigger-open-backgroundColor: var(--button-hover-backgroundColor);
+    height: var(--button-height);
   `,
 
   popover: css`
