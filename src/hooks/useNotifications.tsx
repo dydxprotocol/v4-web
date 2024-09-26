@@ -309,6 +309,15 @@ const useNotificationsContext = () => {
   // Menu state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Unread
+  const hasUnreadNotifications = useMemo(
+    () =>
+      Object.values(notifications).filter(
+        (notification) => notification.status < NotificationStatus.Seen
+      ).length > 0,
+    [notifications]
+  );
+
   // Public
   return {
     notifications,
@@ -335,6 +344,9 @@ const useNotificationsContext = () => {
     // Menu state
     isMenuOpen,
     setIsMenuOpen,
+
+    // Unread
+    hasUnreadNotifications,
 
     // Notification Preferences
     notificationPreferences,
