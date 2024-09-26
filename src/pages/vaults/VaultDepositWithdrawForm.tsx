@@ -14,6 +14,7 @@ import { useSubaccount } from '@/hooks/useSubaccount';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import {
   useForceRefreshVaultAccount,
+  useForceRefreshVaultDetails,
   useLoadedVaultAccount,
   useVaultFormValidationResponse,
 } from '@/hooks/vaultsHooks';
@@ -147,6 +148,7 @@ export const VaultDepositWithdrawForm = ({
 
   const { depositToMegavault, withdrawFromMegavault } = useSubaccount();
   const forceRefreshVaultAccount = useForceRefreshVaultAccount();
+  const forceRefreshVault = useForceRefreshVaultDetails();
   const notify = useCustomNotification();
 
   const onSubmitConfirmForm = async () => {
@@ -209,6 +211,7 @@ export const VaultDepositWithdrawForm = ({
       console.error('Error submitting megavault transaction', e);
     } finally {
       forceRefreshVaultAccount();
+      forceRefreshVault();
       setIsSubmitting(false);
     }
   };

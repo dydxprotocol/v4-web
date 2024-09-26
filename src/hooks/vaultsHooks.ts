@@ -55,6 +55,16 @@ function safeStringifyForAbacus(arg: any): string {
   return JSON.stringify(arg);
 }
 
+export function useForceRefreshVaultDetails() {
+  return useCallback(
+    () =>
+      appQueryClient.invalidateQueries({
+        queryKey: ['vaultDetails'],
+      }),
+    []
+  );
+}
+
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
   const vaultDetailsResult = useQuery({
@@ -178,14 +188,12 @@ export const useLoadedVaultPositions = () => {
 };
 
 export function useForceRefreshVaultAccount() {
-  const { dydxAddress } = useAccounts();
   return useCallback(
     () =>
       appQueryClient.invalidateQueries({
-        queryKey: ['vaultAccount', dydxAddress, true],
-        exact: true,
+        queryKey: ['vaultAccount'],
       }),
-    [dydxAddress]
+    []
   );
 }
 
