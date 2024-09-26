@@ -67,6 +67,7 @@ const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
   position: relative;
 
   > button {
+    ${layoutMixins.textTruncate}
     --button-toggle-on-border: none;
     --button-toggle-off-border: none;
     --button-toggle-off-backgroundColor: transparent;
@@ -76,8 +77,6 @@ const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
     flex: 1;
     z-index: 1;
     outline: none;
-
-    ${layoutMixins.textTruncate}
   }
 
   &::before {

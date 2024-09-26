@@ -6,7 +6,6 @@ import { TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { TradeTypes } from '@/constants/trade';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tabs } from '@/components/Tabs';
@@ -39,10 +38,10 @@ export const TradeBoxOrderView = () => {
     <div tw="flex min-h-full flex-col gap-0.25 pt-0.875">
       <$TopActionsRow>
         <$MarginAndLeverageButtons>
-          <$MarginModeSelector openInTradeBox />
+          <MarginModeSelector openInTradeBox />
           <TargetLeverageButton />
         </$MarginAndLeverageButtons>
-        <$TradeSideToggle />
+        <TradeSideToggle />
       </$TopActionsRow>
       <$Tabs
         key={selectedTradeType}
@@ -77,39 +76,23 @@ const $Tabs = styled(Tabs)`
   }
 ` as typeof Tabs;
 
+const $TopActionsRow = styled.div`
+  display: flex;
+  padding: 0 1rem;
+
+  > * {
+    ${layoutMixins.flexExpandToSpace}
+  }
+`;
+
 const $MarginAndLeverageButtons = styled.div`
-  ${layoutMixins.inlineRow}
+  display: flex;
   gap: 0.5rem;
   margin-right: 0.5rem;
 
   abbr,
   button {
-    // width: 100%;
+    ${layoutMixins.flexExpandToSpace}
     height: 2.5rem;
-    flex: 1;
-    min-width: 1px;
   }
 `;
-
-const $TradeSideToggle = styled(TradeSideToggle)``;
-
-const $TopActionsRow = styled.div`
-  display: flex;
-  // display: grid;
-  // grid-auto-flow: column;
-
-  padding-left: 1rem;
-  padding-right: 1rem;
-
-  > * {
-    min-width: 1px;
-    flex: 1 1 1px;
-  }
-
-  @media ${breakpoints.tablet} {
-    grid-auto-columns: var(--orderbox-column-width) 1fr;
-    gap: var(--form-input-gap);
-  }
-`;
-
-const $MarginModeSelector = styled(MarginModeSelector)``;

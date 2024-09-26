@@ -128,7 +128,7 @@ export const NotificationsMenu = ({
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
       items={items}
-      // title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
+      title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
       slotTrigger={
         <div tw="stack">
           {slotTrigger}
