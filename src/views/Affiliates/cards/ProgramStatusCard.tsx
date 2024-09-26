@@ -10,8 +10,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
-
-import { OnboardingTriggerButton } from '../dialogs/OnboardingTriggerButton';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 const $Container = tw.div`h-full rounded-0.625 bg-color-layer-3`;
 
@@ -29,7 +28,7 @@ interface IProgramCardProps {
   isVip: boolean;
 }
 
-export const ConnectWallet = () => {
+const ConnectWallet = () => {
   const stringGetter = useStringGetter();
 
   return (
@@ -40,7 +39,7 @@ export const ConnectWallet = () => {
   );
 };
 
-export const ProgramCard = ({
+export const ProgramStatusCard = ({
   className,
   isWalletConnected = false,
   isVip = false,

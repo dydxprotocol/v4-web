@@ -11,8 +11,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { OutputType } from '@/components/Output';
 
-import { CriteriaModal } from './CriteriaModal';
-import { BorderStatCell, StatCell } from './StatBox';
+import { CriteriaModal } from '../CriteriaModal';
+import { BorderStatCell, StatCell } from '../StatBox';
 
 const MobileView = ({
   accountStats,
@@ -170,7 +170,7 @@ interface IAffiliateStatsProps {
   isVip: boolean;
 }
 
-export const AffiliateStats = ({ className, accountStats, isVip }: IAffiliateStatsProps) => {
+export const AffiliateStatsCard = ({ className, accountStats, isVip }: IAffiliateStatsProps) => {
   const [isCriteriaVisible, setIsCriteriaVisible] = useState(false);
   const { isNotTablet } = useBreakpoints();
 

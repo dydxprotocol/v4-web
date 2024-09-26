@@ -8,7 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { OutputType } from '@/components/Output';
 
-import { BorderStatCell, StatCell } from './StatBox';
+import { BorderStatCell, StatCell } from '../StatBox';
 
 interface IProgramStats {
   affiliatePayouts: number;
@@ -39,14 +39,14 @@ const MobileView = ({ programStats }: { programStats: IProgramStats }) => {
         <StatCell
           valueSize="large"
           className="relative"
-          title={stringGetter({key: STRING_KEYS.AFFILIATE_PAYOUTS})}
+          title={stringGetter({ key: STRING_KEYS.AFFILIATE_PAYOUTS })}
           outputType={OutputType.CompactFiat}
           value={programStats.affiliatePayouts}
         />
 
         <StatCell
           valueSize="large"
-          title={stringGetter({key: STRING_KEYS.TOTAL_AFFILIATES})}
+          title={stringGetter({ key: STRING_KEYS.TOTAL_AFFILIATES })}
           outputType={OutputType.Number}
           value={programStats.totalAffiliates}
         />
@@ -138,7 +138,7 @@ const DesktopView = ({ programStats }: { programStats: IProgramStats }) => {
   );
 };
 
-export const ProgramStats = ({ className, programStats }: IProgramStatsProps) => {
+export const ProgramStatsCard = ({ className, programStats }: IProgramStatsProps) => {
   const { isNotTablet } = useBreakpoints();
 
   return (

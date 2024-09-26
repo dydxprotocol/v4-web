@@ -16,12 +16,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
-import { AffiliateStats } from '@/views/Affiliates/AffiliateStats';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
-import { CommunityChart } from '@/views/Affiliates/CommunityChart';
 import LastUpdated from '@/views/Affiliates/LastUpdated';
-import { ProgramCard } from '@/views/Affiliates/ProgramCard';
-import { ProgramStats } from '@/views/Affiliates/ProgramStats';
+import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
+import { ProgramStatsCard } from '@/views/Affiliates/cards/ProgramStatsCard';
+import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
+import { CommunityChartContainer } from '@/views/Affiliates/community-chart/ProgramChartContainer';
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
@@ -33,7 +33,7 @@ const $AffiliatesLeaderboard = styled(AffiliatesLeaderboard)`
   ${layoutMixins.contentSectionAttached}
 `;
 
-const $CommunityChart = styled(CommunityChart)`
+const $CommunityChart = styled(CommunityChartContainer)`
   ${layoutMixins.contentSectionAttached}
 `;
 
@@ -139,14 +139,14 @@ export const AffiliatesPage: React.FC = () => {
                 Affiliate threshold card
               </div>
             ) : (
-              <AffiliateStats
+              <AffiliateStatsCard
                 isVip={userStatus.isVip}
                 className="h-fit w-full notTablet:h-full notTablet:w-7/12"
                 accountStats={accountStats}
               />
             )}
 
-            <ProgramCard
+            <ProgramStatusCard
               className="h-fit w-full notTablet:h-full notTablet:w-4/12"
               isWalletConnected={isConnectedWagmi}
               isVip={!!userStatus.isVip}
@@ -155,7 +155,7 @@ export const AffiliatesPage: React.FC = () => {
         )}
 
         {currTab === AffiliateRoute.ProgramStats && (
-          <ProgramStats
+          <ProgramStatsCard
             className="mt-0.5 h-fit notTablet:h-full"
             programStats={{
               affiliatePayouts: 123456789,

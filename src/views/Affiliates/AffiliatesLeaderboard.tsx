@@ -54,7 +54,7 @@ interface IAffiliatesFilterProps {
   compactLayout?: boolean;
 }
 
-export const AffiliatesFilter = ({
+const AffiliatesFilter = ({
   selectedFilter,
   filters,
   onChangeFilter,
