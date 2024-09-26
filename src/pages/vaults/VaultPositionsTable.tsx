@@ -55,6 +55,14 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
                 {asset?.name}
                 <div tw="row gap-0.25">
+                  <Output
+                    type={OutputType.Multiple}
+                    value={
+                      currentLeverageMultiple != null
+                        ? Math.abs(currentLeverageMultiple)
+                        : undefined
+                    }
+                  />
                   <$OutputSigned
                     value={
                       (currentLeverageMultiple ?? 0) < 0
@@ -63,15 +71,6 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     }
                     sign={getNumberSign(currentLeverageMultiple ?? 0)}
                     type={OutputType.Text}
-                  />
-                  @
-                  <Output
-                    type={OutputType.Multiple}
-                    value={
-                      currentLeverageMultiple != null
-                        ? Math.abs(currentLeverageMultiple)
-                        : undefined
-                    }
                   />
                 </div>
               </TableCell>
