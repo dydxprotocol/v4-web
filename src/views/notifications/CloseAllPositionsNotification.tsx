@@ -28,9 +28,12 @@ export const CloseAllPositionsNotification = ({
   const stringGetter = useStringGetter();
   const { closeAllPositions } = useSubaccount();
 
-  const numPositions = localCloseAllPositions.submittedOrderClientIds.length;
-  const numClosed = localCloseAllPositions.filledOrderClientIds.length;
-  const numFailed = localCloseAllPositions.failedOrderClientIds.length;
+  const { submittedOrderClientIds, filledOrderClientIds, failedOrderClientIds } =
+    localCloseAllPositions;
+
+  const numPositions = submittedOrderClientIds.length;
+  const numClosed = filledOrderClientIds.length;
+  const numFailed = failedOrderClientIds.length;
 
   const isPending = numClosed + numFailed < numPositions;
   const allFilled = numClosed === numPositions;
