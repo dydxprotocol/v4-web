@@ -6,6 +6,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -43,6 +44,8 @@ export const NewMarketPreviewStep = ({
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
+  const baseAsset = getDisplayableAssetFromTicker(ticker);
+  const launchableAsset = useMetadataServiceAssetFromId(ticker);
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -61,9 +64,6 @@ export const NewMarketPreviewStep = ({
   }, [errorMessage]);
 
   const isDisabled = alertMessage !== null;
-
-  const baseAsset = getDisplayableAssetFromTicker(ticker);
-  const fullBaseAsset = getDisplayableAssetFromTicker(ticker, 'full');
 
   const heading = shouldHideTitleAndDescription ? null : (
     <>
@@ -106,7 +106,7 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" symbol={fullBaseAsset} />
+          <img src={launchableAsset?.logo} tw="h-2 w-2 rounded-[50%]" alt={baseAsset} />
           <Output useGrouping type={OutputType.Text} value={baseAsset} />
         </div>
       </div>

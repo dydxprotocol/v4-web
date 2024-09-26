@@ -25,6 +25,7 @@ import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
@@ -70,6 +71,13 @@ export const TradeSizeInputs = () => {
     getTradeFormInputs,
     shallowEqual
   );
+
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
+
+  useEffect(() => {
+    // reset size inputs since abacus size is not properly synced/edited before account connection
+    abacusStateManager.clearTradeInputSizeValues();
+  }, [isAccountConnected]);
 
   // Update State variables if their inputs are not being source of calculations
   // Or if they have been reset to null

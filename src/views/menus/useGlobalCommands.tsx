@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 import { type MenuConfig } from '@/constants/menus';
 import { AppRoute } from '@/constants/routes';
@@ -17,19 +16,12 @@ import { Icon, IconName } from '@/components/Icon';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyRecord } from '@/lib/typeUtils';
-
-enum LayoutItems {
-  setDefaultLayout = 'SetDefaultLayout',
-  setReverseLayout = 'SetReverseLayout',
-  setAlternativeLayout = 'SetAlternativeLayout',
-}
 
 export const useGlobalCommands = (): MenuConfig<string | number, string | number> => {
   const dispatch = useAppDispatch();
@@ -137,28 +129,6 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
         tag: id,
         onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
       })),
-    },
-    {
-      // TODO: Remove this group when available under display settings
-      group: 'layout',
-      groupLabel: 'Layout', // TODO: i18n
-      items: [
-        {
-          value: LayoutItems.setDefaultLayout,
-          label: stringGetter({ key: STRING_KEYS.SET_DEFAULT_LAYOUT }),
-          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Default)),
-        },
-        {
-          value: LayoutItems.setReverseLayout,
-          label: stringGetter({ key: STRING_KEYS.SET_REVERSE_LAYOUT }),
-          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Reverse)),
-        },
-        {
-          value: LayoutItems.setAlternativeLayout,
-          label: stringGetter({ key: STRING_KEYS.SET_ALTERNATIVE_LAYOUT }),
-          onSelect: () => dispatch(setSelectedTradeLayout(TradeLayouts.Alternative)),
-        },
-      ],
     },
   ];
 };

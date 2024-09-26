@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useMemo } from 'react';
 import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
@@ -52,6 +52,7 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch } from './state/appTypes';
 import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
@@ -67,8 +68,6 @@ const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
-
-const queryClient = new QueryClient();
 
 const Content = () => {
   useInitializePage();
@@ -186,7 +185,7 @@ const providers = [
     config: privyConfig,
   }),
   wrapProvider(StatsigProvider),
-  wrapProvider(QueryClientProvider, { client: queryClient }),
+  wrapProvider(QueryClientProvider, { client: appQueryClient }),
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
@@ -293,7 +292,7 @@ const $Main = styled.main`
 const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;
-  z-index: 1;
+  z-index: 3;
   inset: 0;
   overflow: clip;
   ${layoutMixins.noPointerEvents}

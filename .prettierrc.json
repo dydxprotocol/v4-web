@@ -15,7 +15,7 @@
     "^@/(styles|icons)(.*)$",
     "^@/(components|views|pages|layout)(.*)$",
     "^@/state(.*)$",
-    "^@/lib(.*)$",
+    "^@/(clients|lib)(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true

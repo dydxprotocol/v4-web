@@ -12,6 +12,7 @@ import type {
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
+import { testFlags } from '@/lib/testFlags';
 
 export enum AppTheme {
   Classic = 'Classic',
@@ -33,6 +34,7 @@ export enum AppColorMode {
 export enum OtherPreference {
   DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
   GasToken = 'GasToken',
+  ReverseLayout = 'ReverseLayout',
 }
 
 export interface ConfigsState {
@@ -46,10 +48,12 @@ export interface ConfigsState {
   defaultToAllMarketsInPositionsOrdersFills: boolean;
 }
 
+const { uiRefresh } = testFlags;
+
 const initialState: ConfigsState = {
   appThemeSetting: getLocalStorage({
     key: LocalStorageKey.SelectedTheme,
-    defaultValue: AppTheme.Classic,
+    defaultValue: uiRefresh ? AppTheme.Dark : AppTheme.Classic,
   }),
   appColorMode: getLocalStorage({
     key: LocalStorageKey.SelectedColorMode,

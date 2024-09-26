@@ -20,7 +20,7 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
   return (
     <$DropdownSelectMenu
       disabled={networks.length <= 1}
-      hideIcon
+      hideIcon={networks.length <= 1}
       items={networks}
       value={selectedNetwork}
       onValueChange={switchNetwork}

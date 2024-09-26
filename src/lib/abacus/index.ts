@@ -62,6 +62,7 @@ import {
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
+import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -118,7 +119,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.staticTyping = false;
+    appConfigs.staticTyping = testFlags.enableStaticTyping;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
@@ -164,7 +165,7 @@ class AbacusStateManager {
   clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
     const state = this.store?.getState();
 
-    const { needsTriggerPrice, needsTrailingPercent, needsLeverage, needsLimitPrice } =
+    const { needsTriggerPrice, needsTrailingPercent, needsLimitPrice } =
       (state && getInputTradeOptions(state)) ?? {};
 
     if (needsTrailingPercent) {
@@ -181,15 +182,21 @@ class AbacusStateManager {
     this.store?.dispatch(setTradeFormInputs(CLEARED_TRADE_INPUTS));
 
     if (shouldResetSize) {
-      this.setTradeValue({ value: null, field: TradeInputField.size });
-      this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
-
-      if (needsLeverage) {
-        this.setTradeValue({ value: null, field: TradeInputField.leverage });
-      }
-
-      this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
+      this.clearTradeInputSizeValues();
     }
+  };
+
+  clearTradeInputSizeValues = () => {
+    const state = this.store?.getState();
+    const { needsLeverage } = (state && getInputTradeOptions(state)) ?? {};
+    this.setTradeValue({ value: null, field: TradeInputField.size });
+    this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
+
+    if (needsLeverage) {
+      this.setTradeValue({ value: null, field: TradeInputField.leverage });
+    }
+
+    this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
   };
 
   clearClosePositionInputValues = ({

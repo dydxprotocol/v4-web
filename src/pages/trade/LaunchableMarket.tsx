@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -18,8 +18,6 @@ import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
-
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
@@ -34,15 +32,11 @@ const LaunchableMarket = () => {
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
 
-  const displayableTicker = useMemo(() => {
-    return getDisplayableTickerFromMarket(marketId ?? '');
-  }, [marketId]);
-
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   return isTablet ? (
     <$TradeLayoutMobile>
-      <TradeHeaderMobile launchableMarketId={displayableTicker} />
+      <TradeHeaderMobile launchableMarketId={marketId} />
 
       <div>
         <DetachedSection>
@@ -50,11 +44,11 @@ const LaunchableMarket = () => {
         </DetachedSection>
 
         <DetachedSection>
-          <MobileBottomPanel isViewingUnlaunchedMarket />
+          <MobileBottomPanel launchableMarketId={marketId} />
         </DetachedSection>
 
         <DetachedSection>
-          <LaunchMarketSidePanel launchableMarketId={displayableTicker} />
+          <LaunchMarketSidePanel launchableMarketId={marketId} />
         </DetachedSection>
       </div>
     </$TradeLayoutMobile>
@@ -65,12 +59,12 @@ const LaunchableMarket = () => {
       isHorizontalPanelOpen={isHorizontalPanelOpen}
     >
       <header tw="[grid-area:Top]">
-        <MarketSelectorAndStats launchableMarketId={displayableTicker} />
+        <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
         <AccountInfo />
-        <$LaunchMarketSidePanel launchableMarketId={displayableTicker} />
+        <$LaunchMarketSidePanel launchableMarketId={marketId} />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
@@ -96,26 +90,12 @@ const $TradeLayout = styled.article<{
   /* prettier-ignore */
   --layout-default:
     'Top Top' auto
-    'Side Inner' minmax(0, 1fr)
-    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) 1fr;
-
-  /* prettier-ignore */
-  --layout-default-desktopMedium:
-    'Side Top' auto
-    'Side Inner' minmax(0, 1fr)
-    'Side Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / var(--sidebar-width) 1fr;
-
-  /* prettier-ignore */
-  --layout-alternative:
-    'Top Top' auto
     'Inner Side' minmax(0, 1fr)
     'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / 1fr var(--sidebar-width);
 
   /* prettier-ignore */
-  --layout-alternative-desktopMedium:
+  --layout-default-desktopMedium:
     'Top Side' auto
     'Inner Side' minmax(0, 1fr)
     'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
@@ -133,15 +113,8 @@ const $TradeLayout = styled.article<{
   ${({ tradeLayout }) =>
     ({
       [TradeLayouts.Default]: null,
-      [TradeLayouts.Alternative]: css`
-        --layout: var(--layout-alternative);
-        @media ${breakpoints.desktopMedium} {
-          --layout: var(--layout-alternative-desktopMedium);
-        }
-      `,
       [TradeLayouts.Reverse]: css`
         direction: rtl;
-
         > * {
           direction: initial;
         }

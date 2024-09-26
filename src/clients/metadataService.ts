@@ -1,48 +1,11 @@
-import { log } from 'console';
+import {
+  MetadataServiceCandlesResponse,
+  MetadataServiceInfoResponse,
+  MetadataServicePath,
+  MetadataServicePricesResponse,
+} from '@/constants/assetMetadata';
 
-type MetadataServiceInfoResponse = Record<
-  string,
-  {
-    name: string;
-    logo: string;
-    urls: {
-      website: string;
-      technical_doc: string;
-      cmc: string;
-    };
-    sector_tags: string[];
-    exchanges: string[];
-  }
->;
-
-type MetadataServicePricesResponse = Record<
-  string,
-  {
-    price: number;
-    percent_change_24h: number;
-    volume_24h: number;
-    market_cap: number;
-  }
->;
-
-type MetadataServiceCandlesResponse = Record<
-  string,
-  {
-    time: string; // ISO date string
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-  }
->;
-
-enum MetadataServicePath {
-  MARKET_MAP = 'market-map',
-  INFO = 'info',
-  PRICES = 'prices',
-  CANDLES = 'candles',
-}
+import { log } from '@/lib/telemetry';
 
 /**
  * MetadataServiceClient
@@ -53,7 +16,7 @@ class MetadataServiceClient {
 
   constructor(host: string) {
     if (!host) {
-      log('MetadataServiceClient requires a host');
+      log('MetadataServiceClient', new Error('MetadataServiceClient requires a host'));
     }
 
     this.host = host;
@@ -77,13 +40,13 @@ class MetadataServiceClient {
     return this._get(MetadataServicePath.MARKET_MAP);
   }
 
-  async getAssetInfo({ assets }: { assets?: string[] }): Promise<MetadataServiceInfoResponse> {
+  async getAssetInfo(assets?: string[]): Promise<MetadataServiceInfoResponse> {
     return this._post(MetadataServicePath.INFO, {
       assets,
     });
   }
 
-  async getAssetPrices({ assets }: { assets?: string[] }): Promise<MetadataServicePricesResponse> {
+  async getAssetPrices(assets?: string[]): Promise<MetadataServicePricesResponse> {
     return this._post(MetadataServicePath.PRICES, {
       assets,
     });

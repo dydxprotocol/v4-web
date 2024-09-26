@@ -67,6 +67,14 @@ class TestFlags {
   get referralCode() {
     return this.queryParams.ref;
   }
+
+  get enableStaticTyping() {
+    return !!this.queryParams.statictyping;
+  }
+
+  get uiRefresh() {
+    return !!this.queryParams.uirefresh;
+  }
 }
 
 export const testFlags = new TestFlags();

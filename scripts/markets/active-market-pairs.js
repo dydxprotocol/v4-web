@@ -1,4 +1,4 @@
-export async function fetchActiveMarketPairs(apiHost: string): Promise<string[]> {
+export async function fetchActiveMarketPairs(apiHost) {
     // Active market pairs are those whose IDs have a status of 'STATUS_ACTIVE' in the CLOB_PAIR_URL.
     const marketURL = `${apiHost}/dydxprotocol/prices/params/market`;
     const clobPairURL = `${apiHost}/dydxprotocol/clob/clob_pair`;
@@ -8,22 +8,19 @@ export async function fetchActiveMarketPairs(apiHost: string): Promise<string[]>
 
     const activeMarketIds = new Set(
         clobPairs
-            .filter((clobPair: { status: string }) => clobPair.status === 'STATUS_ACTIVE')
-            .map((clobPair: { id: string }) => clobPair.id)
+            .filter(clobPair => clobPair.status === 'STATUS_ACTIVE')
+            .map(clobPair => clobPair.id)
     );
 
     const activeMarketPairs = allMarkets
-        .filter((market: { id: string }) => activeMarketIds.has(market.id))
-        .map((market: { pair: string }) => market.pair);
-
-    console.log('Original number of markets:', allMarkets.length);
-    console.log('Final number of markets:', activeMarketPairs.length);
+        .filter(market => activeMarketIds.has(market.id))
+        .map(market => market.pair);
 
     return activeMarketPairs;
 }
 
-async function fetchItems(url: string, contentItemsKey: string): Promise<any[]> {
-    const items: any[] = [];
+async function fetchItems(url, contentItemsKey) {
+    const items = [];
     let key = '';
 
     do {

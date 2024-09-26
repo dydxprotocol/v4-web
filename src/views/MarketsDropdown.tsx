@@ -10,6 +10,7 @@ import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/m
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -257,17 +258,19 @@ const MarketsDropdownContent = ({
 export const MarketsDropdown = memo(
   ({
     currentMarketId,
-    isViewingUnlaunchedMarket,
+    launchableMarketId,
     symbol = '',
   }: {
     currentMarketId?: string;
-    isViewingUnlaunchedMarket?: boolean;
+    launchableMarketId?: string;
     symbol: string | null;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
+    const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+    const isViewingUnlaunchedMarket = !!launchableAsset;
 
     const leverageTag =
       !isViewingUnlaunchedMarket && currentMarketId != null ? (
@@ -293,18 +296,28 @@ export const MarketsDropdown = memo(
                 </h2>
               ) : (
                 <div tw="spacedRow gap-0.625">
-                  <AssetIcon symbol={symbol} />
-                  {isViewingUnlaunchedMarket ? (
-                    <div tw="flex flex-col text-start">
-                      <span tw="font-mini-book">
-                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
-                      </span>
-                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
-                        {currentMarketId}
-                      </h2>
-                    </div>
+                  {launchableAsset ? (
+                    <>
+                      <img
+                        src={launchableAsset.logo}
+                        alt={launchableAsset.name}
+                        tw="h-[1em] w-auto rounded-[50%]"
+                      />
+
+                      <div tw="flex flex-col text-start">
+                        <span tw="font-mini-book">
+                          {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                        </span>
+                        <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                          {currentMarketId}
+                        </h2>
+                      </div>
+                    </>
                   ) : (
-                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    <>
+                      <AssetIcon symbol={symbol} />
+                      <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    </>
                   )}
                   {leverageTag}
                 </div>
