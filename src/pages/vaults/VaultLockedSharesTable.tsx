@@ -24,11 +24,7 @@ export const VaultLockedSharesCard = ({ className }: { className?: string }) => 
   const [showShares, setShowShares] = useState(false);
   const vaultAccount = useLoadedVaultAccount().data;
   const rawLockedShares = vaultAccount?.vaultShareUnlocks;
-  const lockedShares = useMemo(
-    () => [{ amountUsdc: 500, unlockBlockHeight: 36080 } as VaultShareUnlock],
-    []
-  );
-  //   const lockedShares = useMemo(() => rawLockedShares?.toArray(), [rawLockedShares]);
+  const lockedShares = useMemo(() => rawLockedShares?.toArray(), [rawLockedShares]);
   const lockedSharesTotalValue = useMemo(
     () => sum(lockedShares?.map((s) => s.amountUsdc)),
     [lockedShares]
