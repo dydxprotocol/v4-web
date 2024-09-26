@@ -379,6 +379,7 @@ export const VaultDepositWithdrawForm = ({
               size={ButtonSize.XSmall}
               isInputEmpty={amount === ''}
               isLoading={false}
+              disabled={isAccountViewOnly || !canViewAccount}
               onPressedChange={(isPressed: boolean) =>
                 isPressed ? onClickMax() : setAmountState('')
               }
