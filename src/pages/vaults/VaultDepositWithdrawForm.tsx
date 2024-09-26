@@ -285,7 +285,7 @@ export const VaultDepositWithdrawForm = ({
             },
           ],
           transactionTarget: {
-            label: stringGetter({ key: STRING_KEYS.PROTOCOL_VAULT }),
+            label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
             icon: 'vault' as const,
           },
         }
