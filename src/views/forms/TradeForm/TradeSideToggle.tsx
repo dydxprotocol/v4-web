@@ -10,6 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -65,6 +67,7 @@ const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
   position: relative;
 
   > button {
+    ${layoutMixins.textTruncate}
     --button-toggle-on-border: none;
     --button-toggle-off-border: none;
     --button-toggle-off-backgroundColor: transparent;

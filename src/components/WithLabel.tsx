@@ -1,3 +1,7 @@
+import styled from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
 type ElementProps = {
   label?: React.ReactNode;
   children?: React.ReactNode;
@@ -9,10 +13,16 @@ type StyleProps = {
 };
 
 export const WithLabel = ({ label, inputID, children, className }: ElementProps & StyleProps) => (
-  <div className={className} tw="grid gap-0.5 [--label-textColor:--color-text-1]">
+  <$Container className={className} tw="grid gap-0.5 [--label-textColor:--color-text-1]">
     <label htmlFor={inputID} tw="inlineRow text-[color:--label-textColor] font-mini-book">
       {label}
     </label>
     {children}
-  </div>
+  </$Container>
 );
+
+const $Container = styled.div`
+  label {
+    ${layoutMixins.textTruncate}
+  }
+`;
