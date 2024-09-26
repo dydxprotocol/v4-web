@@ -50,6 +50,23 @@ export type TradingRewardsDatum = {
   cumulativeAmount: number;
 };
 
+export type AffiliatesProgramDatum = {
+  date: number;
+  cumulativeAmount: number;
+};
+
+export enum AffiliatesProgramPeriod {
+  Period1d = 'Period1d',
+  Period7d = 'Period7d',
+  Period30d = 'Period30d',
+  Period90d = 'Period90d',
+  PeriodAllTime = 'PeriodAllTime',
+}
+
+export const affiliatesProgramPeriods = Object.keys(
+  AffiliatesProgramPeriod
+) as AffiliatesProgramPeriod[];
+
 export enum TradingRewardsPeriod {
   Period1d = 'Period1d',
   Period7d = 'Period7d',
