@@ -78,6 +78,7 @@ const $Tabs = styled(Tabs)`
 
 const $TopActionsRow = styled.div`
   display: flex;
+  align-items: center;
   padding: 0 1rem;
 
   > * {

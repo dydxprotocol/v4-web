@@ -76,8 +76,14 @@ const $TradeBox = styled.section`
   --tradeBox-content-paddingLeft: 1rem;
 
   ${layoutMixins.container}
-  flex: 1 1 1px;
+  display: flex;
+  flex: 1;
+  min-height: 1px;
   z-index: 0;
+
+  & > * {
+    width: 100%;
+  }
 `;
 
 const $Dialog = styled(Dialog)`
