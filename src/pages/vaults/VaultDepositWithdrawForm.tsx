@@ -8,6 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -146,6 +147,8 @@ export const VaultDepositWithdrawForm = ({
 
   const { depositToMegavault, withdrawFromMegavault } = useSubaccount();
   const forceRefreshVaultAccount = useForceRefreshVaultAccount();
+  const notify = useCustomNotification();
+
   const onSubmitConfirmForm = async () => {
     if (isSubmitting) {
       return;
@@ -154,19 +157,32 @@ export const VaultDepositWithdrawForm = ({
     try {
       const { submissionData } = validationResponse;
       if (operation === 'DEPOSIT') {
-        if (submissionData?.deposit?.amount == null) {
+        const amount = submissionData?.deposit?.amount;
+        if (amount == null) {
+          notify({
+            title: 'Unable to submit Megavault Deposit transaction',
+            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+          });
           // eslint-disable-next-line no-console
           console.error('Somehow got to submission with empty amount in validation response');
           return;
         }
-        const result = await depositToMegavault(submissionData?.deposit?.amount);
+        const result = await depositToMegavault(amount);
+        notify({
+          title: `$${amount} Megavault Deposit successful!`,
+        });
         // eslint-disable-next-line no-console
         console.log('Deposit', result);
       } else if (operation === 'WITHDRAW') {
+        const expectedAmount = validationResponse?.summaryData.estimatedAmountReceived;
         if (
           submissionData?.withdraw?.shares == null ||
           submissionData?.withdraw?.minAmount == null
         ) {
+          notify({
+            title: 'Unable to submit Megavault Withdrawal transaction',
+            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+          });
           // eslint-disable-next-line no-console
           console.error('Somehow got to submission with empty data in validation response');
           return;
@@ -175,6 +191,9 @@ export const VaultDepositWithdrawForm = ({
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
+        notify({
+          title: `$${expectedAmount} Megavault Withdrawal successful!`,
+        });
         // eslint-disable-next-line no-console
         console.log('Withdraw', result);
       } else {
@@ -183,6 +202,7 @@ export const VaultDepositWithdrawForm = ({
       setOperation('DEPOSIT');
       setAmountState('');
       dispatch(setVaultFormConfirmationStep(false));
+
       // TODO tell abacus and respond
       onSuccess?.();
     } catch (e) {
