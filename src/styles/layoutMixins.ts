@@ -361,6 +361,12 @@ export const layoutMixins = {
     }
   `,
 
+  // a flex child that grows to fill any remaining space, but also shrinks past its min-content if necessary
+  flexExpandToSpace: css`
+    flex: 1;
+    min-width: 1px;
+  `,
+
   stack: css`
     display: grid;
     grid-template-areas: 'stack';

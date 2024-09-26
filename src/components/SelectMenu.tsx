@@ -15,6 +15,7 @@ import {
 import styled from 'styled-components';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { WithLabel } from '@/components/WithLabel';
@@ -112,4 +113,8 @@ const $ItemIndicator = styled(ItemIndicator)`
 const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
   border-radius: 0;
+
+  > * {
+    ${layoutMixins.textTruncate}
+  }
 `;

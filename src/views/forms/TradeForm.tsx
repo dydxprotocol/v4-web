@@ -405,9 +405,12 @@ const $TopActionsRow = styled.div`
     gap: var(--orderbox-gap);
   }
 `;
+
 const $OrderbookButton = styled(ToggleButton)`
   --button-toggle-off-textColor: var(--color-text-1);
   --button-toggle-off-backgroundColor: transparent;
+
+  ${layoutMixins.flexExpandToSpace}
 
   > svg {
     color: var(--color-text-0);

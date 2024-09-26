@@ -68,7 +68,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
         {
           [OnboardingSteps.ChooseWallet]: {
             title: stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET }),
-            description: 'Select your wallet from these supported options.',
+            description: stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET_SUBTITLE }),
             children: (
               <$Content>
                 <ChooseWallet onChooseWallet={onChooseWallet} />
