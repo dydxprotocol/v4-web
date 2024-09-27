@@ -108,8 +108,25 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     paramsInJson: Nullable<string>,
     callback: (p0: Nullable<string>) => void
   ): Promise<void> {
+    /**
+     *
+     * This fn is temporary. Just used to get enable us to extract parsedParams
+     * so we can share it among all the dd calls
+     */
+    const safeParse = (str: string | undefined | null): any | undefined => {
+      if (!str) {
+        dd.info('[connectNetwork]: no params str provided, returning empty object');
+        return {};
+      }
+      try {
+        return JSON.parse(str);
+      } catch (err) {
+        dd.error('[connectNetwork]: Failed to parse str', { str }, err);
+        return {};
+      }
+    };
+    const parsedParams = paramsInJson ? safeParse(paramsInJson) : {};
     try {
-      const parsedParams = paramsInJson ? JSON.parse(paramsInJson) : {};
       const {
         indexerUrl,
         websocketUrl,
@@ -122,7 +139,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         CHAINTOKEN_DENOM,
         CHAINTOKEN_DECIMALS,
       } = parsedParams;
-
+      dd.log('[connectNetwork]: Params for connectNetwork', { params: parsedParams });
       const compositeClient = await CompositeClient.connect(
         new Network(
           chainId,
@@ -147,14 +164,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       this.compositeClient = compositeClient;
-
+      dd.log('[connectNetwork]: composite client connected successfully', { params: parsedParams });
       try {
         if (nobleValidatorUrl) {
           this.nobleClient = new NobleClient(nobleValidatorUrl);
           if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
+          if (this.nobleClient.isConnected) dd.log('noble client connected successfully');
         }
       } catch (e) {
-        log('DydxChainTransactions/connectNetwork/NobleClient', e);
+        log('DydxChainTransactions/connectNetwork/NobleClient', e, { params: parsedParams });
       }
 
       // Dispatch custom event to notify other parts of the app that the network has been connected
@@ -166,7 +184,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       callback(JSON.stringify({ success: true }));
     } catch (error) {
       this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
-      log('DydxChainTransactions/connectNetwork', error);
+      log('DydxChainTransactions/connectNetwork', error, { params: parsedParams });
     }
   }
 
