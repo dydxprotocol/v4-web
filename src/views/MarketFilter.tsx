@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MARKET_FILTER_OPTIONS, MarketFilters } from '@/constants/markets';
+import { MenuItem } from '@/constants/menus';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -16,6 +17,8 @@ import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+
+import { testFlags } from '@/lib/testFlags';
 
 export const MarketFilter = ({
   selectedFilter,
@@ -37,49 +40,84 @@ export const MarketFilter = ({
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
+  const { uiRefresh, pml: showLaunchMarkets } = testFlags;
+  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton && showLaunchMarkets;
+
+  const filterToggles = (
+    <$ToggleGroup
+      items={
+        Object.values(filters).map((value) => ({
+          label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
+          slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
+            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+          ),
+          value,
+        })) as MenuItem<MarketFilters>[]
+      }
+      value={selectedFilter}
+      onValueChange={onChangeFilter}
+      uiRefreshEnabled={uiRefresh}
+    />
+  );
+
+  const launchMarketButton = uiRefresh ? (
+    <Button
+      onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+      size={ButtonSize.XSmall}
+      shape={ButtonShape.Pill}
+      action={ButtonAction.Primary}
+    >
+      {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
+    </Button>
+  ) : (
+    <Button
+      onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+      size={ButtonSize.Small}
+    >
+      {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+    </Button>
+  );
 
   return (
-    <$MarketFilter $compactLayout={compactLayout}>
-      <$SearchInput
-        placeholder={stringGetter({ key: searchPlaceholderKey })}
-        onTextChange={onSearchTextChange}
-      />
-
-      <div tw="row overflow-x-scroll">
-        <$ToggleGroupContainer $compactLayout={compactLayout}>
-          <$ToggleGroup
-            items={Object.values(filters).map((value) => ({
-              label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
-              slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
-                <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-              ),
-              value,
-            }))}
-            value={selectedFilter}
-            onValueChange={onChangeFilter}
-          />
-        </$ToggleGroupContainer>
-
-        {showProposeButton && (
-          <Button
-            onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-            size={ButtonSize.Small}
-          >
-            {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-          </Button>
-        )}
+    <$MarketFilter $compactLayout={compactLayout} uiRefreshEnabled={uiRefresh}>
+      <div tw="flex items-center gap-0.5">
+        <$SearchInput
+          placeholder={stringGetter({ key: searchPlaceholderKey })}
+          onTextChange={onSearchTextChange}
+        />
+        {uiRefresh && showProposeButton && launchMarketButton}
       </div>
+
+      {uiRefresh ? (
+        filterToggles
+      ) : (
+        <div tw="row overflow-x-scroll">
+          <$ToggleGroupContainer $compactLayout={compactLayout}>
+            {filterToggles}
+          </$ToggleGroupContainer>
+
+          {showProposeButton && launchMarketButton}
+        </div>
+      )}
     </$MarketFilter>
   );
 };
-const $MarketFilter = styled.div<{ $compactLayout: boolean }>`
+const $MarketFilter = styled.div<{ $compactLayout: boolean; uiRefreshEnabled: boolean }>`
   display: flex;
-  flex-direction: ${({ $compactLayout }) => ($compactLayout ? 'row-reverse' : 'column')};
+  flex-direction: column;
   justify-content: space-between;
   gap: 0.75rem;
   flex: 1;
   overflow: hidden;
+
+  ${({ uiRefreshEnabled }) =>
+    uiRefreshEnabled &&
+    css`
+      button {
+        --button-toggle-off-border: none;
+        --button-toggle-off-backgroundColor: transparent;
+      }
+    `}
 
   ${({ $compactLayout }) =>
     $compactLayout &&
@@ -121,11 +159,24 @@ const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
     `}
 `;
 
-const $ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
+const $ToggleGroup = styled(ToggleGroup)<{ uiRefreshEnabled: boolean }>`
+  --button-toggle-off-border: none;
+  --button-border: none;
+
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          display: flex;
+          flex-wrap: wrap;
+        `
+      : css`
+          overflow-x: auto;
+        `}
+  `}
   padding-right: var(--toggle-group-paddingRight);
-` as typeof ToggleGroup;
+`;
 
 const $SearchInput = styled(SearchInput)`
   min-width: 12rem;
+  flex-grow: 1;
 `;

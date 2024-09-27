@@ -36,6 +36,7 @@ import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 
@@ -272,8 +273,10 @@ export const MarketsDropdown = memo(
     const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
     const isViewingUnlaunchedMarket = !!launchableAsset;
 
+    const { uiRefresh: uiRefreshEnabled } = testFlags;
+
     const leverageTag =
-      !isViewingUnlaunchedMarket && currentMarketId != null ? (
+      !uiRefreshEnabled && !isViewingUnlaunchedMarket && currentMarketId != null ? (
         <Tag>
           <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
         </Tag>
@@ -289,8 +292,8 @@ export const MarketsDropdown = memo(
         slotTrigger={
           <>
             {triggerBackground}
-            <$TriggerContainer $isOpen={isOpen}>
-              {isOpen ? (
+            <$TriggerContainer $isOpen={isOpen} uiRefreshEnabled={uiRefreshEnabled}>
+              {!uiRefreshEnabled && isOpen ? (
                 <h2 tw="text-color-text-2 font-medium-medium">
                   {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
                 </h2>
@@ -323,7 +326,7 @@ export const MarketsDropdown = memo(
                 </div>
               )}
               <p tw="row gap-0.5 text-color-text-0 font-small-book">
-                {isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
+                {!uiRefreshEnabled && isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
                 <DropdownIcon isOpen={isOpen} />
               </p>
             </$TriggerContainer>
@@ -364,9 +367,8 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
     `}
 `;
 
-const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
+const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boolean }>`
   --marketsDropdown-width: var(--sidebar-width);
-  width: var(--sidebar-width);
   position: relative;
 
   ${layoutMixins.spacedRow}
@@ -379,15 +381,24 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
     css`
       --marketsDropdown-width: var(--marketsDropdown-openWidth);
     `}
+
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          gap: 1rem;
+        `
+      : css`
+          width: var(--sidebar-width);
+        `}
+  `}
 `;
 
 const $Popover = styled(Popover)`
   ${popoverMixins.popover}
   --popover-item-height: 3.375rem;
   --popover-backgroundColor: var(--color-layer-2);
-  --stickyArea-topHeight: 6.125rem;
-
-  --toolbar-height: var(--stickyArea-topHeight);
+  display: flex;
+  flex-direction: column;
 
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
@@ -423,10 +434,9 @@ const $Popover = styled(Popover)`
   }
 `;
 const $Toolbar = styled(Toolbar)`
-  ${layoutMixins.stickyHeader}
-  height: var(--toolbar-height);
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
+  padding: 1rem 1rem 0.5rem;
 `;
 
 const $MarketDropdownBanner = styled.div`
@@ -473,9 +483,11 @@ const $TriggerFlag = styled.div`
 `;
 
 const $ScrollArea = styled.div`
-  ${layoutMixins.scrollArea}
-  height: calc(100% - var(--toolbar-height));
+  overflow: scroll;
+  position: relative;
+  height: 100%;
 `;
+
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 

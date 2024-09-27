@@ -29,6 +29,7 @@ import {
 } from '@/state/perpetualsSelectors';
 
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MidMarketPrice } from './MidMarketPrice';
 
@@ -39,15 +40,24 @@ type ElementProps = {
 enum MarketStats {
   OraclePrice = 'OraclePrice',
   PriceChange24H = 'PriceChange24H',
-  OpenInterest = 'OpenInterest',
-  Funding1H = 'Funding1H',
   Volume24H = 'Volume24H',
   Trades24H = 'Trades24H',
+  OpenInterest = 'OpenInterest',
+  Funding1H = 'Funding1H',
   NextFunding = 'NextFunding',
   MaxLeverage = 'MaxLeverage',
 }
 
-const defaultMarketStatistics = Object.values(MarketStats);
+const defaultMarketStatistics = [
+  MarketStats.OraclePrice,
+  MarketStats.PriceChange24H,
+  MarketStats.OpenInterest,
+  MarketStats.Funding1H,
+  MarketStats.Volume24H,
+  MarketStats.Trades24H,
+  MarketStats.NextFunding,
+  MarketStats.MaxLeverage,
+];
 
 export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -59,6 +69,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const lastMidMarketPrice = useRef(midMarketPrice);
   const currentMarketData = useAppSelector(getCurrentMarketData, shallowEqual);
   const isLoading = currentMarketData === undefined;
+
+  const { uiRefresh } = testFlags;
 
   const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent } = currentMarketData ?? {};
 
@@ -104,7 +116,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
       )}
 
       <$Details
-        items={defaultMarketStatistics.map((stat) => ({
+        items={(uiRefresh ? Object.values(MarketStats) : defaultMarketStatistics).map((stat) => ({
           key: stat,
           label: labelMap[stat],
           tooltip: stat,
