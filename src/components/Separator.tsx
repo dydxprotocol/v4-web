@@ -52,7 +52,7 @@ export const WithSeparators = ({
   layout: 'column' | 'row';
   children: React.ReactNode;
   withSeparators?: boolean;
-  fullHeight: boolean;
+  fullHeight?: boolean;
 }) =>
   withSeparators
     ? [children].flat().map((child, i, { length }) => (
