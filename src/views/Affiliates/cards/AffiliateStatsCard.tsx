@@ -32,8 +32,10 @@ const MobileView = ({
           valueSize="large"
           className="relative"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
-          outputType={OutputType.Number}
-          value={isVip ? 'VIP' : accountStats?.currentAffiliateTier}
+          outputType={OutputType.Text}
+          value={
+            isVip ? stringGetter({ key: STRING_KEYS.VIP }) : accountStats?.currentAffiliateTier
+          }
         >
           <a href="#" onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
