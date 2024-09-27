@@ -84,6 +84,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setLocalWallet(localWallet: LocalWallet) {
     this.localWallet = localWallet;
+    if (this.localWallet.address) this.populateAccountNumberCache(this.localWallet.address);
   }
 
   clearAccounts() {
@@ -167,6 +168,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
       log('DydxChainTransactions/connectNetwork', error);
     }
+  }
+
+  populateAccountNumberCache(address: string) {
+    this.compositeClient?.populateAccountNumberCache(address);
   }
 
   setSelectedGasDenom(denom: SelectedGasDenom) {

@@ -23,7 +23,6 @@ import {
   ConnectorType,
   type DydxAddress,
   type EvmAddress,
-  KEPLR_DOWNLOAD_LINK,
   SolAddress,
   WalletInfo,
   WalletType,
@@ -169,9 +168,7 @@ export const useWalletConnection = () => {
             login();
           }
         } else if (wallet.connectorType === ConnectorType.Cosmos) {
-          if (!window.keplr) {
-            window.open(KEPLR_DOWNLOAD_LINK, '_blank');
-          } else if (!isConnectedGraz) {
+          if (!isConnectedGraz) {
             await connectGraz({
               chainId: SUPPORTED_COSMOS_CHAINS,
               walletType: wallet.name,
