@@ -39,6 +39,7 @@ export const InnerPanel = ({
     <Tabs
       value={value}
       onValueChange={setValue}
+      withBorders={false}
       items={[
         {
           content: <TvChart />,
