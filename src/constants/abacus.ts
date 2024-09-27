@@ -256,7 +256,7 @@ export const VaultFormAction = Abacus.exchange.dydx.abacus.functional.vault.Vaul
 export const VaultFormAccountData =
   Abacus.exchange.dydx.abacus.functional.vault.VaultFormAccountData;
 export type VaultDepositWithdrawSlippageResponse =
-  Abacus.exchange.dydx.abacus.functional.vault.VaultDepositWithdrawSlippageResponse;
+  Abacus.indexer.models.chain.OnChainVaultDepositWithdrawSlippageResponse;
 export type VaultFormValidationResult =
   Abacus.exchange.dydx.abacus.functional.vault.VaultFormValidationResult;
 export const { VaultCalculator, VaultAccountCalculator, VaultDepositWithdrawFormValidator } =
