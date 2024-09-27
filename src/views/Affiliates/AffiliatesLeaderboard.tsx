@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import axios from 'axios';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -199,18 +198,18 @@ export const AffiliatesLeaderboard = ({
 
   const fetchAffiliateStats = async () => {
     // Comment for testing with local data
-    const response = await axios.post('http://localhost:3000/v1/leaderboard/search', {
-      pagination: {
-        page,
-        pageSize: 10, // Amount of entities to load
-      },
-    });
-    setAffiliates([...affiliates, ...response.data.results]);
-    setTotal(response.data.total);
+    // const response = await axios.post('http://localhost:3000/v1/leaderboard/search', {
+    //   pagination: {
+    //     page,
+    //     pageSize: 10, // Amount of entities to load
+    //   },
+    // });
+    // setAffiliates([...affiliates, ...response.data.results]);
+    // setTotal(response.data.total);
 
     // Uncomment for testing with local data
-    // setAffiliates(data.slice(0, page * 3));
-    // setTotal(data.length);
+    setAffiliates(data.slice(0, page * 3));
+    setTotal(data.length);
   };
 
   const handleLoadMore = () => {

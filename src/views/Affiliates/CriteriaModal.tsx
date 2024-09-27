@@ -6,6 +6,7 @@ import tw from 'twin.macro';
 import { IAffiliateStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
@@ -13,7 +14,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { OutputType } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { Tag } from '@/components/Tag';
@@ -22,7 +23,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { BorderStatCell, StatCell } from './StatBox';
 
 interface ITierDefinition {
-  tier: number;
+  tier: number | 'vip';
   requirements: { referredVol: number; staked: number };
   affiliateEarnRate: string;
 }
@@ -64,6 +65,11 @@ export const CriteriaModal = ({
       requirements: { staked: 5000, referredVol: 25000000 },
       affiliateEarnRate: '15.0%',
     },
+    {
+      tier: 'vip',
+      requirements: {} as { referredVol: number; staked: number },
+      affiliateEarnRate: '50.0%',
+    },
   ];
 
   const currentUserTierIdx = accountStats
@@ -82,9 +88,8 @@ export const CriteriaModal = ({
           ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
           : isVip
             ? stringGetter({
-                key: STRING_KEYS.YOUR_TIER_VIP,
+                key: STRING_KEYS.YOURE_A_VIP,
                 params: {
-                  TIER: currentUserTier.tier,
                   VIP: (
                     <span className="text-color-success">
                       {stringGetter({ key: STRING_KEYS.VIP })}
@@ -109,6 +114,7 @@ export const CriteriaModal = ({
                   key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
                   params: {
                     VIP_VALUE: <span className="text-color-text-1">{'{VIP Value}'}</span>,
+                    REGULAR_VALUE: <span className="text-color-text-1">{'{Regular Value}'}</span>,
                     APPLY_HERE: (
                       <a href="#">
                         <span className="text-color-accent">
@@ -137,20 +143,30 @@ export const CriteriaModal = ({
             <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
               <div className="flex items-center">
                 {isConnectedWagmi ? stakedDYdX?.toLocaleString() : '-'}
-                <Tag className="ml-0.5">{stringGetter({ key: STRING_KEYS.DYDX })}</Tag>
+                <Tag className="ml-0.25">DYDX</Tag>
               </div>
             </StatCell>
           </div>
         </div>
 
-        <CriteriaTable tiers={tiers} userTier={accountStats?.currentAffiliateTier} />
+        <CriteriaTable
+          tiers={tiers}
+          userTier={isVip ? 'vip' : accountStats?.currentAffiliateTier}
+        />
       </$Container>
     </$Dialog>
   );
 };
 
-const CriteriaTable = ({ userTier, tiers }: { userTier?: number; tiers: ITierDefinition[] }) => {
+const CriteriaTable = ({
+  userTier,
+  tiers,
+}: {
+  userTier?: number | 'vip';
+  tiers: ITierDefinition[];
+}) => {
   const stringGetter = useStringGetter();
+  const { isNotTablet } = useBreakpoints();
 
   const columns = useMemo<ColumnDef<ITierDefinition>[]>(
     () => [
@@ -162,8 +178,12 @@ const CriteriaTable = ({ userTier, tiers }: { userTier?: number; tiers: ITierDef
         renderCell: ({ tier }) => (
           <$TableCell stacked>
             <div className="flex items-center">
-              {tier}
-              {userTier && Number(userTier) === Number(tier) && (
+              {tier.toString().toLowerCase() === 'vip' ? (
+                <span className="text-color-success">{tier.toString().toUpperCase()}</span>
+              ) : (
+                tier.toString().toUpperCase()
+              )}
+              {userTier && userTier.toString().toLowerCase() === tier.toString().toLowerCase() && (
                 <Tag className="ml-0.5 bg-color-accent">
                   {stringGetter({ key: STRING_KEYS.YOU })}
                 </Tag>
@@ -179,30 +199,51 @@ const CriteriaTable = ({ userTier, tiers }: { userTier?: number; tiers: ITierDef
         label: stringGetter({ key: STRING_KEYS.REQUIREMENTS }),
         allowsSorting: false,
 
-        renderCell: ({ requirements }) =>
-          !requirements?.referredVol && !requirements?.staked ? (
+        renderCell: ({ tier, requirements }) =>
+          tier === 'vip' ? (
+            <$TableCell stacked>
+              <div className="flex flex-col gap-x-0.25 notTablet:flex-row">
+                {isNotTablet &&
+                  stringGetter({
+                    key: STRING_KEYS.BY_APPLICATION_ONLY,
+                  })}
+                <div className="flex flex-row">
+                  <span className="capitalize text-color-accent">
+                    {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
+                  </span>
+                  !
+                </div>
+              </div>
+            </$TableCell>
+          ) : !requirements.referredVol && !requirements.staked ? (
             <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
           ) : (
             <$TableCell stacked>
-              <div className="flex flex-col notTablet:flex-row notTablet:items-center">
-                <p className="text-color-text-2 notTablet:mr-0.5">
-                  ${requirements.referredVol?.toLocaleString()}+
-                </p>
-                <p className="text-sm text-color-text-0">
-                  {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-                </p>
-              </div>
-              <p className="text-sm text-color-text-0">or</p>
-              <div className="flex flex-col notTablet:flex-row notTablet:items-center">
-                <p className="text-color-text-2 notTablet:mr-0.5">
-                  {requirements.staked?.toLocaleString()}+
-                </p>
-                <p className="text-sm text-color-text-0">
-                  {stringGetter({ key: STRING_KEYS.STAKED })}
-                </p>
-                <Tag className="w-fit notTablet:ml-0.5">
-                  {stringGetter({ key: STRING_KEYS.DYDX })}
-                </Tag>
+              <div className="flex flex-col gap-y-0.5 notTablet:flex-row notTablet:items-center notTablet:gap-x-1">
+                <div className="flex flex-col">
+                  <div className="flex items-center text-color-text-1">
+                    <Output type={OutputType.CompactFiat} value={requirements.referredVol} />+
+                  </div>
+                  <p className="text-sm text-break text-color-text-0">
+                    {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+                  </p>
+                </div>
+                <div className="text-color-text-0">
+                  {stringGetter({ key: STRING_KEYS.OR }).toUpperCase()}
+                </div>
+                <div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center text-color-text-1">
+                      <Output type={OutputType.CompactFiat} value={requirements.staked} />+
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-sm text-color-text-0">
+                        {stringGetter({ key: STRING_KEYS.STAKED })}
+                      </p>
+                      <Tag className="w-fit notTablet:ml-0.25">DYDX</Tag>
+                    </div>
+                  </div>
+                </div>
               </div>
             </$TableCell>
           ),
@@ -210,15 +251,20 @@ const CriteriaTable = ({ userTier, tiers }: { userTier?: number; tiers: ITierDef
 
       {
         columnKey: 'affiliate-earn-rate',
+        allowsSorting: true,
         getCellValue: (row: ITierDefinition) => row.affiliateEarnRate,
         label: (
           <WithTooltip tooltip="affiliate-commissions" side="right">
             {stringGetter({ key: STRING_KEYS.AFFILIATE_COMISSIONS })}
           </WithTooltip>
         ),
-        renderCell: ({ affiliateEarnRate }) => (
+        renderCell: ({ tier, affiliateEarnRate }) => (
           <$TableCell className="mr-1" stacked>
-            {affiliateEarnRate}
+            {tier === 'vip' ? (
+              <span className="text-color-success">{affiliateEarnRate}</span>
+            ) : (
+              affiliateEarnRate
+            )}
           </$TableCell>
         ),
       },

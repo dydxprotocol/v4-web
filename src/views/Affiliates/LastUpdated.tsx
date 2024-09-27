@@ -41,7 +41,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     if (diffInMinutes === 1) return stringGetter({ key: STRING_KEYS['1_MIN_AGO'] });
     if (diffInMinutes < 60)
       return stringGetter({
-        key: STRING_KEYS.X_MINS_AGO,
+        key: STRING_KEYS.X_MIN_AGO,
         params: {
           X: diffInMinutes,
         },
@@ -51,7 +51,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     if (diffInHours === 1) return stringGetter({ key: STRING_KEYS['1_HOUR_AGO'] });
     if (diffInHours < 24)
       return stringGetter({
-        key: STRING_KEYS.X_HOURS_AGO,
+        key: STRING_KEYS.X_HOUR_AGO,
         params: {
           X: diffInHours,
         },
@@ -60,7 +60,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays === 1) return stringGetter({ key: STRING_KEYS['1_DAY_AGO'] });
     return stringGetter({
-      key: STRING_KEYS.X_DAYS_AGO,
+      key: STRING_KEYS.X_DAY_AGO,
       params: {
         X: diffInDays,
       },

@@ -1,5 +1,6 @@
 import type { TooltipStrings } from '@/constants/localization';
 
+import { affiliateTooltips } from './affiliates';
 import { depositTooltips } from './deposit';
 import { generalTooltips } from './general';
 import { portfolioTooltips } from './portfolio';
@@ -18,4 +19,5 @@ export const tooltipStrings: TooltipStrings = {
   ...tradeChartTooltips,
   ...triggersTooltips,
   ...withdrawTooltips,
+  ...affiliateTooltips,
 } as const;

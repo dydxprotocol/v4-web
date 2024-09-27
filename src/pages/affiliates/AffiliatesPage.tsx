@@ -22,6 +22,7 @@ import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard'
 import { ProgramStatsCard } from '@/views/Affiliates/cards/ProgramStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { CommunityChartContainer } from '@/views/Affiliates/community-chart/ProgramChartContainer';
+import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
@@ -105,7 +106,7 @@ export const AffiliatesPage: React.FC = () => {
     <$Page>
       <$Section className="p-1">
         {isNotTablet && <LastUpdated lastUpdatedDate={new Date('2024-09-11T12:00:00Z')} />}
-        <div className="my-1 w-full bg-color-accent-faded p-4">Referral Banner</div>
+        <AffiliatesBanner />
 
         <AttachedExpandingSection>
           <$NavigationMenu
