@@ -1,19 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { useAccounts } from './useAccounts';
-import { useSubaccount } from './useSubaccount';
+import { log } from '@/lib/telemetry';
 
-export const useReferralAddress = () => {
+import { useAccounts } from './useAccounts';
+import { useDydxClient } from './useDydxClient';
+
+export const useReferredBy = () => {
   const { dydxAddress } = useAccounts();
-  const { getReferredBy } = useSubaccount();
+  const { getReferredBy } = useDydxClient();
 
   const queryFn = async () => {
     if (!dydxAddress) {
       return undefined;
     }
-    const affliateAddress = await getReferredBy(dydxAddress);
+    try {
+      const affliateAddress = await getReferredBy(dydxAddress);
 
-    return affliateAddress;
+      return affliateAddress?.affiliateAddress;
+    } catch (error) {
+      log('useReferredBy', error);
+      return undefined;
+    }
   };
 
   const { data, isFetched } = useQuery({

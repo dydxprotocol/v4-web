@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import abacusStateManager from '@/lib/abacus';
 
 import { accountSlice } from './account';
+import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { assetsSlice } from './assets';
@@ -23,6 +24,7 @@ import { vaultsSlice } from './vaults';
 
 const reducers = {
   account: accountSlice.reducer,
+  affiliates: affiliatesSlice.reducer,
   app: appSlice.reducer,
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
@@ -43,7 +45,7 @@ const persistConfig = {
   key: 'root',
   version: 0,
   storage,
-  whitelist: ['tradingView'],
+  whitelist: ['tradingView', 'affiliates'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 

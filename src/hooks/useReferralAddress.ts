@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { log } from '@/lib/telemetry';
+
 import { useDydxClient } from './useDydxClient';
 
 export const useReferralAddress = (refCode: string) => {
@@ -9,16 +11,21 @@ export const useReferralAddress = (refCode: string) => {
     if (!compositeClient || !refCode) {
       return undefined;
     }
-    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/address`;
-    const response = await fetch(`${endpoint}?referralCode=${encodeURIComponent(refCode)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/address`;
+      const response = await fetch(`${endpoint}?referralCode=${encodeURIComponent(refCode)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const data = await response.json();
-    return data?.address as string | undefined;
+      const data = await response.json();
+      return data?.address as string | undefined;
+    } catch (error) {
+      log('useReferralAddress', error);
+      return undefined;
+    }
   };
 
   const { data, isFetched } = useQuery({

@@ -5,17 +5,18 @@ import { styled } from 'twin.macro';
 import { AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogProps, ReferralDialogProps } from '@/constants/dialogs';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useReferralAddress } from '@/hooks/useReferralAddress';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
+
+import { updateLatestReferrer } from '@/state/affiliates';
+import { useAppDispatch } from '@/state/appTypes';
 
 import { truncateAddress } from '@/lib/wallet';
 
@@ -38,20 +39,17 @@ const CONTENT_SECTIONS = [
 
 export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialogProps>) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
   const { data: referralAddress, isFetched } = useReferralAddress(refCode);
   const { data: affiliatesInfo, isFetched: isAffiliatesInfoFetched } =
     useAffiliatesInfo(referralAddress);
-  const [, saveLastestReferrer] = useLocalStorage<string | undefined>({
-    key: LocalStorageKey.LatestReferrer,
-    defaultValue: undefined,
-  });
 
   useEffect(() => {
-    if (referralAddress && referralAddress !== dydxAddress) {
-      saveLastestReferrer(referralAddress);
+    if (referralAddress) {
+      dispatch(updateLatestReferrer(referralAddress));
     }
-  }, [dydxAddress, referralAddress, saveLastestReferrer]);
+  }, [dydxAddress, referralAddress, dispatch]);
 
   const isEligible = referralAddress && affiliatesInfo?.isEligible;
 

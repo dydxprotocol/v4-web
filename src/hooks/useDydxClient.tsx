@@ -427,6 +427,13 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getReferredBy = useCallback(
+    async (address: string) => {
+      return compositeClient?.validatorClient.get.getReferredBy(address);
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -458,5 +465,6 @@ const useDydxClientContext = () => {
     getValidators,
     getAccountBalance,
     getAffiliateInfo,
+    getReferredBy,
   };
 };
