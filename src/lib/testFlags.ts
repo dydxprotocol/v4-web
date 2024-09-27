@@ -41,7 +41,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults;
+    return !!this.queryParams.vaults || import.meta.env.MODE === 'staging';
   }
 
   get referrer() {

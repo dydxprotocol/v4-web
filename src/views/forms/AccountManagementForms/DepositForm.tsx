@@ -209,10 +209,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       // worth investigating a better fix on abacus
       if (connectedWallet?.name === WalletType.Keplr && nobleAddress) {
         abacusStateManager.setTransfersSourceAddress(nobleAddress);
-      } else if (evmAddress) {
-        abacusStateManager.setTransfersSourceAddress(evmAddress);
+        // put sol first. some users with phantom wallet have previously connected with evm
+        // so they will have both sol and evm addresses. we assume the phantom wallet
+        // is connected with a sol address, not evm.
       } else if (solAddress) {
         abacusStateManager.setTransfersSourceAddress(solAddress);
+      } else if (evmAddress) {
+        abacusStateManager.setTransfersSourceAddress(evmAddress);
       }
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
@@ -468,7 +471,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         gasFee: summary?.gasFee || undefined,
         bridgeFee: summary?.bridgeFee || undefined,
         exchangeRate: summary?.exchangeRate || undefined,
-        estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+        estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
         toAmount: summary?.toAmount || undefined,
         toAmountMin: summary?.toAmountMin || undefined,
       });
@@ -505,7 +508,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         gasFee: summary?.gasFee ?? undefined,
         bridgeFee: summary?.bridgeFee ?? undefined,
         exchangeRate: summary?.exchangeRate ?? undefined,
-        estimatedRouteDuration: summary?.estimatedRouteDuration ?? undefined,
+        estimatedRouteDuration: summary?.estimatedRouteDurationSeconds ?? undefined,
         toAmount: summary?.toAmount ?? undefined,
         toAmountMin: summary?.toAmountMin ?? undefined,
         depositCTAString,

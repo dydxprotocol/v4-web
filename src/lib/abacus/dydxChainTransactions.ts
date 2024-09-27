@@ -3,7 +3,6 @@ import { type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
-  encodeJson,
   GAS_MULTIPLIER,
   IndexerConfig,
   Network,
@@ -15,6 +14,7 @@ import {
   OrderType,
   SubaccountClient,
   ValidatorConfig,
+  encodeJson,
   type LocalWallet,
   type SelectedGasDenom,
 } from '@dydxprotocol/v4-client-js';
@@ -44,9 +44,9 @@ import { placeOrderTimeout } from '@/state/localOrders';
 import { dd } from '../analytics/datadog';
 import { signComplianceSignature, signComplianceSignatureKeplr } from '../compliance';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
-import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
+import { parseToPrimitives } from './parseToPrimitives';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();
@@ -176,45 +176,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setSelectedGasDenom(denom: SelectedGasDenom) {
     this.compositeClient?.setSelectedGasDenom(denom);
-  }
-
-  parseToPrimitives<T>(x: T): T {
-    if (typeof x === 'number' || typeof x === 'string' || typeof x === 'boolean' || x === null) {
-      return x;
-    }
-
-    if (Array.isArray(x)) {
-      return x.map((item) => this.parseToPrimitives(item)) as T;
-    }
-
-    if (Long.isLong(x)) {
-      return x.toString() as T;
-    }
-
-    if (x instanceof Uint8Array) {
-      return bytesToBigInt(x).toString() as T;
-    }
-
-    if (x instanceof Date) {
-      return x.toString() as T;
-    }
-
-    if (typeof x === 'object') {
-      const parsedObj: { [key: string]: any } = {};
-      // eslint-disable-next-line no-restricted-syntax
-      for (const key in x) {
-        if (Object.prototype.hasOwnProperty.call(x, key)) {
-          parsedObj[key] = this.parseToPrimitives((x as any)[key]);
-        }
-      }
-      return parsedObj as T;
-    }
-
-    if (typeof x === 'bigint') {
-      return x.toString() as T;
-    }
-
-    throw new Error(`Unsupported data type: ${typeof x}`);
   }
 
   async placeOrderTransaction(params: HumanReadablePlaceOrderPayload): Promise<string> {
@@ -347,7 +308,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           })
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
 
       return JSON.stringify(parsedTx);
     } catch (error) {
@@ -381,7 +342,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         this.compositeClient?.validatorClient?.post.defaultDydxGasPrice
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
 
       return JSON.stringify(parsedTx);
     } catch (error) {
@@ -426,7 +387,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         `${DEFAULT_TRANSACTION_MEMO} | ${this.nobleWallet?.address}`
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
       dd.info('sendNobleIBC tx submitted', { tx, ibcMsg });
 
       return JSON.stringify(parsedTx);
@@ -515,7 +476,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       dd.info('cctpWithdraw tx submitted', { tx, ibcMsg });
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
 
       return JSON.stringify(parsedTx);
     } catch (error) {
@@ -552,7 +513,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const tx = await this.nobleClient.send(ibcMsgs);
       dd.info('cctpMultiMsgWithdraw tx submitted', { tx, ibcMsgs });
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
 
       return JSON.stringify(parsedTx);
     } catch (error) {
@@ -632,7 +593,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         isIsolatedCancel ? TransactionMemo.cancelOrderTransfer : DEFAULT_TRANSACTION_MEMO
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const parsedTx = parseToPrimitives(tx);
 
       return JSON.stringify(parsedTx);
     } catch (error) {
@@ -742,13 +703,13 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         case QueryType.EquityTiers: {
           const equityTiers =
             await this.compositeClient?.validatorClient.get.getEquityTierLimitConfiguration();
-          const parsedEquityTiers = this.parseToPrimitives(equityTiers);
+          const parsedEquityTiers = parseToPrimitives(equityTiers);
           callback(JSON.stringify(parsedEquityTiers));
           break;
         }
         case QueryType.FeeTiers: {
           const feeTiers = await this.compositeClient?.validatorClient.get.getFeeTiers();
-          const parsedFeeTiers = this.parseToPrimitives(feeTiers);
+          const parsedFeeTiers = parseToPrimitives(feeTiers);
           callback(JSON.stringify(parsedFeeTiers));
           break;
         }
@@ -756,7 +717,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const userFeeTier = await this.compositeClient?.validatorClient.get.getUserFeeTier(
             params.address
           );
-          const parsedUserFeeTier = this.parseToPrimitives(userFeeTier);
+          const parsedUserFeeTier = parseToPrimitives(userFeeTier);
           callback(JSON.stringify(parsedUserFeeTier));
           break;
         }
@@ -764,7 +725,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const userStats = await this.compositeClient?.validatorClient.get.getUserStats(
             params.address
           );
-          const parsedUserStats = this.parseToPrimitives(userStats);
+          const parsedUserStats = parseToPrimitives(userStats);
           callback(JSON.stringify(parsedUserStats));
           break;
         }
@@ -774,33 +735,33 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             await this.compositeClient?.validatorClient.get.getAccountBalances(
               this.localWallet.address
             );
-          const parsedAccountBalances = this.parseToPrimitives(accountBalances);
+          const parsedAccountBalances = parseToPrimitives(accountBalances);
           callback(JSON.stringify(parsedAccountBalances));
           break;
         }
         case QueryType.RewardsParams: {
           const rewardsParams = await this.compositeClient?.validatorClient.get.getRewardsParams();
-          const parsedRewardsParams = this.parseToPrimitives(rewardsParams);
+          const parsedRewardsParams = parseToPrimitives(rewardsParams);
           callback(JSON.stringify(parsedRewardsParams));
           break;
         }
         case QueryType.GetMarketPrice: {
           const price = await this.compositeClient?.validatorClient.get.getPrice(params.marketId);
-          const parsedPrice = this.parseToPrimitives(price);
+          const parsedPrice = parseToPrimitives(price);
           callback(JSON.stringify(parsedPrice));
           break;
         }
         case QueryType.GetDelegations: {
           const delegations =
             await this.compositeClient?.validatorClient.get.getDelegatorDelegations(params.address);
-          const parseDelegations = this.parseToPrimitives(delegations);
+          const parseDelegations = parseToPrimitives(delegations);
           callback(JSON.stringify(parseDelegations));
           break;
         }
         case QueryType.GetNobleBalance: {
           if (this.nobleClient?.isConnected) {
             const nobleBalance = await this.nobleClient.getAccountBalance('uusdc');
-            const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
+            const parsedNobleBalance = parseToPrimitives(nobleBalance);
             callback(JSON.stringify(parsedNobleBalance));
           }
           break;
@@ -809,7 +770,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const rewards = await this.compositeClient?.validatorClient.get.getDelegationTotalRewards(
             params.address
           );
-          const parsedRewards = this.parseToPrimitives(rewards);
+          const parsedRewards = parseToPrimitives(rewards);
           callback(JSON.stringify(parsedRewards));
           break;
         }
@@ -818,7 +779,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             await this.compositeClient?.validatorClient.get.getDelegatorUnbondingDelegations(
               params.address
             );
-          const parseUnbonding = this.parseToPrimitives(unbonding);
+          const parseUnbonding = parseToPrimitives(unbonding);
           callback(JSON.stringify(parseUnbonding));
           break;
         }

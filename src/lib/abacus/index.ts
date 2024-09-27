@@ -8,6 +8,7 @@ import type {
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
+  HumanReadableCloseAllPositionsPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
@@ -402,6 +403,15 @@ class AbacusStateManager {
       data: Nullable<HumanReadablePlaceOrderPayload>
     ) => void
   ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitClosePosition(callback);
+
+  closeAllPositions = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadablePlaceOrderPayload>
+    ) => void
+  ): Nullable<HumanReadableCloseAllPositionsPayload> =>
+    this.stateManager.closeAllPositions(callback);
 
   cancelOrder = (
     orderId: string,

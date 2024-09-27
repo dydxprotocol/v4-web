@@ -6,7 +6,6 @@ import { TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { TradeTypes } from '@/constants/trade';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tabs } from '@/components/Tabs';
@@ -77,27 +76,24 @@ const $Tabs = styled(Tabs)`
   }
 ` as typeof Tabs;
 
+const $TopActionsRow = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+
+  > * {
+    ${layoutMixins.flexExpandToSpace}
+  }
+`;
+
 const $MarginAndLeverageButtons = styled.div`
-  ${layoutMixins.inlineRow}
+  display: flex;
   gap: 0.5rem;
   margin-right: 0.5rem;
 
   abbr,
   button {
-    width: 100%;
+    ${layoutMixins.flexExpandToSpace}
     height: 2.5rem;
-  }
-`;
-
-const $TopActionsRow = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-
-  padding-left: 1rem;
-  padding-right: 1rem;
-
-  @media ${breakpoints.tablet} {
-    grid-auto-columns: var(--orderbox-column-width) 1fr;
-    gap: var(--form-input-gap);
   }
 `;
