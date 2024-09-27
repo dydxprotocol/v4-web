@@ -47,10 +47,12 @@ export const WithSeparators = ({
   layout,
   children,
   withSeparators = true,
+  fullHeight = false,
 }: {
   layout: 'column' | 'row';
   children: React.ReactNode;
   withSeparators?: boolean;
+  fullHeight: boolean;
 }) =>
   withSeparators
     ? [children].flat().map((child, i, { length }) => (
@@ -59,6 +61,7 @@ export const WithSeparators = ({
           {child}
           {i < length - 1 && (
             <StyledSeparator
+              fullHeight={fullHeight}
               orientation={
                 (
                   {

@@ -41,7 +41,7 @@ export const MarketFilter = ({
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
-  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton && showLaunchMarkets;
+  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
 
   const filterToggles = (
     <$ToggleGroup
@@ -85,7 +85,7 @@ export const MarketFilter = ({
           placeholder={stringGetter({ key: searchPlaceholderKey })}
           onTextChange={onSearchTextChange}
         />
-        {uiRefresh && showProposeButton && launchMarketButton}
+        {uiRefresh && showProposeButton && showLaunchMarkets && launchMarketButton}
       </div>
 
       {uiRefresh ? (
