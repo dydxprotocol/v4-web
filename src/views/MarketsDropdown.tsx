@@ -290,6 +290,7 @@ export const MarketsDropdown = memo(
 
     return (
       <$Popover
+        uiRefreshEnabled={uiRefreshEnabled}
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
@@ -322,7 +323,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <AssetIcon symbol={symbol} />
+                      <$TriggerAssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}
@@ -372,19 +373,12 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
 `;
 
 const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boolean }>`
-  --marketsDropdown-width: var(--sidebar-width);
   position: relative;
 
   ${layoutMixins.spacedRow}
   padding: 0 1.25rem;
 
   transition: width 0.1s;
-
-  ${({ $isOpen }) =>
-    $isOpen &&
-    css`
-      --marketsDropdown-width: var(--marketsDropdown-openWidth);
-    `}
 
   ${({ uiRefreshEnabled }) => css`
     ${uiRefreshEnabled
@@ -397,7 +391,7 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boole
   `}
 `;
 
-const $Popover = styled(Popover)`
+const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
   ${popoverMixins.popover}
   --popover-item-height: 3.375rem;
   --popover-backgroundColor: var(--color-layer-2);
@@ -408,7 +402,15 @@ const $Popover = styled(Popover)`
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
 
-  width: var(--marketsDropdown-openWidth);
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          width: var(--marketsDropdown-openWidth);
+        `
+      : css`
+          width: var(--marketsDropdown-openWidth-deprecated);
+        `}
+  `}
   max-width: 100vw;
 
   box-shadow: 0 0 0 1px var(--color-border);
@@ -437,6 +439,7 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
+
 const $Toolbar = styled(Toolbar)`
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
@@ -456,6 +459,15 @@ const $MarketDropdownBanner = styled.div`
   & > * {
     z-index: 1;
   }
+`;
+
+const $TriggerAssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled &&
+    css`
+      --asset-icon-height: 1.5em;
+    `}
+  `}
 `;
 
 const $IconButton = styled(IconButton)`
