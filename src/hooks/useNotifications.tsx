@@ -312,9 +312,9 @@ const useNotificationsContext = () => {
   // Unread
   const hasUnreadNotifications = useMemo(
     () =>
-      Object.values(notifications).filter(
+      Object.values(notifications).some(
         (notification) => notification.status < NotificationStatus.Seen
-      ).length > 0,
+      ),
     [notifications]
   );
 
