@@ -30,14 +30,14 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.12.3
-    version: 1.12.3
+    specifier: 1.12.5
+    version: 1.12.5
   '@dydxprotocol/v4-client-js':
     specifier: 1.6.1
     version: 1.6.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.203
-    version: 1.1.203
+    specifier: ^1.1.206
+    version: 1.1.206
   '@dydxprotocol/v4-proto':
     specifier: ^6.0.1
     version: 6.0.1
@@ -3025,8 +3025,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.12.3:
-    resolution: {integrity: sha512-t7LyjfM6Js7o6lPrD0r4QdXC9GKTpbymZjs9ZGPaOzF+PKwRR+0/uiIjx5sWrGEHAkD19My8/ySghQh+1ZY9EA==}
+  /@dydxprotocol/v4-abacus@1.12.5:
+    resolution: {integrity: sha512-GT95ANVvpnV8hermj8KsdGx76UtfLtjcmL5fnzcj3gmXBJmd+bF6m+vyGSH0ZfwRnDyD5mEu7wpVRAkkpY+gtQ==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -3061,8 +3061,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.203:
-    resolution: {integrity: sha512-U9l0gzM9A/MvzSVh0iy7yjqzdzuO+VVDakoPltgqTU6/b/0wDrjIJpuoxn8Tr2AKVx/ZkJdChGM8EiJwueaicA==}
+  /@dydxprotocol/v4-localization@1.1.206:
+    resolution: {integrity: sha512-ZkSw9stggVzCibuhdx0CmLi30ptDy5ZWDFNhP6OqurxgaBZ3FyQuPPvJ9pXFC7nNTpCJPKRSEK+L5Hceb6yK6w==}
     dev: false
 
   /@dydxprotocol/v4-proto@6.0.1:

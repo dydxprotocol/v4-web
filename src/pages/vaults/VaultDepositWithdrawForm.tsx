@@ -76,7 +76,9 @@ export const VaultDepositWithdrawForm = ({
   const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
 
-  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
+  const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
+    useLoadedVaultAccount().data
+  );
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,6 +89,7 @@ export const VaultDepositWithdrawForm = ({
     estimatedSlippage: slippagePercent,
     vaultBalance: userBalanceUpdated,
     marginUsage: marginUsageUpdated,
+    withdrawableVaultBalance: userAvailableUpdated,
   } = orEmptyObj(validationResponse?.summaryData);
 
   // save initial type to state if it is provided
@@ -220,7 +223,7 @@ export const VaultDepositWithdrawForm = ({
     if (operation === 'DEPOSIT') {
       setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
     } else {
-      setAmountState(`${Math.floor(100 * (userBalance ?? 0)) / 100 ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100 ?? ''}`);
     }
   };
 
@@ -245,6 +248,18 @@ export const VaultDepositWithdrawForm = ({
         MustBigNumber(amount).gt(0) &&
         userBalanceUpdated != null &&
         userBalanceUpdated !== userBalance
+      }
+    />
+  );
+  const availableToWithdrawDiff = (
+    <DiffOutput
+      type={OutputType.Fiat}
+      value={userAvailableBalance}
+      newValue={userAvailableUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        userAvailableUpdated != null &&
+        userAvailableUpdated !== userAvailableBalance
       }
     />
   );
@@ -300,8 +315,8 @@ export const VaultDepositWithdrawForm = ({
           inputReceiptItems: [
             {
               key: 'vault-balance',
-              label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-              value: vaultDiff,
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
+              value: availableToWithdrawDiff,
             },
           ],
           receiptItems: [
