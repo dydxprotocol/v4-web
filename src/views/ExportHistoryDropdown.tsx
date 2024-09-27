@@ -379,7 +379,11 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           label: (
             <Button
               state={{
-                isDisabled: !checkedTrades && !checkedTransfers && !checkedVaultTransfers,
+                isDisabled:
+                  // disable if the hook data is still loading
+                  (checkedVaultTransfers && allVaultTransfers == null) ||
+                  // or you selected nothing
+                  (!checkedTrades && !checkedTransfers && !checkedVaultTransfers),
                 isLoading:
                   isPendingExportTrades ||
                   isPendingExportTransfers ||
