@@ -26,7 +26,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
-import DydxChainTransactions from '@/lib/abacus/dydxChainTransactions';
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -227,7 +227,7 @@ const useDydxClientContext = () => {
         if (result == null) {
           return result;
         }
-        return new DydxChainTransactions().parseToPrimitives(result);
+        return parseToPrimitives(result);
       } catch (error) {
         log('useDydxClient/getVaultWithdrawInfo', error);
         return undefined;

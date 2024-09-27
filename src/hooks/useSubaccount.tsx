@@ -45,7 +45,7 @@ import {
 } from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
-import DydxChainTransactions from '@/lib/abacus/dydxChainTransactions';
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -886,7 +886,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     if (result == null) {
       return result;
     }
-    return new DydxChainTransactions().parseToPrimitives(result);
+    return parseToPrimitives(result);
   }, [compositeClient?.validatorClient, dydxAddress]);
 
   const depositToMegavault = useCallback(
