@@ -879,33 +879,39 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   const getVaultAccountInfo = useCallback(async () => {
+    if (!compositeClient?.validatorClient) {
+      throw new Error('client not initialized');
+    }
     const result = await compositeClient?.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
     if (result == null) {
       return result;
     }
     return new DydxChainTransactions().parseToPrimitives(result);
-  }, [compositeClient?.validatorClient.get, dydxAddress]);
+  }, [compositeClient?.validatorClient, dydxAddress]);
 
   const depositToMegavault = useCallback(
     async (amount: number) => {
-      if (subaccountClient == null) {
-        return undefined;
+      if (!compositeClient) {
+        throw new Error('client not initialized');
       }
-      return compositeClient?.depositToMegavault(
-        subaccountClient,
-        amount,
-        Method.BroadcastTxCommit
-      );
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      return compositeClient.depositToMegavault(subaccountClient, amount, Method.BroadcastTxCommit);
     },
     [compositeClient, subaccountClient]
   );
 
   const withdrawFromMegavault = useCallback(
     async (shares: number, minAmount: number) => {
-      if (subaccountClient == null) {
-        return undefined;
+      if (!compositeClient) {
+        throw new Error('client not initialized');
       }
-      return compositeClient?.withdrawFromMegavault(
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+      return compositeClient.withdrawFromMegavault(
         subaccountClient,
         shares,
         minAmount,

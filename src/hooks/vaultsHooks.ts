@@ -24,6 +24,7 @@ import { selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
+import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
 
 import { appQueryClient } from '../state/appQueryClient';
 import { useAppSelector } from '../state/appTypes';
@@ -48,13 +49,6 @@ const vaultQueryOptions = {
   refetchInterval: timeUnits.minute * 2,
 };
 
-function safeStringifyForAbacus(arg: any): string {
-  if (arg == null) {
-    return '';
-  }
-  return JSON.stringify(arg);
-}
-
 export function useForceRefreshVaultDetails() {
   return useCallback(
     () =>
@@ -73,7 +67,7 @@ export const useLoadedVaultDetails = () => {
       const callResult = await getMegavaultHistoricalPnl();
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
-          VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacus(callResult))
+          VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(callResult))
         )
       );
     },
@@ -104,20 +98,14 @@ const useDebouncedMarketsData = () => {
   const [marketsToReturn, setMarketsToReturn] = useState<{
     data: Nullable<kollections.Map<string, PerpetualMarket>>;
   }>({
-    data:
-      latestMarkets.current != null && latestMarkets.current.size > 0
-        ? latestMarkets.current
-        : undefined,
+    data: latestMarkets.current?.size ? latestMarkets.current : undefined,
   });
 
   const throttledSync = useMemo(
     () =>
       throttle(() => {
         setMarketsToReturn({
-          data:
-            latestMarkets.current != null && latestMarkets.current.size > 0
-              ? latestMarkets.current
-              : undefined,
+          data: latestMarkets.current?.size ? latestMarkets.current : undefined,
         });
       }, MAX_UPDATE_SPEED_MS),
     []
@@ -130,11 +118,11 @@ const useDebouncedMarketsData = () => {
   }, [_marketsOnlyHereToTriggerRerenders, throttledSync]);
 
   // if markets is null and we have non-null, force update it
-  if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {
-    if (latestMarkets.current != null && latestMarkets.current.size > 0) {
+  if (!marketsToReturn.data?.size) {
+    if (latestMarkets.current?.size) {
       setMarketsToReturn((prev) => {
         // if it got set by someone else, don't bother
-        if (prev.data == null || prev.data.size === 0) {
+        if (!prev.data?.size) {
           return { data: latestMarkets.current };
         }
         return prev;
@@ -148,12 +136,13 @@ const useDebouncedMarketsData = () => {
 export const useLoadedVaultPositions = () => {
   const { getVaultsHistoricalPnl, getMegavaultPositions } = useDydxClient();
   const marketsMap = useDebouncedMarketsData();
+
   const { data: subvaultHistories } = useQuery({
     queryKey: ['subvaultHistories'],
     queryFn: async () => {
       return wrapNullable(
         VaultCalculator.getSubvaultHistoricalPnlResponse(
-          safeStringifyForAbacus(await getVaultsHistoricalPnl())
+          safeStringifyForAbacusParsing(await getVaultsHistoricalPnl())
         )
       );
     },
@@ -165,7 +154,7 @@ export const useLoadedVaultPositions = () => {
     queryFn: async () => {
       return wrapNullable(
         VaultCalculator.getVaultPositionsResponse(
-          safeStringifyForAbacus(await getMegavaultPositions())
+          safeStringifyForAbacusParsing(await getMegavaultPositions())
         )
       );
     },
@@ -198,10 +187,9 @@ export function useForceRefreshVaultAccount() {
 }
 
 export const useLoadedVaultAccount = () => {
-  const { getAllAccountTransfersBetween } = useDydxClient();
+  const { getAllAccountTransfersBetween, compositeClient } = useDydxClient();
   const { dydxAddress } = useAccounts();
   const { getVaultAccountInfo } = useSubaccount();
-  const { compositeClient } = useDydxClient();
 
   const accountVaultQueryResult = useQuery({
     queryKey: ['vaultAccount', dydxAddress, compositeClient != null],
@@ -215,10 +203,10 @@ export const useLoadedVaultAccount = () => {
       ]);
 
       const parsedAccount = VaultAccountCalculator.getAccountVaultResponse(
-        safeStringifyForAbacus(acc)
+        safeStringifyForAbacusParsing(acc)
       );
       const parsedTransfers = VaultAccountCalculator.getTransfersBetweenResponse(
-        safeStringifyForAbacus(transfers)
+        safeStringifyForAbacusParsing(transfers)
       );
 
       if (parsedAccount == null || parsedTransfers == null) {
@@ -238,9 +226,10 @@ export const useLoadedVaultAccountTransfers = () => {
   return useMemo(() => account.data?.vaultTransfers?.toArray(), [account.data?.vaultTransfers]);
 };
 
+const VAULT_FORM_AMOUNT_DEBOUNCE_MS = 500;
 const useVaultFormAmountDebounced = () => {
   const amount = useAppSelector((state) => state.vaults.vaultForm.amount);
-  return useDebounce(amount, 500);
+  return useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
 };
 
 export const useVaultFormSlippage = () => {
@@ -273,7 +262,7 @@ export const useVaultFormSlippage = () => {
 
       const parsedSlippage =
         VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(
-          safeStringifyForAbacus(slippage)
+          safeStringifyForAbacusParsing(slippage)
         );
 
       return wrapNullable(parsedSlippage);

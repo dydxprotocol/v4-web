@@ -52,9 +52,10 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
             return (
-              // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+              // eslint-disable-next-line jsx-a11y/interactive-supports-focus
               <div
                 tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
+                role="button"
                 onClick={() =>
                   navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
                 }
@@ -150,14 +151,13 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           getCellValue: (row) => row.marginUsdc,
           label: stringGetter({ key: STRING_KEYS.MARGIN }),
           renderCell: ({ marginUsdc }) => (
-            <TableCell stacked>
+            <TableCell>
               <Output value={marginUsdc} type={OutputType.Fiat} fractionDigits={0} />
-              <Output value={stringGetter({ key: STRING_KEYS.ISOLATED })} type={OutputType.Text} />
             </TableCell>
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [marketIdToAssetMetadataMap, marketsData, stringGetter]
+    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter]
   );
 
   return (
