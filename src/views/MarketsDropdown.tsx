@@ -34,6 +34,7 @@ import { Toolbar } from '@/components/Toolbar';
 
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -54,6 +55,8 @@ const MarketsDropdownContent = ({
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+
+  const { uiRefresh } = testFlags;
 
   const columns = useMemo(
     () =>
@@ -86,7 +89,7 @@ const MarketsDropdownContent = ({
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
           ),
-        },
+        } satisfies ColumnDef<MarketData>,
         {
           columnKey: 'oraclePrice',
           getCellValue: (row) => row.oraclePrice,
@@ -94,7 +97,7 @@ const MarketsDropdownContent = ({
           renderCell: ({ oraclePrice, tickSizeDecimals }) => (
             <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
           ),
-        },
+        } satisfies ColumnDef<MarketData>,
         {
           columnKey: 'priceChange24HPercent',
           getCellValue: (row) => row.priceChange24HPercent,
@@ -112,7 +115,7 @@ const MarketsDropdownContent = ({
               )}
             </div>
           ),
-        },
+        } satisfies ColumnDef<MarketData>,
         {
           columnKey: 'volume24H',
           getCellValue: (row) => row.volume24H,
@@ -120,17 +123,18 @@ const MarketsDropdownContent = ({
           renderCell: ({ volume24H }) => (
             <$Output type={OutputType.CompactFiat} value={volume24H} />
           ),
-        },
-        {
-          columnKey: 'openInterest',
-          getCellValue: (row) => row.openInterestUSDC,
-          label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-          renderCell: (row) => (
-            <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
-          ),
-        },
-      ] satisfies ColumnDef<MarketData>[],
-    [stringGetter]
+        } satisfies ColumnDef<MarketData>,
+        !uiRefresh &&
+          ({
+            columnKey: 'openInterest',
+            getCellValue: (row) => row.openInterestUSDC,
+            label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+            renderCell: (row) => (
+              <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
+            ),
+          } satisfies ColumnDef<MarketData>),
+      ].filter(isTruthy),
+    [stringGetter, uiRefresh]
   );
 
   const slotBottom = useMemo(() => {

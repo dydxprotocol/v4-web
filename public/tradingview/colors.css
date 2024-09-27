@@ -20,9 +20,9 @@
 
   --color-accent: #6966FF; /* ColorToken.Purple1; */
 }
-  
-  /* Theme: Light */
-  :root.theme-light {
+
+/* Theme: Light */
+:root.theme-light {
   --color-layer-0: #E9ECEE; /* ColorToken.LightGray7; */
   --color-layer-1: #ECEFF1; /* ColorToken.LightGray5; */
   --color-layer-2: #FFFFFF; /* ColorToken.White; */
@@ -41,9 +41,9 @@
 
   --color-accent: #7774FF; /* ColorToken.Purple0; */
 }
-  
-  /* Theme: Dark */
-  :root.theme-dark {
+
+/* Theme: Dark */
+:root.theme-dark {
   --color-layer-0: #000000; /* ColorToken.Black; */
   --color-layer-1: #1B1B1D; /* ColorToken.DarkGray14; */
   --color-layer-2: #212124; /* ColorToken.DarkGray11; */
@@ -62,4 +62,3 @@
 
   --color-accent: #7774FF; /* ColorToken.Purple0; */
 }
-  

@@ -56,7 +56,7 @@ export const MarketFilter = ({
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
-      uiRefreshEnabled={uiRefresh}
+      overflow={uiRefresh ? 'wrap' : 'scroll'}
     />
   );
 
@@ -159,22 +159,9 @@ const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
     `}
 `;
 
-const $ToggleGroup = styled(ToggleGroup)<{ uiRefreshEnabled: boolean }>`
-  --button-toggle-off-border: none;
-  --button-border: none;
-
-  ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled
-      ? css`
-          display: flex;
-          flex-wrap: wrap;
-        `
-      : css`
-          overflow-x: auto;
-        `}
-  `}
+const $ToggleGroup = styled(ToggleGroup)`
   padding-right: var(--toggle-group-paddingRight);
-`;
+` as typeof ToggleGroup;
 
 const $SearchInput = styled(SearchInput)`
   min-width: 12rem;

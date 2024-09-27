@@ -41,8 +41,6 @@ export const MarketSelectorAndStats = ({
 
       <VerticalSeparator fullHeight={!!uiRefresh} />
 
-      {/* // xcxc check unlunached markets */}
-
       {launchableMarketId ? (
         <UnlaunchedMarketStatsDetails launchableMarketId={launchableMarketId} />
       ) : (

@@ -1,6 +1,7 @@
 import { type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
+import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
@@ -22,6 +23,7 @@ type ElementProps<MenuItemValue extends string> = {
 
 type StyleProps = {
   className?: string;
+  overflow?: 'scroll' | 'wrap';
 };
 
 export const ToggleGroup = forwardRefFn(
@@ -34,6 +36,7 @@ export const ToggleGroup = forwardRefFn(
       onInteraction,
 
       className,
+      overflow = 'scroll',
       size,
       shape = ButtonShape.Pill,
 
@@ -44,7 +47,7 @@ export const ToggleGroup = forwardRefFn(
     const { isTablet } = useBreakpoints();
 
     return (
-      <Root
+      <$Root
         ref={ref}
         type="single"
         value={value}
@@ -56,6 +59,7 @@ export const ToggleGroup = forwardRefFn(
         }}
         className={className}
         loop
+        overflow={overflow}
         tw="row gap-[0.33em]"
       >
         {items.map((item) => (
@@ -72,7 +76,20 @@ export const ToggleGroup = forwardRefFn(
             </ToggleButton>
           </Item>
         ))}
-      </Root>
+      </$Root>
     );
   }
 );
+
+const $Root = styled(Root)<{ overflow: 'scroll' | 'wrap' }>`
+  ${({ overflow }) =>
+    ({
+      scroll: css`
+        overflow-x: auto;
+      `,
+      wrap: css`
+        display: flex;
+        flex-wrap: wrap;
+      `,
+    })[overflow]}
+`;
