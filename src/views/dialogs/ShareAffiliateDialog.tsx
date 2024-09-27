@@ -7,6 +7,7 @@ import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -32,7 +33,8 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
-  const { data } = useAffiliatesInfo();
+  const { dydxAddress } = useAccounts();
+  const { data } = useAffiliatesInfo(dydxAddress as string);
 
   const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -56,7 +58,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     },
   });
 
-  const affiliatesUrl = `${window.location.host}?ref=${data?.referralCode}`;
+  const affiliatesUrl = `${window.location.host}?ref=${data?.metadata?.referralCode}`;
 
   return (
     <Dialog
@@ -81,7 +83,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
           <div>
             <div tw="text-small text-color-text-0">
-              {data?.isVolumeEligible
+              {data?.isEligible
                 ? stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })
                 : stringGetter({
                     key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
@@ -92,7 +94,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                   })}
             </div>
             <div>
-              {data?.isVolumeEligible
+              {data?.isEligible
                 ? affiliatesUrl
                 : stringGetter({
                     key: STRING_KEYS.YOUVE_TRADED,
@@ -103,7 +105,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                   })}
             </div>
           </div>
-          {data?.isVolumeEligible && (
+          {data?.isEligible && (
             <CopyButton action={ButtonAction.Primary} size={ButtonSize.Small} value={affiliatesUrl}>
               {stringGetter({ key: STRING_KEYS.COPY_LINK })}
             </CopyButton>
@@ -144,7 +146,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
         <div tw="flex gap-1">
           <Button
-            action={data?.isVolumeEligible ? ButtonAction.Base : ButtonAction.Primary}
+            action={data?.isEligible ? ButtonAction.Base : ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.Rocket} />}
             state={{
               isLoading: isCopying,
@@ -154,7 +156,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           >
             {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
           </Button>
-          {data?.isVolumeEligible && (
+          {data?.isEligible && (
             <Button
               action={ButtonAction.Base}
               slotLeft={<Icon iconName={IconName.SocialX} />}

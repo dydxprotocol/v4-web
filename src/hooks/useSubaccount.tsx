@@ -26,6 +26,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
+import { LocalStorageKey } from '@/constants/localStorage';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
@@ -53,6 +54,7 @@ import { hashFromTx } from '@/lib/txUtils';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
+import { useLocalStorage } from './useLocalStorage';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -75,6 +77,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const { connectedWallet } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
 
+  const [latestReferrer] = useLocalStorage<string | undefined>({
+    key: LocalStorageKey.LatestReferrer,
+    defaultValue: undefined,
+  });
   const isKeplr = connectedWallet?.name === WalletType.Keplr;
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
@@ -284,7 +290,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       const balanceAmount = parseFloat(balance.amount);
       const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
       const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
-
       if (shouldDeposit) {
         await depositToSubaccount({
           amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
@@ -877,6 +882,54 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, compositeClient]
   );
 
+  const registerAffiliate = useCallback(
+    async (affiliate: string) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!subaccountClient?.wallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+      if (affiliate === subaccountClient?.wallet?.address) {
+        throw new Error('affiliate not be the same as referree');
+      }
+
+      const response = await compositeClient?.validatorClient.post.registerAffiliate(
+        subaccountClient,
+        affiliate
+      );
+
+      return response;
+    },
+    [subaccountClient, compositeClient]
+  );
+
+  const getReferredBy = useCallback(
+    async (address: string) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+
+      const response = await compositeClient?.validatorClient.get.getReferredBy(address);
+
+      return response;
+    },
+    [compositeClient]
+  );
+
+  useEffect(() => {
+    if (!subaccountClient) return;
+
+    if (
+      latestReferrer &&
+      dydxAddress &&
+      usdcCoinBalance &&
+      parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE
+    ) {
+      registerAffiliate(latestReferrer);
+    }
+  }, [latestReferrer, dydxAddress, registerAffiliate, usdcCoinBalance, subaccountClient]);
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -906,5 +959,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getUndelegateFee,
     withdrawReward,
     getWithdrawRewardFee,
+
+    // affiliates
+    registerAffiliate,
+    getReferredBy,
   };
 };

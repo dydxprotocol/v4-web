@@ -9,6 +9,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useReferralAddress } from '@/hooks/useReferralAddress';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -39,16 +40,20 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const { data: referralAddress, isFetched } = useReferralAddress(refCode);
+  const { data: affiliatesInfo, isFetched: isAffiliatesInfoFetched } =
+    useAffiliatesInfo(referralAddress);
   const [, saveLastestReferrer] = useLocalStorage<string | undefined>({
     key: LocalStorageKey.LatestReferrer,
     defaultValue: undefined,
   });
 
   useEffect(() => {
-    if (referralAddress) {
+    if (referralAddress && referralAddress !== dydxAddress) {
       saveLastestReferrer(referralAddress);
     }
-  }, [referralAddress, saveLastestReferrer]);
+  }, [dydxAddress, referralAddress, saveLastestReferrer]);
+
+  const isEligible = referralAddress && affiliatesInfo?.isEligible;
 
   return (
     <Dialog
@@ -58,18 +63,18 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
       title={
         <span tw="flex flex-row items-center gap-1">
           {stringGetter({
-            key: referralAddress ? STRING_KEYS.YOUR_FRIEND : STRING_KEYS.WELCOME_DYDX,
+            key: isEligible ? STRING_KEYS.YOUR_FRIEND : STRING_KEYS.WELCOME_DYDX,
           })}
           <span tw="text-color-text-0 font-medium-book">{truncateAddress(referralAddress)}</span>
         </span>
       }
       description={stringGetter({
-        key: referralAddress ? STRING_KEYS.INVITED_YOU : STRING_KEYS.THE_PRO_TRADING_PLATFORM,
+        key: isEligible ? STRING_KEYS.INVITED_YOU : STRING_KEYS.THE_PRO_TRADING_PLATFORM,
       })}
       slotHeaderAbove={
-        isFetched ? (
+        isFetched && isAffiliatesInfoFetched ? (
           <$HeaderAbove tw="flex flex-row items-center gap-1">
-            {referralAddress ? (
+            {isEligible ? (
               <img src="/hedgies-placeholder.png" alt="hedgie" tw="h-5" />
             ) : (
               <div tw="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[100%] bg-color-layer-1">
@@ -81,7 +86,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
             <div tw="row">
               <$Triangle />
               <div tw="inline-block rounded-0.5 bg-color-layer-6 px-1 py-0.5 font-bold text-color-text-2">
-                {referralAddress ? (
+                {isEligible ? (
                   <span>
                     {stringGetter({
                       key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,

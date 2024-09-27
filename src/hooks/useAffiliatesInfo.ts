@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 
 type AffiliatesMetadata = {
@@ -9,9 +8,8 @@ type AffiliatesMetadata = {
   isAffiliate: boolean;
 };
 
-export const useAffiliatesInfo = () => {
-  const { dydxAddress } = useAccounts();
-  const { compositeClient } = useDydxClient();
+export const useAffiliatesInfo = (dydxAddress?: string) => {
+  const { compositeClient, getAffiliateInfo } = useDydxClient();
 
   const queryFn = async () => {
     if (!compositeClient || !dydxAddress) {
@@ -24,9 +22,12 @@ export const useAffiliatesInfo = () => {
         'Content-Type': 'application/json',
       },
     });
+    const affiliateInfo = await getAffiliateInfo(dydxAddress);
 
-    const data = await response.json();
-    return data as AffiliatesMetadata | undefined;
+    const data: AffiliatesMetadata | undefined = await response.json();
+    const isEligible = Boolean(data?.isVolumeEligible) || Boolean(affiliateInfo?.isWhitelisted);
+
+    return { metadata: data, affiliateInfo, isEligible };
   };
 
   const { data, isFetched } = useQuery({
