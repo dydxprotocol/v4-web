@@ -52,7 +52,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
         myVaultMetadata?.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
               <Output
                 value={myVaultMetadata?.allTimeReturnUsdc}
