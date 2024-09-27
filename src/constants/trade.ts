@@ -195,3 +195,10 @@ export type LocalCancelAllData = {
   failedOrderIds?: string[];
   errorParams?: ErrorParams;
 };
+
+export type LocalCloseAllPositionsData = {
+  submittedOrderClientIds: string[];
+  filledOrderClientIds: string[];
+  failedOrderClientIds: string[];
+  errorParams?: ErrorParams;
+};
