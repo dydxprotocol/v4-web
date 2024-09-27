@@ -169,12 +169,12 @@ export const VaultDepositWithdrawForm = ({
           console.error('Somehow got to submission with empty amount in validation response');
           return;
         }
-        const result = await depositToMegavault(cachedAmount);
+
+        await depositToMegavault(cachedAmount);
+
         notify({
           title: `$${cachedAmount} Megavault Deposit successful!`,
         });
-        // eslint-disable-next-line no-console
-        console.log('Deposit', result);
       } else if (operation === 'WITHDRAW') {
         const expectedAmount = validationResponse?.summaryData.estimatedAmountReceived;
         if (
@@ -189,15 +189,15 @@ export const VaultDepositWithdrawForm = ({
           console.error('Somehow got to submission with empty data in validation response');
           return;
         }
-        const result = await withdrawFromMegavault(
+
+        await withdrawFromMegavault(
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
+
         notify({
           title: `$${expectedAmount} Megavault Withdrawal successful!`,
         });
-        // eslint-disable-next-line no-console
-        console.log('Withdraw', result);
       } else {
         assertNever(operation);
       }
