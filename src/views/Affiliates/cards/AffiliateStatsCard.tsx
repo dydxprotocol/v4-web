@@ -17,9 +17,11 @@ import { BorderStatCell, StatCell } from '../StatBox';
 const MobileView = ({
   accountStats,
   toggleCriteria,
+  isVip = false,
 }: {
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
+  isVip: boolean;
 }) => {
   const stringGetter = useStringGetter();
 
@@ -31,7 +33,7 @@ const MobileView = ({
           className="relative"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Number}
-          value={accountStats?.currentAffiliateTier}
+          value={isVip ? 'VIP' : accountStats?.currentAffiliateTier}
         >
           <a href="#" onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
@@ -44,13 +46,8 @@ const MobileView = ({
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
           value={accountStats?.totalEarnings}
-        >
-          {/*
-          TODO: Define wether this goes or not
-          <p className="flex">
-            +<p className="text-color-success"> 250k </p> BOOST
-          </p> */}
-        </StatCell>
+        />
+
         <StatCell
           valueSize="large"
           title={stringGetter({ key: STRING_KEYS.ALL_TIME_RANK })}
@@ -94,9 +91,11 @@ const MobileView = ({
 const DesktopView = ({
   accountStats,
   toggleCriteria,
+  isVip = false,
 }: {
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
+  isVip: boolean;
 }) => {
   const stringGetter = useStringGetter();
   const linkRef = useRef<HTMLAnchorElement>(null); // Reference to the button element
@@ -108,8 +107,10 @@ const DesktopView = ({
           valueSize="large"
           className="relative inline-block"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
-          outputType={OutputType.Number}
-          value={accountStats?.currentAffiliateTier}
+          outputType={OutputType.Text}
+          value={
+            isVip ? stringGetter({ key: STRING_KEYS.VIP }) : accountStats?.currentAffiliateTier
+          }
         >
           <a href="#" ref={linkRef} onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
@@ -181,9 +182,9 @@ export const AffiliateStatsCard = ({ className, accountStats, isVip }: IAffiliat
   return (
     <$Container className={className}>
       {isNotTablet ? (
-        <DesktopView accountStats={accountStats} toggleCriteria={toggleCriteria} />
+        <DesktopView accountStats={accountStats} isVip={isVip} toggleCriteria={toggleCriteria} />
       ) : (
-        <MobileView accountStats={accountStats} toggleCriteria={toggleCriteria} />
+        <MobileView accountStats={accountStats} isVip={isVip} toggleCriteria={toggleCriteria} />
       )}
 
       {isCriteriaVisible && (
