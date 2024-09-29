@@ -90,6 +90,7 @@ export const HeaderDesktop = () => {
                 label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
                 href: AppRoute.LaunchMarket,
               },
+              // TODO (@jaredvu): Remove this after adding updated markets-table
               {
                 value: 'TEST_MARKET',
                 label: 'TIME-USD',
