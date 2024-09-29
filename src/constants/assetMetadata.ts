@@ -61,4 +61,4 @@ export enum MetadataServicePath {
   CANDLES = 'candles',
 }
 
-export type MetadataServiceCandleResolutions = '1d' | '7d' | '30d';
+export type MetadataServiceCandlesTimeframes = '1d' | '7d' | '30d';

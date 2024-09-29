@@ -17,6 +17,7 @@ export const subscribeOnStream = ({
   onRealtimeCallback,
   listenerGuid,
   lastBar,
+  noSubscribe,
 }: {
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
@@ -24,6 +25,7 @@ export const subscribeOnStream = ({
   listenerGuid: string;
   onResetCacheNeededCallback: Function;
   lastBar: Bar;
+  noSubscribe?: boolean;
 }) => {
   if (!symbolInfo.ticker) return;
 
@@ -52,10 +54,12 @@ export const subscribeOnStream = ({
   };
 
   subscriptionsByChannelId.set(channelId, subscriptionItem);
+
+  if (noSubscribe) return;
   abacusStateManager.handleCandlesSubscription({ channelId, subscribe: true });
 };
 
-export const unsubscribeFromStream = (subscriberUID: string) => {
+export const unsubscribeFromStream = (subscriberUID: string, noSubscribe?: boolean) => {
   // find a subscription with id === subscriberUID
   // eslint-disable-next-line no-restricted-syntax
   for (const channelId of subscriptionsByChannelId.keys()) {
@@ -68,7 +72,9 @@ export const unsubscribeFromStream = (subscriberUID: string) => {
 
       if (Object.keys(subscriptionItem.handlers).length === 0) {
         // unsubscribe from the channel, if it was the last handler
-        abacusStateManager.handleCandlesSubscription({ channelId, subscribe: false });
+        if (!noSubscribe) {
+          abacusStateManager.handleCandlesSubscription({ channelId, subscribe: false });
+        }
         subscriptionsByChannelId.delete(channelId);
         break;
       }

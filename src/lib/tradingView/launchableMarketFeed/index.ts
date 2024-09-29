@@ -16,7 +16,7 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
-import { LAUNCHABLE_MARKETS_RESOLUTION_MAP } from '@/constants/candles';
+import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { type RootStore } from '@/state/_store';
@@ -28,12 +28,14 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
-import { getHistorySlice2, getSymbol, mapCandles2 } from '../utils';
+import { getSymbol, mapMetadataServiceCandles } from '../utils';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
+const cache = new Map<string, TradingViewBar[]>();
+
 const configurationData: DatafeedConfiguration = {
-  supported_resolutions: objectKeys(LAUNCHABLE_MARKETS_RESOLUTION_MAP),
+  supported_resolutions: objectKeys(RESOLUTION_TO_TIMEFRAME_MAP),
   supports_marks: true,
   exchanges: [
     {
@@ -88,7 +90,6 @@ export const getLaunchableMarketDatafeed = (
       session: '24x7',
       intraday_multipliers: ['60', '240'],
       supported_resolutions: configurationData.supported_resolutions!,
-      data_status: 'streaming',
       timezone,
       format: 'price',
     };
@@ -121,7 +122,7 @@ export const getLaunchableMarketDatafeed = (
     if (!symbolInfo) return;
 
     const asset = getAssetFromMarketId(symbolInfo.ticker!);
-    const { from } = periodParams;
+    const { from, firstDataRequest } = periodParams;
     const fromMs = from * 1000;
 
     try {
@@ -131,46 +132,47 @@ export const getLaunchableMarketDatafeed = (
         resolution
       );
 
-      // Retrieve candles in the store that are between fromMs and toMs
-      const cachedBars = getHistorySlice2({
-        bars: currentMarketBars,
-        fromMs,
-      });
+      const cachedBars = [...currentMarketBars].filter((bar) => bar.time >= fromMs);
 
-      if (!cachedBars.length) {
-        const candlesResponse = await metadataClient.getCandles({
-          asset,
-          resolution: LAUNCHABLE_MARKETS_RESOLUTION_MAP[resolution],
-        });
+      if (firstDataRequest) {
+        let bars: TradingViewBar[] = [];
 
-        const fetchedCandles: MetadataServiceCandlesResponse[string] | undefined =
-          candlesResponse?.[asset] ?? [];
-
-        if (fetchedCandles) {
-          store.dispatch(
-            setLaunchableMarketCandles({
-              candles: fetchedCandles,
-              marketId: symbolInfo.ticker!,
-              resolution,
-            })
-          );
-
-          const bars = [...(fetchedCandles?.map(mapCandles2) ?? [])];
-
-          onHistoryCallback(bars, {
-            noData: false,
+        if (!cachedBars.length) {
+          const candlesResponse = await metadataClient.getCandles({
+            asset,
+            timeframe: RESOLUTION_TO_TIMEFRAME_MAP[resolution],
           });
-        }
-      } else {
-        if (cachedBars[cachedBars.length - 1].time < fromMs) {
-          onHistoryCallback([], {
-            noData: true,
-          });
+
+          const fetchedCandles: MetadataServiceCandlesResponse[string] | undefined =
+            candlesResponse?.[asset] ?? [];
+
+          if (fetchedCandles) {
+            store.dispatch(
+              setLaunchableMarketCandles({
+                candles: fetchedCandles,
+                marketId: symbolInfo.ticker!,
+                resolution,
+              })
+            );
+
+            bars = [...(fetchedCandles?.map(mapMetadataServiceCandles) ?? [])];
+            // console.log('1');
+            cache.set(symbolInfo.ticker!, bars);
+          }
         } else {
-          onHistoryCallback([], {
-            noData: true,
-          });
+          // console.log('2');
+          bars = [...cachedBars];
+          console.log(bars, cachedBars, bars === cachedBars);
         }
+
+        onHistoryCallback(bars, {
+          noData: false,
+        });
+      } else {
+        // console.log('3');
+        onHistoryCallback([], {
+          noData: true,
+        });
       }
     } catch (error) {
       log('tradingView/launchableMarketFeed/getBars', error);

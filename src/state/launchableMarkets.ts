@@ -1,10 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
-import { LAUNCHABLE_MARKETS_RESOLUTION_MAP, TradingViewBar } from '@/constants/candles';
+import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles';
 
 import { objectKeys } from '@/lib/objectHelpers';
-import { mapCandles2 } from '@/lib/tradingView/utils';
+import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
 interface CandleDataByMarket {
   data: Record<string, TradingViewBar[]>;
@@ -37,7 +37,7 @@ export const launchableMarketsSlice = createSlice({
         ? { ...state.candles[marketId], selectedResolution: resolution }
         : {
             data: Object.fromEntries(
-              Object.keys(LAUNCHABLE_MARKETS_RESOLUTION_MAP).map((resolutionString: string) => [
+              Object.keys(RESOLUTION_TO_TIMEFRAME_MAP).map((resolutionString: string) => [
                 resolutionString,
                 [],
               ])
@@ -58,8 +58,8 @@ export const launchableMarketsSlice = createSlice({
                 );
                 return timestamp < existingTimestamp;
               })
-              .map(mapCandles2)
-          : candles.map(mapCandles2)),
+              .map(mapMetadataServiceCandles)
+          : candles.map(mapMetadataServiceCandles)),
       ];
 
       state.candles[marketId] = candleState;
@@ -74,7 +74,7 @@ export const launchableMarketsSlice = createSlice({
         ? { ...state.candles[marketId], selectedResolution: resolution }
         : {
             data: Object.fromEntries(
-              objectKeys(LAUNCHABLE_MARKETS_RESOLUTION_MAP).map((resolutionString) => [
+              objectKeys(RESOLUTION_TO_TIMEFRAME_MAP).map((resolutionString) => [
                 resolutionString,
                 [],
               ])

@@ -5,12 +5,7 @@ import {
 } from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
-import {
-  Candle,
-  TradingViewBar,
-  TradingViewChartBar,
-  TradingViewSymbol,
-} from '@/constants/candles';
+import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
@@ -56,7 +51,9 @@ const getOhlcValues = ({
   };
 };
 
-export const mapCandles2 = (candle: MetadataServiceCandlesResponse[string][number]) => {
+export const mapMetadataServiceCandles = (
+  candle: MetadataServiceCandlesResponse[string][number]
+) => {
   return {
     time: new Date(candle.time).getTime(),
     open: candle.open,
@@ -164,20 +161,6 @@ export const getHistorySlice = ({
     .filter(({ time }) => time >= fromMs);
 };
 
-export const getHistorySlice2 = ({
-  bars,
-  fromMs,
-}: {
-  bars?: TradingViewBar[];
-  fromMs: number;
-}): TradingViewBar[] => {
-  if (!bars) {
-    return [];
-  }
-
-  return bars.filter(({ time }) => time >= fromMs);
-};
-
 export const getChartLineColors = ({
   appTheme,
   appColorMode,
@@ -257,7 +240,7 @@ export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
   const { uiRefresh } = testFlags;
 
   return {
-    debug: true,
+    // debug: true,
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: uiRefresh

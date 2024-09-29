@@ -53,6 +53,7 @@ class TestFlags {
   }
 
   get pml() {
+    return true; // For dev
     return !!this.queryParams.pml;
   }
 

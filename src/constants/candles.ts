@@ -1,6 +1,6 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
-import { MetadataServiceCandleResolutions } from './assetMetadata';
+import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { timeUnits } from './time';
 
 export interface Candle {
@@ -87,11 +87,14 @@ export const RESOLUTION_MAP = {
   '1D': CandleResolution.ONE_DAY,
 } as Record<ResolutionString, CandleResolution>;
 
-export const LAUNCHABLE_MARKETS_RESOLUTION_MAP = {
+/**
+ * @description ResolutionStrings used with TradingView's charting library mapped to MetadataServiceCandlesTimeframes
+ */
+export const RESOLUTION_TO_TIMEFRAME_MAP = {
   '60': '1d',
   '240': '7d',
   '1D': '30d',
-} as Record<ResolutionString, MetadataServiceCandleResolutions>;
+} as Record<ResolutionString, MetadataServiceCandlesTimeframes>;
 
 export const LAUNCHABLE_MARKET_RESOLUTION_CONFIGS = {
   '60': { defaultRange: timeUnits.day },
