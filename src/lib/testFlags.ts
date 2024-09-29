@@ -49,11 +49,10 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return !!this.queryParams.prediction;
+    return !!this.queryParams.prediction || import.meta.env.MODE === 'staging';
   }
 
   get pml() {
-    return true; // For dev
     return !!this.queryParams.pml;
   }
 

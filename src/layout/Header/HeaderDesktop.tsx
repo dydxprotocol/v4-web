@@ -91,9 +91,9 @@ export const HeaderDesktop = () => {
                 href: AppRoute.LaunchMarket,
               },
               {
-                value: 'HI',
-                label: 'TEST',
-                href: '/trade/TIME,raydium,ED5wbeyAYtLM4WRGnohPxJEwniaikEFioVmJyZH6K31m-USD',
+                value: 'TEST_MARKET',
+                label: 'TIME-USD',
+                href: '/trade/TIME,raydium,ED5wbeyAYtLM4WRGnohPxJEwniaikEFioVmJyZH6K31m-USD?pml=true',
               },
             ]
           : []),

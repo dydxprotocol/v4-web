@@ -68,28 +68,21 @@ export const useChartMarketAndResolution = ({
 
   const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
     // Different resolutions have different timeframes to display data efficiently.
-    if (isViewingUnlaunchedMarket) {
-      if (LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution]) {
-        const { defaultRange } = LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution];
+    const defaultRange: undefined | number = isViewingUnlaunchedMarket
+      ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution]?.defaultRange
+      : RESOLUTION_CHART_CONFIGS[resolution].defaultRange;
 
-        // from/to values converted to epoch seconds
-        const newRange = {
-          from: (Date.now() - defaultRange) / 1000,
-          to: Date.now() / 1000,
-        };
+    if (defaultRange) {
+      const to = Date.now() / 1000;
+      const from = (Date.now() - defaultRange) / 1000;
 
-        tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
-      }
-    } else {
-      const { defaultRange } = RESOLUTION_CHART_CONFIGS[resolution];
-
-      // from/to values converted to epoch seconds
-      const newRange = {
-        from: (Date.now() - defaultRange) / 1000,
-        to: Date.now() / 1000,
-      };
-
-      tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
+      tvWidget?.activeChart().setVisibleRange(
+        {
+          from,
+          to,
+        },
+        { percentRightMargin: 10 }
+      );
     }
   };
 };
