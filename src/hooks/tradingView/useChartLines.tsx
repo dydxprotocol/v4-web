@@ -222,6 +222,7 @@ export const useChartLines = ({
   }>({});
 
   const removePendingOrderAdjustment = (clientId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [clientId]: removed, ...withoutOrderId } = pendingOrderAdjustmentsRef.current;
     pendingOrderAdjustmentsRef.current = withoutOrderId;
   };

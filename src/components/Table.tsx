@@ -630,6 +630,7 @@ export const TableRow = <TableRowData extends BaseTableRowData>({
       {...mergeProps(rowProps, focusProps)}
       {...attrs}
       withFocusStickyRows={withFocusStickyRows}
+      withGradientCardRows={withGradientCardRows}
       withScrollSnapRows={withScrollSnapRows}
       isClickable={isClickable}
     >
@@ -787,6 +788,7 @@ const $Table = styled.table<StyledTableStyleProps>`
 
 const $Tr = styled.tr<{
   isClickable?: boolean;
+  withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
 }>`

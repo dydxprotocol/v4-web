@@ -8,71 +8,73 @@
 
 ## Views
 
-* New: `<ViewComponentName>`
-  * <!-- explain features of new view component -->
-  * 
+- New: `<ViewComponentName>`
 
-* `<ViewComponentName>`
-  * <!-- explain changes to existing view component -->
-  * New: ``
-  * Rename: `` → ``
-  * 
+  - <!-- explain features of new view component -->
+  -
+
+- `<ViewComponentName>`
+  - <!-- explain changes to existing view component -->
+  - New: ``
+  - Rename: `→`
+  -
 
 ## Components
 
-* New: `<ComponentName>`
-  * <!-- explain features of new design system component (props, CSS params, style variants, etc.) -->
-  * 
+- New: `<ComponentName>`
 
-* `<ComponentName>`
-  * <!-- explain changes to existing design system component (props, CSS params, style variants, etc.) -->
-  * New: ``
-  * Rename: `` → ``
-  * 
+  - <!-- explain features of new design system component (props, CSS params, style variants, etc.) -->
+  -
+
+- `<ComponentName>`
+  - <!-- explain changes to existing design system component (props, CSS params, style variants, etc.) -->
+  - New: ``
+  - Rename: `→`
+  -
 
 ## Styles/Mixins
 
-* `styles/_____`
-  * <!-- explain changes to CSS styles/mixins -->
-  * New: ``
-  * Rename: `` → ``
-  * 
+- `styles/_____`
+  - <!-- explain changes to CSS styles/mixins -->
+  - New: ``
+  - Rename: `→`
+  -
 
 ## Constants/Types
 
-* `constants/_____`
-  * <!-- explain changes to constants/types -->
-  * 
+- `constants/_____`
+  - <!-- explain changes to constants/types -->
+  -
 
-## Functions
+## Functions/Clients
 
-* `lib/_____`
-  * <!-- explain changes to library functions/methods -->
-  * 
+- `lib/_____`
+  - <!-- explain changes to client or library functions/methods -->
+  -
 
 ## Hooks
 
-* `hooks/_____`
-  * <!-- explain changes to React hooks -->
-  * 
+- `hooks/_____`
+  - <!-- explain changes to React hooks -->
+  -
 
 ## State
 
-* `state/_____`
-  * <!-- explain changes to Redux logic -->
-  * 
+- `state/_____`
+  - <!-- explain changes to Redux logic -->
+  -
 
 ## Packages
 
-* `package-name`
-  * <!-- explain changes to packages -->
-  * updated: v__ -> v__
+- `package-name`
+  - <!-- explain changes to packages -->
+  - updated: v** -> v**
 
 ## Workflows
 
-* `workflow-name.yml`
-  * <!-- explain changes to workflows in GitHub Actions -->
-  * 
+- `workflow-name.yml`
+  - <!-- explain changes to workflows in GitHub Actions -->
+  -
 
 ---
 
