@@ -302,6 +302,8 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    size,
     ...props
   }: ElementProps & StyleProps & { size?: string }) =>
     Component ? <Component className={className} {...props} /> : null

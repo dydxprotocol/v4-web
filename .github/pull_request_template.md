@@ -9,7 +9,6 @@
 ## Views
 
 - New: `<ViewComponentName>`
-
   - <!-- explain features of new view component -->
   -
 
@@ -22,7 +21,6 @@
 ## Components
 
 - New: `<ComponentName>`
-
   - <!-- explain features of new design system component (props, CSS params, style variants, etc.) -->
   -
 
