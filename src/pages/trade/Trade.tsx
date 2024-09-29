@@ -162,7 +162,8 @@ const $TradeLayout = styled.article<{
   }
 
   > * {
-    display: grid;
+    display: flex;
+    flex-direction: column;
   }
 
   > section {

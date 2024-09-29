@@ -32,7 +32,7 @@ import { VaultTransactionsCard } from './VaultTransactions';
 const VaultPage = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.MEGAVAULT }));
 
   const { isTablet } = useBreakpoints();
   if (isTablet) {

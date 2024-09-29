@@ -6,6 +6,7 @@ import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMargin
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
 import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
+import { CloseAllPositionsConfirmationDialog } from '@/views/dialogs/CloseAllPositionsConfirmationDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
@@ -69,6 +70,9 @@ export const DialogManager = () => {
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
+    CloseAllPositionsConfirmation: (args) => (
+      <CloseAllPositionsConfirmationDialog {...args} {...modalProps} />
+    ),
     CancelAllOrdersConfirmation: (args) => (
       <CancelAllOrdersConfirmationDialog {...args} {...modalProps} />
     ),
