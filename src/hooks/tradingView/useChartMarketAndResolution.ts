@@ -10,8 +10,6 @@ import {
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setLaunchableTvChartResolution } from '@/state/launchableMarkets';
-import { getSelectedResolutionForUnlaunchedMarket } from '@/state/launchableMarketsSelectors';
 import { setTvChartResolution } from '@/state/perpetuals';
 import { getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
 
@@ -36,11 +34,7 @@ export const useChartMarketAndResolution = ({
   const dispatch = useAppDispatch();
 
   const selectedResolution: string =
-    useAppSelector((s) =>
-      isViewingUnlaunchedMarket
-        ? getSelectedResolutionForUnlaunchedMarket(s, currentMarketId)
-        : getSelectedResolutionForMarket(s, currentMarketId)
-    ) ?? DEFAULT_RESOLUTION;
+    useAppSelector((s) => getSelectedResolutionForMarket(s, currentMarketId)) ?? DEFAULT_RESOLUTION;
 
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
   const chartResolution = chart?.resolution?.();
@@ -61,14 +55,7 @@ export const useChartMarketAndResolution = ({
   useEffect(() => {
     if (chartResolution) {
       if (chartResolution !== selectedResolution) {
-        if (isViewingUnlaunchedMarket) {
-          dispatch(
-            setLaunchableTvChartResolution({
-              marketId: currentMarketId,
-              resolution: chartResolution,
-            })
-          );
-        } else {
+        if (!isViewingUnlaunchedMarket) {
           dispatch(
             setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution })
           );

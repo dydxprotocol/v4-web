@@ -11,7 +11,6 @@ import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { inputsSlice } from './inputs';
-import { launchableMarketsSlice } from './launchableMarkets';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
 import { localizationSlice } from './localization';
@@ -29,7 +28,6 @@ const reducers = {
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
   inputs: inputsSlice.reducer,
-  launchableMarkets: launchableMarketsSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,

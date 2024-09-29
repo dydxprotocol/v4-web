@@ -20,8 +20,6 @@ import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { type RootStore } from '@/state/_store';
-import { setLaunchableMarketCandles } from '@/state/launchableMarkets';
-import { getMetadataServiceBarsForPriceChart } from '@/state/launchableMarketsSelectors';
 
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
@@ -32,7 +30,7 @@ import { getSymbol, mapMetadataServiceCandles } from '../utils';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
-const cache = new Map<string, TradingViewBar[]>();
+const launchableMarketCandlesCache = new Map<string, TradingViewBar[]>();
 
 const configurationData: DatafeedConfiguration = {
   supported_resolutions: objectKeys(RESOLUTION_TO_TIMEFRAME_MAP),
@@ -124,14 +122,10 @@ export const getLaunchableMarketDatafeed = (
     const asset = getAssetFromMarketId(symbolInfo.ticker!);
     const { from, firstDataRequest } = periodParams;
     const fromMs = from * 1000;
+    const cacheKey = `${symbolInfo.ticker!}-${resolution}`;
 
     try {
-      const currentMarketBars = getMetadataServiceBarsForPriceChart(
-        store.getState(),
-        symbolInfo.ticker!,
-        resolution
-      );
-
+      const currentMarketBars = launchableMarketCandlesCache.get(cacheKey) ?? [];
       const cachedBars = [...currentMarketBars].filter((bar) => bar.time >= fromMs);
 
       if (firstDataRequest) {
@@ -147,29 +141,17 @@ export const getLaunchableMarketDatafeed = (
             candlesResponse?.[asset] ?? [];
 
           if (fetchedCandles) {
-            store.dispatch(
-              setLaunchableMarketCandles({
-                candles: fetchedCandles,
-                marketId: symbolInfo.ticker!,
-                resolution,
-              })
-            );
-
             bars = [...(fetchedCandles?.map(mapMetadataServiceCandles) ?? [])];
-            // console.log('1');
-            cache.set(symbolInfo.ticker!, bars);
+            launchableMarketCandlesCache.set(cacheKey, bars);
           }
         } else {
-          // console.log('2');
-          bars = [...cachedBars];
-          console.log(bars, cachedBars, bars === cachedBars);
+          bars = cachedBars;
         }
 
         onHistoryCallback(bars, {
           noData: false,
         });
       } else {
-        // console.log('3');
         onHistoryCallback([], {
           noData: true,
         });
