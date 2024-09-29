@@ -40,11 +40,13 @@ import {
   cancelOrderFailed,
   cancelOrderSubmitted,
   clearLocalOrders,
+  closeAllPositionsSubmitted,
   placeOrderFailed,
   placeOrderSubmitted,
 } from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -601,6 +603,36 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch, orders]
   );
 
+  const closeAllPositions = useCallback(() => {
+    // this is for each single close position / place order transaction
+    const callback = (
+      success: boolean,
+      parsingError?: Nullable<ParsingError>,
+      data?: Nullable<HumanReadablePlaceOrderPayload>
+    ) => {
+      if (!success) {
+        const errorParams = getValidErrorParamsFromParsingError(parsingError);
+        if (data?.clientId !== undefined) {
+          dispatch(
+            placeOrderFailed({
+              clientId: data.clientId,
+              errorParams,
+            })
+          );
+        }
+      }
+    };
+
+    const payload = abacusStateManager.closeAllPositions(callback);
+    if (payload) {
+      dispatch(
+        closeAllPositionsSubmitted(
+          payload.payloads.toArray().map((orderPayload) => orderPayload.clientId)
+        )
+      );
+    }
+  }, [dispatch]);
+
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
     async ({
@@ -877,6 +909,49 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, compositeClient]
   );
 
+  const getVaultAccountInfo = useCallback(async () => {
+    if (!compositeClient?.validatorClient) {
+      throw new Error('client not initialized');
+    }
+    const result = await compositeClient?.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
+    if (result == null) {
+      return result;
+    }
+    return parseToPrimitives(result);
+  }, [compositeClient?.validatorClient, dydxAddress]);
+
+  const depositToMegavault = useCallback(
+    async (amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      return compositeClient.depositToMegavault(subaccountClient, amount, Method.BroadcastTxCommit);
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const withdrawFromMegavault = useCallback(
+    async (shares: number, minAmount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+      return compositeClient.withdrawFromMegavault(
+        subaccountClient,
+        shares,
+        minAmount,
+        Method.BroadcastTxCommit
+      );
+    },
+    [compositeClient, subaccountClient]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -892,6 +967,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Trading Methods
     placeOrder,
     closePosition,
+    closeAllPositions,
     cancelOrder,
     cancelAllOrders,
     placeTriggerOrders,
@@ -906,5 +982,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getUndelegateFee,
     withdrawReward,
     getWithdrawRewardFee,
+
+    // vaults
+    getVaultAccountInfo,
+    depositToMegavault,
+    withdrawFromMegavault,
   };
 };

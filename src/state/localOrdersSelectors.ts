@@ -33,6 +33,12 @@ export const getLocalCancelOrders = (state: RootState) => state.localOrders.loca
 export const getLocalCancelAlls = (state: RootState) => state.localOrders.localCancelAlls;
 
 /**
+ * @returns the local close all positions data for the current FE session
+ */
+export const getLocalCloseAllPositions = (state: RootState) =>
+  state.localOrders.localCloseAllPositions;
+
+/**
  * @returns whether the subaccount has uncommitted orders (local orders that are only submitted and not placed)
  */
 export const getHasUncommittedOrders = createAppSelector([getLocalPlaceOrders], (placeOrders) =>

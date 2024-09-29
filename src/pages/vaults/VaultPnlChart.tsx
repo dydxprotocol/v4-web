@@ -59,7 +59,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
 
   const timeUnitsToRender = useMemo(() => {
     const dataRange = data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 0;
-    return TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3).map((t) => ({
+    const validRanges = TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3);
+    return validRanges.map((t) => ({
       value: t.value,
       label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
     }));
@@ -165,6 +166,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     selectedTimeRange != null
       ? TIME_RANGES.find((t) => t.value === selectedTimeRange)?.time
       : undefined;
+
   return (
     <div className={className}>
       <div tw="row justify-between pl-1 pr-1">

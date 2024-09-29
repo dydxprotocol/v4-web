@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.11.13
-    version: 1.11.13
+    specifier: 1.12.2
+    version: 1.12.2
   '@dydxprotocol/v4-client-js':
-    specifier: 1.5.0
-    version: 1.5.0
+    specifier: 1.6.1
+    version: 1.6.1
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.203
     version: 1.1.203
@@ -3025,15 +3025,15 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.11.13:
-    resolution: {integrity: sha512-DpULIql3DW8aKLt4doo4KgxQvHHd7ge3soJ7UClsRvyKE8Qabh1AZ/Q+MNq+1BSVoKr0Nmo5YDrDkkJk2i0gNw==}
+  /@dydxprotocol/v4-abacus@1.12.2:
+    resolution: {integrity: sha512-zhMLP53Nfzfh7Doet9+SMI1RlF41jmFmeHlFc3RvgKgSsIBsRs7PA1dmcGVKaWqKvSsEivA5zWPcO/ZfRd18gw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.5.0:
-    resolution: {integrity: sha512-IDnUg6AoaejoUlfVDNmFacyWS0Rl1wrlW6P1ZykXO7FmZAxfR7FV3NEQ0SNLQNZz4aTlag0CS+T5DIkAWvDNZA==}
+  /@dydxprotocol/v4-client-js@1.6.1:
+    resolution: {integrity: sha512-snAF4oXnd1QDu7ClT0RGuU7t35PenLvbRP4+SG5uuWQ6s5UH7bcQdtsun0UNbi5l7rRv6txIc5wmcLInVKezdg==}
     dependencies:
       '@cosmjs/amino': 0.32.3
       '@cosmjs/encoding': 0.32.3
@@ -3042,7 +3042,7 @@ packages:
       '@cosmjs/stargate': 0.32.3
       '@cosmjs/tendermint-rpc': 0.32.3
       '@cosmjs/utils': 0.32.3
-      '@dydxprotocol/v4-proto': 6.0.1
+      '@dydxprotocol/v4-proto': 7.0.0-dev.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.3.2
       '@scure/bip39': 1.2.1
@@ -3067,6 +3067,12 @@ packages:
 
   /@dydxprotocol/v4-proto@6.0.1:
     resolution: {integrity: sha512-+L4mT8AM5MlrnT7a817uepSSKCpvMmE6LV5xQKnH18GxLs7JOv5nQTnONbmi6roz12R7Vi1CntRZuz7Lg6l5Sw==}
+    dependencies:
+      protobufjs: 6.11.4
+    dev: false
+
+  /@dydxprotocol/v4-proto@7.0.0-dev.0:
+    resolution: {integrity: sha512-yQ3xMW8GmKCCwtzXF1E/TMYvPYDPRmAR2T/AFXKlE2YF/P/yQMrz/IySzX4Z+wyAMI+G4Sr+AML7V8ehvAcjog==}
     dependencies:
       protobufjs: 6.11.4
     dev: false

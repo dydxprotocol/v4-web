@@ -8,7 +8,6 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -68,12 +67,6 @@ export const WithdrawButtonAndReceipt = ({
 
   const showExchangeRate =
     !exchange || (withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange);
-  const fallbackRouteDuration = stringGetter({
-    key: STRING_KEYS.X_MINUTES_LOWERCASED,
-    params: {
-      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
-    },
-  });
 
   const submitButtonReceipt = [
     {
@@ -136,22 +129,20 @@ export const WithdrawButtonAndReceipt = ({
       key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value:
-        summary != null && typeof summary.estimatedRouteDuration === 'number' ? (
+        typeof summary?.estimatedRouteDurationSeconds === 'number' ? (
           <Output
             type={OutputType.Text}
             value={stringGetter({
               key: STRING_KEYS.X_MINUTES_LOWERCASED,
               params: {
                 X:
-                  summary.estimatedRouteDuration < 60
+                  summary.estimatedRouteDurationSeconds < 60
                     ? '< 1'
-                    : Math.round(summary.estimatedRouteDuration / 60),
+                    : Math.round(summary.estimatedRouteDurationSeconds / 60),
               },
             })}
           />
-        ) : (
-          fallbackRouteDuration
-        ),
+        ) : undefined,
     },
     {
       key: 'leverage',
