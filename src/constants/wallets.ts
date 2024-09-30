@@ -76,6 +76,16 @@ export enum ConnectorType {
   PhantomSolana = 'phantomSolana',
 }
 
+export type CosmosWalletInfo = {
+  connectorType: ConnectorType.Cosmos;
+  name: CosmosWalletType;
+};
+
+export type PhantomSolanaWalletInfo = {
+  connectorType: ConnectorType.PhantomSolana;
+  name: WalletType.Phantom;
+};
+
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
   | ({
@@ -89,10 +99,7 @@ export type WalletInfo =
         | ConnectorType.Privy;
       name: WalletType;
     }
-  | {
-      connectorType: ConnectorType.Cosmos;
-      name: CosmosWalletType;
-    }
+  | CosmosWalletInfo
   | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
   | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string };
 

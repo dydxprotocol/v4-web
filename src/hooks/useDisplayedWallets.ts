@@ -32,7 +32,7 @@ const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
 };
 
 export const useDisplayedWallets = (): WalletInfo[] => {
-  const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr);
+  const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr) || true;
   const injectedWallets = useMipdInjectedWallets();
 
   return useMemo(() => {
