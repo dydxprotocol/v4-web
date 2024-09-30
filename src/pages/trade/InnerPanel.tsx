@@ -17,6 +17,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 enum Tab {
   Price = 'Price',
@@ -32,6 +33,7 @@ export const InnerPanel = ({
 }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { uiRefresh } = testFlags;
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -39,7 +41,8 @@ export const InnerPanel = ({
     <Tabs
       value={value}
       onValueChange={setValue}
-      withBorders={false}
+      withBorders={!uiRefresh}
+      withUnderline={uiRefresh}
       items={[
         {
           content: <TvChart />,
