@@ -46,6 +46,8 @@ export const NotificationsMenu = ({
 
     isMenuOpen,
     setIsMenuOpen,
+
+    hasUnreadNotifications,
   } = useNotifications();
 
   const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
@@ -56,11 +58,6 @@ export const NotificationsMenu = ({
           : notification.status
       ),
     [notifications, getDisplayData]
-  );
-
-  const hasUnreadNotifications = useMemo(
-    () => notificationsByStatus[NotificationStatus.Triggered]?.length! > 0,
-    [notificationsByStatus]
   );
 
   const items: Parameters<typeof ComboboxDialogMenu>[0]['items'] = useMemo(

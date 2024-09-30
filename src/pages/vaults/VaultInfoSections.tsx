@@ -148,7 +148,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
         <img src="/dydx-chain.png" tw="h-3.5 w-3.5" />
         <div>
           <h3 tw="text-color-text-2 font-extra-medium">
-            {stringGetter({ key: STRING_KEYS.VAULT })}
+            {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
           </h3>
         </div>
       </div>

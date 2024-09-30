@@ -14,6 +14,7 @@ type ElementProps = {
   size?: ButtonSize;
   isInputEmpty: boolean;
   isLoading: boolean;
+  disabled?: boolean;
   onPressedChange: (isPressed: boolean) => void;
 };
 
@@ -21,6 +22,7 @@ export const FormMaxInputToggleButton = ({
   size = ButtonSize.Small,
   isInputEmpty,
   isLoading,
+  disabled,
   onPressedChange,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -29,7 +31,7 @@ export const FormMaxInputToggleButton = ({
     <$FormMaxInputToggleButton
       size={size}
       isPressed={!isInputEmpty}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       onPressedChange={onPressedChange}
       shape={isInputEmpty ? ButtonShape.Rectangle : ButtonShape.Circle}
     >
