@@ -63,7 +63,7 @@ const MarketsDropdownContent = ({
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.displayId,
+          getCellValue: (row: MarketData) => row.displayId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({
             assetId,
@@ -71,7 +71,7 @@ const MarketsDropdownContent = ({
             isNew,
             effectiveInitialMarginFraction,
             initialMarginFraction,
-          }) => (
+          }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
@@ -89,20 +89,20 @@ const MarketsDropdownContent = ({
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
           ),
-        } satisfies ColumnDef<MarketData>,
+        },
         {
           columnKey: 'oraclePrice',
-          getCellValue: (row) => row.oraclePrice,
+          getCellValue: (row: MarketData) => row.oraclePrice,
           label: stringGetter({ key: STRING_KEYS.PRICE }),
-          renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+          renderCell: ({ oraclePrice, tickSizeDecimals }: MarketData) => (
             <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
           ),
-        } satisfies ColumnDef<MarketData>,
+        },
         {
           columnKey: 'priceChange24HPercent',
-          getCellValue: (row) => row.priceChange24HPercent,
+          getCellValue: (row: MarketData) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
-          renderCell: ({ priceChange24HPercent }) => (
+          renderCell: ({ priceChange24HPercent }: MarketData) => (
             <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
@@ -115,25 +115,24 @@ const MarketsDropdownContent = ({
               )}
             </div>
           ),
-        } satisfies ColumnDef<MarketData>,
+        },
         {
           columnKey: 'volume24H',
-          getCellValue: (row) => row.volume24H,
+          getCellValue: (row: MarketData) => row.volume24H,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
-          renderCell: ({ volume24H }) => (
-            <$Output type={OutputType.CompactFiat} value={volume24H} />
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.volume24H} />
           ),
-        } satisfies ColumnDef<MarketData>,
-        !uiRefresh &&
-          ({
-            columnKey: 'openInterest',
-            getCellValue: (row) => row.openInterestUSDC,
-            label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-            renderCell: (row) => (
-              <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
-            ),
-          } satisfies ColumnDef<MarketData>),
-      ].filter(isTruthy),
+        },
+        !uiRefresh && {
+          columnKey: 'openInterest',
+          getCellValue: (row: MarketData) => row.openInterestUSDC,
+          label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
+          ),
+        },
+      ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
     [stringGetter, uiRefresh]
   );
 
@@ -294,6 +293,7 @@ export const MarketsDropdown = memo(
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
+        uiRefreshEnabled={uiRefreshEnabled}
         slotTrigger={
           <>
             {triggerBackground}
@@ -393,7 +393,9 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boole
 
 const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
   ${popoverMixins.popover}
-  --popover-item-height: 3.375rem;
+  --popover-item-height: ${({ uiRefreshEnabled }) =>
+    uiRefreshEnabled ? css`2.75rem` : css`3.375rem`};
+
   --popover-backgroundColor: var(--color-layer-2);
   display: flex;
   flex-direction: column;
@@ -506,6 +508,7 @@ const $ScrollArea = styled.div`
 
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
+  --table-header-height: 2.25rem;
 
   thead {
     --stickyArea-totalInsetTop: 0px;
@@ -528,6 +531,7 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
+
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);

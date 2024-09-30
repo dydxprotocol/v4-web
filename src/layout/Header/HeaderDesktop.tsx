@@ -93,7 +93,7 @@ export const HeaderDesktop = () => {
           value: 'VAULT',
           label: (
             <>
-              {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}{' '}
               <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
             </>
           ),

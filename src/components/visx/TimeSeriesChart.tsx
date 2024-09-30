@@ -153,9 +153,15 @@ export const TimeSeriesChart = <Datum extends {}>({
   );
 
   const [zoomDomain, setZoomDomain] = useState<number | undefined>(
-    defaultZoomDomain
-      ? getClampedZoomDomain(defaultZoomDomain)
-      : xAccessor(latestDatum) - xAccessor(earliestDatum)
+    (() => {
+      if (defaultZoomDomain) {
+        return getClampedZoomDomain(defaultZoomDomain);
+      }
+      if (latestDatum != null && earliestDatum != null) {
+        return xAccessor(latestDatum) - xAccessor(earliestDatum);
+      }
+      return minZoomDomain;
+    })()
   );
 
   const [zoomDomainAnimateTo, setZoomDomainAnimateTo] = useState<number | undefined>();

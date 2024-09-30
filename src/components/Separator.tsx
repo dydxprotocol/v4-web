@@ -17,9 +17,7 @@ const StyledSeparator = styled(Separator)<{ fullHeight: boolean }>`
   &[data-orientation='vertical'] {
     align-self: center;
     width: 0;
-    height: ${({ fullHeight }) => css`
-      ${fullHeight ? css`100%;` : css`calc(100% - 1.5rem);`}
-    `}
+    height: ${({ fullHeight }) => (fullHeight ? css`100%;` : css`calc(100% - 1.5rem);`)}
     margin: 0 !important;
 
     border-right: solid var(--border-width) var(--color-border);
