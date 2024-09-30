@@ -117,7 +117,12 @@ const PortfolioPage = () => {
           />
           <Route
             path={HistoryRoute.VaultTransfers}
-            element={<VaultTransactionsTable withOuterBorders />}
+            element={
+              <VaultTransactionsTable
+                withOuterBorders
+                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}
+              />
+            }
           />
           {/* TODO - TRCL-1693
           <Route
