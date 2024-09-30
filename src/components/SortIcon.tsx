@@ -15,14 +15,14 @@ export const SortIcon = ({ sortDirection, className }: ElementProps & StyleProps
   return (
     <$SortIcon aria-hidden="true" hidden={sortDirection === 'none'} className={className}>
       <$Icon
-        iconName={IconName.Arrow}
+        iconName={IconName.RoundedArrow}
         aria-hidden="true"
         direction="up"
         highlighted={sortDirection === 'ascending'}
         tw="relative right-[-2px] top-[-3px]"
       />
       <$Icon
-        iconName={IconName.Arrow}
+        iconName={IconName.RoundedArrow}
         aria-hidden="true"
         direction="down"
         highlighted={sortDirection === 'descending'}
@@ -63,11 +63,9 @@ const $Icon = styled(Icon)<{ direction: 'up' | 'down'; highlighted: boolean }>`
         `}
   ${({ direction }) =>
     ({
-      up: css`
-        transform: rotate(-90deg);
-      `,
+      up: css``,
       down: css`
-        transform: rotate(90deg);
+        transform: rotate(180deg);
       `,
     })[direction]}
 `;
