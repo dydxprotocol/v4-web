@@ -99,7 +99,10 @@ export const NewMarketPreviewStep = ({
         </div>
       </div>
 
-      <Icon iconName={IconName.FastForward} tw="mt-[1.45rem] h-[1rem] w-[1rem] text-color-text-0" />
+      <Icon
+        iconName={IconName.FastForward}
+        tw="mt-[1.45rem] h-[1rem] min-h-[1rem] w-[1rem] min-w-[1rem] text-color-text-0"
+      />
 
       <div tw="flex flex-col items-center justify-center gap-0.5">
         <span tw="text-small text-color-text-0">

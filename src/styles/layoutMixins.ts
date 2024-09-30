@@ -917,7 +917,6 @@ export const layoutMixins = {
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 1px;
-    width: min-content;
   `,
 
   textLineClamp: css`

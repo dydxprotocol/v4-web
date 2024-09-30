@@ -4,6 +4,6 @@ export const GreenCheckCircle = ({ className }: { className?: string }) => (
   <Icon
     className={className}
     iconName={IconName.CheckCircle}
-    tw="h-[--icon-size] w-[--icon-size] [--icon-size:1.25rem]"
+    tw="h-[--icon-size] min-h-[--icon-size] w-[--icon-size] min-w-[--icon-size] [--icon-size:1.25rem]"
   />
 );

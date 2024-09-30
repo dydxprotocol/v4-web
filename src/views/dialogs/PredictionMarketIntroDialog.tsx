@@ -42,7 +42,7 @@ export const PredictionMarketIntroDialog = ({
   }) => (
     <div key={title} tw="row gap-0.75 align-middle">
       <$IconContainer>
-        <Icon iconName={icon} tw="h-1.75 w-1.75 text-color-text-0" />
+        <Icon iconName={icon} tw="h-1.75 min-h-1.75 w-1.75 min-w-1.75 text-color-text-0" />
       </$IconContainer>
       <div tw="column text-medium">
         <span tw="text-color-text-1">{title}</span>

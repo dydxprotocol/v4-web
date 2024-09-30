@@ -171,4 +171,5 @@ const StyledBaseButton = styled(BaseButton)<StyleProps>`
       ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
       ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
     `}
+    }
 `;

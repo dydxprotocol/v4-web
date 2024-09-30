@@ -309,4 +309,6 @@ export const Icon = styled(
 )`
   width: ${({ size }) => size ?? '1em'};
   height: ${({ size }) => size ?? '1em'};
+  min-width: ${({ size }) => size ?? '1em'};
+  min-height: ${({ size }) => size ?? '1em'};
 `;
