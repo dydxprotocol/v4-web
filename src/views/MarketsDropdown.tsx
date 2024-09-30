@@ -74,7 +74,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <AssetIcon symbol={assetId} />
+              <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 <Output
@@ -293,7 +293,6 @@ export const MarketsDropdown = memo(
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
-        uiRefreshEnabled={uiRefreshEnabled}
         slotTrigger={
           <>
             {triggerBackground}
@@ -323,7 +322,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <$TriggerAssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
+                      <$AssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}
@@ -463,7 +462,7 @@ const $MarketDropdownBanner = styled.div`
   }
 `;
 
-const $TriggerAssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
+const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
   ${({ uiRefreshEnabled }) => css`
     ${uiRefreshEnabled &&
     css`
