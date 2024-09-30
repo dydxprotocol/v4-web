@@ -106,6 +106,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const pnlAbsolute = atLeastOnePoint
     ? relevantDataPoints[relevantDataPoints.length - 1]
     : undefined;
+  const renderedPnlTime = hoveredTime ?? pointsInView[pointsInView.length - 1]?.date;
   const pnlDiff = atLeastTwoPoints
     ? relevantDataPoints[relevantDataPoints.length - 1] - relevantDataPoints[0]
     : undefined;
@@ -189,11 +190,13 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       <$ChartContainer>
         <$ChartBackground chartBackground={chartDotsBackground} />
         <div tw="flexColumn pl-1 pr-1">
-          {hoveredTime != null && (
-            <div tw="text-color-text-0 font-small-book">
-              <Output value={hoveredTime} type={OutputType.Date} />
-            </div>
-          )}
+          <div tw="text-color-text-0 font-small-book">
+            {renderedPnlTime != null ? (
+              <Output value={renderedPnlTime} type={OutputType.Date} />
+            ) : (
+              <>&nbsp;</>
+            )}
+          </div>
           <div tw="row gap-0.5 font-base-medium">
             <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
