@@ -1,7 +1,5 @@
 import { PersistedState } from 'redux-persist';
 
-import { LocalStorageKey } from '@/constants/localStorage';
-
 import { parseStorageItem } from './utils';
 
 /**
@@ -13,10 +11,8 @@ export function migration0(state: PersistedState) {
     throw new Error('state must be defined');
   }
 
-  const oldTvChartConfig = parseStorageItem(
-    localStorage.getItem(LocalStorageKey.TradingViewChartConfig)
-  );
-  localStorage.removeItem(LocalStorageKey.TradingViewChartConfig);
+  const oldTvChartConfig = parseStorageItem(localStorage.getItem('dydx.TradingViewChartConfig'));
+  localStorage.removeItem('dydx.TradingViewChartConfig');
 
   return {
     ...state,

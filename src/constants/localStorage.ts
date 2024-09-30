@@ -28,8 +28,6 @@ export enum LocalStorageKey {
   SelectedTheme = 'dydx.SelectedTheme',
   SelectedColorMode = 'dydx.SelectedColorMode',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
-  TradingViewChartConfig = 'dydx.TradingViewChartConfig',
-  TradingViewChartConfigLaunchable = 'dydx.TradingViewChartConfigLaunchable',
   HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
   DefaultToAllMarketsInPositionsOrdersFills = 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
 
