@@ -2,11 +2,12 @@ import { useCallback, useMemo } from 'react';
 
 import { useFunkitCheckout } from '@funkit/connect';
 
-import { useAppDispatch } from '@/state/appTypes';
-
 import { DialogTypes } from '@/constants/dialogs';
-import { DepositType, resetDepositType, setDepositType } from '@/state/deposit';
-import { closeDialog, openDialog } from '@/state/dialogs';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { DepositType, setDepositType } from '@/state/deposit';
+import { openDialog } from '@/state/dialogs';
+
 import { useAccounts } from './useAccounts';
 import { useFunkitThemeListener } from './useFunkitThemeListener';
 
