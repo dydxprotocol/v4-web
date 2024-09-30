@@ -15,10 +15,6 @@ import {
   ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import {
-  Perpetual,
-  PerpetualMarketType,
-} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -27,6 +23,10 @@ import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
 
 import { Exchange, ExchangeName, Proposal, retry, sleep, voteOnProposals } from './help';
+
+const { PerpetualMarketType } = await import(
+  '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual'
+);
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
