@@ -102,6 +102,7 @@ const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
 
   label {
+    display: flex;
     font: var(--font-mini-book);
   }
 `;
