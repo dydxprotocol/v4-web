@@ -67,7 +67,7 @@ export const useChartMarketAndResolution = ({
 
   const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
     // Different resolutions have different timeframes to display data efficiently.
-    const defaultRange: undefined | number = isViewingUnlaunchedMarket
+    const defaultRange: number | undefined = isViewingUnlaunchedMarket
       ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution]?.defaultRange
       : RESOLUTION_CHART_CONFIGS[resolution].defaultRange;
 
