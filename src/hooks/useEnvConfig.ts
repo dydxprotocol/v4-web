@@ -11,6 +11,7 @@ interface EnvironmentConfig {
   chainLogo: string;
   deployerName: string;
   rewardsHistoryStartDateMs: string;
+  megavaultHistoryStartDateMs: string;
 }
 
 export type EnvironmentConfigKey = keyof EnvironmentConfig;
