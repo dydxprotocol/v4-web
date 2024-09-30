@@ -44,9 +44,8 @@ type ElementProps<TabItemsValue> = {
 type StyleProps = {
   fullWidthTabs?: boolean;
   side?: 'top' | 'bottom';
-  withBorders?: boolean;
+  dividerStyle?: 'border' | 'underline' | 'none';
   withTransitions?: boolean;
-  withUnderline?: boolean;
   className?: string;
 };
 
@@ -62,14 +61,15 @@ export const Tabs = <TabItemsValue extends string>({
   onWheel,
   fullWidthTabs,
   side = 'top',
-  withBorders = true,
-  withUnderline = false,
+  dividerStyle = 'none',
   withTransitions = true,
   disabled = false,
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
   const { uiRefresh } = testFlags;
+  const withBorders = dividerStyle === 'border';
+  const withUnderline = dividerStyle === 'underline';
 
   const triggers = (
     <>

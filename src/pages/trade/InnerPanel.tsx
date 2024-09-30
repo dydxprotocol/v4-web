@@ -41,8 +41,7 @@ export const InnerPanel = ({
     <Tabs
       value={value}
       onValueChange={setValue}
-      withBorders={!uiRefresh}
-      withUnderline={uiRefresh}
+      dividerStyle={uiRefresh ? 'underline' : 'border'}
       items={[
         {
           content: <TvChart />,

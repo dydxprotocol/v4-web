@@ -48,8 +48,7 @@ export const TradeBoxOrderView = () => {
         value={selectedTradeType}
         items={tradeTypeItems}
         onValueChange={onTradeTypeChange}
-        withUnderline
-        withBorders={false}
+        dividerStyle="underline"
         disabled={!allowChangingOrderType}
         sharedContent={
           <$Container>

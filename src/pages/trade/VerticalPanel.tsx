@@ -67,8 +67,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   return (
     <Tabs
       fullWidthTabs
-      withUnderline={uiRefresh}
-      withBorders={false}
+      dividerStyle={uiRefresh ? 'underline' : 'border'}
       value={value}
       onValueChange={(v: Tab) => {
         setValue(v);
