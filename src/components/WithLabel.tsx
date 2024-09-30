@@ -24,5 +24,6 @@ export const WithLabel = ({ label, inputID, children, className }: ElementProps 
 const $Container = styled.div`
   label {
     ${layoutMixins.textTruncate}
+    display: flex;
   }
 `;
