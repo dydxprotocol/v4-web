@@ -72,6 +72,7 @@ export const useTradingViewLaunchable = ({
       tvWidgetRef.current = tvChartWidget;
 
       tvChartWidget.onChartReady(() => {
+        tvWidgetRef?.current?.activeChart().setZoomEnabled(false);
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
           tvWidgetRef?.current?.save((chartConfig: object) => {
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
