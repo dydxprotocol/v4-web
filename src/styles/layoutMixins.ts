@@ -914,10 +914,10 @@ export const layoutMixins = {
   textTruncate: css`
     display: inline-block;
     overflow: hidden;
-    text-align: start;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 1px;
+    width: min-content;
   `,
 
   textLineClamp: css`
