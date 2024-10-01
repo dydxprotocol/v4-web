@@ -199,11 +199,13 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       <$ChartContainer>
         <$ChartBackground chartBackground={chartDotsBackground} />
         <div tw="flexColumn pl-1 pr-1">
-          {hoveredTime != null && (
-            <div tw="text-color-text-0 font-small-book">
+          <div tw="text-color-text-0 font-small-book">
+            {hoveredTime != null ? (
               <Output value={hoveredTime} type={OutputType.Date} />
-            </div>
-          )}
+            ) : (
+              <>&nbsp;</>
+            )}
+          </div>
           <div tw="row gap-0.5 font-base-medium">
             <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
