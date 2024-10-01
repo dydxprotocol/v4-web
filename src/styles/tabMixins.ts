@@ -18,6 +18,10 @@ const tabTriggerStyle = css`
     color: var(--trigger-active-textColor);
     background-color: var(--trigger-active-backgroundColor);
   }
+
+  &:hover {
+    color: var(--trigger-active-textColor);
+  }
 `;
 
 const tabTriggerActiveUnderlineStyle = css`
