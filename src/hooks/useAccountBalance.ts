@@ -60,7 +60,7 @@ export const useAccountBalance = ({
   usdcBalance: number;
   refetchQuery: (options?: RefetchOptions) => Promise<QueryObserverResult>;
 } => {
-  const { sourceAccount, dydxAccountGraz } = useAccounts();
+  const { sourceAccount, dydxAccountGraz, dydxAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
@@ -79,8 +79,6 @@ export const useAccountBalance = ({
     sourceAccount.chain === WalletNetworkType.Solana
       ? (sourceAccount.address as SolAddress)
       : undefined;
-  const dydxAddress =
-    sourceAccount.chain === WalletNetworkType.Cosmos ? sourceAccount.address : undefined;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
