@@ -10,7 +10,8 @@ import { MarketDetails } from '@/views/MarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
-import { TvChart } from '@/views/charts/TvChart';
+import { TvChart } from '@/views/charts/TradingView/TvChart';
+import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -26,11 +27,7 @@ enum Tab {
   Details = 'Details',
 }
 
-export const InnerPanel = ({
-  isViewingUnlaunchedMarket,
-}: {
-  isViewingUnlaunchedMarket?: boolean;
-}) => {
+export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { uiRefresh } = testFlags;
@@ -44,12 +41,16 @@ export const InnerPanel = ({
       dividerStyle={uiRefresh ? 'underline' : 'border'}
       items={[
         {
-          content: <TvChart />,
+          content: launchableMarketId ? (
+            <TvChartLaunchable marketId={launchableMarketId} />
+          ) : (
+            <TvChart />
+          ),
           forceMount: true,
           label: stringGetter({ key: STRING_KEYS.PRICE_CHART_SHORT }),
           value: Tab.Price,
         },
-        !isViewingUnlaunchedMarket && {
+        !launchableMarketId && {
           content: (
             <DepthChart
               onChartClick={({ side, price, size }) => {
@@ -70,7 +71,7 @@ export const InnerPanel = ({
           label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
           value: Tab.Depth,
         },
-        !isViewingUnlaunchedMarket && {
+        !launchableMarketId && {
           content: <FundingChart selectedLocale={selectedLocale} />,
           label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
           value: Tab.Funding,

@@ -34,8 +34,7 @@ export const useCurrentMarketId = () => {
   const hasMarketIds = marketIds.length > 0;
   const launchableMarkets = useLaunchableMarkets();
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
-  const hasLoadedMarkets =
-    hasMarketIds && (launchableMarkets.isSuccess || launchableMarkets.isError);
+  const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -60,15 +59,15 @@ export const useCurrentMarketId = () => {
   }, [hasMarketIds, marketId]);
 
   const isViewingUnlaunchedMarket = useMemo(() => {
-    if (!hasLoadedMarkets || !testFlags.pml) return false;
+    if (!hasLoadedLaunchableMarkets || !testFlags.pml) return false;
     return launchableMarkets.data.some((market) => {
       return market.id === marketId;
     });
-  }, [hasLoadedMarkets, marketId, launchableMarkets.data]);
+  }, [hasLoadedLaunchableMarkets, marketId, launchableMarkets.data]);
 
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
-    if (!hasLoadedMarkets || !marketId) {
+    if (!marketId) {
       setLastViewedMarket(validId);
       dispatch(setCurrentMarketId(validId));
       dispatch(closeDialogInTradeBox());
@@ -80,7 +79,12 @@ export const useCurrentMarketId = () => {
       }
     } else {
       // If v4_markets has been subscribed to, check if marketId is valid
-      if (!marketIds.includes(marketId) && !isViewingUnlaunchedMarket) {
+      if (
+        hasMarketIds &&
+        !marketIds.includes(marketId) &&
+        !isViewingUnlaunchedMarket &&
+        hasLoadedLaunchableMarkets
+      ) {
         // If marketId is not valid (i.e. final settlement), navigate to markets page
         navigate(AppRoute.Markets, {
           replace: true,
@@ -107,7 +111,7 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
       }
     }
-  }, [hasLoadedMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
+  }, [hasMarketIds, hasLoadedLaunchableMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
@@ -122,6 +126,6 @@ export const useCurrentMarketId = () => {
 
   return {
     isViewingUnlaunchedMarket,
-    hasLoadedMarkets,
+    hasLoadedMarkets: hasLoadedLaunchableMarkets && hasMarketIds,
   };
 };
