@@ -180,7 +180,6 @@ const $TabsTrigger = styled(TabsTrigger)<{
       ${({ $withUnderline }) =>
     $withUnderline &&
     css`
-      --trigger-active-backgroundColor: var(--trigger-backgroundColor);
       ${tabMixins.tabTriggerUnderlineStyle}
     `}
 `;

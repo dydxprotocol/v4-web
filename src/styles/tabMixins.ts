@@ -20,18 +20,23 @@ const tabTriggerStyle = css`
   }
 `;
 
+const tabTriggerActiveUnderlineStyle = css`
+  box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
+    var(--trigger-active-underlineColor);
+  color: var(--trigger-active-textColor);
+`;
+
 const tabTriggerUnderlineStyle = css`
   box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
 
   &[data-state='active'] {
-    box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
-      var(--trigger-active-underlineColor);
-    color: var(--trigger-active-textColor);
+    ${tabTriggerActiveUnderlineStyle}
   }
 `;
 
 export const tabMixins = {
   tabTriggerStyle,
+  tabTriggerActiveUnderlineStyle,
   tabTriggerUnderlineStyle,
 } satisfies Record<string, ReturnType<typeof css>>;

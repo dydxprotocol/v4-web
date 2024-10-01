@@ -38,7 +38,6 @@ export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?:
           content: <MarketDetails />,
         },
       ]}
-      withBorders={false}
     />
   );
 };
