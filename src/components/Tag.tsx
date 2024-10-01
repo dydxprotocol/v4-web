@@ -37,8 +37,6 @@ export const Tag = styled.span<StyleProps>`
   letter-spacing: 0.04em;
   line-height: 1.3;
 
-  ${layoutMixins.textTruncate}
-
   ${({ type, size }) =>
     ({
       [TagSize.Small]: css`
