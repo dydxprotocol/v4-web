@@ -1,16 +1,17 @@
+import { PersistedState } from 'redux-persist';
+
 import { EvmDerivedAddresses, SolDerivedAddresses } from '@/constants/account';
 import { ConnectorType, EvmAddress, WalletInfo, WalletNetworkType } from '@/constants/wallets';
 
 import { WalletState } from '../wallet';
-import { V0State } from './0';
 import { parseStorageItem } from './utils';
 
-type V1State = V0State & { wallet: WalletState };
+type V1State = PersistedState & { wallet: WalletState };
 /**
  * Move over wallet data from localStorage into redux
  * TODO (in future migration): Remove these localStorage items
  */
-export function migration1(state: V0State): V1State {
+export function migration1(state: PersistedState): V1State {
   if (!state) {
     throw new Error('state must be defined');
   }
