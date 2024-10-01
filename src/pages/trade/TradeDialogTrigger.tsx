@@ -60,7 +60,7 @@ export const TradeDialogTrigger = () => {
           ) : (
             stringGetter({ key: STRING_KEYS.TAP_TO_TRADE })
           )}
-          <Icon iconName={IconName.Caret} tw="h-1.5 w-1.5 [rotate:0.5turn]" />
+          <Icon iconName={IconName.Caret} size="1.5rem" tw="[rotate:0.5turn]" />
         </$TradeDialogTrigger>
       }
     />

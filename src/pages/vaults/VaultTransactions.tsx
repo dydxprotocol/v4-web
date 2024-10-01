@@ -46,7 +46,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
       ) : (
         <div tw="column content-center justify-items-center p-1 text-color-text-0">
           <div>
-            <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
+            <Icon iconName={IconName.OrderPending} size="2rem" tw="mb-0.75" />
           </div>
           <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
         </div>

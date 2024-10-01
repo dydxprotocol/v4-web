@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
 
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
@@ -33,9 +36,13 @@ export const TargetLeverageButton = ({ className }: { className?: string }) => {
         stringParams={{ TARGET_LEVERAGE: targetLeverage?.toFixed(LEVERAGE_DECIMALS) }}
       >
         <Button onClick={handleClick}>
-          <Output type={OutputType.Multiple} value={targetLeverage} />
+          <$Output type={OutputType.Multiple} value={targetLeverage} />
         </Button>
       </WithTooltip>
     )
   );
 };
+
+const $Output = styled(Output)`
+  ${layoutMixins.textTruncate};
+`;
