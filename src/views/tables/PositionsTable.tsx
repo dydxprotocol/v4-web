@@ -19,7 +19,6 @@ import { PositionSide } from '@/constants/trade';
 
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -45,6 +44,7 @@ import { safeAssign } from '@/lib/objectHelpers';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
+import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
@@ -82,16 +82,16 @@ const getPositionsTableColumnDef = ({
   width,
   isAccountViewOnly,
   showClosePositionAction,
-  shouldRenderTriggers,
   navigateToOrders,
+  isSinglePosition,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
-  shouldRenderTriggers: boolean;
   navigateToOrders: (market: string) => void;
+  isSinglePosition: boolean;
 }) => ({
   width,
   ...(
@@ -342,14 +342,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
-        label: stringGetter({
-          key:
-            showClosePositionAction && shouldRenderTriggers
-              ? STRING_KEYS.ACTIONS
-              : showClosePositionAction
-                ? STRING_KEYS.CLOSE
-                : STRING_KEYS.ACTION,
-        }),
+        label: showClosePositionAction && !isSinglePosition ? <CloseAllPositionsButton /> : '',
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
@@ -426,7 +419,6 @@ export const PositionsTable = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
   const assets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
-  const shouldRenderTriggers = useShouldShowTriggers();
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
@@ -479,7 +471,7 @@ export const PositionsTable = ({
   return (
     <$Table
       key={currentMarket ?? 'positions'}
-      label="Positions"
+      label={stringGetter({ key: STRING_KEYS.POSITIONS })}
       defaultSortDescriptor={{
         column: 'market',
         direction: 'ascending',
@@ -492,8 +484,8 @@ export const PositionsTable = ({
           width: columnWidths?.[key],
           isAccountViewOnly,
           showClosePositionAction,
-          shouldRenderTriggers,
           navigateToOrders,
+          isSinglePosition: positionsData.length === 1,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}

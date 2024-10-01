@@ -209,6 +209,8 @@ export const AbacusMarginMode = Abacus.exchange.dydx.abacus.output.input.MarginM
 
 export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
+export type HumanReadableCloseAllPositionsPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableCloseAllPositionsPayload;
 export type HumanReadableCancelOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableCancelOrderPayload;
 export type HumanReadableTriggerOrdersPayload =
