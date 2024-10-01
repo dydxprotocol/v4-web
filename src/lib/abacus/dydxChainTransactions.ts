@@ -108,8 +108,9 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     paramsInJson: Nullable<string>,
     callback: (p0: Nullable<string>) => void
   ): Promise<void> {
+    let parsedParams;
     try {
-      const parsedParams = paramsInJson ? JSON.parse(paramsInJson) : {};
+      parsedParams = paramsInJson ? JSON.parse(paramsInJson) : {};
       const {
         indexerUrl,
         websocketUrl,
@@ -154,7 +155,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
         }
       } catch (e) {
-        log('DydxChainTransactions/connectNetwork/NobleClient', e);
+        log('DydxChainTransactions/connectNetwork/NobleClient', e, parsedParams);
       }
 
       // Dispatch custom event to notify other parts of the app that the network has been connected
@@ -166,7 +167,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       callback(JSON.stringify({ success: true }));
     } catch (error) {
       this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
-      log('DydxChainTransactions/connectNetwork', error);
+      log('DydxChainTransactions/connectNetwork', error, parsedParams);
     }
   }
 
