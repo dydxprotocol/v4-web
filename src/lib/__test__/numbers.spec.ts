@@ -95,11 +95,12 @@ describe('getFractionDigits', () => {
     expect(getFractionDigits(50)).toEqual(0);
   });
   it('handles decimals', () => {
-    expect(getFractionDigits(0.005)).toEqual(3);
+    // prettier-ignore
+    expect(getFractionDigits(0.00500)).toEqual(3);
   });
   it('trims trailing 0s', () => {
     // eslint-disable-next-line prettier/prettier
-    expect(getFractionDigits(0.00500)).toEqual(3);
+    expect(getFractionDigits(0.005)).toEqual(3);
   });
 });
 

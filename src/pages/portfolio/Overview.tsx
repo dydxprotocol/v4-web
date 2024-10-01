@@ -126,7 +126,7 @@ export const Overview = () => {
         <$MaybeVaultPositionsPanel
           header={
             <ContentSectionHeader
-              title={stringGetter({ key: STRING_KEYS.VAULT })}
+              title={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
               slotRight={
                 isTablet && (
                   <Link onClick={handleViewVault} isAccent tw="font-small-book">

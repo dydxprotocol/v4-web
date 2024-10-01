@@ -7,7 +7,6 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -114,13 +113,6 @@ export const DepositButtonAndReceipt = ({
 
   const showExchangeRate = typeof summary?.exchangeRate === 'number';
   const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
-  const fallbackRouteDuration = stringGetter({
-    key: STRING_KEYS.X_MINUTES_LOWERCASED,
-    params: {
-      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
-    },
-  });
-
   const submitButtonReceipt = [
     {
       key: 'expected-deposit-amount',
@@ -225,23 +217,23 @@ export const DepositButtonAndReceipt = ({
       ),
     },
     {
-      key: 'estimatedRouteDuration',
+      key: 'estimatedRouteDurationSeconds',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value: (
         <Output
           type={OutputType.Text}
           value={
-            summary != null && typeof summary.estimatedRouteDuration === 'number'
+            typeof summary?.estimatedRouteDurationSeconds === 'number'
               ? stringGetter({
                   key: STRING_KEYS.X_MINUTES_LOWERCASED,
                   params: {
                     X:
-                      summary.estimatedRouteDuration < 60
+                      summary.estimatedRouteDurationSeconds < 60
                         ? '< 1'
-                        : Math.round(summary.estimatedRouteDuration / 60),
+                        : Math.round(summary.estimatedRouteDurationSeconds / 60),
                   },
                 })
-              : fallbackRouteDuration
+              : undefined
           }
         />
       ),

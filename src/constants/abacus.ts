@@ -209,6 +209,8 @@ export const AbacusMarginMode = Abacus.exchange.dydx.abacus.output.input.MarginM
 
 export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
+export type HumanReadableCloseAllPositionsPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableCloseAllPositionsPayload;
 export type HumanReadableCancelOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableCancelOrderPayload;
 export type HumanReadableTriggerOrdersPayload =
@@ -255,7 +257,7 @@ export const VaultFormAction = Abacus.exchange.dydx.abacus.functional.vault.Vaul
 export const VaultFormAccountData =
   Abacus.exchange.dydx.abacus.functional.vault.VaultFormAccountData;
 export type VaultDepositWithdrawSlippageResponse =
-  Abacus.exchange.dydx.abacus.functional.vault.VaultDepositWithdrawSlippageResponse;
+  Abacus.indexer.models.chain.OnChainVaultDepositWithdrawSlippageResponse;
 export type VaultFormValidationResult =
   Abacus.exchange.dydx.abacus.functional.vault.VaultFormValidationResult;
 export const { VaultCalculator, VaultAccountCalculator, VaultDepositWithdrawFormValidator } =

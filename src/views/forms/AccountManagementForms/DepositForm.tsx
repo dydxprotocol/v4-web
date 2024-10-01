@@ -477,7 +477,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         gasFee: summary?.gasFee || undefined,
         bridgeFee: summary?.bridgeFee || undefined,
         exchangeRate: summary?.exchangeRate || undefined,
-        estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+        estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
         toAmount: summary?.toAmount || undefined,
         toAmountMin: summary?.toAmountMin || undefined,
       });
@@ -514,7 +514,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         gasFee: summary?.gasFee ?? undefined,
         bridgeFee: summary?.bridgeFee ?? undefined,
         exchangeRate: summary?.exchangeRate ?? undefined,
-        estimatedRouteDuration: summary?.estimatedRouteDuration ?? undefined,
+        estimatedRouteDuration: summary?.estimatedRouteDurationSeconds ?? undefined,
         toAmount: summary?.toAmount ?? undefined,
         toAmountMin: summary?.toAmountMin ?? undefined,
         depositCTAString,
