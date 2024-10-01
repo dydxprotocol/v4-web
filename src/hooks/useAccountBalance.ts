@@ -75,10 +75,7 @@ export const useAccountBalance = ({
     sourceAccount.chain === WalletNetworkType.Evm
       ? (sourceAccount.address as EvmAddress)
       : undefined;
-  const solAddress =
-    sourceAccount.chain === WalletNetworkType.Solana
-      ? (sourceAccount.address as SolAddress)
-      : undefined;
+  const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
