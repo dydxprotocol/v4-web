@@ -80,17 +80,8 @@ export enum WalletNetworkType {
   Evm = 'evm',
   Cosmos = 'cosmos',
   Solana = 'solana',
+  Test = 'test', // for pairing with ConnectorType.Test
 }
-
-export type CosmosWalletInfo = {
-  connectorType: ConnectorType.Cosmos;
-  name: CosmosWalletType;
-};
-
-export type PhantomSolanaWalletInfo = {
-  connectorType: ConnectorType.PhantomSolana;
-  name: WalletType.Phantom;
-};
 
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
@@ -105,7 +96,10 @@ export type WalletInfo =
         | ConnectorType.Privy;
       name: WalletType;
     }
-  | CosmosWalletInfo
+  | {
+      connectorType: ConnectorType.Cosmos;
+      name: CosmosWalletType;
+    }
   | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
   | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string };
 

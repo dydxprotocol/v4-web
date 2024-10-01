@@ -7,7 +7,7 @@ import { parseStorageItem } from './utils';
 
 /**
  * Move over wallet data from localStorage into redux
- *
+ * TODO (in future migration): Remove these localStorage items
  */
 export function migration1(state: PersistedState) {
   if (!state) {

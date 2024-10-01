@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
-import { Address, erc20Abi, formatUnits } from 'viem';
+import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
 import {
@@ -72,7 +72,9 @@ export const useAccountBalance = ({
   const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
 
   const evmAddress =
-    sourceAccount.chain === WalletNetworkType.Evm ? (sourceAccount.address as Address) : undefined;
+    sourceAccount.chain === WalletNetworkType.Evm
+      ? (sourceAccount.address as EvmAddress)
+      : undefined;
   const solAddress =
     sourceAccount.chain === WalletNetworkType.Solana
       ? (sourceAccount.address as SolAddress)

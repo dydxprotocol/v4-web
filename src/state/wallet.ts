@@ -46,7 +46,7 @@ export const walletSlice = createSlice({
       state.sourceAccount.walletInfo = action.payload;
     },
     setSavedEncryptedSignature: (state, action: PayloadAction<string>) => {
-      if (state.sourceAccount.chain === 'cosmos') {
+      if (state.sourceAccount.chain === WalletNetworkType.Cosmos) {
         throw new Error('cosmos wallets should not require signatures for derived addresses');
       }
 

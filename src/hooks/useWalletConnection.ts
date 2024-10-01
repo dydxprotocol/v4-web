@@ -62,7 +62,7 @@ export const useWalletConnection = () => {
 
   const sourceAccount = useAppSelector(getSourceAccount);
 
-  // Save the connect wallet address in Redux so we can show source wallet details even if the user disconnects from their wallet
+  // Save the connected wallet address in Redux so we can show source wallet details even if the user disconnects from their wallet
   useEffect(() => {
     const walletInfo = sourceAccount.walletInfo;
     if (!walletInfo) return;
@@ -241,7 +241,6 @@ export const useWalletConnection = () => {
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
       if (wallet) {
-        setSelectedWallet(undefined);
         await disconnectWallet();
         await new Promise(requestAnimationFrame);
       }
@@ -283,12 +282,13 @@ export const useWalletConnection = () => {
 
   // On page load, if testFlag.address is set, connect to the test wallet.
   useEffect(() => {
-    (async () => {
-      if (testFlags.addressOverride) {
-        dispatch(setWalletInfo({ connectorType: ConnectorType.Test, name: WalletType.TestWallet }));
-      }
-    })();
-  }, []);
+    if (testFlags.addressOverride) {
+      dispatch(setWalletInfo({ connectorType: ConnectorType.Test, name: WalletType.TestWallet }));
+      dispatch(
+        setSourceAddress({ address: testFlags.addressOverride, chain: WalletNetworkType.Test })
+      );
+    }
+  }, [dispatch]);
 
   return {
     // Wallet selection

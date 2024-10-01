@@ -24,7 +24,6 @@ import { getSourceAccount } from '@/state/walletSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
 
 import { useDydxClient } from './useDydxClient';
@@ -152,13 +151,9 @@ const useAccountsContext = () => {
   useEffect(() => {
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
-        // Get override values. Use the testFlags value if it exists, otherwise use the previously
-        // saved value where possible. If neither exist, use a default garbage value.
-        const addressOverride: DydxAddress = (testFlags.addressOverride as DydxAddress) || 'dydx1';
-
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         const wallet = new LocalWallet();
-        wallet.address = addressOverride;
+        wallet.address = sourceAccount.address;
         setLocalDydxWallet(wallet);
 
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
@@ -228,21 +223,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [
-    signerWagmi,
-    isConnectedGraz,
-    sourceAccount.walletInfo?.connectorType,
-    sourceAccount.chain,
-    sourceAccount.encryptedSignature,
-    dispatch,
-    getCosmosOfflineSigner,
-    selectedDydxChainId,
-    localDydxWallet,
-    authenticated,
-    ready,
-    signMessageAsync,
-    setWalletFromSignature,
-  ]);
+  }, [signerWagmi, isConnectedGraz, sourceAccount, localDydxWallet]);
 
   // abacus
   useEffect(() => {
