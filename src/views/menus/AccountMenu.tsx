@@ -139,7 +139,7 @@ export const AccountMenu = () => {
                     slotTooltip={
                       <dl>
                         <dt>
-                          {/* TODO: Fix tooltip string here for Phantom connections */}
+                          {/* TODO: OTE-845 Fix tooltip string here for Phantom connections */}
                           {stringGetter({
                             key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
                             params: {
