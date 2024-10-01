@@ -71,7 +71,8 @@ export const useAccountBalance = ({
   const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
   const isSolanaChain = !!solAddress;
 
-  const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
+  const isEVMnativeToken =
+    addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS || addressOrDenom?.endsWith('native');
 
   const evmNative = useBalance({
     address: evmAddress,

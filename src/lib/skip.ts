@@ -1,3 +1,4 @@
+import { SkipClient } from '@skip-go/client';
 import {
   AxelarTransferInfoJSON,
   CCTPTransferInfoJSON,
@@ -238,3 +239,13 @@ export const fetchTransferStatus = ({
 }) => {
   return fetchSkipStatus({ transactionHash: transactionId, chainId: fromChainId, baseUrl });
 };
+
+// maybe move inside a hook and use the wagmi/phantom hook methods
+// as the signers instead. talk to skip about how this works.
+export const skipClient = new SkipClient({
+  getCosmosSigner: async (chainID) => {
+    const offlineSigner = window.keplr?.getOfflineSigner(chainID);
+    if (!offlineSigner) throw new Error('Keplr not installed');
+    return offlineSigner;
+  },
+});

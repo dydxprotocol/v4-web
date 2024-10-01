@@ -51,6 +51,7 @@ export const useWalletConnection = () => {
   });
 
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
+
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();

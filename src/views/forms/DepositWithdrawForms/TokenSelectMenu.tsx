@@ -1,0 +1,137 @@
+import { useMemo } from 'react';
+
+import { Asset } from '@skip-go/client';
+import { shallowEqual } from 'react-redux';
+import tw from 'twin.macro';
+
+import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM, SOLANA_USDC_DENOM } from '@/constants/denoms';
+import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
+import { STRING_KEYS } from '@/constants/localization';
+import { ConnectorType, WalletType } from '@/constants/wallets';
+
+import { useAssets } from '@/hooks/transfers/useAssets';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { DiffArrow } from '@/components/DiffArrow';
+import { SearchSelectMenu } from '@/components/SearchSelectMenu';
+import { Tag } from '@/components/Tag';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getTransferInputs } from '@/state/inputsSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
+
+import { LowestFeesDecoratorText } from './LowestFeesText';
+
+type ElementProps = {
+  selectedToken?: Asset;
+  onSelectToken: (token: TransferInputTokenResource) => void;
+  isExchange?: boolean;
+};
+
+export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
+  const stringGetter = useStringGetter();
+  const {
+    type,
+    resources,
+    chain: chainIdStr,
+  } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
+  const { connectedWallet } = useAccounts();
+  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
+
+  const lowestFeeTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
+  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
+  const isPhantomWallet = connectedWallet?.connectorType === ConnectorType.PhantomSolana;
+
+  const { assetsForSelectedChain } = useAssets();
+  const tokens = assetsForSelectedChain;
+  const tokenItems = Object.values(tokens)
+    .map((token) => ({
+      value: token.type,
+      label: token.stringKey,
+      onSelect: () => {
+        onSelectToken(token.denom);
+      },
+      slotBefore: (
+        // the curve dao token svg causes the web app to lag when rendered
+        <$Img src={token.logoURI ?? undefined} alt="" />
+      ),
+      slotAfter: !!lowestFeeTokensByDenom[token.type] && <LowestFeesDecoratorText />,
+      tag: token.symbol,
+    }))
+    .filter((token) => {
+      if (isKeplrWallet) {
+        if (chainIdStr === getNobleChainId()) {
+          return true;
+        }
+        if (chainIdStr === getOsmosisChainId()) {
+          return token.value === OSMO_USDC_IBC_DENOM;
+        }
+        if (chainIdStr === getNeutronChainId()) {
+          return token.value === NEUTRON_USDC_IBC_DENOM;
+        }
+      }
+      if (type === TransferType.deposit && isPhantomWallet) {
+        return token.value === SOLANA_USDC_DENOM;
+      }
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByDenom[token.value];
+      }
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByDenom[token.value];
+      }
+      return true;
+    })
+    // we want lowest fee tokens first followed by non-lowest fee cctp tokens
+    .sort((token) => (cctpTokensByDenom[token.value] ? -1 : 1))
+    .sort((token) => (lowestFeeTokensByDenom[token.value] ? -1 : 1));
+  // console.log('tokenitems', tokenItems);
+  return (
+    <SearchSelectMenu
+      items={[
+        {
+          group: 'assets',
+          groupLabel: stringGetter({ key: STRING_KEYS.ASSET }),
+          items: tokenItems,
+        },
+      ]}
+      label={stringGetter({ key: STRING_KEYS.ASSET })}
+      withSearch={!isExchange}
+      withReceiptItems={
+        !isExchange
+          ? [
+              {
+                key: 'swap',
+                label: stringGetter({ key: STRING_KEYS.SWAP }),
+                value: selectedToken && (
+                  <>
+                    <Tag>{type === TransferType.deposit ? selectedToken?.symbol : 'USDC'}</Tag>
+                    <DiffArrow />
+                    <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
+                  </>
+                ),
+              },
+            ]
+          : undefined
+      }
+    >
+      <div tw="row gap-0.5 text-color-text-2 font-base-book">
+        {selectedToken ? (
+          <>
+            <$Img src={selectedToken?.logoURI ?? undefined} alt="" /> {selectedToken?.name}{' '}
+            <Tag>{selectedToken?.symbol}</Tag>
+          </>
+        ) : (
+          stringGetter({ key: STRING_KEYS.SELECT_ASSET })
+        )}
+      </div>
+    </SearchSelectMenu>
+  );
+};
+const $Img = tw.img`h-1.25 w-1.25 rounded-[50%]`;
