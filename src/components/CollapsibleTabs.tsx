@@ -35,10 +35,9 @@ type ElementProps<TabItemsValue> = {
 };
 
 type StyleProps = {
-  className?: string;
   fullWidthTabs?: boolean;
-  withBorders?: boolean;
-  withUnderline?: boolean;
+  dividerStyle?: 'border' | 'underline' | 'none';
+  className?: string;
 };
 
 export type CollapsibleTabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
@@ -53,14 +52,15 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
   onOpenChange,
 
   fullWidthTabs,
-  withBorders = true,
-  withUnderline = false,
+  dividerStyle = 'none',
 
   className,
 }: CollapsibleTabsProps<TabItemsValue>) => {
-  const currentTab = tabItems.find((tabItem) => tabItem.value === tab);
-
   const { uiRefresh } = testFlags;
+
+  const currentTab = tabItems.find((tabItem) => tabItem.value === tab);
+  const withBorders = dividerStyle === 'border';
+  const withUnderline = dividerStyle === 'underline';
 
   return (
     <$TabsRoot

@@ -310,7 +310,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   }[tab];
 
   return isTablet ? (
-    <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
+    <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
       <$CollapsibleTabs
@@ -319,8 +319,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         setTab={setTab}
         defaultOpen={isOpen}
         onOpenChange={setIsOpen}
-        withBorders={!uiRefresh}
-        withUnderline={uiRefresh}
+        dividerStyle={uiRefresh ? 'underline' : 'border'}
         slotToolbar={
           <>
             <ToggleGroup
