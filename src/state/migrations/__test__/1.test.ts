@@ -40,7 +40,7 @@ describe('migration1', () => {
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
     expect(newState.wallet.sourceAccount?.address).toBeUndefined();
-    expect(newState.wallet.sourceAccount?.walletInfo).toBeUndefined();
+    expect(newState.wallet.sourceAccount.walletInfo).toBeUndefined();
   });
 
   it('should set evm address correctly if wallet info is evm', () => {
@@ -49,8 +49,8 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_EVM_ADDRESS);
-    expect(newState.wallet.sourceAccount?.walletInfo.connectorType).toBe(
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_EVM_ADDRESS);
+    expect(newState.wallet.sourceAccount.walletInfo?.connectorType).toBe(
       MOCK_EVM_WALLET_INFO.connectorType
     );
   });
@@ -61,8 +61,8 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_SOLANA_ADDRESS);
-    expect(newState.wallet.sourceAccount?.walletInfo.connectorType).toBe(
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_SOLANA_ADDRESS);
+    expect(newState.wallet.sourceAccount.walletInfo?.connectorType).toBe(
       MOCK_SOLANA_WALLET_INFO.connectorType
     );
   });
@@ -73,8 +73,8 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_DYDX_ADDRESS);
-    expect(newState.wallet.sourceAccount?.walletInfo.connectorType).toBe(
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_DYDX_ADDRESS);
+    expect(newState.wallet.sourceAccount.walletInfo?.connectorType).toBe(
       MOCK_COSMOS_WALLET_INFO.connectorType
     );
   });
@@ -86,8 +86,8 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_SOLANA_ADDRESS);
-    expect(newState.wallet.sourceAccount?.walletInfo.connectorType).toBe(
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_SOLANA_ADDRESS);
+    expect(newState.wallet.sourceAccount.walletInfo?.connectorType).toBe(
       MOCK_SOLANA_WALLET_INFO.connectorType
     );
   });
