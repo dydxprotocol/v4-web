@@ -165,6 +165,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       globalThis.dispatchEvent(customEvent);
       callback(JSON.stringify({ success: true }));
+      this.store?.dispatch(setInitializationError(undefined));
     } catch (error) {
       this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
       log('DydxChainTransactions/connectNetwork', error, parsedParams);
