@@ -41,6 +41,7 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getVaultForm } from '@/state/vaultSelectors';
 import {
+  resetVaultForm,
   setVaultFormAmount,
   setVaultFormConfirmationStep,
   setVaultFormOperation,
@@ -201,9 +202,7 @@ export const VaultDepositWithdrawForm = ({
       } else {
         assertNever(operation);
       }
-      setOperation('DEPOSIT');
-      setAmountState('');
-      dispatch(setVaultFormConfirmationStep(false));
+      dispatch(resetVaultForm());
 
       onSuccess?.();
     } catch (e) {

@@ -48,7 +48,10 @@ export const SelectMenu = <T extends string>({
           <Value />
         )}
         {React.Children.toArray(children).length > 1 && (
-          <Icon iconName={IconName.Triangle} tw="h-0.375 w-0.625 text-color-text-0" />
+          <Icon
+            iconName={IconName.Triangle}
+            tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
+          />
         )}
       </$Trigger>
       <Portal>

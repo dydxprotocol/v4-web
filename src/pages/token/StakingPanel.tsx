@@ -122,7 +122,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
           )}
         </$BalanceRow>
         <$BalanceRow>
-          <div>
+          <div tw="min-w-px">
             <$Label>
               <WithTooltip tooltipString={estimatedAprTooltipString}>
                 {stringGetter({
