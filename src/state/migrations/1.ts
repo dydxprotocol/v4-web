@@ -1,15 +1,16 @@
-import { PersistedState } from 'redux-persist';
-
 import { EvmDerivedAddresses, SolDerivedAddresses } from '@/constants/account';
-import { ConnectorType, EvmAddress, WalletInfo } from '@/constants/wallets';
+import { ConnectorType, EvmAddress, WalletInfo, WalletNetworkType } from '@/constants/wallets';
 
+import { WalletState } from '../wallet';
+import { V0State } from './0';
 import { parseStorageItem } from './utils';
 
+type V1State = V0State & { wallet: WalletState };
 /**
  * Move over wallet data from localStorage into redux
  * TODO (in future migration): Remove these localStorage items
  */
-export function migration1(state: PersistedState) {
+export function migration1(state: V0State): V1State {
   if (!state) {
     throw new Error('state must be defined');
   }
@@ -49,8 +50,10 @@ export function migration1(state: PersistedState) {
       wallet: {
         sourceAccount: {
           address: solAddress ?? undefined,
-          chain: 'solana',
-          encryptedSignature: solAddress && solDerivedAddresses?.[solAddress]?.encryptedSignature,
+          chain: WalletNetworkType.Solana,
+          encryptedSignature: solAddress
+            ? solDerivedAddresses?.[solAddress]?.encryptedSignature
+            : undefined,
           walletInfo: selectedWallet,
         },
       },
@@ -63,7 +66,7 @@ export function migration1(state: PersistedState) {
       wallet: {
         sourceAccount: {
           address: dydxAddress ?? undefined,
-          chain: 'cosmos',
+          chain: WalletNetworkType.Cosmos,
           walletInfo: selectedWallet,
         },
       },
@@ -76,7 +79,7 @@ export function migration1(state: PersistedState) {
     wallet: {
       sourceAccount: {
         address: evmAddress,
-        chain: 'evm',
+        chain: WalletNetworkType.Evm,
         encryptedSignature: shouldCopyOverEvmSignature
           ? evmDerivedAddresses?.[evmAddress]?.encryptedSignature
           : undefined,

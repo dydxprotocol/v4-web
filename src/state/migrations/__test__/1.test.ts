@@ -3,11 +3,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
+import { V0State } from '../0';
 import { migration1 } from '../1';
 
-const V0_STATE = {
+const V0_STATE: V0State = {
   _persist: { version: 0, rehydrated: true },
-  tradingViewConfig: undefined,
+  tradingView: { chartConfig: undefined },
 };
 
 const MOCK_EVM_ADDRESS = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';

@@ -2,16 +2,19 @@ import { PersistedState } from 'redux-persist';
 
 import { parseStorageItem } from './utils';
 
+export type V0State = PersistedState & { tradingView: { chartConfig?: object } };
 /**
  * First migration (as an example), moving over tradingview chart configs
  *
  */
-export function migration0(state: PersistedState) {
+export function migration0(state: PersistedState): V0State {
   if (!state) {
     throw new Error('state must be defined');
   }
 
-  const oldTvChartConfig = parseStorageItem(localStorage.getItem('dydx.TradingViewChartConfig'));
+  const oldTvChartConfig = parseStorageItem<object>(
+    localStorage.getItem('dydx.TradingViewChartConfig')
+  );
   localStorage.removeItem('dydx.TradingViewChartConfig');
 
   return {
