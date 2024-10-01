@@ -345,8 +345,8 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)<{
     $isActive
       ? $withUnderline
         ? css`
-            ${tabMixins.tabTriggerActiveUnderlineStyle}
             ${tabMixins.tabTriggerUnderlineStyle}
+            ${tabMixins.tabTriggerActiveUnderlineStyle}
           `
         : css`
             --trigger-textColor: var(--trigger-active-textColor);
