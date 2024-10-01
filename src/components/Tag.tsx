@@ -1,5 +1,7 @@
 import styled, { css } from 'styled-components';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 export enum TagSize {
   Small = 'Small',
   Medium = 'Medium',
@@ -34,6 +36,8 @@ export const Tag = styled.span<StyleProps>`
   color: var(--color-text-2);
   letter-spacing: 0.04em;
   line-height: 1.3;
+
+  ${layoutMixins.textTruncate}
 
   ${({ type, size }) =>
     ({

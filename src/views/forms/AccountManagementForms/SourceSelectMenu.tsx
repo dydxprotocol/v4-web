@@ -151,7 +151,7 @@ export const SourceSelectMenu = ({
       label={
         label ??
         stringGetter({
-          key: type === TransferType.deposit ? STRING_KEYS.SOURCE : STRING_KEYS.DEPOSIT,
+          key: type === TransferType.deposit ? STRING_KEYS.SOURCE : STRING_KEYS.DESTINATION,
         })
       }
     >
