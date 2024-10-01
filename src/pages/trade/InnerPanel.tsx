@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -6,7 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
-import { MarketDetails } from '@/views/MarketDetails';
+import { CurrentMarketDetails } from '@/views/MarketDetails/CurrentMarketDetails';
+import { LaunchableMarketDetails } from '@/views/MarketDetails/LaunchableMarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
@@ -17,7 +18,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isTruthy } from '@/lib/isTruthy';
 
 enum Tab {
   Price = 'Price',
@@ -32,53 +32,68 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
 
   const [value, setValue] = useState(Tab.Price);
 
-  return (
-    <Tabs
-      value={value}
-      onValueChange={setValue}
-      items={[
+  const innerPanelItems = useMemo(() => {
+    if (launchableMarketId) {
+      return [
         {
-          content: launchableMarketId ? (
-            <TvChartLaunchable marketId={launchableMarketId} />
-          ) : (
-            <TvChart />
-          ),
+          content: <TvChartLaunchable marketId={launchableMarketId} />,
           forceMount: true,
           label: stringGetter({ key: STRING_KEYS.PRICE_CHART_SHORT }),
           value: Tab.Price,
         },
-        !launchableMarketId && {
-          content: (
-            <DepthChart
-              onChartClick={({ side, price, size }) => {
-                abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side });
-                abacusStateManager.setTradeValue({
-                  field: TradeInputField.limitPrice,
-                  value: price,
-                });
-                abacusStateManager.setTradeValue({
-                  field: TradeInputField.size,
-                  value: size,
-                });
-              }}
-              stringGetter={stringGetter}
-              selectedLocale={selectedLocale}
-            />
-          ),
-          label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
-          value: Tab.Depth,
-        },
-        !launchableMarketId && {
-          content: <FundingChart selectedLocale={selectedLocale} />,
-          label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
-          value: Tab.Funding,
-        },
         {
-          content: <MarketDetails />,
+          content: <LaunchableMarketDetails launchableMarketId={launchableMarketId} />,
           label: stringGetter({ key: STRING_KEYS.DETAILS }),
           value: Tab.Details,
         },
-      ].filter(isTruthy)}
+      ];
+    }
+    return [
+      {
+        content: <TvChart />,
+        forceMount: true,
+        label: stringGetter({ key: STRING_KEYS.PRICE_CHART_SHORT }),
+        value: Tab.Price,
+      },
+      {
+        content: (
+          <DepthChart
+            onChartClick={({ side, price, size }) => {
+              abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side });
+              abacusStateManager.setTradeValue({
+                field: TradeInputField.limitPrice,
+                value: price,
+              });
+              abacusStateManager.setTradeValue({
+                field: TradeInputField.size,
+                value: size,
+              });
+            }}
+            stringGetter={stringGetter}
+            selectedLocale={selectedLocale}
+          />
+        ),
+        label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
+        value: Tab.Depth,
+      },
+      {
+        content: <FundingChart selectedLocale={selectedLocale} />,
+        label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
+        value: Tab.Funding,
+      },
+      {
+        content: <CurrentMarketDetails />,
+        label: stringGetter({ key: STRING_KEYS.DETAILS }),
+        value: Tab.Details,
+      },
+    ];
+  }, [launchableMarketId, selectedLocale, stringGetter]);
+
+  return (
+    <Tabs
+      value={value}
+      onValueChange={setValue}
+      items={innerPanelItems}
       slotToolbar={<MarketLinks />}
       withTransitions={false}
     />

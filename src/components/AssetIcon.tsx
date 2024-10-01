@@ -777,13 +777,17 @@ const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
   symbol != null && Object.hasOwn(assetIcons, symbol);
 
 export const AssetIcon = ({
+  logoUrl,
   symbol,
   className,
 }: {
+  logoUrl?: string;
   symbol?: Nullable<string>;
   className?: string;
 }) =>
-  isAssetSymbol(symbol) ? (
+  logoUrl ? (
+    <img src={logoUrl} className={className} alt="" tw="h-[1em] w-auto rounded-[50%]" />
+  ) : isAssetSymbol(symbol) ? (
     <img
       src={assetIcons[symbol]}
       className={className}
@@ -793,6 +797,7 @@ export const AssetIcon = ({
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
+
 const $Placeholder = styled.div`
   background-color: var(--color-layer-5);
   width: 1em;
