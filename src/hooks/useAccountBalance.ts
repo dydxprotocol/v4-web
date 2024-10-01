@@ -80,7 +80,7 @@ export const useAccountBalance = ({
       ? (sourceAccount.address as SolAddress)
       : undefined;
   const dydxAddress =
-    sourceAccount.chain === WalletNetworkType.Solana ? sourceAccount.address : undefined;
+    sourceAccount.chain === WalletNetworkType.Cosmos ? sourceAccount.address : undefined;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 
