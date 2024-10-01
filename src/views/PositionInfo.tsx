@@ -5,6 +5,7 @@ import { type Nullable } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -39,7 +40,7 @@ type PositionInfoItems = {
 
   // Label Properties
   label: string;
-  tooltip?: string;
+  tooltip?: TooltipStringKeys;
   tooltipParams?: Record<string, string>;
 
   // Output/DiffOutput Properties

@@ -26,7 +26,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
@@ -272,21 +272,24 @@ export const VaultDepositWithdrawForm = ({
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+              tooltip: 'cross-free-collateral',
               value: freeCollateralDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-margin-usage',
+              tooltip: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
               value: marginUsageDiff,
             },
             {
               key: 'vault-balance',
+              tooltip: 'vault-your-balance',
               label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
               value: vaultDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
             label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
             icon: 'vault' as const,
@@ -300,27 +303,31 @@ export const VaultDepositWithdrawForm = ({
           inputReceiptItems: [
             {
               key: 'vault-balance',
-              label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
+              tooltip: 'vault-available-to-withdraw',
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
               value: vaultDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-free-collateral',
+              tooltip: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
               value: freeCollateralDiff,
             },
             {
               key: 'slippage',
-              label: stringGetter({ key: STRING_KEYS.EST_SLIPPAGE }),
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_SLIPPAGE }),
+              tooltip: 'vault-estimated-slippage',
               value: <Output type={OutputType.Percent} value={slippagePercent} />,
             },
             {
               key: 'est amount',
-              label: stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED }),
+              tooltip: 'vault-estimated-amount',
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_AMOUNT_RECEIVED }),
               value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
             label: stringGetter({ key: STRING_KEYS.CROSS_ACCOUNT }),
             icon: 'cross' as const,
