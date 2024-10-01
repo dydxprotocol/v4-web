@@ -1,7 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 export enum TagSize {
   Small = 'Small',
   Medium = 'Medium',
