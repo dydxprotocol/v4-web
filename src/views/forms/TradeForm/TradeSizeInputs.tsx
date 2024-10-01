@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
+import _ from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -136,18 +137,17 @@ export const TradeSizeInputs = () => {
     });
   };
 
+  const dispatchSetDisplayUnit = _.debounce((newDisplayUnit) => {
+    if (!id) return;
+    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId: id }));
+  }, 300);
+
   const onUsdcToggle = useCallback(
     (isPressed: boolean) => {
       const newDisplayUnit = isPressed ? DisplayUnit.Fiat : DisplayUnit.Asset;
-      dispatch(
-        setDisplayUnit({
-          newDisplayUnit,
-          entryPoint: 'tradeAmountInput',
-          assetId: id ?? '',
-        })
-      );
+      dispatchSetDisplayUnit(newDisplayUnit);
     },
-    [dispatch, id]
+    [dispatchSetDisplayUnit]
   );
 
   useEffect(() => {

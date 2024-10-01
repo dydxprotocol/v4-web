@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import _ from 'lodash';
 import { useDispatch } from 'react-redux';
 
 import { DisplayUnit } from '@/constants/trade';
@@ -20,18 +21,17 @@ export const DisplayUnitTag = ({ entryPoint, assetId, className }: ElementProps)
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const dispatch = useDispatch();
 
+  const dispatchSetDisplayUnit = _.debounce((newDisplayUnit) => {
+    if (!assetId) return;
+    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint, assetId }));
+  }, 300);
+
   const onToggle = useCallback(() => {
     if (!assetId) return;
 
     const newDisplayUnit = displayUnit === DisplayUnit.Asset ? DisplayUnit.Fiat : DisplayUnit.Asset;
-    dispatch(
-      setDisplayUnit({
-        newDisplayUnit,
-        assetId,
-        entryPoint,
-      })
-    );
-  }, [assetId, dispatch, displayUnit, entryPoint]);
+    dispatchSetDisplayUnit(newDisplayUnit);
+  }, [assetId, dispatchSetDisplayUnit, displayUnit]);
 
   return !assetId ? (
     <Tag className={className}>USD</Tag>
