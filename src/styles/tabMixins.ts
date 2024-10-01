@@ -22,6 +22,7 @@ const tabTriggerStyle = css`
 
 const tabTriggerUnderlineStyle = css`
   box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
+  --trigger-active-backgroundColor: var(--trigger-backgroundColor);
 
   &[data-state='active'] {
     box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0

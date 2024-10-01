@@ -97,6 +97,7 @@ export const Tabs = <TabItemsValue extends string>({
               onValueChange={onValueChange}
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
+              $withUnderline={withUnderline}
               slotTrigger={
                 <$DropdownTabTrigger value={value ?? ''} $withUnderline={withUnderline} />
               }
@@ -332,19 +333,30 @@ const $DropdownTabTrigger = styled(Trigger)<{
 
 const dropdownSelectMenuType = getSimpleStyledOutputType(
   DropdownSelectMenu,
-  {} as { $isActive?: boolean }
+  {} as { $isActive?: boolean; $withUnderline?: boolean }
 );
-const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)<{
+  $isActive?: boolean;
+  $withUnderline?: boolean;
+}>`
   --trigger-radius: 0;
   --dropdownSelectMenu-item-font-size: var(--fontSize-base);
 
-  ${({ $isActive }) =>
-    $isActive &&
-    css`
-      --trigger-textColor: var(--trigger-active-textColor);
-      --trigger-backgroundColor: var(--trigger-active-backgroundColor);
-      --trigger-underline-size: var(--trigger-active-underline-size);
-    `}
+  ${({ $isActive, $withUnderline }) =>
+    $isActive
+      ? $withUnderline
+        ? css`
+            ${tabMixins.tabTriggerUnderlineStyle}
+                box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
+            var(--trigger-active-underlineColor);
+          color: var(--trigger-active-textColor);
+          `
+        : css`
+            --trigger-textColor: var(--trigger-active-textColor);
+            --trigger-backgroundColor: var(--trigger-active-backgroundColor);
+            --trigger-underline-size: var(--trigger-active-underline-size);
+          `
+      : css``}
 ` as typeof dropdownSelectMenuType;
 
 export const MobileTabs = styled(Tabs)`
