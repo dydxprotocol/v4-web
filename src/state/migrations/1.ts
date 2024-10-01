@@ -33,7 +33,12 @@ export function migration1(state: PersistedState) {
     return {
       ...state,
       wallet: {
-        sourceAccount: undefined,
+        sourceAccount: {
+          address: undefined,
+          chain: undefined,
+          encryptedSignature: undefined,
+          walletInfo: undefined,
+        },
       },
     };
   }
