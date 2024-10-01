@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { IAffiliateStats } from '@/constants/affiliates';
+import { IAffiliateStats, IProgramStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 import { AffiliateRoute } from '@/constants/routes';
 
@@ -59,6 +59,7 @@ export const AffiliatesPage: React.FC = () => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const [accountStats, setAccountStats] = useState<IAffiliateStats>();
+  const [programStats, setProgramStats] = useState<IProgramStats>();
   const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
 
   // Mocked user status data
@@ -71,6 +72,15 @@ export const AffiliatesPage: React.FC = () => {
   useEffect(() => {
     fetchAccountStats();
   }, [isConnectedWagmi]);
+
+  useEffect(() => {
+    fetchProgramStats();
+  }, []);
+
+  const fetchProgramStats = async () => {
+    const res = await axios.get(`http://localhost:3000/v1/community/program-stats`);
+    setProgramStats(res.data);
+  };
 
   const fetchAccountStats = async () => {
     if (!isConnectedWagmi) {
@@ -167,14 +177,7 @@ export const AffiliatesPage: React.FC = () => {
         {currTab === AffiliateRoute.ProgramStats && (
           <ProgramStatsCard
             className="mt-0.5 h-fit notTablet:h-full"
-            programStats={{
-              affiliatePayouts: 123456789,
-              referredVolume: 192348687987,
-              referredFees: 2395848660,
-              referredTrades: 103496,
-              totalReferredUsers: 10000,
-              totalAffiliates: 1949585,
-            }}
+            programStats={programStats as IProgramStats}
           />
         )}
       </$Section>

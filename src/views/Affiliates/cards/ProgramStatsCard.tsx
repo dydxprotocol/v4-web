@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { IProgramStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -9,15 +10,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { OutputType } from '@/components/Output';
 
 import { BorderStatCell, StatCell } from '../StatBox';
-
-interface IProgramStats {
-  affiliatePayouts: number;
-  referredVolume: number;
-  referredFees: number;
-  referredTrades: number;
-  totalReferredUsers: number;
-  totalAffiliates: number;
-}
 
 interface IProgramStatsProps {
   className?: string;
@@ -39,9 +31,9 @@ const MobileView = ({ programStats }: { programStats: IProgramStats }) => {
         <StatCell
           valueSize="large"
           className="relative"
-          title={stringGetter({ key: STRING_KEYS.AFFILIATE_PAYOUTS })}
+          title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={programStats.affiliatePayouts}
+          value={programStats.totalEarnings}
         />
 
         <StatCell
@@ -93,14 +85,14 @@ const DesktopView = ({ programStats }: { programStats: IProgramStats }) => {
         <StatCell
           valueSize="large"
           className="relative inline-block"
-          title="Affiliate Payouts"
+          title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={programStats.affiliatePayouts}
+          value={programStats.totalEarnings}
         />
 
         <StatCell
           valueSize="large"
-          title="Total Affiliates"
+          title={stringGetter({ key: STRING_KEYS.TOTAL_AFFILIATES })}
           outputType={OutputType.Number}
           value={programStats.totalAffiliates}
         />

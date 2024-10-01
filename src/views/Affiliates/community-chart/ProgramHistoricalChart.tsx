@@ -211,7 +211,7 @@ export const ProgramHistoricalChart = ({
   const series = useMemo(
     () => [
       {
-        dataKey: 'trading-rewards',
+        dataKey: 'affiliate-program',
         xAccessor: xAccessorFunc,
         yAccessor: yAccessorFunc,
         colorAccessor: () => 'var(--trading-rewards-line-color)',

@@ -19,3 +19,12 @@ export interface IDateStats {
   totalReferredTrades: string;
   totalReferredUsers: string;
 }
+
+export interface IProgramStats {
+  totalEarnings: number;
+  referredVolume: number;
+  referredFees: number;
+  referredTrades: number;
+  totalReferredUsers: number;
+  totalAffiliates: number;
+}
