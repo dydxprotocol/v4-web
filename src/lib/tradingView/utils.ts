@@ -1,6 +1,7 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import {
   ChartPropertiesOverrides,
+  TradingTerminalFeatureset,
   TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
 
@@ -235,9 +236,27 @@ export const getWidgetOverrides = ({
   };
 };
 
-export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
-  Pick<TradingTerminalWidgetOptions, 'container'> => {
+export const getWidgetOptions = (
+  isViewingUnlaunchedMarket?: boolean
+): Partial<TradingTerminalWidgetOptions> & Pick<TradingTerminalWidgetOptions, 'container'> => {
   const { uiRefresh } = testFlags;
+
+  const disabledFeaturesForUnlaunchedMarket: TradingTerminalFeatureset[] = [
+    'chart_scroll',
+    'chart_zoom',
+  ];
+
+  const disabledFeatures: TradingTerminalFeatureset[] = [
+    'header_symbol_search',
+    'header_compare',
+    'symbol_search_hot_key',
+    'symbol_info',
+    'go_to_date',
+    'timeframes_toolbar',
+    'header_layouttoggle',
+    'trading_account_manager',
+    ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
+  ];
 
   return {
     // debug: true,
@@ -248,16 +267,7 @@ export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
       : '/tradingview/custom-styles-deprecated.css',
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
-    disabled_features: [
-      'header_symbol_search',
-      'header_compare',
-      'symbol_search_hot_key',
-      'symbol_info',
-      'go_to_date',
-      'timeframes_toolbar',
-      'header_layouttoggle',
-      'trading_account_manager',
-    ],
+    disabled_features: disabledFeatures,
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',

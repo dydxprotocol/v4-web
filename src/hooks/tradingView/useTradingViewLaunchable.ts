@@ -53,7 +53,7 @@ export const useTradingViewLaunchable = ({
 
   useEffect(() => {
     if (marketId) {
-      const widgetOptions = getWidgetOptions();
+      const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
       const options: TradingTerminalWidgetOptions = {
@@ -72,7 +72,6 @@ export const useTradingViewLaunchable = ({
       tvWidgetRef.current = tvChartWidget;
 
       tvChartWidget.onChartReady(() => {
-        tvWidgetRef?.current?.activeChart().setZoomEnabled(false);
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
           tvWidgetRef?.current?.save((chartConfig: object) => {
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
