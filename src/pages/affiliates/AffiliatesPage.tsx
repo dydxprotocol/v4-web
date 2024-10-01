@@ -19,6 +19,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import LastUpdated from '@/views/Affiliates/LastUpdated';
+import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
 import { ProgramStatsCard } from '@/views/Affiliates/cards/ProgramStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
@@ -60,12 +61,13 @@ export const AffiliatesPage: React.FC = () => {
   const stringGetter = useStringGetter();
   const [accountStats, setAccountStats] = useState<IAffiliateStats>();
   const [programStats, setProgramStats] = useState<IProgramStats>();
+  const [lastUpdated, setLastUpdated] = useState<string>();
   const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
 
   // Mocked user status data
   const userStatus = {
-    isAffiliate: true,
-    isVip: true,
+    isAffiliate: false,
+    isVip: false,
     currentAffiliateTier: 2,
   };
 
@@ -75,6 +77,7 @@ export const AffiliatesPage: React.FC = () => {
 
   useEffect(() => {
     fetchProgramStats();
+    fetchLastUpdated();
   }, []);
 
   const fetchProgramStats = async () => {
@@ -88,26 +91,16 @@ export const AffiliatesPage: React.FC = () => {
       return;
     }
 
-    // Mocked backend (connected account) data
-    const myData = {
-      rank: 9,
-      account: dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress ?? '',
-      referredFees: 100055,
-      referredVolume: 13245678,
-      totalEarnings: 2000349,
-      totalReferredUsers: 300,
-      currentAffiliateTier: 2,
-      totalReferredTrades: 400,
-    };
-
     const res = await axios.get(
-      `http://localhost:3000/v1/accounts/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
+      `http://localhost:3000/v1/leaderboard/accounts/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
     );
 
-    // fetch account stats
     setAccountStats(res.data);
+  };
 
-    // setAccountStats(myData);
+  const fetchLastUpdated = async () => {
+    const res = await axios.get(`http://localhost:3000/v1/last-updated`);
+    setLastUpdated(res.data);
   };
 
   const routesComponent = (
@@ -123,7 +116,7 @@ export const AffiliatesPage: React.FC = () => {
   return (
     <$Page>
       <$Section className="p-1">
-        {isNotTablet && <LastUpdated lastUpdatedDate={new Date('2024-09-11T12:00:00Z')} />}
+        {isNotTablet && lastUpdated && <LastUpdated lastUpdatedDate={new Date(lastUpdated)} />}
         <AffiliatesBanner />
 
         <AttachedExpandingSection>
@@ -154,8 +147,8 @@ export const AffiliatesPage: React.FC = () => {
         {currTab === AffiliateRoute.Leaderboard && (
           <section className="mt-0.5 flex flex-row flex-wrap items-center justify-between gap-y-1">
             {isConnectedWagmi && !userStatus.isAffiliate && !userStatus.isVip ? (
-              <div className="w-full bg-color-accent-faded p-4 notTablet:w-7/12">
-                Affiliate threshold card
+              <div className="w-full notTablet:w-7/12">
+                <ShareAffiliateBanner accountStats={accountStats as IAffiliateStats} />
               </div>
             ) : (
               <AffiliateStatsCard
