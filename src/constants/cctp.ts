@@ -1,3 +1,5 @@
+import { Asset } from '@skip-go/client';
+
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
 
@@ -78,3 +80,13 @@ export const cctpTokensByChainId = cctpTokens.reduce(
   },
   {} as Record<string, CctpTokenInfo[]>
 );
+
+export const isTokenCctp = (token: Asset | null) => {
+  return isDenomCctp(token?.denom);
+};
+
+export const isDenomCctp = (denom: string | undefined) => {
+  return Boolean(
+    mainnetChains.find(({ tokenAddress }) => denom?.toLowerCase() === tokenAddress.toLowerCase())
+  );
+};

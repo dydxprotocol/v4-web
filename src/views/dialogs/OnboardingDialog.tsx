@@ -27,7 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
 
-import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
+import { DepositForm as D2 } from '../forms/DepositWithdrawForms/DepositForm';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 
@@ -99,7 +99,12 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
             children: (
               <$Content>
                 {isMainnet ? (
-                  <DepositForm
+                  // <DepositForm
+                  //   onDeposit={(event) => {
+                  //     track(AnalyticsEvents.TransferDeposit(event ?? {}));
+                  //   }}
+                  // />
+                  <D2
                     onDeposit={(event) => {
                       track(AnalyticsEvents.TransferDeposit(event ?? {}));
                     }}

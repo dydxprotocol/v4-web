@@ -77,7 +77,8 @@ export const useAccountBalance = ({
       : undefined;
   const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
-  const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
+  const isEVMnativeToken =
+    addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS || addressOrDenom?.endsWith('native');
 
   const evmNative = useBalance({
     address: evmAddress,
