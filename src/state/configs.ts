@@ -9,8 +9,11 @@ import type {
   NetworkConfigs,
   Nullable,
 } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { DisplayUnit } from '@/constants/trade';
 
+import { track } from '@/lib/analytics/analytics';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 import { testFlags } from '@/lib/testFlags';
 
@@ -35,11 +38,6 @@ export enum OtherPreference {
   DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
   GasToken = 'GasToken',
   ReverseLayout = 'ReverseLayout',
-}
-
-export enum DisplayUnit {
-  Asset = 'asset',
-  Fiat = 'fiat',
 }
 
 export interface ConfigsState {
@@ -113,9 +111,26 @@ export const configsSlice = createSlice({
       setLocalStorage({ key: LocalStorageKey.HasSeenLaunchIncentives, value: true });
       state.hasSeenLaunchIncentives = true;
     },
-    setDisplayUnit: (state: ConfigsState, { payload }: PayloadAction<DisplayUnit>) => {
-      setLocalStorage({ key: LocalStorageKey.SelectedDisplayUnit, value: payload });
-      state.displayUnit = payload;
+    setDisplayUnit: (
+      state: ConfigsState,
+      {
+        payload,
+      }: PayloadAction<{
+        newDisplayUnit: DisplayUnit;
+        entryPoint: string;
+        assetId: string;
+      }>
+    ) => {
+      const { newDisplayUnit, entryPoint, assetId } = payload;
+      setLocalStorage({ key: LocalStorageKey.SelectedDisplayUnit, value: newDisplayUnit });
+      state.displayUnit = newDisplayUnit;
+      track(
+        AnalyticsEvents.DisplayUnitToggled({
+          entryPoint,
+          assetId,
+          newDisplayUnit,
+        })
+      );
     },
   },
 });

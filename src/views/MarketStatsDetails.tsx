@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -15,6 +16,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
+import { DisplayUnitTag } from '@/components/DisplayUnitTag';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
@@ -22,7 +24,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import {
   getCurrentMarketConfig,
   getCurrentMarketData,
@@ -63,7 +65,7 @@ const defaultMarketStatistics = [
 export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+
   const { tickSizeDecimals, initialMarginFraction, effectiveInitialMarginFraction } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
@@ -73,19 +75,22 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
 
   const { uiRefresh } = testFlags;
 
-  const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent } = currentMarketData ?? {};
+  const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent, assetId } =
+    currentMarketData ?? {};
 
   useEffect(() => {
     lastMidMarketPrice.current = midMarketPrice;
   }, [midMarketPrice]);
 
-  const { nextFundingRate, openInterest, trades24H, volume24H } = perpetual ?? {};
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+
+  const { nextFundingRate, openInterest, openInterestUSDC, trades24H, volume24H } = perpetual ?? {};
 
   const valueMap = {
     [MarketStats.OraclePrice]: oraclePrice,
     [MarketStats.NextFunding]: undefined, // hardcoded
     [MarketStats.Funding1H]: nextFundingRate,
-    [MarketStats.OpenInterest]: openInterest,
+    [MarketStats.OpenInterest]: displayUnit === DisplayUnit.Fiat ? openInterestUSDC : openInterest,
     [MarketStats.PriceChange24H]: priceChange24H,
     [MarketStats.Trades24H]: trades24H,
     [MarketStats.Volume24H]: volume24H,
@@ -126,11 +131,12 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               value={valueMap[stat]}
               stat={stat}
               tickSizeDecimals={tickSizeDecimals}
-              id={id}
+              assetId={assetId ?? ''}
               isLoading={isLoading}
               priceChange24HPercent={priceChange24HPercent}
               initialMarginFraction={initialMarginFraction}
               effectiveInitialMarginFraction={effectiveInitialMarginFraction}
+              useFiatDisplayUnit={displayUnit === DisplayUnit.Fiat}
             />
           ),
         }))}
@@ -211,20 +217,22 @@ const DetailsItem = ({
   value,
   stat,
   tickSizeDecimals,
-  id,
+  assetId,
   isLoading,
   priceChange24HPercent,
   initialMarginFraction,
   effectiveInitialMarginFraction,
+  useFiatDisplayUnit,
 }: {
   value: number | null | undefined;
   stat: MarketStats;
   tickSizeDecimals: number | null | undefined;
-  id: string;
+  assetId: string;
   isLoading: boolean;
   priceChange24HPercent: number | null | undefined;
   initialMarginFraction: number | null | undefined;
   effectiveInitialMarginFraction: number | null | undefined;
+  useFiatDisplayUnit: boolean;
 }) => {
   const valueBN = MustBigNumber(value);
 
@@ -239,8 +247,10 @@ const DetailsItem = ({
         <$Output
           type={OutputType.Number}
           value={value}
-          tag={id}
-          fractionDigits={LARGE_TOKEN_DECIMALS}
+          fractionDigits={useFiatDisplayUnit ? 0 : LARGE_TOKEN_DECIMALS}
+          slotRight={
+            <DisplayUnitTag tw="ml-0.25" assetId={assetId} entryPoint="openInterestAssetTag" />
+          }
         />
       );
     }

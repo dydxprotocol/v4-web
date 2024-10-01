@@ -11,13 +11,13 @@ import {
   ORDERBOOK_ROW_PADDING_RIGHT,
   ORDERBOOK_WIDTH,
 } from '@/constants/orderbook';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
 import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
-import { DisplayUnit } from '@/state/configs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 

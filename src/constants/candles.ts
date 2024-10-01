@@ -38,6 +38,8 @@ export interface TradingViewChartBar extends TradingViewBar {
   tradeLow: number;
   tradeHigh: number;
   trades: number;
+  assetVolume: number;
+  usdVolume: number;
 }
 
 export interface TradingViewSymbol {
