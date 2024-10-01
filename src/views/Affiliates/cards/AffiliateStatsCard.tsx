@@ -18,10 +18,12 @@ const MobileView = ({
   accountStats,
   toggleCriteria,
   isVip = false,
+  currentAffiliateTier = 0,
 }: {
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
   isVip: boolean;
+  currentAffiliateTier: number;
 }) => {
   const stringGetter = useStringGetter();
 
@@ -33,9 +35,7 @@ const MobileView = ({
           className="relative"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
-          value={
-            isVip ? stringGetter({ key: STRING_KEYS.VIP }) : accountStats?.currentAffiliateTier
-          }
+          value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
           <a href="#" onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
@@ -94,10 +94,12 @@ const DesktopView = ({
   accountStats,
   toggleCriteria,
   isVip = false,
+  currentAffiliateTier = 0,
 }: {
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
   isVip: boolean;
+  currentAffiliateTier: number;
 }) => {
   const stringGetter = useStringGetter();
   const linkRef = useRef<HTMLAnchorElement>(null); // Reference to the button element
@@ -110,9 +112,7 @@ const DesktopView = ({
           className="relative inline-block"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
-          value={
-            isVip ? stringGetter({ key: STRING_KEYS.VIP }) : accountStats?.currentAffiliateTier
-          }
+          value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
           <a href="#" ref={linkRef} onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
@@ -171,9 +171,15 @@ interface IAffiliateStatsProps {
   className?: string;
   accountStats?: IAffiliateStats;
   isVip: boolean;
+  currentAffiliateTier: number;
 }
 
-export const AffiliateStatsCard = ({ className, accountStats, isVip }: IAffiliateStatsProps) => {
+export const AffiliateStatsCard = ({
+  className,
+  accountStats,
+  isVip,
+  currentAffiliateTier,
+}: IAffiliateStatsProps) => {
   const [isCriteriaVisible, setIsCriteriaVisible] = useState(false);
   const { isNotTablet } = useBreakpoints();
 
@@ -184,9 +190,19 @@ export const AffiliateStatsCard = ({ className, accountStats, isVip }: IAffiliat
   return (
     <$Container className={className}>
       {isNotTablet ? (
-        <DesktopView accountStats={accountStats} isVip={isVip} toggleCriteria={toggleCriteria} />
+        <DesktopView
+          accountStats={accountStats}
+          currentAffiliateTier={currentAffiliateTier}
+          isVip={isVip}
+          toggleCriteria={toggleCriteria}
+        />
       ) : (
-        <MobileView accountStats={accountStats} isVip={isVip} toggleCriteria={toggleCriteria} />
+        <MobileView
+          accountStats={accountStats}
+          currentAffiliateTier={currentAffiliateTier}
+          isVip={isVip}
+          toggleCriteria={toggleCriteria}
+        />
       )}
 
       {isCriteriaVisible && (

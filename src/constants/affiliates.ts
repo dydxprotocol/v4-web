@@ -9,6 +9,13 @@ export interface IAffiliateStats {
   referredVolume: number;
   totalEarnings: number;
   totalReferredUsers: number;
-  currentAffiliateTier: number;
   totalReferredTrades?: number;
+}
+
+export interface IDateStats {
+  date: string;
+  referredVolume: string;
+  totalEarnings: string;
+  totalReferredTrades: string;
+  totalReferredUsers: string;
 }

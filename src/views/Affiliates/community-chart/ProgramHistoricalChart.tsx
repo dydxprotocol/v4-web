@@ -2,14 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
+import axios from 'axios';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
+import { IDateStats } from '@/constants/affiliates';
 import {
   AffiliatesProgramDatum,
   AffiliatesProgramMetric,
-  TradingRewardsPeriod,
-  tradingRewardsPeriods,
+  AffiliatesProgramPeriod,
+  affiliatesProgramPeriods,
   type TradingRewardsDatum,
 } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
@@ -61,24 +63,24 @@ export const ProgramHistoricalChart = ({
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const historyStartDate = '2024-06-01T00:00:00Z';
+  const historyStartDate = '2024-01-01T00:00:00Z';
   const now = useNow({ intervalMs: timeUnits.minute });
 
-  const [periodOptions, setPeriodOptions] = useState<TradingRewardsPeriod[]>([
-    TradingRewardsPeriod.PeriodAllTime,
+  const [periodOptions, setPeriodOptions] = useState<AffiliatesProgramPeriod[]>([
+    AffiliatesProgramPeriod.PeriodAllTime,
   ]);
   const [tooltipContext, setTooltipContext] =
     useState<TooltipContextType<AffiliatesProgramDatum>>();
   const [isZooming, setIsZooming] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<TradingRewardsPeriod>(
-    TradingRewardsPeriod.PeriodAllTime
+  const [selectedPeriod, setSelectedPeriod] = useState<AffiliatesProgramPeriod>(
+    AffiliatesProgramPeriod.PeriodAllTime
   );
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
   const [metricData, setMetricData] = useState<{ date: number; cumulativeAmount: number }[]>([]);
 
   const chartTitles = {
-    [AffiliatesProgramMetric.AffiliatePayouts]: stringGetter({
-      key: STRING_KEYS.AFFILIATE_PAYOUTS,
+    [AffiliatesProgramMetric.AffiliateEarnings]: stringGetter({
+      key: STRING_KEYS.AFFILIATE_EARNINGS,
     }),
     [AffiliatesProgramMetric.ReferredTrades]: stringGetter({ key: STRING_KEYS.TRADES_REFERRED }),
     [AffiliatesProgramMetric.ReferredUsers]: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
@@ -87,100 +89,63 @@ export const ProgramHistoricalChart = ({
 
   useEffect(() => {
     fetchMetricData();
-  }, [selectedChartMetric]);
+  }, [selectedChartMetric, selectedPeriod]);
+
+  const getStartDate = (): string => {
+    const currentTime = new Date();
+
+    switch (selectedPeriod) {
+      case AffiliatesProgramPeriod.Period1d:
+        return new Date(currentTime.setDate(currentTime.getDate() - 1)).toISOString();
+      case AffiliatesProgramPeriod.Period7d:
+        return new Date(currentTime.setDate(currentTime.getDate() - 7)).toISOString();
+      case AffiliatesProgramPeriod.Period30d:
+        return new Date(currentTime.setMonth(currentTime.getMonth() - 1)).toISOString();
+      case AffiliatesProgramPeriod.Period90d:
+        return new Date(currentTime.setMonth(currentTime.getMonth() - 3)).toISOString();
+      case AffiliatesProgramPeriod.PeriodAllTime:
+        return new Date(0).toISOString(); // The earliest possible date
+      default:
+        throw new Error('Invalid rolling window value');
+    }
+  };
 
   const fetchMetricData = async () => {
-    // Call to backend here
+    const { data } = await axios.get(
+      `http://localhost:3000/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`
+    );
 
-    const mockMetricData = [
-      {
-        date: new Date('2024-09-01T00:00:00Z').valueOf(),
-        cumulativeAmount: 2870,
-      },
+    const periodData: IDateStats[] = data;
 
-      {
-        date: new Date('2024-08-01T00:00:00Z').valueOf(),
-        cumulativeAmount: 3000,
-      },
-      {
-        date: new Date('2024-07-01T00:00:00Z').valueOf(),
-        cumulativeAmount: 0,
-      },
-      {
-        date: new Date('2024-07-02T00:00:00Z').valueOf(),
-        cumulativeAmount: 603,
-      },
-      {
-        date: new Date('2024-07-03T00:00:00Z').valueOf(),
-        cumulativeAmount: 867,
-      },
-      {
-        date: new Date('2024-09-04T00:00:00Z').valueOf(),
-        cumulativeAmount: 1000,
-      },
-      {
-        date: new Date('2024-07-19T00:00:00Z').valueOf(),
-        cumulativeAmount: 908,
-      },
-      {
-        date: new Date('2024-07-29T00:00:00Z').valueOf(),
-        cumulativeAmount: 1029,
-      },
-      {
-        date: new Date('2024-08-07T00:00:00Z').valueOf(),
-        cumulativeAmount: 209,
-      },
-      {
-        date: new Date('2024-08-13T00:00:00Z').valueOf(),
-        cumulativeAmount: 306,
-      },
-      {
-        date: new Date('2024-08-20T00:00:00Z').valueOf(),
-        cumulativeAmount: 700,
-      },
-      {
-        date: new Date('2024-08-30T00:00:00Z').valueOf(),
-        cumulativeAmount: 900,
-      },
-      {
-        date: new Date('2024-07-30T00:00:00Z').valueOf(),
-        cumulativeAmount: 1000,
-      },
-      {
-        date: new Date('2024-07-10T00:00:00Z').valueOf(),
-        cumulativeAmount: 1100,
-      },
-      {
-        date: new Date('2024-09-13T00:00:00Z').valueOf(),
-        cumulativeAmount: 1200,
-      },
-      {
-        date: new Date('2024-09-25T00:00:00Z').valueOf(),
-        cumulativeAmount: 1300,
-      },
-    ];
-    setMetricData(mockMetricData.sort((a, b) => a.date - b.date));
+    setMetricData(
+      periodData
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map((m) => ({
+          date: new Date(m.date).getTime(),
+          cumulativeAmount: Number(m[selectedChartMetric]),
+        }))
+    );
   };
 
   const oldestDataPointDate = metricData?.[0]?.date;
   const newestDataPointDate = metricData?.[metricData.length - 1]?.date;
 
   const msForPeriod = useCallback(
-    (period: TradingRewardsPeriod, clampMax: Boolean = true) => {
+    (period: AffiliatesProgramPeriod, clampMax: Boolean = true) => {
       const earliestDatum = oldestDataPointDate ?? Number(historyStartDate);
       const latestDatum = newestDataPointDate ?? now;
       const maxPeriod = latestDatum - earliestDatum;
 
       switch (period) {
-        case TradingRewardsPeriod.Period1d:
+        case AffiliatesProgramPeriod.Period1d:
           return clampMax ? Math.min(maxPeriod, 1 * timeUnits.day) : 1 * timeUnits.day;
-        case TradingRewardsPeriod.Period7d:
+        case AffiliatesProgramPeriod.Period7d:
           return clampMax ? Math.min(maxPeriod, 7 * timeUnits.day) : 7 * timeUnits.day;
-        case TradingRewardsPeriod.Period30d:
+        case AffiliatesProgramPeriod.Period30d:
           return clampMax ? Math.min(maxPeriod, 30 * timeUnits.day) : 30 * timeUnits.day;
-        case TradingRewardsPeriod.Period90d:
+        case AffiliatesProgramPeriod.Period90d:
           return clampMax ? Math.min(maxPeriod, 90 * timeUnits.day) : 90 * timeUnits.day;
-        case TradingRewardsPeriod.PeriodAllTime:
+        case AffiliatesProgramPeriod.PeriodAllTime:
         default:
           return maxPeriod;
       }
@@ -191,8 +156,8 @@ export const ProgramHistoricalChart = ({
   // Include period option only if oldest date is older it
   // e.g. oldest date is 31 days old -> show 30d option, but not 90d
   const getPeriodOptions = useCallback(
-    (oldestMs: number): TradingRewardsPeriod[] =>
-      tradingRewardsPeriods.reduce((acc: TradingRewardsPeriod[], period) => {
+    (oldestMs: number): AffiliatesProgramPeriod[] =>
+      affiliatesProgramPeriods.reduce((acc: AffiliatesProgramPeriod[], period) => {
         if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
           acc.push(period);
         }
@@ -270,12 +235,13 @@ export const ProgramHistoricalChart = ({
   const renderTooltip = useCallback(() => <div />, []);
 
   const toggleGroupItems = useMemo(() => {
-    return periodOptions.map((period: TradingRewardsPeriod) => ({
+    return periodOptions.map((period: AffiliatesProgramPeriod) => ({
       value: period,
       label:
-        period === TradingRewardsPeriod.PeriodAllTime
+        period === AffiliatesProgramPeriod.PeriodAllTime
           ? stringGetter({ key: STRING_KEYS.ALL })
-          : formatRelativeTime(msForPeriod(period, false), {
+          : // TODO: Remove this type assertion, msForPeriod function is only acepting TradingRewardsPeriod type as argument
+            formatRelativeTime(msForPeriod(period, false), {
               locale: selectedLocale,
               relativeToTimestamp: 0,
               largestUnit: 'day',
@@ -284,7 +250,7 @@ export const ProgramHistoricalChart = ({
   }, [stringGetter, msForPeriod, selectedLocale, periodOptions]);
 
   const setTradingRewardsPeriod = useCallback((value: string) => {
-    setSelectedPeriod(value as TradingRewardsPeriod);
+    setSelectedPeriod(value as AffiliatesProgramPeriod);
   }, []);
 
   return (

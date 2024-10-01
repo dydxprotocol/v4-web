@@ -64,10 +64,10 @@ export enum AffiliatesProgramPeriod {
 }
 
 export enum AffiliatesProgramMetric {
-  ReferredVolume = 'referred_volume',
-  AffiliatePayouts = 'affiliate_payouts',
-  ReferredUsers = 'referred_users',
-  ReferredTrades = 'referred_trades',
+  ReferredVolume = 'referredVolume',
+  AffiliateEarnings = 'totalEarnings',
+  ReferredUsers = 'totalReferredUsers',
+  ReferredTrades = 'totalReferredTrades',
 }
 
 export const affiliatesProgramPeriods = Object.keys(

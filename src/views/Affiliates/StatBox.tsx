@@ -19,19 +19,21 @@ export const StatCell = ({
   className,
   valueSize = 'small',
   outputType,
-}: PropsWithChildren<IStatCellProps>) => (
-  <StatBox className={className}>
-    <StatTitle>{title}</StatTitle>
-    {outputType && (
-      <StatValue
-        valueSize={valueSize}
-        type={value ? outputType : OutputType.Text}
-        value={value ?? '-'}
-      />
-    )}
-    {children}
-  </StatBox>
-);
+}: PropsWithChildren<IStatCellProps>) => {
+  return (
+    <StatBox className={className}>
+      <StatTitle>{title}</StatTitle>
+      {outputType && (
+        <StatValue
+          valueSize={valueSize}
+          type={value ? outputType : OutputType.Text}
+          value={value ?? '-'}
+        />
+      )}
+      {children}
+    </StatBox>
+  );
+};
 
 export const BorderStatCell = styled(StatCell)<{ border: ('top' | 'bottom' | 'right' | 'left')[] }>`
   ${({ border }) => border.map((b) => `border-${b}: 1px solid var(--color-border);`).join('')}

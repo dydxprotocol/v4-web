@@ -205,12 +205,9 @@ export const AffiliatesLeaderboard = ({
         pageSize: 10, // Amount of entities to load
       },
     });
+
     setAffiliates([...affiliates, ...response.data.results]);
     setTotal(response.data.total);
-
-    // Uncomment for testing with local data
-    // setAffiliates(data.slice(0, page * 3));
-    // setTotal(data.length);
   };
 
   const handleLoadMore = () => {
@@ -224,15 +221,19 @@ export const AffiliatesLeaderboard = ({
             {
               columnKey: 'rank',
               label: stringGetter({ key: STRING_KEYS.RANK }),
-              renderCell: ({ rank, account }) => (
-                <TableCell className="align-center flex">
-                  {rank}
+              renderCell: ({ rank, account }) => {
+                return (
+                  <TableCell className="align-center flex">
+                    {rank}
 
-                  {accountStats?.account && account === accountStats.account && (
-                    <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-                  )}
-                </TableCell>
-              ),
+                    {accountStats?.account && account === accountStats.account && (
+                      <Tag className="bg-color-accent">
+                        {stringGetter({ key: STRING_KEYS.YOU })}
+                      </Tag>
+                    )}
+                  </TableCell>
+                );
+              },
               allowsSorting: false,
             },
             {

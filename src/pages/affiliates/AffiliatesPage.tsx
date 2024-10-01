@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 
+import axios from 'axios';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -64,6 +65,7 @@ export const AffiliatesPage: React.FC = () => {
   const userStatus = {
     isAffiliate: true,
     isVip: true,
+    currentAffiliateTier: 2,
   };
 
   useEffect(() => {
@@ -88,8 +90,14 @@ export const AffiliatesPage: React.FC = () => {
       totalReferredTrades: 400,
     };
 
+    const res = await axios.get(
+      `http://localhost:3000/v1/accounts/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
+    );
+
     // fetch account stats
-    setAccountStats(myData);
+    setAccountStats(res.data);
+
+    // setAccountStats(myData);
   };
 
   const routesComponent = (
@@ -141,6 +149,7 @@ export const AffiliatesPage: React.FC = () => {
               </div>
             ) : (
               <AffiliateStatsCard
+                currentAffiliateTier={userStatus.currentAffiliateTier}
                 isVip={userStatus.isVip}
                 className="h-fit w-full notTablet:h-full notTablet:w-7/12"
                 accountStats={accountStats}

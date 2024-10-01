@@ -33,8 +33,8 @@ export const CommunityChartContainer = () => {
             label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
           },
           {
-            value: AffiliatesProgramMetric.AffiliatePayouts,
-            label: stringGetter({ key: STRING_KEYS.AFFILIATE_PAYOUTS }),
+            value: AffiliatesProgramMetric.AffiliateEarnings,
+            label: stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS }),
           },
           {
             value: AffiliatesProgramMetric.ReferredUsers,
