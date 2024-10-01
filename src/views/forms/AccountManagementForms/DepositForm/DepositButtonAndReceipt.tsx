@@ -10,6 +10,7 @@ import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -64,8 +65,10 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi, connectedWallet, selectedWallet, isConnectedGraz } =
+  const { connectWallet, isConnectedWagmi, selectedWallet, isConnectedGraz } =
     useWalletConnection();
+  const { sourceAccount } = useAccounts();
+
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
@@ -266,7 +269,9 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi && connectedWallet?.name !== WalletType.Phantom && !isConnectedGraz ? (
+      ) : !isConnectedWagmi &&
+        sourceAccount.walletInfo?.name !== WalletType.Phantom &&
+        !isConnectedGraz ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>

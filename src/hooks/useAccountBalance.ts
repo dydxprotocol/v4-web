@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
-import { erc20Abi, formatUnits } from 'viem';
+import { Address, erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
 import {
@@ -15,7 +15,7 @@ import {
   SUPPORTED_COSMOS_CHAINS,
 } from '@/constants/graz';
 import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
-import { EvmAddress } from '@/constants/wallets';
+import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { useSolanaConnection } from '@/hooks/useSolanaConnection';
 
@@ -60,7 +60,7 @@ export const useAccountBalance = ({
   usdcBalance: number;
   refetchQuery: (options?: RefetchOptions) => Promise<QueryObserverResult>;
 } => {
-  const { evmAddress, dydxAddress, dydxAccountGraz, solAddress } = useAccounts();
+  const { sourceAccount, dydxAccountGraz } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
@@ -69,7 +69,16 @@ export const useAccountBalance = ({
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
-  const isSolanaChain = !!solAddress;
+  const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
+
+  const evmAddress =
+    sourceAccount.chain === WalletNetworkType.Evm ? (sourceAccount.address as Address) : undefined;
+  const solAddress =
+    sourceAccount.chain === WalletNetworkType.Solana
+      ? (sourceAccount.address as SolAddress)
+      : undefined;
+  const dydxAddress =
+    sourceAccount.chain === WalletNetworkType.Solana ? sourceAccount.address : undefined;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 

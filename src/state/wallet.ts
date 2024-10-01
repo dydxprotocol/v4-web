@@ -1,51 +1,51 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  CosmosWalletInfo,
-  DydxAddress,
-  EvmAddress,
-  PhantomSolanaWalletInfo,
-  SolAddress,
-  WalletInfo,
-} from '@/constants/wallets';
-
-type EvmAccount = {
-  address: EvmAddress;
-  chain: 'evm';
-  encryptedSignature?: string;
-  walletInfo: WalletInfo;
-};
-type SolanaAccount = {
-  address: SolAddress;
-  chain: 'solana';
-  encryptedSignature?: string;
-  walletInfo: PhantomSolanaWalletInfo;
-};
-type CosmosAccount = { address: DydxAddress; chain: 'cosmos'; walletInfo: CosmosWalletInfo };
-
-type SourceAccount = EvmAccount | SolanaAccount | CosmosAccount;
+import { WalletInfo, WalletNetworkType } from '@/constants/wallets';
 
 export interface WalletState {
-  sourceAccount: SourceAccount | undefined;
+  sourceAccount: {
+    address?: string;
+    chain?: WalletNetworkType;
+    encryptedSignature?: string;
+    walletInfo?: WalletInfo;
+  };
 }
 
 const initialState: WalletState = {
-  sourceAccount: undefined,
+  sourceAccount: {
+    address: undefined,
+    chain: undefined,
+    encryptedSignature: undefined,
+    walletInfo: undefined,
+  },
 };
 
 export const walletSlice = createSlice({
   name: 'wallet',
   initialState,
   reducers: {
-    setSourceAccount: (state, action: PayloadAction<SourceAccount>) => {
-      state.sourceAccount = action.payload;
-    },
-    setSavedEncryptedSignature: (state, action: PayloadAction<string>) => {
+    setSourceAddress: (
+      state,
+      action: PayloadAction<{ address: string; chain: WalletNetworkType }>
+    ) => {
+      const { address, chain } = action.payload;
       if (!state.sourceAccount) {
-        throw new Error('no source account set');
+        throw new Error('cannot set source address if source account is not defined');
       }
 
+      // if the source wallet address has changed, clear the derived signature
+      if (state.sourceAccount.address !== address) {
+        state.sourceAccount.encryptedSignature = undefined;
+      }
+
+      state.sourceAccount.address = address;
+      state.sourceAccount.chain = chain;
+    },
+    setWalletInfo: (state, action: PayloadAction<WalletInfo>) => {
+      state.sourceAccount.walletInfo = action.payload;
+    },
+    setSavedEncryptedSignature: (state, action: PayloadAction<string>) => {
       if (state.sourceAccount.chain === 'cosmos') {
         throw new Error('cosmos wallets should not require signatures for derived addresses');
       }
@@ -53,15 +53,23 @@ export const walletSlice = createSlice({
       state.sourceAccount.encryptedSignature = action.payload;
     },
     clearSavedEncryptedSignature: (state) => {
-      if (!state.sourceAccount || state.sourceAccount.chain === 'cosmos') return;
-
       state.sourceAccount.encryptedSignature = undefined;
     },
     clearSourceAccount: (state) => {
-      state.sourceAccount = undefined;
+      state.sourceAccount = {
+        address: undefined,
+        chain: undefined,
+        encryptedSignature: undefined,
+        walletInfo: undefined,
+      };
     },
   },
 });
 
-export const { setSourceAccount, setSavedEncryptedSignature, clearSourceAccount } =
-  walletSlice.actions;
+export const {
+  setSourceAddress,
+  setWalletInfo,
+  setSavedEncryptedSignature,
+  clearSavedEncryptedSignature,
+  clearSourceAccount,
+} = walletSlice.actions;

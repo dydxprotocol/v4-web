@@ -76,6 +76,12 @@ export enum ConnectorType {
   PhantomSolana = 'phantomSolana',
 }
 
+export enum WalletNetworkType {
+  Evm = 'evm',
+  Cosmos = 'cosmos',
+  Solana = 'solana',
+}
+
 export type CosmosWalletInfo = {
   connectorType: ConnectorType.Cosmos;
   name: CosmosWalletType;

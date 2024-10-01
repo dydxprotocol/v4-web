@@ -30,7 +30,7 @@ import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestTag = import.meta.env.VITE_LAST_TAG;
-  const { connectedWallet, selectedWallet, evmAddress, dydxAddress } = useAccounts();
+  const { sourceAccount, selectedWallet, dydxAddress } = useAccounts();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
   /** User properties */
@@ -92,18 +92,20 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
-    identify(AnalyticsUserProperties.WalletType(connectedWallet?.name ?? null));
-  }, [connectedWallet?.name]);
+    identify(AnalyticsUserProperties.WalletType(sourceAccount.walletInfo?.name ?? null));
+  }, [sourceAccount.walletInfo?.name]);
 
   // AnalyticsUserProperty.WalletConnectorType
   useEffect(() => {
-    identify(AnalyticsUserProperties.WalletConnectorType(connectedWallet?.connectorType ?? null));
-  }, [connectedWallet?.connectorType]);
+    identify(
+      AnalyticsUserProperties.WalletConnectorType(sourceAccount.walletInfo?.connectorType ?? null)
+    );
+  }, [sourceAccount.walletInfo?.connectorType]);
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperties.WalletAddress(evmAddress ?? dydxAddress ?? null));
-  }, [evmAddress, dydxAddress]);
+    identify(AnalyticsUserProperties.WalletAddress(sourceAccount.address ?? null));
+  }, [sourceAccount.address]);
 
   // AnalyticsUserProperty.DydxAddress
   useEffect(() => {

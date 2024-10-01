@@ -6,7 +6,7 @@ import { ConnectorType, EvmAddress, WalletInfo } from '@/constants/wallets';
 import { parseStorageItem } from './utils';
 
 /**
- * Move over wallet data into redux
+ * Move over wallet data from localStorage into redux
  *
  */
 export function migration1(state: PersistedState) {
@@ -14,20 +14,20 @@ export function migration1(state: PersistedState) {
     throw new Error('state must be defined');
   }
 
-  const evmAddress = localStorage.getItem('dydx.EvmAddress') as EvmAddress;
-  const evmDerivedAddresses = parseStorageItem(
+  const evmAddress = localStorage.getItem('dydx.EvmAddress') as EvmAddress | undefined;
+  const evmDerivedAddresses = parseStorageItem<EvmDerivedAddresses>(
     localStorage.getItem('dydx.EvmDerivedAddresses')
-  ) as EvmDerivedAddresses;
+  );
 
   const solAddress = localStorage.getItem('dydx.SolAddress');
-  const solDerivedAddresses = parseStorageItem(
+  const solDerivedAddresses = parseStorageItem<SolDerivedAddresses>(
     localStorage.getItem('dydx.SolDerivedAddresses')
-  ) as SolDerivedAddresses;
+  );
 
   const dydxAddress = localStorage.getItem('dydx.DydxAddress');
-  const selectedWallet = parseStorageItem(localStorage.getItem('dydx.OnboardingSelectedWallet')) as
-    | WalletInfo
-    | undefined;
+  const selectedWallet = parseStorageItem<WalletInfo>(
+    localStorage.getItem('dydx.OnboardingSelectedWallet')
+  );
 
   if (!selectedWallet) {
     return {
@@ -38,26 +38,26 @@ export function migration1(state: PersistedState) {
     };
   }
 
-  if (selectedWallet.connectorType === ConnectorType.PhantomSolana && solAddress) {
+  if (selectedWallet.connectorType === ConnectorType.PhantomSolana) {
     return {
       ...state,
       wallet: {
         sourceAccount: {
-          address: solAddress,
+          address: solAddress ?? undefined,
           chain: 'solana',
-          encryptedSignature: solDerivedAddresses[solAddress]?.encryptedSignature,
+          encryptedSignature: solAddress && solDerivedAddresses?.[solAddress]?.encryptedSignature,
           walletInfo: selectedWallet,
         },
       },
     };
   }
 
-  if (selectedWallet.connectorType === ConnectorType.Cosmos && dydxAddress) {
+  if (selectedWallet.connectorType === ConnectorType.Cosmos) {
     return {
       ...state,
       wallet: {
         sourceAccount: {
-          address: dydxAddress,
+          address: dydxAddress ?? undefined,
           chain: 'cosmos',
           walletInfo: selectedWallet,
         },
@@ -65,7 +65,18 @@ export function migration1(state: PersistedState) {
     };
   }
 
+  const shouldCopyOverEvmSignature = evmAddress && evmDerivedAddresses?.version === 'v2';
   return {
     ...state,
+    wallet: {
+      sourceAccount: {
+        address: evmAddress,
+        chain: 'evm',
+        encryptedSignature: shouldCopyOverEvmSignature
+          ? evmDerivedAddresses?.[evmAddress]?.encryptedSignature
+          : undefined,
+        walletInfo: selectedWallet,
+      },
+    },
   };
 }
