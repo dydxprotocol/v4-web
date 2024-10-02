@@ -160,7 +160,6 @@ export const useLoadedVaultPositions = () => {
       );
     },
     ...vaultQueryOptions,
-    refetchInterval: timeUnits.second * 15,
   });
 
   const calculatedPositions = useMemo(() => {
