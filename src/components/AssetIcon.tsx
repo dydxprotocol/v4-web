@@ -790,19 +790,25 @@ export const AssetIcon = ({
   );
 
 const $AssetIcon = styled.img`
-  --asset-icon-height: 1em;
+  --asset-icon-size: 1em;
 
-  height: var(--asset-icon-height);
-  width: auto;
+  height: var(--asset-icon-size);
+  min-height: var(--asset-icon-size);
+  width: var(--asset-icon-size);
+  min-width: var(--asset-icon-size);
+
   border-radius: 50%;
 `;
 
 const $Placeholder = styled.div`
-  --asset-icon-height: 1em;
+  --asset-icon-size: 1em;
+
+  height: var(--asset-icon-size);
+  min-height: var(--asset-icon-size);
+  width: var(--asset-icon-size);
+  min-width: var(--asset-icon-size);
 
   background-color: var(--color-layer-5);
-  width: var(--asset-icon-height);
-  height: var(--asset-icon-height);
   border-radius: 50%;
   overflow: hidden;
 

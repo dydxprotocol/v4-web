@@ -466,7 +466,7 @@ const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
   ${({ uiRefreshEnabled }) => css`
     ${uiRefreshEnabled &&
     css`
-      --asset-icon-height: 1.5em;
+      --asset-icon-size: 1.5em;
     `}
   `}
 `;
