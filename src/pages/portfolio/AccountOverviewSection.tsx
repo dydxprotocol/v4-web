@@ -15,7 +15,7 @@ import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHook
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { Tag, TagSign, TagType } from '@/components/Tag';
+import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getSubaccount } from '@/state/accountSelectors';
@@ -26,16 +26,16 @@ import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-const MegavaultYieldTag = () => {
+export const MegavaultYieldTag = () => {
+  const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
-  // todo
-  // if (vault == null) {
-  //   return null;
-  // }
+  if (vault?.thirtyDayReturnPercent == null || vault.thirtyDayReturnPercent < 0.02) {
+    return <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>;
+  }
 
   return (
     <Tag type={TagType.Number} sign={TagSign.Positive}>
-      <Output type={OutputType.Percent} value={vault?.thirtyDayReturnPercent ?? 0.2456123} />
+      <Output type={OutputType.Percent} value={vault?.thirtyDayReturnPercent} />
     </Tag>
   );
 };
