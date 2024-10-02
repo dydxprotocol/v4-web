@@ -86,7 +86,7 @@ export const TradeFormInputs = () => {
           <WithTooltip tooltip="trigger-price" side="right">
             {stringGetter({ key: STRING_KEYS.TRIGGER_PRICE })}
           </WithTooltip>
-          <Tag tw="ml-0.25">USD</Tag>
+          <Tag>USD</Tag>
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {
@@ -106,7 +106,7 @@ export const TradeFormInputs = () => {
           <WithTooltip tooltip="limit-price" side="right">
             {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
           </WithTooltip>
-          <Tag tw="ml-0.25">USD</Tag>
+          <Tag>USD</Tag>
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {

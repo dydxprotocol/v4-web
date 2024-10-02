@@ -249,7 +249,7 @@ const DetailsItem = ({
           value={value}
           fractionDigits={useFiatDisplayUnit ? 0 : LARGE_TOKEN_DECIMALS}
           slotRight={
-            <DisplayUnitTag tw="ml-0.25" assetId={assetId} entryPoint="openInterestAssetTag" />
+            <DisplayUnitTag tw="ml-[0.5ch]" assetId={assetId} entryPoint="openInterestAssetTag" />
           }
         />
       );

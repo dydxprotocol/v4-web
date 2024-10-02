@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import { useDispatch } from 'react-redux';
 
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { DisplayUnit } from '@/constants/trade';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -21,10 +22,10 @@ export const DisplayUnitTag = ({ entryPoint, assetId, className }: ElementProps)
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const dispatch = useDispatch();
 
-  const dispatchSetDisplayUnit = _.debounce((newDisplayUnit) => {
+  const dispatchSetDisplayUnit = debounce((newDisplayUnit) => {
     if (!assetId) return;
     dispatch(setDisplayUnit({ newDisplayUnit, entryPoint, assetId }));
-  }, 300);
+  }, NORMAL_DEBOUNCE_MS);
 
   const onToggle = useCallback(() => {
     if (!assetId) return;

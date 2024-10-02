@@ -7,6 +7,7 @@ import tw from 'twin.macro';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, TradeSizeInput } from '@/constants/trade';
@@ -140,7 +141,7 @@ export const TradeSizeInputs = () => {
   const dispatchSetDisplayUnit = _.debounce((newDisplayUnit) => {
     if (!id) return;
     dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId: id }));
-  }, 300);
+  }, NORMAL_DEBOUNCE_MS);
 
   const onUsdcToggle = useCallback(
     (isPressed: boolean) => {
@@ -217,7 +218,9 @@ export const TradeSizeInputs = () => {
           >
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {id && <DisplayUnitTag tw="ml-0.25" assetId={id} entryPoint="tradeAmountInputAssetTag" />}
+          {id && (
+            <DisplayUnitTag tw="ml-[0.5ch]" assetId={id} entryPoint="tradeAmountInputAssetTag" />
+          )}
         </>
       }
       slotRight={inputToggleButton()}
