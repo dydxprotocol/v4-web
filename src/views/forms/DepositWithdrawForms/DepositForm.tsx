@@ -149,16 +149,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     setToTokenDenom,
     fromChainId,
     setFromChainId,
-    toChainId,
     setToChainId,
-    toAddress,
     setToAddress,
     setFromAddress,
     amount,
     setAmount,
     setTransferType,
     route,
-    setDecimals,
   } = useTransfers();
   const fromToken = assetsByDenom[fromTokenDenom || ''];
   // console.log(assetsForSelectedChain);
@@ -206,7 +203,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     setToChainId(selectedDydxChainId);
     setToAddress(dydxAddress);
     setToTokenDenom(usdcDenom);
-    setDecimals(fromToken?.decimals || 0);
   }, [
     dydxAddress,
     selectedDydxChainId,
@@ -215,16 +211,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     setToTokenDenom,
     setTransferType,
     usdcDenom,
-    fromToken?.decimals,
   ]);
 
   useEffect(() => {
     setFromChainId(defaultChainId);
-  }, [defaultChainId]);
+  }, [defaultChainId, setFromChainId]);
 
   useEffect(() => {
     setFromTokenDenom(defaultTokenDenom);
-  }, [defaultTokenDenom]);
+  }, [defaultTokenDenom, setFromTokenDenom]);
 
   useEffect(() => {
     setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);

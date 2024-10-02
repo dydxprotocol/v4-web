@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
+import { RouteWarning } from '@skip-go/client';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -10,12 +11,10 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Checkbox } from '@/components/Checkbox';
 
-import { log } from '@/lib/telemetry';
-
 type RouteWarningMessageProps = {
   hasAcknowledged: boolean;
   setHasAcknowledged: Dispatch<SetStateAction<boolean>>;
-  routeWarningJSON: string | undefined | null;
+  routeWarning?: RouteWarning;
 };
 /*
 Warning message example:
@@ -33,22 +32,18 @@ const getStringKeyFromWarningType = (warningType: string) => {
 export const RouteWarningMessage = ({
   hasAcknowledged,
   setHasAcknowledged,
-  routeWarningJSON,
+  routeWarning,
 }: RouteWarningMessageProps) => {
   const stringGetter = useStringGetter();
   const { warningMessage, acknowledgementMessageStringKey } = useMemo(() => {
-    if (!routeWarningJSON) return {};
-    try {
-      const warningObject = JSON.parse(routeWarningJSON);
-      return {
-        warningMessage: warningObject.message,
-        acknowledgementMessageStringKey: getStringKeyFromWarningType(warningObject.type),
-      };
-    } catch (err) {
-      log('RouteWarningMessage/warningObject', err);
-      return {};
-    }
-  }, [routeWarningJSON]);
+    if (!routeWarning) return {};
+    return {
+      warningMessage: routeWarning.message,
+      acknowledgementMessageStringKey: getStringKeyFromWarningType(routeWarning.type),
+    };
+    // Do not use an obj in dependency array. Use primitives instead so shallow equals works
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeWarning?.message, routeWarning?.type]);
   if (!warningMessage || !acknowledgementMessageStringKey) {
     setHasAcknowledged(false);
     return null;

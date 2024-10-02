@@ -9,7 +9,7 @@ import { isMainnet } from '@/constants/networks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
-import { DepositForm as D2 } from '@/views/forms/DepositWithdrawForms/DepositForm';
+import { DepositForm } from '@/views/forms/DepositWithdrawForms/DepositForm';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
@@ -38,7 +38,7 @@ export const DepositDialogContent = ({ onDeposit }: ElementProps) => {
   return (
     <$Content>
       {isMainnet || !showFaucet ? (
-        <D2
+        <DepositForm
           onDeposit={(event) => {
             track(AnalyticsEvents.TransferDeposit(event ?? {}));
             onDeposit?.();

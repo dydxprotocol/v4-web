@@ -1,9 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { Asset, Chain, MsgsDirectRequest } from '@skip-go/client';
+import { Asset, Chain } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import { debounce } from 'lodash';
 import { parseUnits } from 'viem';
 
 import { isDenomCctp, isTokenCctp } from '@/constants/cctp';
@@ -199,10 +198,7 @@ const useTransfersContext = () => {
   );
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
-  const [decimals, setDecimals] = useState<number>(0);
 
-  const walletNetworkType = getNetworkTypeFromWallet(connectedWallet);
-  const selectedChainId = transferType === TransferType.Deposit ? fromChainId : toChainId;
   // console.log('from chain id', fromChainId);
   // console.log('connectedWallet', connectedWallet);
   const chainsQuery = useQuery({
@@ -221,6 +217,11 @@ const useTransfersContext = () => {
   });
   const { chainsByNetworkMap = {} } = chainsQuery.data ?? {};
   const { assetsByChain = {}, assetsByDenom = {} } = assetsQuery.data ?? {};
+
+  const walletNetworkType = getNetworkTypeFromWallet(connectedWallet);
+  const selectedChainId = transferType === TransferType.Deposit ? fromChainId : toChainId;
+  const toToken = assetsByDenom[toTokenDenom ?? ''];
+  const fromToken = assetsByDenom[toTokenDenom ?? ''];
   // console.log('all chains', skipSupportedChains);
   // console.log('all Assets', assetsByChain);
   // only calculate this once! use memo this
@@ -285,9 +286,7 @@ const useTransfersContext = () => {
     return [];
   }, [selectedChainId, assetsByChain]);
 
-  // USE EFFECT HOOKS TO ABSTRACT AWAY THE SETTING OF DEFAULT TOKENS.
-  // THIS IS PROBABLY A BAD PLACE TO PUT THEM. REMOVE THEM.
-
+  // maybe just make these consts into a hook that withdraw and deposit can share
   const defaultChainId =
     getDefaultChainIDFromNetworkType(walletNetworkType) ?? chainsForNetwork[0]?.chainID;
 
@@ -296,20 +295,15 @@ const useTransfersContext = () => {
   const getDepositSourceAddress = () => {
     if (connectedWallet?.name === WalletType.Keplr && nobleAddress) {
       return nobleAddress;
-      // put sol first. some users with phantom wallet have previously connected with evm
-      // so they will have both sol and evm addresses. we assume the phantom wallet
-      // is connected with a sol address, not evm.
     }
+    // put sol first. some users with phantom wallet have previously connected with evm
+    // so they will have both sol and evm addresses. we assume the phantom wallet
+    // is connected with a sol address, not evm.
     if (solAddress) {
       return solAddress;
     }
     return evmAddress;
   };
-
-  const debouncedMsgsDirect = useCallback(
-    debounce((v: MsgsDirectRequest) => skipClient.msgsDirect(v), 500),
-    []
-  );
 
   const hasAllParams =
     !!fromTokenDenom &&
@@ -335,23 +329,13 @@ const useTransfersContext = () => {
     ],
     queryFn: async () => {
       // return { route: {}, txs: [{ evmTx: {} }] };
-      console.log('route query fn hit', {
-        fromTokenDenom,
-        toTokenDenom,
-        toChainId,
-        fromChainId,
-        fromAddress,
-        toAddress,
-        transferType,
-        amount,
-        dydxAddress,
-      });
       // should never happen, this is just to satisfy types
       // but react queries should never return null.
       if (!hasAllParams) return null;
 
       if (transferType === TransferType.Withdraw) {
-        if (isDenomCctp(fromTokenDenom)) {
+        // console.log('selectedToken', assetsByDenom[toTokenDenom ?? '']);
+        if (isDenomCctp(toTokenDenom)) {
           return skipClient.msgsDirect({
             sourceAssetDenom: fromTokenDenom,
             sourceAssetChainID: fromChainId,
@@ -359,16 +343,17 @@ const useTransfersContext = () => {
             destAssetChainID: toChainId,
             chainIdsToAddresses: {
               [selectedDydxChainId]: dydxAddress,
+              [toChainId]: toAddress,
             },
             allowUnsafe: true,
 
             // set bridges specifically
-            bridges: ['IBC', 'AXELAR'],
+            bridges: ['IBC', 'CCTP'],
             smartRelay: true,
             allowSwaps: true,
-            amountIn: parseUnits(amount, decimals).toString(),
-            swapVenues: SWAP_VENUES,
-            allowMultiTx: false,
+            amountIn: parseUnits(amount, fromToken.decimals).toString(),
+            allowMultiTx: true,
+            slippageTolerancePercent: '1',
           });
         }
         // Non cctp withdrawals
@@ -399,7 +384,8 @@ const useTransfersContext = () => {
           allowMultiTx: false,
           smartRelay: true,
           allowSwaps: true,
-          amountIn: parseUnits(amount, decimals).toString(),
+          slippageTolerancePercent: '1',
+          amountIn: parseUnits(amount, fromToken.decimals).toString(),
         });
       }
       const sourceAddress = getDepositSourceAddress();
@@ -417,7 +403,7 @@ const useTransfersContext = () => {
           allowUnsafe: true,
           bridges: ['CCTP', 'IBC'],
           smartRelay: true,
-          amountIn: parseUnits(amount, decimals).toString(),
+          amountIn: parseUnits(amount, selectedToken.decimals).toString(),
         });
       }
       return skipClient.msgsDirect({
@@ -444,7 +430,7 @@ const useTransfersContext = () => {
         allowUnsafe: true,
         bridges: ['CCTP', 'IBC', 'AXELAR'],
         smartSwapOptions: { evmSwaps: true },
-        amountIn: parseUnits(amount, decimals).toString(),
+        amountIn: parseUnits(amount, selectedToken.decimals).toString(),
         slippageTolerancePercent: '1',
         swapVenues: SWAP_VENUES,
       });
@@ -482,9 +468,10 @@ const useTransfersContext = () => {
     transferType,
     setTransferType,
     route,
-    setDecimals,
     defaultChainId,
     defaultTokenDenom,
+    toToken,
+    fromToken,
   };
 };
 

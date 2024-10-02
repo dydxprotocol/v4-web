@@ -2,6 +2,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { Asset } from '@skip-go/client';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -11,6 +12,7 @@ import { TransferInputField } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { isTokenCctp } from '@/constants/cctp';
 import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import {
   getNeutronChainId,
@@ -63,12 +65,14 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isValidAddress } from '@/lib/addressUtils';
+import { convertBech32Address, isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
+import { skipClient } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -82,29 +86,24 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, connectedWallet } = useAccounts();
-  const { sendSkipWithdraw } = useSubaccount();
+  const { dydxAddress, connectedWallet, localDydxWallet } = useAccounts();
+  const { subaccountClient, sendSkipWithdrawFromSubaccount } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
     exchange,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
-    isCctp,
     summary,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
-  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const { usdcLabel, usdcDenom } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const {
-    assetsByDenom,
-    fromTokenDenom,
     setFromTokenDenom,
     defaultTokenDenom,
-    toTokenDenom,
     setToTokenDenom,
     defaultChainId,
     fromChainId,
@@ -118,12 +117,13 @@ export const WithdrawForm = () => {
     setAmount,
     setTransferType,
     route,
-    setDecimals,
+    toToken,
   } = useTransfers();
-  const toToken = assetsByDenom[toTokenDenom || ''];
   const debouncedAmount = useDebounce<string>(amount, 500);
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
 
+  const isCctp = isTokenCctp(toToken);
+  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const isValidDestinationAddress = useMemo(() => {
     const grazChainPrefix =
       GRAZ_CHAINS.find((chain) => chain.chainId === toChainId)?.bech32Config.bech32PrefixAccAddr ??
@@ -143,9 +143,10 @@ export const WithdrawForm = () => {
     () => MustBigNumber(freeCollateral?.current),
     [freeCollateral?.current]
   );
+  const isKeplr = connectedWallet?.name === WalletType.Keplr;
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+    if (isKeplr && dydxAddress) {
       setFromAddress(dydxAddress);
     }
 
@@ -155,29 +156,25 @@ export const WithdrawForm = () => {
   useEffect(() => {
     setTransferType(TransferType.Withdraw);
     setFromChainId(selectedDydxChainId);
-    setToAddress('');
+    setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
-    setDecimals(toToken?.decimals || 0);
   }, [
-    selectedDydxChainId,
-    setToAddress,
-    setToChainId,
-    setToTokenDenom,
     setTransferType,
-    usdcDenom,
-    toToken?.decimals,
     setFromChainId,
+    selectedDydxChainId,
+    setFromAddress,
+    dydxAddress,
     setFromTokenDenom,
-    setDecimals,
+    usdcDenom,
   ]);
 
   useEffect(() => {
     setToChainId(defaultChainId);
-  }, [defaultChainId]);
+  }, [defaultChainId, setToChainId]);
 
   useEffect(() => {
     setToTokenDenom(defaultTokenDenom);
-  }, [defaultTokenDenom]);
+  }, [defaultTokenDenom, setToTokenDenom]);
 
   const { screenAddresses } = useDydxClient();
   const nobleChainId = getNobleChainId();
@@ -191,6 +188,67 @@ export const WithdrawForm = () => {
 
   const cosmosTxMsgs = isCosmosTx && firstTx.cosmosTx.msgs;
   // console.log('evm Tx Data', cosmosTxMsgs)
+
+  const sendSkipWithdraw = useCallback(
+    async (_amount: number, payload: string, _isCctp?: boolean) => {
+      const cctpWithdraw = () => {
+        if (!route || !dydxAddress || !toAddress || !toChainId) return {};
+        return skipClient.executeRoute({
+          route: route?.route,
+          getCosmosSigner: async () => {
+            if (!localDydxWallet?.offlineSigner)
+              throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+            return localDydxWallet?.offlineSigner;
+          },
+          userAddresses: [
+            { chainID: selectedDydxChainId, address: dydxAddress },
+            {
+              chainID: getNobleChainId(),
+              address: convertBech32Address({
+                address: dydxAddress,
+                bech32Prefix: NOBLE_BECH32_PREFIX,
+              }),
+            },
+            {
+              chainID: toChainId,
+              address: toAddress,
+            },
+          ],
+          onTransactionBroadcast: async ({ txHash, chainID }) => {},
+        });
+      };
+      console.log('cctp?', _isCctp);
+      if (_isCctp) {
+        return cctpWithdraw();
+      }
+
+      if (!subaccountClient) {
+        return undefined;
+      }
+
+      // If the dYdX USDC balance is less than the _amount to IBC transfer, the signature cannot be made,
+      // so disable the balance check only for this tx.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {
+          sign: {
+            disableBalanceCheck: true,
+          },
+        };
+      }
+      const tx = await sendSkipWithdrawFromSubaccount({
+        subaccountClient,
+        amount: _amount,
+        payload,
+      });
+
+      // Reset the default options after the tx is sent.
+      if (isKeplr && window.keplr) {
+        window.keplr.defaultOptions = {};
+      }
+      return hashFromTx(tx.hash);
+    },
+    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
+  );
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -250,7 +308,11 @@ export const WithdrawForm = () => {
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
-          const txHash = await sendSkipWithdraw(Number(amount), cosmosTxMsgs, isCctp);
+          const txHash = await sendSkipWithdraw(
+            Number(amount),
+            JSON.stringify(cosmosTxMsgs),
+            isCctp
+          );
 
           if (txHash && toChainId) {
             abacusStateManager.clearTransferInputValues();
@@ -281,6 +343,7 @@ export const WithdrawForm = () => {
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
+          console.log(err);
           setError(
             err.message
               ? stringGetter({

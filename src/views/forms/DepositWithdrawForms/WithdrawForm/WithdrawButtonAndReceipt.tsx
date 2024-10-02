@@ -4,12 +4,14 @@ import { Asset } from '@skip-go/client';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
+import { formatUnits } from 'viem';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useTransfers } from '@/hooks/transfers/useTransfers';
+import { useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -55,19 +57,16 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const {
-    summary,
-    requestPayload,
-    exchange,
-    warning: routeWarning,
-  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+
+  const { route, decimals, toTokenDenom, assetsByDenom } = useTransfers();
+  const selectedToken = toTokenDenom ? assetsByDenom[toTokenDenom] : null;
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
-  const showExchangeRate =
-    !exchange || (withdrawToken && typeof summary?.exchangeRate === 'number' && !exchange);
-
+  const summary = route?.route;
+  const fees = Number(route?.route.usdAmountIn) - Number(route?.route.usdAmountOut);
   const submitButtonReceipt = [
     {
       key: 'expected-amount-received',
@@ -79,39 +78,43 @@ export const WithdrawButtonAndReceipt = ({
         </$RowWithGap>
       ),
       value: (
-        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
+        <Output
+          type={OutputType.Asset}
+          value={
+            summary?.amountOut
+              ? formatUnits(BigInt(summary.amountOut ?? '0'), decimals).toString()
+              : undefined
+          }
+          fractionDigits={TOKEN_DECIMALS}
+        />
       ),
     },
-    showExchangeRate && {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: (
-        <$RowWithGap>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
-          =
+    selectedToken &&
+      !selectedToken.symbol?.toLowerCase().includes('usd') && {
+        key: 'expected-amount-received-usd',
+
+        label: (
+          <$RowWithGap>
+            {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
+            {withdrawToken && <Tag>{usdcLabel}</Tag>}
+          </$RowWithGap>
+        ),
+        value: (
           <Output
             type={OutputType.Asset}
-            value={summary?.exchangeRate}
-            tag={withdrawToken?.symbol}
+            value={summary?.usdAmountOut}
+            fractionDigits={TOKEN_DECIMALS}
           />
-        </$RowWithGap>
-      ),
-    },
-    typeof summary?.gasFee === 'number' && {
-      key: 'gas-fees',
-      label: (
-        <WithTooltip tooltip="gas-fees">{stringGetter({ key: STRING_KEYS.GAS_FEE })}</WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
-    },
-    typeof summary?.bridgeFee === 'number' && {
+        ),
+      },
+    fees && {
       key: 'bridge-fees',
       label: (
-        <WithTooltip tooltip="bridge-fees">
+        <WithTooltip tooltip="bridge-fees-deposit">
           {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
         </WithTooltip>
       ),
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
+      value: <Output type={OutputType.Fiat} value={fees} />,
     },
     !exchange && {
       key: 'slippage',
@@ -163,13 +166,18 @@ export const WithdrawButtonAndReceipt = ({
   ].filter(isTruthy);
 
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
-  const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
+  const requiresAcknowledgement = Boolean(route?.route.warning && !hasAcknowledged);
   const isFormValid =
     !isDisabled &&
     !isEditingSlippage &&
-    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
+    // connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
     !requiresAcknowledgement;
-
+  console.log('valid', isFormValid, {
+    isDisabled,
+    isEditingSlippage,
+    connectionError,
+    requiresAcknowledgement,
+  });
   if (!canAccountTrade) {
     return (
       <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
@@ -183,14 +191,14 @@ export const WithdrawButtonAndReceipt = ({
       <RouteWarningMessage
         hasAcknowledged={hasAcknowledged}
         setHasAcknowledged={setHasAcknowledged}
-        routeWarningJSON={routeWarning}
+        routeWarning={route?.route.warning}
       />
       <Button
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
         state={{
           isDisabled: !isFormValid,
-          isLoading: (isFormValid && !requestPayload) || isLoading,
+          isLoading: (isFormValid && !route) || isLoading,
         }}
       >
         {stringGetter({ key: STRING_KEYS.WITHDRAW })}
