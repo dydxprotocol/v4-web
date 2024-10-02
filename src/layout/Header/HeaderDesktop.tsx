@@ -288,7 +288,9 @@ const $Header = styled.header<{
   font-size: 0.9375rem;
 
   &:before {
-    backdrop-filter: blur(10px);
+    --backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    backdrop-filter: var(--backdrop-filter);
   }
 `;
 
