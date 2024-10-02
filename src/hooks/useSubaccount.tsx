@@ -930,7 +930,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         return response;
       } catch (error) {
         log('useSubaccount/registerAffiliate', error);
-        return undefined;
+        throw error;
       }
     },
     [subaccountClient, compositeClient]
