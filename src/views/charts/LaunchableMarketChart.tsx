@@ -244,7 +244,13 @@ export const LaunchableMarketChart = ({
               top: 0,
               bottom: 0,
             }}
-            minZoomDomain={timeUnits.month}
+            minZoomDomain={
+              {
+                '1d': timeUnits.day,
+                '7d': 7 * timeUnits.day,
+                '30d': timeUnits.month,
+              }[timeframe]
+            }
             slotEmpty={undefined}
             numGridLines={0}
             tickSpacingX={210}
