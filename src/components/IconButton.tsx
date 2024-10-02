@@ -11,6 +11,7 @@ import { ToggleButton, type ToggleButtonProps } from '@/components/ToggleButton'
 type ElementProps = {
   isToggle?: boolean;
   iconName?: IconName;
+  iconSize?: string;
   iconComponent?: ElementType;
   action?: ButtonAction;
   state?: ButtonState | ButtonStateConfig;
@@ -27,6 +28,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
       href,
       isToggle,
       iconName,
+      iconSize,
       iconComponent,
 
       onClick,
@@ -59,7 +61,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         onClick={onClick}
         {...otherProps}
       >
-        <Icon iconName={iconName} iconComponent={iconComponent} />
+        <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
       </$IconButton>
     );
   }

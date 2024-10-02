@@ -281,6 +281,7 @@ export const TradeForm = ({
                 shape={ButtonShape.Circle}
                 action={ButtonAction.Navigation}
                 size={ButtonSize.XSmall}
+                iconSize="1.25em"
                 onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
               />
             )}
@@ -466,11 +467,6 @@ const $ToggleGroup = styled(ToggleGroup)`
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
-
-  svg {
-    width: 1.25em;
-    height: 1.25em;
-  }
 `;
 
 const $InputsColumn = styled.div`
