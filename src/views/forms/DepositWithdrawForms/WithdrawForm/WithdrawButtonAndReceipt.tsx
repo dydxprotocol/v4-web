@@ -59,8 +59,7 @@ export const WithdrawButtonAndReceipt = ({
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
-  const { route, decimals, toTokenDenom, assetsByDenom } = useTransfers();
-  const selectedToken = toTokenDenom ? assetsByDenom[toTokenDenom] : null;
+  const { route, toToken } = useTransfers();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
@@ -82,15 +81,15 @@ export const WithdrawButtonAndReceipt = ({
           type={OutputType.Asset}
           value={
             summary?.amountOut
-              ? formatUnits(BigInt(summary.amountOut ?? '0'), decimals).toString()
+              ? formatUnits(BigInt(summary.amountOut ?? '0'), toToken?.decimals).toString()
               : undefined
           }
           fractionDigits={TOKEN_DECIMALS}
         />
       ),
     },
-    selectedToken &&
-      !selectedToken.symbol?.toLowerCase().includes('usd') && {
+    toToken &&
+      !toToken.symbol?.toLowerCase().includes('usd') && {
         key: 'expected-amount-received-usd',
 
         label: (
@@ -172,12 +171,12 @@ export const WithdrawButtonAndReceipt = ({
     !isEditingSlippage &&
     // connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
     !requiresAcknowledgement;
-  console.log('valid', isFormValid, {
-    isDisabled,
-    isEditingSlippage,
-    connectionError,
-    requiresAcknowledgement,
-  });
+  // console.log('valid', isFormValid, {
+  //   isDisabled,
+  //   isEditingSlippage,
+  //   connectionError,
+  //   requiresAcknowledgement,
+  // });
   if (!canAccountTrade) {
     return (
       <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>

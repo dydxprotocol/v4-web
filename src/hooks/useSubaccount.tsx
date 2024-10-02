@@ -223,13 +223,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (!compositeClient) throw new Error('client not initialized');
         try {
           const transaction = JSON.parse(payload);
-
+          console.log('params', transaction);
           const msg = compositeClient.withdrawFromSubaccountMessage(
             subaccountClient,
             amount.toFixed(usdcDecimals)
           );
+          console.log('transaction.msg', transaction.msg);
           const ibcMsg: EncodeObject = {
-            typeUrl: transaction.msgTypeUrl,
+            typeUrl: transaction.msgTypeUrl ?? transaction.msgTypeURL,
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
@@ -238,7 +239,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
                 : undefined,
             },
           };
-
+          console.log('ibcmsg', ibcMsg);
           return await compositeClient.send(
             subaccountClient.wallet,
             () => Promise.resolve([msg, ibcMsg]),
@@ -247,6 +248,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             TransactionMemo.withdrawFromAccount
           );
         } catch (error) {
+          console.log('error', error);
           // Reset the default options after the tx is sent.
           if (isKeplr && window.keplr) {
             window.keplr.defaultOptions = {};

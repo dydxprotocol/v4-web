@@ -143,7 +143,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const {
     defaultChainId,
     defaultTokenDenom,
-    assetsByDenom,
+    fromToken,
     fromTokenDenom,
     setFromTokenDenom,
     setToTokenDenom,
@@ -157,7 +157,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     setTransferType,
     route,
   } = useTransfers();
-  const fromToken = assetsByDenom[fromTokenDenom || ''];
   // console.log(assetsForSelectedChain);
   // console.log('fromtoken', fromToken, fromTokenDenom);
   const isCctp = isTokenCctp(fromToken);

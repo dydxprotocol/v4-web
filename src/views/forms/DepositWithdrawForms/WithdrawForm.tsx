@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { Asset } from '@skip-go/client';
+import { camelCase } from 'lodash';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -168,6 +169,7 @@ export const WithdrawForm = () => {
     usdcDenom,
   ]);
 
+  // maybe make shared hook `useDefaultTransferOptions`
   useEffect(() => {
     setToChainId(defaultChainId);
   }, [defaultChainId, setToChainId]);
@@ -187,46 +189,53 @@ export const WithdrawForm = () => {
   // console.log(isCosmosTx && firstTx.evmTx);
 
   const cosmosTxMsgs = isCosmosTx && firstTx.cosmosTx.msgs;
-  // console.log('evm Tx Data', cosmosTxMsgs)
+  const cosmosMsg = (cosmosTxMsgs || [])[0] ?? {};
+  const cosmosMsgPayload = JSON.parse(cosmosMsg.msg ?? '{}');
+  const cosmosMsgToSend = {
+    ...cosmosMsg,
+    msg: Object.keys(cosmosMsgPayload).reduce((a, b) => {
+      return { ...a, [camelCase(b)]: cosmosMsgPayload[b] };
+    }, {}),
+  };
+  console.log(cosmosMsg);
+  console.log(cosmosMsgToSend);
 
-  const sendSkipWithdraw = useCallback(
-    async (_amount: number, payload: string, _isCctp?: boolean) => {
-      const cctpWithdraw = () => {
-        if (!route || !dydxAddress || !toAddress || !toChainId) return {};
-        return skipClient.executeRoute({
-          route: route?.route,
-          getCosmosSigner: async () => {
-            if (!localDydxWallet?.offlineSigner)
-              throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-            return localDydxWallet?.offlineSigner;
-          },
-          userAddresses: [
-            { chainID: selectedDydxChainId, address: dydxAddress },
-            {
-              chainID: getNobleChainId(),
-              address: convertBech32Address({
-                address: dydxAddress,
-                bech32Prefix: NOBLE_BECH32_PREFIX,
-              }),
-            },
-            {
-              chainID: toChainId,
-              address: toAddress,
-            },
-          ],
-          onTransactionBroadcast: async ({ txHash, chainID }) => {},
-        });
-      };
-      console.log('cctp?', _isCctp);
-      if (_isCctp) {
-        return cctpWithdraw();
-      }
+  const submitCctpWithdraw = () => {
+    if (!route || !dydxAddress || !toAddress || !toChainId) return {};
+    return skipClient.executeRoute({
+      route: route?.route,
+      getCosmosSigner: async () => {
+        if (!localDydxWallet?.offlineSigner)
+          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+        return localDydxWallet?.offlineSigner;
+      },
+      userAddresses: [
+        { chainID: selectedDydxChainId, address: dydxAddress },
+        {
+          chainID: getNobleChainId(),
+          address: convertBech32Address({
+            address: dydxAddress,
+            bech32Prefix: NOBLE_BECH32_PREFIX,
+          }),
+        },
+        {
+          chainID: toChainId,
+          address: toAddress,
+        },
+      ],
+      onTransactionBroadcast: async ({ txHash }) => {
+        onSubmitComplete(txHash);
+      },
+    });
+  };
 
+  const submitNonCctpWithdraw = useCallback(
+    async (payload: string) => {
       if (!subaccountClient) {
         return undefined;
       }
 
-      // If the dYdX USDC balance is less than the _amount to IBC transfer, the signature cannot be made,
+      // If the dYdX USDC balance is less than the amount to IBC transfer, the signature cannot be made,
       // so disable the balance check only for this tx.
       if (isKeplr && window.keplr) {
         window.keplr.defaultOptions = {
@@ -237,9 +246,10 @@ export const WithdrawForm = () => {
       }
       const tx = await sendSkipWithdrawFromSubaccount({
         subaccountClient,
-        amount: _amount,
+        amount: Number(amount),
         payload,
       });
+      console.log('tx', tx);
 
       // Reset the default options after the tx is sent.
       if (isKeplr && window.keplr) {
@@ -249,6 +259,42 @@ export const WithdrawForm = () => {
     },
     [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
   );
+
+  const onSubmitComplete = (txHash: string | undefined) => {
+    if (!txHash) {
+      throw new Error('No transaction hash returned');
+    }
+    setAmount('');
+
+    const notificationParams = {
+      // id: notificationId,
+      txHash,
+      type: TransferNotificationTypes.Withdrawal,
+      toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
+      fromChainId,
+      toAmount: Number(amount),
+      triggeredAt: Date.now(),
+      isCctp,
+      isExchange: Boolean(exchange),
+      requestId: undefined,
+    };
+    addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
+    const transferWithdrawContext = {
+      chainId: toChainId,
+      tokenAddress: toToken?.denom || undefined,
+      tokenSymbol: toToken?.symbol || undefined,
+      slippage: slippage || undefined,
+      gasFee: summary?.gasFee || undefined,
+      bridgeFee: summary?.bridgeFee || undefined,
+      exchangeRate: summary?.exchangeRate || undefined,
+      estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
+      toAmount: summary?.toAmount || undefined,
+      toAmountMin: summary?.toAmountMin || undefined,
+      txHash,
+    };
+    track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+    dd.info('Transfer withdraw submitted', transferWithdrawContext);
+  };
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -288,54 +334,30 @@ export const WithdrawForm = () => {
           // set nobleChainId in exchange, if exchange is chosen.
           // const toChainId = exchange ? nobleChainId : toChainId || undefined;
 
-          const notificationParams = {
-            id: notificationId,
-            // DUMMY_TX_HASH is a place holder before we get the real txHash
-            txHash: DUMMY_TX_HASH,
-            type: TransferNotificationTypes.Withdrawal,
-            toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-            fromChainId,
-            toAmount: amount,
-            triggeredAt: Date.now(),
-            isCctp,
-            isExchange: Boolean(exchange),
-            requestId: undefined,
-          };
+          // const notificationParams = {
+          //   id: notificationId,
+          //   // DUMMY_TX_HASH is a place holder before we get the real txHash
+          //   txHash: DUMMY_TX_HASH,
+          //   type: TransferNotificationTypes.Withdrawal,
+          //   toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
+          //   fromChainId,
+          //   toAmount: amount,
+          //   triggeredAt: Date.now(),
+          //   isCctp,
+          //   isExchange: Boolean(exchange),
+          //   requestId: undefined,
+          // };
 
           if (isCctp) {
+            // DONT TRIGGER A DUMMY FOR NOW, THIS ADDS A LOT OF WEIRD COMPLEXITY AROUND TRANSFER NOTIFS
             // we want to trigger a dummy notification first since CCTP withdraws can take
             // up to 30s to generate a txHash, set isDummy to true
-            addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
-          }
-
-          const txHash = await sendSkipWithdraw(
-            Number(amount),
-            JSON.stringify(cosmosTxMsgs),
-            isCctp
-          );
-
-          if (txHash && toChainId) {
-            abacusStateManager.clearTransferInputValues();
-            setAmount('');
-
-            addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-            const transferWithdrawContext = {
-              chainId: toChainId,
-              tokenAddress: toToken?.denom || undefined,
-              tokenSymbol: toToken?.symbol || undefined,
-              slippage: slippage || undefined,
-              gasFee: summary?.gasFee || undefined,
-              bridgeFee: summary?.bridgeFee || undefined,
-              exchangeRate: summary?.exchangeRate || undefined,
-              estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
-              toAmount: summary?.toAmount || undefined,
-              toAmountMin: summary?.toAmountMin || undefined,
-              txHash,
-            };
-            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
-            dd.info('Transfer withdraw submitted', transferWithdrawContext);
+            // addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
+            await submitCctpWithdraw();
           } else {
-            throw new Error('No transaction hash returned');
+            const txHash = await submitNonCctpWithdraw(JSON.stringify(cosmosMsgToSend));
+            if (txHash) onSubmitComplete(txHash);
+            else throw new Error('No transaction hash returned');
           }
         }
       } catch (err) {
@@ -343,7 +365,6 @@ export const WithdrawForm = () => {
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
-          console.log(err);
           setError(
             err.message
               ? stringGetter({
@@ -387,6 +408,7 @@ export const WithdrawForm = () => {
   const onChangeAmount = useCallback(
     ({ value }: NumberFormatValues) => {
       setAmount(value);
+      setError(undefined);
     },
     [setAmount]
   );

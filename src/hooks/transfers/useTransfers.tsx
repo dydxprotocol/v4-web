@@ -124,24 +124,8 @@ const assetsQueryFn = async () => {
     includeEvmAssets: true,
     includeSvmAssets: true,
   });
-  const assetsByDenom = Object.values(assetsByChain).reduce<Record<string, Asset>>(
-    (assetsByDenomMap, nextAssets) => {
-      const assetsByDenomForChain = nextAssets.reduce((assetsByDenomForChainMap, nextAsset) => {
-        return {
-          ...assetsByDenomForChainMap,
-          [nextAsset.denom]: nextAsset,
-        };
-      }, {});
-      return {
-        ...assetsByDenomMap,
-        ...assetsByDenomForChain,
-      };
-    },
-    {}
-  );
-  return { assetsByChain, assetsByDenom };
+  return { assetsByChain };
 };
-
 const balancesQueryFn = () => {
   return [];
 };
@@ -199,8 +183,6 @@ const useTransfersContext = () => {
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 
-  // console.log('from chain id', fromChainId);
-  // console.log('connectedWallet', connectedWallet);
   const chainsQuery = useQuery({
     queryKey: ['transferEligibleChains'],
     queryFn: chainsQueryFn,
@@ -216,15 +198,16 @@ const useTransfersContext = () => {
     refetchOnReconnect: false,
   });
   const { chainsByNetworkMap = {} } = chainsQuery.data ?? {};
-  const { assetsByChain = {}, assetsByDenom = {} } = assetsQuery.data ?? {};
+  const { assetsByChain = {} } = assetsQuery.data ?? {};
 
   const walletNetworkType = getNetworkTypeFromWallet(connectedWallet);
   const selectedChainId = transferType === TransferType.Deposit ? fromChainId : toChainId;
-  const toToken = assetsByDenom[toTokenDenom ?? ''];
-  const fromToken = assetsByDenom[toTokenDenom ?? ''];
-  // console.log('all chains', skipSupportedChains);
-  // console.log('all Assets', assetsByChain);
-  // only calculate this once! use memo this
+  const toToken = useMemo(() => {
+    return assetsByChain[toChainId ?? '']?.find((token) => token.denom === toTokenDenom);
+  }, [toChainId, toTokenDenom, assetsByChain]);
+  const fromToken = useMemo(() => {
+    return assetsByChain[fromChainId ?? '']?.find((token) => token.denom === fromTokenDenom);
+  }, [fromChainId, fromTokenDenom, assetsByChain]);
   const chainsForNetwork = useMemo(
     () => chainsByNetworkMap?.[walletNetworkType] ?? [],
     [walletNetworkType, chainsByNetworkMap]
@@ -296,7 +279,7 @@ const useTransfersContext = () => {
     if (connectedWallet?.name === WalletType.Keplr && nobleAddress) {
       return nobleAddress;
     }
-    // put sol first. some users with phantom wallet have previously connected with evm
+    // put sol before evm. some users with phantom wallet have previously connected with evm
     // so they will have both sol and evm addresses. we assume the phantom wallet
     // is connected with a sol address, not evm.
     if (solAddress) {
@@ -306,8 +289,8 @@ const useTransfersContext = () => {
   };
 
   const hasAllParams =
-    !!fromTokenDenom &&
-    !!toTokenDenom &&
+    !!fromToken?.denom &&
+    !!toToken?.denom &&
     !!toChainId &&
     !!fromChainId &&
     !!fromAddress &&
@@ -319,13 +302,13 @@ const useTransfersContext = () => {
   const routeQuery = useQuery({
     queryKey: [
       'transferRoute',
-      fromTokenDenom,
-      toTokenDenom,
       fromChainId,
       toChainId,
       fromAddress,
       toAddress,
       amount,
+      fromToken?.denom,
+      toToken?.denom,
     ],
     queryFn: async () => {
       // return { route: {}, txs: [{ evmTx: {} }] };
@@ -334,16 +317,17 @@ const useTransfersContext = () => {
       if (!hasAllParams) return null;
 
       if (transferType === TransferType.Withdraw) {
+        console.log('fromToken', fromToken);
         // console.log('selectedToken', assetsByDenom[toTokenDenom ?? '']);
-        if (isDenomCctp(toTokenDenom)) {
+        if (isDenomCctp(toToken.denom)) {
           return skipClient.msgsDirect({
-            sourceAssetDenom: fromTokenDenom,
-            sourceAssetChainID: fromChainId,
-            destAssetDenom: toTokenDenom,
-            destAssetChainID: toChainId,
+            sourceAssetDenom: fromToken.denom,
+            sourceAssetChainID: fromToken.chainID,
+            destAssetDenom: toToken.denom,
+            destAssetChainID: toToken.chainID,
             chainIdsToAddresses: {
               [selectedDydxChainId]: dydxAddress,
-              [toChainId]: toAddress,
+              [toToken.chainID]: toAddress,
             },
             allowUnsafe: true,
 
@@ -358,13 +342,13 @@ const useTransfersContext = () => {
         }
         // Non cctp withdrawals
         return skipClient.msgsDirect({
-          sourceAssetDenom: fromTokenDenom,
-          sourceAssetChainID: fromChainId,
-          destAssetDenom: toTokenDenom,
-          destAssetChainID: toChainId,
+          sourceAssetDenom: fromToken.denom,
+          sourceAssetChainID: fromToken.chainID,
+          destAssetDenom: toToken.denom,
+          destAssetChainID: toToken.chainID,
           chainIdsToAddresses: {
             [selectedDydxChainId]: dydxAddress,
-            [toChainId]: toAddress,
+            [toToken.chainID]: toAddress,
             [getOsmosisChainId()]: convertBech32Address({
               address: dydxAddress,
               bech32Prefix: OSMO_BECH32_PREFIX,
@@ -403,7 +387,7 @@ const useTransfersContext = () => {
           allowUnsafe: true,
           bridges: ['CCTP', 'IBC'],
           smartRelay: true,
-          amountIn: parseUnits(amount, selectedToken.decimals).toString(),
+          amountIn: parseUnits(amount, fromToken.decimals).toString(),
         });
       }
       return skipClient.msgsDirect({
@@ -430,7 +414,7 @@ const useTransfersContext = () => {
         allowUnsafe: true,
         bridges: ['CCTP', 'IBC', 'AXELAR'],
         smartSwapOptions: { evmSwaps: true },
-        amountIn: parseUnits(amount, selectedToken.decimals).toString(),
+        amountIn: parseUnits(amount, fromToken.decimals).toString(),
         slippageTolerancePercent: '1',
         swapVenues: SWAP_VENUES,
       });
@@ -439,16 +423,17 @@ const useTransfersContext = () => {
   });
 
   const route = routeQuery?.data;
-  // console.log('route', route);
+
+  // TODO: maybe abstract away the adding of transfer notifications to this hook instead of having
+  // withdrawal and deposit modals handle them separately in multiple places
   const { addOrUpdateTransferNotification } = useLocalNotifications();
 
-  // const setDefaultTokenAndChain = () => {
-  //   const
-  // }
-
   return {
-    // TRIM THIS LIST, ITS YOOOOJ
-    assetsByDenom,
+    // TODO TRIM THIS LIST
+    // expose some general clear/setState functions that the onboarding modals can call on close and mount
+    // ex:
+    // setInitialWithdrawState -> sets fromChainId, toChainId, fromTokenDenom, toTokenDenom, fromAddress, amount, etc. all at once
+    // consider converting all this state into a local reducer
     assetsForSelectedChain,
     chainsForNetwork,
     fromTokenDenom,
