@@ -19,6 +19,7 @@ export const SortIcon = ({ sortDirection, className }: ElementProps & StyleProps
         aria-hidden="true"
         direction="up"
         highlighted={sortDirection === 'ascending'}
+        size="0.75em"
         tw="relative right-[-2px] top-[-3px]"
       />
       <$Icon
@@ -26,6 +27,7 @@ export const SortIcon = ({ sortDirection, className }: ElementProps & StyleProps
         aria-hidden="true"
         direction="down"
         highlighted={sortDirection === 'descending'}
+        size="0.75em"
         tw="relative bottom-[-3px] left-[-2px]"
       />
     </$SortIcon>
@@ -36,11 +38,6 @@ const $SortIcon = styled.div<{ hidden: boolean }>`
   display: inline-flex;
   position: relative;
   transition: opacity 0.3s var(--ease-out-expo);
-
-  svg {
-    width: 0.75em;
-    height: 0.75em;
-  }
 
   ${({ hidden }) =>
     hidden
