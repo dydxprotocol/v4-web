@@ -2,30 +2,36 @@ import { shallowEqual } from 'react-redux';
 
 import { ButtonType } from '@/constants/buttons';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
-export const MarketLinks = () => {
+import { orEmptyObj } from '@/lib/typeUtils';
+
+export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const { resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { coinMarketCapsLink, websiteLink, whitepaperLink } = resources ?? {};
+  const { coinMarketCapsLink, websiteLink, whitepaperLink } = orEmptyObj(resources);
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const { urls } = orEmptyObj(launchableAsset);
 
   const linkItems = [
     {
       key: 'coinmarketcap',
-      href: coinMarketCapsLink,
+      href: urls?.cmc ?? coinMarketCapsLink,
       icon: IconName.CoinMarketCap,
     },
     {
       key: 'whitepaper',
-      href: whitepaperLink,
+      href: urls?.technicalDoc ?? whitepaperLink,
       icon: IconName.Whitepaper,
     },
     {
       key: 'project-website',
-      href: websiteLink,
+      href: urls?.website ?? websiteLink,
       icon: IconName.Website,
     },
   ].filter(({ href }) => href);

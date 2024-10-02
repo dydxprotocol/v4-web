@@ -74,6 +74,7 @@ export const mapCandle =
     high,
     low,
     baseTokenVolume,
+    usdVolume,
     trades,
     orderbookMidPriceOpen,
     orderbookMidPriceClose,
@@ -84,7 +85,7 @@ export const mapCandle =
     const tradeHigh = parseFloat(high);
     const orderbookOpen = orderbookMidPriceOpen ? parseFloat(orderbookMidPriceOpen) : undefined;
     const orderbookClose = orderbookMidPriceClose ? parseFloat(orderbookMidPriceClose) : undefined;
-
+    const tokenVolume = Math.ceil(Number(baseTokenVolume)); // default
     return {
       ...getOhlcValues({
         orderbookCandlesToggleOn,
@@ -97,7 +98,9 @@ export const mapCandle =
         orderbookClose,
       }),
       time: new Date(startedAt).getTime(),
-      volume: Math.ceil(Number(baseTokenVolume)),
+      volume: tokenVolume,
+      assetVolume: tokenVolume,
+      usdVolume: Math.ceil(Number(usdVolume)),
       tradeOpen,
       tradeClose,
       orderbookOpen,

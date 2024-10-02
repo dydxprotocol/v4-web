@@ -11,6 +11,7 @@ import {
   HistoricalPnlPeriod,
   HistoricalPnlPeriods,
 } from '@/constants/abacus';
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -176,7 +177,7 @@ export const PnlChart = ({
             setSelectedPeriod(periodOptions[defaultPeriodIx]);
           }
         }
-      }, 200),
+      }, NORMAL_DEBOUNCE_MS),
     [periodOptions, msForPeriod]
   );
 

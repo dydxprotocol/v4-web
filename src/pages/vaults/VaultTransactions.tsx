@@ -55,7 +55,15 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
   );
 };
 const $ShowHideHistoryButton = styled(Button)``;
-const VaultTransactionsTable = ({ className }: { className?: string }) => {
+export const VaultTransactionsTable = ({
+  className,
+  withOuterBorders,
+  emptyString,
+}: {
+  className?: string;
+  withOuterBorders?: boolean;
+  emptyString?: string;
+}) => {
   const stringGetter = useStringGetter();
   const transactions = useLoadedVaultAccountTransfers() ?? EMPTY_ARR;
 
@@ -117,7 +125,8 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
       }}
       columns={columns}
       className={className}
-      withOuterBorder={transactions.length === 0}
+      withOuterBorder={transactions.length === 0 || withOuterBorders}
+      slotEmpty={emptyString}
     />
   );
 };
