@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -119,7 +120,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
         items={(uiRefresh ? Object.values(MarketStats) : defaultMarketStatistics).map((stat) => ({
           key: stat,
           label: labelMap[stat],
-          tooltip: stat,
+          tooltip: stat as unknown as TooltipStringKeys, // just force for now, component will handle non-existing ones
           value: (
             <DetailsItem
               value={valueMap[stat]}

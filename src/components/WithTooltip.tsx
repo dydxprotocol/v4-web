@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
 import styled from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
-import { tooltipStrings } from '@/constants/tooltips';
+import { STRING_KEYS, TooltipStrings } from '@/constants/localization';
+import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
 
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -17,7 +17,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
 type ElementProps = {
-  tooltip?: keyof typeof tooltipStrings;
+  tooltip?: TooltipStringKeys;
   tooltipString?: string;
   stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
@@ -46,7 +46,7 @@ export const WithTooltip = ({
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
 
-  const getTooltipStrings = tooltip && tooltipStrings[tooltip];
+  const getTooltipStrings: TooltipStrings[string] | undefined = tooltip && tooltipStrings[tooltip];
   if (!getTooltipStrings && !tooltipString && !slotTooltip) return children;
 
   let tooltipTitle;

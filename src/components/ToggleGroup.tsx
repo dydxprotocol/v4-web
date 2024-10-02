@@ -8,6 +8,8 @@ import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
@@ -71,7 +73,7 @@ export const ToggleGroup = forwardRefFn(
               {...buttonProps}
             >
               {item.slotBefore}
-              {item.label}
+              <$Label>{item.label}</$Label>
               {item.slotAfter}
             </ToggleButton>
           </Item>
@@ -92,4 +94,8 @@ const $Root = styled(Root)<{ overflow: 'scroll' | 'wrap' }>`
         flex-wrap: wrap;
       `,
     })[overflow]}
+`;
+
+const $Label = styled.div`
+  ${layoutMixins.textTruncate}
 `;
