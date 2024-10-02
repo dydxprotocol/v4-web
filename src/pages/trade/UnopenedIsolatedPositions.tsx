@@ -121,10 +121,12 @@ const $UnopenedIsolatedPositionsDrawerContainer = styled.div<{ isOpen?: boolean 
     `}
 `;
 const $Button = styled(Button)`
+  --backdrop-filter: blur(4px) contrast(1.01);
   position: sticky;
   top: 0;
   gap: 0.75rem;
-  backdrop-filter: blur(4px) contrast(1.01);
+  -webkit-backdrop-filter: var(--backdrop-filter);
+  backdrop-filter: var(--backdrop-filter);
   background-color: transparent;
   border: none;
   margin: 0 1rem;

@@ -61,6 +61,7 @@ export const useMetadataService = () => {
             percentChange24h: prices[key].percent_change_24h,
             marketCap: prices[key].market_cap,
             volume24h: prices[key].volume_24h,
+            reportedMarketCap: prices[key].self_reported_market_cap,
             tickSizeDecimals,
           };
         }

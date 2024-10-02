@@ -3,34 +3,44 @@ import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
+<<<<<<< HEAD
 import { testFlags } from '@/lib/testFlags';
 
 export const MarketLinks = () => {
+=======
+import { orEmptyObj } from '@/lib/typeUtils';
+
+export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
+>>>>>>> c0c2afc6471e33ae68dc3258125fbbe8f07cdcbc
   const { resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { coinMarketCapsLink, websiteLink, whitepaperLink } = resources ?? {};
+  const { coinMarketCapsLink, websiteLink, whitepaperLink } = orEmptyObj(resources);
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const { urls } = orEmptyObj(launchableAsset);
 
   const { uiRefresh } = testFlags;
 
   const linkItems = [
     {
       key: 'coinmarketcap',
-      href: coinMarketCapsLink,
+      href: urls?.cmc ?? coinMarketCapsLink,
       icon: IconName.CoinMarketCap,
     },
     {
       key: 'whitepaper',
-      href: whitepaperLink,
+      href: urls?.technicalDoc ?? whitepaperLink,
       icon: IconName.Whitepaper,
     },
     {
       key: 'project-website',
-      href: websiteLink,
+      href: urls?.website ?? websiteLink,
       icon: IconName.Website,
     },
   ].filter(({ href }) => href);

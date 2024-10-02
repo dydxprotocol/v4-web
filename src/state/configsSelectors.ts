@@ -54,3 +54,5 @@ export const getHasSeenLaunchIncentives = (state: RootState) =>
 
 export const getDefaultToAllMarketsInPositionsOrdersFills = (state: RootState) =>
   state.configs.defaultToAllMarketsInPositionsOrdersFills;
+
+export const getSelectedDisplayUnit = (state: RootState) => state.configs.displayUnit;

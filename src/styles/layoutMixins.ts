@@ -148,6 +148,7 @@ const sticky = css`
   left: var(--stickyArea-totalInsetLeft, 0px);
   right: var(--stickyArea-totalInsetRight, 0px);
 
+  -webkit-backdrop-filter: var(--stickyArea-backdropFilter);
   backdrop-filter: var(--stickyArea-backdropFilter);
 `;
 

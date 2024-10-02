@@ -163,7 +163,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const [fromAmount, setFromAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
-  const debouncedAmount = useDebounce<string>(fromAmount, 500);
+  const debouncedAmount = useDebounce<string>(fromAmount);
 
   const { usdcLabel, usdcDenom } = useTokenConfigs();
 
