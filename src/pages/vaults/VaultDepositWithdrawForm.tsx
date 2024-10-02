@@ -8,6 +8,7 @@ import tw from 'twin.macro';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useCustomNotification } from '@/hooks/useCustomNotification';
@@ -67,7 +68,6 @@ type VaultDepositWithdrawFormProps = {
 };
 
 const INDEXER_LAG_ALLOWANCE = timeUnits.second * 4;
-const QUANTUM_COUNT = 1e6;
 
 const $SmallIcon = styled(Icon)<{ $hasError?: boolean }>`
   ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
@@ -251,7 +251,7 @@ export const VaultDepositWithdrawForm = ({
                   <Output
                     tw="inline-block text-color-text-1"
                     type={OutputType.Fiat}
-                    value={MustBigNumber(actualAmount).div(QUANTUM_COUNT)}
+                    value={MustBigNumber(actualAmount).div(QUANTUM_MULTIPLIER)}
                   />
                 ),
             },
