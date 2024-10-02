@@ -88,7 +88,18 @@ export const ProgramStatusCard = ({
             <h4 className="ml-0.5 text-color-text-2">{title}</h4>
           </$Header>
           <div>{body}</div>
-          <Button action={ButtonAction.Base}>{buttonText}</Button>
+
+          {!isVip ? (
+            <a className="w-full" href="https://dydx-affiliates.fuul.xyz/">
+              <Button className="w-full" action={ButtonAction.Base}>
+                {buttonText}
+              </Button>
+            </a>
+          ) : (
+            <Button className="w-full" action={ButtonAction.Base}>
+              {buttonText}
+            </Button>
+          )}
         </div>
       )}
     </$Container>

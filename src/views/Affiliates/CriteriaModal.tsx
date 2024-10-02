@@ -116,7 +116,7 @@ export const CriteriaModal = ({
                     VIP_VALUE: <span className="text-color-text-1">{'{VIP Value}'}</span>,
                     REGULAR_VALUE: <span className="text-color-text-1">{'{Regular Value}'}</span>,
                     APPLY_HERE: (
-                      <a href="#">
+                      <a href="https://dydx-affiliates.fuul.xyz/">
                         <span className="text-color-accent">
                           {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                         </span>
@@ -208,9 +208,11 @@ const CriteriaTable = ({
                     key: STRING_KEYS.BY_APPLICATION_ONLY,
                   })}
                 <div className="flex flex-row">
-                  <span className="capitalize text-color-accent">
-                    {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
-                  </span>
+                  <a href="https://dydx-affiliates.fuul.xyz/">
+                    <span className="capitalize text-color-accent">
+                      {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
+                    </span>
+                  </a>
                   !
                 </div>
               </div>

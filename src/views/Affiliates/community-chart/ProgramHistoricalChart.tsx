@@ -18,6 +18,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -63,12 +64,11 @@ export const ProgramHistoricalChart = ({
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const historyStartDate = '2024-01-01T00:00:00Z';
+  const historyStartDate = useEnvConfig('rewardsHistoryStartDateMs');
+
   const now = useNow({ intervalMs: timeUnits.minute });
 
-  const [periodOptions, setPeriodOptions] = useState<AffiliatesProgramPeriod[]>([
-    AffiliatesProgramPeriod.PeriodAllTime,
-  ]);
+  const [periodOptions] = useState<AffiliatesProgramPeriod[]>(affiliatesProgramPeriods);
   const [tooltipContext, setTooltipContext] =
     useState<TooltipContextType<AffiliatesProgramDatum>>();
   const [isZooming, setIsZooming] = useState(false);
@@ -155,30 +155,30 @@ export const ProgramHistoricalChart = ({
 
   // Include period option only if oldest date is older it
   // e.g. oldest date is 31 days old -> show 30d option, but not 90d
-  const getPeriodOptions = useCallback(
-    (oldestMs: number): AffiliatesProgramPeriod[] =>
-      affiliatesProgramPeriods.reduce((acc: AffiliatesProgramPeriod[], period) => {
-        if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
-          acc.push(period);
-        }
-        return acc;
-      }, []),
-    [msForPeriod, newestDataPointDate, now]
-  );
+  // const getPeriodOptions = useCallback(
+  //   (oldestMs: number): AffiliatesProgramPeriod[] =>
+  //     affiliatesProgramPeriods.reduce((acc: AffiliatesProgramPeriod[], period) => {
+  //       if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
+  //         acc.push(period);
+  //       }
+  //       return acc;
+  //     }, []),
+  //   [msForPeriod, newestDataPointDate, now]
+  // );
 
-  useEffect(() => {
-    if (oldestDataPointDate) {
-      const options = getPeriodOptions(oldestDataPointDate);
-      setPeriodOptions(options);
-    }
-  }, [oldestDataPointDate, getPeriodOptions]);
+  // useEffect(() => {
+  //   if (oldestDataPointDate) {
+  //     const options = getPeriodOptions(oldestDataPointDate);
+  //     setPeriodOptions(options);
+  //   }
+  // }, [oldestDataPointDate, getPeriodOptions]);
 
   // Update selected period in toggle if user zooms in/out
   const onZoomSnap = useMemo(
     () =>
       debounce(({ zoomDomain }: { zoomDomain?: number }) => {
         if (zoomDomain) {
-          const predefinedPeriodIx = periodOptions.findIndex(
+          const predefinedPeriodIx = affiliatesProgramPeriods.findIndex(
             // To account for slight variance from zoom animation
             (period) => Math.abs(msForPeriod(period) - zoomDomain) <= 1
           );
@@ -188,11 +188,11 @@ export const ProgramHistoricalChart = ({
           } else {
             // Update period to new selected period
             setIsZooming(false);
-            setSelectedPeriod(periodOptions[predefinedPeriodIx]);
+            setSelectedPeriod(affiliatesProgramPeriods[predefinedPeriodIx]);
           }
         }
       }, 200),
-    [periodOptions, msForPeriod]
+    [msForPeriod]
   );
 
   useEffect(() => {
@@ -234,24 +234,17 @@ export const ProgramHistoricalChart = ({
 
   const renderTooltip = useCallback(() => <div />, []);
 
-  const toggleGroupItems = useMemo(() => {
-    return periodOptions.map((period: AffiliatesProgramPeriod) => ({
-      value: period,
-      label:
-        period === AffiliatesProgramPeriod.PeriodAllTime
-          ? stringGetter({ key: STRING_KEYS.ALL })
-          : // TODO: Remove this type assertion, msForPeriod function is only acepting TradingRewardsPeriod type as argument
-            formatRelativeTime(msForPeriod(period, false), {
-              locale: selectedLocale,
-              relativeToTimestamp: 0,
-              largestUnit: 'day',
-            }),
-    }));
-  }, [stringGetter, msForPeriod, selectedLocale, periodOptions]);
-
-  const setTradingRewardsPeriod = useCallback((value: string) => {
-    setSelectedPeriod(value as AffiliatesProgramPeriod);
-  }, []);
+  const toggleGroupItems = periodOptions.map((period: AffiliatesProgramPeriod) => ({
+    value: period,
+    label:
+      period === AffiliatesProgramPeriod.PeriodAllTime
+        ? stringGetter({ key: STRING_KEYS.ALL })
+        : formatRelativeTime(msForPeriod(period, false), {
+            locale: selectedLocale,
+            relativeToTimestamp: 0,
+            largestUnit: 'day',
+          }),
+  }));
 
   return (
     <>
@@ -262,7 +255,7 @@ export const ProgramHistoricalChart = ({
           <ToggleGroup
             items={toggleGroupItems}
             value={isZooming ? '' : selectedPeriod}
-            onValueChange={setTradingRewardsPeriod}
+            onValueChange={(value) => setSelectedPeriod(value as AffiliatesProgramPeriod)}
             onInteraction={onToggleInteract}
           />
         </div>
