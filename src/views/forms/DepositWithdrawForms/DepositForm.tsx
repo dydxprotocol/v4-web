@@ -594,7 +594,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             to: evmTxDestinationAddress as EvmAddress,
             data: evmTxData as EvmAddress,
             gasLimit: BigInt(DEFAULT_GAS_LIMIT),
-            value: undefined,
+            value: BigInt(evmTxValue),
           };
           setDepositStep(DepositSteps.Confirm);
           console.log('tx', tx);

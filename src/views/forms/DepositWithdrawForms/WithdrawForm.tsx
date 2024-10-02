@@ -9,7 +9,7 @@ import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { TransferInputField } from '@/constants/abacus';
+import { AutoSweepConfig, TransferInputField } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
@@ -159,6 +159,7 @@ export const WithdrawForm = () => {
     setFromChainId(selectedDydxChainId);
     setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
+    setToAddress('0x0f7833777bfC9ef72D8B76AE954D3849DD71F829');
   }, [
     setTransferType,
     setFromChainId,
@@ -167,6 +168,7 @@ export const WithdrawForm = () => {
     dydxAddress,
     setFromTokenDenom,
     usdcDenom,
+    setToAddress,
   ]);
 
   // maybe make shared hook `useDefaultTransferOptions`
@@ -197,36 +199,51 @@ export const WithdrawForm = () => {
       return { ...a, [camelCase(b)]: cosmosMsgPayload[b] };
     }, {}),
   };
-  console.log(cosmosMsg);
-  console.log(cosmosMsgToSend);
+  // console.log(cosmosMsg);
+  // console.log(cosmosMsgToSend);
 
   const submitCctpWithdraw = () => {
+    console.log('subbmitting withdrawal');
     if (!route || !dydxAddress || !toAddress || !toChainId) return {};
-    return skipClient.executeRoute({
-      route: route?.route,
-      getCosmosSigner: async () => {
-        if (!localDydxWallet?.offlineSigner)
-          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-        return localDydxWallet?.offlineSigner;
-      },
-      userAddresses: [
-        { chainID: selectedDydxChainId, address: dydxAddress },
-        {
-          chainID: getNobleChainId(),
-          address: convertBech32Address({
-            address: dydxAddress,
-            bech32Prefix: NOBLE_BECH32_PREFIX,
-          }),
+    console.log('executing route');
+    try {
+      console.log('in try block');
+      return skipClient.executeRoute({
+        route: route?.route,
+        getCosmosSigner: async () => {
+          if (!localDydxWallet?.offlineSigner)
+            throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+          return localDydxWallet?.offlineSigner;
         },
-        {
-          chainID: toChainId,
-          address: toAddress,
+        userAddresses: [
+          { chainID: selectedDydxChainId, address: dydxAddress },
+          {
+            chainID: getNobleChainId(),
+            address: convertBech32Address({
+              address: dydxAddress,
+              bech32Prefix: NOBLE_BECH32_PREFIX,
+            }),
+          },
+          {
+            chainID: toChainId,
+            address: toAddress,
+          },
+        ],
+        onTransactionBroadcast: async ({ txHash }) => {
+          console.log('on submit complete', txHash);
+          // just submit a real notification once, as soon as we bith withdrawing
+          onSubmitComplete(txHash);
+          AutoSweepConfig.disable_autosweep = true;
         },
-      ],
-      onTransactionBroadcast: async ({ txHash }) => {
-        onSubmitComplete(txHash);
-      },
-    });
+        onTransactionCompleted: async () => {
+          console.log('re-enabling autosweep');
+          AutoSweepConfig.disable_autosweep = false;
+        },
+      });
+    } catch (err) {
+      console.log('err', err);
+      return {};
+    }
   };
 
   const submitNonCctpWithdraw = useCallback(
@@ -353,6 +370,7 @@ export const WithdrawForm = () => {
             // we want to trigger a dummy notification first since CCTP withdraws can take
             // up to 30s to generate a txHash, set isDummy to true
             // addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
+            console.log('is cctp, submitting as it');
             await submitCctpWithdraw();
           } else {
             const txHash = await submitNonCctpWithdraw(JSON.stringify(cosmosMsgToSend));
@@ -361,6 +379,7 @@ export const WithdrawForm = () => {
           }
         }
       } catch (err) {
+        console.log('error', err);
         log('WithdrawForm/onSubmit', err);
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
