@@ -133,23 +133,11 @@ export const AccountMenu = () => {
               <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>
                 {connectedWallet && connectedWallet?.name !== WalletType.Keplr ? (
-                  <WithTooltip
-                    slotTooltip={
-                      <dl>
-                        <dt>
-                          {stringGetter({
-                            key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
-                            params: {
-                              DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-                              EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
-                            },
-                          })}
-                        </dt>
-                      </dl>
-                    }
-                  >
-                    <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                  </WithTooltip>
+                  <DydxDerivedAddress
+                    evmAddress={evmAddress}
+                    solAddress={solAddress}
+                    dydxAddress={dydxAddress}
+                  />
                 ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
                 )}
@@ -400,6 +388,46 @@ export const AccountMenu = () => {
       {walletIcon}
       {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
     </$DropdownMenu>
+  );
+};
+
+const DydxDerivedAddress = ({
+  evmAddress,
+  solAddress,
+  dydxAddress,
+}: {
+  evmAddress?: string;
+  solAddress?: string;
+  dydxAddress?: string;
+}) => {
+  const stringGetter = useStringGetter();
+
+  const tooltipText = solAddress
+    ? stringGetter({
+        key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
+        params: {
+          DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+          SOLANA_ADDRESS: truncateAddress(solAddress, ''),
+        },
+      })
+    : stringGetter({
+        key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
+        params: {
+          DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+          EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
+        },
+      });
+
+  return (
+    <WithTooltip
+      slotTooltip={
+        <dl>
+          <dt>{tooltipText}</dt>
+        </dl>
+      }
+    >
+      <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
+    </WithTooltip>
   );
 };
 
