@@ -14,7 +14,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
-import { useAssets } from '@/hooks/transfers/useAssets';
+import { useTransfers } from '@/hooks/transfers/useTransfers';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -56,7 +56,7 @@ export const SourceSelectMenu = ({
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
-  const { chainsForNetwork } = useAssets();
+  const { chainsForNetwork } = useTransfers();
 
   const exchanges =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??

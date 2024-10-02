@@ -3,6 +3,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 
 import { calculateFee, GasPrice, MsgTransferEncodeObject } from '@cosmjs/stargate';
 import { GAS_MULTIPLIER } from '@dydxprotocol/v4-client-js';
+import { Asset } from '@skip-go/client';
 import { useAccount as useAccountGraz, useStargateSigningClient } from 'graz';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
@@ -41,8 +42,7 @@ import {
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { ConnectorType, type EvmAddress, WalletType } from '@/constants/wallets';
 
-import { useAssets } from '@/hooks/transfers/useAssets';
-import { TransferType as T2, useTransfers } from '@/hooks/transfers/useTransfers';
+import { TransferType, useTransfers } from '@/hooks/transfers/useTransfers';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -75,8 +75,8 @@ import { forceOpenDialog } from '@/state/dialogs';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
+import { isNativeDenom } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
@@ -131,7 +131,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   //   requestPayload,
   //   token,
   //   exchange,
-  //   chain: chainIdStr,
+  //   chain: fromChainId,
   //   resources,
   //   summary,
   //   errors: routeErrors,
@@ -140,8 +140,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User inputs
-  const { assetsByDenom } = useAssets();
   const {
+    defaultChainId,
+    defaultTokenDenom,
+    assetsByDenom,
     fromTokenDenom,
     setFromTokenDenom,
     setToTokenDenom,
@@ -163,14 +165,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // console.log('fromtoken', fromToken, fromTokenDenom);
   const isCctp = isTokenCctp(fromToken);
 
-  const chainIdStr = fromChainId;
-
   // todo are these guaranteed to be base 10?
   /* eslint-disable radix */
   let chainId: number | string | undefined;
-  if (chainIdStr) chainId = chainIdStr;
-  if (chainIdStr && chainIdStr.startsWith('solana')) chainId = chainIdStr;
-  if (chainIdStr && !Number.isNaN(parseInt(chainIdStr))) chainId = parseInt(chainIdStr);
+  if (fromChainId) chainId = fromChainId;
+  if (fromChainId && fromChainId.startsWith('solana')) chainId = fromChainId;
+  if (fromChainId && !Number.isNaN(parseInt(fromChainId))) chainId = parseInt(fromChainId);
   /* eslint-enable radix */
 
   const nobleChainId = getNobleChainId();
@@ -202,7 +202,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const balanceBN = MustBigNumber(balance);
 
   useEffect(() => {
-    setTransferType(T2.Deposit);
+    setTransferType(TransferType.Deposit);
     setToChainId(selectedDydxChainId);
     setToAddress(dydxAddress);
     setToTokenDenom(usdcDenom);
@@ -219,8 +219,20 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   ]);
 
   useEffect(() => {
+    setFromChainId(defaultChainId);
+  }, [defaultChainId]);
+
+  useEffect(() => {
+    setFromTokenDenom(defaultTokenDenom);
+  }, [defaultTokenDenom]);
+
+  useEffect(() => {
     setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);
   }, [isCctp, isKeplrWallet]);
+
+  useEffect(() => {
+    setError(null);
+  }, [amount]);
 
   // useEffect(() => {
   // const hasInvalidInput =
@@ -309,9 +321,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     [neutronChainId, osmosisChainId]
   );
 
-  const onSelectToken = useCallback((denom: string) => {
-    if (denom) {
-      setFromTokenDenom(denom);
+  const onSelectToken = useCallback((asset: Asset) => {
+    if (asset) {
+      setFromTokenDenom(asset.denom);
       setAmount('');
     }
   }, []);
@@ -353,7 +365,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (!fromTokenDenom || !fromToken?.decimals) throw new Error('Missing source token address');
     if (!evmTxDestinationAddress) throw new Error('Missing target address');
     if (!evmTxValue) throw new Error('Missing transaction value');
-    if (fromTokenDenom === NATIVE_TOKEN_ADDRESS) return;
+    if (isNativeDenom(fromTokenDenom)) return;
 
     const allowance = await publicClientWagmi.readContract({
       address: fromToken.denom as EvmAddress,
@@ -387,7 +399,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         hash: approveTx,
       });
     }
-  }, [signerWagmi, publicClientWagmi, fromToken, evmAddress, debouncedAmount]);
+  }, [
+    signerWagmi,
+    publicClientWagmi,
+    fromToken,
+    evmAddress,
+    debouncedAmount,
+    isEvmTx,
+    evmTxDestinationAddress,
+    evmTxData,
+    evmTxValue,
+  ]);
 
   const waitForBalanceAndDeposit = useCallback(
     async (initialBalance: string) => {
@@ -413,8 +435,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   // probably better to use skip submit endpoint for this
   const onSubmitCosmos = useCallback(async () => {
-    if (!chainIdStr || !SUPPORTED_COSMOS_CHAINS.includes(chainIdStr)) {
-      throw new Error('chainIdStr not supported');
+    if (!fromChainId || !SUPPORTED_COSMOS_CHAINS.includes(fromChainId)) {
+      throw new Error('fromChainId not supported');
     }
 
     if (!evmTxData) {
@@ -428,7 +450,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       value: transaction.value,
     };
 
-    const account = accounts?.[chainIdStr];
+    const account = accounts?.[fromChainId];
     const signerAddress = account?.bech32Address;
 
     if (!signerAddress) {
@@ -437,20 +459,20 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
     const memo = `${DEFAULT_TRANSACTION_MEMO} | ${signerAddress}`;
 
-    const gasEstimate = await signingClient?.[chainIdStr]?.simulate(
+    const gasEstimate = await signingClient?.[fromChainId]?.simulate(
       signerAddress,
       [transferMsg],
       memo
     );
 
     const gasPrice = (() => {
-      if (nobleChainId === chainIdStr) {
+      if (nobleChainId === fromChainId) {
         return GasPrice.fromString(NOBLE_GAS_PRICE);
       }
-      if (osmosisChainId === chainIdStr) {
+      if (osmosisChainId === fromChainId) {
         return GasPrice.fromString(OSMO_GAS_PRICE);
       }
-      if (neutronChainId === chainIdStr) {
+      if (neutronChainId === fromChainId) {
         return GasPrice.fromString(NEUTRON_GAS_PRICE);
       }
       return undefined;
@@ -470,7 +492,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
     setDepositStep(DepositSteps.KEPLR_APPROVAL);
 
-    const tx = await signingClient?.[chainIdStr]?.signAndBroadcast(
+    const tx = await signingClient?.[fromChainId]?.signAndBroadcast(
       signerAddress,
       [transferMsg],
       fee,
@@ -483,7 +505,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       const notification = {
         txHash,
         toChainId: selectedDydxChainId,
-        fromChainId: chainIdStr || undefined,
+        fromChainId: fromChainId || undefined,
         toAmount: Number(route?.route.amountOut) || undefined,
         triggeredAt: Date.now(),
         requestId: undefined,
@@ -492,7 +514,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       addOrUpdateTransferNotification(notification);
 
       onDeposit?.({
-        chainId: chainIdStr || undefined,
+        chainId: fromChainId || undefined,
         tokenAddress: fromTokenDenom || undefined,
         tokenSymbol: fromToken?.symbol || undefined,
         slippage: slippage || undefined,
@@ -515,12 +537,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         isSubaccountDepositCompleted: true,
       });
     }
-  }, [signerWagmi, chainIdStr, fromToken, fromChainId, nobleChainId, waitForBalanceAndDeposit]);
+  }, [signerWagmi, fromChainId, fromToken, fromChainId, nobleChainId, waitForBalanceAndDeposit]);
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       const transferDepositContext = {
-        chainId: chainIdStr ?? undefined,
+        chainId: fromChainId ?? undefined,
         tokenAddress: fromTokenDenom ?? undefined,
         tokenSymbol: fromToken?.symbol ?? undefined,
         slippage: slippage ?? undefined,
@@ -539,11 +561,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         e.preventDefault();
         setIsLoading(true);
 
-        if (chainIdStr && SUPPORTED_COSMOS_CHAINS.includes(chainIdStr)) {
+        if (fromChainId && SUPPORTED_COSMOS_CHAINS.includes(fromChainId)) {
           await onSubmitCosmos();
           return;
         }
-        console.log('checking noburu curientu');
         if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
           throw new Error('Noble RPC endpoint unaccessible');
         }
@@ -582,13 +603,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             value: undefined,
           };
           setDepositStep(DepositSteps.Confirm);
+          console.log('tx', tx);
           txHash = await signerWagmi.sendTransaction(tx);
         }
         if (txHash) {
           addOrUpdateTransferNotification({
             txHash,
             toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-            fromChainId: chainIdStr || undefined,
+            fromChainId: fromChainId || undefined,
             toAmount: Number(route?.route.usdAmountOut) || undefined,
             triggeredAt: Date.now(),
             isCctp,
@@ -615,7 +637,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       signerWagmi,
-      chainIdStr,
+      fromChainId,
       fromToken,
       fromChainId,
       nobleChainId,
@@ -683,7 +705,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     //     transferType: TransferType.deposit.name,
     //     errorMessage: routeErrorMessage ?? undefined,
     //     amount: debouncedAmount,
-    //     chainId: chainIdStr ?? undefined,
+    //     chainId: fromChainId ?? undefined,
     //     assetAddress: fromTokenDenom ?? undefined,
     //     assetSymbol: fromToken?.symbol ?? undefined,
     //     assetName: fromToken?.name ?? undefined,
@@ -711,10 +733,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (MustBigNumber(amount).gt(MustBigNumber(balance))) {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
-
-    // if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
-    //   return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
-    // }
 
     return undefined;
   }, [error, balance, chainId, amount, fromToken, stringGetter, debouncedAmountBN]);
@@ -761,7 +779,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         })}
       </div>
       <SourceSelectMenu
-        selectedChain={chainIdStr || undefined}
+        selectedChain={fromChainId || undefined}
         // selectedExchange={exchange || undefined}
         onSelect={onSelectNetwork}
       />

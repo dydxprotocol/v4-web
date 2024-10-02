@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
+import { Asset } from '@skip-go/client';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
@@ -36,7 +36,7 @@ type ElementProps = {
   setSlippage: (slippage: number) => void;
 
   slippage: number;
-  withdrawToken?: TransferInputTokenResource;
+  withdrawToken?: Asset;
 
   isDisabled?: boolean;
   isLoading?: boolean;
