@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultAccount } from '@/hooks/vaultsHooks';
 
@@ -31,14 +30,7 @@ export const MaybeVaultPositionsPanel = ({
   className,
 }: MaybeVaultPositionsPanelProps) => {
   const userVault = useLoadedVaultAccount().data;
-  const { isTablet } = useBreakpoints();
   if (!testFlags.enableVaults) return null;
-  if (userVault == null && !isTablet) {
-    return null;
-  }
-  if (userVault?.balanceUsdc != null && userVault.balanceUsdc < 0.01) {
-    return null;
-  }
 
   return (
     <div className={className}>
@@ -54,10 +46,6 @@ type VaultPositionsCardsProps = {
 };
 
 const VaultPositionsCards = ({ onViewVault, userVault }: VaultPositionsCardsProps) => {
-  const stringGetter = useStringGetter();
-  if (userVault == null) {
-    return <$Empty>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</$Empty>;
-  }
   return (
     <$Cards>
       <VaultPositionCard vault={userVault} onViewVault={onViewVault} />
@@ -78,7 +66,7 @@ export const VaultPositionCard = ({ onViewVault, vault }: VaultPositionCardProps
       assetName={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       assetIcon={<img src="/dydx-chain.png" tw="h-1.5 w-1.5" />}
       detailLabel={stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE })}
-      detailValue={<Output type={OutputType.Fiat} value={vault?.balanceUsdc} />}
+      detailValue={<Output tw="flex" type={OutputType.Fiat} value={vault?.balanceUsdc ?? 0} />}
       actionSlot={
         <Link onClick={onViewVault} isAccent tw="font-small-book">
           {stringGetter({ key: STRING_KEYS.VIEW_VAULT })} <Icon iconName={IconName.Arrow} />
@@ -91,20 +79,4 @@ const $Cards = styled.div`
   ${layoutMixins.flexWrap}
   gap: 1rem;
   scroll-snap-align: none;
-`;
-
-const $Empty = styled.div`
-  ${layoutMixins.column}
-
-  justify-items: center;
-  align-content: center;
-  padding: 3rem;
-
-  border: solid var(--border-width) var(--border-color);
-  border-radius: 1rem;
-  margin: 1rem;
-  margin-top: 0;
-
-  color: var(--color-text-0);
-  font: var(--font-base-book);
 `;

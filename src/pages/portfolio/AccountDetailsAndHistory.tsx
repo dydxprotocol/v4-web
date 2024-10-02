@@ -11,7 +11,6 @@ import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -51,7 +50,7 @@ const usePortfolioValues = ({
             selectedLocale,
             dateFormat: 'medium',
           })
-        : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
+        : 'Trading Account', // TODO
     [activeDatum, selectedLocale, stringGetter]
   );
 
@@ -97,18 +96,11 @@ const usePortfolioValues = ({
 
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
-  const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 
-  const {
-    buyingPower,
-    equity,
-    freeCollateral: availableBalance,
-    leverage,
-    marginUsage,
-  } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { equity, leverage, marginUsage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 
@@ -122,17 +114,11 @@ export const AccountDetailsAndHistory = () => {
     });
 
   const accountDetailsConfig = [
-    !isTablet && {
+    {
       key: 'MarginUsage',
       labelKey: STRING_KEYS.MARGIN_USAGE,
       type: OutputType.Percent,
       value: marginUsage?.current,
-    },
-    !isTablet && {
-      key: 'AvailableBalance',
-      labelKey: STRING_KEYS.AVAILABLE_BALANCE,
-      type: OutputType.Fiat,
-      value: availableBalance?.current,
     },
     {
       key: 'Leverage',
@@ -140,19 +126,13 @@ export const AccountDetailsAndHistory = () => {
       type: OutputType.Multiple,
       value: leverage?.current,
     },
-    {
-      key: 'BuyingPower',
-      labelKey: STRING_KEYS.BUYING_POWER,
-      type: OutputType.Fiat,
-      value: MustBigNumber(buyingPower?.current).lt(0) ? undefined : buyingPower?.current, // show '-' when buying power is negative
-    },
   ].filter(isTruthy);
 
   return (
     <$AccountDetailsAndHistory>
       <$AccountValue>
         <$WithLabel label={accountValueLabel}>
-          <div tw="text-color-text-2 font-extra-book">
+          <div tw="mt-1 text-color-text-2 font-large-book">
             <Output
               type={OutputType.Fiat}
               value={accountEquity}
@@ -219,8 +199,7 @@ const $AccountDetailsAndHistory = styled.div<{ isSidebarOpen?: boolean }>`
   display: grid;
   grid-template:
     'PortfolioValue PortfolioValue Chart'
-    'MarginUsage AvailableBalance Chart'
-    'Leverage BuyingPower Chart'
+    'MarginUsage Leverage Chart'
     / 9.375rem 9.375rem 1fr;
 
   ${layoutMixins.withOuterBorderClipped}
@@ -229,7 +208,7 @@ const $AccountDetailsAndHistory = styled.div<{ isSidebarOpen?: boolean }>`
   @media ${breakpoints.tablet} {
     grid-template:
       'PortfolioValue PortfolioValue' auto
-      'Leverage BuyingPower' auto
+      'MarginUsage Leverage' auto
       'Chart Chart' 15rem
       / 1fr 1fr;
   }

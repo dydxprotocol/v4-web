@@ -99,7 +99,7 @@ export const Positions = () => {
         <$MaybeVaultPositionsPanel
           header={
             <ContentSectionHeader
-              title={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+              title={stringGetter({ key: STRING_KEYS.VAULTS })}
               slotRight={
                 isTablet && (
                   <Link onClick={handleViewVault} isAccent tw="font-small-book">
