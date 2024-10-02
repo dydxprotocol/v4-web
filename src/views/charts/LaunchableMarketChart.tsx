@@ -3,10 +3,14 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+import {
+  useMetadataServiceAssetFromId,
+  useMetadataServiceCandles,
+} from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LinkOutIcon } from '@/icons';
@@ -20,12 +24,6 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-enum ChartResolution {
-  DAY = 'day',
-  WEEK = 'week',
-  MONTH = 'month',
-}
-
 export const LaunchableMarketChart = ({
   className,
   ticker,
@@ -34,23 +32,29 @@ export const LaunchableMarketChart = ({
   ticker?: string;
 }) => {
   const stringGetter = useStringGetter();
-  const [resolution, setResolution] = useState(ChartResolution.DAY);
+  const [timeframe, setTimeframe] = useState<MetadataServiceCandlesTimeframes>('1d');
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { id, marketCap, name, price, logo, tickSizeDecimals, urls } = orEmptyObj(launchableAsset);
   const websiteLink = urls?.website ?? undefined;
-
-  if (!ticker) return null;
+  const candlesQuery = useMetadataServiceCandles(id, timeframe);
 
   const items = [
     {
       key: 'market-cap',
       label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
-      value: <Output type={OutputType.CompactFiat} tw="text-color-text-1" value={marketCap} />,
+      value: (
+        <Output
+          type={OutputType.CompactFiat}
+          isLoading={!ticker}
+          tw="text-color-text-1"
+          value={marketCap}
+        />
+      ),
     },
     {
       key: 'max-leverage',
       label: stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE }),
-      value: <Output type={OutputType.Multiple} value={5} />,
+      value: <Output type={OutputType.Multiple} isLoading={!ticker} value={5} />,
     },
   ];
 
@@ -58,12 +62,18 @@ export const LaunchableMarketChart = ({
     <$LaunchableMarketChartContainer className={className}>
       <$ChartContainerHeader tw="flex flex-row items-center justify-between">
         <div tw="mr-0.5 flex flex-row items-center gap-0.5">
-          <img tw="h-2.5 w-2.5 rounded-[50%]" src={logo} alt={name} />
+          {logo ? (
+            <img tw="h-2.5 w-2.5 rounded-[50%]" src={logo} alt={name} />
+          ) : (
+            <div tw="h-2.5 w-2.5 rounded-[50%] bg-color-layer-5" />
+          )}
           <h2 tw="flex flex-row items-center gap-[0.5ch] text-extra text-color-text-1">
-            <Link href={websiteLink}>
-              <span>{name}</span>
-              <LinkOutIcon tw="h-1.25 w-1.25" />
-            </Link>
+            {name && (
+              <Link href={websiteLink}>
+                <span>{name}</span>
+                <LinkOutIcon tw="h-1.25 w-1.25" />
+              </Link>
+            )}
           </h2>
         </div>
 
@@ -83,6 +93,7 @@ export const LaunchableMarketChart = ({
                   type={OutputType.Fiat}
                   tw="text-color-text-1"
                   value={price}
+                  isLoading={!ticker}
                   fractionDigits={tickSizeDecimals}
                 />
               ),
@@ -93,20 +104,20 @@ export const LaunchableMarketChart = ({
           size={ButtonSize.Base}
           items={[
             {
-              value: ChartResolution.DAY,
+              value: '1d',
               label: `1${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
             },
             {
-              value: ChartResolution.WEEK,
+              value: '7d',
               label: `7${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
             },
             {
-              value: ChartResolution.MONTH,
+              value: '30d',
               label: `30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
             },
           ]}
-          value={resolution}
-          onValueChange={setResolution}
+          value={timeframe}
+          onValueChange={setTimeframe}
         />
       </div>
 

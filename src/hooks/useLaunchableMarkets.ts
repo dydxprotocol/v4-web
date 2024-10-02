@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
 import {
   MetadataServiceAsset,
+  MetadataServiceCandlesTimeframes,
   MetadataServiceInfoResponse,
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
@@ -115,4 +116,20 @@ export const useLaunchableMarkets = () => {
     ...metadataServiceData,
     data: filteredPotentialMarkets,
   };
+};
+
+export const useMetadataServiceCandles = (
+  asset?: string,
+  timeframe?: MetadataServiceCandlesTimeframes
+) => {
+  const candlesQuery = useQuery({
+    enabled: !!asset && !!timeframe,
+    queryKey: ['candles', asset, timeframe],
+    queryFn: async () => {
+      return metadataClient.getCandles({ asset: asset!, timeframe: timeframe! });
+    },
+    refetchInterval: timeUnits.minute * 5,
+  });
+
+  return candlesQuery;
 };
