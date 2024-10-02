@@ -60,8 +60,8 @@ export type Hdkey = {
   publicKey: Uint8Array | null;
 };
 
-export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.5;
-export const AMOUNT_USDC_BEFORE_REBALANCE = 0.2;
+export const AMOUNT_RESERVED_FOR_GAS_USDC = 1.25;
+export const AMOUNT_USDC_BEFORE_REBALANCE = 1.0;
 export const AMOUNT_RESERVED_FOR_GAS_DYDX = 0.1;
 export const AMOUNT_RESERVED_FOR_GAS_NOBLE = 0.1;
 

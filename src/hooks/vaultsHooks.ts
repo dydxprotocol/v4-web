@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { kollections } from '@dydxprotocol/v4-abacus';
 import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
 import {
@@ -16,10 +15,11 @@ import {
   VaultFormAction,
   VaultFormData,
 } from '@/constants/abacus';
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
-import { selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
+import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
@@ -31,6 +31,7 @@ import { useAppSelector } from '../state/appTypes';
 import { useAccounts } from './useAccounts';
 import { useDebounce } from './useDebounce';
 import { useDydxClient } from './useDydxClient';
+import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 
 // it's illegal to return undefined from use query so we just wrap results in a data object
@@ -259,13 +260,11 @@ export const useVaultFormSlippage = () => {
       if (operation === 'DEPOSIT' || amount.trim() === '') {
         return wrapNullable(undefined);
       }
-      const sharesToWithdraw = MustBigNumber(amount).div(
-        // usdc / share to determine share value
-        MustBigNumber(vaultBalance?.balanceUsdc).div(MustBigNumber(vaultBalance?.balanceShares))
+      const sharesToWithdraw = VaultDepositWithdrawFormValidator.calculateSharesToWithdraw(
+        vaultBalance,
+        MustBigNumber(amount).toNumber()
       );
-      const slippage = await getVaultWithdrawInfo(
-        sharesToWithdraw.decimalPlaces(0, BigNumber.ROUND_FLOOR).toNumber()
-      );
+      const slippage = await getVaultWithdrawInfo(sharesToWithdraw);
 
       const parsedSlippage =
         VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(
@@ -319,6 +318,50 @@ export const useVaultFormValidationResponse = () => {
   );
 
   return validationResponse;
+};
+
+const TIME_TO_SHOW_ERROR = timeUnits.minute * 1;
+
+function getErrorToRenderFromErrorMessage(
+  errorMessage: string,
+  stringGetter: StringGetterFunction
+): string {
+  if (errorMessage.indexOf('insufficient funds: insufficient funds') > 0) {
+    return stringGetter({ key: STRING_KEYS.BROADCAST_ERROR_SDK_5 });
+  }
+  return errorMessage.split('\n')[0];
+}
+
+export const useVaultFormErrorState = () => {
+  const { amount, confirmationStep, operation } = useAppSelector(getVaultForm) ?? {};
+  const stringGetter = useStringGetter();
+  const [savedErrorMessage, setSavedErrorMessage] = useState<string | undefined>(undefined);
+  const currentTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const handleErrorResponse = (error: any) => {
+    clearTimeout(currentTimeout.current);
+    setSavedErrorMessage(error.message);
+    currentTimeout.current = setTimeout(() => {
+      setSavedErrorMessage(undefined);
+    }, TIME_TO_SHOW_ERROR);
+  };
+
+  // reset on form change
+  useEffect(() => {
+    setSavedErrorMessage(undefined);
+  }, [amount, confirmationStep, operation]);
+  // clear on unmount too
+  useEffect(() => clearTimeout(currentTimeout.current), []);
+
+  const savedError = useMemo(
+    () =>
+      savedErrorMessage
+        ? getErrorToRenderFromErrorMessage(savedErrorMessage, stringGetter)
+        : undefined,
+    [savedErrorMessage, stringGetter]
+  );
+
+  return [savedError, handleErrorResponse] as const;
 };
 
 function operationStringToVaultFormAction(operation: 'DEPOSIT' | 'WITHDRAW') {

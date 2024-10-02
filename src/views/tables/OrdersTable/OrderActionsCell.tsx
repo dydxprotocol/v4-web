@@ -49,6 +49,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
       <$CancelButton
         key="cancelorder"
         iconName={IconName.Close}
+        iconSize="0.875em"
         shape={ButtonShape.Square}
         {...(isOrderStatusClearable(status)
           ? { onClick: () => dispatch(clearOrder(orderId)) }
@@ -65,9 +66,4 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 };
 const $CancelButton = styled(IconButton)`
   --button-hover-textColor: var(--color-red);
-
-  svg {
-    width: 0.875em;
-    height: 0.875em;
-  }
 `;

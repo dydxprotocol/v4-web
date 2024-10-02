@@ -8,6 +8,7 @@ import { NumberFormatValues } from 'react-number-format';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
+import { HEAVY_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -89,7 +90,7 @@ export const StakeFormInputContents = ({
             validatorAddress: validator,
           })
         );
-      }, 1000),
+      }, HEAVY_DEBOUNCE_MS),
     []
   );
 

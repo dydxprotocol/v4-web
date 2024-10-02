@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
+import { IndexedTx } from '@cosmjs/stargate';
 import { NumberFormatValues } from 'react-number-format';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -7,6 +8,8 @@ import tw from 'twin.macro';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { timeUnits } from '@/constants/time';
 
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -16,6 +19,7 @@ import {
   useForceRefreshVaultAccount,
   useForceRefreshVaultDetails,
   useLoadedVaultAccount,
+  useVaultFormErrorState,
   useVaultFormValidationResponse,
 } from '@/hooks/vaultsHooks';
 
@@ -48,7 +52,9 @@ import {
   setVaultFormSlippageAck,
 } from '@/state/vaults';
 
+import { dd } from '@/lib/analytics/datadog';
 import { assertNever } from '@/lib/assertNever';
+import { runFn } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -61,8 +67,11 @@ type VaultDepositWithdrawFormProps = {
   onSuccess?: () => void;
 };
 
-// execute
-const ex = <T,>(fn: () => T) => fn();
+const INDEXER_LAG_ALLOWANCE = timeUnits.second * 4;
+
+const $SmallIcon = styled(Icon)<{ $hasError?: boolean }>`
+  ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
+`;
 
 export const VaultDepositWithdrawForm = ({
   initialType,
@@ -77,7 +86,9 @@ export const VaultDepositWithdrawForm = ({
   const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
 
-  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
+  const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
+    useLoadedVaultAccount().data
+  );
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,6 +99,7 @@ export const VaultDepositWithdrawForm = ({
     estimatedSlippage: slippagePercent,
     vaultBalance: userBalanceUpdated,
     marginUsage: marginUsageUpdated,
+    withdrawableVaultBalance: userAvailableUpdated,
   } = orEmptyObj(validationResponse?.summaryData);
 
   // save initial type to state if it is provided
@@ -112,7 +124,7 @@ export const VaultDepositWithdrawForm = ({
   const errors = useMemo(
     () =>
       validationResponse?.errors.toArray().map((error) => {
-        const errorStrings: { long?: string | JSX.Element; short?: string } = ex(() => {
+        const errorStrings: { long?: string | JSX.Element; short?: string } = runFn(() => {
           const longKey = error.resources.text?.stringKey;
           const shortKey = error.resources.title?.stringKey;
           const long = longKey != null ? stringGetter({ key: longKey }) : undefined;
@@ -151,6 +163,7 @@ export const VaultDepositWithdrawForm = ({
   const forceRefreshVaultAccount = useForceRefreshVaultAccount();
   const forceRefreshVault = useForceRefreshVaultDetails();
   const notify = useCustomNotification();
+  const [submissionError, handleSubmissionError] = useVaultFormErrorState();
 
   const onSubmitConfirmForm = async () => {
     if (isSubmitting) {
@@ -163,53 +176,118 @@ export const VaultDepositWithdrawForm = ({
         const cachedAmount = submissionData?.deposit?.amount;
         if (cachedAmount == null) {
           notify({
-            title: 'Unable to submit Megavault Deposit transaction',
-            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+            slotTitleLeft: <$SmallIcon iconName={IconName.OrderCanceled} $hasError />,
+            title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
+            body: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT_BODY }),
+          });
+          dd.error('Megavault deposit blocked, invalid validation response amount', {
+            deposit: submissionData?.deposit,
           });
           // eslint-disable-next-line no-console
-          console.error('Somehow got to submission with empty amount in validation response');
+          console.error(
+            'Somehow got to deposit submission with empty amount in validation response'
+          );
           return;
         }
 
         await depositToMegavault(cachedAmount);
 
         notify({
-          title: `$${cachedAmount} Megavault Deposit successful!`,
+          title: stringGetter({ key: STRING_KEYS.MEGAVAULT_DEPOSIT_SUCCESSFUL }),
+          slotTitleLeft: <$SmallIcon iconName={IconName.CheckCircle} />,
+          body: stringGetter({
+            key: STRING_KEYS.MEGAVAULT_DEPOSIT_SUCCESSFUL_BODY,
+            params: {
+              AMOUNT: (
+                <Output
+                  tw="inline-block text-color-text-1"
+                  type={OutputType.Fiat}
+                  value={cachedAmount}
+                />
+              ),
+            },
+          }),
         });
       } else if (operation === 'WITHDRAW') {
-        const expectedAmount = validationResponse?.summaryData.estimatedAmountReceived;
         if (
           submissionData?.withdraw?.shares == null ||
           submissionData?.withdraw?.minAmount == null
         ) {
           notify({
-            title: 'Unable to submit Megavault Withdrawal transaction',
-            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+            slotTitleLeft: <$SmallIcon iconName={IconName.OrderCanceled} $hasError />,
+            title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
+            body: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT_BODY }),
+          });
+          dd.error('Megavault withdraw blocked, invalid validation response values', {
+            withdraw: submissionData?.withdraw,
           });
           // eslint-disable-next-line no-console
-          console.error('Somehow got to submission with empty data in validation response');
+          console.error(
+            'Somehow got to withdraw submission with empty data in validation response'
+          );
           return;
         }
 
-        await withdrawFromMegavault(
+        const result = await withdrawFromMegavault(
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
 
+        const events = (result as IndexedTx).events;
+        const actualAmount = events
+          .find((e) => e.type === 'withdraw_from_megavault')
+          ?.attributes.find((a) => a.key === 'redeemed_quote_quantums')?.value;
+
         notify({
-          title: `$${expectedAmount} Megavault Withdrawal successful!`,
+          slotTitleLeft: <$SmallIcon iconName={IconName.CheckCircle} />,
+          title: stringGetter({ key: STRING_KEYS.MEGAVAULT_WITHDRAWAL_SUCCESSFUL }),
+          body: stringGetter({
+            key: STRING_KEYS.MEGAVAULT_WITHDRAWAL_SUCCESSFUL_BODY,
+            params: {
+              AMOUNT:
+                amount == null ? (
+                  stringGetter({ key: STRING_KEYS.UNKNOWN })
+                ) : (
+                  <Output
+                    tw="inline-block text-color-text-1"
+                    type={OutputType.Fiat}
+                    value={MustBigNumber(actualAmount).div(QUANTUM_MULTIPLIER)}
+                  />
+                ),
+            },
+          }),
         });
       } else {
         assertNever(operation);
       }
-      dispatch(resetVaultForm());
 
+      dispatch(resetVaultForm());
       onSuccess?.();
     } catch (e) {
+      handleSubmissionError(e);
+
+      notify({
+        slotTitleLeft: <$SmallIcon iconName={IconName.OrderCanceled} $hasError />,
+        title: stringGetter({
+          key:
+            operation === 'DEPOSIT'
+              ? STRING_KEYS.MEGAVAULT_DEPOSIT_FAILED
+              : STRING_KEYS.MEGAVAULT_WITHDRAWAL_FAILED,
+        }),
+        body: stringGetter({
+          key:
+            operation === 'DEPOSIT'
+              ? STRING_KEYS.MEGAVAULT_DEPOSIT_FAILED_BODY
+              : STRING_KEYS.MEGAVAULT_WITHDRAWAL_FAILED_BODY,
+        }),
+      });
+
+      dd.error('Megavault transaction failed', { ...validationResponse.submissionData }, e);
       // eslint-disable-next-line no-console
       console.error('Error submitting megavault transaction', e);
     } finally {
       forceRefreshVaultAccount();
+      setTimeout(() => forceRefreshVaultAccount(), INDEXER_LAG_ALLOWANCE);
       forceRefreshVault();
       setIsSubmitting(false);
     }
@@ -219,7 +297,7 @@ export const VaultDepositWithdrawForm = ({
     if (operation === 'DEPOSIT') {
       setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
     } else {
-      setAmountState(`${Math.floor(100 * (userBalance ?? 0)) / 100 ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100 ?? ''}`);
     }
   };
 
@@ -244,6 +322,18 @@ export const VaultDepositWithdrawForm = ({
         MustBigNumber(amount).gt(0) &&
         userBalanceUpdated != null &&
         userBalanceUpdated !== userBalance
+      }
+    />
+  );
+  const availableToWithdrawDiff = (
+    <DiffOutput
+      type={OutputType.Fiat}
+      value={userAvailableBalance}
+      newValue={userAvailableUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        userAvailableUpdated != null &&
+        userAvailableUpdated !== userAvailableBalance
       }
     />
   );
@@ -304,7 +394,7 @@ export const VaultDepositWithdrawForm = ({
               key: 'vault-balance',
               tooltip: 'vault-available-to-withdraw',
               label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
-              value: vaultDiff,
+              value: availableToWithdrawDiff,
             },
           ] satisfies DetailsItem[],
           receiptItems: [
@@ -398,6 +488,8 @@ export const VaultDepositWithdrawForm = ({
 
       {renderedErrors}
 
+      {submissionError && <AlertMessage type={AlertType.Error}>{submissionError}</AlertMessage>}
+
       <$FlexFill />
 
       <WithDetailsReceipt detailItems={inputFormConfig.receiptItems}>
@@ -450,6 +542,8 @@ export const VaultDepositWithdrawForm = ({
       </div>
 
       {renderedErrors}
+
+      {submissionError && <AlertMessage type={AlertType.Error}>{submissionError}</AlertMessage>}
 
       <$FlexFill />
 

@@ -34,6 +34,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
+import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
 
 const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
@@ -111,6 +112,15 @@ const PortfolioPage = () => {
               <TransferHistoryTable
                 initialPageSize={initialPageSize}
                 withOuterBorder={isNotTablet}
+              />
+            }
+          />
+          <Route
+            path={HistoryRoute.VaultTransfers}
+            element={
+              <VaultTransactionsTable
+                withOuterBorders
+                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}
               />
             }
           />

@@ -11,7 +11,7 @@ import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
-import { TradeToggleSizeInput } from './trade';
+import { DisplayUnit } from './trade';
 import type { DydxAddress, EvmAddress } from './wallets';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
@@ -128,6 +128,9 @@ export const AnalyticsEvents = unionize(
     ExportTransfersCheckboxClick: ofType<{
       value: boolean;
     }>(),
+    ExportVaultTransfersCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
 
     // Navigation
     NavigatePage: ofType<{
@@ -234,9 +237,10 @@ export const AnalyticsEvents = unionize(
     TradeOrderTypeSelected: ofType<{
       type: TradeTypes;
     }>(),
-    TradeAmountToggleClick: ofType<{
-      newInput: TradeToggleSizeInput;
-      market: string;
+    DisplayUnitToggled: ofType<{
+      newDisplayUnit: DisplayUnit;
+      entryPoint?: string;
+      assetId: string;
     }>(),
     TradePlaceOrder: ofType<
       HumanReadablePlaceOrderPayload & {

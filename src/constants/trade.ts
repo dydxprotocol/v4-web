@@ -204,3 +204,8 @@ export type LocalCloseAllPositionsData = {
   failedOrderClientIds: string[];
   errorParams?: ErrorParams;
 };
+
+export enum DisplayUnit {
+  Asset = 'asset',
+  Fiat = 'fiat',
+}

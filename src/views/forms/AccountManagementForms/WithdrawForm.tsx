@@ -100,7 +100,7 @@ export const WithdrawForm = () => {
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
-  const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+  const debouncedAmount = useDebounce<string>(withdrawAmount);
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 

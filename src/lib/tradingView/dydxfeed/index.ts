@@ -19,6 +19,7 @@ import type {
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
@@ -209,10 +210,17 @@ export const getDydxDatafeed = (
         );
       }
 
+      const volumeUnit = store.getState().configs.displayUnit;
+
       const bars = [
         ...cachedBars,
         ...(fetchedCandles?.map(mapCandle(orderbookCandlesToggleOn)) ?? []),
-      ].reverse();
+      ]
+        .map((bar) => ({
+          ...bar,
+          volume: volumeUnit === DisplayUnit.Fiat ? bar.usdVolume : bar.assetVolume,
+        }))
+        .reverse();
 
       if (bars.length === 0) {
         onHistoryCallback([], {
@@ -244,6 +252,7 @@ export const getDydxDatafeed = (
     listenerGuid: string,
     onResetCacheNeededCallback: Function
   ) => {
+    onResetCacheNeededCallback();
     subscribeOnStream({
       symbolInfo,
       resolution,
