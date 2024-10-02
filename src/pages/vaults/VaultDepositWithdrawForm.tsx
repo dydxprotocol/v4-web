@@ -26,7 +26,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
@@ -41,6 +41,7 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getVaultForm } from '@/state/vaultSelectors';
 import {
+  resetVaultForm,
   setVaultFormAmount,
   setVaultFormConfirmationStep,
   setVaultFormOperation,
@@ -76,7 +77,9 @@ export const VaultDepositWithdrawForm = ({
   const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
 
-  const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
+  const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
+    useLoadedVaultAccount().data
+  );
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,6 +90,7 @@ export const VaultDepositWithdrawForm = ({
     estimatedSlippage: slippagePercent,
     vaultBalance: userBalanceUpdated,
     marginUsage: marginUsageUpdated,
+    withdrawableVaultBalance: userAvailableUpdated,
   } = orEmptyObj(validationResponse?.summaryData);
 
   // save initial type to state if it is provided
@@ -201,9 +205,7 @@ export const VaultDepositWithdrawForm = ({
       } else {
         assertNever(operation);
       }
-      setOperation('DEPOSIT');
-      setAmountState('');
-      dispatch(setVaultFormConfirmationStep(false));
+      dispatch(resetVaultForm());
 
       onSuccess?.();
     } catch (e) {
@@ -220,7 +222,7 @@ export const VaultDepositWithdrawForm = ({
     if (operation === 'DEPOSIT') {
       setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
     } else {
-      setAmountState(`${Math.floor(100 * (userBalance ?? 0)) / 100 ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100 ?? ''}`);
     }
   };
 
@@ -248,6 +250,18 @@ export const VaultDepositWithdrawForm = ({
       }
     />
   );
+  const availableToWithdrawDiff = (
+    <DiffOutput
+      type={OutputType.Fiat}
+      value={userAvailableBalance}
+      newValue={userAvailableUpdated}
+      withDiff={
+        MustBigNumber(amount).gt(0) &&
+        userAvailableUpdated != null &&
+        userAvailableUpdated !== userAvailableBalance
+      }
+    />
+  );
   const marginUsageDiff = (
     <DiffOutput
       type={OutputType.Percent}
@@ -272,21 +286,24 @@ export const VaultDepositWithdrawForm = ({
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+              tooltip: 'cross-free-collateral',
               value: freeCollateralDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-margin-usage',
+              tooltip: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
               value: marginUsageDiff,
             },
             {
               key: 'vault-balance',
+              tooltip: 'vault-your-balance',
               label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
               value: vaultDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
             label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
             icon: 'vault' as const,
@@ -300,27 +317,31 @@ export const VaultDepositWithdrawForm = ({
           inputReceiptItems: [
             {
               key: 'vault-balance',
-              label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-              value: vaultDiff,
+              tooltip: 'vault-available-to-withdraw',
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
+              value: availableToWithdrawDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-free-collateral',
+              tooltip: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
               value: freeCollateralDiff,
             },
             {
               key: 'slippage',
-              label: stringGetter({ key: STRING_KEYS.EST_SLIPPAGE }),
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_SLIPPAGE }),
+              tooltip: 'vault-estimated-slippage',
               value: <Output type={OutputType.Percent} value={slippagePercent} />,
             },
             {
               key: 'est amount',
-              label: stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED }),
+              tooltip: 'vault-estimated-amount',
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_AMOUNT_RECEIVED }),
               value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
             label: stringGetter({ key: STRING_KEYS.CROSS_ACCOUNT }),
             icon: 'cross' as const,

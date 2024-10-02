@@ -285,7 +285,7 @@ export const useWalletConnection = () => {
     if (testFlags.addressOverride) {
       dispatch(setWalletInfo({ connectorType: ConnectorType.Test, name: WalletType.TestWallet }));
       dispatch(
-        setSourceAddress({ address: testFlags.addressOverride, chain: WalletNetworkType.Test })
+        setSourceAddress({ address: testFlags.addressOverride, chain: WalletNetworkType.Cosmos })
       );
     }
   }, [dispatch]);

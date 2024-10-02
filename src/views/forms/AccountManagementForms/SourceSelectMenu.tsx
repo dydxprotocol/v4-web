@@ -150,7 +150,12 @@ export const SourceSelectMenu = ({
             items: chainItems,
           },
       ].filter(isTruthy)}
-      label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
+      label={
+        label ??
+        stringGetter({
+          key: type === TransferType.deposit ? STRING_KEYS.SOURCE : STRING_KEYS.DESTINATION,
+        })
+      }
     >
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (

@@ -34,8 +34,10 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { Icon, IconName } from './Icon';
+import { SortIcon } from './SortIcon';
 import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
 
@@ -429,7 +431,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               item: row,
               state,
               ...getRowAttributes?.(row.value!),
-              withGradientCardRows,
               withFocusStickyRows,
               withScrollSnapRows,
               children: null,
@@ -441,7 +442,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               state={state}
               hasRowAction={!!onRowAction}
               {...getRowAttributes?.(row.value!)}
-              withGradientCardRows={withGradientCardRows}
               withFocusStickyRows={withFocusStickyRows}
               withScrollSnapRows={withScrollSnapRows}
             >
@@ -561,6 +561,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
   const { focusProps } = useFocusRing();
 
+  const { uiRefresh } = testFlags;
+
   return (
     <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
@@ -570,20 +572,29 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
       allowSorting={column.props?.allowsSorting ?? true}
       withScrollSnapColumns={withScrollSnapColumns}
     >
-      <$Row>
+      <$Row uiRefreshEnabled={uiRefresh}>
         {column.rendered}
-        {(column.props.allowsSorting ?? true) && (
-          <$SortArrow
-            aria-hidden="true"
-            sortDirection={
-              state.sortDescriptor?.column === column.key
-                ? state.sortDescriptor?.direction ?? 'none'
-                : 'none'
-            }
-          >
-            <Icon iconName={IconName.Triangle} aria-hidden="true" />
-          </$SortArrow>
-        )}
+        {(column.props.allowsSorting ?? true) &&
+          (uiRefresh ? (
+            <SortIcon
+              sortDirection={
+                state.sortDescriptor?.column === column.key
+                  ? state.sortDescriptor?.direction ?? 'none'
+                  : 'none'
+              }
+            />
+          ) : (
+            <$SortArrow
+              aria-hidden="true"
+              sortDirection={
+                state.sortDescriptor?.column === column.key
+                  ? state.sortDescriptor?.direction ?? 'none'
+                  : 'none'
+              }
+            >
+              <Icon iconName={IconName.Triangle} aria-hidden="true" />
+            </$SortArrow>
+          ))}
       </$Row>
     </$Th>
   );
@@ -594,7 +605,6 @@ export const TableRow = <TableRowData extends BaseTableRowData>({
   children,
   state,
   hasRowAction,
-  withGradientCardRows,
   withFocusStickyRows,
   withScrollSnapRows,
   ...attrs
@@ -603,7 +613,6 @@ export const TableRow = <TableRowData extends BaseTableRowData>({
   children: React.ReactNode;
   state: TableState<TableRowData>;
   hasRowAction?: boolean;
-  withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
@@ -1020,7 +1029,9 @@ const $Tbody = styled.tbody<TableStyleProps>`
     `}
 `;
 
-const $Row = styled.div`
+const $Row = styled.div<{ uiRefreshEnabled: boolean }>`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
+
+  gap: ${({ uiRefreshEnabled }) => (uiRefreshEnabled ? css`0.25ch;` : css`0.5ch`)};
 `;

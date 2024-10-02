@@ -73,6 +73,7 @@ import {
   QrIcon,
   RewardStarIcon,
   RocketIcon,
+  RoundedArrowIcon,
   SearchIcon,
   SendIcon,
   ShareIcon,
@@ -171,6 +172,7 @@ export enum IconName {
   Qr = 'Qr',
   RewardStar = 'RewardStar',
   Rocket = 'Rocket',
+  RoundedArrow = 'RoundedArrow',
   Search = 'Search',
   Send = 'Send',
   Share = 'Share',
@@ -266,6 +268,7 @@ const icons = {
   [IconName.Qr]: QrIcon,
   [IconName.RewardStar]: RewardStarIcon,
   [IconName.Rocket]: RocketIcon,
+  [IconName.RoundedArrow]: RoundedArrowIcon,
   [IconName.Search]: SearchIcon,
   [IconName.Send]: SendIcon,
   [IconName.Share]: ShareIcon,
@@ -302,6 +305,7 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     size,
     ...props
   }: ElementProps & StyleProps & { size?: string }) =>
@@ -309,4 +313,6 @@ export const Icon = styled(
 )`
   width: ${({ size }) => size ?? '1em'};
   height: ${({ size }) => size ?? '1em'};
+  min-width: ${({ size }) => size ?? '1em'};
+  min-height: ${({ size }) => size ?? '1em'};
 `;

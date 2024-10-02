@@ -105,6 +105,8 @@ export const popoverMixins = {
     margin: var(--popover-margin);
     width: var(--popover-width);
     overflow: hidden;
+
+    -webkit-backdrop-filter: var(--popover-backdrop-filter);
     backdrop-filter: var(--popover-backdrop-filter);
     background-color: var(--popover-backgroundColor);
     /* clip-path: inset(0 round calc(var(--popover-radius))); */

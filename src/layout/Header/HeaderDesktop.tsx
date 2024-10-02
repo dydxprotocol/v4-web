@@ -83,12 +83,21 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        !uiRefreshEnabled &&
-          showLaunchMarkets && {
-            value: 'LAUNCH_MARKET',
-            label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
-            href: AppRoute.LaunchMarket,
-          },
+        ...(!uiRefreshEnabled && showLaunchMarkets
+          ? [
+              {
+                value: 'LAUNCH_MARKET',
+                label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
+                href: AppRoute.LaunchMarket,
+              },
+              // TODO (@jaredvu): Remove this after adding updated markets-table
+              {
+                value: 'TEST_MARKET',
+                label: 'TIME-USD',
+                href: '/trade/TIME,raydium,ED5wbeyAYtLM4WRGnohPxJEwniaikEFioVmJyZH6K31m-USD?pml=true',
+              },
+            ]
+          : []),
         showVaults && {
           value: 'VAULT',
           label: (
@@ -258,13 +267,14 @@ const $Header = styled.header<{
     ${uiRefreshEnabled
       ? css`'Logo . NavBefore . Nav . NavAfter' 100%
       / var(--logo-width) var(--border-width) auto
-      var(--border-width) 1fr var(--border-width) auto;`
+      var(--border-width) 1fr var(--border-width) auto`
       : css`'Logo . NavBefore . Nav . NavAfter' 100%
     / var(--logo-width) var(--border-width) calc(
       var(--sidebar-width) - var(--logo-width) - var(--border-width)
     )
-    var(--border-width) 1fr var(--border-width) auto;`}
-  `}
+    var(--border-width) 1fr var(--border-width) auto`}
+  `};
+
   z-index: 2;
 
   @media ${breakpoints.tablet} {
@@ -278,7 +288,9 @@ const $Header = styled.header<{
   font-size: 0.9375rem;
 
   &:before {
-    backdrop-filter: blur(10px);
+    --backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    backdrop-filter: var(--backdrop-filter);
   }
 `;
 

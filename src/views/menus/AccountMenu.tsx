@@ -18,7 +18,7 @@ import {
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
-import { DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
+import { DydxChainAsset, WalletNetworkType, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -135,24 +135,7 @@ export const AccountMenu = () => {
               <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
               <$Column>
                 {walletInfo && walletInfo?.name !== WalletType.Keplr ? (
-                  <WithTooltip
-                    slotTooltip={
-                      <dl>
-                        <dt>
-                          {/* TODO: OTE-845 Fix tooltip string here for Phantom connections */}
-                          {stringGetter({
-                            key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
-                            params: {
-                              DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-                              EVM_ADDRESS: truncateAddress(address, '0x'),
-                            },
-                          })}
-                        </dt>
-                      </dl>
-                    }
-                  >
-                    <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                  </WithTooltip>
+                  <DydxDerivedAddress address={address} />
                 ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
                 )}
@@ -388,6 +371,47 @@ export const AccountMenu = () => {
       {walletIcon}
       {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
     </$DropdownMenu>
+  );
+};
+
+const DydxDerivedAddress = ({
+  address,
+  chain,
+  dydxAddress,
+}: {
+  address?: string;
+  chain?: WalletNetworkType.Solana | WalletNetworkType.Evm;
+  dydxAddress?: string;
+}) => {
+  const stringGetter = useStringGetter();
+
+  const tooltipText =
+    chain === WalletNetworkType.Solana
+      ? stringGetter({
+          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
+          params: {
+            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+            SOLANA_ADDRESS: truncateAddress(address, ''),
+          },
+        })
+      : stringGetter({
+          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
+          params: {
+            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+            EVM_ADDRESS: truncateAddress(address, '0x'),
+          },
+        });
+
+  return (
+    <WithTooltip
+      slotTooltip={
+        <dl>
+          <dt>{tooltipText}</dt>
+        </dl>
+      }
+    >
+      <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
+    </WithTooltip>
   );
 };
 

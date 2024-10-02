@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { kollections } from '@dydxprotocol/v4-abacus';
 import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
 import {
@@ -229,7 +228,14 @@ export const useLoadedVaultAccountTransfers = () => {
 const VAULT_FORM_AMOUNT_DEBOUNCE_MS = 500;
 const useVaultFormAmountDebounced = () => {
   const amount = useAppSelector((state) => state.vaults.vaultForm.amount);
-  return useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
+  const debouncedAmount = useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
+  // if the user goes back to the beginning, use that value for calculations
+  // this fixes an issue where the validation logic would show an error for a second after submission
+  // when we reset the value
+  if (amount === '') {
+    return amount;
+  }
+  return debouncedAmount;
 };
 
 export const useVaultFormSlippage = () => {
@@ -252,13 +258,11 @@ export const useVaultFormSlippage = () => {
       if (operation === 'DEPOSIT' || amount.trim() === '') {
         return wrapNullable(undefined);
       }
-      const sharesToWithdraw = MustBigNumber(amount).div(
-        // usdc / share to determine share value
-        MustBigNumber(vaultBalance?.balanceUsdc).div(MustBigNumber(vaultBalance?.balanceShares))
+      const sharesToWithdraw = VaultDepositWithdrawFormValidator.calculateSharesToWithdraw(
+        vaultBalance,
+        MustBigNumber(amount).toNumber()
       );
-      const slippage = await getVaultWithdrawInfo(
-        sharesToWithdraw.decimalPlaces(0, BigNumber.ROUND_FLOOR).toNumber()
-      );
+      const slippage = await getVaultWithdrawInfo(sharesToWithdraw);
 
       const parsedSlippage =
         VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(

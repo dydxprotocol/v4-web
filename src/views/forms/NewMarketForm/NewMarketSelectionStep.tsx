@@ -30,7 +30,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
@@ -250,71 +250,73 @@ export const NewMarketSelectionStep = ({
       <WithReceipt
         slotReceipt={
           <Details
-            items={[
-              assetToAdd && {
-                key: 'reference-price',
-                label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
-                tooltip: 'reference-price',
-                value: (
-                  <Output
-                    type={OutputType.Fiat}
-                    value={assetToAdd.meta?.referencePrice}
-                    fractionDigits={tickSizeDecimals}
-                  />
-                ),
-              },
-              assetToAdd && {
-                key: 'message-details',
-                label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
-                value: (
-                  <Button
-                    action={ButtonAction.Navigation}
-                    size={ButtonSize.Small}
-                    onClick={() =>
-                      dispatch(
-                        openDialog(
-                          DialogTypes.NewMarketMessageDetails({
-                            assetData: assetToAdd,
-                            clobPairId: nextAvailableClobPairId,
-                            liquidityTier,
-                          })
+            items={(
+              [
+                assetToAdd && {
+                  key: 'reference-price',
+                  label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
+                  tooltip: 'reference-price',
+                  value: (
+                    <Output
+                      type={OutputType.Fiat}
+                      value={assetToAdd.meta?.referencePrice}
+                      fractionDigits={tickSizeDecimals}
+                    />
+                  ),
+                },
+                assetToAdd && {
+                  key: 'message-details',
+                  label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
+                  value: (
+                    <Button
+                      action={ButtonAction.Navigation}
+                      size={ButtonSize.Small}
+                      onClick={() =>
+                        dispatch(
+                          openDialog(
+                            DialogTypes.NewMarketMessageDetails({
+                              assetData: assetToAdd,
+                              clobPairId: nextAvailableClobPairId,
+                              liquidityTier,
+                            })
+                          )
                         )
-                      )
-                    }
-                    tw="[--button-height:auto] [--button-padding:0]"
-                  >
-                    {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-                  </Button>
-                ),
-              },
-              {
-                key: 'dydx-required',
-                label: (
-                  <span>
-                    {stringGetter({ key: STRING_KEYS.REQUIRED_BALANCE })}{' '}
-                    <Tag>{chainTokenLabel}</Tag>
-                  </span>
-                ),
-                value: (
-                  <div tw="ml-[0.5ch] text-color-text-0">
-                    {stringGetter({
-                      key: STRING_KEYS.OR_MORE,
-                      params: {
-                        NUMBER: (
-                          <Output
-                            useGrouping
-                            type={OutputType.Number}
-                            value={initialDepositAmountBN}
-                            fractionDigits={initialDepositAmountDecimals}
-                            tw="inline-block"
-                          />
-                        ),
-                      },
-                    })}
-                  </div>
-                ),
-              },
-            ].filter(isTruthy)}
+                      }
+                      tw="[--button-height:auto] [--button-padding:0]"
+                    >
+                      {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
+                    </Button>
+                  ),
+                },
+                {
+                  key: 'dydx-required',
+                  label: (
+                    <span>
+                      {stringGetter({ key: STRING_KEYS.REQUIRED_BALANCE })}{' '}
+                      <Tag>{chainTokenLabel}</Tag>
+                    </span>
+                  ),
+                  value: (
+                    <div tw="ml-[0.5ch] text-color-text-0">
+                      {stringGetter({
+                        key: STRING_KEYS.OR_MORE,
+                        params: {
+                          NUMBER: (
+                            <Output
+                              useGrouping
+                              type={OutputType.Number}
+                              value={initialDepositAmountBN}
+                              fractionDigits={initialDepositAmountDecimals}
+                              tw="inline-block"
+                            />
+                          ),
+                        },
+                      })}
+                    </div>
+                  ),
+                },
+              ] satisfies Array<DetailsItem | false | undefined>
+            ).filter(isTruthy)}
             tw="px-0.75 pb-0.25 pt-0.375"
           />
         }

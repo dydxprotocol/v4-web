@@ -1,9 +1,9 @@
-import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
+import { TOOLTIP_STRING_KEYS, TooltipStrings } from '@/constants/localization';
 
 import { TransferType } from '../abacus';
 import { getLowestFeeChainNames } from '../cctp';
 
-export const depositTooltips: TooltipStrings = {
+export const depositTooltips = {
   'minimum-deposit-amount': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT_BODY }),
@@ -30,4 +30,4 @@ export const depositTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.BRIDGE_FEES_DEPOSIT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.BRIDGE_FEES_DEPOSIT_BODY }),
   }),
-} as const;
+} satisfies TooltipStrings;

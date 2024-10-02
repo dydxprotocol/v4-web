@@ -269,11 +269,6 @@ const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
 
 const $Button = styled(Button)`
   margin-right: -0.3rem;
-
-  svg {
-    width: 1.25em;
-    height: 1.25em;
-  }
 `;
 
 const $IconButton = styled(IconButton)`

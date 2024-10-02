@@ -1,6 +1,6 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
-export const triggersTooltips: TooltipStrings = {
+export const triggersTooltips = {
   'custom-amount': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.CUSTOM_AMOUNT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.CUSTOM_AMOUNT_BODY }),
@@ -21,4 +21,4 @@ export const triggersTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.UNEQUAL_ORDER_SIZES_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.UNEQUAL_ORDER_SIZES_BODY }),
   }),
-} as const;
+} satisfies TooltipStrings;

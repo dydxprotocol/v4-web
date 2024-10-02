@@ -32,7 +32,7 @@ export type MetadataServiceCandlesResponse = Record<
     low: number;
     close: number;
     volume: number;
-  }
+  }[]
 >;
 
 export type MetadataServiceAsset = {
@@ -60,3 +60,5 @@ export enum MetadataServicePath {
   PRICES = 'prices',
   CANDLES = 'candles',
 }
+
+export type MetadataServiceCandlesTimeframes = '1d' | '7d' | '30d';

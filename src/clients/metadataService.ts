@@ -1,5 +1,6 @@
 import {
   MetadataServiceCandlesResponse,
+  MetadataServiceCandlesTimeframes,
   MetadataServiceInfoResponse,
   MetadataServicePath,
   MetadataServicePricesResponse,
@@ -53,15 +54,15 @@ class MetadataServiceClient {
   }
 
   async getCandles({
-    assets,
-    resolution,
+    asset,
+    timeframe,
   }: {
-    assets?: string[];
-    resolution: '1d' | '7d' | '30d';
+    asset: string;
+    timeframe: MetadataServiceCandlesTimeframes;
   }): Promise<MetadataServiceCandlesResponse> {
     return this._post(MetadataServicePath.CANDLES, {
-      assets,
-      resolution,
+      assets: [asset],
+      timeframe,
     });
   }
 }

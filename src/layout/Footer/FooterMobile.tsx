@@ -49,7 +49,7 @@ export const FooterMobile = () => {
                     label: stringGetter({ key: STRING_KEYS.TRADE }),
                     slotBefore: (
                       <$StartIcon>
-                        <Icon iconName={IconName.Trade} />
+                        <Icon iconName={IconName.Trade} size="1.5rem" />
                       </$StartIcon>
                     ),
                     href: `${AppRoute.Trade}/${marketId ?? DEFAULT_MARKETID}`,
@@ -59,7 +59,7 @@ export const FooterMobile = () => {
                     label: stringGetter({ key: STRING_KEYS.ONBOARDING }),
                     slotBefore: (
                       <$StartIcon disabled={disableConnectButton}>
-                        <Icon iconName={IconName.Play} />
+                        <Icon iconName={IconName.Play} size="1.5rem" />
                       </$StartIcon>
                     ),
                     onClick: () =>
@@ -184,11 +184,6 @@ const $StartIcon = styled.div<{ disabled?: boolean }>`
   background-color: var(--color-accent);
   border: solid var(--border-width) var(--color-border-white);
   border-radius: 50%;
-
-  svg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
 
   ${({ disabled }) =>
     disabled &&
