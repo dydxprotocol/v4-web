@@ -105,11 +105,11 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     slinkyProviderName: 'binance_api',
   },
   [ExchangeName.Bitfinex]: {
-    url: 'https://api-pub.bitfinex.com/v2/tickers?symbols=ALL',
+    url: 'https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange',
     tickers: null,
     parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item[0], {});
+      return response[0].reduce((acc: Map<string, any>, item: string) => {
+        acc.set(item, {});
         return acc;
       }, new Map<string, any>());
     },
@@ -120,7 +120,8 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     tickers: null,
     parseResp: (response: any) => {
       return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.pair, {});
+        const convertedPair = item.pair.replace('/', '').toLowerCase();
+        acc.set(convertedPair, {});
         return acc;
       }, new Map<string, any>());
     },
@@ -233,6 +234,29 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     },
     slinkyProviderName: 'Raydium',
   },
+  [ExchangeName.UniswapV3_Ethereum]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'uniswapv3_api-ethereum',
+  },
+  [ExchangeName.UniswapV3_Base]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'uniswapv3_api-base',
+  },
+
 };
 
 enum ValidationError {
@@ -278,7 +302,11 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     }
 
     // TODO: Skip Raydium since ticker is idiosyncratic
-    if (exchange.exchangeName === ExchangeName.Raydium) {
+    if (
+      exchange.exchangeName === ExchangeName.Raydium ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Ethereum ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Base
+    ) {
       continue; // exit the current iteration of the loop.
     }
 
@@ -300,7 +328,6 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     console.log(`Validated ticker ${exchange.ticker} for exchange ${exchange.exchangeName}`);
   }
 }
-
 async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Initialize wallets.
   const network = Network.local();

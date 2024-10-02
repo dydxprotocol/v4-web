@@ -42,6 +42,8 @@ export enum ExchangeName {
   Mexc = 'Mexc',
   Okx = 'Okx',
   Raydium = 'Raydium',
+  UniswapV3_Ethereum = 'UniswapV3-Ethereum',
+  UniswapV3_Base = 'UniswapV3-Base',
 }
 
 export interface Params {
