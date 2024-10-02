@@ -54,7 +54,7 @@ const $Search = styled.div`
   color: ${({ theme }) => theme.textTertiary};
   border-radius: 2.5rem;
   border: solid var(--border-width) var(--color-layer-6);
-  padding: 0 1rem;
+  padding: 0 0.75rem;
   gap: 0.375rem;
   justify-content: end;
 `;
