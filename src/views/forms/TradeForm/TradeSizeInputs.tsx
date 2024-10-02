@@ -10,6 +10,7 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { TooltipStringKeys } from '@/constants/tooltips';
 import { DisplayUnit, TradeSizeInput } from '@/constants/trade';
 
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -212,7 +213,7 @@ export const TradeSizeInputs = () => {
       label={
         <>
           <WithTooltip
-            tooltip={inputConfig.tooltipId}
+            tooltip={inputConfig.tooltipId as TooltipStringKeys}
             stringParams={{ SYMBOL: id ?? '' }}
             side="right"
           >
