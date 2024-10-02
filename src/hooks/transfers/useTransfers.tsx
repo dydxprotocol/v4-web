@@ -317,7 +317,7 @@ const useTransfersContext = () => {
       if (!hasAllParams) return null;
 
       if (transferType === TransferType.Withdraw) {
-        console.log('fromToken', fromToken);
+        // console.log('fromToken', fromToken);
         // console.log('selectedToken', assetsByDenom[toTokenDenom ?? '']);
         if (isDenomCctp(toToken.denom)) {
           return skipClient.msgsDirect({

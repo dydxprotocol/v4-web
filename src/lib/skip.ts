@@ -242,4 +242,14 @@ export const fetchTransferStatus = ({
 
 // maybe move inside a hook and use the wagmi/phantom hook methods
 // as the signers instead. talk to skip about how this works.
-export const skipClient = new SkipClient();
+export const skipClient = new SkipClient({
+  endpointOptions: {
+    getRpcEndpointForChain: async (chainId: string) => {
+      console.log('getting rest endpoint for chain', chainId);
+      if (chainId === 'noble-1') return 'https://noble-yx-rpc.polkachu.com/';
+      if (chainId === 'dydx-mainnet-1') return 'https://dydx-ops-rpc.kingnodes.com';
+      if (chainId === '43114') return 'https://api.avax.network/ext/bc/C/rpc';
+      return 'https://dydx-ops-rpc.kingnodes.com';
+    },
+  },
+});
