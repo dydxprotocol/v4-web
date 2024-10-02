@@ -7,9 +7,10 @@ import { stakeTooltips } from './stake';
 import { tradeTooltips } from './trade';
 import { tradeChartTooltips } from './tradeChart';
 import { triggersTooltips } from './triggers';
+import { vaultTooltips } from './vault';
 import { withdrawTooltips } from './withdraw';
 
-export const tooltipStrings: TooltipStrings = {
+export const tooltipStrings = {
   ...depositTooltips,
   ...generalTooltips,
   ...portfolioTooltips,
@@ -18,4 +19,7 @@ export const tooltipStrings: TooltipStrings = {
   ...tradeChartTooltips,
   ...triggersTooltips,
   ...withdrawTooltips,
-} as const;
+  ...vaultTooltips,
+} satisfies TooltipStrings;
+
+export type TooltipStringKeys = keyof typeof tooltipStrings;

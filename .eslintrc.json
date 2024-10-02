@@ -70,7 +70,7 @@
     "react/jsx-pascal-case": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/comma-dangle": "off",
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/member-delimiter-style": [
       "error",
