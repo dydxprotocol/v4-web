@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -21,6 +22,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { runIf } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
@@ -49,6 +51,7 @@ export const AccountOverviewSection = () => {
   const totalValue = runIf(equity?.current, (e) => e + (vaultBalance ?? 0));
 
   const handleViewVault = useCallback(() => {
+    track(AnalyticsEvents.ClickViewVaultFromOverview());
     navigate(`${AppRoute.Vault}`, {
       state: { from: AppRoute.Portfolio },
     });
