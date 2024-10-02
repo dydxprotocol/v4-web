@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -139,7 +139,7 @@ export const TradeSizeInputs = () => {
     });
   };
 
-  const dispatchSetDisplayUnit = _.debounce((newDisplayUnit) => {
+  const dispatchSetDisplayUnit = debounce((newDisplayUnit) => {
     if (!id) return;
     dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId: id }));
   }, NORMAL_DEBOUNCE_MS);
