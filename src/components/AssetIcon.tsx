@@ -786,7 +786,12 @@ export const AssetIcon = ({
   className?: string;
 }) =>
   logoUrl ? (
-    <img src={logoUrl} className={className} alt="" tw="h-[1em] w-auto rounded-[50%]" />
+    <img
+      src={logoUrl}
+      className={className}
+      alt={symbol ?? 'logo'}
+      tw="h-[1em] w-auto rounded-[50%]"
+    />
   ) : isAssetSymbol(symbol) ? (
     <img
       src={assetIcons[symbol]}
