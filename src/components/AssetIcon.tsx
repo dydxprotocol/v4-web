@@ -774,7 +774,7 @@ const Placeholder = ({ className, symbol }: { className?: string; symbol: string
 );
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
-  symbol != null && Object.hasOwn(assetIcons, symbol);
+  symbol != null && assetIcons[symbol as AssetSymbol] != null;
 
 export const AssetIcon = ({
   symbol,

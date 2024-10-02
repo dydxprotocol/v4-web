@@ -182,8 +182,8 @@ const getTxDataFromTransferSequence = (
   transferSequence: TransferEventJSON[],
   direction: 'from' | 'to'
 ) => {
-  const transferSequenceIdx = direction === 'to' ? -1 : 0;
-  const transferSequenceObj = transferSequence.at(transferSequenceIdx);
+  const transferSequenceObj =
+    direction === 'to' ? transferSequence.reverse()[0] : transferSequence[0];
   if (!transferSequenceObj) return undefined;
   if ('ibc_transfer' in transferSequenceObj) {
     return getTxDataFromIbcTransfer(transferSequenceObj.ibc_transfer, direction);

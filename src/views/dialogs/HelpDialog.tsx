@@ -114,9 +114,12 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
     </span>
   );
 
-  const maybeLatestVersion = latestVersion && (
+  const latestVersionArr = latestVersion?.split(`release/v`);
+  const version = latestVersionArr?.[latestVersionArr.length - 1];
+
+  const maybeLatestVersion = version && (
     <span>
-      Version - <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
+      Version - <span title={latestVersion}>{version}</span>
     </span>
   );
 
