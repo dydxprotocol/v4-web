@@ -9,7 +9,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
+import { WithdrawForm } from '@/views/forms/DepositWithdrawForms/WithdrawForm';
 
 export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) => {
   const stringGetter = useStringGetter();

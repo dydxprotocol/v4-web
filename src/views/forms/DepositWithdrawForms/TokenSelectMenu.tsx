@@ -4,14 +4,14 @@ import { Asset } from '@skip-go/client';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
-import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { TransferType } from '@/constants/abacus';
 import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM, SOLANA_USDC_DENOM } from '@/constants/denoms';
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
-import { useAssets } from '@/hooks/transfers/useAssets';
+import { useTransfers } from '@/hooks/transfers/useTransfers';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -29,17 +29,13 @@ import { LowestFeesDecoratorText } from './LowestFeesText';
 
 type ElementProps = {
   selectedToken?: Asset;
-  onSelectToken: (token: TransferInputTokenResource) => void;
+  onSelectToken: (token: Asset) => void;
   isExchange?: boolean;
 };
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const {
-    type,
-    resources,
-    chain: chainIdStr,
-  } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
+  const { type, chain: chainIdStr } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
   const { connectedWallet } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
@@ -47,20 +43,20 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
   const isPhantomWallet = connectedWallet?.connectorType === ConnectorType.PhantomSolana;
 
-  const { assetsForSelectedChain } = useAssets();
+  const { assetsForSelectedChain } = useTransfers();
   const tokens = assetsForSelectedChain;
   const tokenItems = Object.values(tokens)
     .map((token) => ({
-      value: token.type,
-      label: token.stringKey,
+      value: token.denom,
+      label: token.name,
       onSelect: () => {
-        onSelectToken(token.denom);
+        onSelectToken(token);
       },
       slotBefore: (
         // the curve dao token svg causes the web app to lag when rendered
         <$Img src={token.logoURI ?? undefined} alt="" />
       ),
-      slotAfter: !!lowestFeeTokensByDenom[token.type] && <LowestFeesDecoratorText />,
+      slotAfter: !!lowestFeeTokensByDenom[token.denom] && <LowestFeesDecoratorText />,
       tag: token.symbol,
     }))
     .filter((token) => {

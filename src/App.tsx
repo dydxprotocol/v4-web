@@ -43,7 +43,6 @@ import { config, privyConfig } from '@/lib/wagmi';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
-import { AssetsProvider } from './hooks/transfers/useAssets';
 import { TransfersProvider } from './hooks/transfers/useTransfers';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
@@ -202,7 +201,6 @@ const providers = [
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
   wrapProvider(TransfersProvider),
-  wrapProvider(AssetsProvider),
 ];
 
 const App = () => {

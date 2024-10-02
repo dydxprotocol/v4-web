@@ -1,3 +1,5 @@
+import { NATIVE_TOKEN_ADDRESS } from './skip';
+
 /**
  *
  * @param fullBaseAsset contains base asset, occassionally accompanied (comma-separated) by dex and address. i.e. 'baseAsset,dex,address'
@@ -49,4 +51,8 @@ export const getTickerFromMarketmapId = (marketmapId: string): string => {
 
 export const getAssetFromMarketId = (marketId: string): string => {
   return marketId.split('-')[0];
+};
+
+export const isNativeDenom = (denom: string): boolean => {
+  return denom === NATIVE_TOKEN_ADDRESS || denom.endsWith('native');
 };
