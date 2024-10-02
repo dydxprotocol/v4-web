@@ -27,6 +27,7 @@ import { useComplianceState } from '@/hooks/useComplianceState';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -74,6 +75,7 @@ export const AccountMenu = () => {
   const theme = useAppSelector(getAppTheme);
 
   const { evmAddress, solAddress, connectedWallet, dydxAddress, hdKey } = useAccounts();
+  const { registerAffiliate } = useSubaccount();
 
   let address: string | undefined;
   if (connectedWallet?.name === WalletType.Phantom) {
@@ -311,6 +313,21 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
         },
+        ...(isDev
+          ? [
+              {
+                value: 'registerAffiliate',
+                icon: <Icon iconName={IconName.Gear} />,
+                label: 'Register Affiliate',
+                onSelect: () => {
+                  const affiliate = window.prompt('Enter affiliate address');
+                  if (affiliate) {
+                    registerAffiliate(affiliate);
+                  }
+                },
+              },
+            ]
+          : []),
         ...(isDev
           ? [
               {

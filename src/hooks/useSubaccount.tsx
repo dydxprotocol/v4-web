@@ -890,13 +890,16 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (affiliate === subaccountClient?.wallet?.address) {
         throw new Error('affiliate not be the same as referree');
       }
-
-      const response = await compositeClient?.validatorClient.post.registerAffiliate(
-        subaccountClient,
-        affiliate
-      );
-
-      return response;
+      try {
+        const response = await compositeClient?.validatorClient.post.registerAffiliate(
+          subaccountClient,
+          affiliate
+        );
+        return response;
+      } catch (error) {
+        log('useSubaccount/registerAffiliate', error);
+        return undefined;
+      }
     },
     [subaccountClient, compositeClient]
   );
@@ -920,6 +923,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       !referredBy
     ) {
       registerAffiliate(latestReferrer);
+      dispatch(removeLatestReferrer());
     }
   }, [
     latestReferrer,
@@ -933,7 +937,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   ]);
 
   useEffect(() => {
-    if (referredBy) {
+    if (referredBy && latestReferrer) {
       dispatch(removeLatestReferrer());
     }
   }, [referredBy, dispatch]);
