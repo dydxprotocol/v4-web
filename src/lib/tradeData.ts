@@ -4,11 +4,11 @@ import {
   AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderTypes,
-  ErrorType,
   ErrorFormat,
-  type ErrorFormatType,
+  ErrorType,
   ValidationError,
   type AbacusOrderSides,
+  type ErrorFormatType,
   type Nullable,
   type SubaccountPosition,
   type TradeState,
@@ -141,13 +141,13 @@ export const getTradeInputAlert = ({
 
 export const calculateCrossPositionMargin = ({
   notionalTotal,
-  adjustedMmf,
+  adjustedImf,
 }: {
   notionalTotal?: Nullable<number>;
-  adjustedMmf?: Nullable<number>;
+  adjustedImf?: Nullable<number>;
 }) => {
   const notionalTotalBN = MustBigNumber(notionalTotal);
-  const adjustedMmfBN = MustBigNumber(adjustedMmf);
+  const adjustedMmfBN = MustBigNumber(adjustedImf);
   return notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
 };
 
@@ -165,14 +165,14 @@ export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<num
 };
 
 export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
-  const { childSubaccountNumber, equity, notionalTotal, adjustedMmf } = position;
+  const { childSubaccountNumber, equity, notionalTotal, adjustedImf } = position;
   const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
   const margin =
     marginMode === AbacusMarginMode.Cross
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
-          adjustedMmf: adjustedMmf.current,
+          adjustedImf: adjustedImf.current,
         })
       : equity?.current;
 

@@ -75,7 +75,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
-  const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
+  const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
 
@@ -110,14 +110,14 @@ export const PlaceOrderButtonAndReceipt = ({
       const currentCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
-          adjustedMmf: adjustedMmf?.current,
+          adjustedImf: adjustedImf?.current,
         })
       );
 
       const postOrderCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.postOrder,
-          adjustedMmf: adjustedMmf?.postOrder,
+          adjustedImf: adjustedImf?.postOrder,
         })
       );
 
