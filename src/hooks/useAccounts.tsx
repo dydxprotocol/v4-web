@@ -134,6 +134,7 @@ const useAccountsContext = () => {
     () => localDydxWallet?.address as DydxAddress | undefined,
     [localDydxWallet]
   );
+  console.log(localDydxWallet);
 
   const nobleAddress = useMemo(() => {
     return localNobleWallet?.address;

@@ -1037,8 +1037,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     sendSkipWithdraw,
+    sendSkipWithdrawFromSubaccount,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
+    subaccountClient,
 
     // Trading Methods
     placeOrder,

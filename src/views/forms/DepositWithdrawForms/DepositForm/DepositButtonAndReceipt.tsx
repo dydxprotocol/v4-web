@@ -91,22 +91,12 @@ export const DepositButtonAndReceipt = ({
 
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
-  const {
-    summary,
-    // requestPayload,
-    depositOptions,
-    chain: chainIdStr,
-    warning: routeWarning,
-  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const { summary } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { route } = useTransfers();
   const newEquity = (equity ?? 0) + (Number(route?.route.usdAmountOut) ?? 0);
 
   const { usdcLabel } = useTokenConfigs();
 
-  const sourceChainName =
-    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
-
-  const showExchangeRate = typeof summary?.exchangeRate === 'number';
   const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
 
   const fees = Number(route?.route.usdAmountIn) - Number(route?.route.usdAmountOut);
@@ -141,17 +131,6 @@ export const DepositButtonAndReceipt = ({
         />
       ),
       tooltip: 'minimum-deposit-amount',
-    },
-    !!showExchangeRate && {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: (
-        <span tw="row gap-[0.5ch]">
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
-          =
-          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-        </span>
-      ),
     },
     fees && {
       key: 'bridge-fees',
@@ -216,16 +195,13 @@ export const DepositButtonAndReceipt = ({
   ].filter(isTruthy);
 
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
-  const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
+  const requiresAcknowledgement = Boolean(route?.route.warning && !hasAcknowledged);
 
   const isFormValid =
     !isDisabled &&
     !isEditingSlippage &&
     // connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
     !requiresAcknowledgement;
-
-  // console.log(isDisabled, isEditingSlippage, connectionError, requiresAcknowledgement);
-  // console.log(isSwitchingNetwork);
 
   return (
     <WithReceipt
@@ -235,7 +211,7 @@ export const DepositButtonAndReceipt = ({
       <RouteWarningMessage
         hasAcknowledged={hasAcknowledged}
         setHasAcknowledged={setHasAcknowledged}
-        routeWarningJSON={routeWarning}
+        routeWarning={route?.route.warning}
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
