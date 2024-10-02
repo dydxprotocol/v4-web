@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
+import { curveLinear } from '@visx/curve';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
+import { TradingViewBar } from '@/constants/candles';
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 
 import {
   useMetadataServiceAssetFromId,
@@ -17,12 +20,61 @@ import { LinkOutIcon } from '@/icons';
 
 import { Details } from '@/components/Details';
 import { Link } from '@/components/Link';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getChartDotBackground } from '@/state/configsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
+
+const DUMMY_DATA = [
+  {
+    time: new Date('October 2, 2024 00:00:00').getTime(),
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0.5,
+    volume: 0,
+  },
+  {
+    time: new Date('October 1, 2024 00:00:00').getTime(),
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0.3,
+    volume: 0,
+  },
+  {
+    time: new Date('September 30, 2024 00:00:00').getTime(),
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0.35,
+    volume: 0,
+  },
+  {
+    time: new Date('September 29, 2024 00:00:00').getTime(),
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0.35,
+    volume: 0,
+  },
+  {
+    time: new Date('September 28, 2024 00:00:00').getTime(),
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0.2,
+    volume: 0,
+  },
+].reverse();
 
 export const LaunchableMarketChart = ({
   className,
@@ -37,6 +89,8 @@ export const LaunchableMarketChart = ({
   const { id, marketCap, name, price, logo, tickSizeDecimals, urls } = orEmptyObj(launchableAsset);
   const websiteLink = urls?.website ?? undefined;
   const candlesQuery = useMetadataServiceCandles(id, timeframe);
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   const items = [
     {
@@ -57,6 +111,31 @@ export const LaunchableMarketChart = ({
       value: <Output type={OutputType.Multiple} isLoading={!ticker} value={5} />,
     },
   ];
+
+  const xAccessorFunc = useCallback((datum: TradingViewBar) => datum.time, []);
+  const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
+
+  const series = useMemo(
+    () => [
+      {
+        dataKey: 'pnl',
+        xAccessor: xAccessorFunc,
+        yAccessor: yAccessorFunc,
+        colorAccessor: () => 'var(--color-positive)',
+        getCurve: () => curveLinear,
+        threshold: {
+          belowAreaProps: {
+            fill: 'var(--color-layer-5)',
+            fillOpacity: 0.5,
+            stroke: 'var(--color-positive)',
+            strokeWidth: 2,
+          },
+          yAccessor: yAccessorFunc,
+        },
+      },
+    ],
+    [xAccessorFunc, yAccessorFunc]
+  );
 
   return (
     <$LaunchableMarketChartContainer className={className}>
@@ -121,7 +200,36 @@ export const LaunchableMarketChart = ({
         />
       </div>
 
-      <$ChartContainer />
+      <$ChartContainer chartBackground={chartDotsBackground}>
+        {candlesQuery.isLoading ? (
+          <LoadingSpace id="launchable-market-chart" />
+        ) : (
+          <TimeSeriesChart
+            selectedLocale={selectedLocale}
+            data={DUMMY_DATA}
+            series={series}
+            margin={{
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            }}
+            padding={{
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            }}
+            minZoomDomain={timeUnits.month * 2}
+            slotEmpty={undefined}
+            numGridLines={0}
+            tickSpacingX={210}
+            tickSpacingY={75}
+          >
+            {null}
+          </TimeSeriesChart>
+        )}
+      </$ChartContainer>
 
       <$Details layout="rowColumns" items={items} />
     </$LaunchableMarketChartContainer>
@@ -157,4 +265,7 @@ const $ToggleGroup = styled(ToggleGroup)`
   }
 ` as typeof ToggleGroup;
 
-const $ChartContainer = tw.div`h-[8.75rem] rounded-[1rem] border-[length:--border-width] border-color-border p-1.5 [border-style:solid]`;
+const $ChartContainer = styled.div<{ chartBackground?: string }>`
+  ${tw`h-[8.75rem] overflow-hidden rounded-[1rem] border-[length:--border-width] border-color-border [border-style:solid]`}
+  background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
+`;

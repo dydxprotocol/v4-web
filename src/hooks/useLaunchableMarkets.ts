@@ -17,6 +17,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
+import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
@@ -129,7 +130,12 @@ export const useMetadataServiceCandles = (
       return metadataClient.getCandles({ asset: asset!, timeframe: timeframe! });
     },
     refetchInterval: timeUnits.minute * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
-  return candlesQuery;
+  return {
+    ...candlesQuery,
+    data: candlesQuery.data?.[asset ?? ''].map(mapMetadataServiceCandles),
+  };
 };
