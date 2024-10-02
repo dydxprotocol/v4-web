@@ -3,7 +3,7 @@ import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localizati
 import { TransferType } from '../abacus';
 import { getLowestFeeChainNames } from '../cctp';
 
-export const withdrawTooltips: TooltipStrings = {
+export const withdrawTooltips = {
   'fast-withdraw-fee': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.FAST_WITHDRAW_FEE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.FAST_WITHDRAW_FEE_BODY }),
@@ -33,4 +33,4 @@ export const withdrawTooltips: TooltipStrings = {
       },
     }),
   }),
-} as const;
+} satisfies TooltipStrings;

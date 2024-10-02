@@ -12,6 +12,7 @@ import {
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -45,7 +46,7 @@ type InputOrderFields = {
 
 type ElementProps = {
   symbol: string;
-  tooltipId: string;
+  tooltipId: TooltipStringKeys;
   stringKeys: {
     header: string;
     headerDiff: string;

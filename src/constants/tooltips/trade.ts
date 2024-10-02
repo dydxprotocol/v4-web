@@ -1,6 +1,6 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
-export const tradeTooltips: TooltipStrings = {
+export const tradeTooltips = {
   'account-leverage': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_BODY }),
@@ -234,4 +234,4 @@ export const tradeTooltips: TooltipStrings = {
   'reward-history': ({ stringGetter }) => ({
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REWARD_HISTORY_BODY }),
   }),
-} as const;
+} satisfies TooltipStrings;
