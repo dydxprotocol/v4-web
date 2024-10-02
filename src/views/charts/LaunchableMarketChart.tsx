@@ -115,26 +115,34 @@ export const LaunchableMarketChart = ({
   const xAccessorFunc = useCallback((datum: TradingViewBar) => datum.time, []);
   const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
 
+  const colorString = useMemo(() => {
+    if (!candlesQuery.data) return 'var(--color-text-1)';
+    const first = candlesQuery.data[0];
+    const last = candlesQuery.data[candlesQuery.data.length - 1];
+    if (first > last) return 'var(--color-negative)';
+    return 'var(--color-positive)';
+  }, [candlesQuery.data]);
+
   const series = useMemo(
     () => [
       {
         dataKey: 'pnl',
         xAccessor: xAccessorFunc,
         yAccessor: yAccessorFunc,
-        colorAccessor: () => 'var(--color-positive)',
+        colorAccessor: () => colorString,
         getCurve: () => curveLinear,
         threshold: {
-          belowAreaProps: {
-            fill: 'var(--color-layer-5)',
-            fillOpacity: 0.5,
-            stroke: 'var(--color-positive)',
-            strokeWidth: 2,
+          aboveAreaProps: {
+            fill: 'var(--color-text-1)',
+            fillOpacity: 0.2,
+            stroke: colorString,
           },
-          yAccessor: yAccessorFunc,
+          // This yAccessor displays a gradient from the line to the bottom (0) of the chart.
+          yAccessor: () => 0,
         },
       },
     ],
-    [xAccessorFunc, yAccessorFunc]
+    [colorString, xAccessorFunc, yAccessorFunc]
   );
 
   return (
@@ -209,10 +217,10 @@ export const LaunchableMarketChart = ({
             data={DUMMY_DATA}
             series={series}
             margin={{
-              left: 0,
-              right: 0,
+              left: -0.5,
+              right: -0.5,
               top: 0,
-              bottom: 0,
+              bottom: -0.5,
             }}
             padding={{
               left: 0,
@@ -220,7 +228,7 @@ export const LaunchableMarketChart = ({
               top: 0,
               bottom: 0,
             }}
-            minZoomDomain={timeUnits.month * 2}
+            minZoomDomain={timeUnits.month}
             slotEmpty={undefined}
             numGridLines={0}
             tickSpacingX={210}
