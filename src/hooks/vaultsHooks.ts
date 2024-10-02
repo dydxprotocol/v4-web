@@ -46,8 +46,8 @@ function mapNullableQueryResult<T>(
 }
 
 const vaultQueryOptions = {
-  staleTime: timeUnits.minute,
-  refetchInterval: timeUnits.minute * 2,
+  staleTime: timeUnits.minute / 4,
+  refetchInterval: timeUnits.minute / 3,
 };
 
 export function useForceRefreshVaultDetails() {
