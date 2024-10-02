@@ -1,6 +1,6 @@
 import type { Story } from '@ladle/react';
 
-import { tooltipStrings } from '@/constants/tooltips';
+import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
 
 import { Button } from '@/components/Button';
 import { WithHovercard } from '@/components/WithHovercard';
@@ -35,6 +35,6 @@ Hovercard.argTypes = {
   hovercard: {
     options: Object.keys(tooltipStrings),
     control: { type: 'select' },
-    defaultValue: Object.keys(tooltipStrings)[0],
+    defaultValue: Object.keys(tooltipStrings)[0] as TooltipStringKeys,
   },
 };

@@ -42,7 +42,7 @@ export const appSlice = createSlice({
       ...state,
       selectedNetwork: action.payload,
     }),
-    setInitializationError: (state: AppState, action: PayloadAction<string>) => {
+    setInitializationError: (state: AppState, action: PayloadAction<string | undefined>) => {
       state.initializationError = action.payload;
     },
   },
