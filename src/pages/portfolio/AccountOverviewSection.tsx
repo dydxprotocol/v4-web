@@ -72,7 +72,7 @@ export const AccountOverviewSection = () => {
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
-      label: <div tw="row gap-0.5">{stringGetter({ key: STRING_KEYS.MEGAVAULT })}</div>,
+      label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
       amount: vaultBalance,
       color: ColorToken.Purple1,
     },
@@ -81,12 +81,12 @@ export const AccountOverviewSection = () => {
   return (
     <$AccountOverviewWrapper>
       <div tw="row w-full justify-between p-1">
-        <$WithLabel label="Portfolio Value">
+        <$WithLabel label={stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE })}>
           <Output tw="font-extra-book" type={OutputType.Fiat} value={totalValue} />
         </$WithLabel>
         {showVaults && (
           <Button action={ButtonAction.Base} onClick={handleViewVault}>
-            View MegaVault
+            {stringGetter({ key: STRING_KEYS.VIEW_MEGAVAULT })}
             <MegavaultYieldTag />
           </Button>
         )}

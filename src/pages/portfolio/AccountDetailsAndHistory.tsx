@@ -50,7 +50,7 @@ const usePortfolioValues = ({
             selectedLocale,
             dateFormat: 'medium',
           })
-        : 'Trading Account', // TODO
+        : stringGetter({ key: STRING_KEYS.TRADING_ACCOUNT }),
     [activeDatum, selectedLocale, stringGetter]
   );
 
