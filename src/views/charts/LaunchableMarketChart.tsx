@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { curveLinear } from '@visx/curve';
+import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -145,6 +146,21 @@ export const LaunchableMarketChart = ({
     [colorString, xAccessorFunc, yAccessorFunc]
   );
 
+  const renderTooltip = (tooltipParam: RenderTooltipParams<TradingViewBar>) => {
+    const datum = tooltipParam?.tooltipData?.nearestDatum?.datum;
+    if (!datum) return <div />;
+
+    return (
+      <div tw="flex flex-col gap-0.5 rounded-[0.5rem] bg-color-layer-7 p-0.5">
+        <Output tw="inline" value={datum.time} type={OutputType.Date} />
+        <span>
+          {stringGetter({ key: STRING_KEYS.PRICE })}:{' '}
+          <Output tw="inline" value={datum.close} type={OutputType.Fiat} />
+        </span>
+      </div>
+    );
+  };
+
   return (
     <$LaunchableMarketChartContainer className={className}>
       <$ChartContainerHeader tw="flex flex-row items-center justify-between">
@@ -233,6 +249,7 @@ export const LaunchableMarketChart = ({
             numGridLines={0}
             tickSpacingX={210}
             tickSpacingY={75}
+            renderTooltip={renderTooltip}
           >
             {null}
           </TimeSeriesChart>
