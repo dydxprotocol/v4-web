@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { MARGIN_MODE_STRINGS } from '@/constants/abacus';
+import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -13,6 +13,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -20,6 +21,7 @@ import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarginModeSelector = ({
@@ -42,6 +44,53 @@ export const MarginModeSelector = ({
         : openDialog(DialogTypes.SelectMarginMode())
     );
   }, [dispatch, openInTradeBox]);
+
+  const items = [AbacusMarginMode.Cross.rawValue, AbacusMarginMode.Isolated.rawValue].map(
+    (val: string) => ({
+      value: val,
+      label: stringGetter({
+        key: MARGIN_MODE_STRINGS[val],
+      }),
+    })
+  );
+
+  const setMarginMode = (value: string) => {
+    abacusStateManager.setTradeValue({
+      value,
+      field: TradeInputField.marginMode,
+    });
+  };
+
+  const marginModeText = <$Text>{stringGetter({ key: STRING_KEYS.MARGIN_MODE })}</$Text>
+
+  // return (
+  //   <$Container>
+  //     {needsMarginMode ? (
+  //       marginModeText
+  //     ) : (
+  //       <$WarningTooltip
+  //         slotTooltip={
+  //           <div tw="flex flex-row [align-items:start]">
+  //             <Icon iconName={IconName.Warning} tw="text-[1.5rem] text-color-warning" />
+  //             {stringGetter({
+  //               key: STRING_KEYS.UNABLE_TO_CHANGE_MARGIN_MODE,
+  //               params: {
+  //                 MARKET: currentAssetId,
+  //               },
+  //             })}
+  //           </div>
+  //         }
+  //       >
+  //         {marginModeText}
+  //       </$WarningTooltip>
+  //     )}
+  //     <ToggleGroup
+  //       items={items}
+  //       value={(marginMode ?? AbacusMarginMode.Cross).rawValue}
+  //       onValueChange={setMarginMode}
+  //     />
+  //   </$Container>
+  // );
 
   return needsMarginMode ? (
     <Button onClick={handleClick} className={className}>
@@ -79,6 +128,13 @@ export const MarginModeSelector = ({
     </$WarningTooltip>
   );
 };
+
+const $Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
   border: 1px solid ${({ theme }) => theme.warning}30;

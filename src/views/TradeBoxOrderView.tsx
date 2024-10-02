@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
+import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { TradeTypes } from '@/constants/trade';
 
@@ -20,8 +20,15 @@ import { MarginModeSelector } from './forms/TradeForm/MarginModeSelector';
 import { TargetLeverageButton } from './forms/TradeForm/TargetLeverageButton';
 import { TradeSideToggle } from './forms/TradeForm/TradeSideToggle';
 import { useTradeTypeOptions } from './forms/TradeForm/useTradeTypeOptions';
+import { getSelectedOrderSide } from '@/lib/tradeData';
+import { getTradeSide } from '@/state/inputsSelectors';
+import { shallowEqual } from 'react-redux';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { STRING_KEYS } from '@/constants/localization';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 export const TradeBoxOrderView = () => {
+  const stringGetter = useStringGetter();
   const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
     if (tradeType) {
       abacusStateManager.clearTradeInputValues();
@@ -34,14 +41,16 @@ export const TradeBoxOrderView = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
-  return (
+  const side = useAppSelector(getTradeSide, shallowEqual);
+  const selectedOrderSide = getSelectedOrderSide(side);
+
+  const sharedContent = (
     <div tw="flex min-h-full flex-col gap-0.25 pt-0.875">
       <$TopActionsRow>
         <$MarginAndLeverageButtons>
           <MarginModeSelector openInTradeBox />
           <TargetLeverageButton />
         </$MarginAndLeverageButtons>
-        <TradeSideToggle />
       </$TopActionsRow>
       <$Tabs
         key={selectedTradeType}
@@ -58,6 +67,31 @@ export const TradeBoxOrderView = () => {
         withUnderline
       />
     </div>
+  );
+
+  const items = [
+    { value: OrderSide.BUY, label: stringGetter({ key: STRING_KEYS.BUY }) },
+    { value: OrderSide.SELL, label: stringGetter({ key: STRING_KEYS.SELL }) },
+];
+  return (
+    <$Tabs
+      key={selectedOrderSide}
+      value={selectedOrderSide}
+      items={items}
+      onValueChange={(newSide: OrderSide) => {
+        abacusStateManager.setTradeValue({
+          value:
+            newSide === OrderSide.BUY
+              ? AbacusOrderSide.Buy.rawValue
+              : AbacusOrderSide.Sell.rawValue,
+          field: TradeInputField.side,
+        });
+      }}
+      withBorders={false}
+      disabled={!allowChangingOrderType}
+      sharedContent={sharedContent}
+      withUnderline
+    />
   );
 };
 const $Container = styled.div`
@@ -78,7 +112,7 @@ const $Tabs = styled(Tabs)`
 
 const $TopActionsRow = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 0 1rem;
 
   > * {
