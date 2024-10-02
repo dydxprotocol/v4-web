@@ -94,7 +94,7 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
       value={value}
       onValueChange={setValue}
       items={innerPanelItems}
-      slotToolbar={<MarketLinks />}
+      slotToolbar={<MarketLinks launchableMarketId={launchableMarketId} />}
       withTransitions={false}
     />
   );
