@@ -72,12 +72,7 @@ export const AccountOverviewSection = () => {
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
-      label: (
-        <div tw="row gap-0.5">
-          {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
-          <MegavaultYieldTag />
-        </div>
-      ),
+      label: <div tw="row gap-0.5">{stringGetter({ key: STRING_KEYS.MEGAVAULT })}</div>,
       amount: vaultBalance,
       color: ColorToken.Purple1,
     },

@@ -1,7 +1,7 @@
 import React, { Key, useCallback, useMemo, useState } from 'react';
 
 import {
-  Cell, // CollectionBuilderContext,
+  Cell,
   Column,
   Row,
   TableBody,
@@ -183,9 +183,9 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           return 0;
         }
         if (first != null) {
-          return 1;
+          return 1 * (sortDirection === 'descending' ? -1 : 1);
         }
-        return -1;
+        return -1 * (sortDirection === 'descending' ? -1 : 1);
       }
 
       return (
