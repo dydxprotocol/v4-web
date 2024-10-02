@@ -14,7 +14,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
@@ -158,7 +158,7 @@ export const MarketDetails: React.FC = () => {
         />
       ),
     },
-  ];
+  ] satisfies DetailsItem[];
 
   return (
     <$MarketDetails>

@@ -305,6 +305,7 @@ export const Icon = styled(
     iconName,
     iconComponent: Component = iconName && icons[iconName],
     className,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     size,
     ...props
   }: ElementProps & StyleProps & { size?: string }) =>
@@ -312,4 +313,6 @@ export const Icon = styled(
 )`
   width: ${({ size }) => size ?? '1em'};
   height: ${({ size }) => size ?? '1em'};
+  min-width: ${({ size }) => size ?? '1em'};
+  min-height: ${({ size }) => size ?? '1em'};
 `;

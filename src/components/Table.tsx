@@ -431,7 +431,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               item: row,
               state,
               ...getRowAttributes?.(row.value!),
-              withGradientCardRows,
               withFocusStickyRows,
               withScrollSnapRows,
               children: null,
@@ -443,7 +442,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               state={state}
               hasRowAction={!!onRowAction}
               {...getRowAttributes?.(row.value!)}
-              withGradientCardRows={withGradientCardRows}
               withFocusStickyRows={withFocusStickyRows}
               withScrollSnapRows={withScrollSnapRows}
             >
@@ -607,7 +605,6 @@ export const TableRow = <TableRowData extends BaseTableRowData>({
   children,
   state,
   hasRowAction,
-  withGradientCardRows,
   withFocusStickyRows,
   withScrollSnapRows,
   ...attrs
@@ -616,7 +613,6 @@ export const TableRow = <TableRowData extends BaseTableRowData>({
   children: React.ReactNode;
   state: TableState<TableRowData>;
   hasRowAction?: boolean;
-  withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
 }) => {

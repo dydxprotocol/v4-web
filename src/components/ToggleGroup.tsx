@@ -1,12 +1,14 @@
 import { type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
@@ -71,7 +73,7 @@ export const ToggleGroup = forwardRefFn(
               {...buttonProps}
             >
               {item.slotBefore}
-              {item.label}
+              <$Label>{item.label}</$Label>
               {item.slotAfter}
             </ToggleButton>
           </Item>
@@ -92,4 +94,8 @@ const $Root = styled(Root)<{ overflow: 'scroll' | 'wrap' }>`
         flex-wrap: wrap;
       `,
     })[overflow]}
+`;
+
+const $Label = styled.div`
+  ${layoutMixins.textTruncate}
 `;
