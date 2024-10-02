@@ -11,15 +11,10 @@ import { IconButton } from '@/components/IconButton';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
-<<<<<<< HEAD
 import { testFlags } from '@/lib/testFlags';
-
-export const MarketLinks = () => {
-=======
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
->>>>>>> c0c2afc6471e33ae68dc3258125fbbe8f07cdcbc
   const { resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { coinMarketCapsLink, websiteLink, whitepaperLink } = orEmptyObj(resources);
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
