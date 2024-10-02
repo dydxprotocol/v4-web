@@ -18,7 +18,7 @@ import type { TvWidget } from '@/constants/tvchart';
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme, getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { updateChartConfig } from '@/state/tradingView';
@@ -259,6 +259,15 @@ export const useTradingView = ({
     orderbookCandlesToggleOn,
     tvWidgetRef,
   ]);
+
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  useEffect(() => {
+    // when display unit is toggled, update bars volume to be the correct unit
+    if (tvWidgetRef.current) {
+      const chart = tvWidgetRef.current.activeChart?.();
+      chart.resetData();
+    }
+  }, [displayUnit]);
 
   return { savedResolution };
 };

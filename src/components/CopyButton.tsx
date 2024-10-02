@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
+import { MODERATE_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -34,7 +35,7 @@ export const CopyButton = ({
 
     setCopied(true);
     navigator.clipboard.writeText(value);
-    setTimeout(() => setCopied(false), 500);
+    setTimeout(() => setCopied(false), MODERATE_DEBOUNCE_MS);
   };
 
   return buttonType === 'text' ? (

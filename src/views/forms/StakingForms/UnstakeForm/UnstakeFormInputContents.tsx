@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
+import { HEAVY_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -68,7 +69,7 @@ export const UnstakeFormInputContents = ({
             validatorAddress: validator,
           })
         );
-      }, 1000),
+      }, HEAVY_DEBOUNCE_MS),
     []
   );
 
