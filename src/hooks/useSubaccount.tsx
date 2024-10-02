@@ -920,7 +920,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw new Error('wallet not initialized');
       }
       if (affiliate === subaccountClient?.wallet?.address) {
-        throw new Error('affiliate not be the same as referree');
+        throw new Error('affiliate can not be the same as referree');
       }
       try {
         const response = await compositeClient?.validatorClient.post.registerAffiliate(

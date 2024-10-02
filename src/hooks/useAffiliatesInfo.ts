@@ -17,8 +17,9 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     if (!compositeClient || !dydxAddress) {
       return undefined;
     }
+    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
+
     try {
-      const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
       const response = await fetch(`${endpoint}?address=${encodeURIComponent(dydxAddress)}`, {
         method: 'GET',
         headers: {
@@ -32,7 +33,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
       return { metadata: data, affiliateInfo, isEligible };
     } catch (error) {
-      log('useAffiliatesInfo', error);
+      log('useAffiliatesInfo', error, { endpoint });
       return undefined;
     }
   };
