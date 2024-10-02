@@ -147,8 +147,8 @@ export const calculateCrossPositionMargin = ({
   adjustedImf?: Nullable<number>;
 }) => {
   const notionalTotalBN = MustBigNumber(notionalTotal);
-  const adjustedMmfBN = MustBigNumber(adjustedImf);
-  return notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
+  const adjustedImfBN = MustBigNumber(adjustedImf);
+  return notionalTotalBN.times(adjustedImfBN).toFixed(USD_DECIMALS);
 };
 
 /**
