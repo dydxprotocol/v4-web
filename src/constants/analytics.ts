@@ -128,6 +128,9 @@ export const AnalyticsEvents = unionize(
     ExportTransfersCheckboxClick: ofType<{
       value: boolean;
     }>(),
+    ExportVaultTransfersCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
 
     // Navigation
     NavigatePage: ofType<{
