@@ -18,7 +18,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 
 enum Tab {

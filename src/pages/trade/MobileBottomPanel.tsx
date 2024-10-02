@@ -37,7 +37,8 @@ export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?:
           label: stringGetter({ key: STRING_KEYS.ABOUT }),
           content: <LaunchableMarketDetails launchableMarketId={launchableMarketId} />,
         },
-      ]}
+      ];
+    }
 
     return [
       {
