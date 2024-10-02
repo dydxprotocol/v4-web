@@ -44,13 +44,15 @@ export const MarginModeSelector = ({
   }, [dispatch, openInTradeBox]);
 
   return needsMarginMode ? (
-    <$Button onClick={handleClick} className={className}>
-      {marginMode &&
-        stringGetter({
-          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-        })}
+    <Button onClick={handleClick} className={className}>
+      <$Text>
+        {marginMode &&
+          stringGetter({
+            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+          })}
+      </$Text>
       <Icon iconName={IconName.Triangle} tw="ml-[0.5ch] rotate-[0.75turn] text-[0.4375rem]" />
-    </$Button>
+    </Button>
   ) : (
     <$WarningTooltip
       className={className}
@@ -66,12 +68,14 @@ export const MarginModeSelector = ({
         </div>
       }
     >
-      <$Button disabled>
-        {marginMode &&
-          stringGetter({
-            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-          })}
-      </$Button>
+      <Button disabled>
+        <$Text>
+          {marginMode &&
+            stringGetter({
+              key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+            })}
+        </$Text>
+      </Button>
     </$WarningTooltip>
   );
 };
@@ -81,6 +85,6 @@ const $WarningTooltip = styled(WithTooltip)`
   gap: 0.5rem;
 `;
 
-const $Button = styled(Button)`
-  ${layoutMixins.textTruncate}
+const $Text = styled.div`
+  ${layoutMixins.textTruncate};
 `;

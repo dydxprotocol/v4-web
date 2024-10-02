@@ -2,6 +2,7 @@ import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
@@ -80,7 +81,7 @@ export const UnlaunchedMarketStatsDetails = ({
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
-          tooltip: stat,
+          tooltip: stat as unknown as TooltipStringKeys,
           value: <DetailsItem value={valueMap[stat]} stat={stat} />,
         }))}
         layout={isTablet ? 'grid' : 'rowColumns'}

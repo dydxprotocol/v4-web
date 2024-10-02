@@ -1,6 +1,6 @@
 import type { Story } from '@ladle/react';
 
-import { tooltipStrings } from '@/constants/tooltips';
+import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
 
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -34,6 +34,6 @@ Tooltip.argTypes = {
   tooltip: {
     options: Object.keys(tooltipStrings),
     control: { type: 'select' },
-    defaultValue: Object.keys(tooltipStrings)[0],
+    defaultValue: Object.keys(tooltipStrings)[0] as TooltipStringKeys,
   },
 };
