@@ -212,7 +212,7 @@ export const PositionsTriggersCell = ({
               }
               slotTrigger={
                 <$PartialFillIcon>
-                  <Icon iconName={IconName.PositionPartial} />
+                  <Icon iconName={IconName.PositionPartial} size="0.875em" />
                 </$PartialFillIcon>
               }
             />
@@ -291,8 +291,5 @@ const $ActionButton = styled(Button)`
 const $PartialFillIcon = styled.span`
   svg {
     display: block;
-
-    width: 0.875em;
-    height: 0.875em;
   }
 `;

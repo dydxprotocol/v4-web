@@ -177,6 +177,7 @@ const $Overlay = styled(Overlay)`
 
   pointer-events: none !important;
 
+  -webkit-backdrop-filter: brightness(var(--overlay-filter));
   backdrop-filter: brightness(var(--overlay-filter));
 `;
 

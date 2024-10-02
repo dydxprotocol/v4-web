@@ -73,7 +73,9 @@ export const WithConfirmationPopover = forwardRef(
           >
             {children}
             <div tw="row justify-end gap-0.25">
-              {onCancel && <$CancelButton iconName={IconName.Close} onClick={onCancel} />}
+              {onCancel && (
+                <$CancelButton iconName={IconName.Close} onClick={onCancel} iconSize="0.8em" />
+              )}
               {onConfirm && <$ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />}
             </div>
           </form>
@@ -107,8 +109,6 @@ const $CancelButton = styled($IconButton)`
 
   svg {
     color: var(--color-red);
-    width: 0.8em;
-    height: 0.8em;
 
     path {
       stroke-width: 3;
