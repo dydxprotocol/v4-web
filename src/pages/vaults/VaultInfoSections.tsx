@@ -22,6 +22,7 @@ import { BackButton } from '@/components/BackButton';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -36,6 +37,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     {
       key: 'balance',
       label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
+      tooltip: 'vault-your-balance' as const,
       value:
         myVaultMetadata == null || myVaultMetadata.balanceUsdc === 0 ? (
           <EmptyValue />
@@ -46,13 +48,14 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     {
       key: 'pnl',
       label: stringGetter({ key: STRING_KEYS.YOUR_ALL_TIME_PNL }),
+      tooltip: 'vault-all-time-pnl' as const,
       value:
         myVaultMetadata == null ||
         myVaultMetadata?.allTimeReturnUsdc == null ||
         myVaultMetadata?.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
               <Output
                 value={myVaultMetadata?.allTimeReturnUsdc}
@@ -68,7 +71,9 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     <$CardsContainer className={className}>
       {items.map((item) => (
         <$DetailCard key={item.key}>
-          <div tw="text-color-text-0">{item.label}</div>
+          <WithTooltip tooltip={item.tooltip}>
+            <div tw="text-color-text-0">{item.label}</div>
+          </WithTooltip>
           <div tw="leading-[1.2rem] text-color-text-2 font-medium-book">{item.value}</div>
         </$DetailCard>
       ))}

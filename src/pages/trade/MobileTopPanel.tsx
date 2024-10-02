@@ -37,7 +37,7 @@ enum Tab {
 const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: IconName }) => (
   <Trigger asChild value={value}>
     <$TabButton>
-      <Icon iconName={icon} />
+      <Icon iconName={icon} size="1.375rem" />
       <span>{label}</span>
     </$TabButton>
   </Trigger>
@@ -151,11 +151,6 @@ const $TabButton = styled(ToggleButton)`
       font-size: 0;
       opacity: 0;
     }
-  }
-
-  svg {
-    width: 1.375rem;
-    height: 1.375rem;
   }
 `;
 const $ScrollableTableContainer = styled.div`

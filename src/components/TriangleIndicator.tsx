@@ -21,7 +21,7 @@ const getSign = (num: BigNumber) =>
 export const TriangleIndicator = ({ className, value }: TriangleIndicatorProps) => {
   return (
     <$TriangleIndicator className={className} sign={getSign(value)}>
-      <Icon iconName={IconName.Triangle} />
+      <Icon iconName={IconName.Triangle} size="0.375em" />
     </$TriangleIndicator>
   );
 };
@@ -30,11 +30,6 @@ const $TriangleIndicator = styled.div<{ sign: NumberSign }>`
   align-items: center;
   height: 100%;
   margin-top: 0.0625rem;
-
-  svg {
-    width: 0.375em;
-    height: 0.375em;
-  }
 
   ${({ sign }) =>
     ({

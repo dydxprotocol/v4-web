@@ -15,6 +15,7 @@ import {
   tradingRewardsPeriods,
   type TradingRewardsDatum,
 } from '@/constants/charts';
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
@@ -171,7 +172,7 @@ export const TradingRewardsChart = ({
             setSelectedPeriod(periodOptions[predefinedPeriodIx]);
           }
         }
-      }, 200),
+      }, NORMAL_DEBOUNCE_MS),
     [periodOptions, msForPeriod]
   );
 

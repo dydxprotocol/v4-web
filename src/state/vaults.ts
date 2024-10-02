@@ -35,6 +35,14 @@ export const vaultsSlice = createSlice({
     setVaultFormOperation: (state, action: PayloadAction<VaultForm['operation']>) => {
       state.vaultForm.operation = action.payload;
     },
+    resetVaultForm: (state) => {
+      state.vaultForm = {
+        amount: '',
+        confirmationStep: false,
+        slippageAck: false,
+        operation: 'DEPOSIT',
+      };
+    },
   },
 });
 
@@ -43,4 +51,5 @@ export const {
   setVaultFormOperation,
   setVaultFormConfirmationStep,
   setVaultFormSlippageAck,
+  resetVaultForm,
 } = vaultsSlice.actions;
