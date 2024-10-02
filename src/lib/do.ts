@@ -1,4 +1,4 @@
-export function run<T>(fn: () => T): T {
+export function runFn<T>(fn: () => T): T {
   return fn();
 }
 
