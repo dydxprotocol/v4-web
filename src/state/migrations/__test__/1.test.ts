@@ -37,7 +37,7 @@ describe('migration1', () => {
   });
 
   it('should not set any address if no wallet info is defined', () => {
-    localStorage.setItem('dydx.EvmAddress', MOCK_EVM_ADDRESS);
+    localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
     expect(newState.wallet.sourceAccount?.address).toBeUndefined();
@@ -45,7 +45,7 @@ describe('migration1', () => {
   });
 
   it('should set evm address correctly if wallet info is evm', () => {
-    localStorage.setItem('dydx.EvmAddress', MOCK_EVM_ADDRESS);
+    localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
     localStorage.setItem('dydx.OnboardingSelectedWallet', JSON.stringify(MOCK_EVM_WALLET_INFO));
 
     const newState = migration1(V0_STATE);
@@ -57,7 +57,7 @@ describe('migration1', () => {
   });
 
   it('should set solana address correctly if wallet info is solana', () => {
-    localStorage.setItem('dydx.SolAddress', MOCK_SOLANA_ADDRESS);
+    localStorage.setItem('dydx.SolAddress', JSON.stringify(MOCK_SOLANA_ADDRESS));
     localStorage.setItem('dydx.OnboardingSelectedWallet', JSON.stringify(MOCK_SOLANA_WALLET_INFO));
 
     const newState = migration1(V0_STATE);
@@ -69,7 +69,7 @@ describe('migration1', () => {
   });
 
   it('should set dydx address correctly if wallet info is cosmos', () => {
-    localStorage.setItem('dydx.DydxAddress', MOCK_DYDX_ADDRESS);
+    localStorage.setItem('dydx.DydxAddress', JSON.stringify(MOCK_DYDX_ADDRESS));
     localStorage.setItem('dydx.OnboardingSelectedWallet', JSON.stringify(MOCK_COSMOS_WALLET_INFO));
 
     const newState = migration1(V0_STATE);
@@ -81,8 +81,8 @@ describe('migration1', () => {
   });
 
   it('should set the right address even if multiple are defined in localstorage', () => {
-    localStorage.setItem('dydx.EvmAddress', MOCK_EVM_ADDRESS);
-    localStorage.setItem('dydx.SolAddress', MOCK_SOLANA_ADDRESS);
+    localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
+    localStorage.setItem('dydx.SolAddress', JSON.stringify(MOCK_SOLANA_ADDRESS));
     localStorage.setItem('dydx.OnboardingSelectedWallet', JSON.stringify(MOCK_SOLANA_WALLET_INFO));
 
     const newState = migration1(V0_STATE);
@@ -94,7 +94,7 @@ describe('migration1', () => {
   });
 
   it('should migrate over saved encrypted v2 signatures', () => {
-    localStorage.setItem('dydx.EvmAddress', MOCK_EVM_ADDRESS);
+    localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
     localStorage.setItem(
       'dydx.EvmDerivedAddresses',
       JSON.stringify({
@@ -111,7 +111,7 @@ describe('migration1', () => {
   });
 
   it('should not migrate over saved encrypted v1 signatures', () => {
-    localStorage.setItem('dydx.EvmAddress', MOCK_EVM_ADDRESS);
+    localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
     localStorage.setItem(
       'dydx.EvmDerivedAddresses',
       JSON.stringify({

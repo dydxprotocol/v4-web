@@ -1,7 +1,14 @@
 import { PersistedState } from 'redux-persist';
 
 import { EvmDerivedAddresses, SolDerivedAddresses } from '@/constants/account';
-import { ConnectorType, EvmAddress, WalletInfo, WalletNetworkType } from '@/constants/wallets';
+import {
+  ConnectorType,
+  DydxAddress,
+  EvmAddress,
+  SolAddress,
+  WalletInfo,
+  WalletNetworkType,
+} from '@/constants/wallets';
 
 import { WalletState } from '../wallet';
 import { parseStorageItem } from './utils';
@@ -16,17 +23,17 @@ export function migration1(state: PersistedState): V1State {
     throw new Error('state must be defined');
   }
 
-  const evmAddress = localStorage.getItem('dydx.EvmAddress') as EvmAddress | undefined;
+  // We have to run parseStorageItem on these strings because they are stored with a extra quotations (from JSON.stringify)!
+  const evmAddress = parseStorageItem<EvmAddress>(localStorage.getItem('dydx.EvmAddress'));
   const evmDerivedAddresses = parseStorageItem<EvmDerivedAddresses>(
     localStorage.getItem('dydx.EvmDerivedAddresses')
   );
-
-  const solAddress = localStorage.getItem('dydx.SolAddress');
+  const solAddress = parseStorageItem<SolAddress>(localStorage.getItem('dydx.SolAddress'));
   const solDerivedAddresses = parseStorageItem<SolDerivedAddresses>(
     localStorage.getItem('dydx.SolDerivedAddresses')
   );
 
-  const dydxAddress = localStorage.getItem('dydx.DydxAddress');
+  const dydxAddress = parseStorageItem<DydxAddress>(localStorage.getItem('dydx.DydxAddress'));
   const selectedWallet = parseStorageItem<WalletInfo>(
     localStorage.getItem('dydx.OnboardingSelectedWallet')
   );
