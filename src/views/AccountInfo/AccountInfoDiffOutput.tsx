@@ -35,7 +35,7 @@ export const AccountInfoDiffOutput = ({
       withDiff={hasDiffPostOrder}
       newValue={postOrderValue}
       value={currentValue}
-      layout="column"
+      layout="row"
       withBaseFont
     />
   );

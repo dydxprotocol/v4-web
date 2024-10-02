@@ -211,6 +211,7 @@ const itemLayoutVariants = {
     gap: 0.375rem;
   `,
 } satisfies Record<string, ReturnType<typeof css>>;
+
 const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
