@@ -1,4 +1,4 @@
-import { Key, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -47,27 +47,42 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.marketId, // todo lookup asset
+          getCellValue: (row) => row.marketId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ marketId, currentLeverageMultiple, currentPosition }) => {
+          renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
             return (
-              <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
-                {asset?.name}
-                <div tw="row gap-0.25">
-                  <$OutputSigned
-                    value={
-                      (currentPosition?.usdc ?? 0) < 0
-                        ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
-                        : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-                    }
-                    sign={getNumberSign(currentPosition?.usdc ?? 0)}
-                    type={OutputType.Text}
-                  />
-                  @
-                  <Output type={OutputType.Multiple} value={currentLeverageMultiple} />
-                </div>
-              </TableCell>
+              // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+              <div
+                tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
+                role="button"
+                onClick={() =>
+                  navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
+                }
+              >
+                <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
+                  {asset?.name}
+                  <div tw="row gap-0.25">
+                    <Output
+                      type={OutputType.Multiple}
+                      value={
+                        currentLeverageMultiple != null
+                          ? Math.abs(currentLeverageMultiple)
+                          : undefined
+                      }
+                    />
+                    <$OutputSigned
+                      value={
+                        (currentLeverageMultiple ?? 0) < 0
+                          ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
+                          : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+                      }
+                      sign={getNumberSign(currentLeverageMultiple ?? 0)}
+                      type={OutputType.Text}
+                    />
+                  </div>
+                </TableCell>
+              </div>
             );
           },
         },
@@ -136,14 +151,13 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           getCellValue: (row) => row.marginUsdc,
           label: stringGetter({ key: STRING_KEYS.MARGIN }),
           renderCell: ({ marginUsdc }) => (
-            <TableCell stacked>
+            <TableCell>
               <Output value={marginUsdc} type={OutputType.Fiat} fractionDigits={0} />
-              <Output value={stringGetter({ key: STRING_KEYS.ISOLATED })} type={OutputType.Text} />
             </TableCell>
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [marketIdToAssetMetadataMap, marketsData, stringGetter]
+    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter]
   );
 
   return (
@@ -152,12 +166,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       withOuterBorder
       data={vaultsData}
       getRowKey={(row) => row.marketId ?? ''}
-      label={stringGetter({ key: STRING_KEYS.VAULT })}
-      onRowAction={(marketId: Key) =>
-        navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
-      }
+      label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       defaultSortDescriptor={{
-        column: 'size',
+        column: 'margin',
         direction: 'descending',
       }}
       columns={columns}

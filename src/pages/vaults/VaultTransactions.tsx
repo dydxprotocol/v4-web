@@ -27,7 +27,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
       {transactions.length > 0 ? (
         <>
           <div tw="flex justify-between px-1 py-0.625">
-            <h3 tw="leading-7 font-base-medium">
+            <h3 tw="leading-7">
               {stringGetter({ key: STRING_KEYS.YOUR_DEPOSITS_AND_WITHDRAWALS })}
               <span tw="ml-0.5 text-color-text-0">{transactions.length}</span>
             </h3>
@@ -46,7 +46,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
       ) : (
         <div tw="column content-center justify-items-center p-1 text-color-text-0">
           <div>
-            <Icon iconName={IconName.OrderPending} tw="mb-0.75 h-2 w-2" />
+            <Icon iconName={IconName.OrderPending} size="2rem" tw="mb-0.75" />
           </div>
           <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
         </div>
@@ -110,7 +110,7 @@ const VaultTransactionsTable = ({ className }: { className?: string }) => {
       withInnerBorders
       data={transactions}
       getRowKey={(row) => row.id ?? ''}
-      label={stringGetter({ key: STRING_KEYS.VAULT })}
+      label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       defaultSortDescriptor={{
         column: 'time',
         direction: 'descending',

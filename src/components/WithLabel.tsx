@@ -24,5 +24,9 @@ export const WithLabel = ({ label, inputID, children, className }: ElementProps 
 const $Container = styled.div`
   label {
     ${layoutMixins.textTruncate}
+    text-align: start;
+    > *:not(:last-child) {
+      margin-right: 0.5ch;
+    }
   }
 `;

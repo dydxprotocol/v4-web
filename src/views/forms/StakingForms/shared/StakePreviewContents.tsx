@@ -40,7 +40,7 @@ export const StakePreviewContents = ({
         </$Row>
         <$Row>
           <$StakeBox> {slotLeft} </$StakeBox>
-          <Icon iconName={IconName.FastForward} tw="h-2.25 w-2.25" />
+          <Icon iconName={IconName.FastForward} size="2.25rem" />
           <$StakeBox> {slotRight} </$StakeBox>
         </$Row>
       </div>

@@ -41,7 +41,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults;
+    return !!this.queryParams.vaults || import.meta.env.MODE === 'staging';
   }
 
   get referrer() {
@@ -49,7 +49,7 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return !!this.queryParams.prediction;
+    return !!this.queryParams.prediction || import.meta.env.MODE === 'staging';
   }
 
   get pml() {

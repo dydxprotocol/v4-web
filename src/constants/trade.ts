@@ -116,6 +116,7 @@ export const GOOD_TIL_TIME_TIMESCALE_STRINGS: Record<TimeUnitShort, string> = {
 };
 
 export enum TradeSizeInput {
+  BalancePercent = 'size.balancePercent',
   Leverage = 'size.leverage',
   Size = 'size.size',
   Usdc = 'size.usdcSize',
@@ -153,6 +154,7 @@ export const CLEARED_SIZE_INPUTS = {
   amountInput: '',
   usdAmountInput: '',
   leverageInput: '',
+  balancePercentInput: '',
 };
 
 export const CLEARED_CLOSE_POSITION_INPUTS = {
@@ -193,5 +195,12 @@ export type LocalCancelAllData = {
   orderIds: string[];
   canceledOrderIds?: string[];
   failedOrderIds?: string[];
+  errorParams?: ErrorParams;
+};
+
+export type LocalCloseAllPositionsData = {
+  submittedOrderClientIds: string[];
+  filledOrderClientIds: string[];
+  failedOrderClientIds: string[];
   errorParams?: ErrorParams;
 };

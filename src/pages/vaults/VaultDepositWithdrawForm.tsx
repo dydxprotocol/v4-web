@@ -8,9 +8,16 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-import { useLoadedVaultAccount, useVaultFormValidationResponse } from '@/hooks/vaultsHooks';
+import {
+  useForceRefreshVaultAccount,
+  useForceRefreshVaultDetails,
+  useLoadedVaultAccount,
+  useVaultFormValidationResponse,
+} from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,7 +26,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
@@ -34,12 +41,14 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getVaultForm } from '@/state/vaultSelectors';
 import {
+  resetVaultForm,
   setVaultFormAmount,
   setVaultFormConfirmationStep,
   setVaultFormOperation,
   setVaultFormSlippageAck,
 } from '@/state/vaults';
 
+import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -71,7 +80,7 @@ export const VaultDepositWithdrawForm = ({
   const { balanceUsdc: userBalance } = orEmptyObj(useLoadedVaultAccount().data);
   const { freeCollateral, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
-  const [isSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     freeCollateral: freeCollateralUpdated,
@@ -138,16 +147,79 @@ export const VaultDepositWithdrawForm = ({
     dispatch(setVaultFormConfirmationStep(true));
   };
 
-  const onSubmitConfirmForm = () => {
-    // TODO tell abacus and respond
-    onSuccess?.();
+  const { depositToMegavault, withdrawFromMegavault } = useSubaccount();
+  const forceRefreshVaultAccount = useForceRefreshVaultAccount();
+  const forceRefreshVault = useForceRefreshVaultDetails();
+  const notify = useCustomNotification();
+
+  const onSubmitConfirmForm = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { submissionData } = validationResponse;
+      if (operation === 'DEPOSIT') {
+        const cachedAmount = submissionData?.deposit?.amount;
+        if (cachedAmount == null) {
+          notify({
+            title: 'Unable to submit Megavault Deposit transaction',
+            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+          });
+          // eslint-disable-next-line no-console
+          console.error('Somehow got to submission with empty amount in validation response');
+          return;
+        }
+
+        await depositToMegavault(cachedAmount);
+
+        notify({
+          title: `$${cachedAmount} Megavault Deposit successful!`,
+        });
+      } else if (operation === 'WITHDRAW') {
+        const expectedAmount = validationResponse?.summaryData.estimatedAmountReceived;
+        if (
+          submissionData?.withdraw?.shares == null ||
+          submissionData?.withdraw?.minAmount == null
+        ) {
+          notify({
+            title: 'Unable to submit Megavault Withdrawal transaction',
+            body: 'Please adjust the amount and try again. If the problem persists, try refreshing the page or contacting support.',
+          });
+          // eslint-disable-next-line no-console
+          console.error('Somehow got to submission with empty data in validation response');
+          return;
+        }
+
+        await withdrawFromMegavault(
+          submissionData?.withdraw?.shares,
+          submissionData?.withdraw?.minAmount
+        );
+
+        notify({
+          title: `$${expectedAmount} Megavault Withdrawal successful!`,
+        });
+      } else {
+        assertNever(operation);
+      }
+      dispatch(resetVaultForm());
+
+      onSuccess?.();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error submitting megavault transaction', e);
+    } finally {
+      forceRefreshVaultAccount();
+      forceRefreshVault();
+      setIsSubmitting(false);
+    }
   };
 
   const onClickMax = () => {
     if (operation === 'DEPOSIT') {
-      setAmountState(`${freeCollateral ?? ''}`);
+      setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
     } else {
-      setAmountState(`${userBalance ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userBalance ?? 0)) / 100 ?? ''}`);
     }
   };
 
@@ -199,23 +271,26 @@ export const VaultDepositWithdrawForm = ({
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+              tooltip: 'cross-free-collateral',
               value: freeCollateralDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-margin-usage',
+              tooltip: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
               value: marginUsageDiff,
             },
             {
               key: 'vault-balance',
+              tooltip: 'vault-your-balance',
               label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
               value: vaultDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
-            label: stringGetter({ key: STRING_KEYS.PROTOCOL_VAULT }),
+            label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
             icon: 'vault' as const,
           },
         }
@@ -227,27 +302,31 @@ export const VaultDepositWithdrawForm = ({
           inputReceiptItems: [
             {
               key: 'vault-balance',
-              label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
+              tooltip: 'vault-available-to-withdraw',
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
               value: vaultDiff,
             },
-          ],
+          ] satisfies DetailsItem[],
           receiptItems: [
             {
               key: 'cross-free-collateral',
+              tooltip: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
               value: freeCollateralDiff,
             },
             {
               key: 'slippage',
-              label: stringGetter({ key: STRING_KEYS.EST_SLIPPAGE }),
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_SLIPPAGE }),
+              tooltip: 'vault-estimated-slippage',
               value: <Output type={OutputType.Percent} value={slippagePercent} />,
             },
             {
               key: 'est amount',
-              label: stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED }),
+              tooltip: 'vault-estimated-amount',
+              label: stringGetter({ key: STRING_KEYS.ESTIMATED_AMOUNT_RECEIVED }),
               value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
             },
-          ],
+          ] satisfies DetailsItem[],
           transactionTarget: {
             label: stringGetter({ key: STRING_KEYS.CROSS_ACCOUNT }),
             icon: 'cross' as const,
@@ -308,6 +387,7 @@ export const VaultDepositWithdrawForm = ({
               size={ButtonSize.XSmall}
               isInputEmpty={amount === ''}
               isLoading={false}
+              disabled={isAccountViewOnly || !canViewAccount}
               onPressedChange={(isPressed: boolean) =>
                 isPressed ? onClickMax() : setAmountState('')
               }
@@ -325,7 +405,7 @@ export const VaultDepositWithdrawForm = ({
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
           state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
             isLoading: isSubmitting,
           }}
           slotLeft={
@@ -408,7 +488,7 @@ export const VaultDepositWithdrawForm = ({
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
           state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount,
+            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
             isLoading: isSubmitting,
           }}
           slotLeft={

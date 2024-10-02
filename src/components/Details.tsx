@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { LoadingContext } from '@/contexts/LoadingContext';
 
@@ -14,7 +15,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 export type DetailsItem = {
   // eslint-disable-next-line react/no-unused-prop-types
   key: string;
-  tooltip?: string;
+  tooltip?: TooltipStringKeys;
   tooltipParams?: Record<string, string>;
   label: string | JSX.Element;
   value?: Nullable<string> | JSX.Element | undefined;
