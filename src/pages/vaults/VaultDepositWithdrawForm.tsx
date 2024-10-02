@@ -317,6 +317,7 @@ export const VaultDepositWithdrawForm = ({
           inputReceiptItems: [
             {
               key: 'vault-balance',
+              tooltip: 'vault-available-to-withdraw',
               label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
               value: availableToWithdrawDiff,
             },
