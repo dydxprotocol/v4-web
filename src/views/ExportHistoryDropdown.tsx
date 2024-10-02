@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
+import { isEmpty } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -217,8 +218,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const allVaultTransfers = useLoadedVaultAccountTransfers();
   const exportVaultTransfers = useCallback(async () => {
     if (dydxAddress && subaccountNumber !== undefined && allVaultTransfers != null) {
-      const transfers = allVaultTransfers;
-      const csvTransfers = transfers.map((transfer) => {
+      const csvTransfers = allVaultTransfers.map((transfer) => {
         const amount = formatNumberOutput(transfer.amountUsdc, OutputType.Fiat, {
           decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
           groupSeparator: LOCALE_GROUP_SEPARATOR,
@@ -360,7 +360,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             <Checkbox
               label={stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}
               checked={checkedVaultTransfers}
-              disabled={allVaultTransfers == null || allVaultTransfers.length === 0}
+              disabled={isEmpty(allVaultTransfers)}
               onCheckedChange={() => {
                 setCheckedVaultTransfers(!checkedVaultTransfers);
 
