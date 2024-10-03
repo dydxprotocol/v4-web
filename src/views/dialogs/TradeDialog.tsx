@@ -17,7 +17,6 @@ import { TradeForm } from '@/views/forms/TradeForm';
 
 import { TradeSideTabs } from '../TradeSideTabs';
 import { MarginAndLeverageButtons } from '../forms/TradeForm/MarginAndLeverageButtons';
-import { TargetLeverageButton } from '../forms/TradeForm/TargetLeverageButton';
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<TradeDialogProps>) => {
   const { isMobile } = useBreakpoints();
