@@ -9,6 +9,7 @@ import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
 import { TradingViewBar } from '@/constants/candles';
 import { STRING_KEYS } from '@/constants/localization';
+import { LIQUIDITY_TIERS } from '@/constants/markets';
 import { timeUnits } from '@/constants/time';
 
 import {
@@ -32,7 +33,10 @@ import { getChartDotBackground } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
+
+const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];
 
 export const LaunchableMarketChart = ({
   className,
@@ -66,7 +70,17 @@ export const LaunchableMarketChart = ({
     {
       key: 'max-leverage',
       label: stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE }),
-      value: <Output type={OutputType.Multiple} isLoading={!ticker} value={5} />,
+      value: (
+        <Output
+          type={OutputType.Multiple}
+          isLoading={!ticker}
+          value={
+            ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction
+              ? BIG_NUMBERS.ONE.div(ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction)
+              : null
+          }
+        />
+      ),
     },
   ];
 
@@ -212,9 +226,7 @@ export const LaunchableMarketChart = ({
             tickSpacingX={210}
             tickSpacingY={75}
             renderTooltip={renderTooltip}
-          >
-            {null}
-          </TimeSeriesChart>
+          />
         )}
       </$ChartContainer>
 
