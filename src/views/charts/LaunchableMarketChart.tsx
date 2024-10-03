@@ -77,7 +77,7 @@ export const LaunchableMarketChart = ({
     if (!candlesQuery.data) return 'var(--color-text-1)';
     const first = candlesQuery.data[0];
     const last = candlesQuery.data[candlesQuery.data.length - 1];
-    if (first > last) return 'var(--color-negative)';
+    if (first.close > last.close) return 'var(--color-negative)';
     return 'var(--color-positive)';
   }, [candlesQuery.data]);
 
