@@ -35,15 +35,15 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
       return { metadata: data, affiliateInfo, isEligible };
     } catch (error) {
       log('useAffiliatesInfo', error, { endpoint });
-      return undefined;
+      throw error;
     }
   };
 
-  const { data, isFetched } = useQuery({
+  const query = useQuery({
     queryKey: ['affiliatesMetadata', dydxAddress],
     queryFn,
     enabled: Boolean(compositeClient && dydxAddress),
   });
 
-  return { data, isFetched };
+  return query;
 };

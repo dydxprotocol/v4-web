@@ -41,8 +41,8 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
-  const { data: referralAddress, isFetched } = useReferralAddress(refCode);
-  const { data: affiliatesInfo, isFetched: isAffiliatesInfoFetched } =
+  const { data: referralAddress, isSuccess } = useReferralAddress(refCode);
+  const { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess } =
     useAffiliatesInfo(referralAddress);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
         key: isEligible ? STRING_KEYS.INVITED_YOU : STRING_KEYS.THE_PRO_TRADING_PLATFORM,
       })}
       slotHeaderAbove={
-        isFetched && isAffiliatesInfoFetched ? (
+        isSuccess && isAffiliatesInfoSuccess ? (
           <$HeaderAbove tw="flex flex-row items-center gap-1">
             {isEligible ? (
               <img src="/hedgies-placeholder.png" alt="hedgie" tw="h-5" />
