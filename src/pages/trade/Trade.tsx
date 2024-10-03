@@ -45,7 +45,7 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  if (true && testFlags.pml) {
+  if (isViewingUnlaunchedMarket && testFlags.pml) {
     return <LaunchableMarket />;
   }
 
