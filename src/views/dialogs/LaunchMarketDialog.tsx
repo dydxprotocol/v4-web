@@ -35,7 +35,7 @@ export const LaunchMarketDialog = ({ setIsOpen }: DialogProps<LaunchMarketDialog
             </$Title>
           ),
           description: stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
               APR_PERCENTAGE: (
                 <Output

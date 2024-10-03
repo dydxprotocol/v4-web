@@ -78,7 +78,7 @@ export const NewMarketSelectionStep = ({
         </h2>
         <span tw="text-base text-color-text-0">
           {stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
               APR_PERCENTAGE: (
                 <Output
