@@ -127,7 +127,6 @@ const useAccountsContext = () => {
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
-
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
 
   const dydxAddress = useMemo(

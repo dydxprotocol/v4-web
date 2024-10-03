@@ -81,7 +81,7 @@ export const cctpTokensByChainId = cctpTokens.reduce(
   {} as Record<string, CctpTokenInfo[]>
 );
 
-export const isTokenCctp = (token: Asset | null) => {
+export const isTokenCctp = (token: Asset | undefined) => {
   return isDenomCctp(token?.denom);
 };
 
