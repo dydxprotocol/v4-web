@@ -203,7 +203,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
             {hoveredTime != null ? (
               <Output value={hoveredTime} type={OutputType.Date} />
             ) : (
-              <>&nbsp;</>
+              <Output value={new Date().valueOf()} type={OutputType.Date} />
             )}
           </div>
           <div tw="row gap-0.5 font-base-medium">
@@ -234,7 +234,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           margin={{
             left: 0,
             right: isMobile ? 20 : 60,
-            top: 10,
+            top: 24,
             bottom: 32,
           }}
           padding={{

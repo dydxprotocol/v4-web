@@ -1,7 +1,7 @@
 import React, { Key, useCallback, useMemo, useState } from 'react';
 
 import {
-  Cell, // CollectionBuilderContext,
+  Cell,
   Column,
   Row,
   TableBody,
@@ -179,15 +179,16 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
       }
       const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
       const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
+      const sortDirectionAsNumber = sortDirection === 'descending' ? -1 : 1;
 
       if (first == null || second == null) {
         if (first === second) {
           return 0;
         }
         if (first != null) {
-          return 1;
+          return sortDirectionAsNumber;
         }
-        return -1;
+        return -1 * sortDirectionAsNumber;
       }
 
       return (
@@ -198,7 +199,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           : // Number
             MustBigNumber(first).comparedTo(MustBigNumber(second))) *
         // Flip the direction if descending order is specified.
-        (sortDirection === 'descending' ? -1 : 1)
+        sortDirectionAsNumber
       );
     },
     [collator, columns]
