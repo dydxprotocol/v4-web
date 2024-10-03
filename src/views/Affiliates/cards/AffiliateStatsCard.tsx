@@ -207,7 +207,7 @@ export const AffiliateStatsCard = ({
 
       {isCriteriaVisible && (
         <CriteriaModal
-          isVip={isVip}
+          userTier={isVip ? 'vip' : currentAffiliateTier}
           accountStats={accountStats}
           isCriteriaVisible={isCriteriaVisible}
           toggleCriteria={toggleCriteria}

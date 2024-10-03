@@ -1,12 +1,9 @@
-import { useMemo } from 'react';
-
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { IAffiliateStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
@@ -32,12 +29,12 @@ export const CriteriaModal = ({
   isCriteriaVisible,
   accountStats,
   toggleCriteria,
-  isVip,
+  userTier,
 }: {
   isCriteriaVisible: boolean;
   toggleCriteria: () => void;
   accountStats?: IAffiliateStats;
-  isVip: boolean;
+  userTier: number | 'vip';
 }) => {
   const { isConnectedWagmi } = useWalletConnection();
 
@@ -72,9 +69,7 @@ export const CriteriaModal = ({
     },
   ];
 
-  const currentUserTierIdx = accountStats
-    ? tiers.findIndex((tier) => tier.tier === accountStats?.currentAffiliateTier)
-    : 0;
+  const currentUserTierIdx = tiers.findIndex((tier) => tier.tier === userTier);
 
   const currentUserTier = tiers[currentUserTierIdx];
 
@@ -86,7 +81,7 @@ export const CriteriaModal = ({
       title={
         !isConnectedWagmi
           ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
-          : isVip
+          : userTier === 'vip'
             ? stringGetter({
                 key: STRING_KEYS.YOURE_A_VIP,
                 params: {
@@ -109,8 +104,14 @@ export const CriteriaModal = ({
       <$Container className="flex flex-col gap-y-1">
         <div className="flex flex-col gap-y-1 px-1 notTablet:p-0">
           <div className="text-color-text-0">
-            {!isVip
+            {userTier === 'vip'
               ? stringGetter({
+                  key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
+                  params: {
+                    VIP: stringGetter({ key: STRING_KEYS.VIP }),
+                  },
+                })
+              : stringGetter({
                   key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
                   params: {
                     VIP_VALUE: <span className="text-color-text-1">{'{VIP Value}'}</span>,
@@ -123,36 +124,29 @@ export const CriteriaModal = ({
                       </a>
                     ),
                   },
-                })
-              : stringGetter({
-                  key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
-                  params: {
-                    VIP: stringGetter({ key: STRING_KEYS.VIP }),
-                  },
                 })}
           </div>
 
-          <div className="flex">
-            <BorderStatCell
-              className="pr-1"
-              border={['right']}
-              title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-              outputType={OutputType.CompactFiat}
-              value={accountStats?.referredVolume}
-            />
-            <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
-              <div className="flex items-center">
-                {isConnectedWagmi ? stakedDYdX?.toLocaleString() : '-'}
-                <Tag className="ml-0.25">DYDX</Tag>
-              </div>
-            </StatCell>
-          </div>
+          {userTier === 'vip' && (
+            <div className="flex">
+              <BorderStatCell
+                className="pr-1"
+                border={['right']}
+                title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+                outputType={OutputType.CompactFiat}
+                value={accountStats?.referredVolume}
+              />
+              <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
+                <div className="flex items-center">
+                  {isConnectedWagmi ? stakedDYdX?.toLocaleString() : '-'}
+                  <Tag className="ml-0.25">DYDX</Tag>
+                </div>
+              </StatCell>
+            </div>
+          )}
         </div>
 
-        <CriteriaTable
-          tiers={tiers}
-          userTier={isVip ? 'vip' : accountStats?.currentAffiliateTier}
-        />
+        <CriteriaTable tiers={tiers} userTier={userTier} />
       </$Container>
     </$Dialog>
   );
@@ -166,47 +160,37 @@ const CriteriaTable = ({
   tiers: ITierDefinition[];
 }) => {
   const stringGetter = useStringGetter();
-  const { isNotTablet } = useBreakpoints();
 
-  const columns = useMemo<ColumnDef<ITierDefinition>[]>(
-    () => [
-      {
-        columnKey: 'tier',
-        allowsSorting: false,
-        getCellValue: (row: ITierDefinition) => row.tier,
-        label: stringGetter({ key: STRING_KEYS.TIER }),
-        renderCell: ({ tier }) => (
-          <$TableCell stacked>
-            <div className="flex items-center">
-              {tier.toString().toLowerCase() === 'vip' ? (
-                <span className="text-color-success">{tier.toString().toUpperCase()}</span>
-              ) : (
-                tier.toString().toUpperCase()
-              )}
-              {userTier && userTier.toString().toLowerCase() === tier.toString().toLowerCase() && (
-                <Tag className="ml-0.5 bg-color-accent">
-                  {stringGetter({ key: STRING_KEYS.YOU })}
-                </Tag>
-              )}
-            </div>
-          </$TableCell>
-        ),
-      },
-      {
-        columnKey: 'requirements',
-        getCellValue: (row: ITierDefinition) =>
-          row.requirements?.referredVol ?? row.requirements?.staked ?? 0,
-        label: stringGetter({ key: STRING_KEYS.REQUIREMENTS }),
-        allowsSorting: false,
+  const columns: ColumnDef<ITierDefinition>[] = [
+    {
+      columnKey: 'tier',
+      allowsSorting: false,
+      label: stringGetter({ key: STRING_KEYS.TIER }),
+      renderCell: ({ tier }) => (
+        <$TableCell stacked>
+          <div className="flex items-center">
+            {tier.toString().toLowerCase() === 'vip' ? (
+              <span className="text-color-success">{tier.toString().toUpperCase()}</span>
+            ) : (
+              tier.toString().toUpperCase()
+            )}
+          </div>
+        </$TableCell>
+      ),
+    },
+    {
+      columnKey: 'requirements',
+      label: stringGetter({ key: STRING_KEYS.REQUIREMENTS }),
+      allowsSorting: false,
 
-        renderCell: ({ tier, requirements }) =>
-          tier === 'vip' ? (
-            <$TableCell stacked>
+      renderCell: ({ tier, requirements }) =>
+        tier === 'vip' ? (
+          <$TableCell>
+            <Tag className="bg-color-layer-5 p-0.5 text-small text-color-text-1">
               <div className="flex flex-col gap-x-0.25 notTablet:flex-row">
-                {isNotTablet &&
-                  stringGetter({
-                    key: STRING_KEYS.BY_APPLICATION_ONLY,
-                  })}
+                {stringGetter({
+                  key: STRING_KEYS.BY_APPLICATION_ONLY,
+                })}
                 <div className="flex flex-row">
                   <a href="https://dydx-affiliates.fuul.xyz/">
                     <span className="capitalize text-color-accent">
@@ -216,66 +200,73 @@ const CriteriaTable = ({
                   !
                 </div>
               </div>
-            </$TableCell>
-          ) : !requirements.referredVol && !requirements.staked ? (
-            <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
-          ) : (
-            <$TableCell stacked>
-              <div className="flex flex-col gap-y-0.5 notTablet:flex-row notTablet:items-center notTablet:gap-x-1">
-                <div className="flex flex-col">
+            </Tag>
+          </$TableCell>
+        ) : !requirements.referredVol && !requirements.staked ? (
+          <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
+        ) : (
+          <$TableCell stacked>
+            <div className="flex flex-col gap-y-0.5 notTablet:flex-row notTablet:items-center notTablet:gap-x-1">
+              <div className="flex flex-row gap-x-0.5 notTablet:flex-col">
+                <div className="flex items-center text-color-text-1">
+                  <Output type={OutputType.CompactFiat} value={requirements.referredVol} />+
+                </div>
+                <p className="text-sm text-break text-color-text-0">
+                  {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+                </p>
+              </div>
+              <div className="text-color-text-0">
+                {stringGetter({ key: STRING_KEYS.OR }).toUpperCase()}
+              </div>
+              <div>
+                <div className="flex flex-row gap-x-0.5 notTablet:flex-col">
                   <div className="flex items-center text-color-text-1">
-                    <Output type={OutputType.CompactFiat} value={requirements.referredVol} />+
+                    <Output type={OutputType.CompactFiat} value={requirements.staked} />+
                   </div>
-                  <p className="text-sm text-break text-color-text-0">
-                    {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-                  </p>
-                </div>
-                <div className="text-color-text-0">
-                  {stringGetter({ key: STRING_KEYS.OR }).toUpperCase()}
-                </div>
-                <div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center text-color-text-1">
-                      <Output type={OutputType.CompactFiat} value={requirements.staked} />+
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-sm text-color-text-0">
-                        {stringGetter({ key: STRING_KEYS.STAKED })}
-                      </p>
-                      <Tag className="w-fit notTablet:ml-0.25">DYDX</Tag>
-                    </div>
+                  <div className="flex items-center">
+                    <p className="text-sm text-color-text-0">
+                      {stringGetter({ key: STRING_KEYS.STAKED })}
+                    </p>
+                    <Tag className="ml-0.25 w-fit">DYDX</Tag>
                   </div>
                 </div>
               </div>
-            </$TableCell>
-          ),
-      },
-
-      {
-        columnKey: 'affiliate-earn-rate',
-        allowsSorting: true,
-        getCellValue: (row: ITierDefinition) => row.affiliateEarnRate,
-        label: (
-          <WithTooltip tooltip="affiliate-commissions" side="right">
-            {stringGetter({ key: STRING_KEYS.AFFILIATE_COMISSIONS })}
-          </WithTooltip>
-        ),
-        renderCell: ({ tier, affiliateEarnRate }) => (
-          <$TableCell className="mr-1" stacked>
-            {tier === 'vip' ? (
-              <span className="text-color-success">{affiliateEarnRate}</span>
-            ) : (
-              affiliateEarnRate
-            )}
+            </div>
           </$TableCell>
         ),
-      },
-    ],
-    []
-  );
+    },
+
+    {
+      columnKey: 'affiliate-earn-rate',
+      allowsSorting: true,
+      getCellValue: (row: ITierDefinition) => row.affiliateEarnRate,
+      label: (
+        <WithTooltip tooltip="affiliate-commissions" side="right">
+          {/* {stringGetter({ key: STRING_KEYS.AFFILIATE_COMISSIONS })} */}
+          Comissions
+        </WithTooltip>
+      ),
+      renderCell: ({ tier, affiliateEarnRate }) => (
+        <$TableCell className="align-center w-full justify-between">
+          {tier === 'vip' ? (
+            <span className="text-color-success">{affiliateEarnRate}</span>
+          ) : (
+            affiliateEarnRate
+          )}
+          {(userTier || userTier === 0) &&
+            userTier.toString().toLowerCase() === tier.toString().toLowerCase() && (
+              <Tag className="bg-color-accent">
+                <span className="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>
+              </Tag>
+            )}
+        </$TableCell>
+      ),
+    },
+  ];
 
   return (
     <$Table
+      affiliateTierIdx={userTier === 'vip' ? 4 : userTier ?? 0}
       withInnerBorders
       withOuterBorder
       getRowKey={(row) => row.tier}
@@ -306,14 +297,24 @@ const $Dialog = styled(Dialog)`
 
 const $TableCell = tw(TableCell)`py-0.5`;
 
-const $Table = styled(Table)<AllTableProps<any>>`
+const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx: number }>`
   th {
     background-color: var(--color-layer-3);
+  }
+
+  th:last-child {
+    text-align: left;
   }
 
   tr {
     background-color: var(--color-layer-3);
   }
+
+  ${({ affiliateTierIdx }) => `
+  tr:nth-child(${affiliateTierIdx + 1}) {
+    background-color: var(--color-layer-5);
+  }
+`}
 
   @media ${breakpoints.notTablet} {
     th {
