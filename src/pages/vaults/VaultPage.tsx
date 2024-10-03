@@ -36,6 +36,7 @@ const VaultPage = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MEGAVAULT }));
 
   const { isTablet } = useBreakpoints();
+
   if (isTablet) {
     // one column, reordered, static positioned deposit buttons
     return (

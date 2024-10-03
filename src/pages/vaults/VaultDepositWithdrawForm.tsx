@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -52,6 +53,7 @@ import {
   setVaultFormSlippageAck,
 } from '@/state/vaults';
 
+import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
 import { assertNever } from '@/lib/assertNever';
 import { runFn } from '@/lib/do';
@@ -169,6 +171,13 @@ export const VaultDepositWithdrawForm = ({
     if (isSubmitting) {
       return;
     }
+    track(
+      AnalyticsEvents.AttemptVaultOperation({
+        amount: MustBigNumber(amount).toNumber(),
+        operation,
+        slippage: validationResponse.summaryData.estimatedSlippage,
+      })
+    );
     setIsSubmitting(true);
     try {
       const { submissionData } = validationResponse;
@@ -180,6 +189,12 @@ export const VaultDepositWithdrawForm = ({
             title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
             body: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT_BODY }),
           });
+          track(
+            AnalyticsEvents.VaultOperationPreAborted({
+              amount: MustBigNumber(amount).toNumber(),
+              operation,
+            })
+          );
           dd.error('Megavault deposit blocked, invalid validation response amount', {
             deposit: submissionData?.deposit,
           });
@@ -192,6 +207,13 @@ export const VaultDepositWithdrawForm = ({
 
         await depositToMegavault(cachedAmount);
 
+        track(
+          AnalyticsEvents.SuccessfulVaultOperation({
+            amount: MustBigNumber(amount).toNumber(),
+            operation,
+            amountDiff: undefined,
+          })
+        );
         notify({
           title: stringGetter({ key: STRING_KEYS.MEGAVAULT_DEPOSIT_SUCCESSFUL }),
           slotTitleLeft: <$SmallIcon iconName={IconName.CheckCircle} />,
@@ -218,6 +240,12 @@ export const VaultDepositWithdrawForm = ({
             title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
             body: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT_BODY }),
           });
+          track(
+            AnalyticsEvents.VaultOperationPreAborted({
+              amount: MustBigNumber(amount).toNumber(),
+              operation,
+            })
+          );
           dd.error('Megavault withdraw blocked, invalid validation response values', {
             withdraw: submissionData?.withdraw,
           });
@@ -228,16 +256,25 @@ export const VaultDepositWithdrawForm = ({
           return;
         }
 
+        const preEstimate = validationResponse.summaryData.estimatedAmountReceived;
         const result = await withdrawFromMegavault(
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
 
-        const events = (result as IndexedTx).events;
+        const events = (result as IndexedTx)?.events;
         const actualAmount = events
-          .find((e) => e.type === 'withdraw_from_megavault')
+          ?.find((e) => e.type === 'withdraw_from_megavault')
           ?.attributes.find((a) => a.key === 'redeemed_quote_quantums')?.value;
+        const realAmountReceived = MustBigNumber(actualAmount).div(QUANTUM_MULTIPLIER).toNumber();
 
+        track(
+          AnalyticsEvents.SuccessfulVaultOperation({
+            amount: realAmountReceived,
+            operation,
+            amountDiff: Math.abs((preEstimate ?? 0) - (realAmountReceived ?? 0)),
+          })
+        );
         notify({
           slotTitleLeft: <$SmallIcon iconName={IconName.CheckCircle} />,
           title: stringGetter({ key: STRING_KEYS.MEGAVAULT_WITHDRAWAL_SUCCESSFUL }),
@@ -251,7 +288,7 @@ export const VaultDepositWithdrawForm = ({
                   <Output
                     tw="inline-block text-color-text-1"
                     type={OutputType.Fiat}
-                    value={MustBigNumber(actualAmount).div(QUANTUM_MULTIPLIER)}
+                    value={realAmountReceived}
                   />
                 ),
             },
@@ -281,7 +318,11 @@ export const VaultDepositWithdrawForm = ({
               : STRING_KEYS.MEGAVAULT_WITHDRAWAL_FAILED_BODY,
         }),
       });
-
+      track(
+        AnalyticsEvents.VaultOperationProtocolError({
+          operation,
+        })
+      );
       dd.error('Megavault transaction failed', { ...validationResponse.submissionData }, e);
       // eslint-disable-next-line no-console
       console.error('Error submitting megavault transaction', e);
@@ -573,7 +614,15 @@ export const VaultDepositWithdrawForm = ({
         <Button
           type={ButtonType.Button}
           action={ButtonAction.Secondary}
-          onClick={() => dispatch(setVaultFormConfirmationStep(false))}
+          onClick={() => {
+            track(
+              AnalyticsEvents.VaultFormPreviewStep({
+                amount: MustBigNumber(amount).toNumber(),
+                operation,
+              })
+            );
+            dispatch(setVaultFormConfirmationStep(false));
+          }}
           tw="pl-1 pr-1"
         >
           {stringGetter({ key: STRING_KEYS.EDIT })}
