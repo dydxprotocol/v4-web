@@ -109,23 +109,26 @@ const tabsStyle = css`
 const $OrderTypeTabs = styled(Tabs)`
   ${tabsStyle}
   --tabs-height: 2.125rem;
-  --trigger-active-backgroundColor: --trigger-backgroundColor;
+  --trigger-active-backgroundColor: var(--trigger-backgroundColor);
 ` as typeof Tabs;
 
 const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: OrderSide });
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
   ${tabsStyle}
-
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
       ? css`
-          --trigger-active-backgroundColor: var(--color-gradient-positive);
+          --trigger-active-underline-backgroundColor: var(--color-gradient-positive);
+          --trigger-active-underlineColor: var(--color-positive);
           --trigger-active-textColor: var(--color-positive);
+          --trigger-hover-textColor: var(--color-text-2);
         `
       : css`
-          --trigger-active-backgroundColor: var(--color-gradient-negative);
+          --trigger-active-underline-backgroundColor: var(--color-gradient-negative);
+          --trigger-active-underlineColor: var(--color-negative);
           --trigger-active-textColor: var(--color-negative);
+          --trigger-hover-textColor: var(--color-text-2);
         `};
 ` as typeof tradeSideTabsType;
 

@@ -162,9 +162,11 @@ const $Root = styled(Root)<{
 
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
+  --trigger-hover-textColor: var(--trigger-active-textColor);
   --trigger-active-underlineColor: ${({ uiRefreshEnabled }) => css`
     ${uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
   `};
+  --trigger-active-underline-backgroundColor: transparent;
   --trigger-active-underline-size: 2px;
   --trigger-underline-size: 0px;
 
