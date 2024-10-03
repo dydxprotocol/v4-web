@@ -34,49 +34,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-const DUMMY_DATA = [
-  {
-    time: new Date('October 2, 2024 00:00:00').getTime(),
-    open: 0,
-    high: 0,
-    low: 0,
-    close: 0.5,
-    volume: 0,
-  },
-  {
-    time: new Date('October 1, 2024 00:00:00').getTime(),
-    open: 0,
-    high: 0,
-    low: 0,
-    close: 0.3,
-    volume: 0,
-  },
-  {
-    time: new Date('September 30, 2024 00:00:00').getTime(),
-    open: 0,
-    high: 0,
-    low: 0,
-    close: 0.35,
-    volume: 0,
-  },
-  {
-    time: new Date('September 29, 2024 00:00:00').getTime(),
-    open: 0,
-    high: 0,
-    low: 0,
-    close: 0.35,
-    volume: 0,
-  },
-  {
-    time: new Date('September 28, 2024 00:00:00').getTime(),
-    open: 0,
-    high: 0,
-    low: 0,
-    close: 0.2,
-    volume: 0,
-  },
-].reverse();
-
 export const LaunchableMarketChart = ({
   className,
   ticker,
@@ -134,7 +91,7 @@ export const LaunchableMarketChart = ({
         getCurve: () => curveLinear,
         threshold: {
           aboveAreaProps: {
-            fill: 'var(--color-text-1)',
+            fill: 'var(--color-text-0)',
             fillOpacity: 0.2,
             stroke: colorString,
           },
@@ -152,7 +109,7 @@ export const LaunchableMarketChart = ({
 
     return (
       <div tw="flex flex-col gap-0.5 rounded-[0.5rem] bg-color-layer-7 p-0.5">
-        <Output tw="inline" value={datum.time} type={OutputType.Date} />
+        <Output tw="inline" value={datum.time} type={OutputType.DateTime} />
         <span>
           {stringGetter({ key: STRING_KEYS.PRICE })}:{' '}
           <Output tw="inline" value={datum.close} type={OutputType.Fiat} />
@@ -225,12 +182,12 @@ export const LaunchableMarketChart = ({
       </div>
 
       <$ChartContainer chartBackground={chartDotsBackground}>
-        {candlesQuery.isLoading ? (
+        {candlesQuery.isLoading || !candlesQuery.data ? (
           <LoadingSpace id="launchable-market-chart" />
         ) : (
           <TimeSeriesChart
             selectedLocale={selectedLocale}
-            data={DUMMY_DATA}
+            data={candlesQuery.data}
             series={series}
             margin={{
               left: -0.5,
@@ -244,13 +201,7 @@ export const LaunchableMarketChart = ({
               top: 0,
               bottom: 0,
             }}
-            minZoomDomain={
-              {
-                '1d': timeUnits.day,
-                '7d': 7 * timeUnits.day,
-                '30d': timeUnits.month,
-              }[timeframe]
-            }
+            minZoomDomain={timeUnits.month}
             slotEmpty={undefined}
             numGridLines={0}
             tickSpacingX={210}
@@ -298,5 +249,6 @@ const $ToggleGroup = styled(ToggleGroup)`
 
 const $ChartContainer = styled.div<{ chartBackground?: string }>`
   ${tw`h-[8.75rem] overflow-hidden rounded-[1rem] border-[length:--border-width] border-color-border [border-style:solid]`}
-  background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
+  background: url(${({ chartBackground }) => chartBackground}) no-repeat center;
+  background-size: 175%;
 `;
