@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -14,6 +14,7 @@ import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { BaseTvChart } from './BaseTvChart';
@@ -80,6 +81,15 @@ export const TvChart = () => {
     isChartReady,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
+
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  useEffect(() => {
+    if (!isChartReady || !tvWidget) return;
+
+    // when display unit is toggled, update bars volume to be the correct unit
+    const chart = tvWidget.activeChart?.();
+    chart?.resetData();
+  }, [displayUnit, tvWidget, isChartReady]);
 
   return <BaseTvChart isChartReady={isChartReady} />;
 };
