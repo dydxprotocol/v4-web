@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
-import { TransferType } from '@/constants/abacus';
 import {
   cctpTokensByChainId,
   getMapOfHighestFeeTokensByChainId,
@@ -11,7 +9,7 @@ import {
 } from '@/constants/cctp';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
-import { EMPTY_ARR } from '@/constants/objects';
+import { TransferType } from '@/constants/transfers';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import { useTransfers } from '@/hooks/transfers/useTransfers';
@@ -23,10 +21,10 @@ import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import exchanges from '../../../../public/configs/exchanges.json';
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
@@ -39,7 +37,7 @@ type ElementProps = {
 
 const solanaChainIdPrefix = 'solana';
 
-export const SourceSelectMenu = ({
+export const NetworkSelectMenu = ({
   label,
   selectedExchange,
   selectedChain,
@@ -53,23 +51,25 @@ export const SourceSelectMenu = ({
     connectedWallet?.connectorType === ConnectorType.PhantomSolana ? true : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
-  const { type, depositOptions, withdrawalOptions } =
-    useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
-  const { chainsForNetwork } = useTransfers();
+  const { chainsForNetwork, transferType } = useTransfers();
 
-  const exchanges =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
-    EMPTY_ARR;
+  // TODO: align the types
+  const lowestFeeTokensByChainId = useMemo(
+    () => getMapOfLowestFeeTokensByChainId(transferType),
+    [transferType]
+  );
 
-  const lowestFeeTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
-
-  const highestFeeTokensByChainId = useMemo(() => getMapOfHighestFeeTokensByChainId(type), [type]);
+  const highestFeeTokensByChainId = useMemo(
+    () => getMapOfHighestFeeTokensByChainId(transferType),
+    [transferType]
+  );
   const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
 
+  // TODO: delete this, the
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
-  const feesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
+  const feesDecoratorProp = transferType === TransferType.Deposit ? 'slotAfter' : 'description';
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
     if (lowestFeeTokensByChainId[chainId]) return <LowestFeesDecoratorText />;
@@ -103,11 +103,11 @@ export const SourceSelectMenu = ({
     })
     .filter((chain) => {
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
-      if (type === TransferType.deposit && CCTPDepositOnly) {
+      if (transferType === TransferType.Deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
       }
       // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
-      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+      if (transferType === TransferType.Withdraw && CCTPWithdrawalOnly) {
         return !!cctpTokensByChainId[chain.value];
       }
 
@@ -117,20 +117,21 @@ export const SourceSelectMenu = ({
     .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1))
     .sort((chain) => (lowestFeeTokensByChainId[chain.value] ? -1 : 1));
 
+  // TODO: actually configure exchanges
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
-    value: exchange.type,
-    label: exchange.string,
+    value: exchange.name,
+    label: exchange.label,
     onSelect: () => {
-      onSelect(exchange.type, 'exchange');
+      onSelect(exchange.name, 'exchange');
     },
-    slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
+    slotBefore: <$Img src={exchange.icon ?? undefined} alt="" />,
     [feesDecoratorProp]: <LowestFeesDecoratorText />,
   }));
 
   const selectedChainOption = chainsForNetwork.find((item) => item.chainID === selectedChain);
-  const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
+  const selectedExchangeOption = exchanges.find((item) => item.name === selectedExchange);
   const isNotPrivyDeposit =
-    type === TransferType.withdrawal || connectedWallet?.name !== WalletType.Privy;
+    transferType === TransferType.Withdraw || connectedWallet?.name !== WalletType.Privy;
   return (
     <SearchSelectMenu
       items={[
@@ -148,7 +149,7 @@ export const SourceSelectMenu = ({
             items: chainItems,
           },
       ].filter(isTruthy)}
-      label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
+      label={label ?? (transferType === TransferType.Deposit ? 'Source' : 'Destination')}
     >
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (
@@ -158,8 +159,8 @@ export const SourceSelectMenu = ({
           </>
         ) : selectedExchangeOption ? (
           <>
-            <$Img src={selectedExchangeOption.iconUrl ?? undefined} alt="" />{' '}
-            {selectedExchangeOption.string}
+            <$Img src={selectedExchangeOption.icon ?? undefined} alt="" />{' '}
+            {selectedExchangeOption.name}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })

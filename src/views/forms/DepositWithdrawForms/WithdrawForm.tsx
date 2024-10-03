@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { Asset } from '@skip-go/client';
+import { Asset, CosmosMsg, Tx } from '@skip-go/client';
 import { camelCase } from 'lodash';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -32,9 +32,10 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
+import { TransferType } from '@/constants/transfers';
 import { WalletType } from '@/constants/wallets';
 
-import { TransferType, useTransfers } from '@/hooks/transfers/useTransfers';
+import { useTransfers } from '@/hooks/transfers/useTransfers';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -75,7 +76,7 @@ import { skipClient } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
-import { SourceSelectMenu } from './SourceSelectMenu';
+import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
 
@@ -199,51 +200,85 @@ export const WithdrawForm = () => {
       return { ...a, [camelCase(b)]: cosmosMsgPayload[b] };
     }, {}),
   };
+
+  const camelCaseKeys = (obj: any) => {
+    return Object.keys(obj).reduce((a, b) => {
+      return { ...a, [camelCase(b)]: obj[b] };
+    }, {});
+  };
+
+  const camelCaseMsgs = (cosmosTxMsgs: CosmosMsg[]) => {
+    return cosmosTxMsgs.map((cosmosMsgWrapper) => {
+      return {
+        ...cosmosMsgWrapper,
+        msg: JSON.stringify(camelCaseKeys(JSON.parse(cosmosMsgWrapper.msg))),
+        msgTypeUrl: cosmosMsgWrapper.msgTypeURL,
+      };
+    });
+  };
+  const camelCaseMsgsForTx = (tx: Tx) => {
+    if ('cosmosTx' in tx) {
+      const cosmosTx = tx.cosmosTx;
+      return {
+        ...tx,
+        cosmosTx: {
+          ...cosmosTx,
+          msgs: camelCaseMsgs(cosmosTx.msgs),
+        },
+      };
+    }
+    throw new Error('this should never happen');
+  };
   // console.log(cosmosMsg);
   // console.log(cosmosMsgToSend);
 
-  const submitCctpWithdraw = () => {
+  const submitCctpWithdraw = async () => {
     console.log('subbmitting withdrawal');
     if (!route || !dydxAddress || !toAddress || !toChainId) return {};
     console.log('executing route');
-    try {
-      console.log('in try block');
-      return skipClient.executeRoute({
-        route: route?.route,
-        getCosmosSigner: async () => {
-          if (!localDydxWallet?.offlineSigner)
-            throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-          return localDydxWallet?.offlineSigner;
+    console.log('sub address', subaccountClient?.address, freeCollateral);
+    const blc = await skipClient.balances({
+      chains: {
+        'dydx-mainnet-1': {
+          address: 'dydx1nhzuazjhyfu474er6v4ey8zn6wa5fy6g2dgp7s',
+          denoms: ['ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5'],
         },
-        userAddresses: [
-          { chainID: selectedDydxChainId, address: dydxAddress },
-          {
-            chainID: getNobleChainId(),
-            address: convertBech32Address({
-              address: dydxAddress,
-              bech32Prefix: NOBLE_BECH32_PREFIX,
-            }),
-          },
-          {
-            chainID: toChainId,
-            address: toAddress,
-          },
-        ],
-        onTransactionBroadcast: async ({ txHash }) => {
-          console.log('on submit complete', txHash);
-          // just submit a real notification once, as soon as we bith withdrawing
-          onSubmitComplete(txHash);
-          AutoSweepConfig.disable_autosweep = true;
+      },
+    });
+    console.log('balance', blc);
+    return skipClient.executeRoute({
+      route: route?.route,
+      // txs: txsCamelCased,
+      getCosmosSigner: async () => {
+        if (!localDydxWallet?.offlineSigner)
+          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+        return localDydxWallet?.offlineSigner;
+      },
+      userAddresses: [
+        { chainID: selectedDydxChainId, address: dydxAddress },
+        {
+          chainID: getNobleChainId(),
+          address: convertBech32Address({
+            address: dydxAddress,
+            bech32Prefix: NOBLE_BECH32_PREFIX,
+          }),
         },
-        onTransactionCompleted: async () => {
-          console.log('re-enabling autosweep');
-          AutoSweepConfig.disable_autosweep = false;
+        {
+          chainID: toChainId,
+          address: toAddress,
         },
-      });
-    } catch (err) {
-      console.log('err', err);
-      return {};
-    }
+      ],
+      onTransactionBroadcast: async ({ txHash }) => {
+        console.log('on submit complete', txHash);
+        // just submit a real notification once, as soon as we bith withdrawing
+        onSubmitComplete(txHash);
+        AutoSweepConfig.disable_autosweep = true;
+      },
+      onTransactionCompleted: async () => {
+        console.log('re-enabling autosweep');
+        AutoSweepConfig.disable_autosweep = false;
+      },
+    });
   };
 
   const submitNonCctpWithdraw = useCallback(
@@ -706,7 +741,7 @@ export const WithdrawForm = () => {
             </span>
           }
         />
-        <SourceSelectMenu
+        <NetworkSelectMenu
           selectedExchange={exchange || undefined}
           selectedChain={toChainId || undefined}
           onSelect={onSelectNetwork}
