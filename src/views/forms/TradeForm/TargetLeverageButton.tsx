@@ -15,6 +15,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
+import { Icon, IconName } from '@/components/Icon';
 
 export const TargetLeverageButton = ({ className }: { className?: string }) => {
   const { needsTargetLeverage } = useTradeFormData();

@@ -79,7 +79,6 @@ export const MarginModeSelector = ({
     </$WarningTooltip>
   );
 };
-
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
   border: 1px solid ${({ theme }) => theme.warning}30;

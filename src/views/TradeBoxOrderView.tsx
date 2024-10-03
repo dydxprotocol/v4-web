@@ -51,8 +51,7 @@ export const TradeBoxOrderView = () => {
         <MarginModeSelector openInTradeBox />
         <TargetLeverageButton />
       </$MarginAndLeverageButtons>
-      <$Tabs
-        tabsHeight="2.125rem"
+      <$OrderTypeTabs
         key={selectedTradeType}
         value={selectedTradeType}
         items={tradeTypeItems}
@@ -95,34 +94,31 @@ export const TradeBoxOrderView = () => {
     />
   );
 };
+
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
   border-top: var(--border-width) solid var(--border-color);
 `;
 
-const tabsType = getSimpleStyledOutputType(Tabs, {} as { tabsHeight: string });
-
-const $Tabs = styled(Tabs)<{ tabsHeight: string }>`
-  overflow: hidden;
-  --tabs-height: ${({ tabsHeight }) =>
-    tabsHeight &&
-    css`
-      ${tabsHeight}
-    `};
-  --trigger-active-backgroundColor: --trigger-backgroundColor;
+const tabsStyle = css`
   --trigger-active-underline-size: 2px;
+  overflow: hidden;
 
   > header {
     justify-content: space-around;
   }
-` as typeof tabsType;
+`;
+
+const $OrderTypeTabs = styled(Tabs)`
+  ${tabsStyle}
+  --tabs-height: 2.125rem;
+  --trigger-active-backgroundColor: --trigger-backgroundColor;
+` as typeof Tabs;
 
 const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: OrderSide });
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
-  overflow: hidden;
-  --tabs-height: 3rem;
-  --trigger-active-underline-size: 2px;
+  ${tabsStyle}
 
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
@@ -134,22 +130,19 @@ const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
           --trigger-active-backgroundColor: var(--color-gradient-negative);
           --trigger-active-textColor: var(--color-negative);
         `};
-
-  > header {
-    justify-content: space-around;
-  }
 ` as typeof tradeSideTabsType;
 
 const $MarginAndLeverageButtons = styled.div`
   display: flex;
   gap: 0.5rem;
-  padding: 0.875rem 1rem;
+  padding: 0.75rem 1rem;
 
   border-bottom: var(--border);
 
   abbr,
   button {
     ${layoutMixins.flexExpandToSpace}
-    height: 2.5rem;
+    height: 2.25rem;
+    flex-basis: 100%;
   }
 `;

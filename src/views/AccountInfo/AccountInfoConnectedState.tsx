@@ -179,7 +179,6 @@ const $WithUsage = styled.div`
 `;
 
 const $Details = styled(Details)`
-  // ${layoutMixins.withOuterAndInnerBorders}
   clip-path: inset(0.5rem 1px);
   padding: 0.25rem 1rem;
 
@@ -200,6 +199,7 @@ const $Details = styled(Details)`
 `;
 const $ConnectedAccountInfoContainer = styled.div`
   ${layoutMixins.column}
+  grid-template-rows: var(--tabs-height) 1fr;
 
   @media ${breakpoints.notTablet} {
     ${layoutMixins.withOuterAndInnerBorders}
@@ -207,8 +207,6 @@ const $ConnectedAccountInfoContainer = styled.div`
       box-shadow: none;
     }
   }
-
-  grid-template-rows: var(--tabs-height) 1fr;
 `;
 
 const $Button = styled(Button)`
