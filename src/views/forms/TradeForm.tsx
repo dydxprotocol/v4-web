@@ -457,7 +457,7 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
 `;
 
 const $FadeContainer = styled.div`
-  ${layoutMixins.scrollAreaFade}
+  ${layoutMixins.scrollAreaFadeEnd}
   display: flex;
   align-items: center;
 `;

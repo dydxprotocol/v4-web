@@ -62,13 +62,13 @@ const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
       ? css`
-          --trigger-active-underline-backgroundColor: var(--color-gradient-positive);
+          --trigger-active-underline-backgroundColor: var(--color-positive-dark);
           --trigger-active-underlineColor: var(--color-positive);
           --trigger-active-textColor: var(--color-positive);
           --trigger-hover-textColor: var(--color-text-2);
         `
       : css`
-          --trigger-active-underline-backgroundColor: var(--color-gradient-negative);
+          --trigger-active-underline-backgroundColor: var(--color-negative-dark);
           --trigger-active-underlineColor: var(--color-negative);
           --trigger-active-textColor: var(--color-negative);
           --trigger-hover-textColor: var(--color-text-2);

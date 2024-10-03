@@ -65,6 +65,7 @@ const scrollAreaFadeEnd = css`
 
   /* Rules */
   position: relative;
+  overflow: hidden;
 
   &:after {
     content: '';
