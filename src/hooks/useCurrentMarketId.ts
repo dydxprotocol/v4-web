@@ -86,9 +86,9 @@ export const useCurrentMarketId = () => {
         hasLoadedLaunchableMarkets
       ) {
         // If marketId is not valid (i.e. final settlement), navigate to markets page
-        navigate(AppRoute.Markets, {
-          replace: true,
-        });
+        // navigate(AppRoute.Markets, {
+        //   replace: true,
+        // });
       } else {
         // If marketId is valid, set currentMarketId
         setLastViewedMarket(marketId);

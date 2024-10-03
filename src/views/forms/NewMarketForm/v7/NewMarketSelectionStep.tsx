@@ -160,6 +160,7 @@ export const NewMarketSelectionStep = ({
             tw="[--withReceipt-backgroundColor:--color-layer-2]"
           >
             <FormInput
+              disabled
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"

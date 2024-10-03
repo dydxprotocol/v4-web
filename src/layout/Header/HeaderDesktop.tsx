@@ -83,7 +83,7 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        ...(!uiRefreshEnabled && showLaunchMarkets
+        ...(showLaunchMarkets
           ? [
               {
                 value: 'LAUNCH_MARKET',
@@ -94,7 +94,7 @@ export const HeaderDesktop = () => {
               {
                 value: 'TEST_MARKET',
                 label: 'TIME-USD',
-                href: '/trade/TIME,raydium,ED5wbeyAYtLM4WRGnohPxJEwniaikEFioVmJyZH6K31m-USD?pml=true',
+                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M?pml=true',
               },
             ]
           : []),
