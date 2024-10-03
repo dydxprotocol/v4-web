@@ -219,9 +219,7 @@ export const TradeSizeInputs = () => {
           >
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {id && (
-            <DisplayUnitTag tw="ml-[0.5ch]" assetId={id} entryPoint="tradeAmountInputAssetTag" />
-          )}
+          {id && <DisplayUnitTag assetId={id} entryPoint="tradeAmountInputAssetTag" />}
         </>
       }
       slotRight={inputToggleButton()}

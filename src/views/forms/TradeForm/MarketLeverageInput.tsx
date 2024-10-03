@@ -112,7 +112,7 @@ export const MarketLeverageInput = ({
       <$WithLabel
         key="leverage"
         label={
-          <div tw="flex gap-0.5">
+          <div tw="flex gap-[0.5ch]">
             <WithTooltip tooltip="leverage" side="right">
               {stringGetter({ key: STRING_KEYS.LEVERAGE })}
             </WithTooltip>

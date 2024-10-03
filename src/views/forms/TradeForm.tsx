@@ -459,7 +459,7 @@ const $ToggleGroup = styled(ToggleGroup)`
     gap: 0;
 
     img {
-      height: 0;
+      display: none;
     }
   }
 ` as typeof ToggleGroup;

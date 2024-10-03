@@ -472,10 +472,6 @@ export const PositionsTable = ({
     <$Table
       key={currentMarket ?? 'positions'}
       label={stringGetter({ key: STRING_KEYS.POSITIONS })}
-      defaultSortDescriptor={{
-        column: 'market',
-        direction: 'ascending',
-      }}
       data={positionsData}
       columns={columnKeys.map((key: PositionsTableColumnKey) =>
         getPositionsTableColumnDef({
