@@ -5,6 +5,7 @@ import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
+import { QUICK_DEBOUNCE_MS } from '@/constants/debounce';
 import { PositionSide } from '@/constants/trade';
 
 import { Slider } from '@/components/Slider';
@@ -81,7 +82,7 @@ export const LeverageSlider = ({
             value: newLeverage,
             field: TradeInputField.leverage,
           }),
-        50
+        QUICK_DEBOUNCE_MS
       ),
     []
   );

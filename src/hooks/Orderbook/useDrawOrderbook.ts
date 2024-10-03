@@ -11,6 +11,7 @@ import {
   ORDERBOOK_ROW_PADDING_RIGHT,
   ORDERBOOK_WIDTH,
 } from '@/constants/orderbook';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
@@ -36,7 +37,7 @@ type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
   histogramRange: number;
   side: PerpetualMarketOrderbookLevel['side'];
-  displayUnit: 'fiat' | 'asset';
+  displayUnit: DisplayUnit;
 };
 
 type StyleProps = {
@@ -258,11 +259,11 @@ export const useDrawOrderbook = ({
         });
 
       // Size text
-      const displaySize = displayUnit === 'asset' ? size : sizeCost;
+      const displaySize = displayUnit === DisplayUnit.Asset ? size : sizeCost;
       if (displaySize != null) {
         ctx.fillStyle = updatedTextColor ?? textColor;
         ctx.fillText(
-          displayUnit === 'asset'
+          displayUnit === DisplayUnit.Asset
             ? getConsistentAssetSizeString(displaySize, {
                 decimalSeparator,
                 groupSeparator,
@@ -277,11 +278,11 @@ export const useDrawOrderbook = ({
       }
 
       // Depth text
-      const displayDepth = displayUnit === 'asset' ? depth : depthCost;
+      const displayDepth = displayUnit === DisplayUnit.Asset ? depth : depthCost;
       if (displayDepth != null) {
         ctx.fillStyle = textColor;
         ctx.fillText(
-          displayUnit === 'asset'
+          displayUnit === DisplayUnit.Asset
             ? getConsistentAssetSizeString(displayDepth, {
                 decimalSeparator,
                 groupSeparator,

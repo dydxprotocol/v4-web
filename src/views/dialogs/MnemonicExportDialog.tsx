@@ -46,7 +46,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: DialogProps<MnemonicExportDi
       <>
         <span tw="row gap-1 text-color-text-1">
           <$CautionIconContainer>
-            <Icon iconName={IconName.CautionCircleStroked} />
+            <Icon iconName={IconName.CautionCircleStroked} size="1.125em" />
           </$CautionIconContainer>
 
           <p>{stringGetter({ key: STRING_KEYS.SECRET_PHRASE_RISK })}</p>
@@ -144,8 +144,6 @@ const $CautionIconContainer = styled.div`
   color: var(--color-error);
 
   svg {
-    width: 1.125em;
-    height: 1.125em;
     justify-self: center;
   }
 

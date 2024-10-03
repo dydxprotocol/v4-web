@@ -145,11 +145,13 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
                   iconName={IconName.Arrow}
                   direction="up"
                   color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
+                  size="0.875em"
                 />
                 <$ArrowIcon
                   iconName={IconName.Arrow}
                   direction="down"
                   color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
+                  size="0.875em"
                 />
               </$ArrowIconContainer>
               {stringGetter({ key: label })}
@@ -263,11 +265,6 @@ const $AppThemeHeader = styled.h3<{ textcolor: string }>`
 const $ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.25rem;
-
-  svg {
-    height: 0.875em;
-    width: 0.875em;
-  }
 `;
 
 const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`

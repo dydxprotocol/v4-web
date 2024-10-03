@@ -9,8 +9,11 @@ import type {
   NetworkConfigs,
   Nullable,
 } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { DisplayUnit } from '@/constants/trade';
 
+import { track } from '@/lib/analytics/analytics';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 import { testFlags } from '@/lib/testFlags';
 
@@ -46,6 +49,7 @@ export interface ConfigsState {
   network?: NetworkConfigs;
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
+  displayUnit: DisplayUnit;
 }
 
 const { uiRefresh } = testFlags;
@@ -70,6 +74,10 @@ const initialState: ConfigsState = {
   defaultToAllMarketsInPositionsOrdersFills: getLocalStorage({
     key: LocalStorageKey.DefaultToAllMarketsInPositionsOrdersFills,
     defaultValue: true,
+  }),
+  displayUnit: getLocalStorage({
+    key: LocalStorageKey.SelectedDisplayUnit,
+    defaultValue: DisplayUnit.Asset,
   }),
 };
 
@@ -103,6 +111,27 @@ export const configsSlice = createSlice({
       setLocalStorage({ key: LocalStorageKey.HasSeenLaunchIncentives, value: true });
       state.hasSeenLaunchIncentives = true;
     },
+    setDisplayUnit: (
+      state: ConfigsState,
+      {
+        payload,
+      }: PayloadAction<{
+        newDisplayUnit: DisplayUnit;
+        entryPoint: string;
+        assetId: string;
+      }>
+    ) => {
+      const { newDisplayUnit, entryPoint, assetId } = payload;
+      setLocalStorage({ key: LocalStorageKey.SelectedDisplayUnit, value: newDisplayUnit });
+      state.displayUnit = newDisplayUnit;
+      track(
+        AnalyticsEvents.DisplayUnitToggled({
+          entryPoint,
+          assetId,
+          newDisplayUnit,
+        })
+      );
+    },
   },
 });
 
@@ -112,4 +141,5 @@ export const {
   setAppColorMode,
   setConfigs,
   markLaunchIncentivesSeen,
+  setDisplayUnit,
 } = configsSlice.actions;
