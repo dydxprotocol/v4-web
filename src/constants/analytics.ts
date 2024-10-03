@@ -330,7 +330,6 @@ export const AnalyticsEvents = unionize(
     }>(),
 
     // vaults
-    ViewMegaVaultPage: ofType<{}>(),
     ClickViewVaultFromPositionCard: ofType<{}>(),
     ClickViewVaultFromOverview: ofType<{}>(),
 

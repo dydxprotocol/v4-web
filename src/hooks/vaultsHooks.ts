@@ -234,7 +234,7 @@ const useVaultFormAmountDebounced = () => {
   const debouncedAmount = useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
 
   useEffect(() => {
-    if (MustBigNumber(debouncedAmount).gt(0.01)) {
+    if (MustBigNumber(debouncedAmount).gt(0)) {
       track(AnalyticsEvents.EnterValidVaultAmountForm());
     }
   }, [debouncedAmount]);

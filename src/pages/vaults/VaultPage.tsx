@@ -1,9 +1,6 @@
-import { useEffect } from 'react';
-
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,8 +19,6 @@ import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { track } from '@/lib/analytics/analytics';
-
 import { VaultDepositWithdrawForm } from './VaultDepositWithdrawForm';
 import {
   VaultDescription,
@@ -39,10 +34,6 @@ const VaultPage = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MEGAVAULT }));
-
-  useEffect(() => {
-    track(AnalyticsEvents.ViewMegaVaultPage());
-  }, []);
 
   const { isTablet } = useBreakpoints();
 
