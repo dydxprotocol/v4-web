@@ -15,10 +15,7 @@ import {
   ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import {
-  Perpetual,
-  PerpetualMarketType,
-} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -26,7 +23,16 @@ import { readFileSync } from 'fs';
 import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
 
-import { Exchange, ExchangeName, Proposal, retry, sleep, voteOnProposals } from './help';
+import {
+  createAndSendMarketMapProposal,
+  Exchange,
+  ExchangeName,
+  PerpetualMarketType,
+  Proposal,
+  retry,
+  sleep,
+  voteOnProposals,
+} from './help';
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
@@ -318,12 +324,27 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
 
+  // Send market map proposal first.
+  await createAndSendMarketMapProposal(
+    filteredProposals,
+    network.validatorConfig.restEndpoint,
+    network.validatorConfig.chainId,
+    'v4-chain/protocol/build/dydxprotocold',
+  );
+  console.log("Submitted market map proposal");
+  await sleep(5000);
+  for (const wallet of wallets) {
+    retry(() => voteOnProposals([1], client, wallet));
+  }
+  await sleep(5000);
+
   const numExistingMarkets = allPerps.perpetual.reduce(
     (max, perp) => (perp.params!.id > max ? perp.params!.id : max),
     0
   );
   const marketsProposed = new Map<number, Proposal>(); // marketId -> Proposal
 
+  let proposalId: number = 2;
   for (let i = 0; i < filteredProposals.length; i += 4) {
     // Send out proposals in groups of 4 or fewer.
     const proposalsToSend = filteredProposals.slice(i, i + 4);
@@ -331,7 +352,6 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1;
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -372,7 +392,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
       // Record proposed market.
       marketsProposed.set(marketId, { ...proposal, id: Long.fromNumber(proposalId) });
-      proposalIds.push(proposalId);
+      proposalIds.push(proposalId++);
     }
 
     // Wait 5 seconds for proposals to be processed.

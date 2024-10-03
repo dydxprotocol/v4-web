@@ -9,7 +9,10 @@ import {
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
+import { spawn } from 'child_process';
+import * as fs from 'fs';
 import Long from 'long';
+
 
 const VOTE_FEE: StdFee = {
   amount: [
@@ -25,6 +28,7 @@ export interface Exchange {
   exchangeName: ExchangeName;
   ticker: string;
   adjustByMarket?: string;
+  invert?: boolean;
 }
 
 export enum ExchangeName {
@@ -67,6 +71,61 @@ export interface Proposal {
   summary: string;
   params: Params;
 }
+
+
+export enum PerpetualMarketType {
+  /** PERPETUAL_MARKET_TYPE_UNSPECIFIED - Unspecified market type. */
+  PERPETUAL_MARKET_TYPE_UNSPECIFIED = 0,
+
+  /** PERPETUAL_MARKET_TYPE_CROSS - Market type for cross margin perpetual markets. */
+  PERPETUAL_MARKET_TYPE_CROSS = 1,
+
+  /** PERPETUAL_MARKET_TYPE_ISOLATED - Market type for isolated margin perpetual markets. */
+  PERPETUAL_MARKET_TYPE_ISOLATED = 2,
+  UNRECOGNIZED = -1,
+}
+
+interface Market {
+  ticker: {
+    currency_pair: {
+      Base: string;
+      Quote: string;
+    };
+    decimals: string;
+    enabled: boolean;
+    min_provider_count: string;
+    metadata_JSON: string;
+  };
+  provider_configs: ProviderConfig[];
+}
+
+interface ProviderConfig {
+  name: string;
+  normalize_by_pair: {
+    Base: string;
+    Quote: string;
+  } | null;
+  off_chain_ticker: string;
+  invert: boolean;
+  metadata_JSON: string;
+}
+
+const exchangeNameToMarketMapProviderName: Record<ExchangeName, string> = {
+  [ExchangeName.Binance]: 'binance_ws',
+  [ExchangeName.BinanceUS]: 'binance_ws',
+  [ExchangeName.Bitfinex]: 'bitfinex_ws',
+  [ExchangeName.Bitstamp]: 'bitstamp_api',
+  [ExchangeName.Bybit]: 'bybit_ws',
+  [ExchangeName.CoinbasePro]: 'coinbase_ws',
+  [ExchangeName.CryptoCom]: 'crypto_dot_com_ws',
+  [ExchangeName.Gate]: 'gate_ws',
+  [ExchangeName.Huobi]: 'huobi_ws',
+  [ExchangeName.Kraken]: 'kraken_api',
+  [ExchangeName.Kucoin]: 'kucoin_ws',
+  [ExchangeName.Mexc]: 'mexc_ws',
+  [ExchangeName.Okx]: 'okx_ws',
+  [ExchangeName.Raydium]: 'raydium_api',
+};
 
 export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -130,4 +189,126 @@ export async function voteOnProposals(
   } else {
     console.log(`Voted on proposals ${proposalIds} with wallet ${wallet.address}`);
   }
+}
+
+export async function createAndSendMarketMapProposal(
+  proposals: Proposal[],
+  validatorEndpoint: string,
+  chainId: string,
+  binary: string,
+) {
+  const markets: Market[] = proposals.map((proposal) => {
+    const { ticker, priceExponent, minExchanges, exchangeConfigJson } = proposal.params;
+
+    const providerConfigs: ProviderConfig[] = exchangeConfigJson.map((config) => {
+      let normalize_by_pair: { Base: string; Quote: string } | null = null;
+
+      if (config.adjustByMarket) {
+        const [Base, Quote] = config.adjustByMarket.split('-');
+        normalize_by_pair = { Base, Quote };
+      }
+
+      return {
+        name: `${exchangeNameToMarketMapProviderName[config.exchangeName as ExchangeName]}`,
+        normalize_by_pair,
+        off_chain_ticker: config.ticker,
+        invert: config.invert || false,
+        metadata_JSON: '',
+      };
+    });
+
+    return {
+      ticker: {
+        currency_pair: {
+          Base: ticker.split('-')[0],
+          Quote: ticker.split('-')[1],
+        },
+        decimals: Math.abs(priceExponent).toString(),
+        enabled: true,
+        min_provider_count: minExchanges.toString(),
+        metadata_JSON: '',
+      },
+      provider_configs: providerConfigs,
+    };
+  });
+
+  const proposal = {
+    "title": "Add markets to market map",
+    "summary":"Add markets to market map",
+    "messages": [
+      {
+        "@type": "/slinky.marketmap.v1.MsgCreateMarkets",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "create_markets": markets,
+      },
+    ],
+    "deposit":"5000000000000000000adv4tnt",
+    "expedited": true,
+  };
+
+  const proposalFile = 'marketMapProposal.json';
+  fs.writeFileSync(proposalFile, JSON.stringify(proposal, null, 2), 'utf-8');
+
+  try {
+    await execCLI(
+      binary,
+      ['keys', 'show', 'alice'],
+    )
+  } catch (error) {
+    await execCLI(
+      binary,
+      ['keys', 'add', 'tom', '--recover'],
+      'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small',
+    )
+  }
+
+  await execCLI(
+    binary,
+    [
+      '--node', validatorEndpoint,
+      'tx', 'gov', 'submit-proposal', 'marketMapProposal.json',
+      '--from', 'alice',
+      '--fees', '300000000000000000adv4tnt',
+      '--chain-id', chainId,
+      '--gas', 'auto'
+    ],
+    'y',
+  )
+
+  fs.unlinkSync(proposalFile);
+}
+
+export function execCLI(
+  command: string,
+  args?: string[],
+  input?: string,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args);
+
+    let output = '';
+
+    process.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+      output += data.toString();
+    });
+
+    process.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+      output += data.toString();
+    });
+
+    process.on('close', (code) => {
+      if (code === 0) {
+        resolve(output);
+      } else {
+        reject(`Process exited with code: ${code}`);
+      }
+    });
+
+    if (input) {
+      process.stdin.write(`${input}\n`);
+    }
+    process.stdin.end();
+  });
 }

@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'public/configs/otherMarketData.json'
-      - 'scripts/validate-other-market-data.ts'
+      - 'scripts/markets/validate-other-market-data.ts'
 
 jobs:
   validate:
@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'dydxprotocol/v4-chain'
-          ref: '725ad716cbe9e9aebf2472e877fe2a71e8a63d87'
+          ref: '18c72e1b2d9bf9849c1062ac022caba4fa9ecf60'
           path: 'v4-chain'
 
       - name: Start v4 localnet
@@ -49,11 +49,6 @@ jobs:
           echo "Starting localnet..."
           DOCKER_BUILDKIT=1 make localnet-init
           DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
-
-      - name: Get diff of otherMarketData.json
-        run: |
-          git fetch origin
-          git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
       
       - name: Checkout main branch
         uses: actions/checkout@v3
