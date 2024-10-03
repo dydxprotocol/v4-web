@@ -56,14 +56,13 @@ export const TradeBoxOrderView = () => {
         value={selectedTradeType}
         items={tradeTypeItems}
         onValueChange={onTradeTypeChange}
-        withBorders={false}
+        dividerStyle="underline"
         disabled={!allowChangingOrderType}
         sharedContent={
           <$Container>
             <TradeForm />
           </$Container>
         }
-        withUnderline
       />
     </div>
   );
@@ -75,6 +74,7 @@ export const TradeBoxOrderView = () => {
   return (
     <$TradeSideTabs
       fullWidthTabs
+      dividerStyle="underline"
       activeTab={selectedOrderSide}
       key={selectedOrderSide}
       value={selectedOrderSide}
@@ -90,20 +90,17 @@ export const TradeBoxOrderView = () => {
       }}
       disabled={!allowChangingOrderType}
       sharedContent={sharedContent}
-      withUnderline
     />
   );
 };
 
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
-  border-top: var(--border-width) solid var(--border-color);
 `;
 
 const tabsStyle = css`
   --trigger-active-underline-size: 2px;
   overflow: hidden;
-
   > header {
     justify-content: space-around;
   }

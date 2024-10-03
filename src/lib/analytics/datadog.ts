@@ -15,6 +15,7 @@ if (CLIENT_TOKEN) {
     forwardErrorsToLogs: true,
     sessionSampleRate: 100,
     env: CURRENT_MODE,
+    proxy: import.meta.env.VITE_DATADOG_PROXY_URL,
   });
 }
 

@@ -59,7 +59,7 @@ export const FooterMobile = () => {
                     label: stringGetter({ key: STRING_KEYS.ONBOARDING }),
                     slotBefore: (
                       <$StartIcon disabled={disableConnectButton}>
-                        <Icon iconName={IconName.Play} />
+                        <Icon iconName={IconName.Play} size="1.5rem" />
                       </$StartIcon>
                     ),
                     onClick: () =>

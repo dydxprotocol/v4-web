@@ -29,6 +29,7 @@ export enum PortfolioRoute {
 export enum HistoryRoute {
   Trades = 'trades',
   Transfers = 'transfers',
+  VaultTransfers = 'vault-transfers',
   Payments = 'payments',
 }
 
