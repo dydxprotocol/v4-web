@@ -42,7 +42,14 @@ export const MegavaultYieldTag = () => {
 
   return (
     <Tag type={TagType.Number} sign={TagSign.Positive}>
-      <Output type={OutputType.Percent} value={vault?.thirtyDayReturnPercent} />
+      {stringGetter({
+        key: STRING_KEYS.APR,
+        params: {
+          PERCENT: (
+            <Output tw="mr-0.25" type={OutputType.Percent} value={vault?.thirtyDayReturnPercent} />
+          ),
+        },
+      })}
     </Tag>
   );
 };

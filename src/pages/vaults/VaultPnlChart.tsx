@@ -234,7 +234,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           margin={{
             left: 0,
             right: isMobile ? 20 : 60,
-            top: 10,
+            top: 24,
             bottom: 32,
           }}
           padding={{
