@@ -30,6 +30,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const usePortfolioValues = ({
   equity,
@@ -100,7 +101,7 @@ export const AccountDetailsAndHistory = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 
-  const { equity, leverage, marginUsage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { equity, leverage, marginUsage } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 

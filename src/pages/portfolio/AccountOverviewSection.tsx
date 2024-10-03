@@ -26,10 +26,15 @@ import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+const EMBARRASSING_APR_THRESHOLD = 0.02;
+
 export const MegavaultYieldTag = () => {
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
-  if (vault?.thirtyDayReturnPercent == null || vault.thirtyDayReturnPercent < 0.02) {
+  if (
+    vault?.thirtyDayReturnPercent == null ||
+    vault.thirtyDayReturnPercent < EMBARRASSING_APR_THRESHOLD
+  ) {
     return <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>;
   }
 
@@ -128,11 +133,7 @@ export const AccountOverviewSection = () => {
                   section.amount != null &&
                   totalValue != null &&
                   section.amount > 0 && (
-                    <$LineSegment
-                      key={section.id}
-                      $color=""
-                      $widthPercent={section.amount / totalValue}
-                    >
+                    <$LineSegment key={section.id} $widthPercent={section.amount / totalValue}>
                       {section.amount / totalValue > 0.09 && (
                         <Output
                           tw="text-color-text-0 font-small-book"
@@ -152,9 +153,9 @@ export const AccountOverviewSection = () => {
   );
 };
 
-const $LineSegment = styled.div<{ $color: string; $widthPercent: number }>`
-  width: ${(a) => a.$widthPercent * 100}%;
-  background-color: ${(arg) => arg.$color};
+const $LineSegment = styled.div<{ $color?: string; $widthPercent: number }>`
+  width: ${({ $widthPercent }) => $widthPercent * 100}%;
+  background-color: ${({ $color }) => $color};
 `;
 
 const $ColorSwatch = styled.div<{ $color: string }>`
@@ -163,7 +164,7 @@ const $ColorSwatch = styled.div<{ $color: string }>`
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 0.5rem;
-  background-color: ${(arg) => arg.$color};
+  background-color: ${({ $color }) => $color};
 `;
 
 const $AccountOverviewWrapper = styled.div`
