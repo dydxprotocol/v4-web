@@ -20,6 +20,7 @@ import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { tradingViewSlice } from './tradingView';
 import { vaultsSlice } from './vaults';
+import { walletSlice } from './wallet';
 
 const reducers = {
   account: accountSlice.reducer,
@@ -35,15 +36,16 @@ const reducers = {
   perpetuals: perpetualsSlice.reducer,
   tradingView: tradingViewSlice.reducer,
   vaults: vaultsSlice.reducer,
+  wallet: walletSlice.reducer,
 } as const;
 
 const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 0,
+  version: 1,
   storage,
-  whitelist: ['tradingView'],
+  whitelist: ['tradingView', 'wallet'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 

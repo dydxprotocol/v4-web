@@ -235,10 +235,16 @@ export const resolveWagmiConnector = ({
   return undefined;
 };
 
+/* This method checks if the connection mechanism goes through wagmi */
 export function isWagmiConnectorType(wallet: WalletInfo | undefined): boolean {
   if (!wallet) return false;
 
   return [ConnectorType.Injected, ConnectorType.Coinbase, ConnectorType.WalletConnect].includes(
     wallet.connectorType
   );
+}
+
+/* This method checks if the resolved wallet address is returned by wagmi */
+export function isWagmiResolvedWallet(wallet: WalletInfo | undefined): boolean {
+  return isWagmiConnectorType(wallet) || wallet?.connectorType === ConnectorType.Privy;
 }

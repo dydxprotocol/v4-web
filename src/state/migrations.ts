@@ -2,9 +2,11 @@ import { createMigrate, PersistedState, PersistMigrate } from 'redux-persist';
 import { MigrationConfig } from 'redux-persist/lib/createMigrate';
 
 import { migration0 } from './migrations/0';
+import { migration1 } from './migrations/1';
 
 export const migrations = {
   0: migration0,
+  1: migration1,
 } as const;
 
 /*
