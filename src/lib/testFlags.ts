@@ -1,3 +1,5 @@
+import { isDev } from '@/constants/networks';
+
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -33,7 +35,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults || import.meta.env.MODE === 'staging';
+    return !!this.queryParams.vaults || isDev;
   }
 
   get referrer() {
@@ -41,15 +43,15 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return !!this.queryParams.prediction || import.meta.env.MODE === 'staging';
+    return !!this.queryParams.prediction || isDev;
   }
 
   get pml() {
-    return !!this.queryParams.pml || import.meta.env.MODE === 'staging';
+    return !!this.queryParams.pml || isDev;
   }
 
   get showLimitClose() {
-    return !!this.queryParams.limitclose || import.meta.env.MODE === 'staging';
+    return !!this.queryParams.limitclose;
   }
 
   get referralCode() {
@@ -61,7 +63,7 @@ class TestFlags {
   }
 
   get uiRefresh() {
-    return !!this.queryParams.uirefresh || import.meta.env.MODE === 'staging';
+    return !!this.queryParams.uirefresh || isDev;
   }
 }
 
