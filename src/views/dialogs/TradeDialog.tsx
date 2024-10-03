@@ -15,8 +15,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
-import { TradeSideTabs } from '../TradeSideTabs';
-
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<TradeDialogProps>) => {
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -71,23 +69,11 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
         },
       }[currentStep]}
     >
-      {MobilePlaceOrderSteps.EditOrder ? (
-        <TradeSideTabs
-          sharedContent={
-            <$TradeForm
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-              onConfirm={onCloseDialog}
-            />
-          }
-        />
-      ) : (
-        <$TradeForm
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-          onConfirm={onCloseDialog}
-        />
-      )}
+      <$TradeForm
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        onConfirm={onCloseDialog}
+      />
     </$Dialog>
   );
 };

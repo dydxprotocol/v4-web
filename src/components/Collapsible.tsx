@@ -61,7 +61,7 @@ export const Collapsible = ({
         </>
       )}
       <$TriggerIcon>
-        <Icon iconName={triggerIcon} />
+        <Icon iconName={triggerIcon} size="0.75em" />
       </$TriggerIcon>
       {triggerIconSide === 'left' && (
         <>

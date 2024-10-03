@@ -53,6 +53,7 @@ import abacusStateManager from '@/lib/abacus';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
+import { TradeSideTabs } from '../TradeSideTabs';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
@@ -346,9 +347,18 @@ export const TradeForm = ({
           <PositionPreview />
           {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
         </>
+      ) : currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
+        <TradeSideTabs
+          sharedContent={
+            <$Content>
+              <$MarginAndLeverageButtons openInTradeBox={false} />
+              {tabletActionsRow}
+              {orderbookAndInputs}
+            </$Content>
+          }
+        />
       ) : (
         <>
-          <MarginAndLeverageButtons openInTradeBox={false} />
           {tabletActionsRow}
           {orderbookAndInputs}
         </>
@@ -401,6 +411,12 @@ const $TradeForm = styled.form`
   }
 `;
 
+const $Content = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.75rem;
+  box-shadow: none;
+`;
+
 const $TopActionsRow = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -409,6 +425,10 @@ const $TopActionsRow = styled.div`
     grid-auto-columns: var(--orderbox-column-width) 1fr;
     gap: var(--orderbox-gap);
   }
+`;
+
+const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
+  margin-top: 0.75rem;
 `;
 
 const $OrderbookButton = styled(ToggleButton)`
@@ -465,9 +485,8 @@ const $FadeContainer = styled.div`
 const $ToggleGroup = styled(ToggleGroup)`
   button[data-state='off'] {
     gap: 0;
-
     img {
-      height: 0;
+      --asset-icon-size: 0rem;
     }
   }
 ` as typeof ToggleGroup;
