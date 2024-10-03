@@ -502,6 +502,7 @@ const useAccountsContext = () => {
     // dYdX accounts
     hdKey,
     localDydxWallet,
+    localNobleWallet,
     dydxAccounts,
     dydxAddress,
 

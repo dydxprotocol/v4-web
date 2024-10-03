@@ -266,8 +266,6 @@ const useTransfersContext = () => {
     setToChainId('');
     setAmount('');
   };
-  console.log('fromToken', fromToken);
-  console.log('toToken', toToken);
 
   return {
     // TODO TRIM THIS LIST

@@ -127,12 +127,25 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         subaccountClient: SubaccountClient;
         amount: number;
       }) => {
+        if (!compositeClient) throw new Error('not initialized balhbalhb');
         try {
-          return await compositeClient?.withdrawFromSubaccount(
+          const msg = await compositeClient?.withdrawFromSubaccountMessage(
             subaccountClient,
-            amount.toFixed(usdcDecimals),
-            TransactionMemo.withdrawFromSubaccount
+            amount.toFixed(usdcDecimals)
           );
+          console.log('msg for multtx', msg);
+          return await compositeClient?.send(
+            subaccountClient.wallet,
+            () => Promise.resolve([msg]),
+            false,
+            undefined,
+            TransactionMemo.withdrawFromAccount
+          );
+          // return await compositeClient?.withdrawFromSubaccount(
+          //   subaccountClient,
+          //   amount.toFixed(usdcDecimals),
+          //   TransactionMemo.withdrawFromSubaccount
+          // );
         } catch (error) {
           log('useSubaccount/withdrawFromSubaccount', error);
           throw error;
@@ -223,12 +236,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (!compositeClient) throw new Error('client not initialized');
         try {
           const transaction = JSON.parse(payload);
-          console.log('params', transaction);
+          console.log('params', amount);
           const msg = compositeClient.withdrawFromSubaccountMessage(
             subaccountClient,
             amount.toFixed(usdcDecimals)
           );
+          console.log('msg', msg);
           console.log('transaction.msg', transaction.msg);
+          return;
           const ibcMsg: EncodeObject = {
             typeUrl: transaction.msgTypeUrl ?? transaction.msgTypeURL,
             value: {
@@ -912,3 +927,21 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getWithdrawRewardFee,
   };
 };
+
+// withdraw from skip (non cctp) withdrawfromsubaccountmessage
+// {
+//   "typeUrl": "/dydxprotocol.sending.MsgWithdrawFromSubaccount",
+//   "value": {
+//       "sender": {
+//           "owner": "dydx1nhzuazjhyfu474er6v4ey8zn6wa5fy6g2dgp7s",
+//           "number": 0
+//       },
+//       "recipient": "dydx1nhzuazjhyfu474er6v4ey8zn6wa5fy6g2dgp7s",
+//       "assetId": 0,
+//       "quantums": {
+//           "low": 0,
+//           "high": 0,
+//           "unsigned": false
+//       }
+//   }
+// }

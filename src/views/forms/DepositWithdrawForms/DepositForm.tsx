@@ -310,6 +310,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const evmTxValue = isEvmTx && firstTx.evmTx.value;
 
+  const isSvmTx = firstTx && 'svmTx' in firstTx;
+  const svmTxDestinationAddress = isSvmTx && firstTx.svmTx.to;
+  const svmTxData = isSvmTx && firstTx.svmTx.data;
+
+  const svmTxValue = isSvmTx && firstTx.svmTx.value;
+
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
     if (!fromTokenDenom || !fromToken?.decimals) throw new Error('Missing source token address');

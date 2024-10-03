@@ -2,8 +2,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { Asset, CosmosMsg, Tx } from '@skip-go/client';
+import { Asset } from '@skip-go/client';
 import { camelCase } from 'lodash';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -19,6 +18,7 @@ import {
   getNeutronChainId,
   getNobleChainId,
   getOsmosisChainId,
+  getSolanaChainId,
   GRAZ_CHAINS,
 } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
@@ -67,14 +67,14 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { convertBech32Address, isValidAddress } from '@/lib/addressUtils';
+import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { skipClient } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
-import { hashFromTx } from '@/lib/txUtils';
+import { sleep } from '@/lib/timeUtils';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -88,8 +88,8 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, connectedWallet, localDydxWallet } = useAccounts();
-  const { subaccountClient, sendSkipWithdrawFromSubaccount } = useSubaccount();
+  const { dydxAddress, connectedWallet, localDydxWallet, localNobleWallet } = useAccounts();
+  const { subaccountClient, withdraw, sendSkipWithdrawFromSubaccount } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
@@ -100,7 +100,7 @@ export const WithdrawForm = () => {
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
-  const { usdcLabel, usdcDenom } = useTokenConfigs();
+  const { usdcLabel, usdcDenom, usdcDecimals } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const {
@@ -133,7 +133,7 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: toChainId === 'solana' ? 'solana' : prefix ? 'cosmos' : 'evm',
+      network: toChainId === getSolanaChainId() ? 'solana' : prefix ? 'cosmos' : 'evm',
       prefix,
     });
   }, [exchange, toAddress, toChainId]);
@@ -181,7 +181,7 @@ export const WithdrawForm = () => {
     setToTokenDenom(defaultTokenDenom);
   }, [defaultTokenDenom, setToTokenDenom]);
 
-  const { screenAddresses } = useDydxClient();
+  const { screenAddresses, getAccountBalance, compositeClient } = useDydxClient();
   const nobleChainId = getNobleChainId();
   const osmosisChainId = getOsmosisChainId();
   const neutronChainId = getNeutronChainId();
@@ -189,8 +189,6 @@ export const WithdrawForm = () => {
   const firstTx = route?.txs?.[0];
   // should always be a cosmosTx
   const isCosmosTx = firstTx && 'cosmosTx' in firstTx;
-  // console.log(isCosmosTx && firstTx.evmTx);
-
   const cosmosTxMsgs = isCosmosTx && firstTx.cosmosTx.msgs;
   const cosmosMsg = (cosmosTxMsgs || [])[0] ?? {};
   const cosmosMsgPayload = JSON.parse(cosmosMsg.msg ?? '{}');
@@ -201,34 +199,95 @@ export const WithdrawForm = () => {
     }, {}),
   };
 
-  const camelCaseKeys = (obj: any) => {
-    return Object.keys(obj).reduce((a, b) => {
-      return { ...a, [camelCase(b)]: obj[b] };
-    }, {});
-  };
-
-  const camelCaseMsgs = (cosmosTxMsgs: CosmosMsg[]) => {
-    return cosmosTxMsgs.map((cosmosMsgWrapper) => {
-      return {
-        ...cosmosMsgWrapper,
-        msg: JSON.stringify(camelCaseKeys(JSON.parse(cosmosMsgWrapper.msg))),
-        msgTypeUrl: cosmosMsgWrapper.msgTypeURL,
-      };
+  const submitWithdrawToDydxChain = async () => {
+    if (!route || !dydxAddress || !toAddress || !toChainId) return null;
+    return skipClient.executeRoute({
+      route: route?.route,
+      getCosmosSigner: async (chainID) => {
+        console.log('getting cosmos signer for chainID', chainID);
+        if (chainID === 'noble-1') {
+          return localNobleWallet?.offlineSigner;
+        }
+        if (!localDydxWallet?.offlineSigner)
+          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+        return localDydxWallet?.offlineSigner;
+      },
+      // build this dynamically
+      userAddresses: [
+        { chainID: selectedDydxChainId, address: dydxAddress },
+        {
+          chainID: getNobleChainId(),
+          address: localNobleWallet?.address,
+        },
+        {
+          chainID: toChainId,
+          address: toAddress,
+        },
+      ],
+      onTransactionBroadcast: async ({ txHash, chainID }) => {
+        console.log('on submit complete', txHash, chainID);
+        if (chainID === toChainId) onSubmitComplete(txHash);
+        AutoSweepConfig.disable_autosweep = true;
+        // just submit a real notification once, as soon as we bith withdrawing
+        if (chainID === fromChainId)
+          console.log('we would have disabled autosweeping here', chainID);
+      },
+      onTransactionCompleted: async (chainID) => {
+        console.log('transaction completed for chainID', chainID);
+        if (chainID === getNobleChainId()) {
+          console.log('re-enabling autosweep');
+          AutoSweepConfig.disable_autosweep = false;
+        }
+      },
     });
   };
-  const camelCaseMsgsForTx = (tx: Tx) => {
-    if ('cosmosTx' in tx) {
-      const cosmosTx = tx.cosmosTx;
-      return {
-        ...tx,
-        cosmosTx: {
-          ...cosmosTx,
-          msgs: camelCaseMsgs(cosmosTx.msgs),
-        },
-      };
+
+  /**
+   * Polls for the withdraw to leave your subaccoun
+   */
+  const submitMultiTxWithdrawal = useCallback(async () => {
+    const initialBalance = (await getAccountBalance(dydxAddress as string, usdcDenom))?.amount;
+    let currentBalance = initialBalance;
+    let iterCount = 0;
+    console.log('withdraw', amount);
+    await withdraw(Number(amount));
+    while (currentBalance === initialBalance) {
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(1000);
+      // we are polling so no need to parallelize the awaits
+      currentBalance =
+        // eslint-disable-next-line no-await-in-loop
+        (await getAccountBalance(dydxAddress as string, usdcDenom))?.amount || initialBalance;
+      iterCount += 1;
+      if (iterCount > 20) {
+        throw new Error('Balance update timed out');
+      }
     }
-    throw new Error('this should never happen');
-  };
+    await submitWithdrawToDydxChain();
+  }, [getAccountBalance, dydxAddress, usdcDenom, withdraw, amount, submitWithdrawToDydxChain]);
+
+  const getCosmosTxWithSubaccountWithdrawal = useCallback(async () => {
+    if (!isCosmosTx || !compositeClient || !subaccountClient) return null;
+    const subaccountWithdrawalMsg = await compositeClient.withdrawFromSubaccountMessage(
+      subaccountClient,
+      Number(amount).toFixed(usdcDecimals)
+    );
+    const cosmosSubaccountWithdrawalMsg = {
+      msgTypeURL: subaccountWithdrawalMsg.typeUrl,
+      msg: JSON.stringify(subaccountWithdrawalMsg.value),
+    };
+
+    console.log(cosmosSubaccountWithdrawalMsg);
+    const cosmosTxWithSubaccountWithdrawal = firstTx.cosmosTx;
+    cosmosTxWithSubaccountWithdrawal.msgs.unshift(cosmosSubaccountWithdrawalMsg);
+    const cosmosTxPayload = route?.txs;
+    cosmosTxPayload[0] = {
+      ...route?.txs[0],
+      cosmosTx: cosmosTxWithSubaccountWithdrawal,
+    };
+    console.log('cosmos payload', cosmosTxPayload);
+    return cosmosTxPayload;
+  }, [amount, compositeClient, cosmosMsg, isCosmosTx, route?.txs, subaccountClient, usdcDecimals]);
   // console.log(cosmosMsg);
   // console.log(cosmosMsgToSend);
 
@@ -246,39 +305,43 @@ export const WithdrawForm = () => {
       },
     });
     console.log('balance', blc);
-    return skipClient.executeRoute({
-      route: route?.route,
-      // txs: txsCamelCased,
-      getCosmosSigner: async () => {
-        if (!localDydxWallet?.offlineSigner)
-          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-        return localDydxWallet?.offlineSigner;
-      },
-      userAddresses: [
-        { chainID: selectedDydxChainId, address: dydxAddress },
-        {
-          chainID: getNobleChainId(),
-          address: convertBech32Address({
-            address: dydxAddress,
-            bech32Prefix: NOBLE_BECH32_PREFIX,
-          }),
-        },
-        {
-          chainID: toChainId,
-          address: toAddress,
-        },
-      ],
-      onTransactionBroadcast: async ({ txHash }) => {
-        console.log('on submit complete', txHash);
-        // just submit a real notification once, as soon as we bith withdrawing
-        onSubmitComplete(txHash);
-        AutoSweepConfig.disable_autosweep = true;
-      },
-      onTransactionCompleted: async () => {
-        console.log('re-enabling autosweep');
-        AutoSweepConfig.disable_autosweep = false;
-      },
-    });
+    await submitMultiTxWithdrawal();
+    // const txs = await getCosmosTxWithSubaccountWithdrawal();
+    // console.log('txs', txs);
+    // return skipClient.executeTxs({
+    //   route: route?.route,
+    //   txs,
+    //   getCosmosSigner: async () => {
+    //     if (!localDydxWallet?.offlineSigner)
+    //       throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+    //     return localDydxWallet?.offlineSigner;
+    //   },
+    //   // build this dynamically
+    //   userAddresses: [
+    //     { chainID: selectedDydxChainId, address: dydxAddress },
+    //     {
+    //       chainID: getNobleChainId(),
+    //       address: convertBech32Address({
+    //         address: dydxAddress,
+    //         bech32Prefix: NOBLE_BECH32_PREFIX,
+    //       }),
+    //     },
+    //     {
+    //       chainID: toChainId,
+    //       address: toAddress,
+    //     },
+    //   ],
+    //   onTransactionBroadcast: async ({ txHash }) => {
+    //     console.log('on submit complete', txHash);
+    //     // just submit a real notification once, as soon as we bith withdrawing
+    //     onSubmitComplete(txHash);
+    //     AutoSweepConfig.disable_autosweep = true;
+    //   },
+    //   onTransactionCompleted: async () => {
+    //     console.log('re-enabling autosweep');
+    //     AutoSweepConfig.disable_autosweep = false;
+    //   },
+    // });
   };
 
   const submitNonCctpWithdraw = useCallback(
@@ -307,7 +370,7 @@ export const WithdrawForm = () => {
       if (isKeplr && window.keplr) {
         window.keplr.defaultOptions = {};
       }
-      return hashFromTx(tx.hash);
+      // return hashFromTx(tx.hash);
     },
     [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
   );
@@ -607,11 +670,8 @@ export const WithdrawForm = () => {
       };
     }
 
-    if (routeErrors) {
-      const routeErrorMessageOverride = getRouteErrorMessageOverride(
-        routeErrors,
-        routeErrorMessage
-      );
+    if (route?.code) {
+      const routeErrorMessageOverride = getRouteErrorMessageOverride(route?.code, route?.message);
       const routeErrorContext = {
         transferType: TransferType.Withdraw,
         errorMessage: routeErrorMessageOverride ?? undefined,
