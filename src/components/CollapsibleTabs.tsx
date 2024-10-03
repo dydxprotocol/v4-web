@@ -68,7 +68,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
       defaultValue={defaultTab}
       value={tab}
       onValueChange={(v) => setTab?.(v as TabItemsValue)}
-      uiRefreshEnabled={uiRefresh}
+      $uiRefreshEnabled={uiRefresh}
       asChild
     >
       <$CollapsibleRoot
@@ -112,15 +112,15 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
     </$TabsRoot>
   );
 };
-const $TabsRoot = styled(TabsRoot)<{ uiRefreshEnabled: boolean }>`
+const $TabsRoot = styled(TabsRoot)<{ $uiRefreshEnabled: boolean }>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
   --trigger-textColor: var(--color-text-0);
 
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
-  --trigger-active-underlineColor: ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
+  --trigger-active-underlineColor: ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
   `};
   --trigger-active-underline-size: 2px;
   --trigger-underline-size: 0px;

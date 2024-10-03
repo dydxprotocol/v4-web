@@ -126,7 +126,7 @@ export const Tabs = <TabItemsValue extends string>({
       onWheel={onWheel}
       $side={side}
       $withInnerBorder={withBorders || withUnderline}
-      uiRefreshEnabled={uiRefresh}
+      $uiRefreshEnabled={uiRefresh}
     >
       <$Header $side={side}>{triggers}</$Header>
 
@@ -154,7 +154,7 @@ export const Tabs = <TabItemsValue extends string>({
 const $Root = styled(Root)<{
   $side: 'top' | 'bottom';
   $withInnerBorder?: boolean;
-  uiRefreshEnabled: boolean;
+  $uiRefreshEnabled: boolean;
 }>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
@@ -163,8 +163,8 @@ const $Root = styled(Root)<{
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
   --trigger-hover-textColor: var(--trigger-active-textColor);
-  --trigger-active-underlineColor: ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
+  --trigger-active-underlineColor: ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
   `};
   --trigger-active-underline-backgroundColor: transparent;
   --trigger-active-underline-size: 2px;

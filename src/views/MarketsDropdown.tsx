@@ -74,7 +74,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <AssetIcon symbol={assetId} />
+              <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 <Output
@@ -289,10 +289,10 @@ export const MarketsDropdown = memo(
 
     return (
       <$Popover
+        uiRefreshEnabled={uiRefreshEnabled}
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
-        uiRefreshEnabled={uiRefreshEnabled}
         slotTrigger={
           <>
             {triggerBackground}
@@ -322,7 +322,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <AssetIcon symbol={symbol} />
+                      <$AssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}
@@ -372,19 +372,12 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
 `;
 
 const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boolean }>`
-  --marketsDropdown-width: var(--sidebar-width);
   position: relative;
 
   ${layoutMixins.spacedRow}
   padding: 0 1.25rem;
 
   transition: width 0.1s;
-
-  ${({ $isOpen }) =>
-    $isOpen &&
-    css`
-      --marketsDropdown-width: var(--marketsDropdown-openWidth);
-    `}
 
   ${({ uiRefreshEnabled }) => css`
     ${uiRefreshEnabled
@@ -410,7 +403,15 @@ const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
 
-  width: var(--marketsDropdown-openWidth);
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          width: var(--marketsDropdown-openWidth);
+        `
+      : css`
+          width: var(--marketsDropdown-openWidth-deprecated);
+        `}
+  `}
   max-width: 100vw;
 
   box-shadow: 0 0 0 1px var(--color-border);
@@ -439,6 +440,7 @@ const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
     outline: none;
   }
 `;
+
 const $Toolbar = styled(Toolbar)`
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
@@ -458,6 +460,15 @@ const $MarketDropdownBanner = styled.div`
   & > * {
     z-index: 1;
   }
+`;
+
+const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled &&
+    css`
+      --asset-icon-size: 1.5em;
+    `}
+  `}
 `;
 
 const $IconButton = styled(IconButton)`

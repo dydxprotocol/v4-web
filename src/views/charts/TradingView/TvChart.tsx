@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -12,8 +12,10 @@ import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
+import usePrevious from '@/hooks/usePrevious';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { BaseTvChart } from './BaseTvChart';
@@ -80,6 +82,19 @@ export const TvChart = () => {
     isChartReady,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
+
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const prevDisplayUnit = usePrevious(displayUnit);
+
+  useEffect(() => {
+    if (!isChartReady || !tvWidget) return;
+
+    // Only reset data if displayUnit has actually changed
+    if (prevDisplayUnit !== displayUnit) {
+      const chart = tvWidget.activeChart?.();
+      chart?.resetData();
+    }
+  }, [displayUnit, tvWidget, isChartReady, prevDisplayUnit]);
 
   return <BaseTvChart isChartReady={isChartReady} />;
 };
