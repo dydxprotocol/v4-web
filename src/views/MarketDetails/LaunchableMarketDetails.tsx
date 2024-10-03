@@ -1,4 +1,5 @@
 import { STRING_KEYS } from '@/constants/localization';
+import { LIQUIDITY_TIERS } from '@/constants/markets';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -11,11 +12,7 @@ import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
 
-const ISOLATED_LIQUIDITY_TIER_INFO = {
-  initialMarginFraction: 0.05,
-  maintenanceMarginFraction: 0.03,
-  impactNotional: 2_500,
-};
+const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];
 
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();

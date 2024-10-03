@@ -254,9 +254,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           numGridLines={0}
           tickSpacingX={210}
           tickSpacingY={75}
-        >
-          {undefined}
-        </TimeSeriesChart>
+        />
       </$ChartContainer>
     </div>
   );
