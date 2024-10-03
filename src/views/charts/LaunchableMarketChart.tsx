@@ -112,7 +112,12 @@ export const LaunchableMarketChart = ({
         <Output tw="inline" value={datum.time} type={OutputType.DateTime} />
         <span>
           {stringGetter({ key: STRING_KEYS.PRICE })}:{' '}
-          <Output tw="inline" value={datum.close} type={OutputType.Fiat} />
+          <Output
+            tw="inline"
+            value={datum.close}
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals}
+          />
         </span>
       </div>
     );
