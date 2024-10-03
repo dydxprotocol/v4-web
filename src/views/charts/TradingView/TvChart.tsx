@@ -12,6 +12,7 @@ import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
+import usePrevious from '@/hooks/usePrevious';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/configsSelectors';
@@ -83,13 +84,17 @@ export const TvChart = () => {
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const prevDisplayUnit = usePrevious(displayUnit);
+
   useEffect(() => {
     if (!isChartReady || !tvWidget) return;
 
-    // when display unit is toggled, update bars volume to be the correct unit
-    const chart = tvWidget.activeChart?.();
-    chart?.resetData();
-  }, [displayUnit, tvWidget, isChartReady]);
+    // Only reset data if displayUnit has actually changed
+    if (prevDisplayUnit !== displayUnit) {
+      const chart = tvWidget.activeChart?.();
+      chart?.resetData();
+    }
+  }, [displayUnit, tvWidget, isChartReady, prevDisplayUnit]);
 
   return <BaseTvChart isChartReady={isChartReady} />;
 };
