@@ -49,7 +49,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
     if (referralAddress) {
       dispatch(updateLatestReferrer(referralAddress));
     }
-  }, [dydxAddress, referralAddress, dispatch]);
+  }, [referralAddress, dispatch]);
 
   const isEligible = referralAddress && affiliatesInfo?.isEligible;
 
