@@ -69,7 +69,7 @@ type VaultDepositWithdrawFormProps = {
   onSuccess?: () => void;
 };
 
-const INDEXER_LAG_ALLOWANCE = timeUnits.second * 4;
+const INDEXER_LAG_ALLOWANCE = timeUnits.second * 2;
 
 const $SmallIcon = styled(Icon)<{ $hasError?: boolean }>`
   ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
