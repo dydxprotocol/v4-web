@@ -32,14 +32,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get isolatedMargin() {
-    return !!this.queryParams.isolatedmargin;
-  }
-
-  get enableComplianceApi() {
-    return !!this.queryParams.complianceapi;
-  }
-
   get enableVaults() {
     return !!this.queryParams.vaults || import.meta.env.MODE === 'staging';
   }
@@ -53,11 +45,11 @@ class TestFlags {
   }
 
   get pml() {
-    return !!this.queryParams.pml;
+    return !!this.queryParams.pml || import.meta.env.MODE === 'staging';
   }
 
   get showLimitClose() {
-    return !!this.queryParams.limitclose;
+    return !!this.queryParams.limitclose || import.meta.env.MODE === 'staging';
   }
 
   get referralCode() {
@@ -69,7 +61,7 @@ class TestFlags {
   }
 
   get uiRefresh() {
-    return !!this.queryParams.uirefresh;
+    return !!this.queryParams.uirefresh || import.meta.env.MODE === 'staging';
   }
 }
 
