@@ -35,13 +35,15 @@ export const AccountInfoDiffOutput = ({
       withDiff={hasDiffPostOrder}
       newValue={postOrderValue}
       value={currentValue}
-      layout="column"
+      layout="row"
       withBaseFont
     />
   );
 };
 const $DiffOutput = styled(DiffOutput)<{ withDiff?: boolean }>`
-  --diffOutput-valueWithDiff-font: var(--font-small-book);
+  --diffOutput-value-font: var(--font-mini-book);
+  --diffOutput-valueWithDiff-font: var(--font-mini-book);
+  --diffOutput-newValue-font: var(--font-mini-book);
   --diffOutput-gap: 0.125rem;
   font: var(--font-base-book);
 `;

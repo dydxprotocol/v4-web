@@ -18,6 +18,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 enum Tab {
   Price = 'Price',
@@ -29,6 +30,7 @@ enum Tab {
 export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { uiRefresh } = testFlags;
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -93,6 +95,7 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
     <Tabs
       value={value}
       onValueChange={setValue}
+      dividerStyle={uiRefresh ? 'underline' : 'border'}
       items={innerPanelItems}
       slotToolbar={<MarketLinks launchableMarketId={launchableMarketId} />}
       withTransitions={false}

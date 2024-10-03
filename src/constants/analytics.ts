@@ -12,7 +12,7 @@ import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import { DisplayUnit } from './trade';
-import type { DydxAddress, EvmAddress } from './wallets';
+import type { DydxAddress } from './wallets';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
@@ -68,7 +68,7 @@ export const AnalyticsUserProperties = unionize(
     // Wallet
     WalletType: ofType<WalletType | string | null>(),
     WalletConnectorType: ofType<ConnectorType | null>(),
-    WalletAddress: ofType<EvmAddress | DydxAddress | null>(),
+    WalletAddress: ofType<string | null>(),
 
     // Account
     DydxAddress: ofType<DydxAddress | null>(),

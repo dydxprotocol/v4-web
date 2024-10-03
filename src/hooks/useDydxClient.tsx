@@ -488,6 +488,20 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getAffiliateInfo = useCallback(
+    async (address: string) => {
+      return compositeClient?.validatorClient.get.getAffiliateInfo(address);
+    },
+    [compositeClient]
+  );
+
+  const getReferredBy = useCallback(
+    async (address: string) => {
+      return compositeClient?.validatorClient.get.getReferredBy(address);
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -518,6 +532,8 @@ const useDydxClientContext = () => {
     getWithdrawalCapacityByDenom,
     getValidators,
     getAccountBalance,
+    getAffiliateInfo,
+    getReferredBy,
 
     // vault methods
     getMegavaultHistoricalPnl,

@@ -25,6 +25,7 @@ export const TabsStory: Story<Parameters<typeof Tabs>[0]> = (args) => {
 
 TabsStory.args = {
   fullWidthTabs: false,
+  dividerStyle: 'underline',
   items: [
     {
       value: TabItem.Item1,
@@ -49,6 +50,11 @@ TabsStory.argTypes = {
     options: Object.values(TabItem),
     control: { type: 'select' },
     defaultValue: TabItem.Item1,
+  },
+  dividerStyle: {
+    options: ['none', 'border', 'underline'],
+    control: { type: 'select' },
+    defaultValue: 'underline',
   },
 };
 const $Container = styled.section`
