@@ -9,21 +9,20 @@ import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
-import { MarginModeSelector } from '../forms/TradeForm/MarginModeSelector';
+import { TradeSideTabs } from '../TradeSideTabs';
+import { MarginAndLeverageButtons } from '../forms/TradeForm/MarginAndLeverageButtons';
 import { TargetLeverageButton } from '../forms/TradeForm/TargetLeverageButton';
-import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<TradeDialogProps>) => {
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
+
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
   );
@@ -44,14 +43,9 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
           title: (
-            <$TopActionsRow tw="flex gap-0.5">
-              <$MarginAndLeverageButtons tw="flex gap-0.5">
-                <MarginModeSelector openInTradeBox={false} tw="flex-1" />
-                <$TargetLeverageButton />
-              </$MarginAndLeverageButtons>
-
-              <TradeSideToggle />
-            </$TopActionsRow>
+            <div tw="inlineRow h-[--dialog-icon-size]">
+              {stringGetter({ key: STRING_KEYS.TRADE })}
+            </div>
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
@@ -79,11 +73,26 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
         },
       }[currentStep]}
     >
-      <$TradeForm
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        onConfirm={onCloseDialog}
-      />
+      {MobilePlaceOrderSteps.EditOrder ? (
+        <TradeSideTabs
+          sharedContent={
+            <>
+              <MarginAndLeverageButtons openInTradeBox={false} />
+              <$TradeForm
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+                onConfirm={onCloseDialog}
+              />
+            </>
+          }
+        />
+      ) : (
+        <$TradeForm
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          onConfirm={onCloseDialog}
+        />
+      )}
     </$Dialog>
   );
 };
@@ -103,27 +112,6 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
     css`
       --dialog-icon-size: 2.5rem;
     `}
-`;
-
-const $TopActionsRow = styled.div`
-  > * {
-    ${layoutMixins.flexExpandToSpace}
-  }
-`;
-
-const $MarginAndLeverageButtons = styled.div`
-  abbr,
-  button {
-    ${layoutMixins.flexExpandToSpace}
-  }
-`;
-
-const $TargetLeverageButton = styled(TargetLeverageButton)`
-  flex: 1;
-
-  button {
-    width: 100%;
-  }
 `;
 
 const $TradeForm = styled(TradeForm)`
