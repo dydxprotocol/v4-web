@@ -20,7 +20,7 @@ const tabTriggerStyle = css`
   }
 
   &:hover {
-    color: var(--trigger-active-textColor);
+    color: var(--trigger-hover-textColor);
   }
 `;
 
@@ -32,7 +32,7 @@ const tabTriggerActiveUnderlineStyle = css`
 
 const tabTriggerUnderlineStyle = css`
   box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
-  --trigger-active-backgroundColor: var(--trigger-backgroundColor);
+  --trigger-active-backgroundColor: var(--trigger-active-underline-backgroundColor);
 
   &[data-state='active'] {
     ${tabTriggerActiveUnderlineStyle}
