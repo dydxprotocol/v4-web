@@ -11,6 +11,7 @@ import { TradingViewBar } from '@/constants/candles';
 import { STRING_KEYS } from '@/constants/localization';
 import { LIQUIDITY_TIERS } from '@/constants/markets';
 import { timeUnits } from '@/constants/time';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import {
   useMetadataServiceAssetFromId,
@@ -21,6 +22,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { LinkOutIcon } from '@/icons';
 
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -48,24 +50,32 @@ export const LaunchableMarketChart = ({
   const stringGetter = useStringGetter();
   const [timeframe, setTimeframe] = useState<MetadataServiceCandlesTimeframes>('1d');
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
-  const { id, marketCap, name, price, logo, tickSizeDecimals, urls } = orEmptyObj(launchableAsset);
-  const websiteLink = urls?.website ?? undefined;
+  const { id, marketCap, name, price, logo, reportedMarketCap, tickSizeDecimals, urls } =
+    orEmptyObj(launchableAsset);
+  const cmcLink = urls?.cmc ?? undefined;
   const candlesQuery = useMetadataServiceCandles(id, timeframe);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const chartDotsBackground = useAppSelector(getChartDotBackground);
+  const showSelfReportedMarketCap = marketCap ? false : !!reportedMarketCap;
 
   const items = [
     {
       key: 'market-cap',
-      label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+      label: (
+        <span tw="flex items-center gap-0.25">
+          {stringGetter({ key: STRING_KEYS.MARKET_CAP })}
+          {showSelfReportedMarketCap && <Icon iconName={IconName.CautionCircle} />}
+        </span>
+      ),
       value: (
         <Output
           type={OutputType.CompactFiat}
           isLoading={!ticker}
           tw="text-color-text-1"
-          value={marketCap}
+          value={showSelfReportedMarketCap ? reportedMarketCap : marketCap}
         />
       ),
+      tooltip: showSelfReportedMarketCap ? ('self-reported-cmc' as TooltipStringKeys) : undefined,
     },
     {
       key: 'max-leverage',
@@ -148,9 +158,9 @@ export const LaunchableMarketChart = ({
           )}
           <h2 tw="flex flex-row items-center gap-[0.5ch] text-extra text-color-text-1">
             {name && (
-              <Link href={websiteLink}>
+              <Link href={cmcLink}>
                 <span>{name}</span>
-                <LinkOutIcon tw="h-1.25 w-1.25" />
+                {cmcLink && <LinkOutIcon tw="h-1.25 w-1.25" />}
               </Link>
             )}
           </h2>
@@ -201,7 +211,7 @@ export const LaunchableMarketChart = ({
       </div>
 
       <$ChartContainer chartBackground={chartDotsBackground}>
-        {candlesQuery.isLoading || !candlesQuery.data ? (
+        {!ticker ? null : candlesQuery.isLoading || !candlesQuery.data ? (
           <LoadingSpace id="launchable-market-chart" />
         ) : (
           <TimeSeriesChart

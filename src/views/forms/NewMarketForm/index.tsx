@@ -79,7 +79,12 @@ export const NewMarketForm = ({
       {
         key: 'deposit-lockup',
         label: stringGetter({ key: STRING_KEYS.DEPOSIT_LOCKUP }),
-        value: <Output type={OutputType.Percent} value={0.3256} />,
+        value: (
+          <Output
+            type={OutputType.Text}
+            value={`30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`}
+          />
+        ),
       },
       {
         key: 'cross-margin-usage',

@@ -191,10 +191,6 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_BODY }),
   }),
-  'reference-price': ({ stringGetter }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_BODY }),
-  }),
   spread: () => ({
     title: 'Spread',
     body: 'The difference in price between the highest bid (the price a buyer is willing to buy for) and lowest ask (the price a seller is willing to sell for) an asset.',

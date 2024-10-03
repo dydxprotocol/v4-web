@@ -78,7 +78,7 @@ export const NewMarketSelectionStep = ({
         </h2>
         <span tw="text-base text-color-text-0">
           {stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
               APR_PERCENTAGE: (
                 <Output
@@ -160,6 +160,7 @@ export const NewMarketSelectionStep = ({
             tw="[--withReceipt-backgroundColor:--color-layer-2]"
           >
             <FormInput
+              disabled
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"
