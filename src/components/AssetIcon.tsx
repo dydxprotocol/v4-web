@@ -793,20 +793,31 @@ export const AssetIcon = ({
       tw="h-[1em] w-auto rounded-[50%]"
     />
   ) : isAssetSymbol(symbol) ? (
-    <img
-      src={assetIcons[symbol]}
-      className={className}
-      alt={symbol}
-      tw="h-[1em] w-auto rounded-[50%]"
-    />
+    <$AssetIcon src={assetIcons[symbol]} className={className} alt={symbol} />
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
 
+const $AssetIcon = styled.img`
+  --asset-icon-size: 1em;
+
+  height: var(--asset-icon-size);
+  min-height: var(--asset-icon-size);
+  width: var(--asset-icon-size);
+  min-width: var(--asset-icon-size);
+
+  border-radius: 50%;
+`;
+
 const $Placeholder = styled.div`
+  --asset-icon-size: 1em;
+
+  height: var(--asset-icon-size);
+  min-height: var(--asset-icon-size);
+  width: var(--asset-icon-size);
+  min-width: var(--asset-icon-size);
+
   background-color: var(--color-layer-5);
-  width: 1em;
-  height: 1em;
   border-radius: 50%;
   overflow: hidden;
 
