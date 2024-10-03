@@ -15,6 +15,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
@@ -33,6 +34,7 @@ export const MarginModeSelector = ({
   const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { marginMode } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
   const { needsMarginMode } = useTradeFormData();
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const dispatch = useAppDispatch();
   const handleClick = useCallback(() => {
@@ -44,7 +46,7 @@ export const MarginModeSelector = ({
   }, [dispatch, openInTradeBox]);
 
   return needsMarginMode ? (
-    <Button onClick={handleClick} className={className}>
+    <Button onClick={handleClick} className={className} disabled={!canAccountTrade}>
       <$Text>
         {marginMode &&
           stringGetter({

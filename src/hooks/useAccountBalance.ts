@@ -15,7 +15,7 @@ import {
   SUPPORTED_COSMOS_CHAINS,
 } from '@/constants/graz';
 import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
-import { EvmAddress } from '@/constants/wallets';
+import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { useSolanaConnection } from '@/hooks/useSolanaConnection';
 
@@ -60,7 +60,7 @@ export const useAccountBalance = ({
   usdcBalance: number;
   refetchQuery: (options?: RefetchOptions) => Promise<QueryObserverResult>;
 } => {
-  const { evmAddress, dydxAddress, dydxAccountGraz, solAddress } = useAccounts();
+  const { sourceAccount, dydxAccountGraz, dydxAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
@@ -69,7 +69,13 @@ export const useAccountBalance = ({
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
-  const isSolanaChain = !!solAddress;
+  const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
+
+  const evmAddress =
+    sourceAccount.chain === WalletNetworkType.Evm
+      ? (sourceAccount.address as EvmAddress)
+      : undefined;
+  const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
   const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
 

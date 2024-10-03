@@ -41,12 +41,12 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     resources,
     chain: chainIdStr,
   } = orEmptyObj(useAppSelector(getTransferInputs, shallowEqual));
-  const { connectedWallet } = useAccounts();
+  const { sourceAccount } = useAccounts();
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const lowestFeeTokensByDenom = useMemo(() => getMapOfLowestFeeTokensByDenom(type), [type]);
-  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
-  const isPhantomWallet = connectedWallet?.connectorType === ConnectorType.PhantomSolana;
+  const isKeplrWallet = sourceAccount.walletInfo?.name === WalletType.Keplr;
+  const isPhantomWallet = sourceAccount.walletInfo?.connectorType === ConnectorType.PhantomSolana;
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??

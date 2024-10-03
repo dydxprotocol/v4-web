@@ -1,4 +1,4 @@
-export function parseStorageItem(data: string | null) {
+export function parseStorageItem<T>(data: string | null): T | undefined {
   if (!data) return undefined;
 
   try {
