@@ -15,10 +15,6 @@ import {
   ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import {
-  Perpetual,
-  PerpetualMarketType,
-} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -27,6 +23,10 @@ import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
 
 import { Exchange, ExchangeName, Proposal, retry, sleep, voteOnProposals } from './help';
+
+const { PerpetualMarketType } = await import(
+  '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual'
+);
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
@@ -105,11 +105,11 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     slinkyProviderName: 'binance_api',
   },
   [ExchangeName.Bitfinex]: {
-    url: 'https://api-pub.bitfinex.com/v2/tickers?symbols=ALL',
+    url: 'https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange',
     tickers: null,
     parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item[0], {});
+      return response[0].reduce((acc: Map<string, any>, item: string) => {
+        acc.set(item, {});
         return acc;
       }, new Map<string, any>());
     },
@@ -120,7 +120,8 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     tickers: null,
     parseResp: (response: any) => {
       return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.pair, {});
+        const convertedPair = item.pair.replace('/', '').toLowerCase();
+        acc.set(convertedPair, {});
         return acc;
       }, new Map<string, any>());
     },
@@ -233,6 +234,28 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     },
     slinkyProviderName: 'Raydium',
   },
+  [ExchangeName.UniswapV3_Ethereum]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'uniswapv3_api-ethereum',
+  },
+  [ExchangeName.UniswapV3_Base]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'uniswapv3_api-base',
+  },
 };
 
 enum ValidationError {
@@ -278,7 +301,11 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     }
 
     // TODO: Skip Raydium since ticker is idiosyncratic
-    if (exchange.exchangeName === ExchangeName.Raydium) {
+    if (
+      exchange.exchangeName === ExchangeName.Raydium ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Ethereum ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Base
+    ) {
       continue; // exit the current iteration of the loop.
     }
 
