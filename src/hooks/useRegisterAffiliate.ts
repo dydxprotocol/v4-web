@@ -9,7 +9,7 @@ import { useDydxClient } from './useDydxClient';
 
 export const useReferredBy = () => {
   const { dydxAddress } = useAccounts();
-  const { getReferredBy, compositeClient } = useDydxClient();
+  const { getReferredBy } = useDydxClient();
 
   const queryFn = async ({ queryKey }: { queryKey: (string | DydxAddress | undefined)[] }) => {
     const [, address] = queryKey;
@@ -29,7 +29,7 @@ export const useReferredBy = () => {
   const { data, isFetched } = useQuery({
     queryKey: ['referredBy', dydxAddress],
     queryFn,
-    enabled: Boolean(compositeClient && dydxAddress),
+    enabled: Boolean(dydxAddress),
   });
 
   return { data, isFetched };

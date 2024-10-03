@@ -10,6 +10,7 @@ import {
   type GovAddNewMarketParams,
   type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
+import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { shallowEqual } from 'react-redux';
 import { formatUnits, parseUnits } from 'viem';
@@ -939,6 +940,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const latestReferrer = useAppSelector(getLatestReferrer);
   const { data: referredBy, isFetched: isReferredByFetched } = useReferredBy();
 
+  const { mutateAsync: registerAffiliateMutate, isPending: isRegisterAffiliatePending } =
+    useMutation({
+      mutationFn: async (affiliate: string) => {
+        const tx = await registerAffiliate(affiliate);
+        dispatch(removeLatestReferrer());
+        return tx;
+      },
+    });
+
   useEffect(() => {
     if (!subaccountClient) return;
 
@@ -952,27 +962,28 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       usdcCoinBalance &&
       parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE &&
       isReferredByFetched &&
-      !referredBy
+      !referredBy &&
+      !isRegisterAffiliatePending
     ) {
-      registerAffiliate(latestReferrer);
-      dispatch(removeLatestReferrer());
+      registerAffiliateMutate(latestReferrer);
     }
   }, [
     latestReferrer,
     dydxAddress,
-    registerAffiliate,
+    registerAffiliateMutate,
     usdcCoinBalance,
     subaccountClient,
     isReferredByFetched,
     referredBy,
     dispatch,
+    isRegisterAffiliatePending,
   ]);
 
   useEffect(() => {
     if (referredBy && latestReferrer) {
       dispatch(removeLatestReferrer());
     }
-  }, [referredBy, dispatch]);
+  }, [referredBy, dispatch, latestReferrer]);
 
   const getVaultAccountInfo = useCallback(async () => {
     if (!compositeClient?.validatorClient) {
