@@ -27,6 +27,9 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { setSavedEncryptedSignature } from '@/state/wallet';
+
 import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -40,10 +43,10 @@ type ElementProps = {
 
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
-  const { setWalletFromSignature, saveEvmSignature, saveSolSignature, connectedWallet } =
-    useAccounts();
+  const { sourceAccount, setWalletFromSignature } = useAccounts();
 
   const [error, setError] = useState<string>();
 
@@ -93,7 +96,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signMessageAsync = useSignForWalletDerivation(connectedWallet);
+  const signMessageAsync = useSignForWalletDerivation(sourceAccount.walletInfo);
 
   const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
 
@@ -156,12 +159,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       // 3: Remember me (encrypt and store signature)
       if (shouldRememberMe && staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
-
-        if (connectedWallet?.name === WalletType.Phantom) {
-          saveSolSignature(encryptedSignature);
-        } else {
-          saveEvmSignature(encryptedSignature);
-        }
+        dispatch(setSavedEncryptedSignature(encryptedSignature));
       }
 
       // 4. Done
@@ -262,7 +260,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           }
           tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
-          {!isMatchingNetwork && connectedWallet?.name !== WalletType.Phantom ? (
+          {!isMatchingNetwork && sourceAccount.walletInfo?.name !== WalletType.Phantom ? (
             <Button
               action={ButtonAction.Primary}
               onClick={onClickSwitchNetwork}

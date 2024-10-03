@@ -8,7 +8,6 @@ export enum LocalStorageKey {
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
-  LatestReferrer = 'dydx.LatestReferrer',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',

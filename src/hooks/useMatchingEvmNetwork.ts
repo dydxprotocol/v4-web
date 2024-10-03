@@ -5,7 +5,7 @@ import { useAccount, useSwitchChain } from 'wagmi';
 
 import { ConnectorType } from '@/constants/wallets';
 
-import { useWalletConnection } from './useWalletConnection';
+import { useAccounts } from './useAccounts';
 
 export const useMatchingEvmNetwork = ({
   chainId,
@@ -19,22 +19,22 @@ export const useMatchingEvmNetwork = ({
   onSuccess?: () => void;
 }) => {
   const { chain } = useAccount();
-  const { connectedWallet } = useWalletConnection();
+  const { sourceAccount } = useAccounts();
   const { isPending, switchChainAsync } = useSwitchChain();
   const { wallets } = useWallets();
 
   const isMatchingNetwork = useMemo(() => {
     // In the Keplr wallet, the network will always match
-    if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Cosmos) {
       return true;
     }
     // If chainId is not a number, we can assume it is a non EVM compatible chain
     return Boolean(chain && chainId && typeof chainId === 'number' && chain.id === chainId);
-  }, [connectedWallet, chain, chainId]);
+  }, [sourceAccount.walletInfo, chain, chainId]);
 
   const matchNetwork = useCallback(async () => {
     if (!isMatchingNetwork) {
-      if (connectedWallet?.connectorType === ConnectorType.Privy) {
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
         await wallets?.[0].switchChain(Number(chainId));
       } else {
         await switchChainAsync?.({ chainId: Number(chainId) }, { onError, onSuccess });

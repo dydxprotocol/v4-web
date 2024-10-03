@@ -76,6 +76,12 @@ export enum ConnectorType {
   PhantomSolana = 'phantomSolana',
 }
 
+export enum WalletNetworkType {
+  Evm = 'evm',
+  Cosmos = 'cosmos',
+  Solana = 'solana',
+}
+
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
   | ({
