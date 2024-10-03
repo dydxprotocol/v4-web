@@ -56,18 +56,9 @@ export const TradeSideTabs = ({ sharedContent }: { sharedContent: React.ReactNod
   );
 };
 
-const tabsStyle = css`
-  --trigger-active-underline-size: 2px;
-  overflow: hidden;
-  > header {
-    justify-content: space-around;
-  }
-`;
-
 const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: OrderSide });
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
-  ${tabsStyle}
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
       ? css`

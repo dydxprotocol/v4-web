@@ -172,6 +172,7 @@ const $Root = styled(Root)<{
 
   /* Variants */
   --tabs-currentHeight: var(--tabs-height);
+
   @media ${breakpoints.tablet} {
     --tabs-currentHeight: var(--tabs-height-mobile);
   }

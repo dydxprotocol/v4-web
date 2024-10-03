@@ -424,6 +424,7 @@ const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean; $withBlur: boole
 
 const $Content = styled.div`
   flex: 1;
+  min-height: 1px;
 
   ${layoutMixins.column}
 

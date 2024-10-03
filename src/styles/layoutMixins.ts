@@ -44,6 +44,7 @@ const scrollAreaFade = css`
 
   /* Rules */
   position: relative;
+  overflow: hidden;
 
   &:before {
     content: '';

@@ -16,7 +16,6 @@ import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
 import { TradeSideTabs } from '../TradeSideTabs';
-import { MarginAndLeverageButtons } from '../forms/TradeForm/MarginAndLeverageButtons';
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<TradeDialogProps>) => {
   const { isMobile } = useBreakpoints();
@@ -75,14 +74,11 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
       {MobilePlaceOrderSteps.EditOrder ? (
         <TradeSideTabs
           sharedContent={
-            <>
-              <MarginAndLeverageButtons openInTradeBox={false} />
-              <$TradeForm
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                onConfirm={onCloseDialog}
-              />
-            </>
+            <$TradeForm
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+              onConfirm={onCloseDialog}
+            />
           }
         />
       ) : (

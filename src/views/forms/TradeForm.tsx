@@ -54,6 +54,7 @@ import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
+import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
 import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
@@ -253,11 +254,13 @@ export const TradeForm = ({
         {/* TODO[TRCL-1411]: add orderbook scale functionality */}
       </div>
 
-      <$ToggleGroup
-        items={allTradeTypeItems}
-        value={selectedTradeType}
-        onValueChange={onTradeTypeChange}
-      />
+      <$FadeContainer>
+        <$ToggleGroup
+          items={allTradeTypeItems}
+          value={selectedTradeType}
+          onValueChange={onTradeTypeChange}
+        />
+      </$FadeContainer>
     </$TopActionsRow>
   );
 
@@ -345,6 +348,7 @@ export const TradeForm = ({
         </>
       ) : (
         <>
+          <MarginAndLeverageButtons openInTradeBox={false} />
           {tabletActionsRow}
           {orderbookAndInputs}
         </>
@@ -452,9 +456,13 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
   }
 `;
 
-const $ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
+const $FadeContainer = styled.div`
+  ${layoutMixins.scrollAreaFade}
+  display: flex;
+  align-items: center;
+`;
 
+const $ToggleGroup = styled(ToggleGroup)`
   button[data-state='off'] {
     gap: 0;
 

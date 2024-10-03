@@ -5,8 +5,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { MarginModeSelector } from '@/views/forms/TradeForm/MarginModeSelector';
 import { TargetLeverageButton } from '@/views/forms/TradeForm/TargetLeverageButton';
 
-export const MarginAndLeverageButtons = ({ openInTradeBox }: { openInTradeBox: boolean }) => (
-  <$MarginAndLeverageButtons>
+export const MarginAndLeverageButtons = ({
+  openInTradeBox,
+  className,
+}: {
+  openInTradeBox: boolean;
+  className?: string;
+}) => (
+  <$MarginAndLeverageButtons className={className}>
     <MarginModeSelector openInTradeBox={openInTradeBox} />
     <TargetLeverageButton />
   </$MarginAndLeverageButtons>
@@ -15,9 +21,6 @@ export const MarginAndLeverageButtons = ({ openInTradeBox }: { openInTradeBox: b
 const $MarginAndLeverageButtons = styled.div`
   display: flex;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-
-  border-bottom: var(--border);
 
   abbr,
   button {

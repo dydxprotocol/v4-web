@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
@@ -36,8 +36,8 @@ export const TradeBoxOrderView = () => {
   return (
     <TradeSideTabs
       sharedContent={
-        <div tw="flex min-h-full flex-col gap-0.25">
-          <MarginAndLeverageButtons openInTradeBox />
+        <div tw="flex min-h-full flex-col">
+          <$MarginAndLeverageButtons openInTradeBox />
           <$OrderTypeTabs
             value={selectedTradeType}
             items={tradeTypeItems}
@@ -60,16 +60,16 @@ const $Container = styled.div`
   ${layoutMixins.scrollArea}
 `;
 
-const tabsStyle = css`
-  --trigger-active-underline-size: 2px;
-  overflow: hidden;
-  > header {
-    justify-content: space-around;
-  }
+const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
+  padding: 0.75rem 1rem;
+  box-shadow: inset 0 calc(-1 * var(--border-width)) var(--border-color);
 `;
 
 const $OrderTypeTabs = styled(Tabs)`
-  ${tabsStyle}
   --tabs-height: 2.125rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
+
+  > header {
+    justify-content: space-around;
+  }
 ` as typeof Tabs;
