@@ -52,7 +52,7 @@ export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?:
         content: <CurrentMarketDetails />,
       },
     ];
-  }, [launchableMarketId]);
+  }, [launchableMarketId, stringGetter]);
 
-  return <MobileTabs defaultValue={InfoSection.Statistics} items={items} withBorders={false} />;
+  return <MobileTabs defaultValue={InfoSection.Statistics} items={items} />;
 };
