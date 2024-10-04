@@ -80,7 +80,7 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, connectedWallet } = useAccounts();
+  const { dydxAddress, sourceAccount } = useAccounts();
   const { sendSkipWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -100,7 +100,7 @@ export const WithdrawForm = () => {
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
-  const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+  const debouncedAmount = useDebounce<string>(withdrawAmount);
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
@@ -111,7 +111,12 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: chainIdStr === 'solana' ? 'solana' : prefix ? 'cosmos' : 'evm',
+      network:
+        chainIdStr === 'solana' || chainIdStr === 'solana-devnet'
+          ? 'solana'
+          : prefix
+            ? 'cosmos'
+            : 'evm',
       prefix,
     });
   }, [exchange, toAddress, chainIdStr]);
@@ -133,7 +138,7 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+    if (sourceAccount.walletInfo?.name === WalletType.Keplr && dydxAddress) {
       abacusStateManager.setTransfersSourceAddress(dydxAddress);
     }
 
@@ -145,7 +150,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, connectedWallet]);
+  }, [dydxAddress, sourceAccount.walletInfo]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -255,7 +260,7 @@ export const WithdrawForm = () => {
               gasFee: summary?.gasFee || undefined,
               bridgeFee: summary?.bridgeFee || undefined,
               exchangeRate: summary?.exchangeRate || undefined,
-              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
               toAmount: summary?.toAmount || undefined,
               toAmountMin: summary?.toAmountMin || undefined,
               txHash,
@@ -339,19 +344,19 @@ export const WithdrawForm = () => {
   }, [freeCollateralBN, setWithdrawAmount]);
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Privy) {
+    if (sourceAccount.walletInfo?.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (connectedWallet?.name === WalletType.Keplr) {
+    if (sourceAccount.walletInfo?.name === WalletType.Keplr) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: nobleChainId,
       });
     }
-  }, [connectedWallet, nobleChainId]);
+  }, [sourceAccount.walletInfo, nobleChainId]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {

@@ -53,6 +53,7 @@ const $DisconnectedAccountInfoContainer = styled.div`
   gap: 0.5em;
 
   p {
+    ${layoutMixins.textLineClamp}
     font: var(--font-small-book);
     max-width: 14.5rem;
   }

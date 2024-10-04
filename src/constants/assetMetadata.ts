@@ -20,6 +20,7 @@ export type MetadataServicePricesResponse = Record<
     percent_change_24h: number | null;
     volume_24h: number | null;
     market_cap: number | null;
+    self_reported_market_cap: number | null;
   }
 >;
 
@@ -32,7 +33,7 @@ export type MetadataServiceCandlesResponse = Record<
     low: number;
     close: number;
     volume: number;
-  }
+  }[]
 >;
 
 export type MetadataServiceAsset = {
@@ -50,7 +51,7 @@ export type MetadataServiceAsset = {
   percentChange24h: number | null;
   volume24h: number | null;
   marketCap: number | null;
-
+  reportedMarketCap: number | null;
   tickSizeDecimals: number;
 };
 
@@ -60,3 +61,5 @@ export enum MetadataServicePath {
   PRICES = 'prices',
   CANDLES = 'candles',
 }
+
+export type MetadataServiceCandlesTimeframes = '1d' | '7d' | '30d';

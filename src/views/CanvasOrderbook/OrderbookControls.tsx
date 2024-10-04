@@ -1,37 +1,35 @@
 import { useCallback } from 'react';
 
 import { clamp } from 'lodash';
-import { shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { DisplayUnit } from '@/constants/trade';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
+import { setDisplayUnit } from '@/state/configs';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 type OrderbookControlsProps = {
   className?: string;
-  assetName?: string;
-  selectedUnit: 'fiat' | 'asset';
-  setSelectedUnit(val: 'fiat' | 'asset'): void;
+  assetId?: string;
   grouping: Nullable<MarketOrderbookGrouping>;
 };
 
-export const OrderbookControls = ({
-  className,
-  assetName,
-  selectedUnit,
-  setSelectedUnit,
-  grouping,
-}: OrderbookControlsProps) => {
+export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
+  const dispatch = useDispatch();
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+
   const modifyScale = useCallback(
     (direction: number) => {
       const start = grouping?.multiplier.ordinal ?? 0;
@@ -44,7 +42,19 @@ export const OrderbookControls = ({
   );
   const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
   const tickSizeDecimals = currentMarketConfig?.tickSizeDecimals ?? USD_DECIMALS;
-
+  const onToggleDisplayUnit = useCallback(
+    (newValue: DisplayUnit) => {
+      if (!assetId) return;
+      dispatch(
+        setDisplayUnit({
+          newDisplayUnit: newValue,
+          assetId,
+          entryPoint: 'orderbookControls',
+        })
+      );
+    },
+    [dispatch, assetId]
+  );
   return (
     <$OrderbookControlsContainer className={className}>
       <div tw="flex justify-between gap-0.5">
@@ -71,15 +81,17 @@ export const OrderbookControls = ({
             fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
           />
         </div>
-        <ToggleGroup
-          items={[
-            { label: assetName ?? '', value: 'asset' as const },
-            { label: 'USD', value: 'fiat' as const },
-          ]}
-          shape={ButtonShape.Rectangle}
-          value={selectedUnit}
-          onValueChange={setSelectedUnit}
-        />
+        {assetId && (
+          <ToggleGroup
+            items={[
+              { label: assetId, value: DisplayUnit.Asset },
+              { label: 'USD', value: DisplayUnit.Fiat },
+            ]}
+            shape={ButtonShape.Rectangle}
+            value={displayUnit}
+            onValueChange={onToggleDisplayUnit}
+          />
+        )}
       </div>
     </$OrderbookControlsContainer>
   );

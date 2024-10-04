@@ -15,6 +15,7 @@ import {
 import styled from 'styled-components';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { WithLabel } from '@/components/WithLabel';
@@ -47,7 +48,10 @@ export const SelectMenu = <T extends string>({
           <Value />
         )}
         {React.Children.toArray(children).length > 1 && (
-          <Icon iconName={IconName.Triangle} tw="h-0.375 w-0.625 text-color-text-0" />
+          <Icon
+            iconName={IconName.Triangle}
+            tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
+          />
         )}
       </$Trigger>
       <Portal>
@@ -112,4 +116,8 @@ const $ItemIndicator = styled(ItemIndicator)`
 const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
   border-radius: 0;
+
+  > * {
+    ${layoutMixins.textTruncate}
+  }
 `;

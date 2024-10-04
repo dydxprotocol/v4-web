@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
-import styled, { css } from 'styled-components';
 
+import { DEFAULT_MARKETID } from '@/constants/markets';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
@@ -12,13 +12,17 @@ import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
+import usePrevious from '@/hooks/usePrevious';
 
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useAppSelector } from '@/state/appTypes';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { BaseTvChart } from './BaseTvChart';
 
 export const TvChart = () => {
   const [isChartReady, setIsChartReady] = useState(false);
+  const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
   const tvWidgetRef = useRef<TvWidget | null>(null);
   const tvWidget = tvWidgetRef.current;
@@ -54,6 +58,7 @@ export const TvChart = () => {
     setIsChartReady,
   });
   useChartMarketAndResolution({
+    currentMarketId,
     tvWidget,
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
@@ -78,32 +83,18 @@ export const TvChart = () => {
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
-  return (
-    <$PriceChart isChartReady={isChartReady}>
-      {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const prevDisplayUnit = usePrevious(displayUnit);
 
-      <div id="tv-price-chart" />
-    </$PriceChart>
-  );
-};
-const $PriceChart = styled.div<{ isChartReady?: boolean }>`
-  ${layoutMixins.stack}
-  user-select: none;
-  pointer-events: initial; // allow pointer events when dialog overlay is visible
+  useEffect(() => {
+    if (!isChartReady || !tvWidget) return;
 
-  height: 100%;
-
-  #tv-price-chart {
-    ${({ isChartReady }) =>
-      !isChartReady &&
-      css`
-        filter: blur(3px);
-        translate: 0 0 1rem;
-        opacity: 0;
-      `};
-
-    @media (prefers-reduced-motion: no-preference) {
-      transition: 0.2s var(--ease-out-expo);
+    // Only reset data if displayUnit has actually changed
+    if (prevDisplayUnit !== displayUnit) {
+      const chart = tvWidget.activeChart?.();
+      chart?.resetData();
     }
-  }
-`;
+  }, [displayUnit, tvWidget, isChartReady, prevDisplayUnit]);
+
+  return <BaseTvChart isChartReady={isChartReady} />;
+};

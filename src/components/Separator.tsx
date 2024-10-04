@@ -1,9 +1,9 @@
 import { Fragment } from 'react';
 
 import { Separator } from '@radix-ui/react-separator';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const StyledSeparator = styled(Separator)`
+const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
   flex: 0 !important;
   z-index: -1;
 
@@ -17,29 +17,47 @@ const StyledSeparator = styled(Separator)`
   &[data-orientation='vertical'] {
     align-self: center;
     width: 0;
-    height: calc(100% - 1.5rem);
     margin: 0 !important;
-
     border-right: solid var(--border-width) var(--color-border);
+
+    ${({ $fullHeight }) =>
+      $fullHeight
+        ? css`
+            height: 100%;
+          `
+        : css`
+            height: calc(100% - 1.5rem);
+          `}
   }
 `;
 
 export const VerticalSeparator = ({
   className,
   decorative = false,
+  fullHeight = false,
 }: {
   className?: string;
   decorative?: boolean;
-}) => <StyledSeparator className={className} orientation="vertical" decorative={decorative} />;
+  fullHeight?: boolean;
+}) => (
+  <StyledSeparator
+    className={className}
+    orientation="vertical"
+    decorative={decorative}
+    $fullHeight={fullHeight}
+  />
+);
 
 export const WithSeparators = ({
   layout,
   children,
   withSeparators = true,
+  fullHeight = false,
 }: {
   layout: 'column' | 'row';
   children: React.ReactNode;
   withSeparators?: boolean;
+  fullHeight?: boolean;
 }) =>
   withSeparators
     ? [children].flat().map((child, i, { length }) => (
@@ -48,6 +66,7 @@ export const WithSeparators = ({
           {child}
           {i < length - 1 && (
             <StyledSeparator
+              $fullHeight={fullHeight}
               orientation={
                 (
                   {

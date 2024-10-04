@@ -113,3 +113,49 @@ export enum FundingDirection {
 export const PREDICTION_MARKET = {
   TRUMPWIN: 'TRUMPWIN-USD',
 };
+
+// Liquidity Tiers
+export const LIQUIDITY_TIERS = {
+  0: {
+    label: 'Large-cap',
+    initialMarginFraction: 0.05,
+    maintenanceMarginFraction: 0.03,
+    impactNotional: 10_000,
+  },
+  1: {
+    label: 'Small-cap',
+    initialMarginFraction: 0.1,
+    maintenanceMarginFraction: 0.05,
+    impactNotional: 5_000,
+  },
+  2: {
+    label: 'Long-tail',
+    initialMarginFraction: 0.2,
+    maintenanceMarginFraction: 0.1,
+    impactNotional: 2_500,
+  },
+  3: {
+    label: 'Safety',
+    initialMarginFraction: 1,
+    maintenanceMarginFraction: 0.2,
+    impactNotional: 2_500,
+  },
+  4: {
+    label: 'Isolated',
+    initialMarginFraction: 0.05,
+    maintenanceMarginFraction: 0.03,
+    impactNotional: 2_500,
+  },
+  5: {
+    label: 'Mid-cap',
+    initialMarginFraction: 0.05,
+    maintenanceMarginFraction: 0.03,
+    impactNotional: 5_000,
+  },
+  6: {
+    label: 'FX',
+    initialMarginFraction: 0.01,
+    maintenanceMarginFraction: 0.0005,
+    impactNotional: 2_500,
+  },
+};

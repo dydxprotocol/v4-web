@@ -74,6 +74,7 @@ const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
     flex: 1;
     z-index: 1;
     outline: none;
+    min-width: 1px;
   }
 
   &::before {

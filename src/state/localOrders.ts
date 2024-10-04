@@ -2,13 +2,14 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import _ from 'lodash';
 
-import { Nullable, SubaccountFill, SubaccountOrder } from '@/constants/abacus';
+import { AbacusOrderStatus, Nullable, SubaccountFill, SubaccountOrder } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
   CANCEL_ALL_ORDERS_KEY,
   CancelOrderStatuses,
   LocalCancelAllData,
   LocalCancelOrderData,
+  LocalCloseAllPositionsData,
   LocalPlaceOrderData,
   PlaceOrderStatuses,
   TradeTypes,
@@ -21,6 +22,7 @@ export interface LocalOrdersState {
   localPlaceOrders: LocalPlaceOrderData[];
   localCancelOrders: LocalCancelOrderData[];
   localCancelAlls: Record<string, LocalCancelAllData>;
+  localCloseAllPositions?: LocalCloseAllPositionsData;
   latestOrder?: Nullable<SubaccountOrder>;
 }
 
@@ -28,6 +30,7 @@ const initialState: LocalOrdersState = {
   localPlaceOrders: [],
   localCancelOrders: [],
   localCancelAlls: {},
+  localCloseAllPositions: undefined,
   latestOrder: undefined,
 };
 
@@ -39,12 +42,19 @@ export const localOrdersSlice = createSlice({
       return initialState;
     },
     updateOrders: (state, action: PayloadAction<SubaccountOrder[]>) => {
-      const canceledOrderIdsInPayload = action.payload
-        .filter((order) => isOrderStatusCanceled(order.status))
-        .map((order) => order.id);
+      const { payload: orders } = action;
+      let { localCloseAllPositions } = state;
+      const canceledOrders = orders.filter((order) => isOrderStatusCanceled(order.status));
+      const filledOrderClientIds = orders
+        .filter((order) => order.status === AbacusOrderStatus.Filled)
+        .map((order) => order.clientId)
+        .filter(isTruthy);
 
-      if (!canceledOrderIdsInPayload) return state;
+      // no relevant cancel or filled orders
+      if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.length))
+        return state;
 
+      const canceledOrderIdsInPayload = canceledOrders.map((order) => order.id);
       // ignore locally canceled orders since it's intentional and already handled
       // by local cancel tracking and notification
       const isOrderCanceledByBackend = (orderId: string) =>
@@ -55,6 +65,23 @@ export const localOrdersSlice = createSlice({
         const newCanceledOrderIds = _.intersection(batch.orderIds, canceledOrderIdsInPayload);
         return _.uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
       };
+
+      if (localCloseAllPositions) {
+        localCloseAllPositions = {
+          ...localCloseAllPositions,
+          filledOrderClientIds: _.uniq([
+            ..._.intersection(localCloseAllPositions.submittedOrderClientIds, filledOrderClientIds),
+            ...localCloseAllPositions.filledOrderClientIds,
+          ]),
+          failedOrderClientIds: _.uniq([
+            ..._.intersection(
+              localCloseAllPositions.submittedOrderClientIds,
+              canceledOrders.map((order) => order.clientId)?.filter(isTruthy)
+            ),
+            ...localCloseAllPositions.failedOrderClientIds,
+          ]),
+        };
+      }
 
       return {
         ...state,
@@ -77,6 +104,7 @@ export const localOrdersSlice = createSlice({
           ...batch,
           canceledOrderIds: getNewCanceledOrderIds(batch),
         })),
+        localCloseAllPositions,
       };
     },
     updateFilledOrders: (state, action: PayloadAction<SubaccountFill[]>) => {
@@ -212,6 +240,13 @@ export const localOrdersSlice = createSlice({
       updateCancelAllOrderIds(state, order.id, 'failedOrderIds', order.marketId);
       if (errorParams) cancelOrderFailed({ orderId: order.id, errorParams });
     },
+    closeAllPositionsSubmitted: (state, action: PayloadAction<string[]>) => {
+      state.localCloseAllPositions = {
+        submittedOrderClientIds: action.payload,
+        filledOrderClientIds: [],
+        failedOrderClientIds: [],
+      };
+    },
   },
 });
 
@@ -232,6 +267,8 @@ export const {
 
   cancelAllSubmitted,
   cancelAllOrderFailed,
+
+  closeAllPositionsSubmitted,
 } = localOrdersSlice.actions;
 
 // helper functions

@@ -11,8 +11,8 @@ import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
-import { TradeToggleSizeInput } from './trade';
-import type { DydxAddress, EvmAddress } from './wallets';
+import { DisplayUnit } from './trade';
+import type { DydxAddress } from './wallets';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
@@ -68,7 +68,7 @@ export const AnalyticsUserProperties = unionize(
     // Wallet
     WalletType: ofType<WalletType | string | null>(),
     WalletConnectorType: ofType<ConnectorType | null>(),
-    WalletAddress: ofType<EvmAddress | DydxAddress | null>(),
+    WalletAddress: ofType<string | null>(),
 
     // Account
     DydxAddress: ofType<DydxAddress | null>(),
@@ -126,6 +126,9 @@ export const AnalyticsEvents = unionize(
       value: boolean;
     }>(),
     ExportTransfersCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
+    ExportVaultTransfersCheckboxClick: ofType<{
       value: boolean;
     }>(),
 
@@ -234,9 +237,10 @@ export const AnalyticsEvents = unionize(
     TradeOrderTypeSelected: ofType<{
       type: TradeTypes;
     }>(),
-    TradeAmountToggleClick: ofType<{
-      newInput: TradeToggleSizeInput;
-      market: string;
+    DisplayUnitToggled: ofType<{
+      newDisplayUnit: DisplayUnit;
+      entryPoint?: string;
+      assetId: string;
     }>(),
     TradePlaceOrder: ofType<
       HumanReadablePlaceOrderPayload & {
@@ -324,6 +328,25 @@ export const AnalyticsEvents = unionize(
       assetSymbol?: string;
       assetName?: string;
     }>(),
+
+    // vaults
+    ClickViewVaultFromPositionCard: ofType<{}>(),
+    ClickViewVaultFromOverview: ofType<{}>(),
+
+    EnterValidVaultAmountForm: ofType<{}>(),
+    VaultFormPreviewStep: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
+    AttemptVaultOperation: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      amount: number;
+      slippage: number | null | undefined;
+    }>(),
+    VaultOperationPreAborted: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
+    SuccessfulVaultOperation: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      amount: number;
+      amountDiff: number | null | undefined;
+    }>(),
+    VaultOperationProtocolError: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW' }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

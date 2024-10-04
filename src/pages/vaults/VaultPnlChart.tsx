@@ -11,6 +11,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useVaultPnlHistory } from '@/hooks/vaultsHooks';
@@ -50,16 +51,26 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const [visibleTimeRange, setVisibleTimeRange] = useState<[number, number] | undefined>(undefined);
   const [hoveredTime, setHoveredTime] = useState<number | undefined>(undefined);
 
+  const megavaultMinimumDateTimeMs = useEnvConfig('megavaultHistoryStartDateMs');
   const data = useMemo(
-    () => vaultPnl.map((v, index) => safeAssign({}, v, { index })),
+    () =>
+      vaultPnl
+        .map((v, index) => safeAssign({}, v, { index }))
+        .filter(
+          (f) =>
+            megavaultMinimumDateTimeMs == null ||
+            f.date == null ||
+            MustBigNumber(megavaultMinimumDateTimeMs).toNumber() <= f.date
+        ),
     // need to churn reference so chart updates axes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vaultPnl, selectedChart]
+    [vaultPnl, selectedChart, megavaultMinimumDateTimeMs]
   );
 
   const timeUnitsToRender = useMemo(() => {
     const dataRange = data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 0;
-    return TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3).map((t) => ({
+    const validRanges = TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3);
+    return validRanges.map((t) => ({
       value: t.value,
       label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
     }));
@@ -165,6 +176,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     selectedTimeRange != null
       ? TIME_RANGES.find((t) => t.value === selectedTimeRange)?.time
       : undefined;
+
   return (
     <div className={className}>
       <div tw="row justify-between pl-1 pr-1">
@@ -187,11 +199,13 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       <$ChartContainer>
         <$ChartBackground chartBackground={chartDotsBackground} />
         <div tw="flexColumn pl-1 pr-1">
-          {hoveredTime != null && (
-            <div tw="text-color-text-0 font-small-book">
+          <div tw="text-color-text-0 font-small-book">
+            {hoveredTime != null ? (
               <Output value={hoveredTime} type={OutputType.Date} />
-            </div>
-          )}
+            ) : (
+              <Output value={new Date().valueOf()} type={OutputType.Date} />
+            )}
+          </div>
           <div tw="row gap-0.5 font-base-medium">
             <Output value={pnlAbsolute} type={OutputType.Fiat} tw="font-medium-medium" />
             {pnlDiff != null && (
@@ -220,7 +234,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           margin={{
             left: 0,
             right: isMobile ? 20 : 60,
-            top: 10,
+            top: 24,
             bottom: 32,
           }}
           padding={{
@@ -235,14 +249,13 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           onTooltipContext={onTooltipContext}
           onZoom={handleZoom}
           defaultZoomDomain={zoomDomain}
+          domainBasePadding={[0.01, 0]}
           minZoomDomain={timeUnits.day * 2.5}
           slotEmpty={undefined}
           numGridLines={0}
           tickSpacingX={210}
           tickSpacingY={75}
-        >
-          {undefined}
-        </TimeSeriesChart>
+        />
       </$ChartContainer>
     </div>
   );

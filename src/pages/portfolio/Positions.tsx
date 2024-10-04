@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
@@ -19,6 +20,7 @@ import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/Position
 
 import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
 
+import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
@@ -41,6 +43,7 @@ export const Positions = () => {
   }, [navigate]);
 
   const handleViewVault = useCallback(() => {
+    track(AnalyticsEvents.ClickViewVaultFromPositionCard());
     navigate(`${AppRoute.Vault}`, {
       state: { from: AppRoute.Portfolio },
     });
@@ -99,7 +102,7 @@ export const Positions = () => {
         <$MaybeVaultPositionsPanel
           header={
             <ContentSectionHeader
-              title={stringGetter({ key: STRING_KEYS.VAULT })}
+              title={stringGetter({ key: STRING_KEYS.VAULTS })}
               slotRight={
                 isTablet && (
                   <Link onClick={handleViewVault} isAccent tw="font-small-book">

@@ -69,7 +69,7 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
         showVaults && {
           value: 'vaults',
           slotBefore: <Icon iconName={IconName.Governance} />,
-          label: stringGetter({ key: STRING_KEYS.VAULT }),
+          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
           onSelect: () => navigate(AppRoute.Vault),
         },
       ].filter(isTruthy),

@@ -17,7 +17,7 @@ export type DiffArrowProps = ElementProps & StyleProps;
 
 export const DiffArrow = ({ className, direction = 'right', sign }: DiffArrowProps) => (
   <$DiffArrowContainer className={className} direction={direction} sign={sign}>
-    <Icon iconName={IconName.Arrow} />
+    <Icon iconName={IconName.Arrow} size="0.75em" />
   </$DiffArrowContainer>
 );
 const $DiffArrowContainer = styled.span<DiffArrowProps>`
@@ -28,11 +28,6 @@ const $DiffArrowContainer = styled.span<DiffArrowProps>`
   display: inline-flex;
   position: relative;
   color: var(--diffArrow-color);
-
-  svg {
-    width: 0.75em;
-    height: 0.75em;
-  }
 
   ${({ sign }) =>
     sign &&

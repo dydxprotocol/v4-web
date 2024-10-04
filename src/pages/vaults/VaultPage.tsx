@@ -26,15 +26,17 @@ import {
   VaultPositionsSection,
   YourVaultDetailsCards,
 } from './VaultInfoSections';
+import { VaultLockedSharesCard } from './VaultLockedSharesTable';
 import { VaultPnlChart } from './VaultPnlChart';
 import { VaultTransactionsCard } from './VaultTransactions';
 
 const VaultPage = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.MEGAVAULT }));
 
   const { isTablet } = useBreakpoints();
+
   if (isTablet) {
     // one column, reordered, static positioned deposit buttons
     return (
@@ -44,6 +46,9 @@ const VaultPage = () => {
         <$OneColumnContainer>
           <$VaultDetailsColumn>
             <$YourVaultDetailsCards />
+            <$VaultTransactionsCardContainer>
+              <VaultLockedSharesCard />
+            </$VaultTransactionsCardContainer>
             <$VaultTransactionsCardContainer>
               <VaultTransactionsCard />
             </$VaultTransactionsCardContainer>
@@ -102,6 +107,7 @@ const VaultPage = () => {
               <VaultDepositWithdrawForm />
             </div>
           </$DepositFormContainer>
+          <VaultLockedSharesCard />
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
           </$VaultTransactionsCardContainer>

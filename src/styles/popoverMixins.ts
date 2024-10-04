@@ -1,5 +1,6 @@
 import { css, keyframes } from 'styled-components';
 
+import { headerMixins } from './headerMixins';
 import { layoutMixins } from './layoutMixins';
 
 export const popoverMixins = {
@@ -73,6 +74,13 @@ export const popoverMixins = {
     overflow: hidden;
   `,
 
+  mobileDownloadTrigger: css`
+    ${headerMixins.button}
+    --trigger-backgroundColor: transparent;
+    --trigger-open-backgroundColor: var(--button-hover-backgroundColor);
+    height: var(--button-height);
+  `,
+
   popover: css`
     --border-width: var(--default-border-width);
     --border-color: var(--color-border);
@@ -97,6 +105,8 @@ export const popoverMixins = {
     margin: var(--popover-margin);
     width: var(--popover-width);
     overflow: hidden;
+
+    -webkit-backdrop-filter: var(--popover-backdrop-filter);
     backdrop-filter: var(--popover-backdrop-filter);
     background-color: var(--popover-backgroundColor);
     /* clip-path: inset(0 round calc(var(--popover-radius))); */

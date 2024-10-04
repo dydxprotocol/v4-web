@@ -292,7 +292,7 @@ const $Main = styled.main`
 const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;
-  z-index: 1;
+  z-index: 3;
   inset: 0;
   overflow: clip;
   ${layoutMixins.noPointerEvents}

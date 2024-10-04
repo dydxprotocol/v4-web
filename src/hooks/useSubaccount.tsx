@@ -10,6 +10,7 @@ import {
   type GovAddNewMarketParams,
   type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
+import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { shallowEqual } from 'react-redux';
 import { formatUnits, parseUnits } from 'viem';
@@ -32,6 +33,8 @@ import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { clearSubaccountState } from '@/state/account';
 import { getBalances, getSubaccountOrders } from '@/state/accountSelectors';
+import { removeLatestReferrer } from '@/state/affiliates';
+import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import {
@@ -40,11 +43,13 @@ import {
   cancelOrderFailed,
   cancelOrderSubmitted,
   clearLocalOrders,
+  closeAllPositionsSubmitted,
   placeOrderFailed,
   placeOrderSubmitted,
 } from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -53,6 +58,7 @@ import { hashFromTx } from '@/lib/txUtils';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
+import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -72,10 +78,10 @@ export const useSubaccount = () => useContext(SubaccountContext);
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
   const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
-  const { connectedWallet } = useAccounts();
+  const { sourceAccount } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
 
-  const isKeplr = connectedWallet?.name === WalletType.Keplr;
+  const isKeplr = sourceAccount.walletInfo?.name === WalletType.Keplr;
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({
@@ -284,7 +290,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       const balanceAmount = parseFloat(balance.amount);
       const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
       const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
-
       if (shouldDeposit) {
         await depositToSubaccount({
           amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
@@ -601,6 +606,36 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch, orders]
   );
 
+  const closeAllPositions = useCallback(() => {
+    // this is for each single close position / place order transaction
+    const callback = (
+      success: boolean,
+      parsingError?: Nullable<ParsingError>,
+      data?: Nullable<HumanReadablePlaceOrderPayload>
+    ) => {
+      if (!success) {
+        const errorParams = getValidErrorParamsFromParsingError(parsingError);
+        if (data?.clientId !== undefined) {
+          dispatch(
+            placeOrderFailed({
+              clientId: data.clientId,
+              errorParams,
+            })
+          );
+        }
+      }
+    };
+
+    const payload = abacusStateManager.closeAllPositions(callback);
+    if (payload) {
+      dispatch(
+        closeAllPositionsSubmitted(
+          payload.payloads.toArray().map((orderPayload) => orderPayload.clientId)
+        )
+      );
+    }
+  }, [dispatch]);
+
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
     async ({
@@ -877,6 +912,122 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, compositeClient]
   );
 
+  const registerAffiliate = useCallback(
+    async (affiliate: string) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!subaccountClient?.wallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+      if (affiliate === subaccountClient?.wallet?.address) {
+        throw new Error('affiliate can not be the same as referree');
+      }
+      try {
+        const response = await compositeClient?.validatorClient.post.registerAffiliate(
+          subaccountClient,
+          affiliate
+        );
+        return response;
+      } catch (error) {
+        log('useSubaccount/registerAffiliate', error);
+        throw error;
+      }
+    },
+    [subaccountClient, compositeClient]
+  );
+
+  const latestReferrer = useAppSelector(getLatestReferrer);
+  const { data: referredBy, isFetched: isReferredByFetched } = useReferredBy();
+
+  const { mutateAsync: registerAffiliateMutate, isPending: isRegisterAffiliatePending } =
+    useMutation({
+      mutationFn: async (affiliate: string) => {
+        const tx = await registerAffiliate(affiliate);
+        dispatch(removeLatestReferrer());
+        return tx;
+      },
+    });
+
+  useEffect(() => {
+    if (!subaccountClient) return;
+
+    if (dydxAddress === latestReferrer) {
+      dispatch(removeLatestReferrer());
+      return;
+    }
+    if (
+      latestReferrer &&
+      dydxAddress &&
+      usdcCoinBalance &&
+      parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE &&
+      isReferredByFetched &&
+      !referredBy &&
+      !isRegisterAffiliatePending
+    ) {
+      registerAffiliateMutate(latestReferrer);
+    }
+  }, [
+    latestReferrer,
+    dydxAddress,
+    registerAffiliateMutate,
+    usdcCoinBalance,
+    subaccountClient,
+    isReferredByFetched,
+    referredBy,
+    dispatch,
+    isRegisterAffiliatePending,
+  ]);
+
+  useEffect(() => {
+    if (referredBy && latestReferrer) {
+      dispatch(removeLatestReferrer());
+    }
+  }, [referredBy, dispatch, latestReferrer]);
+
+  const getVaultAccountInfo = useCallback(async () => {
+    if (!compositeClient?.validatorClient) {
+      throw new Error('client not initialized');
+    }
+    const result = await compositeClient?.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
+    if (result == null) {
+      return result;
+    }
+    return parseToPrimitives(result);
+  }, [compositeClient?.validatorClient, dydxAddress]);
+
+  const depositToMegavault = useCallback(
+    async (amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      return compositeClient.depositToMegavault(subaccountClient, amount, Method.BroadcastTxCommit);
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const withdrawFromMegavault = useCallback(
+    async (shares: number, minAmount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+      return compositeClient.withdrawFromMegavault(
+        subaccountClient,
+        shares,
+        minAmount,
+        Method.BroadcastTxCommit
+      );
+    },
+    [compositeClient, subaccountClient]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -892,6 +1043,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Trading Methods
     placeOrder,
     closePosition,
+    closeAllPositions,
     cancelOrder,
     cancelAllOrders,
     placeTriggerOrders,
@@ -906,5 +1058,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getUndelegateFee,
     withdrawReward,
     getWithdrawRewardFee,
+
+    // affiliates
+    registerAffiliate,
+
+    // vaults
+    getVaultAccountInfo,
+    depositToMegavault,
+    withdrawFromMegavault,
   };
 };

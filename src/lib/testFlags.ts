@@ -1,3 +1,5 @@
+import { isDev } from '@/constants/networks';
+
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -32,16 +34,8 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get isolatedMargin() {
-    return !!this.queryParams.isolatedmargin;
-  }
-
-  get enableComplianceApi() {
-    return !!this.queryParams.complianceapi;
-  }
-
   get enableVaults() {
-    return !!this.queryParams.vaults;
+    return !!this.queryParams.vaults || isDev;
   }
 
   get referrer() {
@@ -49,15 +43,11 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return !!this.queryParams.prediction;
+    return !!this.queryParams.prediction || isDev;
   }
 
   get pml() {
     return !!this.queryParams.pml;
-  }
-
-  get showCancelAll() {
-    return !!this.queryParams.cancelall;
   }
 
   get showLimitClose() {
@@ -73,7 +63,7 @@ class TestFlags {
   }
 
   get uiRefresh() {
-    return !!this.queryParams.uirefresh;
+    return !!this.queryParams.uirefresh || isDev;
   }
 }
 

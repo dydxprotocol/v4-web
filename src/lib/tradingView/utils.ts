@@ -1,9 +1,11 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import {
   ChartPropertiesOverrides,
+  TradingTerminalFeatureset,
   TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
 
+import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
@@ -50,6 +52,19 @@ const getOhlcValues = ({
   };
 };
 
+export const mapMetadataServiceCandles = (
+  candle: MetadataServiceCandlesResponse[string][number]
+) => {
+  return {
+    time: new Date(candle.time).getTime(),
+    open: candle.open,
+    close: candle.close,
+    high: candle.high,
+    low: candle.low,
+    volume: candle.volume,
+  };
+};
+
 export const mapCandle =
   (orderbookCandlesToggleOn: boolean) =>
   ({
@@ -59,6 +74,7 @@ export const mapCandle =
     high,
     low,
     baseTokenVolume,
+    usdVolume,
     trades,
     orderbookMidPriceOpen,
     orderbookMidPriceClose,
@@ -69,7 +85,7 @@ export const mapCandle =
     const tradeHigh = parseFloat(high);
     const orderbookOpen = orderbookMidPriceOpen ? parseFloat(orderbookMidPriceOpen) : undefined;
     const orderbookClose = orderbookMidPriceClose ? parseFloat(orderbookMidPriceClose) : undefined;
-
+    const tokenVolume = Math.ceil(Number(baseTokenVolume)); // default
     return {
       ...getOhlcValues({
         orderbookCandlesToggleOn,
@@ -82,7 +98,9 @@ export const mapCandle =
         orderbookClose,
       }),
       time: new Date(startedAt).getTime(),
-      volume: Math.ceil(Number(baseTokenVolume)),
+      volume: tokenVolume,
+      assetVolume: tokenVolume,
+      usdVolume: Math.ceil(Number(usdVolume)),
       tradeOpen,
       tradeClose,
       orderbookOpen,
@@ -221,9 +239,27 @@ export const getWidgetOverrides = ({
   };
 };
 
-export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
-  Pick<TradingTerminalWidgetOptions, 'container'> => {
+export const getWidgetOptions = (
+  isViewingUnlaunchedMarket?: boolean
+): Partial<TradingTerminalWidgetOptions> & Pick<TradingTerminalWidgetOptions, 'container'> => {
   const { uiRefresh } = testFlags;
+
+  const disabledFeaturesForUnlaunchedMarket: TradingTerminalFeatureset[] = [
+    'chart_scroll',
+    'chart_zoom',
+  ];
+
+  const disabledFeatures: TradingTerminalFeatureset[] = [
+    'header_symbol_search',
+    'header_compare',
+    'symbol_search_hot_key',
+    'symbol_info',
+    'go_to_date',
+    'timeframes_toolbar',
+    'header_layouttoggle',
+    'trading_account_manager',
+    ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
+  ];
 
   return {
     // debug: true,
@@ -234,16 +270,7 @@ export const getWidgetOptions = (): Partial<TradingTerminalWidgetOptions> &
       : '/tradingview/custom-styles-deprecated.css',
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
-    disabled_features: [
-      'header_symbol_search',
-      'header_compare',
-      'symbol_search_hot_key',
-      'symbol_info',
-      'go_to_date',
-      'timeframes_toolbar',
-      'header_layouttoggle',
-      'trading_account_manager',
-    ],
+    disabled_features: disabledFeatures,
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',
@@ -264,5 +291,5 @@ export const getSavedResolution = ({ savedConfig }: { savedConfig?: object }): s
     (source: { type: string; state: { interval: string | null } }) => source.type === 'MainSeries'
   )?.state?.interval;
 
-  return savedResolution ?? null;
+  return savedResolution ?? undefined;
 };

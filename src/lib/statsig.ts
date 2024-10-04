@@ -28,8 +28,8 @@ export const initStatsigAsync = async () => {
       // TODO: create a top level settings.ts file to coerce boolean env vars to actual boolean
       import.meta.env.VITE_TEST_USER_ID === 'true' ? { userID: 'test-id' } : {},
       {
-        disableLogging: import.meta.env.VITE_DISABLE_STATSIG,
-        disableStorage: import.meta.env.VITE_DISABLE_STATSIG,
+        disableLogging: process.env.VITEST === 'true',
+        disableStorage: process.env.VITEST === 'true',
         environment: { tier: STATSIG_ENVIRONMENT_TIER },
       }
     );

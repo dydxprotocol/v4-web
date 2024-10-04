@@ -42,7 +42,8 @@
   --dialog-header-height: 4rem;
 
   /* Market Selector constants */
-  --marketsDropdown-openWidth: 45rem;
+  --marketsDropdown-openWidth-deprecated: 45rem;
+  --marketsDropdown-openWidth: 40rem;
 
   /* Form constants */
   --form-input-gap: 0.625rem;

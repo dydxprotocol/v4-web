@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { kollections } from '@dydxprotocol/v4-abacus';
+import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
 import { throttle } from 'lodash';
 
 import {
@@ -15,152 +15,26 @@ import {
   VaultFormAction,
   VaultFormData,
 } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
-import { selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
+import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
+import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
 
 import { appQueryClient } from '../state/appQueryClient';
 import { useAppSelector } from '../state/appTypes';
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-async function placeholderFetchMegavaultHistory() {
-  await delay(Math.random() * 2000);
-
-  const baseObj = {
-    megavaultPnl: [
-      {
-        id: '1',
-        createdAt: '0',
-        equity: '1000',
-        totalPnl: '1000',
-        subaccountId: '0',
-        netTransfers: '0',
-        blockHeight: '0',
-        blockTime: '0',
-      },
-    ],
-  };
-  return JSON.stringify(baseObj);
-}
-
-async function placeholderFetchSubvaultHistory() {
-  await delay(Math.random() * 2000);
-  return JSON.stringify({
-    vaultsPnl: [
-      {
-        ticker: 'BTC-USD',
-        historicalPnl: [
-          {
-            id: '1',
-            createdAt: '0',
-            equity: '0',
-            totalPnl: '0',
-            subaccountId: '0',
-            netTransfers: '0',
-            blockHeight: '0',
-            blockTime: '0',
-          },
-        ],
-      },
-    ],
-  });
-}
-
-async function placeholderFetchMegavaultPositions() {
-  await delay(Math.random() * 2000);
-  return JSON.stringify({
-    positions: [
-      {
-        ticker: 'BTC-USD',
-        assetPosition: {
-          side: 'LONG',
-          size: '100',
-          assetId: 'USDC',
-          subaccountNumber: 0,
-        },
-        perpetualPosition: {
-          market: 'BTC-USD',
-          status: 'OPEN',
-          side: 'SHORT',
-          size: '100',
-          maxSize: '100',
-          entryPrice: '40000',
-          realizedPnl: '0',
-          createdAt: '0',
-          createdAtHeight: '0',
-          sumOpen: undefined,
-          sumClose: undefined,
-          netFunding: '0',
-          unrealizedPnl: undefined,
-          closedAt: undefined,
-          exitPrice: undefined,
-          subaccountNumber: 0,
-        },
-        equity: '100',
-      },
-    ],
-  });
-}
-
-async function placeholderFetchVaultAccount() {
-  await delay(Math.random() * 2000);
-
-  const baseObj = {
-    address: '0x123',
-    shares: 100,
-    locked_shares: 0,
-    equity: 100,
-    withdrawable_amount: 100,
-  };
-  return JSON.stringify(baseObj);
-}
-
-async function placeholderFetchVaultFormSlippage(shares: number, resultAmountTemporary: number) {
-  await delay(Math.random() * 2000);
-
-  const baseObj = {
-    shares,
-    expectedAmount: resultAmountTemporary,
-  };
-  return JSON.stringify(baseObj);
-}
-
-async function placeholderFetchVaultAccountTransfers() {
-  await delay(Math.random() * 2000);
-
-  const baseObj = {
-    pageSize: 100,
-    totalResults: 0,
-    offset: 0,
-    transfersSubset: [],
-    totalNetTransfers: '0',
-  };
-  return JSON.stringify(baseObj);
-}
-
-function useDebounceHf<T>(value: T, delayMs?: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delayMs ?? 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delayMs]);
-
-  return debouncedValue;
-}
+import { useAccounts } from './useAccounts';
+import { useDebounce } from './useDebounce';
+import { useDydxClient } from './useDydxClient';
+import { useStringGetter } from './useStringGetter';
+import { useSubaccount } from './useSubaccount';
 
 // it's illegal to return undefined from use query so we just wrap results in a data object
 function wrapNullable<T>(data: T | undefined | null): { data: T | null | undefined } {
@@ -174,17 +48,29 @@ function mapNullableQueryResult<T>(
 }
 
 const vaultQueryOptions = {
-  staleTime: timeUnits.minute,
-  refetchInterval: timeUnits.minute * 2,
+  staleTime: timeUnits.minute / 4,
+  refetchInterval: timeUnits.minute / 3,
 };
 
+export function useForceRefreshVaultDetails() {
+  return useCallback(
+    () =>
+      appQueryClient.invalidateQueries({
+        queryKey: ['vaultDetails'],
+      }),
+    []
+  );
+}
+
 export const useLoadedVaultDetails = () => {
+  const { getMegavaultHistoricalPnl } = useDydxClient();
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
+      const callResult = await getMegavaultHistoricalPnl();
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
-          VaultCalculator.getVaultHistoricalPnlResponse(await placeholderFetchMegavaultHistory())
+          VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(callResult))
         )
       );
     },
@@ -195,7 +81,7 @@ export const useLoadedVaultDetails = () => {
 
 export const useVaultPnlHistory = () => {
   const details = useLoadedVaultDetails();
-  return useMemo(() => details.data?.history?.toArray(), [details.data?.history]);
+  return useMemo(() => details.data?.history?.toArray().reverse(), [details.data?.history]);
 };
 
 const MAX_UPDATE_SPEED_MS = timeUnits.minute;
@@ -214,27 +100,32 @@ const useDebouncedMarketsData = () => {
   // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
   const [marketsToReturn, setMarketsToReturn] = useState<{
     data: Nullable<kollections.Map<string, PerpetualMarket>>;
-  }>({ data: latestMarkets.current });
+  }>({
+    data: latestMarkets.current?.size ? latestMarkets.current : undefined,
+  });
 
   const throttledSync = useMemo(
     () =>
       throttle(() => {
         setMarketsToReturn({
-          data: latestMarkets.current,
+          data: latestMarkets.current?.size ? latestMarkets.current : undefined,
         });
       }, MAX_UPDATE_SPEED_MS),
     []
   );
 
   // update once per minute
-  throttledSync();
+  // this useEffect is meant to run basically every render
+  useEffect(() => {
+    throttledSync();
+  }, [_marketsOnlyHereToTriggerRerenders, throttledSync]);
 
   // if markets is null and we have non-null, force update it
-  if (marketsToReturn.data == null || marketsToReturn.data.size === 0) {
-    if (latestMarkets.current != null && latestMarkets.current.size > 0) {
+  if (!marketsToReturn.data?.size) {
+    if (latestMarkets.current?.size) {
       setMarketsToReturn((prev) => {
         // if it got set by someone else, don't bother
-        if (prev.data == null || prev.data.size === 0) {
+        if (!prev.data?.size) {
           return { data: latestMarkets.current };
         }
         return prev;
@@ -246,12 +137,16 @@ const useDebouncedMarketsData = () => {
 };
 
 export const useLoadedVaultPositions = () => {
-  const marketsMap = useDebouncedMarketsData().data;
+  const { getVaultsHistoricalPnl, getMegavaultPositions } = useDydxClient();
+  const marketsMap = useDebouncedMarketsData();
+
   const { data: subvaultHistories } = useQuery({
     queryKey: ['subvaultHistories'],
     queryFn: async () => {
       return wrapNullable(
-        VaultCalculator.getSubvaultHistoricalPnlResponse(await placeholderFetchSubvaultHistory())
+        VaultCalculator.getSubvaultHistoricalPnlResponse(
+          safeStringifyForAbacusParsing(await getVaultsHistoricalPnl())
+        )
       );
     },
     ...vaultQueryOptions,
@@ -261,43 +156,60 @@ export const useLoadedVaultPositions = () => {
     queryKey: ['vaultPositions'],
     queryFn: async () => {
       return wrapNullable(
-        VaultCalculator.getVaultPositionsResponse(await placeholderFetchMegavaultPositions())
+        VaultCalculator.getVaultPositionsResponse(
+          safeStringifyForAbacusParsing(await getMegavaultPositions())
+        )
       );
     },
     ...vaultQueryOptions,
   });
 
   const calculatedPositions = useMemo(() => {
-    if (vaultPositions?.data == null || marketsMap == null || marketsMap.size === 0) {
+    if (vaultPositions?.data == null || marketsMap.data == null || marketsMap.data.size === 0) {
       return undefined;
     }
     return VaultCalculator.calculateVaultPositions(
       vaultPositions.data,
       subvaultHistories?.data,
-      marketsMap
+      marketsMap.data
     );
   }, [subvaultHistories, vaultPositions, marketsMap]);
 
   return calculatedPositions;
 };
 
-const vaultAccountQueryKey = ['vaultAccount'];
-
-export function forceRefreshVaultAccount() {
-  appQueryClient.invalidateQueries({ queryKey: vaultAccountQueryKey, exact: true });
+export function useForceRefreshVaultAccount() {
+  return useCallback(
+    () =>
+      appQueryClient.invalidateQueries({
+        queryKey: ['vaultAccount'],
+      }),
+    []
+  );
 }
 
 export const useLoadedVaultAccount = () => {
+  const { getAllAccountTransfersBetween, compositeClient } = useDydxClient();
+  const { dydxAddress } = useAccounts();
+  const { getVaultAccountInfo } = useSubaccount();
+
   const accountVaultQueryResult = useQuery({
-    queryKey: vaultAccountQueryKey,
+    queryKey: ['vaultAccount', dydxAddress, compositeClient != null],
     queryFn: async () => {
+      if (dydxAddress == null || compositeClient == null) {
+        return wrapNullable(undefined);
+      }
       const [acc, transfers] = await Promise.all([
-        placeholderFetchVaultAccount(),
-        placeholderFetchVaultAccountTransfers(),
+        getVaultAccountInfo(),
+        getAllAccountTransfersBetween(dydxAddress, '0', MEGAVAULT_MODULE_ADDRESS, '0'),
       ]);
 
-      const parsedAccount = VaultAccountCalculator.getAccountVaultResponse(acc);
-      const parsedTransfers = VaultAccountCalculator.getTransfersBetweenResponse(transfers);
+      const parsedAccount = VaultAccountCalculator.getAccountVaultResponse(
+        safeStringifyForAbacusParsing(acc)
+      );
+      const parsedTransfers = VaultAccountCalculator.getTransfersBetweenResponse(
+        safeStringifyForAbacusParsing(transfers)
+      );
 
       if (parsedAccount == null || parsedTransfers == null) {
         return wrapNullable(undefined);
@@ -316,15 +228,33 @@ export const useLoadedVaultAccountTransfers = () => {
   return useMemo(() => account.data?.vaultTransfers?.toArray(), [account.data?.vaultTransfers]);
 };
 
+const VAULT_FORM_AMOUNT_DEBOUNCE_MS = 500;
 const useVaultFormAmountDebounced = () => {
   const amount = useAppSelector((state) => state.vaults.vaultForm.amount);
-  return useDebounceHf(amount, 500);
+  const debouncedAmount = useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
+
+  useEffect(() => {
+    if (MustBigNumber(debouncedAmount).gt(0)) {
+      track(AnalyticsEvents.EnterValidVaultAmountForm());
+    }
+  }, [debouncedAmount]);
+
+  // if the user goes back to the beginning, use that value for calculations
+  // this fixes an issue where the validation logic would show an error for a second after submission
+  // when we reset the value
+  if (amount === '') {
+    return amount;
+  }
+
+  return debouncedAmount;
 };
 
 export const useVaultFormSlippage = () => {
   const amount = useVaultFormAmountDebounced();
   const operation = useAppSelector((state) => state.vaults.vaultForm.operation);
   const vaultBalance = useLoadedVaultAccount().data;
+  const { getVaultWithdrawInfo } = useDydxClient();
+  const { compositeClient } = useDydxClient();
 
   const slippageQueryResult = useQuery({
     queryKey: [
@@ -333,22 +263,22 @@ export const useVaultFormSlippage = () => {
       operation,
       vaultBalance?.balanceUsdc,
       vaultBalance?.balanceShares,
+      compositeClient != null,
     ],
     queryFn: async () => {
       if (operation === 'DEPOSIT' || amount.trim() === '') {
         return wrapNullable(undefined);
       }
-      const sharesToWithdraw = MustBigNumber(amount).div(
-        // usdc / share to determine share value
-        MustBigNumber(vaultBalance?.balanceUsdc).div(MustBigNumber(vaultBalance?.balanceShares))
+      const sharesToWithdraw = VaultDepositWithdrawFormValidator.calculateSharesToWithdraw(
+        vaultBalance,
+        MustBigNumber(amount).toNumber()
       );
-      const slippage = await placeholderFetchVaultFormSlippage(
-        sharesToWithdraw.decimalPlaces(0, BigNumber.ROUND_FLOOR).toNumber(),
-        MustBigNumber(amount).times(0.96145).toNumber()
-      );
+      const slippage = await getVaultWithdrawInfo(sharesToWithdraw);
 
       const parsedSlippage =
-        VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(slippage);
+        VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(
+          safeStringifyForAbacusParsing(slippage)
+        );
 
       return wrapNullable(parsedSlippage);
     },
@@ -397,6 +327,50 @@ export const useVaultFormValidationResponse = () => {
   );
 
   return validationResponse;
+};
+
+const TIME_TO_SHOW_ERROR = timeUnits.minute * 1;
+
+function getErrorToRenderFromErrorMessage(
+  errorMessage: string,
+  stringGetter: StringGetterFunction
+): string {
+  if (errorMessage.indexOf('insufficient funds: insufficient funds') > 0) {
+    return stringGetter({ key: STRING_KEYS.BROADCAST_ERROR_SDK_5 });
+  }
+  return errorMessage.split('\n')[0];
+}
+
+export const useVaultFormErrorState = () => {
+  const { amount, confirmationStep, operation } = useAppSelector(getVaultForm) ?? {};
+  const stringGetter = useStringGetter();
+  const [savedErrorMessage, setSavedErrorMessage] = useState<string | undefined>(undefined);
+  const currentTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const handleErrorResponse = (error: any) => {
+    clearTimeout(currentTimeout.current);
+    setSavedErrorMessage(error.message);
+    currentTimeout.current = setTimeout(() => {
+      setSavedErrorMessage(undefined);
+    }, TIME_TO_SHOW_ERROR);
+  };
+
+  // reset on form change
+  useEffect(() => {
+    setSavedErrorMessage(undefined);
+  }, [amount, confirmationStep, operation]);
+  // clear on unmount too
+  useEffect(() => clearTimeout(currentTimeout.current), []);
+
+  const savedError = useMemo(
+    () =>
+      savedErrorMessage
+        ? getErrorToRenderFromErrorMessage(savedErrorMessage, stringGetter)
+        : undefined,
+    [savedErrorMessage, stringGetter]
+  );
+
+  return [savedError, handleErrorResponse] as const;
 };
 
 function operationStringToVaultFormAction(operation: 'DEPOSIT' | 'WITHDRAW') {

@@ -44,12 +44,14 @@ export const SourceSelectMenu = ({
   selectedChain,
   onSelect,
 }: ElementProps) => {
-  const { connectedWallet } = useAccounts();
+  const { sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { CCTPWithdrawalOnly, CCTPDepositOnly: initialCCTPDepositValue } = useEnvFeatures();
   // Only CCTP deposits are supported for Phantom / Solana
   const CCTPDepositOnly =
-    connectedWallet?.connectorType === ConnectorType.PhantomSolana ? true : initialCCTPDepositValue;
+    sourceAccount.walletInfo?.connectorType === ConnectorType.PhantomSolana
+      ? true
+      : initialCCTPDepositValue;
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -65,7 +67,7 @@ export const SourceSelectMenu = ({
   const lowestFeeTokensByChainId = useMemo(() => getMapOfLowestFeeTokensByChainId(type), [type]);
 
   const highestFeeTokensByChainId = useMemo(() => getMapOfHighestFeeTokensByChainId(type), [type]);
-  const isKeplrWallet = connectedWallet?.name === WalletType.Keplr;
+  const isKeplrWallet = sourceAccount.walletInfo?.name === WalletType.Keplr;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -93,7 +95,7 @@ export const SourceSelectMenu = ({
         return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
       }
       // only solana chains are supported on phantom
-      if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.PhantomSolana) {
         return selectedDydxChainId !== chain.value && chain.value.startsWith(solanaChainIdPrefix);
       }
       // other wallets do not support solana
@@ -130,7 +132,7 @@ export const SourceSelectMenu = ({
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
   const isNotPrivyDeposit =
-    type === TransferType.withdrawal || connectedWallet?.name !== WalletType.Privy;
+    type === TransferType.withdrawal || sourceAccount.walletInfo?.name !== WalletType.Privy;
   return (
     <SearchSelectMenu
       items={[
@@ -148,7 +150,12 @@ export const SourceSelectMenu = ({
             items: chainItems,
           },
       ].filter(isTruthy)}
-      label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
+      label={
+        label ??
+        stringGetter({
+          key: type === TransferType.deposit ? STRING_KEYS.SOURCE : STRING_KEYS.DESTINATION,
+        })
+      }
     >
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (

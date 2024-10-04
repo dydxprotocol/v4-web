@@ -14,6 +14,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -74,7 +75,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
-  const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
+  const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
 
@@ -109,14 +110,14 @@ export const PlaceOrderButtonAndReceipt = ({
       const currentCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
-          adjustedMmf: adjustedMmf?.current,
+          adjustedImf: adjustedImf?.current,
         })
       );
 
       const postOrderCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.postOrder,
-          adjustedMmf: adjustedMmf?.postOrder,
+          adjustedImf: adjustedImf?.postOrder,
         })
       );
 
@@ -142,84 +143,86 @@ export const PlaceOrderButtonAndReceipt = ({
     );
   };
 
-  const items = [
-    {
-      key: 'expected-price',
-      label: (
-        <WithTooltip tooltip="expected-price" side="right">
-          {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
-        </WithTooltip>
-      ),
-      value: (
-        <Output
-          useGrouping
-          fractionDigits={tickSizeDecimals}
-          type={OutputType.Fiat}
-          value={expectedPrice}
-        />
-      ),
-    },
-    {
-      key: 'liquidation-price',
-      label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
-      value: (
-        <DiffOutput
-          useGrouping
-          type={OutputType.Fiat}
-          fractionDigits={tickSizeDecimals}
-          value={liquidationPrice?.current}
-          newValue={liquidationPrice?.postOrder}
-          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
-        />
-      ),
-    },
-    {
-      key: 'position-margin',
-      label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-      value: renderMarginValue(),
-    },
-    {
-      key: 'position-leverage',
-      label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
-      value: (
-        <DiffOutput
-          useGrouping
-          type={OutputType.Multiple}
-          value={nullIfZero(leverage?.current)}
-          newValue={leverage?.postOrder}
-          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(leverage)}
-          showSign={ShowSign.None}
-        />
-      ),
-    },
-    {
-      key: 'fee',
-      label: (
-        <WithTooltip tooltip="fee" side="right">
-          {stringGetter({ key: STRING_KEYS.FEE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
-    },
-    {
-      key: 'max-reward',
-      label: (
-        <>
-          {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
-          <AssetIcon symbol={chainTokenLabel} />
-        </>
-      ),
-      value: (
-        <Output
-          type={OutputType.Asset}
-          value={reward}
-          useGrouping
-          tag={reward ? chainTokenLabel : ''}
-        />
-      ),
-      tooltip: 'max-reward',
-    },
-  ].filter(isTruthy);
+  const items = (
+    [
+      {
+        key: 'expected-price',
+        label: (
+          <WithTooltip tooltip="expected-price" side="right">
+            {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
+          </WithTooltip>
+        ),
+        value: (
+          <Output
+            useGrouping
+            fractionDigits={tickSizeDecimals}
+            type={OutputType.Fiat}
+            value={expectedPrice}
+          />
+        ),
+      },
+      {
+        key: 'liquidation-price',
+        label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
+        value: (
+          <DiffOutput
+            useGrouping
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals}
+            value={liquidationPrice?.current}
+            newValue={liquidationPrice?.postOrder}
+            withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
+          />
+        ),
+      },
+      {
+        key: 'position-margin',
+        label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
+        value: renderMarginValue(),
+      },
+      {
+        key: 'position-leverage',
+        label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+        value: (
+          <DiffOutput
+            useGrouping
+            type={OutputType.Multiple}
+            value={nullIfZero(leverage?.current)}
+            newValue={leverage?.postOrder}
+            withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(leverage)}
+            showSign={ShowSign.None}
+          />
+        ),
+      },
+      {
+        key: 'fee',
+        label: (
+          <WithTooltip tooltip="fee" side="right">
+            {stringGetter({ key: STRING_KEYS.FEE })}
+          </WithTooltip>
+        ),
+        value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
+      },
+      {
+        key: 'max-reward',
+        label: (
+          <>
+            {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
+            <AssetIcon symbol={chainTokenLabel} />
+          </>
+        ),
+        value: (
+          <Output
+            type={OutputType.Asset}
+            value={reward}
+            useGrouping
+            tag={reward ? chainTokenLabel : ''}
+          />
+        ),
+        tooltip: 'max-reward',
+      },
+    ] satisfies Array<DetailsItem | false | undefined>
+  ).filter(isTruthy);
 
   const returnToMarketState = () => ({
     buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,

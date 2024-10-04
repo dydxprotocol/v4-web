@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -7,9 +7,9 @@ import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { SKIP_EST_TIME_DEFAULT_MINUTES } from '@/constants/skip';
 import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -17,7 +17,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -64,8 +64,10 @@ export const DepositButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const { connectWallet, isConnectedWagmi, connectedWallet, selectedWallet, isConnectedGraz } =
+  const { connectWallet, isConnectedWagmi, selectedWallet, isConnectedGraz } =
     useWalletConnection();
+  const { sourceAccount } = useAccounts();
+
   const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
@@ -111,139 +113,143 @@ export const DepositButtonAndReceipt = ({
 
   const showExchangeRate = typeof summary?.exchangeRate === 'number';
   const showMinDepositAmount = typeof summary?.toAmountMin === 'number';
-  const fallbackRouteDuration = stringGetter({
-    key: STRING_KEYS.X_MINUTES_LOWERCASED,
-    params: {
-      X: `< ${SKIP_EST_TIME_DEFAULT_MINUTES}`,
-    },
-  });
-
-  const submitButtonReceipt = [
-    {
-      key: 'expected-deposit-amount',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
-        </span>
-      ),
-      value: (
-        <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />
-      ),
-    },
-    !!showMinDepositAmount && {
-      key: 'minimum-deposit-amount',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
-        </span>
-      ),
-      value: (
-        <Output
-          type={OutputType.Fiat}
-          fractionDigits={TOKEN_DECIMALS}
-          value={summary?.toAmountMin}
-        />
-      ),
-      tooltip: 'minimum-deposit-amount',
-    },
-    !!showExchangeRate && {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: (
-        <span tw="row gap-[0.5ch]">
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
-          =
-          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-        </span>
-      ),
-    },
-    typeof summary?.gasFee === 'number' && {
-      key: 'gas-fees',
-      label: (
-        <WithTooltip tooltip="gas-fees-deposit" stringParams={{ SOURCE_CHAIN: sourceChainName }}>
-          {stringGetter({ key: STRING_KEYS.GAS_FEE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
-    },
-    typeof summary?.bridgeFee === 'number' && {
-      key: 'bridge-fees',
-      label: (
-        <WithTooltip tooltip="bridge-fees-deposit">
-          {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
-    },
-    {
-      key: 'equity',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
-        </span>
-      ),
-      value: (
-        <DiffOutput
-          type={OutputType.Fiat}
-          value={equity}
-          newValue={newEquity} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
-          sign={NumberSign.Positive}
-          withDiff={equity !== newEquity && !!newEquity}
-        />
-      ),
-    },
-    {
-      key: 'buying-power',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.BUYING_POWER })} <Tag>{usdcLabel}</Tag>
-        </span>
-      ),
-      value: (
-        <DiffOutput
-          type={OutputType.Fiat}
-          value={MustBigNumber(buyingPower).lt(0) ? undefined : buyingPower}
-          newValue={newBuyingPower}
-          sign={NumberSign.Positive}
-          withDiff={Boolean(newBuyingPower) && buyingPower !== newBuyingPower}
-        />
-      ),
-    },
-    {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
-    },
-    {
-      key: 'estimatedRouteDuration',
-      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
-      value: (
-        <Output
-          type={OutputType.Text}
-          value={
-            summary != null && typeof summary.estimatedRouteDuration === 'number'
-              ? stringGetter({
-                  key: STRING_KEYS.X_MINUTES_LOWERCASED,
-                  params: {
-                    X:
-                      summary.estimatedRouteDuration < 60
-                        ? '< 1'
-                        : Math.round(summary.estimatedRouteDuration / 60),
-                  },
-                })
-              : fallbackRouteDuration
-          }
-        />
-      ),
-    },
-  ].filter(isTruthy);
+  const submitButtonReceipt = (
+    [
+      {
+        key: 'expected-deposit-amount',
+        label: (
+          <span>
+            {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
+          </span>
+        ),
+        value: (
+          <Output
+            type={OutputType.Fiat}
+            fractionDigits={TOKEN_DECIMALS}
+            value={summary?.toAmount}
+          />
+        ),
+      },
+      !!showMinDepositAmount && {
+        key: 'minimum-deposit-amount',
+        label: (
+          <span>
+            {stringGetter({ key: STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
+          </span>
+        ),
+        value: (
+          <Output
+            type={OutputType.Fiat}
+            fractionDigits={TOKEN_DECIMALS}
+            value={summary?.toAmountMin}
+          />
+        ),
+        tooltip: 'minimum-deposit-amount',
+      },
+      !!showExchangeRate && {
+        key: 'exchange-rate',
+        label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
+        value: (
+          <span tw="row gap-[0.5ch]">
+            <Output
+              type={OutputType.Asset}
+              value={1}
+              fractionDigits={0}
+              tag={sourceToken?.symbol}
+            />
+            =
+            <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
+          </span>
+        ),
+      },
+      typeof summary?.gasFee === 'number' && {
+        key: 'gas-fees',
+        label: (
+          <WithTooltip tooltip="gas-fees-deposit" stringParams={{ SOURCE_CHAIN: sourceChainName }}>
+            {stringGetter({ key: STRING_KEYS.GAS_FEE })}
+          </WithTooltip>
+        ),
+        value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+      },
+      typeof summary?.bridgeFee === 'number' && {
+        key: 'bridge-fees',
+        label: (
+          <WithTooltip tooltip="bridge-fees-deposit">
+            {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
+          </WithTooltip>
+        ),
+        value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
+      },
+      {
+        key: 'equity',
+        label: (
+          <span>
+            {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
+          </span>
+        ),
+        value: (
+          <DiffOutput
+            type={OutputType.Fiat}
+            value={equity}
+            newValue={newEquity} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
+            sign={NumberSign.Positive}
+            withDiff={equity !== newEquity && !!newEquity}
+          />
+        ),
+      },
+      {
+        key: 'buying-power',
+        label: (
+          <span>
+            {stringGetter({ key: STRING_KEYS.BUYING_POWER })} <Tag>{usdcLabel}</Tag>
+          </span>
+        ),
+        value: (
+          <DiffOutput
+            type={OutputType.Fiat}
+            value={MustBigNumber(buyingPower).lt(0) ? undefined : buyingPower}
+            newValue={newBuyingPower}
+            sign={NumberSign.Positive}
+            withDiff={Boolean(newBuyingPower) && buyingPower !== newBuyingPower}
+          />
+        ),
+      },
+      {
+        key: 'slippage',
+        label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+        value: (
+          <SlippageEditor
+            disabled
+            slippage={slippage}
+            setIsEditing={setIsEditingSlipapge}
+            setSlippage={setSlippage}
+          />
+        ),
+      },
+      {
+        key: 'estimatedRouteDurationSeconds',
+        label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
+        value: (
+          <Output
+            type={OutputType.Text}
+            value={
+              typeof summary?.estimatedRouteDurationSeconds === 'number'
+                ? stringGetter({
+                    key: STRING_KEYS.X_MINUTES_LOWERCASED,
+                    params: {
+                      X:
+                        summary.estimatedRouteDurationSeconds < 60
+                          ? '< 1'
+                          : Math.round(summary.estimatedRouteDurationSeconds / 60),
+                    },
+                  })
+                : undefined
+            }
+          />
+        ),
+      },
+    ] satisfies Array<DetailsItem | undefined | false>
+  ).filter(isTruthy);
 
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const requiresAcknowledgement = Boolean(routeWarning && !hasAcknowledged);
@@ -266,7 +272,9 @@ export const DepositButtonAndReceipt = ({
       />
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : !isConnectedWagmi && connectedWallet?.name !== WalletType.Phantom && !isConnectedGraz ? (
+      ) : !isConnectedWagmi &&
+        sourceAccount.walletInfo?.name !== WalletType.Phantom &&
+        !isConnectedGraz ? (
         <Button action={ButtonAction.Primary} onClick={connectWagmi}>
           {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
         </Button>

@@ -37,7 +37,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { selectWallet, connectedWallet } = useAccounts();
+  const { selectWallet, sourceAccount } = useAccounts();
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
@@ -68,7 +68,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
         {
           [OnboardingSteps.ChooseWallet]: {
             title: stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET }),
-            description: 'Select your wallet from these supported options.',
+            description: stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET_SUBTITLE }),
             children: (
               <$Content>
                 <ChooseWallet onChooseWallet={onChooseWallet} />
@@ -77,8 +77,8 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
           },
           [OnboardingSteps.KeyDerivation]: {
             slotIcon: {
-              [EvmDerivedAccountStatus.NotDerived]: connectedWallet && (
-                <WalletIcon wallet={connectedWallet} />
+              [EvmDerivedAccountStatus.NotDerived]: sourceAccount.walletInfo && (
+                <WalletIcon wallet={sourceAccount.walletInfo} />
               ),
               [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
               [EvmDerivedAccountStatus.EnsuringDeterminism]: <$Ring withAnimation value={0.25} />,

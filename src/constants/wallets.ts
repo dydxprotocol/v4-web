@@ -76,6 +76,12 @@ export enum ConnectorType {
   PhantomSolana = 'phantomSolana',
 }
 
+export enum WalletNetworkType {
+  Evm = 'evm',
+  Cosmos = 'cosmos',
+  Solana = 'solana',
+}
+
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
   | ({
@@ -181,6 +187,7 @@ export const COINBASE_MIPD_RDNS = 'com.coinbase.wallet';
 export const METAMASK_MIPD_RDNS = 'io.metamask';
 
 export const METAMASK_DOWNLOAD_LINK = 'https://metamask.io/download/';
+export const PHANTOM_DOWNLOAD_LINK = 'https://phantom.app/download';
 export const KEPLR_DOWNLOAD_LINK = 'https://www.keplr.app/get';
 
 // TODO: export this type from abacus instead

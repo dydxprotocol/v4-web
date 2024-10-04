@@ -10,6 +10,8 @@ import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
@@ -54,10 +56,10 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
       slotIcon={dialogProps[currentStep].slotIcon}
       slotFooter={<LegalDisclaimer />}
       title={
-        <span tw="inlineRow">
-          {dialogProps[currentStep].title}
+        <span tw="flex items-center gap-[0.5ch]">
+          <$Text>{dialogProps[currentStep].title}</$Text>
           {stakingApr && (
-            <Tag sign={TagSign.Positive} tw="inline-block">
+            <Tag sign={TagSign.Positive} tw="inline-block shrink-[2]">
               {stringGetter({
                 key: STRING_KEYS.EST_APR,
                 params: {
@@ -108,4 +110,8 @@ const LegalDisclaimer = () => {
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
   --dialog-content-paddingBottom: 1rem;
+`;
+
+const $Text = styled.div`
+  ${layoutMixins.textTruncate}
 `;
