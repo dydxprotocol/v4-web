@@ -88,6 +88,10 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-title-gap: 0.25rem;
   --dialog-icon-size: 2rem;
 
+  > div {
+    min-height: 1px;
+  }
+
   ${({ currentStep }) =>
     currentStep === MobilePlaceOrderSteps.EditOrder &&
     css`
