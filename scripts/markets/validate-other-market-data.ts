@@ -44,7 +44,7 @@ const PATH_TO_OLD_PROPOSALS =
 const PATH_TO_PROPOSALS = 'public/configs/otherMarketData.json';
 // TODO: Query MIN_DEPOSIT and VOTING_PERIOD_SECONDS from chain.
 const MIN_DEPOSIT = '10000000';
-const VOTING_PERIOD_SECONDS = 300;
+const VOTING_PERIOD_SECONDS = 120;
 const VOTE_FEE: StdFee = {
   amount: [
     {

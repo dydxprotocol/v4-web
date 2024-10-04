@@ -198,7 +198,7 @@ export async function createAndSendMarketMapProposal(
       return {
         name: config.exchangeName,
         normalize_by_pair,
-        off_chain_ticker: modifiedTicker,
+        off_chain_ticker: config.ticker,
         invert: config.invert || false,
         metadata_JSON: '',
       };
