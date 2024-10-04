@@ -260,7 +260,7 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": null,
+      "assetName": "Turkish Lira",
       "referencePrice": 0.029351335479999997,
       "cmcId": 2810.0
     }
@@ -301,7 +301,7 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": null,
+      "assetName": "Euro",
       "referencePrice": 1.1008,
       "cmcId": 2790.0
     }
@@ -343,7 +343,7 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": null,
+      "assetName": "Brazilian Real",
       "referencePrice": 0.176056338,
       "cmcId": 2783.0
     }
