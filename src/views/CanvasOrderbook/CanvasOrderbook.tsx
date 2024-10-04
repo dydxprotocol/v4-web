@@ -31,6 +31,7 @@ import {
 } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
@@ -68,6 +69,7 @@ export const CanvasOrderbook = forwardRef(
 
     const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
+    const { uiRefresh } = testFlags;
     /**
      * Slice asks and bids to rowsPerSide using empty rows
      */
@@ -203,7 +205,9 @@ export const CanvasOrderbook = forwardRef(
     return (
       <div ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          {!hideHeader && <OrderbookControls assetId={id} grouping={currentGrouping} />}
+          {!hideHeader && !uiRefresh && (
+            <OrderbookControls assetId={id} grouping={currentGrouping} />
+          )}
           {!hideHeader && (
             <OrderbookRow tw="h-1.75 text-color-text-0">
               <span>

@@ -45,5 +45,5 @@ const $Root = styled(Root)<{ layout?: 'column' | 'row' }>`
       row: layoutMixins.row,
     }[layout]}
 
-  padding: 0 1rem;
+  padding: var(--toolbar-padding);
 `;

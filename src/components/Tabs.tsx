@@ -110,7 +110,7 @@ export const Tabs = <TabItemsValue extends string>({
       </$List>
 
       {(currentItem?.slotToolbar ?? slotToolbar) && (
-        <Toolbar>{currentItem?.slotToolbar ?? slotToolbar}</Toolbar>
+        <$Toolbar>{currentItem?.slotToolbar ?? slotToolbar}</$Toolbar>
       )}
     </>
   );
@@ -175,6 +175,9 @@ const $Root = styled(Root)<{
   @media ${breakpoints.tablet} {
     --tabs-currentHeight: var(--tabs-height-mobile);
   }
+
+  --toolbar-padding: 0 1rem;
+  --toolbar-width: ;
 
   /* Rules */
   ${layoutMixins.scrollArea}
@@ -357,6 +360,11 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)<{
           `
       : css``}
 ` as typeof dropdownSelectMenuType;
+
+const $Toolbar = styled(Toolbar)`
+  justify-content: flex-end;
+  width: var(--toolbar-width);
+`;
 
 export const MobileTabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;

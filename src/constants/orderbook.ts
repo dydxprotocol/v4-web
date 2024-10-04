@@ -13,4 +13,5 @@ export const ORDERBOOK_HEIGHT = 756;
 export const ORDERBOOK_WIDTH = 300;
 export const ORDERBOOK_ROW_HEIGHT = 21;
 export const ORDERBOOK_ROW_PADDING_RIGHT = 8;
-export const ORDERBOOK_HEADER_HEIGHT = 70;
+export const ORDERBOOK_HEADER_HEIGHT = 43;
+export const ORDERBOOK_CONTROLS_HEIGHT = 38;

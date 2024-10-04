@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { clamp } from 'lodash';
 import { shallowEqual, useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -19,6 +19,7 @@ import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 type OrderbookControlsProps = {
   className?: string;
@@ -29,6 +30,7 @@ type OrderbookControlsProps = {
 export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const { uiRefresh } = testFlags;
 
   const modifyScale = useCallback(
     (direction: number) => {
@@ -42,6 +44,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
   );
   const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
   const tickSizeDecimals = currentMarketConfig?.tickSizeDecimals ?? USD_DECIMALS;
+
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
       if (!assetId) return;
@@ -55,10 +58,16 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     },
     [dispatch, assetId]
   );
+
   return (
-    <$OrderbookControlsContainer className={className}>
+    <$OrderbookControlsContainer className={className} uiRefreshEnabled={uiRefresh}>
       <div tw="flex justify-between gap-0.5">
         <div tw="flex gap-0.5">
+          <Output
+            value={grouping?.tickSize}
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
+          />
           <$ButtonGroup>
             <Button
               size={ButtonSize.XSmall}
@@ -75,13 +84,8 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
               +
             </Button>
           </$ButtonGroup>
-          <Output
-            value={grouping?.tickSize}
-            type={OutputType.Fiat}
-            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
-          />
         </div>
-        {assetId && (
+        {!uiRefresh && assetId && (
           <ToggleGroup
             items={[
               { label: assetId, value: DisplayUnit.Asset },
@@ -97,7 +101,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
   );
 };
 
-const $OrderbookControlsContainer = styled.div`
+const $OrderbookControlsContainer = styled.div<{ uiRefreshEnabled: boolean }>`
   color: var(--color-text-0);
   font: var(--font-small-book);
 
@@ -109,6 +113,12 @@ const $OrderbookControlsContainer = styled.div`
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
   }
+
+  ${({ uiRefreshEnabled }) =>
+    !uiRefreshEnabled &&
+    css`
+      flex-direction: column-reverse;
+    `}
 `;
 const $ButtonGroup = styled.div`
   display: flex;
