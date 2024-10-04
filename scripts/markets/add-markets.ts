@@ -4,22 +4,27 @@ This script adds markets to a dYdX chain. Markets are read from public/config/ot
 Supported environments: local, dev, dev2, dev3, dev4, dev5, staging.
 
 Usage:
-  $ pnpx tsx scripts/markets/add-markets.ts <environment> <number_of_markets>
+  $ pnpx tsx scripts/markets/add-markets.ts <environment> <number_of_markets> <path_to_dydx_binary>
 Example (add 10 markets on staging):
-  $ pnpx tsx scripts/markets/add-markets.ts staging 10
+  $ pnpx tsx scripts/markets/add-markets.ts staging 10 /Users/alice/v4-chain/protocol/build/dydxprotocold
 */
 import {
   CompositeClient,
   IndexerConfig,
   LocalWallet as LocalWalletType,
   Network,
-  ValidatorConfig,
+  ValidatorConfig
 } from '@dydxprotocol/v4-client-js';
-import { PerpetualMarketType } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { readFileSync } from 'fs';
 import Long from 'long';
-
-import { Proposal, retry, sleep, voteOnProposals } from './help';
+import {
+  createAndSendMarketMapProposal,
+  PerpetualMarketType,
+  Proposal,
+  retry,
+  sleep,
+  voteOnProposals
+} from './help';
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
@@ -132,7 +137,12 @@ const ENV_CONFIG = {
   },
 };
 
-async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): Promise<void> {
+async function addMarkets(
+  env: Env,
+  numMarkets: number,
+  proposals: Proposal[],
+  binary: string
+): Promise<void> {
   // Initialize client and wallets.
   const config = ENV_CONFIG[env];
   const indexerConfig = new IndexerConfig(config.indexerRestEndpoint, config.indexerWsEndpoint);
@@ -150,6 +160,7 @@ async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): 
     'Client Example'
   );
   const network = new Network(env, indexerConfig, validatorConfig);
+  const sleepMsBtwTxs = 3.5 * config.blockTimeSeconds * 1000;
 
   const client = await CompositeClient.connect(network);
   const wallets: LocalWalletType[] = await Promise.all(
@@ -158,16 +169,37 @@ async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): 
     })
   );
 
-  // Send proposals to add all markets (skip markets that already exist).
+  // Filter out markets that already exist on-chain.
   const allPerps = await client.validatorClient.get.getAllPerpetuals();
   const allTickers = allPerps.perpetual.map((perp) => perp.params!.ticker);
   const filteredProposals = proposals.filter(
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
 
-  console.log(`Adding ${numMarkets} new markets to ${env}...`);
+  // Add markets to market map first.
+  console.log("Submitting market map proposal...");
+  await createAndSendMarketMapProposal(
+    filteredProposals.slice(0, numMarkets),
+    config.validatorEndpoint,
+    config.chainId,
+    binary,
+  );
+  await sleep(sleepMsBtwTxs);
+  console.log("Submitted market map proposal");
 
-  const sleepMsBtwTxs = 3.5 * config.blockTimeSeconds * 1000;
+  // Get latest gov proposal ID.
+  const allProposalsResp = await client.validatorClient.get.getAllGovProposals();
+  let latestProposalId = allProposalsResp.proposals.reduce(
+    (max, proposal) => (proposal.id.toNumber() > max ? proposal.id.toNumber() : max),
+    0
+  );
+
+  for (const wallet of wallets) {
+    retry(() => voteOnProposals([latestProposalId], client, wallet));
+  }
+  console.log(`Voted on market map proposal with id ${latestProposalId}`);
+  await sleep(sleepMsBtwTxs);
+
   let numProposalsToSend = Math.min(numMarkets, filteredProposals.length);
   let numProposalsSent = 0;
   const numExistingMarkets = allPerps.perpetual.reduce(
@@ -184,8 +216,7 @@ async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): 
         break;
       }
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1;
-      const marketId: number = numExistingMarkets + proposalId;
+      const marketId: number = numExistingMarkets + numProposalsSent + 1;
 
       // Send proposal.
       const exchangeConfigString = `{"exchanges":${JSON.stringify(
@@ -220,7 +251,7 @@ async function addMarkets(env: Env, numMarkets: number, proposals: Proposal[]): 
       console.log(`Proposed market ${marketId} with ticker ${proposal.params.ticker}`);
 
       // Record proposed market.
-      proposalIds.push(proposalId);
+      proposalIds.push(++latestProposalId);
       numProposalsSent++;
     }
 
@@ -242,12 +273,15 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const env = args[0] as Env;
   const numMarkets = parseInt(args[1], 10);
+  const binary = args[2];
 
   // Validate inputs.
   if (!Object.values(Env).includes(env)) {
     throw new Error(`Invalid environment: ${env}`);
   } else if (isNaN(numMarkets) || numMarkets <= 0) {
     throw new Error(`Invalid number of markets: ${numMarkets}`);
+  } else if (!binary) {
+    throw new Error(`dydx binary path not provided`);
   }
 
   // Read proposals.
@@ -256,7 +290,7 @@ async function main(): Promise<void> {
   );
 
   // Add markets.
-  await addMarkets(env, numMarkets, Object.values(proposals));
+  await addMarkets(env, numMarkets, Object.values(proposals), binary);
 }
 
 main()

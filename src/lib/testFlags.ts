@@ -47,7 +47,7 @@ class TestFlags {
   }
 
   get pml() {
-    return !!this.queryParams.pml || isDev;
+    return !!this.queryParams.pml;
   }
 
   get showLimitClose() {
