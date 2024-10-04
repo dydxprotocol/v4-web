@@ -241,7 +241,7 @@ export async function createAndSendMarketMapProposal(
   } catch (error) {
     await execCLI(
       binary,
-      ['keys', 'add', 'tom', '--recover'],
+      ['keys', 'add', 'alice', '--recover'],
       'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small',
     )
   }
@@ -252,7 +252,7 @@ export async function createAndSendMarketMapProposal(
       '--node', validatorEndpoint,
       'tx', 'gov', 'submit-proposal', 'marketMapProposal.json',
       '--from', 'alice',
-      '--fees', '300000000000000000adv4tnt',
+      '--fees', '800000000000000000adv4tnt',
       '--chain-id', chainId,
       '--gas', 'auto'
     ],
