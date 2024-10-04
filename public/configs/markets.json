@@ -1995,6 +1995,13 @@
         "websiteLink": "https://egoco.in/en/",
         "whitepaperLink": "https://docs.paysenger.com/"
     },
+    "EIGEN-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/eigenlayer/",
+        "name": "EigenLayer",
+        "tags": ["Defi"],
+        "websiteLink": "https://www.eigenlayer.xyz/",
+        "whitepaperLink": "https://docs.eigenlayer.xyz/assets/files/EIGEN_Token_Whitepaper-0df8e17b7efa052fd2a22e1ade9c6f69.pdf/"
+    },
     "ELA-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/elastos/",
         "name": "Elastos",
