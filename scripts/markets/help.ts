@@ -46,7 +46,7 @@ export enum ExchangeName {
   Raydium = 'raydium_api',
   UniswapV3_Ethereum = 'uniswapv3_api-ethereum',
   UniswapV3_Base = 'uniswapv3_api-base',
-  Polymarket = 'polymarket_api'
+  Polymarket = 'polymarket_api',
 }
 
 export interface Params {
@@ -184,6 +184,9 @@ export async function createAndSendMarketMapProposal(
   const markets: Market[] = proposals.map((proposal) => {
     const { ticker, priceExponent, minExchanges, exchangeConfigJson } = proposal.params;
 
+    // Modify the ticker format, replace the last dash with a slash
+    const modifiedTicker = ticker.replace(/-([^-]+)$/, '/$1');
+
     const providerConfigs: ProviderConfig[] = exchangeConfigJson.map((config) => {
       let normalize_by_pair: { Base: string; Quote: string } | null = null;
 
@@ -195,7 +198,7 @@ export async function createAndSendMarketMapProposal(
       return {
         name: config.exchangeName,
         normalize_by_pair,
-        off_chain_ticker: config.ticker,
+        off_chain_ticker: modifiedTicker,
         invert: config.invert || false,
         metadata_JSON: '',
       };
@@ -204,8 +207,8 @@ export async function createAndSendMarketMapProposal(
     return {
       ticker: {
         currency_pair: {
-          Base: ticker.split('/')[0],
-          Quote: ticker.split('/')[1],
+          Base: modifiedTicker.split('/')[0],
+          Quote: modifiedTicker.split('/')[1],
         },
         decimals: Math.abs(priceExponent).toString(),
         enabled: true,
