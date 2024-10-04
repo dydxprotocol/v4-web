@@ -1598,7 +1598,7 @@ const assetIcons = {
     '/currencies/zero,raydium,93rc484omk5t9h89rzt5qiaxkhgp9jscxfffrihnbe57.png',
   ZKP: '/currencies/zkp.png',
   ZTX: '/currencies/ztx.png',
-};
+} as const;
 
 const Placeholder = ({ className, symbol }: { className?: string; symbol: string }) => (
   <$Placeholder className={className}>
