@@ -12,6 +12,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
@@ -43,7 +44,7 @@ const DetailsItem = ({ value, stat }: { value: number | null | undefined; stat: 
   }
 };
 
-export const UnlaunchedMarketStatsDetails = ({
+export const LaunchableMarketStatsDetails = ({
   launchableMarketId,
   showMidMarketPrice = true,
 }: ElementProps) => {
@@ -54,17 +55,32 @@ export const UnlaunchedMarketStatsDetails = ({
   const {
     marketCap,
     price,
+    reportedMarketCap,
     tickSizeDecimals,
     volume24h: spotVolume24H,
   } = orEmptyObj(launchableAsset);
 
+  const showSelfReportedMarketCap = marketCap ? false : !!reportedMarketCap;
+
   const valueMap = {
-    [MarketStats.MARKET_CAP]: marketCap,
+    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap ? reportedMarketCap : marketCap,
     [MarketStats.SPOT_VOLUME_24H]: spotVolume24H,
   };
 
+  const tooltipMap = {
+    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap
+      ? ('self-reported-cmc' as TooltipStringKeys)
+      : undefined,
+    [MarketStats.SPOT_VOLUME_24H]: undefined,
+  };
+
   const labelMap = {
-    [MarketStats.MARKET_CAP]: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+    [MarketStats.MARKET_CAP]: (
+      <span tw="flex items-center gap-0.25">
+        {stringGetter({ key: STRING_KEYS.MARKET_CAP })}
+        {showSelfReportedMarketCap && <Icon iconName={IconName.CautionCircle} />}
+      </span>
+    ),
     [MarketStats.SPOT_VOLUME_24H]: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
   };
 
@@ -81,7 +97,7 @@ export const UnlaunchedMarketStatsDetails = ({
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
-          tooltip: stat as unknown as TooltipStringKeys,
+          tooltip: tooltipMap[stat] as unknown as TooltipStringKeys,
           value: <DetailsItem value={valueMap[stat]} stat={stat} />,
         }))}
         layout={isTablet ? 'grid' : 'rowColumns'}

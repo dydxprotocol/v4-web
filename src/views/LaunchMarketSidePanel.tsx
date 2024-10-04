@@ -111,8 +111,11 @@ export const LaunchMarketSidePanel = ({
       >
         <Button
           action={ButtonAction.Primary}
+          disabled={!launchableAsset}
           onClick={() => {
-            dispatch(openDialog(DialogTypes.LaunchMarket()));
+            if (launchableMarketId) {
+              dispatch(openDialog(DialogTypes.LaunchMarket({ launchableMarketId })));
+            }
           }}
         >
           {stringGetter({ key: STRING_KEYS.BEGIN_LAUNCH })} →

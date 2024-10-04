@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { VerticalSeparator } from '@/components/Separator';
+import { LaunchableMarketStatsDetails } from '@/views/LaunchableMarketStatsDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
 import { MarketsDropdown } from '@/views/MarketsDropdown';
-import { UnlaunchedMarketStatsDetails } from '@/views/UnlaunchedMarketStatsDetails';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -42,7 +42,7 @@ export const MarketSelectorAndStats = ({
       <VerticalSeparator fullHeight={!!uiRefresh} />
 
       {launchableMarketId ? (
-        <UnlaunchedMarketStatsDetails launchableMarketId={launchableMarketId} />
+        <LaunchableMarketStatsDetails launchableMarketId={launchableMarketId} />
       ) : (
         <MarketStatsDetails />
       )}

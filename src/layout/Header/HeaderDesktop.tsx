@@ -94,7 +94,7 @@ export const HeaderDesktop = () => {
               {
                 value: 'TEST_MARKET',
                 label: 'TIME-USD',
-                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M?pml=true',
+                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M-USD?pml=true',
               },
             ]
           : []),
