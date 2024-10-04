@@ -211,7 +211,7 @@ export async function createAndSendMarketMapProposal(
           Quote: modifiedTicker.split('/')[1],
         },
         decimals: Math.abs(priceExponent).toString(),
-        enabled: true,
+        enabled: false,
         min_provider_count: minExchanges.toString(),
         metadata_JSON: '',
       },
@@ -224,9 +224,9 @@ export async function createAndSendMarketMapProposal(
     "summary":"Add markets to market map",
     "messages": [
       {
-        "@type": "/slinky.marketmap.v1.MsgCreateMarkets",
+        "@type": "/slinky.marketmap.v1.MsgUpsertMarkets",
         "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
-        "create_markets": markets,
+        "markets": markets,
       },
     ],
     "deposit":"5000000000000000000adv4tnt",
@@ -237,15 +237,12 @@ export async function createAndSendMarketMapProposal(
   fs.writeFileSync(proposalFile, JSON.stringify(proposal, null, 2), 'utf-8');
 
   try {
-    await execCLI(
-      binary,
-      ['keys', 'show', 'alice'],
-    )
+    await execCLI(binary, ['keys', 'show', 'alice']);
   } catch (error) {
     await execCLI(
       binary,
       ['keys', 'add', 'alice', '--recover'],
-      'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small',
+      'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small'
     )
   }
 

@@ -330,7 +330,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     filteredProposals,
     network.validatorConfig.restEndpoint,
     network.validatorConfig.chainId,
-    'v4-chain/protocol/build/dydxprotocold',
+    'v4-chain/protocol/build/dydxprotocold'
   );
   console.log("Submitted market map proposal");
   await sleep(5000);
