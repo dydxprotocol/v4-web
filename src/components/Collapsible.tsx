@@ -61,7 +61,7 @@ export const Collapsible = ({
         </>
       )}
       <$TriggerIcon>
-        <Icon iconName={triggerIcon} size="0.75em" />
+        <Icon iconName={triggerIcon} />
       </$TriggerIcon>
       {triggerIconSide === 'left' && (
         <>
@@ -92,6 +92,7 @@ const $Trigger = styled(Trigger)`
   --trigger-textColor: inherit;
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
+  --icon-size: var(--trigger-icon-width);
 `;
 const $TriggerIcon = styled.span`
   width: var(--trigger-icon-width);
