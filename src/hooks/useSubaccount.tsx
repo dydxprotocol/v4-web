@@ -962,7 +962,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       usdcCoinBalance &&
       parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE &&
       isReferredByFetched &&
-      !referredBy &&
+      !referredBy?.affiliateAddress &&
       !isRegisterAffiliatePending
     ) {
       registerAffiliateMutate(latestReferrer);
@@ -980,7 +980,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   ]);
 
   useEffect(() => {
-    if (referredBy && latestReferrer) {
+    if (referredBy?.affiliateAddress && latestReferrer) {
       dispatch(removeLatestReferrer());
     }
   }, [referredBy, dispatch, latestReferrer]);

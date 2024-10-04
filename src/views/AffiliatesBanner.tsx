@@ -6,9 +6,11 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -22,9 +24,54 @@ import { openDialog } from '@/state/dialogs';
 export const AffiliatesBanner = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+  const { isTablet } = useBreakpoints();
   const { affiliateProgram } = useURLConfigs();
 
   const background = useAppSelector(getGridBackground);
+
+  const titleString = stringGetter({
+    key: STRING_KEYS.EARN_FOR_EACH_TRADER,
+    params: { AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString() },
+  });
+  const descriptionString1 = stringGetter({
+    key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
+    params: {
+      AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
+    },
+  });
+  const descriptionString2 = stringGetter({
+    key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
+    params: {
+      LINK: (
+        <Link href={affiliateProgram} isInline isAccent>
+          {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
+        </Link>
+      ),
+    },
+  });
+
+  if (isTablet) {
+    return (
+      <$Background backgroundImagePath={background} tw="bg-color-layer-1 p-1">
+        <div tw="column items-start gap-1">
+          <div tw="font-bold text-color-text-2">{titleString}</div>
+          <div tw="">
+            {descriptionString1} <br />
+            {descriptionString2}
+          </div>
+          <Button
+            action={ButtonAction.Primary}
+            slotLeft={<Icon iconName={IconName.Giftbox} />}
+            onClick={() => {
+              dispatch(openDialog(DialogTypes.ShareAffiliate()));
+            }}
+          >
+            {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+          </Button>
+        </div>
+      </$Background>
+    );
+  }
 
   return (
     <$Background
@@ -37,30 +84,12 @@ export const AffiliatesBanner = () => {
           <div tw="row">
             <$Triangle />
             <div tw="inline-block rounded-0.5 bg-color-layer-6 px-1 py-0.5 font-bold text-color-text-2">
-              {stringGetter({
-                key: STRING_KEYS.EARN_FOR_EACH_TRADER,
-                params: { AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString() },
-              })}
+              {titleString}
             </div>
           </div>
           <div tw="ml-0.5">
-            {stringGetter({
-              key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
-              params: {
-                AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
-              },
-            })}{' '}
-            <br />
-            {stringGetter({
-              key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
-              params: {
-                LINK: (
-                  <Link href={affiliateProgram} isInline isAccent>
-                    {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
-                  </Link>
-                ),
-              },
-            })}
+            {descriptionString1} <br />
+            {descriptionString2}
           </div>
         </div>
       </div>
@@ -91,6 +120,11 @@ const $Background = styled.div<{ backgroundImagePath: string }>`
   background-repeat: no-repeat;
   background-position-x: 100%;
   background-size: contain;
+
+  @media ${breakpoints.tablet} {
+    background-position-x: 0;
+    background-size: cover;
+  }
 `;
 
 const $Triangle = styled.div`
