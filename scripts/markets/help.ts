@@ -32,20 +32,21 @@ export interface Exchange {
 }
 
 export enum ExchangeName {
-  Binance = 'Binance',
-  BinanceUS = 'BinanceUS',
-  Bitfinex = 'Bitfinex',
-  Bitstamp = 'Bitstamp',
-  Bybit = 'Bybit',
-  CoinbasePro = 'CoinbasePro',
-  CryptoCom = 'CryptoCom',
-  Gate = 'Gate',
-  Huobi = 'Huobi',
-  Kraken = 'Kraken',
-  Kucoin = 'Kucoin',
-  Mexc = 'Mexc',
-  Okx = 'Okx',
-  Raydium = 'Raydium',
+  Binance = 'binance_ws',
+  Bitfinex = 'bitfinex_ws',
+  Bitstamp = 'bitstamp_api',
+  Bybit = 'bybit_ws',
+  CoinbasePro = 'coinbase_ws',
+  CryptoCom = 'crypto_dot_com_ws',
+  Gate = 'gate_ws',
+  Huobi = 'huobi_ws',
+  Kraken = 'kraken_api',
+  Kucoin = 'kucoin_ws',
+  Okx = 'okx_ws',
+  Raydium = 'raydium_api',
+  UniswapV3_Ethereum = 'uniswapv3_api-ethereum',
+  UniswapV3_Base = 'uniswapv3_api-base',
+  Polymarket = 'polymarket_api'
 }
 
 export interface Params {

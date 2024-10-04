@@ -84,7 +84,6 @@ interface ExchangeInfo {
   url: string;
   tickers: Map<string, any> | null;
   parseResp: (response: any) => Map<string, any>;
-  slinkyProviderName: string;
 }
 
 const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
@@ -97,40 +96,27 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'binance_api',
-  },
-  [ExchangeName.BinanceUS]: {
-    url: 'https://api.binance.us/api/v3/ticker/24hr',
-    tickers: null,
-    parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.symbol, {});
-        return acc;
-      }, new Map<string, any>());
-    },
-    slinkyProviderName: 'binance_api',
   },
   [ExchangeName.Bitfinex]: {
-    url: 'https://api-pub.bitfinex.com/v2/tickers?symbols=ALL',
+    url: 'https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange',
     tickers: null,
     parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item[0], {});
+      return response[0].reduce((acc: Map<string, any>, item: string) => {
+        acc.set(item, {});
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bitfinex_ws',
   },
   [ExchangeName.Bitstamp]: {
     url: 'https://www.bitstamp.net/api/v2/ticker/',
     tickers: null,
     parseResp: (response: any) => {
       return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.pair, {});
+        const convertedPair = item.pair.replace('/', '').toLowerCase();
+        acc.set(convertedPair, {});
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bitstamp_ws',
   },
   [ExchangeName.Bybit]: {
     url: 'https://api.bybit.com/v5/market/tickers?category=spot',
@@ -141,7 +127,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bybit_ws',
   },
   [ExchangeName.CoinbasePro]: {
     url: 'https://api.exchange.coinbase.com/products',
@@ -152,7 +137,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'coinbase_api',
   },
   [ExchangeName.CryptoCom]: {
     url: 'https://api.crypto.com/v2/public/get-ticker',
@@ -163,7 +147,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'crypto_dot_com_ws',
   },
   [ExchangeName.Gate]: {
     url: 'https://api.gateio.ws/api/v4/spot/tickers',
@@ -174,7 +157,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'gate_ws',
   },
   [ExchangeName.Huobi]: {
     url: 'https://api.huobi.pro/market/tickers',
@@ -185,7 +167,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'huobi_ws',
   },
   [ExchangeName.Kraken]: {
     url: 'https://api.kraken.com/0/public/Ticker',
@@ -193,7 +174,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     parseResp: (response: any) => {
       return new Map<string, any>(Object.entries(response.result));
     },
-    slinkyProviderName: 'kraken_api',
   },
   [ExchangeName.Kucoin]: {
     url: 'https://api.kucoin.com/api/v1/market/allTickers',
@@ -204,18 +184,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'kucoin_ws',
-  },
-  [ExchangeName.Mexc]: {
-    url: 'https://www.mexc.com/open/api/v2/market/ticker',
-    tickers: null,
-    parseResp: (response: any) => {
-      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.symbol, {});
-        return acc;
-      }, new Map<string, any>());
-    },
-    slinkyProviderName: 'mexc_ws',
   },
   [ExchangeName.Okx]: {
     url: 'https://www.okx.com/api/v5/market/tickers?instType=SPOT',
@@ -226,7 +194,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'okx_ws',
   },
   [ExchangeName.Raydium]: {
     url: '',
@@ -237,7 +204,36 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'Raydium',
+  },
+  [ExchangeName.UniswapV3_Ethereum]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+  },
+  [ExchangeName.UniswapV3_Base]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+  },
+  [ExchangeName.Polymarket]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
   },
 };
 
@@ -268,6 +264,7 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
       (exchange.exchangeName !== ExchangeName.Raydium &&
+        exchange.exchangeName !== ExchangeName.Polymarket &&
         !/usd$|usdc$/i.test(exchange.ticker) &&
         exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
@@ -283,8 +280,13 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
       continue; // exit the current iteration of the loop.
     }
 
-    // TODO: Skip Raydium since ticker is idiosyncratic
-    if (exchange.exchangeName === ExchangeName.Raydium) {
+    // TODO: Skip Raydium, Uniswap, and Polymarket since ticker is idiosyncratic
+    if (
+      exchange.exchangeName === ExchangeName.Raydium ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Ethereum ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Base ||
+      exchange.exchangeName === ExchangeName.Polymarket
+    ) {
       continue; // exit the current iteration of the loop.
     }
 
@@ -480,7 +482,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       validateSlinkyMetricsPerTicker(
         dydxTickerToSlinkyTicker(proposal.params.ticker),
         exchange.ticker.toLowerCase(),
-        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
+        exchange.exchangeName
       );
     }
   }
