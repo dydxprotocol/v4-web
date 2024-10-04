@@ -58,7 +58,7 @@ export const AffiliatesBanner = () => {
 
   if (isTablet) {
     return (
-      <$Background backgroundImagePath={background} tw="bg-color-layer-1 p-1">
+      <$Background backgroundImagePath={background} tw="mt-1 bg-color-layer-1 p-1">
         <div tw="column items-start gap-1">
           <div tw="font-bold text-color-text-2">{titleString}</div>
           <div tw="">{description}</div>
