@@ -701,6 +701,24 @@ function validateParamsSchema(proposal: Proposal): void {
   }
 }
 
+function validateAtomicResolution(proposal: Proposal): void {
+  if (proposal.params.ticker === 'TRUMPWIN-USD') {
+    if (proposal.params.atomicResolution !== -6) {
+      throw new Error(
+        `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match -6`
+      );
+    } else {
+      return;
+    }
+  }
+  const calculatedAtomicResolution = -6 - Math.floor(Math.log10(proposal.meta.referencePrice));
+  if (proposal.params.atomicResolution !== calculatedAtomicResolution) {
+    throw new Error(
+      `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match the calculated value (${calculatedAtomicResolution}) based on reference price ${proposal.meta.referencePrice}`
+    );
+  }
+}
+
 // getProposalsToValidate finds proposals that are either added or whose params are modified,
 // i.e. ignoring initialDeposit, meta, summary, title, etc.
 function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<string> {
@@ -741,6 +759,12 @@ async function main(): Promise<void> {
   console.log('Validating JSON schema of all proposals...\n');
   for (const proposal of Object.values(newProposals)) {
     validateParamsSchema(proposal);
+  }
+
+  // Validate atomicResolution of all proposals.
+  console.log('Validating atomicResolution of all proposals...\n');
+  for (const proposal of Object.values(newProposals)) {
+    validateAtomicResolution(proposal);
   }
 
   // Validate parameters of all proposals.
