@@ -111,23 +111,6 @@ interface ProviderConfig {
   metadata_JSON: string;
 }
 
-const exchangeNameToMarketMapProviderName: Record<ExchangeName, string> = {
-  [ExchangeName.Binance]: 'binance_ws',
-  [ExchangeName.BinanceUS]: 'binance_ws',
-  [ExchangeName.Bitfinex]: 'bitfinex_ws',
-  [ExchangeName.Bitstamp]: 'bitstamp_api',
-  [ExchangeName.Bybit]: 'bybit_ws',
-  [ExchangeName.CoinbasePro]: 'coinbase_ws',
-  [ExchangeName.CryptoCom]: 'crypto_dot_com_ws',
-  [ExchangeName.Gate]: 'gate_ws',
-  [ExchangeName.Huobi]: 'huobi_ws',
-  [ExchangeName.Kraken]: 'kraken_api',
-  [ExchangeName.Kucoin]: 'kucoin_ws',
-  [ExchangeName.Mexc]: 'mexc_ws',
-  [ExchangeName.Okx]: 'okx_ws',
-  [ExchangeName.Raydium]: 'raydium_api',
-};
-
 export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -210,7 +193,7 @@ export async function createAndSendMarketMapProposal(
       }
 
       return {
-        name: `${exchangeNameToMarketMapProviderName[config.exchangeName as ExchangeName]}`,
+        name: config.exchangeName,
         normalize_by_pair,
         off_chain_ticker: config.ticker,
         invert: config.invert || false,
