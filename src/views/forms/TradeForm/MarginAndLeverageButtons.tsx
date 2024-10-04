@@ -5,13 +5,18 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { MarginModeSelector } from '@/views/forms/TradeForm/MarginModeSelector';
 import { TargetLeverageButton } from '@/views/forms/TradeForm/TargetLeverageButton';
 
+type ElementProps = {
+  openInTradeBox: boolean;
+};
+
+type StyleProps = {
+  className?: string;
+};
+
 export const MarginAndLeverageButtons = ({
   openInTradeBox,
   className,
-}: {
-  openInTradeBox: boolean;
-  className?: string;
-}) => (
+}: ElementProps & StyleProps) => (
   <$MarginAndLeverageButtons className={className}>
     <MarginModeSelector openInTradeBox={openInTradeBox} />
     <TargetLeverageButton />

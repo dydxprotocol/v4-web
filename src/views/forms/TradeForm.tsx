@@ -349,6 +349,7 @@ export const TradeForm = ({
         </>
       ) : currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
         <TradeSideTabs
+          tw="overflow-visible"
           sharedContent={
             <$Content>
               <$MarginAndLeverageButtons openInTradeBox={false} />

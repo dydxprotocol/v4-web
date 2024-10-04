@@ -20,7 +20,15 @@ import abacusStateManager from '@/lib/abacus';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
-export const TradeSideTabs = ({ sharedContent }: { sharedContent: React.ReactNode }) => {
+type ElementProps = {
+  sharedContent: React.ReactNode;
+};
+
+type StyleProps = {
+  className?: string;
+};
+
+export const TradeSideTabs = ({ sharedContent, className }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
   const onboardingState = useAppSelector(getOnboardingState);
@@ -36,6 +44,7 @@ export const TradeSideTabs = ({ sharedContent }: { sharedContent: React.ReactNod
 
   return (
     <$TradeSideTabs
+      className={className}
       fullWidthTabs
       dividerStyle="underline"
       activeTab={selectedOrderSide}
