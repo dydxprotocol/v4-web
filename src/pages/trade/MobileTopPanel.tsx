@@ -51,7 +51,7 @@ export const MobileTopPanel = ({
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const [value, setValue] = useState(Tab.Account);
+  const [value, setValue] = useState(Tab.Price);
 
   const items = [
     {
