@@ -111,7 +111,12 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: chainIdStr === 'solana' ? 'solana' : prefix ? 'cosmos' : 'evm',
+      network:
+        chainIdStr === 'solana' || chainIdStr === 'solana-devnet'
+          ? 'solana'
+          : prefix
+            ? 'cosmos'
+            : 'evm',
       prefix,
     });
   }, [exchange, toAddress, chainIdStr]);

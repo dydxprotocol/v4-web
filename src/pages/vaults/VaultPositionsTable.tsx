@@ -60,7 +60,10 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
                 }
               >
-                <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="h-[2.5em]" />}>
+                <TableCell
+                  stacked
+                  slotLeft={<AssetIcon symbol={asset?.id} tw="[--asset-icon-size:2.5em]" />}
+                >
                   {asset?.name}
                   <div tw="row gap-0.25">
                     <Output
@@ -132,6 +135,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 }
               >
                 <$OutputSigned
+                  tw="w-5"
                   sign={getNumberSign(thirtyDayPnl.absolute)}
                   value={thirtyDayPnl.absolute}
                   type={OutputType.Fiat}

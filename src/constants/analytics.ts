@@ -328,6 +328,25 @@ export const AnalyticsEvents = unionize(
       assetSymbol?: string;
       assetName?: string;
     }>(),
+
+    // vaults
+    ClickViewVaultFromPositionCard: ofType<{}>(),
+    ClickViewVaultFromOverview: ofType<{}>(),
+
+    EnterValidVaultAmountForm: ofType<{}>(),
+    VaultFormPreviewStep: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
+    AttemptVaultOperation: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      amount: number;
+      slippage: number | null | undefined;
+    }>(),
+    VaultOperationPreAborted: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
+    SuccessfulVaultOperation: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      amount: number;
+      amountDiff: number | null | undefined;
+    }>(),
+    VaultOperationProtocolError: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW' }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

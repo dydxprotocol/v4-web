@@ -1,9 +1,12 @@
 import { STRING_KEYS } from '@/constants/localization';
+import { LIQUIDITY_TIERS } from '@/constants/markets';
+import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DetailsItem } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
@@ -11,11 +14,7 @@ import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
 
-const ISOLATED_LIQUIDITY_TIER_INFO = {
-  initialMarginFraction: 0.05,
-  maintenanceMarginFraction: 0.03,
-  impactNotional: 2_500,
-};
+const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];
 
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();
@@ -23,8 +22,9 @@ export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMark
 
   if (!launchableAsset) return null;
 
-  const { name, id, logo, urls, marketCap, volume24h } = launchableAsset;
+  const { name, id, logo, urls, marketCap, reportedMarketCap, volume24h } = launchableAsset;
   const { website, technicalDoc, cmc } = urls;
+  const showSelfReportedMarketCap = marketCap ? false : !!reportedMarketCap;
 
   const items = [
     {
@@ -34,8 +34,19 @@ export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMark
     },
     {
       key: 'market-cap',
-      label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
-      value: <Output useGrouping value={marketCap} type={OutputType.Fiat} />,
+      label: (
+        <span tw="flex items-center gap-0.25">
+          {stringGetter({ key: STRING_KEYS.MARKET_CAP })}
+          {showSelfReportedMarketCap && <Icon iconName={IconName.CautionCircle} />}
+        </span>
+      ),
+      value: (
+        <Output
+          type={OutputType.Fiat}
+          value={showSelfReportedMarketCap ? reportedMarketCap : marketCap}
+        />
+      ),
+      tooltip: showSelfReportedMarketCap ? ('self-reported-cmc' as TooltipStringKeys) : undefined,
     },
     {
       key: 'volume-24h',

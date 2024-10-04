@@ -135,4 +135,5 @@ const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
+  min-width: auto;
 ` as typeof Table;

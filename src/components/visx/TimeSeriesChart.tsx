@@ -78,7 +78,7 @@ type ElementProps<Datum extends {}> = {
   onVisibleDataChange?: (data: Datum[]) => void;
   onZoom?: (_: { zoomDomain: number | undefined }) => void;
   slotEmpty: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 };
 

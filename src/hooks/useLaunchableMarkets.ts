@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
 import {
   MetadataServiceAsset,
+  MetadataServiceCandlesTimeframes,
   MetadataServiceInfoResponse,
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
@@ -16,6 +17,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
+import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
@@ -114,5 +116,26 @@ export const useLaunchableMarkets = () => {
   return {
     ...metadataServiceData,
     data: filteredPotentialMarkets,
+  };
+};
+
+export const useMetadataServiceCandles = (
+  asset?: string,
+  timeframe?: MetadataServiceCandlesTimeframes
+) => {
+  const candlesQuery = useQuery({
+    enabled: !!asset && !!timeframe,
+    queryKey: ['candles', asset, timeframe],
+    queryFn: async () => {
+      return metadataClient.getCandles({ asset: asset!, timeframe: timeframe! });
+    },
+    refetchInterval: timeUnits.minute * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    ...candlesQuery,
+    data: candlesQuery.data?.[asset ?? ''].map(mapMetadataServiceCandles),
   };
 };

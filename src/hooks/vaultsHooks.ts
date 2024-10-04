@@ -15,6 +15,7 @@ import {
   VaultFormAction,
   VaultFormData,
 } from '@/constants/abacus';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 
@@ -22,6 +23,7 @@ import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
 import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
@@ -46,8 +48,8 @@ function mapNullableQueryResult<T>(
 }
 
 const vaultQueryOptions = {
-  staleTime: timeUnits.minute,
-  refetchInterval: timeUnits.minute * 2,
+  staleTime: timeUnits.minute / 4,
+  refetchInterval: timeUnits.minute / 3,
 };
 
 export function useForceRefreshVaultDetails() {
@@ -160,7 +162,6 @@ export const useLoadedVaultPositions = () => {
       );
     },
     ...vaultQueryOptions,
-    refetchInterval: timeUnits.second * 15,
   });
 
   const calculatedPositions = useMemo(() => {
@@ -231,12 +232,20 @@ const VAULT_FORM_AMOUNT_DEBOUNCE_MS = 500;
 const useVaultFormAmountDebounced = () => {
   const amount = useAppSelector((state) => state.vaults.vaultForm.amount);
   const debouncedAmount = useDebounce(amount, VAULT_FORM_AMOUNT_DEBOUNCE_MS);
+
+  useEffect(() => {
+    if (MustBigNumber(debouncedAmount).gt(0)) {
+      track(AnalyticsEvents.EnterValidVaultAmountForm());
+    }
+  }, [debouncedAmount]);
+
   // if the user goes back to the beginning, use that value for calculations
   // this fixes an issue where the validation logic would show an error for a second after submission
   // when we reset the value
   if (amount === '') {
     return amount;
   }
+
   return debouncedAmount;
 };
 

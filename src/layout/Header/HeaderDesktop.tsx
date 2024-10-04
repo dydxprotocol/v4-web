@@ -21,7 +21,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { NewTag } from '@/components/Tag';
+import { MegavaultYieldTag } from '@/pages/portfolio/AccountOverviewSection';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -83,7 +83,7 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        ...(!uiRefreshEnabled && showLaunchMarkets
+        ...(showLaunchMarkets
           ? [
               {
                 value: 'LAUNCH_MARKET',
@@ -94,7 +94,7 @@ export const HeaderDesktop = () => {
               {
                 value: 'TEST_MARKET',
                 label: 'TIME-USD',
-                href: '/trade/TIME,raydium,ED5wbeyAYtLM4WRGnohPxJEwniaikEFioVmJyZH6K31m-USD?pml=true',
+                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M?pml=true',
               },
             ]
           : []),
@@ -102,8 +102,7 @@ export const HeaderDesktop = () => {
           value: 'VAULT',
           label: (
             <>
-              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}{' '}
-              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })} <MegavaultYieldTag />
             </>
           ),
           href: AppRoute.Vault,

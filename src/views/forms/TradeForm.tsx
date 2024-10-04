@@ -486,7 +486,7 @@ const $ToggleGroup = styled(ToggleGroup)`
   button[data-state='off'] {
     gap: 0;
     img {
-      --asset-icon-size: 0rem;
+      display: none;
     }
   }
 ` as typeof ToggleGroup;

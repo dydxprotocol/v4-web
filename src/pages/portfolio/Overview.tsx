@@ -16,8 +16,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 import { TelegramInviteBanner } from '@/views/TelegramInviteBanner';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
@@ -27,8 +25,8 @@ import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCal
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
-import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions';
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
+import { AccountOverviewSection } from './AccountOverviewSection';
 
 export const Overview = () => {
   const stringGetter = useStringGetter();
@@ -50,12 +48,6 @@ export const Overview = () => {
     });
   }, [navigate]);
 
-  const handleViewVault = useCallback(() => {
-    navigate(`${AppRoute.Vault}`, {
-      state: { from: AppRoute.Portfolio },
-    });
-  }, [navigate]);
-
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
@@ -70,6 +62,10 @@ export const Overview = () => {
       )}
 
       <DetachedSection>
+        <AccountOverviewSection />
+      </DetachedSection>
+
+      <DetachedSection>
         <AccountDetailsAndHistory />
       </DetachedSection>
 
@@ -80,7 +76,7 @@ export const Overview = () => {
       )}
 
       <AttachedExpandingSection tw="mt-1">
-        <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
+        <$PortfolioContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
 
         <PositionsTable
           columnKeys={
@@ -115,44 +111,23 @@ export const Overview = () => {
       <DetachedSection>
         <$MaybeUnopenedIsolatedPositionsPanel
           header={
-            <ContentSectionHeader
+            <$PortfolioContentSectionHeader
               title={stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
             />
           }
           onViewOrders={handleViewUnopenedIsolatedOrders}
         />
       </DetachedSection>
-      <DetachedSection>
-        <$MaybeVaultPositionsPanel
-          header={
-            <ContentSectionHeader
-              title={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
-              slotRight={
-                isTablet && (
-                  <Link onClick={handleViewVault} isAccent tw="font-small-book">
-                    {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}{' '}
-                    <Icon iconName={IconName.Arrow} />
-                  </Link>
-                )
-              }
-            />
-          }
-          onViewVault={handleViewVault}
-        />
-      </DetachedSection>
     </div>
   );
 };
-const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
-  margin-top: 1rem;
-  margin-bottom: 1rem;
 
-  > div {
-    padding-left: 1rem;
+const $PortfolioContentSectionHeader = styled(ContentSectionHeader)`
+  h3 {
+    font: var(--font-medium-medium);
   }
 `;
-
-const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
+const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
   margin-top: 1rem;
   margin-bottom: 1rem;
 
