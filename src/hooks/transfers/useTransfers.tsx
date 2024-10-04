@@ -224,8 +224,6 @@ const useTransfersContext = () => {
       }
 
       // DEPOSITS
-      // This should never happen. Consider moving to a useMemo hook
-      // and setting as part of allParams + query keys
 
       if (isDenomCctp(fromToken.denom)) {
         // CCTP Deposits

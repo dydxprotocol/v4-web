@@ -13,7 +13,6 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { isTokenCctp } from '@/constants/cctp';
-import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM } from '@/constants/denoms';
 import {
   getNeutronChainId,
   getNobleChainId,
@@ -75,6 +74,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { skipClient } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
+import { hashFromTx } from '@/lib/txUtils';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -92,12 +92,7 @@ export const WithdrawForm = () => {
   const { subaccountClient, withdraw, sendSkipWithdrawFromSubaccount } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
-  const {
-    exchange,
-    errors: routeErrors,
-    errorMessage: routeErrorMessage,
-    summary,
-  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
   const { usdcLabel, usdcDenom, usdcDecimals } = useTokenConfigs();
@@ -160,7 +155,7 @@ export const WithdrawForm = () => {
     setFromChainId(selectedDydxChainId);
     setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
-    setToAddress('0x0f7833777bfC9ef72D8B76AE954D3849DD71F829');
+    setToAddress('7AFKEVD1Q2wWTG78w7UEQcQs6Bvpt7SCRSytCgUknbnr');
   }, [
     setTransferType,
     setFromChainId,
@@ -181,7 +176,7 @@ export const WithdrawForm = () => {
     setToTokenDenom(defaultTokenDenom);
   }, [defaultTokenDenom, setToTokenDenom]);
 
-  const { screenAddresses, getAccountBalance, compositeClient } = useDydxClient();
+  const { screenAddresses, getAccountBalance } = useDydxClient();
   const nobleChainId = getNobleChainId();
   const osmosisChainId = getOsmosisChainId();
   const neutronChainId = getNeutronChainId();
@@ -199,57 +194,122 @@ export const WithdrawForm = () => {
     }, {}),
   };
 
-  const submitWithdrawToDydxChain = async () => {
-    if (!route || !dydxAddress || !toAddress || !toChainId) return null;
-    return skipClient.executeRoute({
-      route: route?.route,
-      getCosmosSigner: async (chainID) => {
-        console.log('getting cosmos signer for chainID', chainID);
-        if (chainID === 'noble-1') {
-          return localNobleWallet?.offlineSigner;
-        }
-        if (!localDydxWallet?.offlineSigner)
-          throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-        return localDydxWallet?.offlineSigner;
-      },
-      // build this dynamically
-      userAddresses: [
-        { chainID: selectedDydxChainId, address: dydxAddress },
-        {
-          chainID: getNobleChainId(),
-          address: localNobleWallet?.address,
-        },
-        {
-          chainID: toChainId,
-          address: toAddress,
-        },
-      ],
-      onTransactionBroadcast: async ({ txHash, chainID }) => {
-        console.log('on submit complete', txHash, chainID);
-        if (chainID === toChainId) onSubmitComplete(txHash);
-        AutoSweepConfig.disable_autosweep = true;
-        // just submit a real notification once, as soon as we bith withdrawing
-        if (chainID === fromChainId)
-          console.log('we would have disabled autosweeping here', chainID);
-      },
-      onTransactionCompleted: async (chainID) => {
-        console.log('transaction completed for chainID', chainID);
-        if (chainID === getNobleChainId()) {
-          console.log('re-enabling autosweep');
-          AutoSweepConfig.disable_autosweep = false;
-        }
-      },
-    });
-  };
+  const onSubmitComplete = useCallback(
+    (txHash: string | undefined, notificationId: string) => {
+      if (!txHash || !fromChainId || !toChainId) {
+        throw new Error('No transaction hash returned');
+      }
+      setAmount('');
+
+      const notificationParams = {
+        id: notificationId,
+        txHash,
+        type: TransferNotificationTypes.Withdrawal,
+        toChainId,
+        fromChainId,
+        toAmount: Number(amount),
+        triggeredAt: Date.now(),
+        isCctp,
+        isExchange: Boolean(exchange),
+        requestId: undefined,
+      };
+      addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
+      const transferWithdrawContext = {
+        chainId: toChainId,
+        tokenAddress: toToken?.denom || undefined,
+        tokenSymbol: toToken?.symbol || undefined,
+        slippage: slippage || undefined,
+        gasFee: undefined,
+        bridgeFee:
+          Number(route?.route.usdAmountIn) - Number(route?.route.usdAmountOut) || undefined,
+        exchangeRate: undefined,
+        estimatedRouteDuration: route?.route.estimatedRouteDurationSeconds || undefined,
+        toAmount: Number(route?.route.amountOut) || undefined,
+        toAmountMin: Number(route?.route.estimatedAmountOut) || undefined,
+        txHash,
+      };
+      track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+      dd.info('Transfer withdraw submitted', transferWithdrawContext);
+    },
+    [
+      addOrUpdateTransferNotification,
+      amount,
+      exchange,
+      fromChainId,
+      isCctp,
+      route,
+      setAmount,
+      slippage,
+      toChainId,
+      toToken,
+    ]
+  );
 
   /**
-   * Polls for the withdraw to leave your subaccoun
+   * Submits a multiTx route to the dydx chain
+   * TODO: maybe move this to useTransfers
    */
-  const submitMultiTxWithdrawal = useCallback(async () => {
+  const submitWithdrawToDydxChain = useCallback(
+    async (notificationId: string) => {
+      if (!route || !dydxAddress || !toAddress || !toChainId || !localNobleWallet?.address) return;
+      await skipClient.executeRoute({
+        route: route?.route,
+        getCosmosSigner: async (chainID) => {
+          if (chainID === 'noble-1') {
+            if (!localNobleWallet?.offlineSigner) {
+              throw new Error('No local noblewallet offline signer. Cannot submit tx');
+            }
+            return localNobleWallet?.offlineSigner;
+          }
+          if (!localDydxWallet?.offlineSigner)
+            throw new Error('No local dydxwallet offline signer. Cannot submit tx');
+          return localDydxWallet?.offlineSigner;
+        },
+        // TODO: think about building this dynamically
+        userAddresses: [
+          { chainID: selectedDydxChainId, address: dydxAddress },
+          {
+            chainID: getNobleChainId(),
+            address: localNobleWallet?.address,
+          },
+          {
+            chainID: toChainId,
+            address: toAddress,
+          },
+        ],
+        onTransactionBroadcast: async ({ txHash, chainID }) => {
+          if (chainID === toChainId) onSubmitComplete(txHash, notificationId);
+        },
+        onTransactionCompleted: async (chainID) => {
+          // once the transaction in noble is complete, we can be confident that
+          // there are no more funds in the noble wallet that need to be transferred
+          if (chainID === getNobleChainId()) {
+            AutoSweepConfig.disable_autosweep = false;
+          }
+        },
+      });
+    },
+    [
+      route,
+      dydxAddress,
+      toAddress,
+      toChainId,
+      selectedDydxChainId,
+      localNobleWallet,
+      localDydxWallet,
+      onSubmitComplete,
+    ]
+  );
+
+  /**
+   * Polls for the withdraw to from subaccount to hit main account
+   * Locks the execution thread until fresh funds have hit the main account
+   * TODO: lock the thread until main account has at least as much funds as necessary to execute tx
+   */
+  const withdrawFromSubaccount = useCallback(async () => {
     const initialBalance = (await getAccountBalance(dydxAddress as string, usdcDenom))?.amount;
     let currentBalance = initialBalance;
     let iterCount = 0;
-    console.log('withdraw', amount);
     await withdraw(Number(amount));
     while (currentBalance === initialBalance) {
       // eslint-disable-next-line no-await-in-loop
@@ -263,85 +323,13 @@ export const WithdrawForm = () => {
         throw new Error('Balance update timed out');
       }
     }
-    await submitWithdrawToDydxChain();
-  }, [getAccountBalance, dydxAddress, usdcDenom, withdraw, amount, submitWithdrawToDydxChain]);
+  }, [getAccountBalance, dydxAddress, usdcDenom, withdraw, amount]);
 
-  const getCosmosTxWithSubaccountWithdrawal = useCallback(async () => {
-    if (!isCosmosTx || !compositeClient || !subaccountClient) return null;
-    const subaccountWithdrawalMsg = await compositeClient.withdrawFromSubaccountMessage(
-      subaccountClient,
-      Number(amount).toFixed(usdcDecimals)
-    );
-    const cosmosSubaccountWithdrawalMsg = {
-      msgTypeURL: subaccountWithdrawalMsg.typeUrl,
-      msg: JSON.stringify(subaccountWithdrawalMsg.value),
-    };
-
-    console.log(cosmosSubaccountWithdrawalMsg);
-    const cosmosTxWithSubaccountWithdrawal = firstTx.cosmosTx;
-    cosmosTxWithSubaccountWithdrawal.msgs.unshift(cosmosSubaccountWithdrawalMsg);
-    const cosmosTxPayload = route?.txs;
-    cosmosTxPayload[0] = {
-      ...route?.txs[0],
-      cosmosTx: cosmosTxWithSubaccountWithdrawal,
-    };
-    console.log('cosmos payload', cosmosTxPayload);
-    return cosmosTxPayload;
-  }, [amount, compositeClient, cosmosMsg, isCosmosTx, route?.txs, subaccountClient, usdcDecimals]);
-  // console.log(cosmosMsg);
-  // console.log(cosmosMsgToSend);
-
-  const submitCctpWithdraw = async () => {
-    console.log('subbmitting withdrawal');
-    if (!route || !dydxAddress || !toAddress || !toChainId) return {};
-    console.log('executing route');
-    console.log('sub address', subaccountClient?.address, freeCollateral);
-    const blc = await skipClient.balances({
-      chains: {
-        'dydx-mainnet-1': {
-          address: 'dydx1nhzuazjhyfu474er6v4ey8zn6wa5fy6g2dgp7s',
-          denoms: ['ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5'],
-        },
-      },
-    });
-    console.log('balance', blc);
-    await submitMultiTxWithdrawal();
-    // const txs = await getCosmosTxWithSubaccountWithdrawal();
-    // console.log('txs', txs);
-    // return skipClient.executeTxs({
-    //   route: route?.route,
-    //   txs,
-    //   getCosmosSigner: async () => {
-    //     if (!localDydxWallet?.offlineSigner)
-    //       throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-    //     return localDydxWallet?.offlineSigner;
-    //   },
-    //   // build this dynamically
-    //   userAddresses: [
-    //     { chainID: selectedDydxChainId, address: dydxAddress },
-    //     {
-    //       chainID: getNobleChainId(),
-    //       address: convertBech32Address({
-    //         address: dydxAddress,
-    //         bech32Prefix: NOBLE_BECH32_PREFIX,
-    //       }),
-    //     },
-    //     {
-    //       chainID: toChainId,
-    //       address: toAddress,
-    //     },
-    //   ],
-    //   onTransactionBroadcast: async ({ txHash }) => {
-    //     console.log('on submit complete', txHash);
-    //     // just submit a real notification once, as soon as we bith withdrawing
-    //     onSubmitComplete(txHash);
-    //     AutoSweepConfig.disable_autosweep = true;
-    //   },
-    //   onTransactionCompleted: async () => {
-    //     console.log('re-enabling autosweep');
-    //     AutoSweepConfig.disable_autosweep = false;
-    //   },
-    // });
+  const submitCctpWithdraw = async (notificationId: string) => {
+    if (!route || !dydxAddress || !toAddress || !toChainId) return;
+    AutoSweepConfig.disable_autosweep = true;
+    await withdrawFromSubaccount();
+    await submitWithdrawToDydxChain(notificationId);
   };
 
   const submitNonCctpWithdraw = useCallback(
@@ -364,52 +352,15 @@ export const WithdrawForm = () => {
         amount: Number(amount),
         payload,
       });
-      console.log('tx', tx);
 
       // Reset the default options after the tx is sent.
       if (isKeplr && window.keplr) {
         window.keplr.defaultOptions = {};
       }
-      // return hashFromTx(tx.hash);
+      return hashFromTx(tx.hash);
     },
-    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
+    [subaccountClient, isKeplr, sendSkipWithdrawFromSubaccount, amount]
   );
-
-  const onSubmitComplete = (txHash: string | undefined) => {
-    if (!txHash) {
-      throw new Error('No transaction hash returned');
-    }
-    setAmount('');
-
-    const notificationParams = {
-      // id: notificationId,
-      txHash,
-      type: TransferNotificationTypes.Withdrawal,
-      toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-      fromChainId,
-      toAmount: Number(amount),
-      triggeredAt: Date.now(),
-      isCctp,
-      isExchange: Boolean(exchange),
-      requestId: undefined,
-    };
-    addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-    const transferWithdrawContext = {
-      chainId: toChainId,
-      tokenAddress: toToken?.denom || undefined,
-      tokenSymbol: toToken?.symbol || undefined,
-      slippage: slippage || undefined,
-      gasFee: summary?.gasFee || undefined,
-      bridgeFee: summary?.bridgeFee || undefined,
-      exchangeRate: summary?.exchangeRate || undefined,
-      estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
-      toAmount: summary?.toAmount || undefined,
-      toAmountMin: summary?.toAmountMin || undefined,
-      txHash,
-    };
-    track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
-    dd.info('Transfer withdraw submitted', transferWithdrawContext);
-  };
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -446,38 +397,16 @@ export const WithdrawForm = () => {
             })
           );
         } else {
-          // set nobleChainId in exchange, if exchange is chosen.
-          // const toChainId = exchange ? nobleChainId : toChainId || undefined;
-
-          // const notificationParams = {
-          //   id: notificationId,
-          //   // DUMMY_TX_HASH is a place holder before we get the real txHash
-          //   txHash: DUMMY_TX_HASH,
-          //   type: TransferNotificationTypes.Withdrawal,
-          //   toChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-          //   fromChainId,
-          //   toAmount: amount,
-          //   triggeredAt: Date.now(),
-          //   isCctp,
-          //   isExchange: Boolean(exchange),
-          //   requestId: undefined,
-          // };
-
           if (isCctp) {
-            // DONT TRIGGER A DUMMY FOR NOW, THIS ADDS A LOT OF WEIRD COMPLEXITY AROUND TRANSFER NOTIFS
-            // we want to trigger a dummy notification first since CCTP withdraws can take
-            // up to 30s to generate a txHash, set isDummy to true
-            // addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
-            console.log('is cctp, submitting as it');
-            await submitCctpWithdraw();
+            // TODO: figure out withdrawal notifications
+            await submitCctpWithdraw(notificationId);
           } else {
             const txHash = await submitNonCctpWithdraw(JSON.stringify(cosmosMsgToSend));
-            if (txHash) onSubmitComplete(txHash);
+            if (txHash) onSubmitComplete(txHash, notificationId);
             else throw new Error('No transaction hash returned');
           }
         }
       } catch (err) {
-        console.log('error', err);
         log('WithdrawForm/onSubmit', err);
         if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
@@ -533,11 +462,6 @@ export const WithdrawForm = () => {
   const onSetSlippage = useCallback(
     (newSlippage: number) => {
       setSlippage(newSlippage);
-
-      // TODO: to be implemented via abacus
-      // if (MustBigNumber(newSlippage).gt(0) && debouncedAmountBN.gt(0)) {
-      //   fetchRoute({ newAmount: debouncedAmount, newSlippage });
-      // }
     },
     [setSlippage, debouncedAmount]
   );
@@ -560,22 +484,10 @@ export const WithdrawForm = () => {
 
   const onSelectNetwork = useCallback(
     (chainID: string, type: 'chain' | 'exchange') => {
-      console.log('chainID', chainID);
       if (chainID) {
         setAmount('');
         if (type === 'chain') {
           setToChainId(chainID);
-          if (chainID === osmosisChainId) {
-            setToTokenDenom(OSMO_USDC_IBC_DENOM);
-          }
-          if (chainID === neutronChainId) {
-            setToTokenDenom(NEUTRON_USDC_IBC_DENOM);
-          }
-        } else {
-          abacusStateManager.setTransferValue({
-            field: TransferInputField.exchange,
-            value: chainID,
-          });
         }
       }
     },
