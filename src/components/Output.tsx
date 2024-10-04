@@ -404,9 +404,23 @@ export const Output = ({
     case OutputType.Percent:
     case OutputType.SmallPercent:
     case OutputType.Multiple: {
+      const formattedNumber = formatNumberOutput(value, type, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+        useGrouping,
+        fractionDigits,
+        minimumFractionDigits,
+        roundingMode,
+        showSign: ShowSign.None,
+      });
+
+      const renderedNumber = <NumberValue value={formattedNumber} withSubscript={withSubscript} />;
+
       const hasValue = value !== null && value !== undefined;
-      const isNegative = MustBigNumber(value).isNegative();
-      const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
+      const containsNonZeroNumber = /[1-9]/.test(formattedNumber);
+      const isNegative = MustBigNumber(value).isNegative() && containsNonZeroNumber;
+      const isPositive = MustBigNumber(value).isPositive() && containsNonZeroNumber;
 
       const sign: string | undefined = {
         [ShowSign.Both]: isNegative ? UNICODE.MINUS : isPositive ? UNICODE.PLUS : undefined,
@@ -414,21 +428,6 @@ export const Output = ({
         [ShowSign.None]: undefined,
       }[showSign];
 
-      const renderedNumber = (
-        <NumberValue
-          value={formatNumberOutput(value, type, {
-            decimalSeparator,
-            groupSeparator,
-            selectedLocale,
-            useGrouping,
-            fractionDigits,
-            minimumFractionDigits,
-            roundingMode,
-            showSign: ShowSign.None,
-          })}
-          withSubscript={withSubscript}
-        />
-      );
       return (
         <$Number
           key={value?.toString()}

@@ -29,7 +29,7 @@ import { orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = VaultPosition;
 
-const VAULT_PAGE_SIZE = 50 as const;
+const VAULT_PAGE_SIZE = 20 as const;
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
