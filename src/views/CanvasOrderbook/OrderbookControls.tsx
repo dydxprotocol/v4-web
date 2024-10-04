@@ -60,7 +60,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
   );
 
   return (
-    <$OrderbookControlsContainer className={className} uiRefreshEnabled={uiRefresh}>
+    <$OrderbookControlsContainer className={className} $uiRefreshEnabled={uiRefresh}>
       <div tw="flex justify-between gap-0.5">
         <div tw="flex gap-0.5">
           <Output
@@ -101,7 +101,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
   );
 };
 
-const $OrderbookControlsContainer = styled.div<{ uiRefreshEnabled: boolean }>`
+const $OrderbookControlsContainer = styled.div<{ $uiRefreshEnabled: boolean }>`
   color: var(--color-text-0);
   font: var(--font-small-book);
 
@@ -114,8 +114,8 @@ const $OrderbookControlsContainer = styled.div<{ uiRefreshEnabled: boolean }>`
     padding-bottom: 0.3rem;
   }
 
-  ${({ uiRefreshEnabled }) =>
-    !uiRefreshEnabled &&
+  ${({ $uiRefreshEnabled }) =>
+    !$uiRefreshEnabled &&
     css`
       flex-direction: column-reverse;
     `}

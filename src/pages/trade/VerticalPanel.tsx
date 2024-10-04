@@ -126,4 +126,4 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
 const $Tabs = styled(Tabs)`
   --toolbar-padding: 0;
   --toolbar-width: 50%;
-`;
+` as typeof Tabs;

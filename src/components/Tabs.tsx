@@ -176,7 +176,6 @@ const $Root = styled(Root)<{
     --tabs-currentHeight: var(--tabs-height-mobile);
   }
 
-  --toolbar-padding: 0 1rem;
   --toolbar-width: ;
 
   /* Rules */
