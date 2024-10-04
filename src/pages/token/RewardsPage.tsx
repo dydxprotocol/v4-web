@@ -112,8 +112,8 @@ const RewardsPage = () => {
             {showStakingRewardPanel && stakingRewardPanel}
             <StakingPanel />
             <UnbondingPanels />
-            <TradingRewardsChartPanel />
             <LaunchIncentivesPanel />
+            <TradingRewardsChartPanel />
             <NewMarketsPanel />
             <GovernancePanel />
             <RewardHistoryPanel />
@@ -126,8 +126,8 @@ const RewardsPage = () => {
           {showMigratePanel && <MigratePanel />}
           <div tw="flex gap-1.5">
             <div tw="flexColumn flex-[2] gap-1.5">
-              <TradingRewardsChartPanel />
               <LaunchIncentivesPanel />
+              <TradingRewardsChartPanel />
               <RewardHistoryPanel />
             </div>
             <div tw="flexColumn flex-1 gap-1.5">
