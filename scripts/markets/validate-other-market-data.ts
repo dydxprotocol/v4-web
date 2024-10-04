@@ -263,8 +263,7 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
-      (exchange.exchangeName !== ExchangeName.Raydium &&
-        exchange.exchangeName !== ExchangeName.Polymarket &&
+      (exchange.exchangeName !== ExchangeName.Polymarket &&
         !/usd$|usdc$/i.test(exchange.ticker) &&
         exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
