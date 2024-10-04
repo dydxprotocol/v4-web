@@ -224,7 +224,7 @@ export async function createAndSendMarketMapProposal(
     "summary":"Add markets to market map",
     "messages": [
       {
-        "@type": "/connect.marketmap.v2.MsgCreateMarkets",
+        "@type": "/slinky.marketmap.v1.MsgCreateMarkets",
         "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
         "create_markets": markets,
       },
