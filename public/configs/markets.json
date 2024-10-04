@@ -8180,5 +8180,23 @@
         ],
         "websiteLink": "https://bubcat.onl/",
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/goodjobbub/"
+    },
+    "MOODENG-USD": {
+        "name": "Moo Deng (moodengsol.com)",
+        "tags": [
+            "Meme"
+        ],
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/moo-deng-solana/",
+        "websiteLink": "https://moodengsol.com/",
+        "whitepaperLink": null
+    },
+    "GIGA,RAYDIUM,63LFDMNB3MQ8MW9MTZ2TO9BEA2M71KZUUGQ5TIJXCQJ9-USD": {
+        "name": "Gigachad",
+        "tags": [
+            "Meme"
+        ],
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gigachad-meme/",
+        "websiteLink": "https://gigachadsolana.com/",
+        "whitepaperLink": null
     }
 }
