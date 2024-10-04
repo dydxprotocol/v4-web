@@ -29,6 +29,7 @@ export interface Exchange {
   ticker: string;
   adjustByMarket?: string;
   invert?: boolean;
+  metadata_JSON?: string;
 }
 
 export enum ExchangeName {
@@ -200,7 +201,7 @@ export async function createAndSendMarketMapProposal(
         normalize_by_pair,
         off_chain_ticker: config.ticker,
         invert: config.invert || false,
-        metadata_JSON: '',
+        metadata_JSON: config.metadata_JSON,
       };
     });
 
@@ -252,7 +253,7 @@ export async function createAndSendMarketMapProposal(
       '--node', validatorEndpoint,
       'tx', 'gov', 'submit-proposal', 'marketMapProposal.json',
       '--from', 'alice',
-      '--fees', '800000000000000000adv4tnt',
+      '--fees', '2000000000000000000adv4tnt',
       '--chain-id', chainId,
       '--gas', 'auto'
     ],

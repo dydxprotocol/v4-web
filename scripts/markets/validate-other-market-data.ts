@@ -664,6 +664,7 @@ function validateParamsSchema(proposal: Proposal): void {
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
             invert: { type: 'boolean', nullable: true },
+            metadata_JSON: { type: 'string', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
