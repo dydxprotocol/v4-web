@@ -123,7 +123,6 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
-              // href: documentation,
               onClick: () => {
                 dispatch(
                   openDialog(
