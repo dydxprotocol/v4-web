@@ -33,32 +33,35 @@ export const AffiliatesBanner = () => {
     key: STRING_KEYS.EARN_FOR_EACH_TRADER,
     params: { AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString() },
   });
-  const descriptionString1 = stringGetter({
-    key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
-    params: {
-      AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
-    },
-  });
-  const descriptionString2 = stringGetter({
-    key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
-    params: {
-      LINK: (
-        <Link href={affiliateProgram} isInline isAccent>
-          {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
-        </Link>
-      ),
-    },
-  });
+
+  const description = (
+    <>
+      {stringGetter({
+        key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
+        params: {
+          AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT.toLocaleString()}`,
+        },
+      })}{' '}
+      <br />
+      {stringGetter({
+        key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
+        params: {
+          LINK: (
+            <Link href={affiliateProgram} isInline isAccent>
+              {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
+            </Link>
+          ),
+        },
+      })}
+    </>
+  );
 
   if (isTablet) {
     return (
       <$Background backgroundImagePath={background} tw="bg-color-layer-1 p-1">
         <div tw="column items-start gap-1">
           <div tw="font-bold text-color-text-2">{titleString}</div>
-          <div tw="">
-            {descriptionString1} <br />
-            {descriptionString2}
-          </div>
+          <div tw="">{description}</div>
           <Button
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.Giftbox} />}
@@ -87,10 +90,7 @@ export const AffiliatesBanner = () => {
               {titleString}
             </div>
           </div>
-          <div tw="ml-0.5">
-            {descriptionString1} <br />
-            {descriptionString2}
-          </div>
+          <div tw="ml-0.5">{description}</div>
         </div>
       </div>
       <div>
