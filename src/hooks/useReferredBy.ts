@@ -14,15 +14,15 @@ export const useReferredBy = () => {
   const queryFn = async ({ queryKey }: { queryKey: (string | DydxAddress | undefined)[] }) => {
     const [, address] = queryKey;
     if (!address) {
-      return undefined;
+      return {};
     }
     try {
       const affliateAddress = await getReferredBy(address);
 
-      return affliateAddress?.affiliateAddress;
+      return { affiliateAddress: affliateAddress?.affiliateAddress };
     } catch (error) {
       log('useReferredBy', error);
-      return undefined;
+      throw error;
     }
   };
 

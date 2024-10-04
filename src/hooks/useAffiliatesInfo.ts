@@ -15,7 +15,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
   const queryFn = async () => {
     if (!compositeClient || !dydxAddress) {
-      return undefined;
+      return {};
     }
     const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
 
@@ -29,8 +29,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
       const affiliateInfo = await getAffiliateInfo(dydxAddress);
 
       const data: AffiliatesMetadata | undefined = await response.json();
-      const isEligible =
-        Boolean(data?.isVolumeEligible) || Boolean(affiliateInfo?.isWhitelisted) || true;
+      const isEligible = Boolean(data?.isVolumeEligible) || Boolean(affiliateInfo?.isWhitelisted);
 
       return { metadata: data, affiliateInfo, isEligible };
     } catch (error) {
