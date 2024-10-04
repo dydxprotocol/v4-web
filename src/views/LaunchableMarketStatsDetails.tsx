@@ -1,5 +1,8 @@
+import { ReactNode } from 'react';
+
 import styled, { css } from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
@@ -12,6 +15,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
@@ -43,7 +47,7 @@ const DetailsItem = ({ value, stat }: { value: number | null | undefined; stat: 
   }
 };
 
-export const UnlaunchedMarketStatsDetails = ({
+export const LaunchableMarketStatsDetails = ({
   launchableMarketId,
   showMidMarketPrice = true,
 }: ElementProps) => {
@@ -54,19 +58,32 @@ export const UnlaunchedMarketStatsDetails = ({
   const {
     marketCap,
     price,
+    reportedMarketCap,
     tickSizeDecimals,
     volume24h: spotVolume24H,
   } = orEmptyObj(launchableAsset);
 
+  const showSelfReportedMarketCap = marketCap ? false : !!reportedMarketCap;
+
   const valueMap = {
-    [MarketStats.MARKET_CAP]: marketCap,
+    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap ? reportedMarketCap : marketCap,
     [MarketStats.SPOT_VOLUME_24H]: spotVolume24H,
-  };
+  } satisfies Record<MarketStats, Nullable<number>>;
+
+  const tooltipMap = {
+    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap ? 'self-reported-cmc' : undefined,
+    [MarketStats.SPOT_VOLUME_24H]: undefined,
+  } satisfies Record<MarketStats, TooltipStringKeys | undefined>;
 
   const labelMap = {
-    [MarketStats.MARKET_CAP]: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+    [MarketStats.MARKET_CAP]: (
+      <span tw="flex items-center gap-0.25">
+        {stringGetter({ key: STRING_KEYS.MARKET_CAP })}
+        {showSelfReportedMarketCap && <Icon iconName={IconName.CautionCircle} />}
+      </span>
+    ),
     [MarketStats.SPOT_VOLUME_24H]: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
-  };
+  } satisfies Record<MarketStats, ReactNode>;
 
   return (
     <$MarketDetailsItems>
@@ -81,7 +98,7 @@ export const UnlaunchedMarketStatsDetails = ({
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
-          tooltip: stat as unknown as TooltipStringKeys,
+          tooltip: tooltipMap[stat],
           value: <DetailsItem value={valueMap[stat]} stat={stat} />,
         }))}
         layout={isTablet ? 'grid' : 'rowColumns'}
