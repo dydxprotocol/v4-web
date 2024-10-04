@@ -22,6 +22,19 @@ jobs:
           node-version: 18
           cache: pnpm
 
+      - name: Initialize password store
+        run: |
+          gpg --batch --gen-key <<EOF
+          Key-Type: RSA
+          Key-Length: 2048
+          Name-Real: GitHub Actions
+          Name-Email: actions@github.com
+          Expire-Date: 0
+          %no-protection
+          EOF
+          GPG_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub:/ { print $5 }')
+          pass init $GPG_ID
+
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
