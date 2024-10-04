@@ -36,17 +36,17 @@ export enum NewMarketFormStep {
 }
 
 export const NewMarketForm = ({
-  launchableMarketId,
+  defaultLaunchableMarketId,
   setFormStep,
   updateTickerToAdd,
 }: {
-  launchableMarketId?: string;
+  defaultLaunchableMarketId?: string;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
 }) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
-  const [tickerToAdd, setTickerToAdd] = useState<string | undefined>(launchableMarketId);
+  const [tickerToAdd, setTickerToAdd] = useState<string | undefined>(defaultLaunchableMarketId);
   const [liquidityTier, setLiquidityTier] = useState<number>();
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();

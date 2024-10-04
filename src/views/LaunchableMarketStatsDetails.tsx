@@ -1,5 +1,8 @@
+import { ReactNode } from 'react';
+
 import styled, { css } from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
@@ -65,14 +68,12 @@ export const LaunchableMarketStatsDetails = ({
   const valueMap = {
     [MarketStats.MARKET_CAP]: showSelfReportedMarketCap ? reportedMarketCap : marketCap,
     [MarketStats.SPOT_VOLUME_24H]: spotVolume24H,
-  };
+  } satisfies Record<MarketStats, Nullable<number>>;
 
   const tooltipMap = {
-    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap
-      ? ('self-reported-cmc' as TooltipStringKeys)
-      : undefined,
+    [MarketStats.MARKET_CAP]: showSelfReportedMarketCap ? 'self-reported-cmc' : undefined,
     [MarketStats.SPOT_VOLUME_24H]: undefined,
-  };
+  } satisfies Record<MarketStats, TooltipStringKeys | undefined>;
 
   const labelMap = {
     [MarketStats.MARKET_CAP]: (
@@ -82,7 +83,7 @@ export const LaunchableMarketStatsDetails = ({
       </span>
     ),
     [MarketStats.SPOT_VOLUME_24H]: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
-  };
+  } satisfies Record<MarketStats, ReactNode>;
 
   return (
     <$MarketDetailsItems>
@@ -97,7 +98,7 @@ export const LaunchableMarketStatsDetails = ({
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
-          tooltip: tooltipMap[stat] as unknown as TooltipStringKeys,
+          tooltip: tooltipMap[stat],
           value: <DetailsItem value={valueMap[stat]} stat={stat} />,
         }))}
         layout={isTablet ? 'grid' : 'rowColumns'}

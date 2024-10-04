@@ -17,7 +17,7 @@ import { Output, OutputType } from '@/components/Output';
 import { NewMarketForm, NewMarketFormStep } from '../forms/NewMarketForm';
 
 export const LaunchMarketDialog = ({
-  launchableMarketId,
+  defaultLaunchableMarketId,
   setIsOpen,
 }: DialogProps<LaunchMarketDialogProps>) => {
   const { isMobile } = useBreakpoints();
@@ -89,7 +89,10 @@ export const LaunchMarketDialog = ({
       setIsOpen={setIsOpen}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <NewMarketForm launchableMarketId={launchableMarketId} setFormStep={setFormStep} />
+      <NewMarketForm
+        defaultLaunchableMarketId={defaultLaunchableMarketId}
+        setFormStep={setFormStep}
+      />
     </Dialog>
   );
 };

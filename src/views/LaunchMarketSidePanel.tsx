@@ -114,7 +114,11 @@ export const LaunchMarketSidePanel = ({
           disabled={!launchableAsset}
           onClick={() => {
             if (launchableMarketId) {
-              dispatch(openDialog(DialogTypes.LaunchMarket({ launchableMarketId })));
+              dispatch(
+                openDialog(
+                  DialogTypes.LaunchMarket({ defaultLaunchableMarketId: launchableMarketId })
+                )
+              );
             }
           }}
         >
