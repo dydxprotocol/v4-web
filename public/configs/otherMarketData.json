@@ -13378,47 +13378,6 @@
       "cmcId": 6756.0
     }
   },
-  "TOSHI": {
-    "title": "Add TOSHI-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TOSHI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 284,
-      "ticker": "TOSHI-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "TOSHI_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "TOSHI,UNISWAP_V3_BASE,0XAC1BD2486AAF3B5C0FC3FD868558B082A531B2B4/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x5aa4ad647580bfe86258d300bc9852f4434e2c61\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Toshi",
-      "referencePrice": 0.00011981528000000001,
-      "cmcId": 27750.0
-    }
-  },
   "ZCX": {
     "title": "Add ZCX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZCX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -18178,42 +18137,6 @@
       "assetName": "Slothana",
       "referencePrice": 0.00681719463,
       "cmcId": 31163.0
-    }
-  },
-  "MOCHI,UNISWAP_V3_BASE,0XF6E932CA12AFA26665DC4DDE7E27BE02A7C02E50": {
-    "title": "Add MOCHI,UNISWAP_V3_BASE,0XF6E932CA12AFA26665DC4DDE7E27BE02A7C02E50-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MOCHI,UNISWAP_V3_BASE,0XF6E932CA12AFA26665DC4DDE7E27BE02A7C02E50-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 399,
-      "ticker": "MOCHI,UNISWAP_V3_BASE,0XF6E932CA12AFA26665DC4DDE7E27BE02A7C02E50-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -15,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "MOCHI,UNISWAP_V3_BASE,0XF6E932CA12AFA26665DC4DDE7E27BE02A7C02E50/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xfcc89a1f250d76de198767d33e1ca9138a7fb54b\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 0.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Mochi (New)",
-      "referencePrice": 7.901173001000001e-06,
-      "cmcId": 28478.0
     }
   },
   "DUEL": {
@@ -25347,78 +25270,6 @@
       "assetName": "Mythos",
       "referencePrice": 0.20637080000000002,
       "cmcId": 22125.0
-    }
-  },
-  "WEWE,UNISWAP_V3_BASE,0X6B9BB36519538E0C073894E964E90172E1C0B41F": {
-    "title": "Add WEWE,UNISWAP_V3_BASE,0X6B9BB36519538E0C073894E964E90172E1C0B41F-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WEWE,UNISWAP_V3_BASE,0X6B9BB36519538E0C073894E964E90172E1C0B41F-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 588,
-      "ticker": "WEWE,UNISWAP_V3_BASE,0X6B9BB36519538E0C073894E964E90172E1C0B41F-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "WEWE,UNISWAP_V3_BASE,0X6B9BB36519538E0C073894E964E90172E1C0B41F/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x5e9bb3d7682a9537db831060176c4247ab80d1ec\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "WEWECOIN",
-      "referencePrice": 0.000100036,
-      "cmcId": 32343.0
-    }
-  },
-  "OWO,UNISWAP_V3_BASE,0X5D559EA7BB2DAE4B694A079CB8328A2145FD32F6": {
-    "title": "Add OWO,UNISWAP_V3_BASE,0X5D559EA7BB2DAE4B694A079CB8328A2145FD32F6-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OWO,UNISWAP_V3_BASE,0X5D559EA7BB2DAE4B694A079CB8328A2145FD32F6-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 589,
-      "ticker": "OWO,UNISWAP_V3_BASE,0X5D559EA7BB2DAE4B694A079CB8328A2145FD32F6-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "OWO,UNISWAP_V3_BASE,0X5D559EA7BB2DAE4B694A079CB8328A2145FD32F6/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x09c149c856e6fb6e40aa39209142411b554b1a41\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "SoMon",
-      "referencePrice": 0.019056858,
-      "cmcId": 32669.0
     }
   },
   "JUNGLE,RAYDIUM,9P32YQUCXFZNDOXMMJNZBPQXQGFOU4TA4SB1RAQH9CYW": {
