@@ -221,8 +221,8 @@ export async function createAndSendMarketMapProposal(
     return {
       ticker: {
         currency_pair: {
-          Base: ticker.split('-')[0],
-          Quote: ticker.split('-')[1],
+          Base: ticker.split('/')[0],
+          Quote: ticker.split('/')[1],
         },
         decimals: Math.abs(priceExponent).toString(),
         enabled: true,
@@ -238,7 +238,7 @@ export async function createAndSendMarketMapProposal(
     "summary":"Add markets to market map",
     "messages": [
       {
-        "@type": "/slinky.marketmap.v1.MsgCreateMarkets",
+        "@type": "/connect.marketmap.v2.MsgCreateMarkets",
         "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
         "create_markets": markets,
       },
