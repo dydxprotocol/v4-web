@@ -249,6 +249,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           onTooltipContext={onTooltipContext}
           onZoom={handleZoom}
           defaultZoomDomain={zoomDomain}
+          domainBasePadding={[0.01, 0]}
           minZoomDomain={timeUnits.day * 2.5}
           slotEmpty={undefined}
           numGridLines={0}
