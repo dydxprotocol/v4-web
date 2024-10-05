@@ -345,6 +345,8 @@ export const AnalyticsEvents = unionize(
       operation: 'DEPOSIT' | 'WITHDRAW';
       amount: number;
       amountDiff: number | null | undefined;
+      submissionTimeBase: number;
+      submissionTimeTotal: number;
     }>(),
     VaultOperationProtocolError: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW' }>(),
   },

@@ -206,14 +206,19 @@ export const VaultDepositWithdrawForm = ({
           return;
         }
 
+        const startTime = new Date().valueOf();
         await depositToMegavault(cachedAmount);
+        const intermediateTime = new Date().valueOf();
         await sleep(INDEXER_LAG_ALLOWANCE);
+        const finalTime = new Date().valueOf();
 
         track(
           AnalyticsEvents.SuccessfulVaultOperation({
             amount: MustBigNumber(amount).toNumber(),
             operation,
             amountDiff: undefined,
+            submissionTimeBase: intermediateTime - startTime,
+            submissionTimeTotal: finalTime - startTime,
           })
         );
         notify({
@@ -259,11 +264,15 @@ export const VaultDepositWithdrawForm = ({
         }
 
         const preEstimate = validationResponse.summaryData.estimatedAmountReceived;
+
+        const startTime = new Date().valueOf();
         const result = await withdrawFromMegavault(
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
+        const intermediateTime = new Date().valueOf();
         await sleep(INDEXER_LAG_ALLOWANCE);
+        const finalTime = new Date().valueOf();
 
         const events = (result as IndexedTx)?.events;
         const actualAmount = events
@@ -276,6 +285,8 @@ export const VaultDepositWithdrawForm = ({
             amount: realAmountReceived,
             operation,
             amountDiff: Math.abs((preEstimate ?? 0) - (realAmountReceived ?? 0)),
+            submissionTimeBase: intermediateTime - startTime,
+            submissionTimeTotal: finalTime - startTime,
           })
         );
         notify({
