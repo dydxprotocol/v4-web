@@ -6,7 +6,7 @@ type NonNullableArray<T extends readonly any[]> = {
   [K in keyof T]: NonNullable<T[K]>;
 };
 
-export function runIf<Args extends any[], T>(
+export function mapIfPresent<Args extends any[], T>(
   ...args: [...Args, (...args: NonNullableArray<Args>) => T]
 ): T | undefined {
   if ([...args].some((f) => f == null)) {

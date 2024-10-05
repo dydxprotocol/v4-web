@@ -56,9 +56,10 @@ import {
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
 import { assertNever } from '@/lib/assertNever';
-import { runFn } from '@/lib/do';
-import { MustBigNumber } from '@/lib/numbers';
+import { mapIfPresent, runFn } from '@/lib/do';
+import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
+import { sleep } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 // errors we don't want to show aggressive visual cues about, just disable submit
@@ -69,7 +70,7 @@ type VaultDepositWithdrawFormProps = {
   onSuccess?: () => void;
 };
 
-const INDEXER_LAG_ALLOWANCE = timeUnits.second * 2;
+const INDEXER_LAG_ALLOWANCE = timeUnits.second * 2.5;
 
 const $SmallIcon = styled(Icon)<{ $hasError?: boolean }>`
   ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
@@ -206,6 +207,7 @@ export const VaultDepositWithdrawForm = ({
         }
 
         await depositToMegavault(cachedAmount);
+        await sleep(INDEXER_LAG_ALLOWANCE);
 
         track(
           AnalyticsEvents.SuccessfulVaultOperation({
@@ -261,6 +263,7 @@ export const VaultDepositWithdrawForm = ({
           submissionData?.withdraw?.shares,
           submissionData?.withdraw?.minAmount
         );
+        await sleep(INDEXER_LAG_ALLOWANCE);
 
         const events = (result as IndexedTx)?.events;
         const actualAmount = events
@@ -328,7 +331,6 @@ export const VaultDepositWithdrawForm = ({
       console.error('Error submitting megavault transaction', e);
     } finally {
       forceRefreshVaultAccount();
-      setTimeout(() => forceRefreshVaultAccount(), INDEXER_LAG_ALLOWANCE);
       forceRefreshVault();
       setIsSubmitting(false);
     }
@@ -347,6 +349,13 @@ export const VaultDepositWithdrawForm = ({
       type={OutputType.Fiat}
       value={freeCollateral?.current}
       newValue={freeCollateralUpdated}
+      sign={getNumberSign(
+        mapIfPresent(
+          freeCollateralUpdated,
+          freeCollateral?.current,
+          (updated, cur) => updated - cur
+        )
+      )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         freeCollateralUpdated != null &&
@@ -359,6 +368,9 @@ export const VaultDepositWithdrawForm = ({
       type={OutputType.Fiat}
       value={userBalance}
       newValue={userBalanceUpdated}
+      sign={getNumberSign(
+        mapIfPresent(userBalanceUpdated, userBalance ?? 0.0, (updated, cur) => updated - cur)
+      )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         userBalanceUpdated != null &&
@@ -371,6 +383,13 @@ export const VaultDepositWithdrawForm = ({
       type={OutputType.Fiat}
       value={userAvailableBalance}
       newValue={userAvailableUpdated}
+      sign={getNumberSign(
+        mapIfPresent(
+          userAvailableUpdated,
+          userAvailableBalance ?? 0.0,
+          (updated, cur) => updated - cur
+        )
+      )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         userAvailableUpdated != null &&
@@ -383,6 +402,9 @@ export const VaultDepositWithdrawForm = ({
       type={OutputType.Percent}
       value={marginUsage?.current}
       newValue={marginUsageUpdated}
+      sign={getNumberSign(
+        mapIfPresent(marginUsage?.current, marginUsageUpdated, (updated, cur) => updated - cur)
+      )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         marginUsageUpdated != null &&

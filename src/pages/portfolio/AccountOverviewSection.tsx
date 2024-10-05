@@ -23,7 +23,7 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
-import { runIf } from '@/lib/do';
+import { mapIfPresent } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -60,7 +60,7 @@ export const AccountOverviewSection = () => {
 
   const { equity, freeCollateral } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { balanceUsdc: vaultBalance } = orEmptyObj(useLoadedVaultAccount().data);
-  const totalValue = runIf(equity?.current, (e) => e + (vaultBalance ?? 0));
+  const totalValue = mapIfPresent(equity?.current, (e) => e + (vaultBalance ?? 0));
 
   const handleViewVault = useCallback(() => {
     track(AnalyticsEvents.ClickViewVaultFromOverview());
@@ -81,8 +81,8 @@ export const AccountOverviewSection = () => {
     },
     {
       id: 'open-positions',
-      label: stringGetter({ key: STRING_KEYS.OPEN_POSITIONS }),
-      amount: runIf(equity?.current, freeCollateral?.current, (e, f) => e - f),
+      label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
+      amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) => e - f),
       color: ColorToken.Green2,
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {

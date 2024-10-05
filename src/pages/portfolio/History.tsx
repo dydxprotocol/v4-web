@@ -44,7 +44,7 @@ export const History = () => {
                 },
                 enableVaults && {
                   value: HistoryRoute.VaultTransfers,
-                  label: <h3>{stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}</h3>,
+                  label: <h3>{stringGetter({ key: STRING_KEYS.VAULT_TRANSFERS })}</h3>,
                   href: HistoryRoute.VaultTransfers,
                   tag: 'USDC',
                 },

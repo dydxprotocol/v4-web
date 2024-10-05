@@ -98,4 +98,6 @@ const $Root = styled(Root)<{ overflow: 'scroll' | 'wrap' }>`
 
 const $Label = styled.div`
   ${layoutMixins.textTruncate}
+  // don't truncate 2 characters
+  min-width: 1rem;
 `;
