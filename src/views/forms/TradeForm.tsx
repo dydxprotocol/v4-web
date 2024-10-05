@@ -53,7 +53,9 @@ import abacusStateManager from '@/lib/abacus';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
+import { TradeSideTabs } from '../TradeSideTabs';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
+import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
 import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
@@ -253,11 +255,13 @@ export const TradeForm = ({
         {/* TODO[TRCL-1411]: add orderbook scale functionality */}
       </div>
 
-      <$ToggleGroup
-        items={allTradeTypeItems}
-        value={selectedTradeType}
-        onValueChange={onTradeTypeChange}
-      />
+      <$FadeContainer>
+        <$ToggleGroup
+          items={allTradeTypeItems}
+          value={selectedTradeType}
+          onValueChange={onTradeTypeChange}
+        />
+      </$FadeContainer>
     </$TopActionsRow>
   );
 
@@ -343,6 +347,17 @@ export const TradeForm = ({
           <PositionPreview />
           {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
         </>
+      ) : currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
+        <TradeSideTabs
+          tw="overflow-visible"
+          sharedContent={
+            <$Content>
+              <$MarginAndLeverageButtons openInTradeBox={false} />
+              {tabletActionsRow}
+              {orderbookAndInputs}
+            </$Content>
+          }
+        />
       ) : (
         <>
           {tabletActionsRow}
@@ -397,6 +412,12 @@ const $TradeForm = styled.form`
   }
 `;
 
+const $Content = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.75rem;
+  box-shadow: none;
+`;
+
 const $TopActionsRow = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -405,6 +426,10 @@ const $TopActionsRow = styled.div`
     grid-auto-columns: var(--orderbox-column-width) 1fr;
     gap: var(--orderbox-gap);
   }
+`;
+
+const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
+  margin-top: 0.75rem;
 `;
 
 const $OrderbookButton = styled(ToggleButton)`
@@ -452,12 +477,15 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
   }
 `;
 
-const $ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
+const $FadeContainer = styled.div`
+  ${layoutMixins.scrollAreaFadeEnd}
+  display: flex;
+  align-items: center;
+`;
 
+const $ToggleGroup = styled(ToggleGroup)`
   button[data-state='off'] {
     gap: 0;
-
     img {
       display: none;
     }

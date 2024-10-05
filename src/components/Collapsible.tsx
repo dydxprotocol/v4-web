@@ -92,6 +92,7 @@ const $Trigger = styled(Trigger)`
   --trigger-textColor: inherit;
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
+  --icon-size: var(--trigger-icon-width);
 `;
 const $TriggerIcon = styled.span`
   width: var(--trigger-icon-width);

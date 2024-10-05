@@ -68,9 +68,7 @@ const $YourPosition = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);
 
-  > img {
-    height: 1.75em;
-  }
+  --asset-icon-size: 1.75em;
 
   strong {
     font-weight: normal;
