@@ -10,10 +10,12 @@ type AffiliatesMetadata = {
   isAffiliate: boolean;
 };
 
+process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000';
+
 export const useAffiliatesInfo = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo } = useDydxClient();
 
-  const queryFn = async () => {
+  const fetchAffiliateMetadata = async () => {
     if (!compositeClient || !dydxAddress) {
       return {};
     }
@@ -38,11 +40,95 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     }
   };
 
-  const query = useQuery({
-    queryKey: ['affiliatesMetadata', dydxAddress],
-    queryFn,
+  const fetchProgramStats = async () => {
+    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/program-stats`;
+
+    try {
+      const res = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      });
+
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      log('useAffiliatesInfo/fetchProgramStats', error, { endpoint });
+      throw error;
+    }
+  };
+
+  const fetchAccountStats = async () => {
+    // if (!isConnectedWagmi) {
+    //   return;
+    // }
+    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/account/${dydxAddress}`;
+
+    try {
+      const res = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      });
+
+      const data = await res.json();
+
+      return data;
+    } catch (error) {
+      log('useAffiliatesInfo/fetchAccountStats', error, { endpoint });
+      throw error;
+    }
+  };
+
+  const fetchLastUpdated = async () => {
+    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/last-updated`;
+
+    try {
+      const res = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      });
+
+      const data = await res.json();
+
+      return data;
+    } catch (error) {
+      log('useAffiliatesInfo/fetchLastUpdated', error, { endpoint });
+      throw error;
+    }
+  };
+
+  const affiliateMetadataQuery = useQuery({
+    queryKey: ['affiliateMetadata', dydxAddress],
+    queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress),
   });
 
-  return query;
+  const programStatsQuery = useQuery({
+    queryKey: ['programStats'],
+    queryFn: fetchProgramStats,
+    enabled: Boolean(compositeClient),
+  });
+
+  const affiliateStatsQuery = useQuery({
+    queryKey: ['accountStats', dydxAddress],
+    queryFn: fetchAccountStats,
+    enabled: Boolean(dydxAddress),
+  });
+
+  const lastUpdatedQuery = useQuery({
+    queryKey: ['lastUpdated'],
+    queryFn: fetchLastUpdated,
+  });
+
+  return {
+    affiliateMetadataQuery,
+    programStatsQuery,
+    affiliateStatsQuery,
+    lastUpdatedQuery,
+  };
 };

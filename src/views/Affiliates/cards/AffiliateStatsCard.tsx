@@ -23,7 +23,7 @@ const MobileView = ({
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
   isVip: boolean;
-  currentAffiliateTier: number;
+  currentAffiliateTier?: number;
 }) => {
   const stringGetter = useStringGetter();
 
@@ -99,7 +99,7 @@ const DesktopView = ({
   accountStats?: IAffiliateStats;
   toggleCriteria: () => void;
   isVip: boolean;
-  currentAffiliateTier: number;
+  currentAffiliateTier?: number;
 }) => {
   const stringGetter = useStringGetter();
   const linkRef = useRef<HTMLAnchorElement>(null); // Reference to the button element
@@ -171,7 +171,7 @@ interface IAffiliateStatsProps {
   className?: string;
   accountStats?: IAffiliateStats;
   isVip: boolean;
-  currentAffiliateTier: number;
+  currentAffiliateTier?: number;
 }
 
 export const AffiliateStatsCard = ({
@@ -207,7 +207,7 @@ export const AffiliateStatsCard = ({
 
       {isCriteriaVisible && (
         <CriteriaModal
-          userTier={isVip ? 'vip' : currentAffiliateTier}
+          userTier={isVip ? 'vip' : (currentAffiliateTier ?? 0)}
           accountStats={accountStats}
           isCriteriaVisible={isCriteriaVisible}
           toggleCriteria={toggleCriteria}

@@ -33,14 +33,14 @@ const MobileView = ({ programStats }: { programStats: IProgramStats }) => {
           className="relative"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={programStats.totalEarnings}
+          value={programStats?.totalEarnings}
         />
 
         <StatCell
           valueSize="large"
           title={stringGetter({ key: STRING_KEYS.TOTAL_AFFILIATES })}
           outputType={OutputType.Number}
-          value={programStats.totalAffiliates}
+          value={programStats?.totalAffiliates}
         />
       </MobileStatsHeader>
       <div className="flex w-full flex-wrap justify-between">
@@ -49,27 +49,27 @@ const MobileView = ({ programStats }: { programStats: IProgramStats }) => {
           className="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={programStats.referredVolume}
+          value={programStats?.referredVolume}
         />
         <BorderStatCell
           border={['bottom']}
           className="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.FEES_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={programStats.referredFees}
+          value={programStats?.referredFees}
         />
         <BorderStatCell
           border={['right']}
           className="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
           outputType={OutputType.Number}
-          value={programStats.totalReferredUsers}
+          value={programStats?.totalReferredUsers}
         />
         <StatCell
           className="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.TRADES_REFERRED })}
           outputType={OutputType.Number}
-          value={programStats.referredTrades}
+          value={programStats?.referredTrades}
         />
       </div>
     </div>
@@ -87,14 +87,14 @@ const DesktopView = ({ programStats }: { programStats: IProgramStats }) => {
           className="relative inline-block"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={programStats.totalEarnings}
+          value={programStats?.totalEarnings}
         />
 
         <StatCell
           valueSize="large"
           title={stringGetter({ key: STRING_KEYS.TOTAL_AFFILIATES })}
           outputType={OutputType.Number}
-          value={programStats.totalAffiliates}
+          value={programStats?.totalAffiliates}
         />
       </div>
       <div className="flex">
@@ -103,27 +103,27 @@ const DesktopView = ({ programStats }: { programStats: IProgramStats }) => {
           className="pr-1"
           outputType={OutputType.CompactFiat}
           title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-          value={programStats.referredVolume}
+          value={programStats?.referredVolume}
         />
         <BorderStatCell
           border={['right']}
           className="px-1"
           title={stringGetter({ key: STRING_KEYS.FEES_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={programStats.referredFees}
+          value={programStats?.referredFees}
         />
         <BorderStatCell
           border={['right']}
           className="px-1"
           title={stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
           outputType={OutputType.Number}
-          value={programStats.totalReferredUsers}
+          value={programStats?.totalReferredUsers}
         />
         <StatCell
           className="px-1"
           title={stringGetter({ key: STRING_KEYS.TRADES_REFERRED })}
           outputType={OutputType.Number}
-          value={programStats.referredTrades}
+          value={programStats?.referredTrades}
         />
       </div>
     </div>

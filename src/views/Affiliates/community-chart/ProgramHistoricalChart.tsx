@@ -2,11 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
-import axios from 'axios';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
-import { IDateStats } from '@/constants/affiliates';
 import {
   AffiliatesProgramDatum,
   AffiliatesProgramMetric,
@@ -18,6 +16,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
+import { useCommunityChart } from '@/hooks/useCommunityChart';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
@@ -72,11 +71,11 @@ export const ProgramHistoricalChart = ({
   const [tooltipContext, setTooltipContext] =
     useState<TooltipContextType<AffiliatesProgramDatum>>();
   const [isZooming, setIsZooming] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<AffiliatesProgramPeriod>(
-    AffiliatesProgramPeriod.PeriodAllTime
-  );
+
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
-  const [metricData, setMetricData] = useState<{ date: number; cumulativeAmount: number }[]>([]);
+  const { setSelectedPeriod, selectedPeriod, communityChartMetricsQuery } =
+    useCommunityChart(selectedChartMetric);
+  const metricData = communityChartMetricsQuery?.data ?? [];
 
   const chartTitles = {
     [AffiliatesProgramMetric.AffiliateEarnings]: stringGetter({
@@ -87,48 +86,9 @@ export const ProgramHistoricalChart = ({
     [AffiliatesProgramMetric.ReferredVolume]: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
   };
 
-  useEffect(() => {
-    fetchMetricData();
-  }, [selectedChartMetric, selectedPeriod]);
-
-  const getStartDate = (): string => {
-    const currentTime = new Date();
-
-    switch (selectedPeriod) {
-      case AffiliatesProgramPeriod.Period1d:
-        return new Date(currentTime.setDate(currentTime.getDate() - 1)).toISOString();
-      case AffiliatesProgramPeriod.Period7d:
-        return new Date(currentTime.setDate(currentTime.getDate() - 7)).toISOString();
-      case AffiliatesProgramPeriod.Period30d:
-        return new Date(currentTime.setMonth(currentTime.getMonth() - 1)).toISOString();
-      case AffiliatesProgramPeriod.Period90d:
-        return new Date(currentTime.setMonth(currentTime.getMonth() - 3)).toISOString();
-      case AffiliatesProgramPeriod.PeriodAllTime:
-        return new Date(0).toISOString(); // The earliest possible date
-      default:
-        throw new Error('Invalid rolling window value');
-    }
-  };
-
-  const fetchMetricData = async () => {
-    const { data } = await axios.get(
-      `http://localhost:3000/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`
-    );
-
-    const periodData: IDateStats[] = data;
-
-    setMetricData(
-      periodData
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((m) => ({
-          date: new Date(m.date).getTime(),
-          cumulativeAmount: Number(m[selectedChartMetric]),
-        }))
-    );
-  };
-
-  const oldestDataPointDate = metricData?.[0]?.date;
-  const newestDataPointDate = metricData?.[metricData.length - 1]?.date;
+  const oldestDataPointDate = metricData[0] && new Date(metricData[0].date).getTime();
+  const newestDataPointDate =
+    metricData[metricData.length - 1] && new Date(metricData.length - 1).getTime();
 
   const msForPeriod = useCallback(
     (period: AffiliatesProgramPeriod, clampMax: Boolean = true) => {
@@ -152,26 +112,6 @@ export const ProgramHistoricalChart = ({
     },
     [now, historyStartDate, newestDataPointDate, oldestDataPointDate]
   );
-
-  // Include period option only if oldest date is older it
-  // e.g. oldest date is 31 days old -> show 30d option, but not 90d
-  // const getPeriodOptions = useCallback(
-  //   (oldestMs: number): AffiliatesProgramPeriod[] =>
-  //     affiliatesProgramPeriods.reduce((acc: AffiliatesProgramPeriod[], period) => {
-  //       if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
-  //         acc.push(period);
-  //       }
-  //       return acc;
-  //     }, []),
-  //   [msForPeriod, newestDataPointDate, now]
-  // );
-
-  // useEffect(() => {
-  //   if (oldestDataPointDate) {
-  //     const options = getPeriodOptions(oldestDataPointDate);
-  //     setPeriodOptions(options);
-  //   }
-  // }, [oldestDataPointDate, getPeriodOptions]);
 
   // Update selected period in toggle if user zooms in/out
   const onZoomSnap = useMemo(

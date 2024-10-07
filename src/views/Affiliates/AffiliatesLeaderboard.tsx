@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import axios from 'axios';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -8,6 +7,7 @@ import { IAffiliateStats } from '@/constants/affiliates';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAffiliatesLeaderboard } from '@/hooks/useAffiliatesLeaderboard';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -93,28 +93,8 @@ export const AffiliatesLeaderboard = ({
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
-  const [affiliates, setAffiliates] = useState<IAffiliateStats[]>([]);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-
-  useEffect(() => {
-    fetchAffiliateStats();
-  }, [page]);
-
-  const fetchAffiliateStats = async () => {
-    // Comment for testing with local data
-    const response = await axios.post('http://localhost:3000/v1/leaderboard/search', {
-      pagination: {
-        page,
-        pageSize: 10, // Amount of entities to load
-      },
-    });
-
-    setAffiliates([...affiliates, ...response.data.results]);
-
-    setTotal(response.data.total);
-  };
+  const { affiliates, total, setPage } = useAffiliatesLeaderboard();
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1);

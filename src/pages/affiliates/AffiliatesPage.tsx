@@ -1,6 +1,5 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 
-import axios from 'axios';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -9,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AffiliateRoute } from '@/constants/routes';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -58,49 +58,22 @@ const $NavigationMenu = styled(NavigationMenu)`
 export const AffiliatesPage: React.FC = () => {
   const { isConnectedWagmi } = useWalletConnection();
   const { dydxAddress } = useAccounts();
+  const { programStatsQuery, affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
+    useAffiliatesInfo(dydxAddress);
+  const { data: lastUpdated } = lastUpdatedQuery;
+  const { data: accountStats } = affiliateStatsQuery;
+  const { data: programStats } = programStatsQuery;
+  const { data: affiliateMetadata } = affiliateMetadataQuery;
 
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
-  const [accountStats, setAccountStats] = useState<IAffiliateStats>();
-  const [programStats, setProgramStats] = useState<IProgramStats>();
-  const [lastUpdated, setLastUpdated] = useState<string>();
   const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
 
   // Mocked user status data
   const userStatus = {
-    isAffiliate: true,
-    isVip: true,
-    currentAffiliateTier: 2,
-  };
-
-  useEffect(() => {
-    fetchAccountStats();
-  }, [isConnectedWagmi]);
-
-  useEffect(() => {
-    fetchProgramStats();
-    fetchLastUpdated();
-  }, []);
-
-  const fetchProgramStats = async () => {
-    const res = await axios.get(`http://localhost:3000/v1/community/program-stats`);
-    setProgramStats(res.data);
-  };
-
-  const fetchAccountStats = async () => {
-    if (!isConnectedWagmi) {
-      setAccountStats(undefined);
-      return;
-    }
-
-    const res = await axios.get(`http://localhost:3000/v1/leaderboard/account/${dydxAddress}`);
-
-    setAccountStats(res.data);
-  };
-
-  const fetchLastUpdated = async () => {
-    const res = await axios.get(`http://localhost:3000/v1/last-updated`);
-    setLastUpdated(res.data);
+    isAffiliate: affiliateMetadata?.metadata?.isAffiliate ?? false,
+    isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
+    currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
   };
 
   const routesComponent = (
