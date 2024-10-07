@@ -67,8 +67,8 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
         params: {
           AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT,
-          VIP_AMOUNT_USD: AFFILIATES_EARN_PER_MONTH,
-          AMOUNT_PER_MONTH: AFFILIATES_EARN_PER_MONTH,
+          VIP_AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString(),
+          AMOUNT_PER_MONTH: AFFILIATES_EARN_PER_MONTH.toLocaleString(),
           LEARN_MORE_LINK: (
             <Link href={affiliateProgram} isInline>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
@@ -142,18 +142,20 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           />
         </div>
 
-        <div tw="flex gap-1">
-          <Button
-            action={data?.isVolumeEligible ? ButtonAction.Base : ButtonAction.Primary}
-            slotLeft={<Icon iconName={IconName.Rocket} />}
-            state={{
-              isLoading: isCopying,
-            }}
-            tw="flex-1"
-            href={affiliateProgram}
-          >
-            {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-          </Button>
+        <div tw="flex justify-center gap-1">
+          <a href="https://dydx-affiliates.fuul.xyz/" className="w-full">
+            <Button
+              action={data?.isVolumeEligible ? ButtonAction.Base : ButtonAction.Primary}
+              slotLeft={<Icon iconName={IconName.Rocket} />}
+              state={{
+                isLoading: isCopying,
+              }}
+              tw="w-full flex-1"
+              href={affiliateProgram}
+            >
+              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+            </Button>
+          </a>
           {data?.isVolumeEligible && (
             <Button
               action={ButtonAction.Base}

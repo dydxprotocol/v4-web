@@ -47,9 +47,9 @@ export const AffiliatesBanner = () => {
             {stringGetter({
               key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
               params: {
-                AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
+                AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT.toLocaleString()}`,
               },
-            })}{' '}
+            })}
             <br />
             {stringGetter({
               key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,

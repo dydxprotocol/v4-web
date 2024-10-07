@@ -92,7 +92,7 @@ export const AffiliatesPage: React.FC = () => {
     }
 
     const res = await axios.get(
-      `http://localhost:3000/v1/leaderboard/accounts/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
+      `http://localhost:3000/v1/leaderboard/account/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
     );
 
     setAccountStats(res.data);

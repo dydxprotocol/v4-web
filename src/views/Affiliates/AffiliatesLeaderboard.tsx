@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import styled, { css } from 'styled-components';
@@ -26,8 +26,8 @@ import { Toolbar } from '@/components/Toolbar';
 
 enum AffiliateEpochsFilter {
   ALL = 'all',
-  EPOCH_1 = 'epoch_1',
-  EPOCH_2 = 'epoch_2',
+  EPOCH_1 = 'Epoch 1',
+  EPOCH_2 = 'Epoch 2',
 }
 
 export const AFFILIATE_FILTERS_OPTIONS: Record<
@@ -83,101 +83,6 @@ const AffiliatesFilter = ({
   );
 };
 
-const data: IAffiliateStats[] = [
-  {
-    rank: 1,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-
-  {
-    rank: 2,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 3,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 13249359,
-    totalEarnings: 200000000,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 4,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-
-  {
-    rank: 5,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 6,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 7,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 8,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 9,
-    account: '0x73D692d7266388591648bB7C2476974c6FAA0277',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-  {
-    rank: 10,
-    account: '0x1234567890abcdef1234567890abcdef12345678',
-    referredFees: 100055,
-    referredVolume: 1324935921,
-    totalEarnings: 200,
-    totalReferredUsers: 300,
-    currentAffiliateTier: 3,
-  },
-];
-
 export const AffiliatesLeaderboard = ({
   className,
   accountStats,
@@ -207,6 +112,7 @@ export const AffiliatesLeaderboard = ({
     });
 
     setAffiliates([...affiliates, ...response.data.results]);
+
     setTotal(response.data.total);
   };
 
@@ -214,126 +120,121 @@ export const AffiliatesLeaderboard = ({
     setPage((prev) => prev + 1);
   };
 
-  const columns = useMemo<ColumnDef<IAffiliateStats>[]>(
-    () =>
-      isTablet
-        ? ([
-            {
-              columnKey: 'rank',
-              label: stringGetter({ key: STRING_KEYS.RANK }),
-              renderCell: ({ rank, account }) => {
-                return (
-                  <TableCell className="align-center flex">
-                    {rank}
+  const columns: ColumnDef<IAffiliateStats>[] = isTablet
+    ? [
+        {
+          columnKey: 'rank',
+          label: stringGetter({ key: STRING_KEYS.RANK }),
+          renderCell: ({ rank, account }) => {
+            return (
+              <TableCell className="align-center flex">
+                {rank}
 
-                    {accountStats?.account && account === accountStats.account && (
-                      <Tag className="bg-color-accent">
-                        {stringGetter({ key: STRING_KEYS.YOU })}
-                      </Tag>
-                    )}
-                  </TableCell>
-                );
-              },
-              allowsSorting: false,
-            },
-            {
-              columnKey: 'account',
-              label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
-              allowsSorting: false,
+                {accountStats?.account && account === accountStats.account && (
+                  <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+                )}
+              </TableCell>
+            );
+          },
+          allowsSorting: false,
+        },
+        {
+          columnKey: 'account',
+          label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
+          allowsSorting: false,
 
-              renderCell: ({ account }) => `${account.slice(0, 8)}...${account.slice(-5)}`,
-            },
-            {
-              columnKey: 'total-earnings',
-              label: stringGetter({ key: STRING_KEYS.TOTAL }),
-              allowsSorting: false,
+          renderCell: ({ account }) => `${account.slice(0, 8)}...${account.slice(-5)}`,
+        },
+        {
+          columnKey: 'total-earnings',
+          label: stringGetter({ key: STRING_KEYS.TOTAL }),
+          allowsSorting: false,
 
-              renderCell: ({ totalEarnings, totalReferredUsers }) => (
-                <TableCell className="flex flex-col justify-start text-end">
-                  <div className="w-full">
-                    <$EarningsOutput
-                      type={OutputType.CompactFiat}
-                      value={totalEarnings}
-                      slotRight={
-                        <span className="ml-0.25 text-color-text-2">
-                          {stringGetter({ key: STRING_KEYS.EARNINGS })}
-                        </span>
-                      }
-                    />
-                  </div>
-                  <div className="w-full text-color-text-0">
-                    {totalReferredUsers.toLocaleString()}{' '}
-                    {stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
-                  </div>
-                </TableCell>
-              ),
-            },
-          ] satisfies ColumnDef<IAffiliateStats>[])
-        : ([
-            {
-              columnKey: 'rank',
-              label: stringGetter({ key: STRING_KEYS.RANK }),
-              allowsSorting: false,
-              renderCell: ({ rank }) => (
-                <TableCell className="align-center flex text-color-text-1 font-medium-book">
-                  {rank}
-                  {accountStats?.rank && rank === accountStats.rank && (
-                    <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-                  )}
-                </TableCell>
-              ),
-            },
-            {
-              columnKey: 'account',
-              label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
-              allowsSorting: false,
-
-              renderCell: ({ account }) => (
-                <$DesktopOutput
-                  type={OutputType.Text}
-                  value={`${account.slice(0, 8)}...${account.slice(-5)}`}
+          renderCell: ({ totalEarnings, totalReferredUsers }) => (
+            <TableCell className="flex flex-col justify-start text-end">
+              <div className="w-full">
+                <$EarningsOutput
+                  type={OutputType.CompactFiat}
+                  value={totalEarnings}
+                  slotRight={
+                    <span className="ml-0.25 text-color-text-2">
+                      {stringGetter({ key: STRING_KEYS.EARNINGS })}
+                    </span>
+                  }
                 />
-              ),
-            },
-            {
-              columnKey: 'total-earnings',
-              label: stringGetter({ key: STRING_KEYS.TOTAL_EARNINGS }),
-              allowsSorting: false,
+              </div>
+              <div className="w-full text-color-text-0">
+                {totalReferredUsers.toLocaleString()}{' '}
+                {stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
+              </div>
+            </TableCell>
+          ),
+        },
+      ]
+    : [
+        {
+          columnKey: 'rank',
+          label: stringGetter({ key: STRING_KEYS.RANK }),
+          allowsSorting: false,
+          renderCell: ({ rank, account }) => (
+            <TableCell className="align-center flex text-color-text-1 font-medium-book">
+              {rank}
+              {accountStats?.account && account === accountStats.account && (
+                <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+              )}
+            </TableCell>
+          ),
+        },
+        {
+          columnKey: 'account',
+          label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
+          allowsSorting: false,
 
-              renderCell: ({ totalEarnings }) => (
-                <$EarningsOutput type={OutputType.CompactFiat} value={totalEarnings} />
-              ),
-            },
-            {
-              columnKey: 'ref-vol',
-              label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
-              allowsSorting: false,
+          renderCell: ({ account }) => (
+            <$DesktopOutput
+              type={OutputType.Text}
+              // value={`${account.slice(0, 8)}...${account.slice(-5)}`}
+              value={account}
+            />
+          ),
+        },
+        {
+          columnKey: 'total-earnings',
+          label: stringGetter({ key: STRING_KEYS.TOTAL_EARNINGS }),
+          allowsSorting: false,
 
-              renderCell: ({ referredVolume }) => (
-                <$NumberOutput type={OutputType.CompactFiat} value={referredVolume} />
-              ),
-            } as ColumnDef<IAffiliateStats>,
+          renderCell: ({ totalEarnings }) => (
+            <$EarningsOutput type={OutputType.CompactFiat} value={totalEarnings} />
+          ),
+        },
+        {
+          columnKey: 'ref-vol',
+          label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
+          allowsSorting: false,
 
-            {
-              columnKey: 'ref-fees',
-              label: stringGetter({ key: STRING_KEYS.FEES_REFERRED }),
-              allowsSorting: false,
-              renderCell: ({ referredFees }) => (
-                <$NumberOutput type={OutputType.CompactFiat} value={referredFees} />
-              ),
-            } as ColumnDef<IAffiliateStats>,
+          renderCell: ({ referredVolume }) => (
+            <$NumberOutput type={OutputType.CompactFiat} value={referredVolume} />
+          ),
+        } as ColumnDef<IAffiliateStats>,
 
-            {
-              columnKey: 'total-referred-users',
-              label: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
-              allowsSorting: false,
-              renderCell: ({ totalReferredUsers }) => (
-                <$NumberOutput type={OutputType.Number} value={totalReferredUsers} />
-              ),
-            },
-          ] satisfies ColumnDef<IAffiliateStats>[]),
-    [isTablet]
-  );
+        {
+          columnKey: 'ref-fees',
+          label: stringGetter({ key: STRING_KEYS.FEES_REFERRED }),
+          allowsSorting: false,
+          renderCell: ({ referredFees }) => (
+            <$NumberOutput type={OutputType.CompactFiat} value={referredFees} />
+          ),
+        } as ColumnDef<IAffiliateStats>,
+
+        {
+          columnKey: 'total-referred-users',
+          label: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
+          allowsSorting: false,
+          renderCell: ({ totalReferredUsers }) => (
+            <$NumberOutput type={OutputType.Number} value={totalReferredUsers} />
+          ),
+        },
+      ];
 
   const setFilter = (newFilter: AffiliateEpochsFilter) => {
     setEpochFilter(newFilter);
