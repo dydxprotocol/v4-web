@@ -156,8 +156,8 @@ const useLocalNotificationsContext = () => {
               if (
                 !isExchange &&
                 !hasErrors &&
-                (!currentStatus?.squidTransactionStatus ||
-                  currentStatus?.squidTransactionStatus === 'ongoing')
+                (!currentStatus?.latestRouteStatusSummary ||
+                  currentStatus?.latestRouteStatusSummary === 'ongoing')
               ) {
                 try {
                   const skipParams = {
@@ -178,7 +178,7 @@ const useLocalNotificationsContext = () => {
                   });
                   if (status) {
                     transferNotification.status = status;
-                    if (status.squidTransactionStatus === 'success') {
+                    if (status?.latestRouteStatusSummary === 'success') {
                       track(
                         AnalyticsEvents.TransferNotification({
                           triggeredAt,

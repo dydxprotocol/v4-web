@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
@@ -8,31 +8,32 @@ import {
   TradingTerminalWidgetOptions,
   widget as Widget,
 } from 'public/tradingview/';
-import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { updateChartConfig } from '@/state/tradingView';
+import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from '../useDydxClient';
-import { useLocalStorage } from '../useLocalStorage';
 import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
+import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -65,6 +66,7 @@ export const useTradingView = ({
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
+  const dispatch = useAppDispatch();
 
   const { group, decimal } = useLocaleSeparators();
 
@@ -72,23 +74,28 @@ export const useTradingView = ({
   const appColorMode = useAppSelector(getAppColorMode);
 
   const marketId = useAppSelector(getCurrentMarketId);
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
-  const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
-    key: LocalStorageKey.TradingViewChartConfig,
-    defaultValue: undefined,
-  });
+  const savedTvChartConfig = useAppSelector(getTvChartConfig);
 
-  const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
+  const savedResolution = useMemo(
+    () => getSavedResolution({ savedConfig: savedTvChartConfig }),
+    [savedTvChartConfig]
+  );
 
-  const [initialPriceScale, setInitialPriceScale] = useState<number | null>(null);
-
-  const hasMarkets = marketIds.length > 0;
-  const hasPriceScaleInfo = initialPriceScale !== null || hasMarkets;
+  const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
+    [marketId: string]: number | undefined;
+  }>({});
+  const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
+    useAppSelector(getCurrentMarketConfig)
+  );
+  const tickSizeDecimals =
+    (marketId
+      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
+      : tickSizeDecimalsAbacus) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -121,20 +128,26 @@ export const useTradingView = ({
     // we only need tick size from current market for the price scale settings
     // if markets haven't been loaded via abacus, get the current market info from indexer
     (async () => {
-      if (marketId && !hasPriceScaleInfo) {
+      if (marketId && tickSizeDecimals === undefined) {
         const marketTickSize = await getMarketTickSize(marketId);
-        const priceScale = BigNumber(10).exponentiatedBy(
-          BigNumber(marketTickSize).decimalPlaces() ?? 2
-        );
-        setInitialPriceScale(priceScale.toNumber());
+        setTickSizeDecimalsIndexer((prev) => ({
+          ...prev,
+          [marketId]: BigNumber(marketTickSize).decimalPlaces() ?? undefined,
+        }));
       }
     })();
-  }, [marketId, hasPriceScaleInfo, getMarketTickSize]);
+  }, [marketId, tickSizeDecimals, getMarketTickSize]);
+
+  const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && hasPriceScaleInfo) {
+    if (marketId && tickSizeDecimals !== undefined) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+
+      const initialPriceScale = BigNumber(10)
+        .exponentiatedBy(tickSizeDecimals ?? 2)
+        .toNumber();
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
@@ -157,7 +170,10 @@ export const useTradingView = ({
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
-      tvWidgetRef.current?.onChartReady(() => {
+      tvChartWidget.onChartReady(() => {
+        // Initialize additional right-click-menu options
+        tvWidgetRef.current?.onContextMenu(tradingViewLimitOrder);
+
         tvWidgetRef.current?.headerReady().then(() => {
           if (tvWidgetRef.current) {
             // Order Lines
@@ -209,7 +225,9 @@ export const useTradingView = ({
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
+          tvWidgetRef?.current?.save((chartConfig: object) => {
+            dispatch(updateChartConfig(chartConfig));
+          })
         );
 
         setIsChartReady(true);
@@ -231,7 +249,7 @@ export const useTradingView = ({
     selectedLocale,
     selectedNetwork,
     !!marketId,
-    hasPriceScaleInfo,
+    tickSizeDecimals !== undefined,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
     buySellMarksToggleRef,

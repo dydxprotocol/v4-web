@@ -4,13 +4,16 @@ import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { VerticalSeparator } from '@/components/Separator';
+import { LaunchableMarketStatsDetails } from '@/views/LaunchableMarketStatsDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
 import { MarketsDropdown } from '@/views/MarketsDropdown';
-import { UnlaunchedMarketStatsDetails } from '@/views/UnlaunchedMarketStatsDetails';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
+
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { testFlags } from '@/lib/testFlags';
 
 export const MarketSelectorAndStats = ({
   className,
@@ -22,22 +25,33 @@ export const MarketSelectorAndStats = ({
   const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
+  const { uiRefresh } = testFlags;
+
+  const displayableId = launchableMarketId
+    ? getDisplayableTickerFromMarket(launchableMarketId)
+    : launchableMarketId;
+
   return (
     <$Container className={className}>
       <MarketsDropdown
-        isViewingUnlaunchedMarket={!!launchableMarketId}
-        currentMarketId={launchableMarketId ?? currentMarketId}
+        launchableMarketId={launchableMarketId}
+        currentMarketId={displayableId ?? currentMarketId}
         symbol={id}
       />
 
-      <VerticalSeparator />
+      <VerticalSeparator fullHeight={!!uiRefresh} />
 
-      {launchableMarketId ? <UnlaunchedMarketStatsDetails /> : <MarketStatsDetails />}
+      {launchableMarketId ? (
+        <LaunchableMarketStatsDetails launchableMarketId={launchableMarketId} />
+      ) : (
+        <MarketStatsDetails />
+      )}
     </$Container>
   );
 };
 const $Container = styled.div`
   ${layoutMixins.container}
+  ${layoutMixins.scrollAreaFadeEnd}
 
   display: grid;
 

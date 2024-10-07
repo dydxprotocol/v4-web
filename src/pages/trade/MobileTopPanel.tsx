@@ -16,7 +16,7 @@ import { AccountInfo } from '@/views/AccountInfo';
 import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
-import { TvChart } from '@/views/charts/TvChart';
+import { TvChart } from '@/views/charts/TradingView/TvChart';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -37,7 +37,7 @@ enum Tab {
 const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: IconName }) => (
   <Trigger asChild value={value}>
     <$TabButton>
-      <Icon iconName={icon} />
+      <Icon iconName={icon} size="1.375rem" />
       <span>{label}</span>
     </$TabButton>
   </Trigger>
@@ -51,7 +51,7 @@ export const MobileTopPanel = ({
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const [value, setValue] = useState(Tab.Account);
+  const [value, setValue] = useState(Tab.Price);
 
   const items = [
     {
@@ -112,7 +112,6 @@ export const MobileTopPanel = ({
         ),
       }))}
       side="bottom"
-      withBorders={false}
     />
   );
 };
@@ -152,11 +151,6 @@ const $TabButton = styled(ToggleButton)`
       font-size: 0;
       opacity: 0;
     }
-  }
-
-  svg {
-    width: 1.375rem;
-    height: 1.375rem;
   }
 `;
 const $ScrollableTableContainer = styled.div`

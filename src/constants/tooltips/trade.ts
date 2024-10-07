@@ -1,6 +1,6 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
-export const tradeTooltips: TooltipStrings = {
+export const tradeTooltips = {
   'account-leverage': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_BODY }),
@@ -77,6 +77,10 @@ export const tradeTooltips: TooltipStrings = {
   leverage: ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LEVERAGE_BODY }),
+  }),
+  'limit-close': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_BODY }),
   }),
   'limit-price': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_TITLE }),
@@ -187,10 +191,6 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_BODY }),
   }),
-  'reference-price': ({ stringGetter }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_BODY }),
-  }),
   spread: () => ({
     title: 'Spread',
     body: 'The difference in price between the highest bid (the price a buyer is willing to buy for) and lowest ask (the price a seller is willing to sell for) an asset.',
@@ -230,4 +230,4 @@ export const tradeTooltips: TooltipStrings = {
   'reward-history': ({ stringGetter }) => ({
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REWARD_HISTORY_BODY }),
   }),
-} as const;
+} satisfies TooltipStrings;

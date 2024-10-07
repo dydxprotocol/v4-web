@@ -13,7 +13,7 @@ type ElementProps = {
   disabled?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  label: React.ReactNode;
+  label?: React.ReactNode;
   triggerIcon?: IconName;
   slotTrigger?: React.ReactNode;
   children: React.ReactNode;
@@ -83,7 +83,7 @@ const $Root = styled(Root)`
   display: grid;
 
   &[data-state='open'] {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 `;
 

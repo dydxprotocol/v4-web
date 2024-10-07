@@ -1,6 +1,6 @@
 import environments from '../../public/configs/v1/env.json';
 
-const CURRENT_MODE = ({
+export const CURRENT_MODE = ({
   production: 'MAINNET',
   testnet: 'TESTNET',
   staging: 'DEV',

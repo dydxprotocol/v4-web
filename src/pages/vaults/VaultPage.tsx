@@ -26,15 +26,17 @@ import {
   VaultPositionsSection,
   YourVaultDetailsCards,
 } from './VaultInfoSections';
+import { VaultLockedSharesCard } from './VaultLockedSharesTable';
 import { VaultPnlChart } from './VaultPnlChart';
 import { VaultTransactionsCard } from './VaultTransactions';
 
 const VaultPage = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  useDocumentTitle(stringGetter({ key: STRING_KEYS.VAULT }));
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.MEGAVAULT }));
 
   const { isTablet } = useBreakpoints();
+
   if (isTablet) {
     // one column, reordered, static positioned deposit buttons
     return (
@@ -44,6 +46,9 @@ const VaultPage = () => {
         <$OneColumnContainer>
           <$VaultDetailsColumn>
             <$YourVaultDetailsCards />
+            <$VaultTransactionsCardContainer>
+              <VaultLockedSharesCard />
+            </$VaultTransactionsCardContainer>
             <$VaultTransactionsCardContainer>
               <VaultTransactionsCard />
             </$VaultTransactionsCardContainer>
@@ -62,7 +67,7 @@ const VaultPage = () => {
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.Deposit} />}
             onClick={() =>
-              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'deposit' })))
+              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'DEPOSIT' })))
             }
           >
             {stringGetter({ key: STRING_KEYS.DEPOSIT })}
@@ -72,7 +77,7 @@ const VaultPage = () => {
             action={ButtonAction.Secondary}
             slotLeft={<Icon iconName={IconName.Withdraw} />}
             onClick={() =>
-              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'withdraw' })))
+              dispatch(openDialog(DialogTypes.VaultDepositWithdraw({ initialType: 'WITHDRAW' })))
             }
           >
             {stringGetter({ key: STRING_KEYS.WITHDRAW })}
@@ -102,6 +107,7 @@ const VaultPage = () => {
               <VaultDepositWithdrawForm />
             </div>
           </$DepositFormContainer>
+          <VaultLockedSharesCard />
           <$VaultTransactionsCardContainer>
             <VaultTransactionsCard />
           </$VaultTransactionsCardContainer>

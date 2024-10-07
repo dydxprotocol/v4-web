@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { Link, useNavigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -16,11 +16,12 @@ import breakpoints from '@/styles/breakpoints';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { NewTag } from '@/components/Tag';
+import { MegavaultYieldTag } from '@/pages/portfolio/AccountOverviewSection';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -38,11 +39,15 @@ export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { chainTokenLabel } = useTokenConfigs();
+  const {
+    enableVaults: showVaults,
+    pml: showLaunchMarkets,
+    uiRefresh: uiRefreshEnabled,
+  } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
-  const showVaults = testFlags.enableVaults;
-  const showLaunchMarkets = testFlags.pml;
 
   const navItems = [
     {
@@ -58,27 +63,51 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
-        {
-          value: 'PORTFOLIO',
-          label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-          href: AppRoute.Portfolio,
-        },
-        {
-          value: 'MARKETS',
-          label: stringGetter({ key: STRING_KEYS.MARKETS }),
-          href: AppRoute.Markets,
-        },
-        showLaunchMarkets && {
-          value: 'LAUNCH_MARKET',
-          label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
-          href: AppRoute.LaunchMarket,
-        },
+        ...(uiRefreshEnabled
+          ? [
+              {
+                value: 'MARKETS',
+                label: stringGetter({ key: STRING_KEYS.MARKETS }),
+                href: AppRoute.Markets,
+              },
+              {
+                value: 'PORTFOLIO',
+                label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
+                href: AppRoute.Portfolio,
+              },
+            ]
+          : [
+              {
+                value: 'PORTFOLIO',
+                label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
+                href: AppRoute.Portfolio,
+              },
+              {
+                value: 'MARKETS',
+                label: stringGetter({ key: STRING_KEYS.MARKETS }),
+                href: AppRoute.Markets,
+              },
+            ]),
+        ...(showLaunchMarkets
+          ? [
+              {
+                value: 'LAUNCH_MARKET',
+                label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
+                href: AppRoute.LaunchMarket,
+              },
+              // TODO (@jaredvu): Remove this after adding updated markets-table
+              {
+                value: 'TEST_MARKET',
+                label: 'TIME-USD',
+                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M-USD?pml=true',
+              },
+            ]
+          : []),
         showVaults && {
           value: 'VAULT',
           label: (
             <>
-              {stringGetter({ key: STRING_KEYS.VAULT })}{' '}
-              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })} <MegavaultYieldTag />
             </>
           ),
           href: AppRoute.Vault,
@@ -99,7 +128,15 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
-              href: documentation,
+              onClick: () => {
+                dispatch(
+                  openDialog(
+                    DialogTypes.ExternalLink({
+                      link: documentation,
+                    })
+                  )
+                );
+              },
             },
             {
               value: 'MINTSCAN',
@@ -146,26 +183,53 @@ export const HeaderDesktop = () => {
   ];
 
   return (
-    <$Header>
+    <$Header uiRefreshEnabled={uiRefreshEnabled}>
       <$LogoLink to="/">
         <LogoShortIcon />
       </$LogoLink>
 
       <VerticalSeparator />
 
-      <$NavBefore>
-        <NetworkSelectMenu sideOffset={16} />
-        <VerticalSeparator />
+      <$NavBefore uiRefreshEnabled={uiRefreshEnabled}>
         <LanguageSelector sideOffset={16} />
+        <VerticalSeparator />
+        <NetworkSelectMenu sideOffset={16} />
       </$NavBefore>
 
       <VerticalSeparator />
 
-      <$NavigationMenu items={navItems} orientation="horizontal" />
+      <$NavigationScrollBar>
+        <$NavigationMenu items={navItems} orientation="horizontal" />
+      </$NavigationScrollBar>
 
       <div role="separator" />
 
       <$NavAfter>
+        {uiRefreshEnabled && (
+          <>
+            {showLaunchMarkets && (
+              <$LaunchMarketButton
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                action={ButtonAction.Navigation}
+                onClick={() => navigate(AppRoute.LaunchMarket)}
+              >
+                {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
+              </$LaunchMarketButton>
+            )}
+            <Button
+              tw="mr-[0.5em]"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              action={ButtonAction.Primary}
+              onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+            >
+              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+            </Button>
+            <VerticalSeparator />
+          </>
+        )}
+
         <MobileDownloadLinks />
 
         <$IconButton
@@ -192,7 +256,9 @@ export const HeaderDesktop = () => {
     </$Header>
   );
 };
-const $Header = styled.header`
+const $Header = styled.header<{
+  uiRefreshEnabled: boolean;
+}>`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
   --logo-width: 3.5rem;
@@ -209,12 +275,19 @@ const $Header = styled.header`
   display: grid;
   align-items: stretch;
   grid-auto-flow: column;
-  grid-template:
-    'Logo . NavBefore . Nav . NavAfter' 100%
+  grid-template: ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`'Logo . NavBefore . Nav . NavAfter' 100%
+      / var(--logo-width) var(--border-width) auto
+      var(--border-width) 1fr var(--border-width) auto`
+      : css`'Logo . NavBefore . Nav . NavAfter' 100%
     / var(--logo-width) var(--border-width) calc(
       var(--sidebar-width) - var(--logo-width) - var(--border-width)
     )
-    var(--border-width) 1fr var(--border-width) auto;
+    var(--border-width) 1fr var(--border-width) auto`}
+  `};
+
+  z-index: 2;
 
   @media ${breakpoints.tablet} {
     --trigger-height: 3rem;
@@ -227,8 +300,14 @@ const $Header = styled.header`
   font-size: 0.9375rem;
 
   &:before {
-    backdrop-filter: blur(10px);
+    --backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--backdrop-filter);
+    backdrop-filter: var(--backdrop-filter);
   }
+`;
+
+const $NavigationScrollBar = styled.div`
+  ${layoutMixins.scrollAreaFade}
 `;
 
 const $NavigationMenu = styled(NavigationMenu)`
@@ -242,8 +321,22 @@ const $NavigationMenu = styled(NavigationMenu)`
   scroll-padding: 0 0.5rem;
 ` as typeof NavigationMenu;
 
-const $NavBefore = styled.div`
-  ${layoutMixins.flexEqualColumns}
+const $NavBefore = styled.div<{
+  uiRefreshEnabled: boolean;
+}>`
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          ${layoutMixins.row}
+        `
+      : css`
+          direction: rtl;
+          > * {
+            direction: initial;
+          }
+          ${layoutMixins.flexEqualColumns}
+        `}
+  `}
 
   > * {
     align-self: center;
@@ -264,6 +357,7 @@ const $LogoLink = styled(Link)`
 
 const $NavAfter = styled.div`
   ${layoutMixins.row}
+
   justify-self: end;
   padding: 0 0.75rem;
 
@@ -279,4 +373,9 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
   --button-border: none;
   --button-icon-size: 1rem;
   --button-padding: 0 0.5em;
+`;
+
+const $LaunchMarketButton = styled(Button)`
+  --button-backgroundColor: var(--color-layer-5);
+  --button-border: solid var(--border-width) var(--color-border);
 `;

@@ -14,12 +14,15 @@ import {
 import styled, { css, keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { tabMixins } from '@/styles/tabMixins';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { type TabItem } from '@/components/Tabs';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
+
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps<TabItemsValue> = {
   defaultTab?: TabItemsValue;
@@ -32,8 +35,9 @@ type ElementProps<TabItemsValue> = {
 };
 
 type StyleProps = {
-  className?: string;
   fullWidthTabs?: boolean;
+  dividerStyle?: 'border' | 'underline' | 'none';
+  className?: string;
 };
 
 export type CollapsibleTabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
@@ -48,10 +52,15 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
   onOpenChange,
 
   fullWidthTabs,
+  dividerStyle = 'none',
 
   className,
 }: CollapsibleTabsProps<TabItemsValue>) => {
+  const { uiRefresh } = testFlags;
+
   const currentTab = tabItems.find((tabItem) => tabItem.value === tab);
+  const withBorders = dividerStyle === 'border';
+  const withUnderline = dividerStyle === 'underline';
 
   return (
     <$TabsRoot
@@ -59,6 +68,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
       defaultValue={defaultTab}
       value={tab}
       onValueChange={(v) => setTab?.(v as TabItemsValue)}
+      $uiRefreshEnabled={uiRefresh}
       asChild
     >
       <$CollapsibleRoot
@@ -67,9 +77,15 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
         onOpenChange={(isOpen: boolean) => onOpenChange?.(isOpen)}
       >
         <$Header>
-          <$TabsList $fullWidthTabs={fullWidthTabs}>
+          <$TabsList $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
             {tabItems.map(({ value, label, tag, slotRight }) => (
-              <$TabsTrigger key={value} value={value} onClick={() => onOpenChange?.(true)}>
+              <$TabsTrigger
+                key={value}
+                value={value}
+                $withBorders={withBorders}
+                $withUnderline={withUnderline}
+                onClick={() => onOpenChange?.(true)}
+              >
                 {label}
                 {tag && <Tag>{tag}</Tag>}
                 {slotRight}
@@ -96,13 +112,18 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
     </$TabsRoot>
   );
 };
-const $TabsRoot = styled(TabsRoot)`
+const $TabsRoot = styled(TabsRoot)<{ $uiRefreshEnabled: boolean }>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
   --trigger-textColor: var(--color-text-0);
 
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
+  --trigger-active-underlineColor: ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
+  `};
+  --trigger-active-underline-size: 2px;
+  --trigger-underline-size: 0px;
 
   /* Rules */
   ${layoutMixins.scrollArea}
@@ -119,10 +140,17 @@ const $TabsRoot = styled(TabsRoot)`
   ${layoutMixins.withInnerHorizontalBorders}
 `;
 
-const $TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean }>`
-  ${layoutMixins.withOuterAndInnerBorders}
-
+const $TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean; $withBorders: boolean }>`
   align-self: stretch;
+
+  ${({ $withBorders }) =>
+    $withBorders &&
+    css`
+      ${layoutMixins.withOuterAndInnerBorders}
+
+      margin: 0 calc(-1 * var(--border-width));
+      padding: 0 var(--border-width);
+    `}
 
   ${({ $fullWidthTabs }) =>
     $fullWidthTabs
@@ -135,31 +163,28 @@ const $TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean }>`
         `}
 
   overflow-x: auto;
-  margin: 0 calc(-1 * var(--border-width));
-  padding: 0 var(--border-width);
 `;
 
-const $TabsTrigger = styled(TabsTrigger)`
-  ${layoutMixins.withOuterBorder}
+const $TabsTrigger = styled(TabsTrigger)<{
+  $withBorders: boolean;
+  $withUnderline: boolean;
+}>`
+  ${tabMixins.tabTriggerStyle}
 
-  ${layoutMixins.row}
-  justify-content: center;
-  gap: 0.5ch;
+  ${({ $withBorders }) =>
+    $withBorders &&
+    css`
+      ${layoutMixins.withOuterBorder}
+    `}
 
-  align-self: stretch;
-  padding: 0 1.5rem;
-  font: var(--font-base-book);
-  color: var(--trigger-textColor);
-  background-color: var(--trigger-backgroundColor);
-
-  &[data-state='active'] {
-    color: var(--trigger-active-textColor);
-    background-color: var(--trigger-active-backgroundColor);
-  }
+      ${({ $withUnderline }) =>
+    $withUnderline &&
+    css`
+      ${tabMixins.tabTriggerUnderlineStyle}
+    `}
 `;
 const $TabsContent = styled(TabsContent)`
   ${layoutMixins.flexColumn}
-
   outline: none;
   box-shadow: none;
 
@@ -208,6 +233,7 @@ const $Header = styled.header`
     box-shadow: none;
   }
 `;
+
 const $IconButton = styled(IconButton)`
   --button-icon-size: 1em;
   ${$CollapsibleRoot}[data-state='closed'] & {

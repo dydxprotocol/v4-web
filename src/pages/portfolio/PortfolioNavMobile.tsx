@@ -10,10 +10,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
 
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
+
 export const PortfolioNavMobile = () => {
   const stringGetter = useStringGetter();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { enableVaults } = testFlags;
 
   const portfolioRouteItems = [
     {
@@ -51,13 +55,18 @@ export const PortfolioNavMobile = () => {
       label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
       description: stringGetter({ key: STRING_KEYS.TRANSFERS_DESCRIPTION }),
     },
+    enableVaults && {
+      value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.VaultTransfers}`,
+      label: stringGetter({ key: STRING_KEYS.VAULT_TRANSFERS }),
+      description: stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS_DESCRIPTION }),
+    },
     // TODO: TRCL-1693 - re-enable when Payments are ready
     // {
     //   value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Payments}`,
     //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
     //   description: stringGetter({ key: STRING_KEYS.PAYMENTS_DESCRIPTION }),
     // },
-  ];
+  ].filter(isTruthy);
 
   const routeMap = Object.fromEntries(
     portfolioRouteItems.map(({ value, label }) => [value, { value, label }])

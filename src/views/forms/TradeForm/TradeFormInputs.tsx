@@ -1,4 +1,4 @@
-import { Ref } from 'react';
+import { Ref, useEffect } from 'react';
 
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -50,6 +50,16 @@ export const TradeFormInputs = () => {
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+
+  useEffect(() => {
+    // when limit price input is empty and mid price is available, set limit price input to mid price
+    if (!midMarketPrice || !needsLimitPrice || limitPriceInput !== '') return;
+    dispatch(
+      setTradeFormInputs({
+        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+      })
+    );
+  }, [dispatch, limitPriceInput, midMarketPrice, needsLimitPrice, tickSizeDecimals]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   BondStatus,
   Validator,
-} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
+} from '@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash';
 import { shallowEqual } from 'react-redux';

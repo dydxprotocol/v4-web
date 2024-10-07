@@ -9,6 +9,11 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import {
+  useLoadedVaultAccount,
+  useLoadedVaultDetails,
+  useLoadedVaultPositions,
+} from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -17,47 +22,45 @@ import { BackButton } from '@/components/BackButton';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getUserVault, getVaultDetails } from '@/state/vaultSelectors';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getNumberSign } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { VaultPositionsTable } from './VaultPositionsTable';
 
 const EmptyValue = () => <span tw="text-color-text-0">—</span>;
 export const YourVaultDetailsCards = ({ className }: { className?: string }) => {
-  const myVaultMetadata = useAppSelector(getUserVault);
+  const myVaultMetadata = useLoadedVaultAccount().data;
   const stringGetter = useStringGetter();
   const items = [
     {
       key: 'balance',
       label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
+      tooltip: 'vault-your-balance' as const,
       value:
-        myVaultMetadata == null || myVaultMetadata.userBalance === 0 ? (
+        myVaultMetadata == null || myVaultMetadata.balanceUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <Output value={myVaultMetadata?.userBalance} type={OutputType.Fiat} />
+          <Output value={myVaultMetadata?.balanceUsdc} type={OutputType.Fiat} />
         ),
     },
     {
       key: 'pnl',
       label: stringGetter({ key: STRING_KEYS.YOUR_ALL_TIME_PNL }),
+      tooltip: 'vault-all-time-pnl' as const,
       value:
-        myVaultMetadata == null || myVaultMetadata?.userReturn.absolute === 0 ? (
+        myVaultMetadata == null ||
+        myVaultMetadata?.allTimeReturnUsdc == null ||
+        myVaultMetadata?.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.userReturn.absolute)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
               <Output
-                value={myVaultMetadata?.userReturn.absolute}
+                value={myVaultMetadata?.allTimeReturnUsdc}
                 type={OutputType.Fiat}
                 fractionDigits={0}
-              />
-              <Output
-                value={myVaultMetadata?.userReturn.percent}
-                type={OutputType.Percent}
-                withParentheses
               />
             </div>
           </$ColoredReturn>
@@ -68,7 +71,9 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
     <$CardsContainer className={className}>
       {items.map((item) => (
         <$DetailCard key={item.key}>
-          <div tw="text-color-text-0">{item.label}</div>
+          <WithTooltip tooltip={item.tooltip}>
+            <div tw="text-color-text-0">{item.label}</div>
+          </WithTooltip>
           <div tw="leading-[1.2rem] text-color-text-2 font-medium-book">{item.value}</div>
         </$DetailCard>
       ))}
@@ -99,12 +104,12 @@ export const VaultDescription = ({ className }: { className?: string }) => {
 };
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const numPositions = useAppSelector(getVaultDetails)?.positions?.length ?? 0;
+  const numPositions = useLoadedVaultPositions()?.positions?.size;
 
   return (
     <div className={className}>
       <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
-        {stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}{' '}
+        {stringGetter({ key: STRING_KEYS.POSITIONS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
         </Tag>
@@ -118,7 +123,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = useAppSelector(getVaultDetails) ?? {};
+  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {
@@ -148,7 +153,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
         <img src="/dydx-chain.png" tw="h-3.5 w-3.5" />
         <div>
           <h3 tw="text-color-text-2 font-extra-medium">
-            {stringGetter({ key: STRING_KEYS.VAULT })}
+            {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
           </h3>
         </div>
       </div>

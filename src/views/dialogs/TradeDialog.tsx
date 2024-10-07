@@ -9,6 +9,8 @@ import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
@@ -42,14 +44,14 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
           title: (
-            <div tw="grid grid-cols-[1fr_2fr] gap-0.5">
-              <div tw="flex gap-0.5">
+            <$TopActionsRow tw="flex gap-0.5">
+              <$MarginAndLeverageButtons tw="flex gap-0.5">
                 <MarginModeSelector openInTradeBox={false} tw="flex-1" />
                 <$TargetLeverageButton />
-              </div>
+              </$MarginAndLeverageButtons>
 
               <TradeSideToggle />
-            </div>
+            </$TopActionsRow>
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
@@ -102,6 +104,20 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
       --dialog-icon-size: 2.5rem;
     `}
 `;
+
+const $TopActionsRow = styled.div`
+  > * {
+    ${layoutMixins.flexExpandToSpace}
+  }
+`;
+
+const $MarginAndLeverageButtons = styled.div`
+  abbr,
+  button {
+    ${layoutMixins.flexExpandToSpace}
+  }
+`;
+
 const $TargetLeverageButton = styled(TargetLeverageButton)`
   flex: 1;
 

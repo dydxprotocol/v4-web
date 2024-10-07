@@ -7,12 +7,14 @@ import { type MenuItem } from '@/constants/menus';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { tabMixins } from '@/styles/tabMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+import { testFlags } from '@/lib/testFlags';
 
 export type TabItem<TabItemsValue> = {
   value: TabItemsValue;
@@ -42,9 +44,8 @@ type ElementProps<TabItemsValue> = {
 type StyleProps = {
   fullWidthTabs?: boolean;
   side?: 'top' | 'bottom';
-  withBorders?: boolean;
+  dividerStyle?: 'border' | 'underline' | 'none';
   withTransitions?: boolean;
-  withUnderline?: boolean;
   className?: string;
 };
 
@@ -60,13 +61,15 @@ export const Tabs = <TabItemsValue extends string>({
   onWheel,
   fullWidthTabs,
   side = 'top',
-  withBorders = true,
-  withUnderline = false,
+  dividerStyle = 'none',
   withTransitions = true,
   disabled = false,
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
+  const { uiRefresh } = testFlags;
+  const withBorders = dividerStyle === 'border';
+  const withUnderline = dividerStyle === 'underline';
 
   const triggers = (
     <>
@@ -94,6 +97,7 @@ export const Tabs = <TabItemsValue extends string>({
               onValueChange={onValueChange}
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
+              $withUnderline={withUnderline}
               slotTrigger={
                 <$DropdownTabTrigger value={value ?? ''} $withUnderline={withUnderline} />
               }
@@ -121,7 +125,8 @@ export const Tabs = <TabItemsValue extends string>({
       }
       onWheel={onWheel}
       $side={side}
-      $withInnerBorder={withBorders}
+      $withInnerBorder={withBorders || withUnderline}
+      $uiRefreshEnabled={uiRefresh}
     >
       <$Header $side={side}>{triggers}</$Header>
 
@@ -145,46 +150,28 @@ export const Tabs = <TabItemsValue extends string>({
     </$Root>
   );
 };
-const tabTriggerStyle = css`
-  ${layoutMixins.row}
-  justify-content: center;
-  gap: 0.5ch;
 
-  align-self: stretch;
-  padding: 0 1.5rem;
-
-  font: var(--trigger-font, var(--font-base-book));
-  color: var(--trigger-textColor);
-  background-color: var(--trigger-backgroundColor);
-
-  &[data-state='active'] {
-    color: var(--trigger-active-textColor);
-    background-color: var(--trigger-active-backgroundColor);
-  }
-`;
-
-const tabTriggerUnderlineStyle = css`
-  box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
-  &[data-state='active'] {
-    box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
-      var(--trigger-active-textColor);
-  }
-`;
-
-const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean }>`
+const $Root = styled(Root)<{
+  $side: 'top' | 'bottom';
+  $withInnerBorder?: boolean;
+  $uiRefreshEnabled: boolean;
+}>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
   --trigger-textColor: var(--color-text-0);
 
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
-
-  --trigger-active-underline-size: 0px;
+  --trigger-hover-textColor: var(--trigger-active-textColor);
+  --trigger-active-underlineColor: ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
+  `};
+  --trigger-active-underline-backgroundColor: transparent;
+  --trigger-active-underline-size: 2px;
   --trigger-underline-size: 0px;
 
   /* Variants */
   --tabs-currentHeight: var(--tabs-height);
-
   @media ${breakpoints.tablet} {
     --tabs-currentHeight: var(--tabs-height-mobile);
   }
@@ -264,8 +251,11 @@ const $List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>
         `}
 `;
 
-const $Trigger = styled(Trigger)<{ $withBorders?: boolean; $withUnderline?: boolean }>`
-  ${tabTriggerStyle}
+const $Trigger = styled(Trigger)<{
+  $withBorders?: boolean;
+  $withUnderline?: boolean;
+}>`
+  ${tabMixins.tabTriggerStyle}
 
   ${({ $withBorders }) =>
     $withBorders &&
@@ -276,7 +266,7 @@ const $Trigger = styled(Trigger)<{ $withBorders?: boolean; $withUnderline?: bool
   ${({ $withUnderline }) =>
     $withUnderline &&
     css`
-      ${tabTriggerUnderlineStyle}
+      ${tabMixins.tabTriggerUnderlineStyle}
     `}
 `;
 const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
@@ -327,35 +317,45 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
   }
 `;
 
-const $DropdownTabTrigger = styled(Trigger)<{ $withUnderline?: boolean }>`
-  ${tabTriggerStyle}
+const $DropdownTabTrigger = styled(Trigger)<{
+  $withUnderline?: boolean;
+}>`
+  ${tabMixins.tabTriggerStyle}
   gap: 1ch;
-
   height: 100%;
   width: 100%;
 
   ${({ $withUnderline }) =>
     $withUnderline &&
     css`
-      ${tabTriggerUnderlineStyle}
+      ${tabMixins.tabTriggerUnderlineStyle}
     `}
 `;
 
 const dropdownSelectMenuType = getSimpleStyledOutputType(
   DropdownSelectMenu,
-  {} as { $isActive?: boolean }
+  {} as { $isActive?: boolean; $withUnderline?: boolean }
 );
-const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)<{
+  $isActive?: boolean;
+  $withUnderline?: boolean;
+}>`
   --trigger-radius: 0;
   --dropdownSelectMenu-item-font-size: var(--fontSize-base);
 
-  ${({ $isActive }) =>
-    $isActive &&
-    css`
-      --trigger-textColor: var(--trigger-active-textColor);
-      --trigger-backgroundColor: var(--trigger-active-backgroundColor);
-      --trigger-underline-size: var(--trigger-active-underline-size);
-    `}
+  ${({ $isActive, $withUnderline }) =>
+    $isActive
+      ? $withUnderline
+        ? css`
+            ${tabMixins.tabTriggerUnderlineStyle}
+            ${tabMixins.tabTriggerActiveUnderlineStyle}
+          `
+        : css`
+            --trigger-textColor: var(--trigger-active-textColor);
+            --trigger-backgroundColor: var(--trigger-active-backgroundColor);
+            --trigger-underline-size: var(--trigger-active-underline-size);
+          `
+      : css``}
 ` as typeof dropdownSelectMenuType;
 
 export const MobileTabs = styled(Tabs)`

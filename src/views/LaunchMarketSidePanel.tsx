@@ -4,13 +4,18 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
+import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 
 export const LaunchMarketSidePanel = ({
   className,
@@ -21,6 +26,8 @@ export const LaunchMarketSidePanel = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
 
   const items = [
     {
@@ -31,8 +38,16 @@ export const LaunchMarketSidePanel = ({
       body: stringGetter({
         key: STRING_KEYS.MARKET_LAUNCH_DETAILS_2,
         params: {
-          DEPOSIT_AMOUNT: `${10_000} USDC`,
-          APR_PERCENTAGE: <Output type={OutputType.Percent} value={0.3456} />,
+          DEPOSIT_AMOUNT: (
+            <Output
+              tw="inline-block"
+              type={OutputType.Asset}
+              value={10_000}
+              slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
+              fractionDigits={0}
+            />
+          ),
+          APR_PERCENTAGE: <Output tw="inline-block" type={OutputType.Percent} value={0.3456} />,
           PAST_DAYS: 30,
         },
       }),
@@ -41,7 +56,7 @@ export const LaunchMarketSidePanel = ({
       title: stringGetter({ key: STRING_KEYS.TRADE }),
       body: stringGetter({
         key: STRING_KEYS.AVAILABLE_TO_TRADE_POST_LAUNCH,
-        params: { MARKET: launchableMarketId },
+        params: { MARKET: baseAsset },
       }),
     },
   ];
@@ -63,18 +78,53 @@ export const LaunchMarketSidePanel = ({
       <h2 tw="text-large text-color-text-2">
         {stringGetter({
           key: STRING_KEYS.INSTANTLY_LAUNCH,
-          params: { MARKET: launchableMarketId },
+          params: { MARKET: baseAsset },
         })}
       </h2>
+
       <div tw="flex flex-col gap-1">{steps}</div>
-      <Button
-        action={ButtonAction.Primary}
-        onClick={() => {
-          dispatch(openDialog(DialogTypes.LaunchMarket()));
-        }}
+
+      <WithDetailsReceipt
+        side="top"
+        detailItems={[
+          {
+            key: 'deposit',
+            label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
+            value: (
+              <Output
+                tw="inline text-color-text-1"
+                type={OutputType.Asset}
+                value={10_000}
+                slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" symbol="USDC" />}
+                fractionDigits={0}
+              />
+            ),
+          },
+          {
+            key: 'time-until-live',
+            label: stringGetter({ key: STRING_KEYS.TIME_UNTIL_LIVE }),
+            value: (
+              <span tw="text-color-positive">{stringGetter({ key: STRING_KEYS.INSTANT })}</span>
+            ),
+          },
+        ]}
       >
-        {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET })}
-      </Button>
+        <Button
+          action={ButtonAction.Primary}
+          disabled={!launchableAsset}
+          onClick={() => {
+            if (launchableMarketId) {
+              dispatch(
+                openDialog(
+                  DialogTypes.LaunchMarket({ defaultLaunchableMarketId: launchableMarketId })
+                )
+              );
+            }
+          }}
+        >
+          {stringGetter({ key: STRING_KEYS.BEGIN_LAUNCH })} →
+        </Button>
+      </WithDetailsReceipt>
     </$Container>
   );
 };

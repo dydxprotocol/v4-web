@@ -10,6 +10,7 @@ import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/m
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
+import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -33,8 +34,10 @@ import { Toolbar } from '@/components/Toolbar';
 
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 
@@ -53,12 +56,14 @@ const MarketsDropdownContent = ({
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
+  const { uiRefresh } = testFlags;
+
   const columns = useMemo(
     () =>
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.displayId,
+          getCellValue: (row: MarketData) => row.displayId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({
             assetId,
@@ -66,10 +71,10 @@ const MarketsDropdownContent = ({
             isNew,
             effectiveInitialMarginFraction,
             initialMarginFraction,
-          }) => (
+          }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <AssetIcon symbol={assetId} />
+              <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 <Output
@@ -87,17 +92,17 @@ const MarketsDropdownContent = ({
         },
         {
           columnKey: 'oraclePrice',
-          getCellValue: (row) => row.oraclePrice,
+          getCellValue: (row: MarketData) => row.oraclePrice,
           label: stringGetter({ key: STRING_KEYS.PRICE }),
-          renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+          renderCell: ({ oraclePrice, tickSizeDecimals }: MarketData) => (
             <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
           ),
         },
         {
           columnKey: 'priceChange24HPercent',
-          getCellValue: (row) => row.priceChange24HPercent,
+          getCellValue: (row: MarketData) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
-          renderCell: ({ priceChange24HPercent }) => (
+          renderCell: ({ priceChange24HPercent }: MarketData) => (
             <div tw="inlineRow">
               {!priceChange24HPercent ? (
                 <$Output type={OutputType.Text} value={null} />
@@ -113,22 +118,22 @@ const MarketsDropdownContent = ({
         },
         {
           columnKey: 'volume24H',
-          getCellValue: (row) => row.volume24H,
+          getCellValue: (row: MarketData) => row.volume24H,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
-          renderCell: ({ volume24H }) => (
-            <$Output type={OutputType.CompactFiat} value={volume24H} />
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.volume24H} />
           ),
         },
-        {
+        !uiRefresh && {
           columnKey: 'openInterest',
-          getCellValue: (row) => row.openInterestUSDC,
+          getCellValue: (row: MarketData) => row.openInterestUSDC,
           label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-          renderCell: (row) => (
+          renderCell: (row: MarketData) => (
             <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
           ),
         },
-      ] satisfies ColumnDef<MarketData>[],
-    [stringGetter]
+      ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
+    [stringGetter, uiRefresh]
   );
 
   const slotBottom = useMemo(() => {
@@ -148,9 +153,9 @@ const MarketsDropdownContent = ({
     defaultValue: false,
   });
 
-  const currentDate = new Date();
-
   const slotTop = useMemo(() => {
+    const currentDate = new Date();
+
     if (
       !hasSeenElectionBannerTrumpWin &&
       featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
@@ -177,7 +182,6 @@ const MarketsDropdownContent = ({
 
     return null;
   }, [
-    currentDate,
     setHasSeenElectionBannerTrupmWin,
     hasSeenElectionBannerTrumpWin,
     stringGetter,
@@ -258,20 +262,24 @@ const MarketsDropdownContent = ({
 export const MarketsDropdown = memo(
   ({
     currentMarketId,
-    isViewingUnlaunchedMarket,
+    launchableMarketId,
     symbol = '',
   }: {
     currentMarketId?: string;
-    isViewingUnlaunchedMarket?: boolean;
+    launchableMarketId?: string;
     symbol: string | null;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
+    const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+    const isViewingUnlaunchedMarket = !!launchableAsset;
+
+    const { uiRefresh: uiRefreshEnabled } = testFlags;
 
     const leverageTag =
-      !isViewingUnlaunchedMarket && currentMarketId != null ? (
+      !uiRefreshEnabled && !isViewingUnlaunchedMarket && currentMarketId != null ? (
         <Tag>
           <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
         </Tag>
@@ -281,35 +289,48 @@ export const MarketsDropdown = memo(
 
     return (
       <$Popover
+        uiRefreshEnabled={uiRefreshEnabled}
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
           <>
             {triggerBackground}
-            <$TriggerContainer $isOpen={isOpen}>
-              {isOpen ? (
+            <$TriggerContainer $isOpen={isOpen} uiRefreshEnabled={uiRefreshEnabled}>
+              {!uiRefreshEnabled && isOpen ? (
                 <h2 tw="text-color-text-2 font-medium-medium">
                   {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
                 </h2>
               ) : (
                 <div tw="spacedRow gap-0.625">
-                  <AssetIcon symbol={symbol} />
-                  {isViewingUnlaunchedMarket ? (
-                    <div tw="flex flex-col text-start">
-                      <span tw="font-mini-book">Not Launched</span>
-                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
-                        {currentMarketId}
-                      </h2>
-                    </div>
+                  {launchableAsset ? (
+                    <>
+                      <img
+                        src={launchableAsset.logo}
+                        alt={launchableAsset.name}
+                        tw="h-[1em] w-auto rounded-[50%]"
+                      />
+
+                      <div tw="flex flex-col text-start">
+                        <span tw="font-mini-book">
+                          {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                        </span>
+                        <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                          {currentMarketId}
+                        </h2>
+                      </div>
+                    </>
                   ) : (
-                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    <>
+                      <$AssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
+                      <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    </>
                   )}
                   {leverageTag}
                 </div>
               )}
               <p tw="row gap-0.5 text-color-text-0 font-small-book">
-                {isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
+                {!uiRefreshEnabled && isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
                 <DropdownIcon isOpen={isOpen} />
               </p>
             </$TriggerContainer>
@@ -350,9 +371,7 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
     `}
 `;
 
-const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
-  --marketsDropdown-width: var(--sidebar-width);
-  width: var(--sidebar-width);
+const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boolean }>`
   position: relative;
 
   ${layoutMixins.spacedRow}
@@ -360,26 +379,39 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
 
   transition: width 0.1s;
 
-  ${({ $isOpen }) =>
-    $isOpen &&
-    css`
-      --marketsDropdown-width: var(--marketsDropdown-openWidth);
-    `}
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          gap: 1rem;
+        `
+      : css`
+          width: var(--sidebar-width);
+        `}
+  `}
 `;
 
-const $Popover = styled(Popover)`
+const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
   ${popoverMixins.popover}
-  --popover-item-height: 3.375rem;
-  --popover-backgroundColor: var(--color-layer-2);
-  --stickyArea-topHeight: 6.125rem;
+  --popover-item-height: ${({ uiRefreshEnabled }) =>
+    uiRefreshEnabled ? css`2.75rem` : css`3.375rem`};
 
-  --toolbar-height: var(--stickyArea-topHeight);
+  --popover-backgroundColor: var(--color-layer-2);
+  display: flex;
+  flex-direction: column;
 
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
 
-  width: var(--marketsDropdown-openWidth);
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled
+      ? css`
+          width: var(--marketsDropdown-openWidth);
+        `
+      : css`
+          width: var(--marketsDropdown-openWidth-deprecated);
+        `}
+  `}
   max-width: 100vw;
 
   box-shadow: 0 0 0 1px var(--color-border);
@@ -408,11 +440,11 @@ const $Popover = styled(Popover)`
     outline: none;
   }
 `;
+
 const $Toolbar = styled(Toolbar)`
-  ${layoutMixins.stickyHeader}
-  height: var(--toolbar-height);
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
+  padding: 1rem 1rem 0.5rem;
 `;
 
 const $MarketDropdownBanner = styled.div`
@@ -428,6 +460,15 @@ const $MarketDropdownBanner = styled.div`
   & > * {
     z-index: 1;
   }
+`;
+
+const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
+  ${({ uiRefreshEnabled }) => css`
+    ${uiRefreshEnabled &&
+    css`
+      --asset-icon-size: 1.5em;
+    `}
+  `}
 `;
 
 const $IconButton = styled(IconButton)`
@@ -459,11 +500,14 @@ const $TriggerFlag = styled.div`
 `;
 
 const $ScrollArea = styled.div`
-  ${layoutMixins.scrollArea}
-  height: calc(100% - var(--toolbar-height));
+  overflow: scroll;
+  position: relative;
+  height: 100%;
 `;
+
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
+  --table-header-height: 2.25rem;
 
   thead {
     --stickyArea-totalInsetTop: 0px;
@@ -486,6 +530,7 @@ const $Table = styled(Table)`
     height: var(--popover-item-height);
   }
 ` as typeof Table;
+
 const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);

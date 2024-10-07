@@ -2,6 +2,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import {
+  AbacusOrderSide,
   AbacusOrderStatus,
   AbacusOrderType,
   AbacusOrderTypes,
@@ -113,6 +114,10 @@ export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabl
     ? [AbacusOrderType.TakeProfitLimit, AbacusOrderType.TakeProfitMarket]
     : [AbacusOrderType.TakeProfitMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
+};
+
+export const isSellOrder = (order: SubaccountOrder) => {
+  return order.side.ordinal === AbacusOrderSide.Sell.ordinal;
 };
 
 type AddedProps = {

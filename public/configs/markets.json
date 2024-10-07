@@ -72,7 +72,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ac-milan-fan-token/",
         "name": "AC Milan Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/",
@@ -456,7 +455,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/argentinefootballassociationfantoken/",
         "name": "Argentine Football Association Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://socios.com",
@@ -561,7 +559,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/atletico-de-madrid-fan-token/",
         "name": "Atletico De Madrid Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/atletico-de-madrid/",
@@ -712,7 +709,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/fc-barcelona-fan-token/",
         "name": "FC Barcelona Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://chiliz.com",
@@ -1009,6 +1005,7 @@
         "coinMarketCapsLink": "https://www.google.com/finance/quote/BRL-USD?hl=en",
         "name": "Brazilian Real",
         "tags": [
+            "FX"
         ]
     },
     "BRISE-USD": {
@@ -1288,7 +1285,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/manchester-city-fan-token/",
         "name": "Manchester City Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com",
@@ -1591,7 +1587,8 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/multi-collateral-dai/",
         "name": "Dai",
         "tags": [
-            "Defi"
+            "Defi",
+            "FX"
         ],
         "websiteLink": "https://makerdao.com/",
         "whitepaperLink": null
@@ -1998,6 +1995,13 @@
         "websiteLink": "https://egoco.in/en/",
         "whitepaperLink": "https://docs.paysenger.com/"
     },
+    "EIGEN-USD": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/eigenlayer/",
+        "name": "EigenLayer",
+        "tags": ["Defi"],
+        "websiteLink": "https://www.eigenlayer.xyz/",
+        "whitepaperLink": "https://docs.eigenlayer.xyz/assets/files/EIGEN_Token_Whitepaper-0df8e17b7efa052fd2a22e1ade9c6f69.pdf/"
+    },
     "ELA-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/elastos/",
         "name": "Elastos",
@@ -2165,12 +2169,16 @@
     "EUR-USD": {
         "coinMarketCapsLink": "https://www.google.com/finance/quote/EUR-USD?hl=en",
         "name": "Euro",
-        "tags": []
+        "tags": [
+            "FX"
+        ]
     },
     "EURC-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/euro-coin/",
         "name": "EURC",
-        "tags": [],
+        "tags": [
+            "FX"
+        ],
         "websiteLink": "https://www.circle.com",
         "whitepaperLink": null
     },
@@ -2689,7 +2697,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/topgoal/",
         "name": "TopGoal",
         "tags": [
-            "Entertainment",
             "NFT",
             "Entertainment"
         ],
@@ -3281,7 +3288,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/juventus-fan-token/",
         "name": "Juventus Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/juventus/",
@@ -4639,7 +4645,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/og-fan-token/",
         "name": "OG Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/og/",
@@ -5212,7 +5217,6 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/paris-saint-germain-fan-token/",
         "name": "Paris Saint-Germain Fan Token",
         "tags": [
-            "Entertainment",
             "Entertainment"
         ],
         "websiteLink": "https://www.socios.com/paris-saint-germain/",
@@ -6608,6 +6612,7 @@
         "coinMarketCapsLink": "https://www.google.com/finance/quote/TRY-USD?hl=en",
         "name": "Turkish lira",
         "tags": [
+            "FX"
         ]
     },
     "TT-USD": {

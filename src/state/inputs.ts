@@ -11,12 +11,17 @@ import {
   type TransferInputs,
   type TriggerOrdersInputs,
 } from '@/constants/abacus';
-import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
+import {
+  CLEARED_CLOSE_POSITION_INPUTS,
+  CLEARED_SIZE_INPUTS,
+  CLEARED_TRADE_INPUTS,
+} from '@/constants/trade';
 import { CLEARED_TRIGGER_LIMIT_INPUTS, CLEARED_TRIGGER_ORDER_INPUTS } from '@/constants/triggers';
 
 import { safeAssign } from '@/lib/objectHelpers';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
+type ClosePositionFormInputs = typeof CLEARED_CLOSE_POSITION_INPUTS;
 type TriggerFormInputs = typeof CLEARED_TRIGGER_ORDER_INPUTS & typeof CLEARED_TRIGGER_LIMIT_INPUTS;
 
 export interface InputsState {
@@ -25,6 +30,7 @@ export interface InputsState {
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
   adjustIsolatedMarginInputs?: Nullable<AdjustIsolatedMarginInputs>;
+  closePositionFormInputs: ClosePositionFormInputs;
   closePositionInputs?: Nullable<ClosePositionInputs>;
   triggerFormInputs: TriggerFormInputs;
   triggerOrdersInputs?: Nullable<TriggerOrdersInputs>;
@@ -37,6 +43,9 @@ const initialState: InputsState = {
   tradeFormInputs: {
     ...CLEARED_TRADE_INPUTS,
     ...CLEARED_SIZE_INPUTS,
+  },
+  closePositionFormInputs: {
+    ...CLEARED_CLOSE_POSITION_INPUTS,
   },
   tradeInputs: undefined,
   transferInputs: undefined,
@@ -79,10 +88,17 @@ export const inputsSlice = createSlice({
     setTradeFormInputs: (state, action: PayloadAction<Partial<TradeFormInputs>>) => {
       state.tradeFormInputs = assign({}, state.tradeFormInputs, action.payload);
     },
+    setClosePositionFormInputs: (
+      state,
+      action: PayloadAction<Partial<ClosePositionFormInputs>>
+    ) => {
+      state.closePositionFormInputs = assign({}, state.closePositionFormInputs, action.payload);
+    },
     setTriggerFormInputs: (state, action: PayloadAction<Partial<TriggerFormInputs>>) => {
       state.triggerFormInputs = assign({}, state.triggerFormInputs, action.payload);
     },
   },
 });
 
-export const { setInputs, setTradeFormInputs, setTriggerFormInputs } = inputsSlice.actions;
+export const { setInputs, setTradeFormInputs, setClosePositionFormInputs, setTriggerFormInputs } =
+  inputsSlice.actions;

@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
+import { debounce } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { TradeInputField } from '@/constants/abacus';
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { TradeSizeInput } from '@/constants/trade';
+import { TooltipStringKeys } from '@/constants/tooltips';
+import { DisplayUnit, TradeSizeInput } from '@/constants/trade';
 
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -17,6 +19,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { DisplayUnitTag } from '@/components/DisplayUnitTag';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
@@ -25,8 +28,11 @@ import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { setDisplayUnit } from '@/state/configs';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getInputTradeOptions,
@@ -37,13 +43,12 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
+import { TradePercentSizeToggle } from './TradePercentSizeToggle';
 
 export const TradeSizeInputs = () => {
-  const [showUSDCInput, setShowUSDCInput] = useState(false);
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
@@ -55,14 +60,27 @@ export const TradeSizeInputs = () => {
 
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData ?? {};
-  const { needsLeverage } = currentTradeInputOptions ?? {};
+  const {
+    size,
+    usdcSize,
+    leverage,
+    balancePercent,
+    input: lastEditedInput,
+  } = inputTradeSizeData ?? {};
+  const { needsBalancePercent, needsLeverage } = currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
-  const { amountInput, usdAmountInput, leverageInput } = useAppSelector(
+  const { amountInput, usdAmountInput, leverageInput, balancePercentInput } = useAppSelector(
     getTradeFormInputs,
     shallowEqual
   );
+
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
+
+  useEffect(() => {
+    // reset size inputs since abacus size is not properly synced/edited before account connection
+    abacusStateManager.clearTradeInputSizeValues();
+  }, [isAccountConnected]);
 
   // Update State variables if their inputs are not being source of calculations
   // Or if they have been reset to null
@@ -76,7 +94,14 @@ export const TradeSizeInputs = () => {
     if (lastEditedInput !== TradeSizeInput.Leverage || leverage == null) {
       dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
     }
-  }, [size, usdcSize, leverage, lastEditedInput, dispatch]);
+    if (lastEditedInput !== TradeSizeInput.BalancePercent || balancePercent == null) {
+      dispatch(
+        setTradeFormInputs({
+          balancePercentInput: balancePercent ? balancePercent.toString() : '',
+        })
+      );
+    }
+  }, [size, usdcSize, leverage, balancePercent, lastEditedInput, dispatch]);
 
   const onSizeInput = ({
     floatValue,
@@ -93,6 +118,9 @@ export const TradeSizeInputs = () => {
       field: TradeInputField.size,
     });
   };
+
+  const displayUnit = useAppSelector(getSelectedDisplayUnit);
+  const showUSDInput = displayUnit === DisplayUnit.Fiat;
 
   const onUSDCInput = ({
     floatValue,
@@ -111,29 +139,32 @@ export const TradeSizeInputs = () => {
     });
   };
 
+  const dispatchSetDisplayUnit = debounce((newDisplayUnit) => {
+    if (!id) return;
+    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId: id }));
+  }, NORMAL_DEBOUNCE_MS);
+
   const onUsdcToggle = useCallback(
     (isPressed: boolean) => {
-      setShowUSDCInput(isPressed);
-      abacusStateManager.setTradeValue({
-        field: TradeInputField.lastInput,
-        value: isPressed ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
-      });
-
-      track(
-        AnalyticsEvents.TradeAmountToggleClick({
-          newInput: isPressed ? TradeSizeInput.Usdc : TradeSizeInput.Size,
-          market: id ?? '',
-        })
-      );
+      const newDisplayUnit = isPressed ? DisplayUnit.Fiat : DisplayUnit.Asset;
+      dispatchSetDisplayUnit(newDisplayUnit);
     },
-    [id]
+    [dispatchSetDisplayUnit]
   );
+
+  useEffect(() => {
+    // when display unit is toggled globally, set the last input to the corresponding unit for calculation
+    abacusStateManager.setTradeValue({
+      field: TradeInputField.lastInput,
+      value: showUSDInput ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
+    });
+  }, [showUSDInput]);
 
   const inputToggleButton = () => {
     const slotTooltip =
-      !showUSDCInput && usdAmountInput ? (
+      !showUSDInput && usdAmountInput ? (
         <$Tooltip>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Tooltip>
-      ) : showUSDCInput && amountInput ? (
+      ) : showUSDInput && amountInput ? (
         <$Tooltip>
           ≈ {amountInput} {id && <Tag>{id}</Tag>}
         </$Tooltip>
@@ -141,7 +172,7 @@ export const TradeSizeInputs = () => {
 
     const toggleButton = (
       <$ToggleButton
-        isPressed={showUSDCInput}
+        isPressed={showUSDInput}
         onPressedChange={onUsdcToggle}
         size={ButtonSize.XSmall}
         shape={ButtonShape.Square}
@@ -159,52 +190,60 @@ export const TradeSizeInputs = () => {
     );
   };
 
+  const inputConfig = {
+    [DisplayUnit.Asset]: {
+      onInput: onSizeInput,
+      type: InputType.Number,
+      tooltipId: 'order-amount',
+      value: amountInput,
+    },
+    [DisplayUnit.Fiat]: {
+      onInput: onUSDCInput,
+      type: InputType.Currency,
+      tooltipId: 'order-amount-usd',
+      value: usdAmountInput,
+    },
+  }[displayUnit];
+
   const sizeInput = (
     <FormInput
       id="trade-amount"
       decimals={decimals}
-      onInput={onSizeInput}
+      onInput={inputConfig.onInput}
       label={
         <>
-          <WithTooltip tooltip="order-amount" stringParams={{ SYMBOL: id ?? '' }} side="right">
+          <WithTooltip
+            tooltip={inputConfig.tooltipId as TooltipStringKeys}
+            stringParams={{ SYMBOL: id ?? '' }}
+            side="right"
+          >
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {id && <Tag>{id}</Tag>}
+          {id && <DisplayUnitTag assetId={id} entryPoint="tradeAmountInputAssetTag" />}
         </>
       }
       slotRight={inputToggleButton()}
-      type={InputType.Number}
-      value={amountInput || ''}
-    />
-  );
-
-  const usdcInput = (
-    <FormInput
-      id="trade-usdc"
-      onInput={onUSDCInput}
-      type={InputType.Currency}
-      value={usdAmountInput || ''}
-      decimals={tickSizeDecimals ?? USD_DECIMALS}
-      label={
-        <>
-          <WithTooltip tooltip="order-amount-usd" stringParams={{ SYMBOL: id ?? '' }} side="right">
-            {stringGetter({ key: STRING_KEYS.AMOUNT })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      }
-      slotRight={inputToggleButton()}
+      type={inputConfig.type}
+      value={inputConfig.value || ''}
     />
   );
 
   return (
     <div tw="flexColumn gap-[--form-input-gap]">
-      {showUSDCInput ? usdcInput : sizeInput}
+      {sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
           leverageInputValue={leverageInput}
           setLeverageInputValue={(value: string) =>
             dispatch(setTradeFormInputs({ leverageInput: value }))
+          }
+        />
+      )}
+      {needsBalancePercent && (
+        <TradePercentSizeToggle
+          balancePercentValue={balancePercentInput}
+          setBalancePercentInputValue={(value: string) =>
+            dispatch(setTradeFormInputs({ balancePercentInput: value }))
           }
         />
       )}

@@ -26,6 +26,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -167,6 +168,73 @@ const useDydxClientContext = () => {
       return [];
     }
   };
+
+  const getMegavaultHistoricalPnl = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getMegavaultHistoricalPnl();
+    } catch (error) {
+      log('useDydxClient/getMegavaultHistoricalPnl', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getMegavaultPositions = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getMegavaultPositions();
+    } catch (error) {
+      log('useDydxClient/getMegavaultPositions', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getVaultsHistoricalPnl = useCallback(async () => {
+    try {
+      return await indexerClient.vault.getVaultsHistoricalPnl();
+    } catch (error) {
+      log('useDydxClient/getVaultsHistoricalPnl', error);
+      return undefined;
+    }
+  }, [indexerClient.vault]);
+
+  const getAllAccountTransfersBetween = useCallback(
+    async (
+      sourceAddress: string,
+      sourceSubaccountNumber: string,
+      recipientAddress: string,
+      recipientSubaccountNumber: string
+    ) => {
+      try {
+        return await indexerClient.account.getTransfersBetween(
+          sourceAddress,
+          sourceSubaccountNumber,
+          recipientAddress,
+          recipientSubaccountNumber
+        );
+      } catch (error) {
+        log('useDydxClient/getAllAccountTransfersBetween', error);
+        return undefined;
+      }
+    },
+    [indexerClient.account]
+  );
+
+  const getVaultWithdrawInfo = useCallback(
+    async (shares: number) => {
+      try {
+        const result = await compositeClient?.validatorClient.get.getMegavaultWithdrawalInfo(
+          BigInt(shares)
+        );
+        if (result == null) {
+          return result;
+        }
+        return parseToPrimitives(result);
+      } catch (error) {
+        log('useDydxClient/getVaultWithdrawInfo', error);
+        return undefined;
+      }
+    },
+    [compositeClient?.validatorClient.get]
+  );
 
   const requestAllAccountFills = async (address: string, subaccountNumber: number) => {
     try {
@@ -398,7 +466,8 @@ const useDydxClientContext = () => {
   }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
-    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
+    // The perpetualId is 0 (parent subaccount number)
+    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus(0);
   }, [compositeClient]);
 
   const getWithdrawalCapacityByDenom = useCallback(
@@ -415,6 +484,20 @@ const useDydxClientContext = () => {
   const getAccountBalance = useCallback(
     async (address: string, denom: string) => {
       return compositeClient?.validatorClient.get.getAccountBalance(address, denom);
+    },
+    [compositeClient]
+  );
+
+  const getAffiliateInfo = useCallback(
+    async (address: string) => {
+      return compositeClient?.validatorClient.get.getAffiliateInfo(address);
+    },
+    [compositeClient]
+  );
+
+  const getReferredBy = useCallback(
+    async (address: string) => {
+      return compositeClient?.validatorClient.get.getReferredBy(address);
     },
     [compositeClient]
   );
@@ -449,5 +532,14 @@ const useDydxClientContext = () => {
     getWithdrawalCapacityByDenom,
     getValidators,
     getAccountBalance,
+    getAffiliateInfo,
+    getReferredBy,
+
+    // vault methods
+    getMegavaultHistoricalPnl,
+    getMegavaultPositions,
+    getVaultsHistoricalPnl,
+    getAllAccountTransfersBetween,
+    getVaultWithdrawInfo,
   };
 };

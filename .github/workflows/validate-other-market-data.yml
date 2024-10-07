@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'public/configs/otherMarketData.json'
-      - 'scripts/validate-other-market-data.ts'
+      - 'scripts/markets/validate-other-market-data.ts'
 
 jobs:
   validate:
@@ -22,6 +22,19 @@ jobs:
           node-version: 18
           cache: pnpm
 
+      - name: Initialize password store
+        run: |
+          gpg --batch --gen-key <<EOF
+          Key-Type: RSA
+          Key-Length: 2048
+          Name-Real: GitHub Actions
+          Name-Email: actions@github.com
+          Expire-Date: 0
+          %no-protection
+          EOF
+          GPG_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub:/ { print $5 }')
+          pass init $GPG_ID
+
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -37,7 +50,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'dydxprotocol/v4-chain'
-          ref: '725ad716cbe9e9aebf2472e877fe2a71e8a63d87'
+          ref: '6a45430024d66bf10577e13b1d0698fd86b0ad32'
           path: 'v4-chain'
 
       - name: Start v4 localnet
@@ -48,12 +61,7 @@ jobs:
           make build
           echo "Starting localnet..."
           DOCKER_BUILDKIT=1 make localnet-init
-          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }}
-
-      - name: Get diff of otherMarketData.json
-        run: |
-          git fetch origin
-          git diff remotes/origin/main -- public/configs/otherMarketData.json > otherMarketDiff.txt
+          DOCKER_BUILDKIT=1 make localnet-compose-upd -e RAYDIUM_URL=${{ secrets.RAYDIUM_URL }} -e UNISWAPV3_BASE_URL=${{ secrets.UNISWAPV3_BASE_URL }} -e UNISWAPV3_ETHEREUM_URL=${{ secrets.UNISWAPV3_ETHEREUM_URL }}
       
       - name: Checkout main branch
         uses: actions/checkout@v3

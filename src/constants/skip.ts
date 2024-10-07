@@ -1,7 +1,9 @@
+export type RouteStatusSummary = 'success' | 'ongoing' | undefined;
+
 export type RouteStatus = {
   chainId: string | undefined;
   txHash: string | undefined;
-  status: 'success' | 'ongoing' | undefined;
+  status: RouteStatusSummary;
 };
 export type SkipTransactionStatus = {
   chainData: {
@@ -18,7 +20,7 @@ export type SkipTransactionStatus = {
 export type TransactionDataParams = {
   chainId: string | undefined;
   txHash: string | undefined;
-  status: string | undefined;
+  state: string | undefined;
   txUrl: string | undefined;
   transferDirection: TransferDirection;
 };
@@ -26,12 +28,12 @@ export type TransactionDataParams = {
 export type TransferDirection = 'from' | 'to';
 
 export type SkipStatusResponse = {
-  axelarTransactionUrl: string | undefined;
-  squidTransactionStatus: string | undefined;
-  routeStatus: RouteStatus[];
-  toChain: SkipTransactionStatus | undefined;
-  fromChain: SkipTransactionStatus | undefined;
-  error: string | undefined;
+  axelarTransactionUrl?: string | undefined;
+  latestRouteStatusSummary?: RouteStatusSummary;
+  routeStatus?: RouteStatus[];
+  toChain?: SkipTransactionStatus | undefined;
+  fromChain?: SkipTransactionStatus | undefined;
+  error?: string | undefined;
 };
 
 export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;

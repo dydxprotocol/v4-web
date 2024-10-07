@@ -12,13 +12,10 @@ import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
-  ProposalStatus
+  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
-import {
-  Perpetual,
-  PerpetualMarketType,
-} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
+import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -26,18 +23,28 @@ import { readFileSync } from 'fs';
 import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
 
-import { Exchange, ExchangeName, Proposal, retry, sleep, voteOnProposals } from './help';
+import {
+  createAndSendMarketMapProposal,
+  Exchange,
+  ExchangeName,
+  PerpetualMarketType,
+  Proposal,
+  retry,
+  sleep,
+  voteOnProposals,
+} from './help';
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
 );
 const LocalWallet = LocalWalletModule.default;
 
-const PATH_TO_OLD_PROPOSALS = 'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
+const PATH_TO_OLD_PROPOSALS =
+  'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
 const PATH_TO_PROPOSALS = 'public/configs/otherMarketData.json';
 // TODO: Query MIN_DEPOSIT and VOTING_PERIOD_SECONDS from chain.
 const MIN_DEPOSIT = '10000000';
-const VOTING_PERIOD_SECONDS = 300;
+const VOTING_PERIOD_SECONDS = 120;
 const VOTE_FEE: StdFee = {
   amount: [
     {
@@ -77,7 +84,6 @@ interface ExchangeInfo {
   url: string;
   tickers: Map<string, any> | null;
   parseResp: (response: any) => Map<string, any>;
-  slinkyProviderName: string;
 }
 
 const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
@@ -90,40 +96,27 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'binance_api',
-  },
-  [ExchangeName.BinanceUS]: {
-    url: 'https://api.binance.us/api/v3/ticker/24hr',
-    tickers: null,
-    parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.symbol, {});
-        return acc;
-      }, new Map<string, any>());
-    },
-    slinkyProviderName: 'binance_api',
   },
   [ExchangeName.Bitfinex]: {
-    url: 'https://api-pub.bitfinex.com/v2/tickers?symbols=ALL',
+    url: 'https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange',
     tickers: null,
     parseResp: (response: any) => {
-      return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item[0], {});
+      return response[0].reduce((acc: Map<string, any>, item: string) => {
+        acc.set(item, {});
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bitfinex_ws',
   },
   [ExchangeName.Bitstamp]: {
     url: 'https://www.bitstamp.net/api/v2/ticker/',
     tickers: null,
     parseResp: (response: any) => {
       return Array.from(response).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.pair, {});
+        const convertedPair = item.pair.replace('/', '').toLowerCase();
+        acc.set(convertedPair, {});
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bitstamp_ws',
   },
   [ExchangeName.Bybit]: {
     url: 'https://api.bybit.com/v5/market/tickers?category=spot',
@@ -134,7 +127,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'bybit_ws',
   },
   [ExchangeName.CoinbasePro]: {
     url: 'https://api.exchange.coinbase.com/products',
@@ -145,7 +137,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'coinbase_api',
   },
   [ExchangeName.CryptoCom]: {
     url: 'https://api.crypto.com/v2/public/get-ticker',
@@ -156,7 +147,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'crypto_dot_com_ws',
   },
   [ExchangeName.Gate]: {
     url: 'https://api.gateio.ws/api/v4/spot/tickers',
@@ -167,7 +157,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'gate_ws',
   },
   [ExchangeName.Huobi]: {
     url: 'https://api.huobi.pro/market/tickers',
@@ -178,7 +167,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'huobi_ws',
   },
   [ExchangeName.Kraken]: {
     url: 'https://api.kraken.com/0/public/Ticker',
@@ -186,7 +174,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     parseResp: (response: any) => {
       return new Map<string, any>(Object.entries(response.result));
     },
-    slinkyProviderName: 'kraken_api',
   },
   [ExchangeName.Kucoin]: {
     url: 'https://api.kucoin.com/api/v1/market/allTickers',
@@ -197,18 +184,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'kucoin_ws',
-  },
-  [ExchangeName.Mexc]: {
-    url: 'https://www.mexc.com/open/api/v2/market/ticker',
-    tickers: null,
-    parseResp: (response: any) => {
-      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
-        acc.set(item.symbol, {});
-        return acc;
-      }, new Map<string, any>());
-    },
-    slinkyProviderName: 'mexc_ws',
   },
   [ExchangeName.Okx]: {
     url: 'https://www.okx.com/api/v5/market/tickers?instType=SPOT',
@@ -219,7 +194,6 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'okx_ws',
   },
   [ExchangeName.Raydium]: {
     url: '',
@@ -230,7 +204,36 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
-    slinkyProviderName: 'Raydium',
+  },
+  [ExchangeName.UniswapV3_Ethereum]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+  },
+  [ExchangeName.UniswapV3_Base]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+  },
+  [ExchangeName.Polymarket]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
   },
 };
 
@@ -260,7 +263,7 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
-      (exchange.exchangeName !== ExchangeName.Raydium &&
+      (exchange.exchangeName !== ExchangeName.Polymarket &&
         !/usd$|usdc$/i.test(exchange.ticker) &&
         exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
@@ -276,8 +279,13 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
       continue; // exit the current iteration of the loop.
     }
 
-    // TODO: Skip Raydium since ticker is idiosyncratic
-    if (exchange.exchangeName === ExchangeName.Raydium) {
+    // TODO: Skip Raydium, Uniswap, and Polymarket since ticker is idiosyncratic
+    if (
+      exchange.exchangeName === ExchangeName.Raydium ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Ethereum ||
+      exchange.exchangeName === ExchangeName.UniswapV3_Base ||
+      exchange.exchangeName === ExchangeName.Polymarket
+    ) {
       continue; // exit the current iteration of the loop.
     }
 
@@ -317,12 +325,27 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
 
+  // Send market map proposal first.
+  await createAndSendMarketMapProposal(
+    filteredProposals,
+    network.validatorConfig.restEndpoint,
+    network.validatorConfig.chainId,
+    'v4-chain/protocol/build/dydxprotocold'
+  );
+  console.log("Submitted market map proposal");
+  await sleep(5000);
+  for (const wallet of wallets) {
+    retry(() => voteOnProposals([1], client, wallet));
+  }
+  await sleep(5000);
+
   const numExistingMarkets = allPerps.perpetual.reduce(
     (max, perp) => (perp.params!.id > max ? perp.params!.id : max),
     0
   );
   const marketsProposed = new Map<number, Proposal>(); // marketId -> Proposal
 
+  let proposalId: number = 2;
   for (let i = 0; i < filteredProposals.length; i += 4) {
     // Send out proposals in groups of 4 or fewer.
     const proposalsToSend = filteredProposals.slice(i, i + 4);
@@ -330,7 +353,6 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1; 
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -370,8 +392,8 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       );
 
       // Record proposed market.
-      marketsProposed.set(marketId, {...proposal, id: Long.fromNumber(proposalId)});
-      proposalIds.push(proposalId);
+      marketsProposed.set(marketId, { ...proposal, id: Long.fromNumber(proposalId) });
+      proposalIds.push(proposalId++);
     }
 
     // Wait 5 seconds for proposals to be processed.
@@ -401,10 +423,13 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   );
   console.log(`${proposalsRejected.proposals.length} proposals rejected`);
   proposalsRejected.proposals.map((proposal) => {
-    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_REJECTED);
+    allErrors.set(
+      `Proposal ${proposal.id} with title ${proposal.title}`,
+      ValidationError.PROPOSAL_REJECTED
+    );
     failedOrRejectedProposals.add(proposal.id);
     console.log(`Proposal ${proposal.id} with title ${proposal.title} was rejected`);
-  })
+  });
 
   // Check which proposals failed.
   console.log('\nChecking which proposals failed...');
@@ -413,10 +438,15 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   );
   console.log(`${proposalsFailed.proposals.length} proposals failed`);
   proposalsFailed.proposals.map((proposal) => {
-    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_FAILED);
+    allErrors.set(
+      `Proposal ${proposal.id} with title ${proposal.title}`,
+      ValidationError.PROPOSAL_FAILED
+    );
     failedOrRejectedProposals.add(proposal.id);
-    console.log(`Proposal ${proposal.id} with title ${proposal.title} failed due to: ${proposal.failedReason}`);
-  })
+    console.log(
+      `Proposal ${proposal.id} with title ${proposal.title} failed due to: ${proposal.failedReason}`
+    );
+  });
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
@@ -451,7 +481,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       validateSlinkyMetricsPerTicker(
         dydxTickerToSlinkyTicker(proposal.params.ticker),
         exchange.ticker.toLowerCase(),
-        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
+        exchange.exchangeName
       );
     }
   }
@@ -551,36 +581,66 @@ function makePrometheusRateQuery(
     });
 }
 
-function validatePrice(price: MarketPrice, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validatePrice(
+  price: MarketPrice,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (price.exponent !== proposal.params.priceExponent) {
-    allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_EXPONENT_MISMATCH);
+    allErrors.set(
+      `Price ${price.id.toString()} with ticker ${ticker}`,
+      ValidationError.PRICE_EXPONENT_MISMATCH
+    );
   }
   if (price.price.isZero()) {
     allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_ZERO);
   }
 }
 
-function validateClobPair(clobPair: ClobPair, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validateClobPair(
+  clobPair: ClobPair,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (clobPair.quantumConversionExponent !== proposal.params.quantumConversionExponent) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_QCE_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_QCE_MISMATCH
+    );
   }
   if (!clobPair.stepBaseQuantums.equals(proposal.params.stepBaseQuantums)) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SBQ_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_SBQ_MISMATCH
+    );
   }
   if (clobPair.subticksPerTick !== proposal.params.subticksPerTick) {
-    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SPT_MISMATCH);
+    allErrors.set(
+      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
+      ValidationError.CLOB_SPT_MISMATCH
+    );
   }
 }
 
-function validatePerpetual(perpetual: Perpetual, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+function validatePerpetual(
+  perpetual: Perpetual,
+  proposal: Proposal,
+  allErrors: Map<String, ValidationError>
+): void {
   const ticker = proposal?.params?.ticker;
   if (perpetual.params!.atomicResolution !== proposal.params.atomicResolution) {
-    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_AR_MISMATCH);
+    allErrors.set(
+      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
+      ValidationError.PERP_AR_MISMATCH
+    );
   }
   if (perpetual.params!.liquidityTier !== proposal.params.liquidityTier) {
-    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_LT_MISMATCH);
+    allErrors.set(
+      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
+      ValidationError.PERP_LT_MISMATCH
+    );
   }
 }
 
@@ -603,7 +663,8 @@ function validateParamsSchema(proposal: Proposal): void {
             exchangeName: { type: 'string' },
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
-            invert: {type: 'boolean', nullable: true },
+            invert: { type: 'boolean', nullable: true },
+            metadata_JSON: { type: 'string', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
@@ -672,7 +733,9 @@ function removeIdFromParams(params: any): any {
 
 async function main(): Promise<void> {
   // Read new proposals.
-  const newProposals: Record<string, Proposal> = JSON.parse(readFileSync(PATH_TO_PROPOSALS, 'utf8'));
+  const newProposals: Record<string, Proposal> = JSON.parse(
+    readFileSync(PATH_TO_PROPOSALS, 'utf8')
+  );
 
   // Validate JSON schema of all proposals.
   console.log('Validating JSON schema of all proposals...\n');
@@ -693,9 +756,7 @@ async function main(): Promise<void> {
   if (proposalsToValidate.size === 0) {
     return;
   }
-  await validateAgainstLocalnet(
-    Array.from(proposalsToValidate).map((name) => newProposals[name])
-  );
+  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]));
 
   console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
 }

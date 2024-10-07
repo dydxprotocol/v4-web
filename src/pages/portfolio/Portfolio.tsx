@@ -26,7 +26,6 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
@@ -35,6 +34,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
+import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
 
 const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
@@ -116,6 +116,16 @@ const PortfolioPage = () => {
             }
           />
           <Route
+            path={HistoryRoute.VaultTransfers}
+            element={
+              <VaultTransactionsTable
+                withOuterBorders
+                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}
+              />
+            }
+          />
+          {/* TODO - TRCL-1693
+          <Route
             path={HistoryRoute.Payments}
             element={
               <FundingPaymentsTable
@@ -123,7 +133,7 @@ const PortfolioPage = () => {
                 withOuterBorder={isNotTablet}
               />
             }
-          />
+          /> */}
         </Route>
         <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
       </Routes>

@@ -21,11 +21,11 @@ export const useReferralAddress = (refCode: string) => {
     return data?.address as string | undefined;
   };
 
-  const { data, isFetched } = useQuery({
+  const query = useQuery({
     queryKey: ['referralAddress', refCode],
     queryFn,
     enabled: Boolean(compositeClient && refCode),
   });
 
-  return { data, isFetched };
+  return query;
 };

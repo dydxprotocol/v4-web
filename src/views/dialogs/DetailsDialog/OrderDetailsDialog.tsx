@@ -27,8 +27,9 @@ import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
+import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { isMarketOrderType, isOrderStatusClearable } from '@/lib/orders';

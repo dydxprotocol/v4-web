@@ -10,8 +10,8 @@ interface EnvironmentConfig {
   chainName: string;
   chainLogo: string;
   deployerName: string;
-  squidIntegratorId: string;
   rewardsHistoryStartDateMs: string;
+  megavaultHistoryStartDateMs: string;
 }
 
 export type EnvironmentConfigKey = keyof EnvironmentConfig;

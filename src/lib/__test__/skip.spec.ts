@@ -97,7 +97,7 @@ describe('formSkipStatusResponse - non CCTP Deposit', () => {
     const expected = {
       axelarTransactionUrl:
         'https://axelarscan.io/gmp/0x6792ba9fa4d1a0316ffabad1541dc4c5ddcd8c4bb38b9a1368f08931f9c14e1c',
-      squidTransactionStatus: 'ongoing',
+      latestRouteStatusSummary: 'ongoing',
       routeStatus: [
         {
           chainId: '1',
@@ -129,7 +129,7 @@ describe('formSkipStatusResponse - non CCTP Deposit', () => {
   it('converts deposit from ethereum on ETH Success payload', () => {
     const transferStatusResponse = depositFromEthereumEthSuccess;
     const expected = {
-      squidTransactionStatus: 'success',
+      latestRouteStatusSummary: 'success',
       axelarTransactionUrl:
         'https://axelarscan.io/gmp/0x6792ba9fa4d1a0316ffabad1541dc4c5ddcd8c4bb38b9a1368f08931f9c14e1c',
       fromChain: {
@@ -178,7 +178,7 @@ describe('formSkipStatusResponse - non CCTP Withdrawal', () => {
       error: undefined,
       fromChain: undefined,
       routeStatus: [],
-      squidTransactionStatus: 'ongoing',
+      latestRouteStatusSummary: 'ongoing',
       toChain: undefined,
     };
     const result = formSkipStatusResponse(transferStatusResponse);
@@ -187,7 +187,7 @@ describe('formSkipStatusResponse - non CCTP Withdrawal', () => {
   it('converts withdrawal to bnb on bsc Pending payload', () => {
     const transferStatusResponse = withdrawToBinanceBNBPending;
     const expected = {
-      squidTransactionStatus: 'ongoing',
+      latestRouteStatusSummary: 'ongoing',
       axelarTransactionUrl:
         'https://axelarscan.io/gmp/169170FB7F14E4D9EE4203A332CF29BE90E36E91CFCE5F231EFCD2D99292F974',
       fromChain: {
@@ -228,7 +228,7 @@ describe('formSkipStatusResponse - non CCTP Withdrawal', () => {
   it('converts withdrawal to bnb on bsc Success payload', () => {
     const transferStatusResponse = withdrawToBinanceBNBSuccess;
     const expected = {
-      squidTransactionStatus: 'success',
+      latestRouteStatusSummary: 'success',
       axelarTransactionUrl:
         'https://axelarscan.io/gmp/169170FB7F14E4D9EE4203A332CF29BE90E36E91CFCE5F231EFCD2D99292F974',
       fromChain: {
@@ -273,7 +273,7 @@ describe('formSkipStatusResponse - CCTP Deposit', () => {
   it('converts deposit from usdc on ETH Pending payload', () => {
     const transferStatusResponse = depositFromUsdcEthPending;
     const expected = {
-      squidTransactionStatus: 'ongoing',
+      latestRouteStatusSummary: 'ongoing',
       axelarTransactionUrl: undefined,
       error: undefined,
       fromChain: {
@@ -314,7 +314,7 @@ describe('formSkipStatusResponse - CCTP Deposit', () => {
   it('converts deposit from usdc on ETH Success payload', () => {
     const transferStatusResponse = depositFromUsdcEthSuccess;
     const expected = {
-      squidTransactionStatus: 'success',
+      latestRouteStatusSummary: 'success',
       axelarTransactionUrl: undefined,
       error: undefined,
       fromChain: {
@@ -359,7 +359,7 @@ describe('formSkipStatusResponse - CCTP Withdrawal', () => {
   it('converts withdrawal to usdc on eth Pending payload', () => {
     const transferStatusResponse = withdrawToUsdcEthPending;
     const expected = {
-      squidTransactionStatus: 'ongoing',
+      latestRouteStatusSummary: 'ongoing',
       axelarTransactionUrl: undefined,
       error: undefined,
       fromChain: {
@@ -400,7 +400,7 @@ describe('formSkipStatusResponse - CCTP Withdrawal', () => {
   it('converts withdrawal to usdc on eth Success payload', () => {
     const transferStatusResponse = withdrawToUsdcEthSuccess;
     const expected = {
-      squidTransactionStatus: 'success',
+      latestRouteStatusSummary: 'success',
       axelarTransactionUrl: undefined,
       error: undefined,
       fromChain: {

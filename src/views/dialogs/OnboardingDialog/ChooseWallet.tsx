@@ -60,9 +60,11 @@ export const ChooseWallet = ({
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
           >
-            {wallet.connectorType === ConnectorType.Injected
-              ? wallet.name
-              : stringGetter({ key: wallets[wallet.name].stringKey })}
+            <$WalletName>
+              {wallet.connectorType === ConnectorType.Injected
+                ? wallet.name
+                : stringGetter({ key: wallets[wallet.name].stringKey })}
+            </$WalletName>
           </$WalletButton>
         ))}
       </$Wallets>
@@ -113,6 +115,11 @@ const $WalletButton = styled(Button)`
     }
   }
 `;
+
+const $WalletName = styled.div`
+  ${layoutMixins.textTruncate}
+`;
+
 const $Footer = styled.footer`
   ${layoutMixins.spacedRow}
   justify-content: center;

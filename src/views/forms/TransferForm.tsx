@@ -63,7 +63,7 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { dydxAddress, connectedWallet } = useAccounts();
+  const { dydxAddress, sourceAccount } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -118,7 +118,7 @@ export const TransferForm = ({
   };
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+    if (sourceAccount.walletInfo?.name === WalletType.Keplr && dydxAddress) {
       abacusStateManager.setTransfersSourceAddress(dydxAddress);
     }
 

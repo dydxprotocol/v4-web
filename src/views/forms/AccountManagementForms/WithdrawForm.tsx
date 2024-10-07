@@ -64,6 +64,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
+import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -79,8 +80,8 @@ export const WithdrawForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { dydxAddress, connectedWallet } = useAccounts();
-  const { sendSquidWithdraw } = useSubaccount();
+  const { dydxAddress, sourceAccount } = useAccounts();
+  const { sendSkipWithdraw } = useSubaccount();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
@@ -99,7 +100,7 @@ export const WithdrawForm = () => {
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
-  const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+  const debouncedAmount = useDebounce<string>(withdrawAmount);
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
@@ -110,7 +111,12 @@ export const WithdrawForm = () => {
     const prefix = exchange ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
-      network: prefix ? 'cosmos' : 'evm',
+      network:
+        chainIdStr === 'solana' || chainIdStr === 'solana-devnet'
+          ? 'solana'
+          : prefix
+            ? 'cosmos'
+            : 'evm',
       prefix,
     });
   }, [exchange, toAddress, chainIdStr]);
@@ -132,7 +138,7 @@ export const WithdrawForm = () => {
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Keplr && dydxAddress) {
+    if (sourceAccount.walletInfo?.name === WalletType.Keplr && dydxAddress) {
       abacusStateManager.setTransfersSourceAddress(dydxAddress);
     }
 
@@ -144,7 +150,7 @@ export const WithdrawForm = () => {
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, [dydxAddress, connectedWallet]);
+  }, [dydxAddress, sourceAccount.walletInfo]);
 
   useEffect(() => {
     const setTransferValue = async () => {
@@ -235,7 +241,7 @@ export const WithdrawForm = () => {
             addOrUpdateTransferNotification({ ...notificationParams, isDummy: true });
           }
 
-          const txHash = await sendSquidWithdraw(
+          const txHash = await sendSkipWithdraw(
             debouncedAmountBN.toNumber(),
             requestPayload.data,
             isCctp
@@ -246,21 +252,21 @@ export const WithdrawForm = () => {
             setWithdrawAmount('');
 
             addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-
-            track(
-              AnalyticsEvents.TransferWithdraw({
-                chainId: toChainId,
-                tokenAddress: toToken?.address || undefined,
-                tokenSymbol: toToken?.symbol || undefined,
-                slippage: slippage || undefined,
-                gasFee: summary?.gasFee || undefined,
-                bridgeFee: summary?.bridgeFee || undefined,
-                exchangeRate: summary?.exchangeRate || undefined,
-                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-                toAmount: summary?.toAmount || undefined,
-                toAmountMin: summary?.toAmountMin || undefined,
-              })
-            );
+            const transferWithdrawContext = {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
+              txHash,
+            };
+            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+            dd.info('Transfer withdraw submitted', transferWithdrawContext);
           } else {
             throw new Error('No transaction hash returned');
           }
@@ -338,19 +344,19 @@ export const WithdrawForm = () => {
   }, [freeCollateralBN, setWithdrawAmount]);
 
   useEffect(() => {
-    if (connectedWallet?.name === WalletType.Privy) {
+    if (sourceAccount.walletInfo?.name === WalletType.Privy) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.exchange,
         value: 'coinbase',
       });
     }
-    if (connectedWallet?.name === WalletType.Keplr) {
+    if (sourceAccount.walletInfo?.name === WalletType.Keplr) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: nobleChainId,
       });
     }
-  }, [connectedWallet, nobleChainId]);
+  }, [sourceAccount.walletInfo, nobleChainId]);
 
   const onSelectNetwork = useCallback(
     (name: string, type: 'chain' | 'exchange') => {
@@ -482,16 +488,18 @@ export const WithdrawForm = () => {
         routeErrors,
         routeErrorMessage
       );
-
-      track(
-        AnalyticsEvents.RouteError({
-          transferType: TransferType.withdrawal.name,
-          errorMessage: routeErrorMessageOverride ?? undefined,
-          amount: debouncedAmount,
-          chainId: chainIdStr ?? undefined,
-          assetId: toToken?.toString(),
-        })
-      );
+      const routeErrorContext = {
+        transferType: TransferType.withdrawal.name,
+        errorMessage: routeErrorMessageOverride ?? undefined,
+        amount: debouncedAmount,
+        chainId: chainIdStr ?? undefined,
+        assetAddress: toToken?.address ?? undefined,
+        assetSymbol: toToken?.symbol ?? undefined,
+        assetName: toToken?.name ?? undefined,
+        assetId: toToken?.toString() ?? undefined,
+      };
+      track(AnalyticsEvents.RouteError(routeErrorContext));
+      dd.info('Route error received', routeErrorContext);
       return {
         errorMessage: routeErrorMessageOverride
           ? stringGetter({

@@ -10,6 +10,7 @@ export enum TriggerType {
   Default = 'Default',
   SearchSelect = 'SearchSelect',
   MarketDropdown = 'MarketDropdown',
+  MobileDownloadTrigger = 'MobileDownloadTrigger',
 }
 
 type ElementProps = {
@@ -23,6 +24,7 @@ type ElementProps = {
 
 type StyleProps = {
   className?: string;
+  disabled?: boolean;
   fullWidth?: boolean;
   noBlur?: boolean;
   align?: 'start' | 'center' | 'end';
@@ -47,6 +49,7 @@ export const Popover = ({
   withPortal = false,
   className,
   children,
+  disabled,
 }: PopoverProps) => {
   const [trigger, setTrigger] = useState<HTMLButtonElement | null>(null);
   const rect = useRect(trigger);
@@ -69,7 +72,7 @@ export const Popover = ({
 
   return (
     <Root modal={modal} open={open} onOpenChange={onOpenChange}>
-      <$Trigger ref={setTrigger} $noBlur={noBlur} $triggerType={triggerType}>
+      <$Trigger ref={setTrigger} disabled={disabled} $noBlur={noBlur} $triggerType={triggerType}>
         {slotTrigger}
       </$Trigger>
       {slotAnchor}
@@ -88,6 +91,7 @@ const $Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType 
       `,
       [TriggerType.SearchSelect]: popoverMixins.searchSelectTrigger,
       [TriggerType.MarketDropdown]: popoverMixins.marketDropdownTrigger,
+      [TriggerType.MobileDownloadTrigger]: popoverMixins.mobileDownloadTrigger,
     })[$triggerType]}
 
   ${({ $noBlur }) =>

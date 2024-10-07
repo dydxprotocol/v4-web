@@ -5,18 +5,21 @@ import type {
   ErrorCallback,
   GetMarksCallback,
   HistoryCallback,
+  IBasicDataFeed,
   LibrarySymbolInfo,
   Mark,
   OnReadyCallback,
   ResolutionString,
   ResolveCallback,
   SearchSymbolsCallback,
+  SubscribeBarsCallback,
   Timezone,
 } from 'public/tradingview/charting_library';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
@@ -71,7 +74,7 @@ export const getDydxDatafeed = (
   },
   selectedLocale: SupportedLocales,
   stringGetter: StringGetterFunction
-) => ({
+): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
   },
@@ -126,10 +129,10 @@ export const getDydxDatafeed = (
     const colorMode = getAppColorMode(store.getState());
 
     const [fromMs, toMs] = [fromSeconds * 1000, toSeconds * 1000];
-    const market = getMarketData(store.getState(), symbolInfo.name);
+    const market = getMarketData(store.getState(), symbolInfo.ticker!);
     if (!market) return;
 
-    const fills = getMarketFills(store.getState())[symbolInfo.name] ?? [];
+    const fills = getMarketFills(store.getState())[symbolInfo.ticker!] ?? [];
     const inRangeFills = fills.filter(
       (fill) => fill.createdAtMilliseconds >= fromMs && fill.createdAtMilliseconds <= toMs
     );
@@ -176,7 +179,7 @@ export const getDydxDatafeed = (
     try {
       const currentMarketBars = getPerpetualBarsForPriceChart(orderbookCandlesToggleOn)(
         store.getState(),
-        symbolInfo.name,
+        symbolInfo.ticker!,
         resolution
       );
 
@@ -196,21 +199,28 @@ export const getDydxDatafeed = (
         const earliestCachedBarTime = cachedBars?.[cachedBars.length - 1]?.time;
 
         fetchedCandles = await getCandlesForDatafeed({
-          marketId: symbolInfo.name,
+          marketId: symbolInfo.ticker!,
           resolution,
           fromMs,
           toMs: earliestCachedBarTime || toMs,
         });
 
         store.dispatch(
-          setCandles({ candles: fetchedCandles, marketId: symbolInfo.name, resolution })
+          setCandles({ candles: fetchedCandles, marketId: symbolInfo.ticker!, resolution })
         );
       }
+
+      const volumeUnit = store.getState().configs.displayUnit;
 
       const bars = [
         ...cachedBars,
         ...(fetchedCandles?.map(mapCandle(orderbookCandlesToggleOn)) ?? []),
-      ].reverse();
+      ]
+        .map((bar) => ({
+          ...bar,
+          volume: volumeUnit === DisplayUnit.Fiat ? bar.usdVolume : bar.assetVolume,
+        }))
+        .reverse();
 
       if (bars.length === 0) {
         onHistoryCallback([], {
@@ -221,7 +231,7 @@ export const getDydxDatafeed = (
       }
 
       if (firstDataRequest) {
-        lastBarsCache.set(`${symbolInfo.name}/${RESOLUTION_MAP[resolution]}`, {
+        lastBarsCache.set(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`, {
           ...bars[bars.length - 1],
         });
       }
@@ -236,23 +246,24 @@ export const getDydxDatafeed = (
   },
 
   subscribeBars: (
-    symbolInfo: any,
-    resolution: any,
-    onRealtimeCallback: any,
-    subscribeUID: any,
-    onResetCacheNeededCallback: any
+    symbolInfo: LibrarySymbolInfo,
+    resolution: ResolutionString,
+    onTick: SubscribeBarsCallback,
+    listenerGuid: string,
+    onResetCacheNeededCallback: Function
   ) => {
+    onResetCacheNeededCallback();
     subscribeOnStream({
       symbolInfo,
       resolution,
-      onRealtimeCallback,
-      subscribeUID,
+      onRealtimeCallback: onTick,
+      listenerGuid,
       onResetCacheNeededCallback,
-      lastBar: lastBarsCache.get(`${symbolInfo.full_name}/${RESOLUTION_MAP[resolution]}`),
+      lastBar: lastBarsCache.get(`${symbolInfo.ticker}/${RESOLUTION_MAP[resolution]}`),
     });
   },
 
-  unsubscribeBars: (subscriberUID: any) => {
+  unsubscribeBars: (subscriberUID: string) => {
     unsubscribeFromStream(subscriberUID);
   },
 });

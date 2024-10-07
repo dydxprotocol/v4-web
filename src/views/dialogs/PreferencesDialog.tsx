@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import { DialogProps, PreferencesDialogProps } from '@/constants/dialogs';
+import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuConfig } from '@/constants/menus';
 import { isDev } from '@/constants/networks';
@@ -18,6 +19,8 @@ import { Switch } from '@/components/Switch';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+import { setSelectedTradeLayout } from '@/state/layout';
+import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -89,6 +92,7 @@ const usePreferenceMenu = (): MenuConfig<
   );
 
   const { setSelectedGasDenom, selectedGasDenom } = useDydxClient();
+  const selectedLayout = useAppSelector(getSelectedTradeLayout);
 
   const otherSection = useMemo(
     () => ({
@@ -109,27 +113,58 @@ const usePreferenceMenu = (): MenuConfig<
             dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
           },
         },
-        isDev && {
-          value: OtherPreference.GasToken,
-          label: 'Pay gas with USDC',
-          slotAfter: (
-            <Switch
-              name={OtherPreference.GasToken}
-              checked={selectedGasDenom === SelectedGasDenom.USDC}
-              onCheckedChange={() => null}
-            />
-          ),
-          onSelect: () => {
-            setSelectedGasDenom(
-              selectedGasDenom === SelectedGasDenom.USDC
-                ? SelectedGasDenom.NATIVE
-                : SelectedGasDenom.USDC
-            );
-          },
-        },
+        ...(isDev
+          ? [
+              {
+                value: OtherPreference.GasToken,
+                label: 'Pay gas with USDC',
+                slotAfter: (
+                  <Switch
+                    name={OtherPreference.GasToken}
+                    checked={selectedGasDenom === SelectedGasDenom.USDC}
+                    onCheckedChange={() => null}
+                  />
+                ),
+                onSelect: () => {
+                  setSelectedGasDenom(
+                    selectedGasDenom === SelectedGasDenom.USDC
+                      ? SelectedGasDenom.NATIVE
+                      : SelectedGasDenom.USDC
+                  );
+                },
+              },
+              {
+                value: OtherPreference.ReverseLayout,
+                label: 'Reverse Layout',
+                slotAfter: (
+                  <Switch
+                    name={OtherPreference.ReverseLayout}
+                    checked={selectedLayout === TradeLayouts.Reverse}
+                    onCheckedChange={() => null}
+                  />
+                ),
+                onSelect: () => {
+                  dispatch(
+                    setSelectedTradeLayout(
+                      selectedLayout === TradeLayouts.Reverse
+                        ? TradeLayouts.Default
+                        : TradeLayouts.Reverse
+                    )
+                  );
+                },
+              },
+            ]
+          : []),
       ].filter(isTruthy),
     }),
-    [stringGetter, defaultToAllMarkets, selectedGasDenom, setSelectedGasDenom]
+    [
+      stringGetter,
+      defaultToAllMarkets,
+      selectedGasDenom,
+      setSelectedGasDenom,
+      dispatch,
+      selectedLayout,
+    ]
   );
 
   return [notificationSection, otherSection];

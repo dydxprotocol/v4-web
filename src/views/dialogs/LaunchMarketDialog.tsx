@@ -16,7 +16,10 @@ import { Output, OutputType } from '@/components/Output';
 
 import { NewMarketForm, NewMarketFormStep } from '../forms/NewMarketForm';
 
-export const LaunchMarketDialog = ({ setIsOpen }: DialogProps<LaunchMarketDialogProps>) => {
+export const LaunchMarketDialog = ({
+  defaultLaunchableMarketId,
+  setIsOpen,
+}: DialogProps<LaunchMarketDialogProps>) => {
   const { isMobile } = useBreakpoints();
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
@@ -35,7 +38,7 @@ export const LaunchMarketDialog = ({ setIsOpen }: DialogProps<LaunchMarketDialog
             </$Title>
           ),
           description: stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
               APR_PERCENTAGE: (
                 <Output
@@ -86,7 +89,10 @@ export const LaunchMarketDialog = ({ setIsOpen }: DialogProps<LaunchMarketDialog
       setIsOpen={setIsOpen}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <NewMarketForm setFormStep={setFormStep} />
+      <NewMarketForm
+        defaultLaunchableMarketId={defaultLaunchableMarketId}
+        setFormStep={setFormStep}
+      />
     </Dialog>
   );
 };

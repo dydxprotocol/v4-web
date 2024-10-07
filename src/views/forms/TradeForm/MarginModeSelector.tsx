@@ -9,10 +9,13 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
@@ -31,6 +34,7 @@ export const MarginModeSelector = ({
   const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { marginMode } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
   const { needsMarginMode } = useTradeFormData();
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const dispatch = useAppDispatch();
   const handleClick = useCallback(() => {
@@ -42,11 +46,13 @@ export const MarginModeSelector = ({
   }, [dispatch, openInTradeBox]);
 
   return needsMarginMode ? (
-    <Button onClick={handleClick} className={className}>
-      {marginMode &&
-        stringGetter({
-          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-        })}
+    <Button onClick={handleClick} className={className} disabled={!canAccountTrade}>
+      <$Text>
+        {marginMode &&
+          stringGetter({
+            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+          })}
+      </$Text>
       <Icon iconName={IconName.Triangle} tw="ml-[0.5ch] rotate-[0.75turn] text-[0.4375rem]" />
     </Button>
   ) : (
@@ -65,10 +71,12 @@ export const MarginModeSelector = ({
       }
     >
       <Button disabled>
-        {marginMode &&
-          stringGetter({
-            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-          })}
+        <$Text>
+          {marginMode &&
+            stringGetter({
+              key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+            })}
+        </$Text>
       </Button>
     </$WarningTooltip>
   );
@@ -76,4 +84,9 @@ export const MarginModeSelector = ({
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
   border: 1px solid ${({ theme }) => theme.warning}30;
+  gap: 0.5rem;
+`;
+
+const $Text = styled.div`
+  ${layoutMixins.textTruncate};
 `;

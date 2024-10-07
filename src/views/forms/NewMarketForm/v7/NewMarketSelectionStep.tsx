@@ -1,6 +1,7 @@
 import { FormEvent, useMemo } from 'react';
 
 import { LightningBoltIcon } from '@radix-ui/react-icons';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -29,10 +30,11 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { getOnboardingState } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type NewMarketSelectionStepProps = {
   tickerToAdd?: string;
@@ -53,6 +55,8 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
+  const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const { freeCollateral } = subAccount;
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -74,7 +78,7 @@ export const NewMarketSelectionStep = ({
         </h2>
         <span tw="text-base text-color-text-0">
           {stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
               APR_PERCENTAGE: (
                 <Output
@@ -118,9 +122,7 @@ export const NewMarketSelectionStep = ({
                   launchableMarkets.data?.map((launchableMarket) => ({
                     value: launchableMarket.id,
                     label: getDisplayableTickerFromMarket(launchableMarket.id),
-                    tag: getDisplayableAssetFromBaseAsset(
-                      launchableMarket.ticker.currency_pair.Base
-                    ),
+                    tag: getDisplayableAssetFromBaseAsset(launchableMarket.asset),
                     onSelect: () => {
                       setTickerToAdd(launchableMarket.id);
                     },
@@ -148,7 +150,7 @@ export const NewMarketSelectionStep = ({
                   <DiffOutput
                     withDiff
                     type={OutputType.Fiat}
-                    value={100000}
+                    value={freeCollateral?.current}
                     newValue={88000}
                     fractionDigits={USD_DECIMALS}
                   />
@@ -158,6 +160,7 @@ export const NewMarketSelectionStep = ({
             tw="[--withReceipt-backgroundColor:--color-layer-2]"
           >
             <FormInput
+              disabled
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"

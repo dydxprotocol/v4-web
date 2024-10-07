@@ -6,11 +6,12 @@ import {
   getSubaccountId,
   getSubaccountOpenOrders,
   getUnbondingDelegations,
-  getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
 import { isOrderStatusOpen } from '@/lib/orders';
+
+import { getCurrentMarketId } from './perpetualsSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -56,14 +57,6 @@ export const calculateIsAccountViewOnly = createAppSelector(
   [getOnboardingState, calculateCanViewAccount],
   (onboardingState: OnboardingState, canViewAccountInfo: boolean) =>
     onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
-);
-
-/**
- * @description calculate whether the subaccount has uncommitted positions
- */
-export const calculateHasUncommittedOrders = createAppSelector(
-  [getUncommittedOrderClientIds],
-  (uncommittedOrderClientIds: string[]) => uncommittedOrderClientIds.length > 0
 );
 
 /**
@@ -135,3 +128,24 @@ export const calculateHasCancelableOrders = () =>
       );
     }
   );
+
+export const calculateHasCancelableOrdersInOtherMarkets = createAppSelector(
+  [getSubaccountOpenOrders, getCurrentMarketId],
+  (openOrders, marketId) =>
+    marketId !== undefined &&
+    (openOrders?.some((order) => order.marketId !== marketId && isOrderStatusOpen(order.status)) ??
+      false)
+);
+
+export const selectSubaccountStateForVaults = createAppSelector(
+  [
+    (state) => state.account.subaccount?.marginUsage?.current,
+    (state) => state.account.subaccount?.freeCollateral?.current,
+    calculateCanViewAccount,
+  ],
+  (marginUsage, freeCollateral, canViewAccount) => ({
+    marginUsage,
+    freeCollateral,
+    canViewAccount,
+  })
+);

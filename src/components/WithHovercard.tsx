@@ -3,14 +3,15 @@ import type { ReactNode } from 'react';
 import { Content, Portal, Root, Trigger } from '@radix-ui/react-hover-card';
 import styled from 'styled-components';
 
-import { tooltipStrings } from '@/constants/tooltips';
+import { TooltipStrings } from '@/constants/localization';
+import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
 type ElementProps = {
-  hovercard?: keyof typeof tooltipStrings;
+  hovercard?: TooltipStringKeys;
   stringParams?: Record<string, string | undefined>;
   slotTrigger?: ReactNode;
   slotButton?: ReactNode;
@@ -33,7 +34,8 @@ export const WithHovercard = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
-  const getHovercardStrings = hovercard && tooltipStrings[hovercard];
+  const getHovercardStrings: TooltipStrings[string] | undefined =
+    hovercard && tooltipStrings[hovercard];
 
   let hovercardTitle;
   let hovercardBody;

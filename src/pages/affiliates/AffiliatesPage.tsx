@@ -8,6 +8,7 @@ import { IAffiliateStats, IProgramStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 import { AffiliateRoute } from '@/constants/routes';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -55,8 +56,9 @@ const $NavigationMenu = styled(NavigationMenu)`
 `;
 
 export const AffiliatesPage: React.FC = () => {
-  const { isConnectedWagmi, dydxAddressGraz, dydxAddress, solAddress, evmAddress } =
-    useWalletConnection();
+  const { isConnectedWagmi } = useWalletConnection();
+  const { dydxAddress } = useAccounts();
+
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const [accountStats, setAccountStats] = useState<IAffiliateStats>();
@@ -91,9 +93,7 @@ export const AffiliatesPage: React.FC = () => {
       return;
     }
 
-    const res = await axios.get(
-      `http://localhost:3000/v1/leaderboard/account/${dydxAddressGraz ?? dydxAddress ?? solAddress ?? evmAddress}`
-    );
+    const res = await axios.get(`http://localhost:3000/v1/leaderboard/account/${dydxAddress}`);
 
     setAccountStats(res.data);
   };

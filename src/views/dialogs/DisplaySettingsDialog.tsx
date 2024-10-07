@@ -24,6 +24,8 @@ import {
 } from '@/state/configs';
 import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettingsDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -41,26 +43,47 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
   };
 
   const themePanels = () => {
+    const { uiRefresh } = testFlags;
     return (
       <$AppThemeRoot value={currentThemeSetting}>
-        {[
-          {
-            themeSetting: AppTheme.Classic,
-            label: STRING_KEYS.CLASSIC_DARK,
-          },
-          {
-            themeSetting: AppThemeSystemSetting.System,
-            label: STRING_KEYS.SYSTEM,
-          },
-          {
-            themeSetting: AppTheme.Dark,
-            label: STRING_KEYS.DARK,
-          },
-          {
-            themeSetting: AppTheme.Light,
-            label: STRING_KEYS.LIGHT,
-          },
-        ].map(({ themeSetting, label }) => {
+        {(uiRefresh
+          ? [
+              {
+                themeSetting: AppTheme.Dark,
+                label: STRING_KEYS.DARK,
+              },
+              {
+                themeSetting: AppTheme.Light,
+                label: STRING_KEYS.LIGHT,
+              },
+              {
+                themeSetting: AppTheme.Classic,
+                label: STRING_KEYS.CLASSIC_DARK,
+              },
+              {
+                themeSetting: AppThemeSystemSetting.System,
+                label: STRING_KEYS.SYSTEM,
+              },
+            ]
+          : [
+              {
+                themeSetting: AppTheme.Classic,
+                label: STRING_KEYS.CLASSIC_DARK,
+              },
+              {
+                themeSetting: AppThemeSystemSetting.System,
+                label: STRING_KEYS.SYSTEM,
+              },
+              {
+                themeSetting: AppTheme.Dark,
+                label: STRING_KEYS.DARK,
+              },
+              {
+                themeSetting: AppTheme.Light,
+                label: STRING_KEYS.LIGHT,
+              },
+            ]
+        ).map(({ themeSetting, label }) => {
           const theme =
             themeSetting === AppThemeSystemSetting.System
               ? globalThis.matchMedia('(prefers-color-scheme: dark)').matches
@@ -87,7 +110,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
               </$AppThemeHeader>
               <img src="/chart-bars.svg" tw="z-[1] h-auto w-full" />
               <$CheckIndicator>
-                <Icon iconName={IconName.Check} tw="h-[--icon-size] w-[--icon-size]" />
+                <Icon iconName={IconName.Check} size="0.5rem" />
               </$CheckIndicator>
             </$AppThemeItem>
           );
@@ -122,11 +145,13 @@ export const DisplaySettingsDialog = ({ setIsOpen }: DialogProps<DisplaySettings
                   iconName={IconName.Arrow}
                   direction="up"
                   color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
+                  size="0.875em"
                 />
                 <$ArrowIcon
                   iconName={IconName.Arrow}
                   direction="down"
                   color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
+                  size="0.875em"
                 />
               </$ArrowIconContainer>
               {stringGetter({ key: label })}
@@ -240,11 +265,6 @@ const $AppThemeHeader = styled.h3<{ textcolor: string }>`
 const $ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.25rem;
-
-  svg {
-    height: 0.875em;
-    width: 0.875em;
-  }
 `;
 
 const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`

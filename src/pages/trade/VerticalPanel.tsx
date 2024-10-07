@@ -10,21 +10,24 @@ import { Tabs } from '@/components/Tabs';
 import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
+import { testFlags } from '@/lib/testFlags';
+
 enum Tab {
   Orderbook = 'Orderbook',
   Trades = 'Trades',
 }
 
 const HISTOGRAM_SIDES_BY_LAYOUT = {
-  [TradeLayouts.Default]: 'left',
-  [TradeLayouts.Alternative]: 'right',
-  [TradeLayouts.Reverse]: 'right',
+  [TradeLayouts.Default]: 'right',
+  [TradeLayouts.Reverse]: 'left',
 } as const;
 
 export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Orderbook);
   const [rowsPerSide, setRowsPerSide] = useState<number | undefined>(undefined);
+
+  const { uiRefresh } = testFlags;
 
   const canvasOrderbookRef = useRef<HTMLDivElement>(null);
   const canvasOrderbook = canvasOrderbookRef.current;
@@ -64,6 +67,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   return (
     <Tabs
       fullWidthTabs
+      dividerStyle={uiRefresh ? 'underline' : 'border'}
       value={value}
       onValueChange={(v: Tab) => {
         setValue(v);

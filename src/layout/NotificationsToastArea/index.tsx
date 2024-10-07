@@ -81,7 +81,6 @@ const StyledToastArea = styled.div`
   pointer-events: none;
 
   @media ${breakpoints.mobile} {
-    width: 100%;
-    position: fixed;
+    display: none; // hide notifications on mobile web view
   }
 `;

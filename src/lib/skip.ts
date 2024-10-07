@@ -10,6 +10,7 @@ import {
 
 import {
   RouteStatus,
+  RouteStatusSummary,
   SkipStatusResponse,
   SkipTransactionStatus,
   TransactionDataParams,
@@ -86,11 +87,11 @@ class TransactionData {
 
   transactionStatus: SkipTransactionStatus;
 
-  constructor({ chainId, txHash, status, txUrl, transferDirection }: TransactionDataParams) {
+  constructor({ chainId, txHash, state, txUrl, transferDirection }: TransactionDataParams) {
     this.routeStatus = {
       chainId,
       txHash,
-      status: getStatusFromTransferState(status, transferDirection),
+      status: getRouteStatusSummaryFromStateAndDirection(state, transferDirection),
     };
     this.transactionStatus = {
       chainData: {
@@ -104,21 +105,21 @@ class TransactionData {
   }
 }
 
-const getSquidStatusFromState = (state: string | undefined) => {
+const getRouteStatusSummaryFromState = (state: string | undefined): RouteStatusSummary => {
   if (!state) return undefined;
   if (state.includes('SUCCESS') || state.includes('RECEIVED')) return 'success';
   return 'ongoing';
 };
 
-const getStatusFromTransferState = (
+const getRouteStatusSummaryFromStateAndDirection = (
   state: string | undefined,
   transferDirection: TransferDirection
-) => {
+): RouteStatusSummary => {
   if (!state) return undefined;
   //        If state is not unknown, it means the FROM tx succeeded
   if (!state.includes('UNKNOWN') && transferDirection === 'from') return 'success';
   //        Both TO and FROM tx are successful when transfer has succeeded
-  return getSquidStatusFromState(state);
+  return getRouteStatusSummaryFromState(state);
 };
 
 const getTxDataFromIbcTransfer = (
@@ -131,7 +132,7 @@ const getTxDataFromIbcTransfer = (
       ibcTransfer.packet_txs[txType]?.chain_id ?? ibcTransfer[`${transferDirection}_chain_id`],
     txUrl: ibcTransfer.packet_txs[txType]?.explorer_link,
     txHash: ibcTransfer.packet_txs[txType]?.tx_hash,
-    status: ibcTransfer.state,
+    state: ibcTransfer.state,
     transferDirection,
   });
 };
@@ -145,7 +146,7 @@ const getTxDataFromCCTPTransfer = (
     chainId: cctpTransfer.txs[txType]?.chain_id ?? cctpTransfer[`${transferDirection}_chain_id`],
     txUrl: cctpTransfer.txs[txType]?.explorer_link,
     txHash: cctpTransfer.txs[txType]?.tx_hash,
-    status: cctpTransfer.state,
+    state: cctpTransfer.state,
     transferDirection,
   });
 };
@@ -162,7 +163,7 @@ const getTxDataFromAxelarTransfer = (
         axelarTransfer[`${transferDirection}_chain_id`],
       txUrl: axelarTransfer.txs.contract_call_with_token_txs[txType]?.explorer_link,
       txHash: axelarTransfer.txs.contract_call_with_token_txs[txType]?.tx_hash,
-      status: axelarTransfer.state,
+      state: axelarTransfer.state,
       transferDirection,
     });
   }
@@ -172,7 +173,7 @@ const getTxDataFromAxelarTransfer = (
       axelarTransfer[`${transferDirection}_chain_id`],
     txUrl: axelarTransfer.txs.send_token_txs[txType]?.explorer_link,
     txHash: axelarTransfer.txs.send_token_txs[txType]?.tx_hash,
-    status: axelarTransfer.state,
+    state: axelarTransfer.state,
     transferDirection,
   });
 };
@@ -218,7 +219,7 @@ export const formSkipStatusResponse = (
     .filter(isTruthy);
   return {
     axelarTransactionUrl: getAxelarTxUrl(transfer),
-    squidTransactionStatus: getSquidStatusFromState(transfer.state),
+    latestRouteStatusSummary: getRouteStatusSummaryFromState(transfer.state),
     routeStatus,
     toChain: toChainTxData?.transactionStatus,
     fromChain: fromChainTxData?.transactionStatus,

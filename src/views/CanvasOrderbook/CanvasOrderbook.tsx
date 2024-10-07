@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -16,10 +16,12 @@ import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues'
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
+import { DisplayUnitTag } from '@/components/DisplayUnitTag';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import {
@@ -131,7 +133,7 @@ export const CanvasOrderbook = forwardRef(
       [currentInput, tickSizeDecimals]
     );
 
-    const [displayUnit, setDisplayUnit] = useState<'fiat' | 'asset'>('asset');
+    const displayUnit = useAppSelector(getSelectedDisplayUnit);
 
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
       data: asksSlice,
@@ -149,8 +151,6 @@ export const CanvasOrderbook = forwardRef(
       side: 'bid',
     });
 
-    const usdTag = <Tag>USD</Tag>;
-    const assetTag = id ? <Tag>{id}</Tag> : undefined;
     const asksOrderbook = (
       <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
@@ -199,29 +199,23 @@ export const CanvasOrderbook = forwardRef(
         <$OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
       </$OrderbookSideContainer>
     );
+
     return (
       <div ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          {!hideHeader && (
-            <OrderbookControls
-              assetName={id}
-              selectedUnit={displayUnit}
-              setSelectedUnit={setDisplayUnit}
-              grouping={currentGrouping}
-            />
-          )}
+          {!hideHeader && <OrderbookControls assetId={id} grouping={currentGrouping} />}
           {!hideHeader && (
             <OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
-                {stringGetter({ key: STRING_KEYS.PRICE })} {usdTag}
+                {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
               </span>
               <span>
                 {stringGetter({ key: STRING_KEYS.SIZE })}{' '}
-                {displayUnit === 'fiat' ? usdTag : assetTag}
+                <DisplayUnitTag assetId={id} entryPoint="orderbookAssetTag" />
               </span>
               <span>
                 {stringGetter({ key: STRING_KEYS.TOTAL })}{' '}
-                {displayUnit === 'fiat' ? usdTag : assetTag}
+                <DisplayUnitTag assetId={id} entryPoint="orderbookAssetTag" />
               </span>
             </OrderbookRow>
           )}

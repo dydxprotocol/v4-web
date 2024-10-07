@@ -52,7 +52,6 @@ import {
   isMarketOrderType,
   isOrderStatusClearable,
 } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -216,13 +215,7 @@ const getOrdersTableColumnDef = ({
       },
       [OrdersTableColumnKey.Actions]: {
         columnKey: 'cancelOrClear',
-        label: testFlags.showCancelAll ? (
-          <CancelOrClearAllOrdersButton marketId={currentMarket} />
-        ) : (
-          stringGetter({
-            key: STRING_KEYS.ACTION,
-          })
-        ),
+        label: <CancelOrClearAllOrdersButton marketId={currentMarket} />,
         isActionable: true,
         allowsSorting: false,
         renderCell: ({ id, status, orderFlags }) => (

@@ -28,7 +28,6 @@ import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
-  calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
@@ -40,11 +39,13 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 import { MarketTypeFilter } from './types';
@@ -71,6 +72,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const navigate = useNavigate();
   const { isTablet, isDesktopSmall } = useBreakpoints();
 
+  const { uiRefresh } = testFlags;
+
   const allMarkets = useAppSelector(getDefaultToAllMarketsInPositionsOrdersFills);
   const [view, setView] = useState<PanelView>(
     allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
@@ -94,7 +97,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
   );
-  const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
+  const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(
@@ -119,140 +122,47 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     [navigate]
   );
 
-  const tabItems = useMemo(
-    () => [
-      {
-        value: InfoSection.Position,
-        label: stringGetter({
-          key: showCurrentMarket ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
-        }),
+  const positionTabItem = useMemo(
+    () => ({
+      value: InfoSection.Position,
+      label: stringGetter({
+        key: showCurrentMarket ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
+      }),
 
-        tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
+      tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
 
-        content: isTablet ? (
-          <PositionInfo showNarrowVariation={isTablet} />
-        ) : (
-          <PositionsTable
-            currentMarket={showCurrentMarket ? currentMarketId : undefined}
-            marketTypeFilter={viewIsolated}
-            columnKeys={
-              isTablet
-                ? [
-                    PositionsTableColumnKey.Details,
-                    PositionsTableColumnKey.IndexEntry,
-                    PositionsTableColumnKey.PnL,
-                  ]
-                : [
-                    PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Margin,
-                    PositionsTableColumnKey.UnrealizedPnl,
-                    !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
-                    PositionsTableColumnKey.NetFunding,
-                    PositionsTableColumnKey.AverageOpenAndClose,
-                    PositionsTableColumnKey.LiquidationAndOraclePrice,
-                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    shouldRenderActions && PositionsTableColumnKey.Actions,
-                  ].filter(isTruthy)
-            }
-            showClosePositionAction={shouldRenderActions}
-            initialPageSize={initialPageSize}
-            navigateToOrders={onViewOrders}
-          />
-        ),
-      },
-      {
-        asChild: true,
-        value: InfoSection.Orders,
-        label: stringGetter({ key: STRING_KEYS.ORDERS }),
-
-        slotRight: isWaitingForOrderToIndex ? (
-          <LoadingSpinner tw="[--spinner-width:1rem]" />
-        ) : (
-          ordersTagNumber && (
-            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
-              {ordersTagNumber}
-            </Tag>
-          )
-        ),
-
-        content: (
-          <OrdersTable
-            currentMarket={showCurrentMarket ? currentMarketId : undefined}
-            marketTypeFilter={viewIsolated}
-            columnKeys={
-              isTablet
-                ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
-                : [
-                    !showCurrentMarket && OrdersTableColumnKey.Market,
-                    OrdersTableColumnKey.Status,
-                    OrdersTableColumnKey.Side,
-                    OrdersTableColumnKey.AmountFill,
-                    OrdersTableColumnKey.Price,
-                    OrdersTableColumnKey.Trigger,
-                    OrdersTableColumnKey.MarginType,
-                    OrdersTableColumnKey.GoodTil,
-                    !isAccountViewOnly && OrdersTableColumnKey.Actions,
-                  ].filter(isTruthy)
-            }
-            initialPageSize={initialPageSize}
-          />
-        ),
-      },
-      {
-        asChild: true,
-        value: InfoSection.Fills,
-        label: stringGetter({ key: STRING_KEYS.FILLS }),
-
-        slotRight: fillsTagNumber && (
-          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-            {fillsTagNumber}
-          </Tag>
-        ),
-
-        content: (
-          <FillsTable
-            currentMarket={showCurrentMarket ? currentMarketId : undefined}
-            columnKeys={
-              isTablet
-                ? [
-                    FillsTableColumnKey.Time,
-                    FillsTableColumnKey.TypeAmount,
-                    FillsTableColumnKey.PriceFee,
-                  ]
-                : [
-                    !showCurrentMarket && FillsTableColumnKey.Market,
-                    FillsTableColumnKey.Time,
-                    FillsTableColumnKey.Type,
-                    FillsTableColumnKey.Side,
-                    FillsTableColumnKey.AmountTag,
-                    FillsTableColumnKey.Price,
-                    FillsTableColumnKey.TotalFee,
-                    FillsTableColumnKey.Liquidity,
-                  ].filter(isTruthy)
-            }
-            columnWidths={{
-              [FillsTableColumnKey.TypeAmount]: '100%',
-            }}
-            initialPageSize={initialPageSize}
-          />
-        ),
-      },
-      // TODO - TRCL-1693 - re-enable when funding payments are supported
-      // {
-      //   value: InfoSection.Payments,
-      //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
-
-      //   tag: shortenNumberForDisplay(
-      //     showCurrentMarket ? numFundingPayments : numTotalFundingPayments
-      //   ),
-      //   content: (
-      //     <FundingPaymentsTable currentMarket={showCurrentMarket ? currentMarket?.id : undefined} />
-      //   ),
-      // },
-    ],
-    // TODO - not sure if it's necessary but lots of the actual deps are missing from the deps list
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      content: isTablet ? (
+        <PositionInfo showNarrowVariation={isTablet} />
+      ) : (
+        <PositionsTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          columnKeys={
+            isTablet
+              ? [
+                  PositionsTableColumnKey.Details,
+                  PositionsTableColumnKey.IndexEntry,
+                  PositionsTableColumnKey.PnL,
+                ]
+              : [
+                  PositionsTableColumnKey.Market,
+                  PositionsTableColumnKey.Size,
+                  PositionsTableColumnKey.Margin,
+                  PositionsTableColumnKey.UnrealizedPnl,
+                  !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
+                  PositionsTableColumnKey.NetFunding,
+                  PositionsTableColumnKey.AverageOpenAndClose,
+                  PositionsTableColumnKey.LiquidationAndOraclePrice,
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
+          }
+          showClosePositionAction={shouldRenderActions}
+          initialPageSize={initialPageSize}
+          navigateToOrders={onViewOrders}
+        />
+      ),
+    }),
     [
       stringGetter,
       currentMarketId,
@@ -260,13 +170,134 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       showCurrentMarket,
       isTablet,
       isDesktopSmall,
+      shouldRenderActions,
+      shouldRenderTriggers,
+      numTotalPositions,
+      onViewOrders,
+    ]
+  );
+
+  const ordersTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Orders,
+      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+
+      slotRight: isWaitingForOrderToIndex ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        ordersTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+            {ordersTagNumber}
+          </Tag>
+        )
+      ),
+
+      content: (
+        <OrdersTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          columnKeys={
+            isTablet
+              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+              : [
+                  !showCurrentMarket && OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.AmountFill,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.GoodTil,
+                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [
+      stringGetter,
+      currentMarketId,
+      viewIsolated,
+      showCurrentMarket,
+      isTablet,
       isWaitingForOrderToIndex,
       isAccountViewOnly,
       ordersTagNumber,
-      fillsTagNumber,
-      hasUnseenFillUpdates,
       hasUnseenOrderUpdates,
     ]
+  );
+
+  const fillsTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Fills,
+      label: stringGetter({ key: STRING_KEYS.FILLS }),
+
+      slotRight: fillsTagNumber && (
+        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+          {fillsTagNumber}
+        </Tag>
+      ),
+
+      content: (
+        <FillsTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          columnKeys={
+            isTablet
+              ? [
+                  FillsTableColumnKey.Time,
+                  FillsTableColumnKey.TypeAmount,
+                  FillsTableColumnKey.PriceFee,
+                ]
+              : [
+                  !showCurrentMarket && FillsTableColumnKey.Market,
+                  FillsTableColumnKey.Time,
+                  FillsTableColumnKey.Type,
+                  FillsTableColumnKey.Side,
+                  FillsTableColumnKey.AmountTag,
+                  FillsTableColumnKey.Price,
+                  FillsTableColumnKey.TotalFee,
+                  FillsTableColumnKey.Liquidity,
+                ].filter(isTruthy)
+          }
+          columnWidths={{
+            [FillsTableColumnKey.TypeAmount]: '100%',
+          }}
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [
+      stringGetter,
+      currentMarketId,
+      showCurrentMarket,
+      isTablet,
+      fillsTagNumber,
+      hasUnseenFillUpdates,
+    ]
+  );
+
+  // TODO - TRCL-1693 - re-enable when funding payments are supported
+  // const paymentsTabItem = {
+  //   value: InfoSection.Payments,
+  //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
+
+  //   tag: shortenNumberForDisplay(
+  //     showCurrentMarket ? numFundingPayments : numTotalFundingPayments
+  //   ),
+  //   content: (
+  //     <FundingPaymentsTable currentMarket={showCurrentMarket ? currentMarket?.id : undefined} />
+  //   ),
+  // },
+
+  const tabItems = useMemo(
+    () =>
+      uiRefresh
+        ? [positionTabItem, fillsTabItem, ordersTabItem]
+        : [positionTabItem, ordersTabItem, fillsTabItem],
+    [uiRefresh, positionTabItem, fillsTabItem, ordersTabItem]
   );
 
   const slotBottom = {
@@ -279,7 +310,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   }[tab];
 
   return isTablet ? (
-    <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
+    <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
       <$CollapsibleTabs
@@ -288,6 +319,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         setTab={setTab}
         defaultOpen={isOpen}
         onOpenChange={setIsOpen}
+        dividerStyle={uiRefresh ? 'underline' : 'border'}
         slotToolbar={
           <>
             <ToggleGroup

@@ -7,3 +7,5 @@ export const OSMO_USDC_IBC_DENOM = isMainnet
 export const NEUTRON_USDC_IBC_DENOM = isMainnet
   ? 'ibc/B559A80D62249C8AA07A380E2A2BEA6E5CA9A6F079C912C3A9E9B494105E4F81'
   : '';
+
+export const SOLANA_USDC_DENOM = isMainnet ? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' : '';

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { StatusResponse } from '@0xsquid/sdk';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,7 +21,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 type ElementProps = {
-  status?: StatusResponse | SkipStatusResponse;
+  status?: SkipStatusResponse;
   type: TransferNotificationTypes;
 };
 
@@ -101,16 +100,16 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
 
     if (!routeStatus?.length) {
       newCurrentStep = TransferStatusStep.FromChain;
-    } else if (currentStatus.chainId === toChain) {
+    } else if (currentStatus?.chainId === toChain) {
       newCurrentStep =
-        currentStatus.status !== 'success'
+        currentStatus?.status !== 'success'
           ? TransferStatusStep.ToChain
           : TransferStatusStep.Complete;
-    } else if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
+    } else if (currentStatus?.chainId === fromChain && currentStatus?.status !== 'success') {
       newCurrentStep = TransferStatusStep.FromChain;
     }
 
-    if (status?.squidTransactionStatus === 'success') {
+    if (status?.latestRouteStatusSummary === 'success') {
       newCurrentStep = TransferStatusStep.Complete;
     }
 

@@ -46,3 +46,7 @@ export const getDisplayableTickerFromMarket = (market: string): string => {
 export const getTickerFromMarketmapId = (marketmapId: string): string => {
   return marketmapId.replace('/', '-');
 };
+
+export const getAssetFromMarketId = (marketId: string): string => {
+  return marketId.split('-')[0];
+};

@@ -4,9 +4,11 @@ import {
   AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderTypes,
+  ErrorFormat,
   ErrorType,
   ValidationError,
   type AbacusOrderSides,
+  type ErrorFormatType,
   type Nullable,
   type SubaccountPosition,
   type TradeState,
@@ -63,22 +65,26 @@ const formatErrorParam = ({
   tickSizeDecimals,
 }: {
   value: Nullable<string>;
-  format?: Nullable<string>;
+  format: Nullable<ErrorFormatType>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
   switch (format) {
-    case 'percent': {
+    case ErrorFormat.Percent: {
       const percentBN = MustBigNumber(value);
       return `${percentBN.times(100).toFixed(PERCENT_DECIMALS)}%`;
     }
-    case 'size': {
+    case ErrorFormat.Size: {
       const sizeBN = MustBigNumber(value);
       return sizeBN.toFixed(stepSizeDecimals ?? 0);
     }
-    case 'price': {
+    case ErrorFormat.Price: {
       const dollarBN = MustBigNumber(value);
       return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
+    }
+    case ErrorFormat.UsdcPrice: {
+      const dollarBN = MustBigNumber(value);
+      return `$${dollarBN.toFixed(USD_DECIMALS)}`;
     }
     default: {
       return value ?? '';
@@ -135,14 +141,14 @@ export const getTradeInputAlert = ({
 
 export const calculateCrossPositionMargin = ({
   notionalTotal,
-  adjustedMmf,
+  adjustedImf,
 }: {
   notionalTotal?: Nullable<number>;
-  adjustedMmf?: Nullable<number>;
+  adjustedImf?: Nullable<number>;
 }) => {
   const notionalTotalBN = MustBigNumber(notionalTotal);
-  const adjustedMmfBN = MustBigNumber(adjustedMmf);
-  return notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
+  const adjustedImfBN = MustBigNumber(adjustedImf);
+  return notionalTotalBN.times(adjustedImfBN).toFixed(USD_DECIMALS);
 };
 
 /**
@@ -159,14 +165,14 @@ export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<num
 };
 
 export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
-  const { childSubaccountNumber, equity, notionalTotal, adjustedMmf } = position;
+  const { childSubaccountNumber, equity, notionalTotal, adjustedImf } = position;
   const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
   const margin =
     marginMode === AbacusMarginMode.Cross
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
-          adjustedMmf: adjustedMmf.current,
+          adjustedImf: adjustedImf.current,
         })
       : equity?.current;
 
