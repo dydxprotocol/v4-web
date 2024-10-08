@@ -11,6 +11,7 @@ import appMiddleware from './appMiddleware';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
+import { dismissableSlice } from './dismissable';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
@@ -30,6 +31,7 @@ const reducers = {
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
+  dismissable: dismissableSlice.reducer,
   inputs: inputsSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
@@ -45,9 +47,9 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 1,
+  version: 2,
   storage,
-  whitelist: ['tradingView', 'wallet', 'affiliates'],
+  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 
