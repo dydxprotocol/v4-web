@@ -2,21 +2,21 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface DismissableState {
-  hasSeenPolymarketDialog: boolean;
+  hasSeenPredictionMarketIntoDialog: boolean;
 }
 
 const initialState: DismissableState = {
-  hasSeenPolymarketDialog: false,
+  hasSeenPredictionMarketIntoDialog: false,
 };
 
 export const dismissableSlice = createSlice({
   name: 'Dismissable',
   initialState,
   reducers: {
-    setHasSeenPolymarketDialog: (state, action: PayloadAction<boolean>) => {
-      state.hasSeenPolymarketDialog = action.payload;
+    setHasSeenPredictionMarketIntoDialog: (state, action: PayloadAction<boolean>) => {
+      state.hasSeenPredictionMarketIntoDialog = action.payload;
     },
   },
 });
 
-export const { setHasSeenPolymarketDialog } = dismissableSlice.actions;
+export const { setHasSeenPredictionMarketIntoDialog } = dismissableSlice.actions;
