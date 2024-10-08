@@ -34,7 +34,8 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
   const { dydxAddress } = useAccounts();
-  const { data } = useAffiliatesInfo(dydxAddress as string);
+  const { affiliateMetadataQuery } = useAffiliatesInfo(dydxAddress as string);
+  const { data } = affiliateMetadataQuery;
 
   const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,

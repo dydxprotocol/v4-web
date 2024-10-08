@@ -29,17 +29,19 @@ export const CriteriaModal = ({
   isCriteriaVisible,
   accountStats,
   toggleCriteria,
+  stakedAmount,
   userTier,
 }: {
   isCriteriaVisible: boolean;
   toggleCriteria: () => void;
   accountStats?: IAffiliateStats;
+  stakedAmount?: string;
   userTier: number | 'vip';
 }) => {
   const { isConnectedWagmi } = useWalletConnection();
 
   const stringGetter = useStringGetter();
-  const stakedDYdX = accountStats?.account ? 500 : 0;
+  const stakedDYdX = stakedAmount ?? '0';
 
   const tiers: ITierDefinition[] = [
     {
@@ -266,7 +268,7 @@ const CriteriaTable = ({
 
   return (
     <$Table
-      affiliateTierIdx={userTier === 'vip' ? 4 : userTier ?? 0}
+      affiliateTierIdx={userTier === 'vip' ? 4 : (userTier ?? 0)}
       withInnerBorders
       withOuterBorder
       getRowKey={(row) => row.tier}

@@ -41,6 +41,8 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchProgramStats = async () => {
+    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
+
     const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/program-stats`;
 
     try {
@@ -60,9 +62,8 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchAccountStats = async () => {
-    // if (!isConnectedWagmi) {
-    //   return;
-    // }
+    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
+
     const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/account/${dydxAddress}`;
 
     try {
@@ -83,6 +84,8 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchLastUpdated = async () => {
+    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
+
     const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/last-updated`;
 
     try {

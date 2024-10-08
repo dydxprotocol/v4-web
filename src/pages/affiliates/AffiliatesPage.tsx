@@ -74,6 +74,7 @@ export const AffiliatesPage: React.FC = () => {
     isAffiliate: affiliateMetadata?.metadata?.isAffiliate ?? false,
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
+    stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount.toString(),
   };
 
   const routesComponent = (
@@ -127,6 +128,7 @@ export const AffiliatesPage: React.FC = () => {
               <AffiliateStatsCard
                 currentAffiliateTier={userStatus.currentAffiliateTier}
                 isVip={userStatus.isVip}
+                stakedDydx={userStatus.stakedDydx}
                 className="h-fit w-full notTablet:h-full notTablet:w-7/12"
                 accountStats={accountStats}
               />

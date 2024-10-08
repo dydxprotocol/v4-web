@@ -47,8 +47,7 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
             {stringGetter({
               key: STRING_KEYS.YOUVE_TRADED,
               params: {
-                // TODO: get the actual amount from the API
-                AMOUNT_USD: accountStats?.referredVolume,
+                AMOUNT_USD: accountStats?.referredVolume ?? 0,
               },
             })}
           </div>

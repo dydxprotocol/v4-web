@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
-import { useQuery } from '@tanstack/react-query';
+// };
+import { useEffect, useState } from 'react';
 
 import { IDateStats } from '@/constants/affiliates';
 import { AffiliatesProgramMetric, AffiliatesProgramPeriod } from '@/constants/charts';
@@ -8,9 +7,17 @@ import { AffiliatesProgramMetric, AffiliatesProgramPeriod } from '@/constants/ch
 import { log } from '@/lib/telemetry';
 
 export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) => {
+  // State to keep track of selected period
   const [selectedPeriod, setSelectedPeriod] = useState<AffiliatesProgramPeriod>(
     AffiliatesProgramPeriod.PeriodAllTime
   );
+
+  // State to store the metric data for the currently selected period
+  const [metricData, setMetricData] = useState<{ date: number; cumulativeAmount: number }[]>([]);
+
+  useEffect(() => {
+    fetchMetricData();
+  }, [selectedChartMetric, selectedPeriod]);
 
   const getStartDate = (): string => {
     const currentTime = new Date();
@@ -31,38 +38,32 @@ export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) 
     }
   };
 
-  const fetchCommunityChartMetrics = async () => {
-    process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000';
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
+  // TODO: Leverage react-query with a refactor of the chart. Implementation is the same as trading rewards chart
+  const fetchMetricData = async () => {
+    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; // Local
 
+    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
     try {
       const response = await fetch(endpoint, {
         headers: {
           'Content-Type': 'application/json',
         },
-        method: 'GET',
       });
 
-      const data: IDateStats[] = await response.json();
+      const periodData: IDateStats[] = await response.json();
 
-      const result = data
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((m) => ({
-          date: new Date(m.date).getTime(),
-          cumulativeAmount: Number(m[selectedChartMetric]),
-        }));
-
-      return result;
-    } catch (error) {
-      log('useAffiliatesCommunityChart', error, { endpoint });
-      throw error;
+      setMetricData(
+        periodData
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .map((m) => ({
+            date: new Date(m.date).getTime(),
+            cumulativeAmount: Number(m[selectedChartMetric]),
+          }))
+      );
+    } catch (e) {
+      log('useCommunityChart/fetchMetricData', e, { endpoint });
     }
   };
 
-  const communityChartMetricsQuery = useQuery({
-    queryKey: ['communityChart'],
-    queryFn: fetchCommunityChartMetrics,
-  });
-
-  return { communityChartMetricsQuery, selectedPeriod, setSelectedPeriod };
+  return { metricData, selectedPeriod, setSelectedPeriod };
 };

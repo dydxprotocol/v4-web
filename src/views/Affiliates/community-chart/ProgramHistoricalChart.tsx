@@ -6,12 +6,12 @@ import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import {
-  AffiliatesProgramDatum,
   AffiliatesProgramMetric,
   AffiliatesProgramPeriod,
   affiliatesProgramPeriods,
   type TradingRewardsDatum,
 } from '@/constants/charts';
+import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
@@ -67,15 +67,14 @@ export const ProgramHistoricalChart = ({
 
   const now = useNow({ intervalMs: timeUnits.minute });
 
-  const [periodOptions] = useState<AffiliatesProgramPeriod[]>(affiliatesProgramPeriods);
-  const [tooltipContext, setTooltipContext] =
-    useState<TooltipContextType<AffiliatesProgramDatum>>();
+  const [tooltipContext, setTooltipContext] = useState<TooltipContextType<TradingRewardsDatum>>();
   const [isZooming, setIsZooming] = useState(false);
 
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
-  const { setSelectedPeriod, selectedPeriod, communityChartMetricsQuery } =
-    useCommunityChart(selectedChartMetric);
-  const metricData = communityChartMetricsQuery?.data ?? [];
+  const { metricData, setSelectedPeriod, selectedPeriod } = useCommunityChart(selectedChartMetric);
+
+  const oldestDataPointDate = metricData?.[0]?.date;
+  const newestDataPointDate = metricData?.[metricData.length - 1]?.date;
 
   const chartTitles = {
     [AffiliatesProgramMetric.AffiliateEarnings]: stringGetter({
@@ -85,10 +84,6 @@ export const ProgramHistoricalChart = ({
     [AffiliatesProgramMetric.ReferredUsers]: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
     [AffiliatesProgramMetric.ReferredVolume]: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
   };
-
-  const oldestDataPointDate = metricData[0] && new Date(metricData[0].date).getTime();
-  const newestDataPointDate =
-    metricData[metricData.length - 1] && new Date(metricData.length - 1).getTime();
 
   const msForPeriod = useCallback(
     (period: AffiliatesProgramPeriod, clampMax: Boolean = true) => {
@@ -131,7 +126,7 @@ export const ProgramHistoricalChart = ({
             setSelectedPeriod(affiliatesProgramPeriods[predefinedPeriodIx]);
           }
         }
-      }, 200),
+      }, NORMAL_DEBOUNCE_MS),
     [msForPeriod]
   );
 
@@ -174,7 +169,7 @@ export const ProgramHistoricalChart = ({
 
   const renderTooltip = useCallback(() => <div />, []);
 
-  const toggleGroupItems = periodOptions.map((period: AffiliatesProgramPeriod) => ({
+  const toggleGroupItems = affiliatesProgramPeriods.map((period: AffiliatesProgramPeriod) => ({
     value: period,
     label:
       period === AffiliatesProgramPeriod.PeriodAllTime
@@ -188,7 +183,7 @@ export const ProgramHistoricalChart = ({
 
   return (
     <>
-      {metricData.length === 0 ? undefined : (
+      {metricData?.length === 0 ? undefined : (
         <div tw="spacedRow w-full font-medium-book">
           <span tw="h-min text-color-text-1">{chartTitles[selectedChartMetric]}</span>
 

@@ -172,12 +172,14 @@ interface IAffiliateStatsProps {
   accountStats?: IAffiliateStats;
   isVip: boolean;
   currentAffiliateTier?: number;
+  stakedDydx?: string;
 }
 
 export const AffiliateStatsCard = ({
   className,
   accountStats,
   isVip,
+  stakedDydx,
   currentAffiliateTier,
 }: IAffiliateStatsProps) => {
   const [isCriteriaVisible, setIsCriteriaVisible] = useState(false);
@@ -210,6 +212,7 @@ export const AffiliateStatsCard = ({
           userTier={isVip ? 'vip' : (currentAffiliateTier ?? 0)}
           accountStats={accountStats}
           isCriteriaVisible={isCriteriaVisible}
+          stakedAmount={stakedDydx}
           toggleCriteria={toggleCriteria}
         />
       )}
