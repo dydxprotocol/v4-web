@@ -1,13 +1,12 @@
 import { useCallback, useState } from 'react';
 
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import type { DialogProps, PredictionMarketIntroDialogProps } from '@/constants/dialogs';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -16,20 +15,26 @@ import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { NewTag } from '@/components/Tag';
 
+import { setHasSeenPolymarketDialog } from '@/state/dismissable';
+
 export const PredictionMarketIntroDialog = ({
   setIsOpen,
 }: DialogProps<PredictionMarketIntroDialogProps>) => {
   const stringGetter = useStringGetter();
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
-  const [, setHasSeenPredictionMarketsIntro] = useLocalStorage({
-    key: LocalStorageKey.HasSeenPredictionMarketsIntro,
-    defaultValue: false,
-  });
+  const dispatch = useDispatch();
+
+  const onDismissPredictionMarketsIntro = useCallback(() => {
+    dispatch(setHasSeenPolymarketDialog(true));
+  }, [dispatch]);
 
   const onContinue = useCallback(() => {
-    setHasSeenPredictionMarketsIntro(doNotShowAgain);
+    if (doNotShowAgain) {
+      onDismissPredictionMarketsIntro();
+    }
+
     setIsOpen(false);
-  }, [doNotShowAgain, setIsOpen, setHasSeenPredictionMarketsIntro]);
+  }, [doNotShowAgain, setIsOpen, onDismissPredictionMarketsIntro]);
 
   const renderPoint = ({
     icon,

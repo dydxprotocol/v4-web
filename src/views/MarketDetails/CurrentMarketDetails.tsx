@@ -14,6 +14,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
@@ -51,14 +52,9 @@ export const CurrentMarketDetails = () => {
 
   const items = [
     {
-      key: 'market-name',
-      label: stringGetter({ key: STRING_KEYS.MARKET_NAME }),
-      value: displayId,
-    },
-    {
       key: 'ticker',
       label: stringGetter({ key: STRING_KEYS.TICKER }),
-      value: market,
+      value: getDisplayableTickerFromMarket(market ?? ''),
     },
     {
       key: 'market-type',

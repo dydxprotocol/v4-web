@@ -17,6 +17,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
+import { getHasSeenPolymarketDialog } from '@/state/dismissableSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -35,19 +36,15 @@ export const useCurrentMarketId = () => {
   const launchableMarkets = useLaunchableMarkets();
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
+  const hasSeenPolymarketDialog = useAppSelector(getHasSeenPolymarketDialog);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
     defaultValue: DEFAULT_MARKETID,
   });
 
-  const [hasSeenPredictionMarketsIntro] = useLocalStorage({
-    key: LocalStorageKey.HasSeenPredictionMarketsIntro,
-    defaultValue: false,
-  });
-
   const onNavigateToPredictionMarket = () => {
-    if (!hasSeenPredictionMarketsIntro) {
+    if (!hasSeenPolymarketDialog) {
       dispatch(openDialog(DialogTypes.PredictionMarketIntro()));
     }
   };
