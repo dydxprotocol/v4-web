@@ -36,9 +36,6 @@ export enum LocalStorageKey {
   HasSeenTradeFormMessageTRUMPWIN = 'dydx.HasSeenTradeFormMessageTRUMPWIN',
 }
 
-// TODO: Remove or migrate
-// HasSeenPredictionMarketsIntro = 'dydx.HasSeenPredictionMarketsIntro',
-
 export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.EvmDerivedAddresses]: 'v2',
   [LocalStorageKey.SolDerivedAddresses]: 'v1',
