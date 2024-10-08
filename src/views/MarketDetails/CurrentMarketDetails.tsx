@@ -14,14 +14,13 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const { configs, displayId, market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { configs, displayId } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { id, name, resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
@@ -54,7 +53,7 @@ export const CurrentMarketDetails = () => {
     {
       key: 'ticker',
       label: stringGetter({ key: STRING_KEYS.TICKER }),
-      value: getDisplayableTickerFromMarket(market ?? ''),
+      value: displayId,
     },
     {
       key: 'market-type',
