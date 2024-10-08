@@ -17,7 +17,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-import { gethasSeenPredictionMarketIntoDialog } from '@/state/dismissableSelectors';
+import { getHasSeenPredictionMarketIntoDialog } from '@/state/dismissableSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -36,7 +36,7 @@ export const useCurrentMarketId = () => {
   const launchableMarkets = useLaunchableMarkets();
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
-  const hasSeenPredictionMarketIntoDialog = useAppSelector(gethasSeenPredictionMarketIntoDialog);
+  const hasSeenPredictionMarketIntoDialog = useAppSelector(getHasSeenPredictionMarketIntoDialog);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,

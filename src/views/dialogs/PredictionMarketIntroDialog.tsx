@@ -15,7 +15,7 @@ import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { NewTag } from '@/components/Tag';
 
-import { sethasSeenPredictionMarketIntoDialog } from '@/state/dismissable';
+import { setHasSeenPredictionMarketIntoDialog } from '@/state/dismissable';
 
 export const PredictionMarketIntroDialog = ({
   setIsOpen,
@@ -25,7 +25,7 @@ export const PredictionMarketIntroDialog = ({
   const dispatch = useDispatch();
 
   const onDismissPredictionMarketsIntro = useCallback(() => {
-    dispatch(sethasSeenPredictionMarketIntoDialog(true));
+    dispatch(setHasSeenPredictionMarketIntoDialog(true));
   }, [dispatch]);
 
   const onContinue = useCallback(() => {

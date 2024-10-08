@@ -1,4 +1,4 @@
 import { type RootState } from './_store';
 
-export const gethasSeenPredictionMarketIntoDialog = (state: RootState) =>
+export const getHasSeenPredictionMarketIntoDialog = (state: RootState) =>
   state.dismissable.hasSeenPredictionMarketIntoDialog;
