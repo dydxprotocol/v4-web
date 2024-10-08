@@ -47,7 +47,7 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 1,
+  version: 2,
   storage,
   whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),

@@ -13,7 +13,7 @@ import {
 import { WalletState } from '../wallet';
 import { parseStorageItem } from './utils';
 
-type V1State = PersistedState & { wallet: WalletState };
+export type V1State = PersistedState & { wallet: WalletState };
 /**
  * Move over wallet data from localStorage into redux
  * TODO (in future migration): Remove these localStorage items
