@@ -76,6 +76,8 @@ export const useMarketsData = (
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
+      // temporary filterout TRUMPWIN until the backend is working
+      .filter((m) => m.assetId !== 'TRUMPWIN')
       .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
         const isNew = Boolean(
