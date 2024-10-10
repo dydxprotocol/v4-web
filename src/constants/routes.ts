@@ -10,11 +10,17 @@ export enum AppRoute {
   Settings = '/settings',
   Terms = '/terms',
   Privacy = '/privacy',
+  Affiliates = '/affiliates',
   LaunchMarket = '/launch-market',
 }
 
 export enum MarketsRoute {
   New = 'new',
+}
+
+export enum AffiliateRoute {
+  Leaderboard = 'leaderboard',
+  ProgramStats = 'program-stats',
 }
 
 export enum PortfolioRoute {

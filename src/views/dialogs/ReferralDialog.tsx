@@ -42,8 +42,10 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
   const { data: referralAddress, isSuccess } = useReferralAddress(refCode);
-  const { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess } =
-    useAffiliatesInfo(referralAddress);
+
+  const { affiliateMetadataQuery } = useAffiliatesInfo(referralAddress);
+
+  const { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess } = affiliateMetadataQuery;
 
   useEffect(() => {
     if (referralAddress) {
