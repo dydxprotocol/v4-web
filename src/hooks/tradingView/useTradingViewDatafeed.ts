@@ -42,8 +42,8 @@ import { subscribeOnStream, unsubscribeFromStream } from '@/lib/tradingView/dydx
 import { getMarkForOrderFills } from '@/lib/tradingView/dydxfeed/utils';
 import { getHistorySlice, getSymbol, mapCandle } from '@/lib/tradingView/utils';
 
-import { useLocaleSeparators } from './useLocaleSeparators';
-import { useStringGetter } from './useStringGetter';
+import { useLocaleSeparators } from '../useLocaleSeparators';
+import { useStringGetter } from '../useStringGetter';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
