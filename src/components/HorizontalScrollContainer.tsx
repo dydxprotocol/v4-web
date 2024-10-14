@@ -18,10 +18,12 @@ export const HorizontalScrollContainer = ({
   showFadeStart,
   showFadeEnd,
 }: ElementProps & StyleProps) => {
-  return (
+  return showFadeStart || showFadeEnd ? (
     <$Container className={className} showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
       {children}
     </$Container>
+  ) : (
+    children
   );
 };
 
@@ -43,12 +45,12 @@ const $Container = styled.div<{
       &:after {
         opacity: 0;
       }
-    `}
+    `};
+
+  ${layoutMixins.scrollAreaFadeStart}
+  ${layoutMixins.scrollAreaFadeEnd}
   
-    ${layoutMixins.scrollAreaFadeStart}
-    ${layoutMixins.scrollAreaFadeEnd}
-  
-    display: flex;
+  display: flex;
   align-items: center;
   overflow: hidden;
 
