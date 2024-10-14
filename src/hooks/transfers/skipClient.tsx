@@ -14,7 +14,7 @@ import { useDydxClient } from '../useDydxClient';
 import { useEndpointsConfig } from '../useEndpointsConfig';
 
 type SkipContextType = ReturnType<typeof useSkipClientContext>;
-const SkipContext = createContext<SkipContextType | undefined>(undefined);
+const SkipContext = createContext<SkipContextType>({} as SkipContextType);
 SkipContext.displayName = 'skipClient';
 
 export const SkipProvider = ({ ...props }) => (
