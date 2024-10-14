@@ -27,20 +27,46 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { convertBech32Address } from '@/lib/addressUtils';
-import { isNativeDenom } from '@/lib/assetUtils';
 
+import { skipClient } from '../../lib/skip';
 import { useAccounts } from '../useAccounts';
-import { useSkipClient } from './skipClient';
+
+const chainsQueryFn = async () => {
+  const skipSupportedChains = await skipClient.chains({
+    includeEVM: true,
+    includeSVM: true,
+  });
+  const chainsByNetworkMap = skipSupportedChains.reduce<Record<string, Chain[]>>(
+    (chainsMap, nextChain) => {
+      const chainsListForNetworkType = chainsMap[nextChain.chainType] ?? [];
+      chainsMap[nextChain.chainType] = [...chainsListForNetworkType, nextChain];
+      return chainsMap;
+    },
+    {}
+  );
+  return {
+    skipSupportedChains,
+    chainsByNetworkMap,
+  };
+};
+
+const assetsQueryFn = async () => {
+  // TODO: sort this! first by native asset, then by lowest fees (so lowest fees is first)
+  const assetsByChain = await skipClient.assets({
+    includeEvmAssets: true,
+    includeSvmAssets: true,
+  });
+  return { assetsByChain };
+};
 
 export const useTransfers = () => {
-  const { skipClient } = useSkipClient();
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>();
-  const [fromChainId, setFromChainId] = useState<string | undefined>();
-  const [toTokenDenom, setToTokenDenom] = useState<string | undefined>();
-  const [toChainId, setToChainId] = useState<string | undefined>();
+  const [fromTokenDenom, setFromTokenDenom] = useState<string | null>(null);
+  const [fromChainId, setFromChainId] = useState<string | null>(null);
+  const [toTokenDenom, setToTokenDenom] = useState<string | null>(null);
+  const [toChainId, setToChainId] = useState<string | null>(null);
   const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
     undefined
   );
@@ -52,37 +78,14 @@ export const useTransfers = () => {
 
   const chainsQuery = useQuery({
     queryKey: ['transferEligibleChains'],
-    queryFn: async () => {
-      const skipSupportedChains = await skipClient.chains({
-        includeEVM: true,
-        includeSVM: true,
-      });
-      const chainsByNetworkMap = skipSupportedChains.reduce<Record<string, Chain[]>>(
-        (chainsMap, nextChain) => {
-          const chainsListForNetworkType = chainsMap[nextChain.chainType] ?? [];
-          chainsMap[nextChain.chainType] = [...chainsListForNetworkType, nextChain];
-          return chainsMap;
-        },
-        {}
-      );
-      return {
-        skipSupportedChains,
-        chainsByNetworkMap,
-      };
-    },
+    queryFn: chainsQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
   const assetsQuery = useQuery({
     queryKey: ['transferEligibleAssets'],
-    queryFn: async () => {
-      const assetsByChain = await skipClient.assets({
-        includeEvmAssets: true,
-        includeSvmAssets: true,
-      });
-      return { assetsByChain };
-    },
+    queryFn: assetsQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,

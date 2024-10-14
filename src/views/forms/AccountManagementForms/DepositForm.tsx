@@ -78,7 +78,6 @@ import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
 import { isNativeDenom } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
