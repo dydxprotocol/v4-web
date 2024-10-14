@@ -135,11 +135,17 @@ export const Tabs = <TabItemsValue extends string>({
       $withInnerBorder={withBorders || withUnderline}
       $uiRefreshEnabled={uiRefresh}
     >
-      <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+      {showFadeStart || showFadeEnd ? (
+        <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+          <$Header $side={side} ref={headerRef}>
+            {triggers}
+          </$Header>
+        </$HorizontalScrollContainer>
+      ) : (
         <$Header $side={side} ref={headerRef}>
           {triggers}
         </$Header>
-      </$HorizontalScrollContainer>
+      )}
 
       {sharedContent ?? (
         <div tw="stack shadow-none">
