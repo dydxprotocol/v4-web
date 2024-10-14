@@ -16,8 +16,6 @@ import { ToggleButton } from '@/components/ToggleButton';
 
 import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
 
-import { HorizontalScrollContainer } from './HorizontalScrollContainer';
-
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];
   value: MenuItemValue;
@@ -59,7 +57,7 @@ export const ToggleGroup = forwardRefFn(
     });
 
     return (
-      <HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+      <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
         <$Root
           ref={innerRef}
           type="single"
@@ -90,7 +88,7 @@ export const ToggleGroup = forwardRefFn(
             </Item>
           ))}
         </$Root>
-      </HorizontalScrollContainer>
+      </$HorizontalScrollContainer>
     );
   }
 );
@@ -112,4 +110,27 @@ const $Root = styled(Root)<{
 
 const $Label = styled.div`
   ${layoutMixins.textTruncate}
+`;
+
+const $HorizontalScrollContainer = styled.div<{
+  showFadeStart: boolean;
+  showFadeEnd: boolean;
+}>`
+  ${layoutMixins.horizontalFadeScrollArea}
+
+  ${({ showFadeStart }) =>
+    !showFadeStart &&
+    css`
+      &:before {
+        opacity: 0;
+      }
+    `}
+
+  ${({ showFadeEnd }) =>
+    !showFadeEnd &&
+    css`
+      &:after {
+        opacity: 0;
+      }
+    `};
 `;

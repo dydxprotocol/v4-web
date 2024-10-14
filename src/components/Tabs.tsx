@@ -18,8 +18,6 @@ import { Toolbar } from '@/components/Toolbar';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { testFlags } from '@/lib/testFlags';
 
-import { HorizontalScrollContainer } from './HorizontalScrollContainer';
-
 export type TabItem<TabItemsValue> = {
   value: TabItemsValue;
   label: React.ReactNode;
@@ -225,8 +223,28 @@ const $Root = styled(Root)<{
   }
 `;
 
-const $HorizontalScrollContainer = styled(HorizontalScrollContainer)`
+const $HorizontalScrollContainer = styled.div<{
+  showFadeStart: boolean;
+  showFadeEnd: boolean;
+}>`
+  ${layoutMixins.horizontalFadeScrollArea}
   --scrollArea-fade-zIndex: calc(var(--stickyHeader-zIndex) + 1);
+
+  ${({ showFadeStart }) =>
+    !showFadeStart &&
+    css`
+      &:before {
+        opacity: 0;
+      }
+    `}
+
+  ${({ showFadeEnd }) =>
+    !showFadeEnd &&
+    css`
+      &:after {
+        opacity: 0;
+      }
+    `};
 `;
 
 const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
