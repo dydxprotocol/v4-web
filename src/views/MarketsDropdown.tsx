@@ -1,4 +1,4 @@
-import { Key, memo, useMemo, useState } from 'react';
+import { Key, memo, useEffect, useMemo, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
@@ -286,6 +286,22 @@ export const MarketsDropdown = memo(
       ) : undefined;
 
     const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
+
+    useEffect(() => {
+      // listen for '/' key to open the dropdown
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === '/') {
+          event.preventDefault();
+          setIsOpen(true);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }, []);
 
     return (
       <$Popover
