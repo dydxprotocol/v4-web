@@ -11,11 +11,11 @@ import { useChartLines } from '@/hooks/tradingView/useChartLines';
 import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
 import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
+import { useTradingViewDatafeed } from '@/hooks/tradingView/useTradingViewDatafeed';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import usePrevious from '@/hooks/usePrevious';
-import { useTradingViewDatafeed } from '@/hooks/useTradingViewDatafeed';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/configsSelectors';
