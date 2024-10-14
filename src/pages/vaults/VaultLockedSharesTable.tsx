@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { VaultShareUnlock } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 
 import { useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -78,7 +79,9 @@ const VaultLockedSharesTable = ({
             const estimatedUnlockMs = mapIfPresent(
               unlockBlockHeight,
               height,
-              (unblock, actual) => new Date().valueOf() + (unblock - actual) * 1000
+              // add a day so users don't get confused day of about why their money isn't unlocked
+              (unblock, actual) =>
+                new Date().valueOf() + (unblock - actual) * 1000 + timeUnits.hour * 24
             );
             return (
               <Output
