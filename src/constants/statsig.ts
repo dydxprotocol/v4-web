@@ -12,6 +12,7 @@ export enum StatsigFlags {
   ffEnableAffiliates = 'ff_enable_affiliates',
   ffLimitOrdersFromChart = 'ff_limit_orders_from_chart',
   ffEnableLimitClose = 'ff_enable_limit_close',
+  ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

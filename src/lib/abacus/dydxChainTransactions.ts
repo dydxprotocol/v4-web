@@ -122,7 +122,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         USDC_GAS_DENOM,
         CHAINTOKEN_DENOM,
         CHAINTOKEN_DECIMALS,
+        enableTimestampNonce,
       } = parsedParams;
+
+      console.log({ enableTimestampNonce });
 
       const compositeClient = await CompositeClient.connect(
         new Network(
@@ -143,7 +146,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastTimeoutMs: 60_000,
             },
             DEFAULT_TRANSACTION_MEMO,
-            true // TODO(@aforaleka): default this to true in v4-clients once verified working
+            enableTimestampNonce
           )
         )
       );
