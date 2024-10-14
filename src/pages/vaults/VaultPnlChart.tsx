@@ -162,7 +162,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   }, []);
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
-  const { isMobile } = useBreakpoints();
+  const { isMobile, isDesktopSmall } = useBreakpoints();
 
   const onVisibleDataChange = useCallback((inRangeData: VaultPnlDatum[]) => {
     setVisibleTimeRange(
@@ -201,7 +201,11 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         <div tw="flexColumn pl-1 pr-1">
           <div tw="text-color-text-0 font-small-book">
             {hoveredTime != null ? (
-              <Output value={hoveredTime} type={OutputType.Date} />
+              <Output
+                value={hoveredTime}
+                type={OutputType.DateTime}
+                dateOptions={{ format: 'medium' }}
+              />
             ) : (
               <Output value={new Date().valueOf()} type={OutputType.Date} />
             )}
@@ -232,7 +236,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           series={series}
           yAxisOrientation="right"
           margin={{
-            left: 0,
+            left: isDesktopSmall ? 20 : 0,
             right: isMobile ? 20 : 60,
             top: 24,
             bottom: 32,
@@ -240,8 +244,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           padding={{
             left: 0.01,
             right: 0.01,
-            top: 0.05,
-            bottom: 0,
+            top: 0.1,
+            bottom: 0.1,
           }}
           tickFormatY={tickFormatY}
           onVisibleDataChange={onVisibleDataChange}
@@ -249,6 +253,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           onTooltipContext={onTooltipContext}
           onZoom={handleZoom}
           defaultZoomDomain={zoomDomain}
+          domainBasePadding={[0.01, 0]}
           minZoomDomain={timeUnits.day * 2.5}
           slotEmpty={undefined}
           numGridLines={0}

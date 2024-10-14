@@ -20,7 +20,7 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const { configs, displayId, market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { configs, displayId } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { id, name, resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
@@ -51,14 +51,9 @@ export const CurrentMarketDetails = () => {
 
   const items = [
     {
-      key: 'market-name',
-      label: stringGetter({ key: STRING_KEYS.MARKET_NAME }),
-      value: displayId,
-    },
-    {
       key: 'ticker',
       label: stringGetter({ key: STRING_KEYS.TICKER }),
-      value: market,
+      value: displayId,
     },
     {
       key: 'market-type',

@@ -358,7 +358,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         testFlags.enableVaults && {
           label: (
             <Checkbox
-              label={stringGetter({ key: STRING_KEYS.MEGAVAULT_TRANSFERS })}
+              label={stringGetter({ key: STRING_KEYS.VAULT_TRANSFERS })}
               checked={checkedVaultTransfers}
               disabled={isEmpty(allVaultTransfers)}
               onCheckedChange={() => {

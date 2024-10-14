@@ -17,7 +17,7 @@ import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
-import { runIf } from '@/lib/do';
+import { mapIfPresent } from '@/lib/do';
 
 export const VaultLockedSharesCard = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -75,7 +75,7 @@ const VaultLockedSharesTable = ({
           getCellValue: (row) => row.unlockBlockHeight,
           label: stringGetter({ key: STRING_KEYS.AVAILABLE }),
           renderCell: ({ unlockBlockHeight }) => {
-            const estimatedUnlockMs = runIf(
+            const estimatedUnlockMs = mapIfPresent(
               unlockBlockHeight,
               height,
               (unblock, actual) => new Date().valueOf() + (unblock - actual) * 1000

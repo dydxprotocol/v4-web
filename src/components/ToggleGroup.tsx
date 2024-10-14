@@ -110,6 +110,8 @@ const $Root = styled(Root)<{
 
 const $Label = styled.div`
   ${layoutMixins.textTruncate}
+  // don't truncate 2 characters
+  min-width: 1rem;
 `;
 
 const $HorizontalScrollContainer = styled.div<{

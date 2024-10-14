@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import { MARKET_FILTER_OPTIONS, MarketFilters, type MarketData } from '@/constants/markets';
+import { StatsigFlags } from '@/constants/statsig';
 
 import {
   SEVEN_DAY_SPARKLINE_ENTRIES,
@@ -17,6 +18,8 @@ import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyRecord } from '@/lib/typeUtils';
+
+import { useAllStatsigGateValues } from './useStatsig';
 
 const filterFunctions = {
   [MarketFilters.AI]: (market: MarketData) => {
@@ -72,10 +75,15 @@ export const useMarketsData = (
   );
   const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
+  const featureFlags = useAllStatsigGateValues();
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
+      // temporary filterout TRUMPWIN until the backend is working
+      .filter(
+        (m) => m.assetId !== 'TRUMPWIN' || featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi]
+      )
       .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
         const isNew = Boolean(

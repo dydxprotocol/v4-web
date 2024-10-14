@@ -94,7 +94,7 @@ export const HeaderDesktop = () => {
               {
                 value: 'TEST_MARKET',
                 label: 'TIME-USD',
-                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M?pml=true',
+                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M-USD?pml=true',
               },
             ]
           : []),
@@ -123,7 +123,15 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
-              href: documentation,
+              onClick: () => {
+                dispatch(
+                  openDialog(
+                    DialogTypes.ExternalLink({
+                      link: documentation,
+                    })
+                  )
+                );
+              },
             },
             {
               value: 'MINTSCAN',

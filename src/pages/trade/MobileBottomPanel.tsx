@@ -5,10 +5,10 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { MobileTabs } from '@/components/Tabs';
+import { LaunchableMarketStatsDetails } from '@/views/LaunchableMarketStatsDetails';
 import { CurrentMarketDetails } from '@/views/MarketDetails/CurrentMarketDetails';
 import { LaunchableMarketDetails } from '@/views/MarketDetails/LaunchableMarketDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
-import { UnlaunchedMarketStatsDetails } from '@/views/UnlaunchedMarketStatsDetails';
 
 enum InfoSection {
   Statistics = 'Statistics',
@@ -26,7 +26,7 @@ export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?:
           value: InfoSection.Statistics,
           label: stringGetter({ key: STRING_KEYS.STATISTICS }),
           content: (
-            <UnlaunchedMarketStatsDetails
+            <LaunchableMarketStatsDetails
               launchableMarketId={launchableMarketId}
               showMidMarketPrice={false}
             />

@@ -65,6 +65,10 @@ const useAccountsContext = () => {
 
   const { ready, authenticated } = usePrivy();
 
+  const blockedGeo = useMemo(() => {
+    return geo && isBlockedGeo(geo) && checkForGeo;
+  }, [geo, checkForGeo]);
+
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
   useEffect(() => {
     const { address, chain } = sourceAccount;
@@ -187,7 +191,7 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
-          } else if (sourceAccount.encryptedSignature) {
+          } else if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
 
@@ -205,7 +209,7 @@ const useAccountsContext = () => {
         if (!localDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
-          if (sourceAccount?.encryptedSignature) {
+          if (sourceAccount?.encryptedSignature && geo && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
               await setWalletFromSignature(signature);
@@ -223,7 +227,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, localDydxWallet]);
+  }, [signerWagmi, isConnectedGraz, sourceAccount, localDydxWallet, blockedGeo]);
 
   // abacus
   useEffect(() => {
@@ -288,10 +292,10 @@ const useAccountsContext = () => {
   }, [dispatch, dydxSubaccounts]);
 
   useEffect(() => {
-    if (geo && isBlockedGeo(geo) && checkForGeo) {
+    if (blockedGeo) {
       disconnect();
     }
-  }, [checkForGeo, geo]);
+  }, [blockedGeo]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
