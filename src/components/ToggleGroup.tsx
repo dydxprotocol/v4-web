@@ -1,4 +1,4 @@
-import { UIEvent, useCallback, useState, type Ref } from 'react';
+import { useImperativeHandle, useRef, type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
 import styled, { css } from 'styled-components';
@@ -7,6 +7,7 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useFadeOnHorizontalScrollContainer } from '@/hooks/useFadeOnHorizontalScrollContainer';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -14,6 +15,8 @@ import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
+
+import { HorizontalScrollContainer } from './HorizontalScrollContainer';
 
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];
@@ -48,34 +51,19 @@ export const ToggleGroup = forwardRefFn(
   ) => {
     const { isTablet } = useBreakpoints();
 
-    const [showFadeStart, setShowFadeStart] = useState(false);
-    const [showFadeEnd, setShowFadeEnd] = useState(false);
+    const innerRef = useRef<HTMLInputElement>(null);
+    useImperativeHandle(ref, () => innerRef.current!, []);
 
-    const handleScroll = useCallback((e: UIEvent<HTMLElement>) => {
-      const { clientWidth, scrollWidth, scrollLeft } = e.currentTarget;
-      const scrollStart =
-        clientWidth != null &&
-        scrollWidth != null &&
-        scrollLeft != null &&
-        scrollWidth > clientWidth &&
-        scrollLeft > 0;
-      const scrollEnd =
-        clientWidth != null &&
-        scrollWidth != null &&
-        scrollLeft != null &&
-        scrollWidth > clientWidth + scrollLeft;
-
-      setShowFadeStart(scrollStart);
-      setShowFadeEnd(scrollEnd);
-    }, []);
+    const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
+      scrollRef: innerRef,
+    });
 
     return (
-      <$Container showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+      <HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
         <$Root
-          ref={ref}
+          ref={innerRef}
           type="single"
           value={value}
-          onScroll={overflow === 'scroll' ? handleScroll : undefined}
           onValueChange={(newValue: MenuItemValue) => {
             if ((ensureSelected && newValue) || !ensureSelected) {
               onValueChange(newValue);
@@ -102,40 +90,10 @@ export const ToggleGroup = forwardRefFn(
             </Item>
           ))}
         </$Root>
-      </$Container>
+      </HorizontalScrollContainer>
     );
   }
 );
-
-const $Container = styled.div<{
-  showFadeStart: boolean;
-  showFadeEnd: boolean;
-}>`
-  ${({ showFadeStart }) =>
-    !showFadeStart &&
-    css`
-      &:before {
-        opacity: 0;
-      }
-    `}
-
-  ${({ showFadeEnd }) =>
-    !showFadeEnd &&
-    css`
-      &:after {
-        opacity: 0;
-      }
-    `}
-
-  ${layoutMixins.scrollAreaFadeStart}
-  ${layoutMixins.scrollAreaFadeEnd}
-
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-
-  transition: opacity 0.3s var(--ease-out-expo);
-`;
 
 const $Root = styled(Root)<{
   overflow: 'scroll' | 'wrap';

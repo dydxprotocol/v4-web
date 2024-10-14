@@ -53,7 +53,7 @@ const scrollAreaFadeStart = css`
     height: 100%;
     width: var(--scrollArea-fadeWidth);
     background: linear-gradient(to left, transparent 10%, var(--color-layer-2));
-    z-index: 1;
+    z-index: var(--scrollArea-fade-zIndex);
   }
 `;
 
@@ -73,12 +73,14 @@ const scrollAreaFadeEnd = css`
     height: 100%;
     width: var(--scrollArea-fadeWidth);
     background: linear-gradient(to right, transparent 10%, var(--color-layer-2));
-    z-index: 1;
+    z-index: var(--scrollArea-fade-zIndex);
   }
 `;
 
 // Applies a fade to a scrollable container. Apply to the parent of layoutMixins.scrollArea
 const scrollAreaFade = css`
+  --scrollArea-fade-zIndex: 1;
+
   ${scrollAreaFadeStart}
   ${scrollAreaFadeEnd}
 `;

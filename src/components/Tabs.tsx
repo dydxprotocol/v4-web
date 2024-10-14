@@ -1,9 +1,11 @@
-import { type ReactNode, type Ref } from 'react';
+import { useRef, type ReactNode, type Ref } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
+
+import { useFadeOnHorizontalScrollContainer } from '@/hooks/useFadeOnHorizontalScrollContainer';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -15,6 +17,8 @@ import { Toolbar } from '@/components/Toolbar';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { testFlags } from '@/lib/testFlags';
+
+import { HorizontalScrollContainer } from './HorizontalScrollContainer';
 
 export type TabItem<TabItemsValue> = {
   value: TabItemsValue;
@@ -70,6 +74,11 @@ export const Tabs = <TabItemsValue extends string>({
   const { uiRefresh } = testFlags;
   const withBorders = dividerStyle === 'border';
   const withUnderline = dividerStyle === 'underline';
+
+  const headerRef = useRef<HTMLDivElement>(null);
+  const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
+    scrollRef: headerRef,
+  });
 
   const triggers = (
     <>
@@ -128,7 +137,11 @@ export const Tabs = <TabItemsValue extends string>({
       $withInnerBorder={withBorders || withUnderline}
       $uiRefreshEnabled={uiRefresh}
     >
-      <$Header $side={side}>{triggers}</$Header>
+      <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+        <$Header $side={side} ref={headerRef}>
+          {triggers}
+        </$Header>
+      </$HorizontalScrollContainer>
 
       {sharedContent ?? (
         <div tw="stack shadow-none">
@@ -212,8 +225,13 @@ const $Root = styled(Root)<{
   }
 `;
 
+const $HorizontalScrollContainer = styled(HorizontalScrollContainer)`
+  --scrollArea-fade-zIndex: calc(var(--stickyHeader-zIndex) + 1);
+`;
+
 const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
   ${layoutMixins.contentSectionDetachedScrollable}
+  flex: 1;
 
   ${({ $side }) =>
     ({
