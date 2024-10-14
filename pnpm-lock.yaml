@@ -2157,6 +2157,10 @@ packages:
     resolution: {integrity: sha512-HPPN4NPYXW9i7TRHNLJOdKK84z9m0mByy4mY+jHE3t9zIvOz0nK0qEG00uAlgakJvPeoh2ge7gWUAUOTNcbd6A==}
     dev: false
 
+  /@chain-registry/types@0.50.0:
+    resolution: {integrity: sha512-77TY/i3lPPQRQGBl0PFrb8+k3rbjIb4LOSsmK49mlMSPUNeJ3Wcx3Donnm2XvdpQDH5aeCofWOPonZ2/3XoibQ==}
+    dev: false
+
   /@coinbase/wallet-sdk@3.9.3:
     resolution: {integrity: sha512-N/A2DRIf0Y3PHc1XAMvbBUu4zisna6qAdqABMZwBMNEfWrXpAwx16pZGkYCLGE+Rvv1edbcB2LYDRnACNcmCiw==}
     dependencies:
@@ -2418,6 +2422,25 @@ packages:
       '@cosmjs/utils': 0.31.3
       cosmjs-types: 0.8.0
       long: 4.0.0
+      pako: 2.1.0
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+    dev: false
+
+  /@cosmjs/cosmwasm-stargate@0.32.4:
+    resolution: {integrity: sha512-Fuo9BGEiB+POJ5WeRyBGuhyKR1ordvxZGLPuPosFJOH9U0gKMgcjwKMCgAlWFkMlHaTB+tNdA8AifWiHrI7VgA==}
+    dependencies:
+      '@cosmjs/amino': 0.32.4
+      '@cosmjs/crypto': 0.32.4
+      '@cosmjs/encoding': 0.32.4
+      '@cosmjs/math': 0.32.4
+      '@cosmjs/proto-signing': 0.32.4
+      '@cosmjs/stargate': 0.32.4
+      '@cosmjs/tendermint-rpc': 0.32.4
+      '@cosmjs/utils': 0.32.4
+      cosmjs-types: 0.9.0
       pako: 2.1.0
     transitivePeerDependencies:
       - bufferutil
@@ -3917,6 +3940,58 @@ packages:
     transitivePeerDependencies:
       - debug
       - google-protobuf
+    dev: false
+
+  /@injectivelabs/sdk-ts@1.14.5(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-j/6EcvNgQn563L0P5x80cZDTbYYbsXmHgtIbj8DCzemzgPRadmZLtlMDBjMQZ0ZcMhDSMfVOCINBOB2bBz2qMw==}
+    requiresBuild: true
+    dependencies:
+      '@apollo/client': 3.10.6(@types/react@18.3.3)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+      '@cosmjs/amino': 0.31.3
+      '@cosmjs/proto-signing': 0.31.3
+      '@cosmjs/stargate': 0.31.3
+      '@ensdomains/ens-validation': 0.1.0
+      '@ensdomains/eth-ens-namehash': 2.0.15
+      '@ethersproject/bytes': 5.7.0
+      '@injectivelabs/core-proto-ts': 0.0.21
+      '@injectivelabs/dmm-proto-ts': 1.0.19
+      '@injectivelabs/exceptions': 1.14.11(google-protobuf@3.21.2)
+      '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.2)
+      '@injectivelabs/grpc-web-node-http-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
+      '@injectivelabs/grpc-web-react-native-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
+      '@injectivelabs/indexer-proto-ts': 1.11.32
+      '@injectivelabs/mito-proto-ts': 1.0.55
+      '@injectivelabs/networks': 1.14.11(google-protobuf@3.21.2)
+      '@injectivelabs/test-utils': 1.14.5
+      '@injectivelabs/token-metadata': 1.14.11(google-protobuf@3.21.2)
+      '@injectivelabs/ts-types': 1.14.11
+      '@injectivelabs/utils': 1.14.11(google-protobuf@3.21.2)
+      '@metamask/eth-sig-util': 4.0.1
+      axios: 0.27.2
+      bech32: 2.0.0
+      bip39: 3.1.0
+      cosmjs-types: 0.7.2
+      ethereumjs-util: 7.1.5
+      ethers: 5.7.2
+      google-protobuf: 3.21.2
+      graphql: 16.8.1
+      http-status-codes: 2.3.0
+      js-sha3: 0.8.0
+      jscrypto: 1.0.3
+      keccak256: 1.0.6
+      link-module-alias: 1.2.0
+      secp256k1: 4.0.3
+      shx: 0.3.4
+      snakecase-keys: 5.5.0
+    transitivePeerDependencies:
+      - '@types/react'
+      - bufferutil
+      - debug
+      - graphql-ws
+      - react
+      - react-dom
+      - subscriptions-transport-ws
+      - utf-8-validate
     dev: false
 
   /@injectivelabs/sdk-ts@1.14.5(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0):
@@ -12546,6 +12621,12 @@ packages:
     resolution: {integrity: sha512-+p8Nb7YNFudtUibf8aWfqmaqxBxjwQy0IU6YMeT6tV4nRy0RPOeJ/xhob826YzWzz6+Ym9kzDPfkbpBknKehgg==}
     dependencies:
       '@chain-registry/types': 0.50.1
+    dev: false
+
+  /chain-registry@1.69.0:
+    resolution: {integrity: sha512-jNDHQrtF7qwqvQBF+1FylyKxTkUofD5MD/wVFshlmGciOjLR8Amh4wC0zPzeWrJsOWUihvYFR8qPpjCgT1YvTw==}
+    dependencies:
+      '@chain-registry/types': 0.50.0
     dev: false
 
   /chalk@2.4.2:
