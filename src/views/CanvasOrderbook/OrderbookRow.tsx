@@ -77,6 +77,7 @@ const $OrderbookMiddleRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
   height: 1.75rem;
   border-top: var(--border);
   border-bottom: var(--border);
+  white-space: nowrap;
 
   ${({ side }) =>
     side &&
