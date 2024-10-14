@@ -1,7 +1,6 @@
 import {
   AxelarTransferInfoJSON,
   CCTPTransferInfoJSON,
-  SkipClient,
   TrackTxResponseJSON,
   TransferEventJSON,
   TransferInfoJSON,
@@ -239,14 +238,3 @@ export const fetchTransferStatus = ({
 }) => {
   return fetchSkipStatus({ transactionHash: transactionId, chainId: fromChainId, baseUrl });
 };
-
-export const skipClient = new SkipClient({
-  endpointOptions: {
-    getRpcEndpointForChain: async (chainId: string) => {
-      if (chainId === 'noble-1') return 'https://noble-yx-rpc.polkachu.com/';
-      if (chainId === 'dydx-mainnet-1') return 'https://dydx-ops-rpc.kingnodes.com';
-      if (chainId === '43114') return 'https://api.avax.network/ext/bc/C/rpc';
-      return 'https://dydx-ops-rpc.kingnodes.com';
-    },
-  },
-});

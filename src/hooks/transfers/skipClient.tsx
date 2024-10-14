@@ -10,6 +10,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { RPCUrlsByChainId } from '@/lib/wagmi';
 
+import { useDydxClient } from '../useDydxClient';
 import { useEndpointsConfig } from '../useEndpointsConfig';
 
 type SkipContextType = ReturnType<typeof useSkipClientContext>;
@@ -25,6 +26,7 @@ export const useSkipClient = () => useContext(SkipContext);
 const useSkipClientContext = () => {
   const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators } =
     useEndpointsConfig();
+  const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const skipClient = useMemo(
     () =>
@@ -34,7 +36,8 @@ const useSkipClientContext = () => {
             if (chainId === getNobleChainId()) return nobleValidator;
             if (chainId === getNeutronChainId()) return neutronValidator;
             if (chainId === getOsmosisChainId()) return osmosisValidator;
-            if (chainId === selectedDydxChainId) return validators[0];
+            if (chainId === selectedDydxChainId)
+              return compositeClient?.network.validatorConfig.restEndpoint ?? validators[0];
             if (chainId === getSolanaChainId()) return solanaRpcUrl;
             const evmRpcUrls = RPCUrlsByChainId[chainId];
             if (evmRpcUrls) return evmRpcUrls[0];
