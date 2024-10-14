@@ -21,6 +21,7 @@ import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { isDev } from '@/constants/networks';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -32,6 +33,7 @@ import { log } from '@/lib/telemetry';
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
+import { useStatsigGateValue } from './useStatsig';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
@@ -72,6 +74,8 @@ const useDydxClientContext = () => {
     return new IndexerClient(config);
   }, [indexerEndpoints]);
 
+  const enableTimestampNonce = useStatsigGateValue(StatsigFlags.ffEnableTimestampNonce);
+
   useEffect(() => {
     (async () => {
       if (
@@ -99,7 +103,8 @@ const useDydxClientContext = () => {
                   broadcastPollIntervalMs: 3_000,
                   broadcastTimeoutMs: 60_000,
                 },
-                DEFAULT_TRANSACTION_MEMO
+                DEFAULT_TRANSACTION_MEMO,
+                enableTimestampNonce
               )
             )
           );
