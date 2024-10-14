@@ -125,8 +125,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         enableTimestampNonce,
       } = parsedParams;
 
-      console.log({ enableTimestampNonce });
-
       const compositeClient = await CompositeClient.connect(
         new Network(
           chainId,
