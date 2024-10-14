@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.12.22.tgz
-    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.12.22.tgz
+    specifier: 1.12.23
+    version: 1.12.23
   '@dydxprotocol/v4-client-js':
     specifier: 1.10.0
     version: 1.10.0
@@ -3023,6 +3023,13 @@ packages:
         optional: true
     dependencies:
       '@datadog/browser-core': 5.23.3
+    dev: false
+
+  /@dydxprotocol/v4-abacus@1.12.23:
+    resolution: {integrity: sha512-ojM2uuQHjEOwagY+edA9C+BzRXTx2SorNU/WJVTAylHqS6wMI/5R3T+7vOa2sOOIPtfA28UQRszzC6R3NBJZzw==}
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
     dev: false
 
   /@dydxprotocol/v4-client-js@1.10.0:
@@ -25399,12 +25406,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.12.22.tgz:
-    resolution: {integrity: sha512-halfuKFUsAWLt1Au59Z3L2XsxSrymRgdEkFcgAhwhSYLKldxUJKUDIxlVVxE9XORYf+21lozKhhtJId8V13TpA==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.12.22.tgz}
-    name: '@dydxprotocol/v4-abacus'
-    version: 1.12.22
-    dependencies:
-      '@js-joda/core': 3.2.0
-      format-util: 1.0.5
-    dev: false
