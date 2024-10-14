@@ -142,7 +142,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastPollIntervalMs: 3_000,
               broadcastTimeoutMs: 60_000,
             },
-            DEFAULT_TRANSACTION_MEMO
+            DEFAULT_TRANSACTION_MEMO,
+            true // TODO(@aforaleka): default this to true in v4-clients once verified working
           )
         )
       );
