@@ -254,14 +254,11 @@ export const TradeForm = ({
         </$OrderbookButton>
         {/* TODO[TRCL-1411]: add orderbook scale functionality */}
       </div>
-
-      <$FadeContainer>
-        <$ToggleGroup
-          items={allTradeTypeItems}
-          value={selectedTradeType}
-          onValueChange={onTradeTypeChange}
-        />
-      </$FadeContainer>
+      <$ToggleGroup
+        items={allTradeTypeItems}
+        value={selectedTradeType}
+        onValueChange={onTradeTypeChange}
+      />
     </$TopActionsRow>
   );
 
@@ -351,7 +348,7 @@ export const TradeForm = ({
         <TradeSideTabs
           tw="overflow-visible"
           sharedContent={
-            <$Content>
+            <$Content tw="gap-0.75 shadow-none">
               <$MarginAndLeverageButtons openInTradeBox={false} />
               {tabletActionsRow}
               {orderbookAndInputs}
@@ -414,8 +411,6 @@ const $TradeForm = styled.form`
 
 const $Content = styled.div`
   ${layoutMixins.flexColumn}
-  gap: 0.75rem;
-  box-shadow: none;
 `;
 
 const $TopActionsRow = styled.div`
@@ -475,12 +470,6 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
             gap: 0;
           `}
   }
-`;
-
-const $FadeContainer = styled.div`
-  ${layoutMixins.scrollAreaFadeEnd}
-  display: flex;
-  align-items: center;
 `;
 
 const $ToggleGroup = styled(ToggleGroup)`

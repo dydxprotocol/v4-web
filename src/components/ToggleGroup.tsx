@@ -1,4 +1,4 @@
-import { type Ref } from 'react';
+import { UIEvent, useCallback, useState, type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
 import styled, { css } from 'styled-components';
@@ -48,42 +48,98 @@ export const ToggleGroup = forwardRefFn(
   ) => {
     const { isTablet } = useBreakpoints();
 
+    const [showFadeStart, setShowFadeStart] = useState(false);
+    const [showFadeEnd, setShowFadeEnd] = useState(false);
+
+    const handleScroll = useCallback((e: UIEvent<HTMLElement>) => {
+      const { clientWidth, scrollWidth, scrollLeft } = e.currentTarget;
+      const scrollStart =
+        clientWidth != null &&
+        scrollWidth != null &&
+        scrollLeft != null &&
+        scrollWidth > clientWidth &&
+        scrollLeft > 0;
+      const scrollEnd =
+        clientWidth != null &&
+        scrollWidth != null &&
+        scrollLeft != null &&
+        scrollWidth > clientWidth + scrollLeft;
+
+      setShowFadeStart(scrollStart);
+      setShowFadeEnd(scrollEnd);
+    }, []);
+
     return (
-      <$Root
-        ref={ref}
-        type="single"
-        value={value}
-        onValueChange={(newValue: MenuItemValue) => {
-          if ((ensureSelected && newValue) || !ensureSelected) {
-            onValueChange(newValue);
-          }
-          onInteraction?.();
-        }}
-        className={className}
-        loop
-        overflow={overflow}
-        tw="row gap-[0.33em]"
-      >
-        {items.map((item) => (
-          <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
-            <ToggleButton
-              size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
-              shape={shape}
-              disabled={item.disabled}
-              {...buttonProps}
-            >
-              {item.slotBefore}
-              <$Label>{item.label}</$Label>
-              {item.slotAfter}
-            </ToggleButton>
-          </Item>
-        ))}
-      </$Root>
+      <$Container showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+        <$Root
+          ref={ref}
+          type="single"
+          value={value}
+          onScroll={overflow === 'scroll' ? handleScroll : undefined}
+          onValueChange={(newValue: MenuItemValue) => {
+            if ((ensureSelected && newValue) || !ensureSelected) {
+              onValueChange(newValue);
+            }
+            onInteraction?.();
+          }}
+          className={className}
+          loop
+          overflow={overflow}
+          tw="row gap-[0.33em]"
+        >
+          {items.map((item) => (
+            <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
+              <ToggleButton
+                size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
+                shape={shape}
+                disabled={item.disabled}
+                {...buttonProps}
+              >
+                {item.slotBefore}
+                <$Label>{item.label}</$Label>
+                {item.slotAfter}
+              </ToggleButton>
+            </Item>
+          ))}
+        </$Root>
+      </$Container>
     );
   }
 );
 
-const $Root = styled(Root)<{ overflow: 'scroll' | 'wrap' }>`
+const $Container = styled.div<{
+  showFadeStart: boolean;
+  showFadeEnd: boolean;
+}>`
+  ${({ showFadeStart }) =>
+    !showFadeStart &&
+    css`
+      &:before {
+        opacity: 0;
+      }
+    `}
+
+  ${({ showFadeEnd }) =>
+    !showFadeEnd &&
+    css`
+      &:after {
+        opacity: 0;
+      }
+    `}
+
+  ${layoutMixins.scrollAreaFadeStart}
+  ${layoutMixins.scrollAreaFadeEnd}
+
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  transition: opacity 0.3s var(--ease-out-expo);
+`;
+
+const $Root = styled(Root)<{
+  overflow: 'scroll' | 'wrap';
+}>`
   ${({ overflow }) =>
     ({
       scroll: css`

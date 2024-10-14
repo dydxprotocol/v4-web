@@ -52,6 +52,7 @@ export const MarketSelectorAndStats = ({
 const $Container = styled.div`
   ${layoutMixins.container}
   ${layoutMixins.scrollAreaFadeEnd}
+  overflow: hidden;
 
   display: grid;
 
