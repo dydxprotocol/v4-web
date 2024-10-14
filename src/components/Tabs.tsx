@@ -84,7 +84,7 @@ export const Tabs = <TabItemsValue extends string>({
                 $withUnderline={withUnderline}
                 disabled={disabled}
               >
-                {item.label}
+                <$Label>{item.label}</$Label>
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
               </$Trigger>
@@ -103,7 +103,7 @@ export const Tabs = <TabItemsValue extends string>({
               }
               disabled={disabled}
             >
-              {item.label}
+              <$Label>{item.label}</$Label>
             </$DropdownSelectMenu>
           )
         )}
@@ -269,6 +269,11 @@ const $Trigger = styled(Trigger)<{
       ${tabMixins.tabTriggerUnderlineStyle}
     `}
 `;
+
+const $Label = styled.div`
+  ${layoutMixins.textTruncate}
+`;
+
 const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
   ${layoutMixins.flexColumn}
   outline: none;
