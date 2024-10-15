@@ -39,16 +39,15 @@ export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
   PREDICTION_MARKET = 'Prediction Market',
-  FX = 'FX',
-  LAYER_1 = 'Layer 1',
-  LAYER_2 = 'Layer 2',
-  DEFI = 'Defi',
-  AI = 'AI',
-  NFT = 'NFT',
-  GAMING = 'Gaming',
-  MEME = 'Meme',
-  RWA = 'RWA',
-  ENT = 'Entertainment',
+  // FX = 'FX',
+  LAYER_1 = 'layer-1',
+  LAYER_2 = 'layer-2',
+  DEFI = 'defi',
+  AI = 'ai-big-data',
+  DEPIN = 'depin',
+  GAMING = 'gaming',
+  MEMES = 'memes',
+  RWA = 'real-world-assets',
 }
 
 // ORDER IS INTENTIONAL
@@ -65,7 +64,7 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.NEW]: {
     label: STRING_KEYS.RECENTLY_LISTED,
   },
-  [MarketFilters.MEME]: {
+  [MarketFilters.MEMES]: {
     label: STRING_KEYS.MEME,
   },
   [MarketFilters.AI]: {
@@ -73,6 +72,9 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.DEFI]: {
     label: STRING_KEYS.DEFI,
+  },
+  [MarketFilters.DEPIN]: {
+    label: undefined,
   },
   [MarketFilters.LAYER_1]: {
     label: STRING_KEYS.LAYER_1,
@@ -85,16 +87,6 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.GAMING]: {
     label: STRING_KEYS.GAMING,
-  },
-  [MarketFilters.FX]: {
-    label: STRING_KEYS.FOREX,
-    isNew: true,
-  },
-  [MarketFilters.NFT]: {
-    label: STRING_KEYS.NFT,
-  },
-  [MarketFilters.ENT]: {
-    label: STRING_KEYS.ENTERTAINMENT,
   },
   [MarketFilters.PREDICTION_MARKET]: {
     label: STRING_KEYS.PREDICTION_MARKET,
