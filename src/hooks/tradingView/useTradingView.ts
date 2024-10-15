@@ -1,8 +1,8 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
-import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
+  type IBasicDataFeed,
   LanguageCode,
   ResolutionString,
   TradingTerminalWidgetOptions,
@@ -15,21 +15,16 @@ import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localizatio
 import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
-import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
-import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
-import { orEmptyObj } from '@/lib/typeUtils';
 
-import { useDydxClient } from '../useDydxClient';
-import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useAllStatsigGateValues } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
@@ -50,6 +45,8 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
   setIsChartReady,
+  tickSizeDecimals,
+  datafeed,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
@@ -62,13 +59,13 @@ export const useTradingView = ({
   buySellMarksToggleOn: boolean;
   setBuySellMarksToggleOn: Dispatch<SetStateAction<boolean>>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
+  tickSizeDecimals?: number;
+  datafeed: IBasicDataFeed;
 }) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
   const featureFlags = useAllStatsigGateValues();
   const dispatch = useAppDispatch();
-
-  const { group, decimal } = useLocaleSeparators();
 
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -77,25 +74,12 @@ export const useTradingView = ({
   const selectedLocale = useAppSelector(getSelectedLocale);
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
-  const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
-
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
 
   const savedResolution = useMemo(
     () => getSavedResolution({ savedConfig: savedTvChartConfig }),
     [savedTvChartConfig]
   );
-
-  const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
-    [marketId: string]: number | undefined;
-  }>({});
-  const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig)
-  );
-  const tickSizeDecimals =
-    (marketId
-      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
-      : tickSizeDecimalsAbacus) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -124,42 +108,17 @@ export const useTradingView = ({
     []
   );
 
-  useEffect(() => {
-    // we only need tick size from current market for the price scale settings
-    // if markets haven't been loaded via abacus, get the current market info from indexer
-    (async () => {
-      if (marketId && tickSizeDecimals === undefined) {
-        const marketTickSize = await getMarketTickSize(marketId);
-        setTickSizeDecimalsIndexer((prev) => ({
-          ...prev,
-          [marketId]: BigNumber(marketTickSize).decimalPlaces() ?? undefined,
-        }));
-      }
-    })();
-  }, [marketId, tickSizeDecimals, getMarketTickSize]);
-
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && tickSizeDecimals !== undefined) {
+    if (marketId) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
-      const initialPriceScale = BigNumber(10)
-        .exponentiatedBy(tickSizeDecimals ?? 2)
-        .toNumber();
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(
-          store,
-          getCandlesForDatafeed,
-          initialPriceScale,
-          orderbookCandlesToggleOn,
-          { decimal, group },
-          selectedLocale,
-          stringGetter
-        ),
+        datafeed,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
@@ -249,6 +208,7 @@ export const useTradingView = ({
     selectedLocale,
     selectedNetwork,
     !!marketId,
+    datafeed,
     tickSizeDecimals !== undefined,
     orderLineToggleRef,
     orderbookCandlesToggleRef,
