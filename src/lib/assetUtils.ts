@@ -58,7 +58,7 @@ const SKIP_NATIVE_DENOM_SUFFIX = 'native';
  * skip does not, but we add this value in order to be able to send payloads to cosmjs
  * @todo We may need to add additional logic here if we 'useAccountBalance' on forms that do not follow this format.
  */
-const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const isNativeDenom = (denom: string | undefined): boolean => {
   if (!denom) return false;
