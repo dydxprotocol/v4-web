@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { Chain, MsgsDirectRequest } from '@skip-go/client';
+import { Chain, MsgsDirectRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
@@ -14,7 +14,6 @@ import {
   OSMO_BECH32_PREFIX,
 } from '@/constants/graz';
 import {
-  COSMOS_SWAP_VENUES,
   getDefaultChainIDFromNetworkType,
   getDefaultTokenDenomFromAssets,
   getNetworkTypeFromWalletNetworkType,
@@ -27,11 +26,19 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { convertBech32Address } from '@/lib/addressUtils';
+import { isNativeDenom } from '@/lib/assetUtils';
+import { MustBigNumber } from '@/lib/numbers';
 
-import { skipClient } from '../../lib/skip';
 import { useAccounts } from '../useAccounts';
+import { useDebounce } from '../useDebounce';
+import { useSkipClient } from './skipClient';
 
-const chainsQueryFn = async () => {
+type TransferQueryFnProps = {
+  queryKey: [string, { skipClient: SkipClient }];
+};
+
+export const chainsQueryFn = async ({ queryKey }: TransferQueryFnProps) => {
+  const [, { skipClient }] = queryKey;
   const skipSupportedChains = await skipClient.chains({
     includeEVM: true,
     includeSVM: true,
@@ -50,8 +57,8 @@ const chainsQueryFn = async () => {
   };
 };
 
-const assetsQueryFn = async () => {
-  // TODO: sort this! first by native asset, then by lowest fees (so lowest fees is first)
+export const assetsQueryFn = async ({ queryKey }: TransferQueryFnProps) => {
+  const [, { skipClient }] = queryKey;
   const assetsByChain = await skipClient.assets({
     includeEvmAssets: true,
     includeSvmAssets: true,
@@ -60,13 +67,14 @@ const assetsQueryFn = async () => {
 };
 
 export const useTransfers = () => {
+  const { skipClient } = useSkipClient();
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const [fromTokenDenom, setFromTokenDenom] = useState<string | null>(null);
-  const [fromChainId, setFromChainId] = useState<string | null>(null);
-  const [toTokenDenom, setToTokenDenom] = useState<string | null>(null);
-  const [toChainId, setToChainId] = useState<string | null>(null);
+  const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>(undefined);
+  const [fromChainId, setFromChainId] = useState<string | undefined>(undefined);
+  const [toTokenDenom, setToTokenDenom] = useState<string | undefined>(undefined);
+  const [toChainId, setToChainId] = useState<string | undefined>(undefined);
   const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
     undefined
   );
@@ -76,15 +84,18 @@ export const useTransfers = () => {
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 
+  const debouncedAmount = useDebounce<string>(amount, 500);
+  const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
+
   const chainsQuery = useQuery({
-    queryKey: ['transferEligibleChains'],
+    queryKey: ['transferEligibleChains', { skipClient }],
     queryFn: chainsQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
   const assetsQuery = useQuery({
-    queryKey: ['transferEligibleAssets'],
+    queryKey: ['transferEligibleAssets', { skipClient }],
     queryFn: assetsQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -138,7 +149,7 @@ export const useTransfers = () => {
     !!fromAddress &&
     !!toAddress &&
     !!transferType &&
-    !!amount &&
+    !!debouncedAmount &&
     !!dydxAddress;
 
   const routeQuery = useQuery({
@@ -151,14 +162,14 @@ export const useTransfers = () => {
       fromAddress,
       toAddress,
       transferType,
-      amount,
+      debouncedAmount,
       dydxAddress,
       selectedDydxChainId,
     ],
     queryFn: async () => {
       // this should never happen, this is just to satisfy typescript
-      // react queries should never return null.
-      if (!hasAllParams) return null;
+      // react query fns should never return udnefined.
+      if (!hasAllParams) return undefined;
 
       const baseParams = {
         sourceAssetDenom: fromToken.denom,
@@ -168,8 +179,7 @@ export const useTransfers = () => {
         allowUnsafe: true,
         slippageTolerancePercent: '1',
         smartRelay: true,
-        // TODO: talk to skip about this, why are decimals optional? when would that happen?
-        amountIn: parseUnits(amount, fromToken.decimals ?? 0).toString(),
+        amountIn: parseUnits(debouncedAmount, fromToken.decimals ?? 0).toString(),
       };
 
       // consider moving to useMemo outside of this query
@@ -189,27 +199,14 @@ export const useTransfers = () => {
       };
       // WITHDRAWALS
       if (transferType === TransferType.Withdraw) {
-        if (isTokenCctp(toToken)) {
-          return skipClient.msgsDirect({
-            ...baseParams,
-            chainIdsToAddresses: {
-              [selectedDydxChainId]: dydxAddress,
-              [toToken.chainID]: toAddress,
-            },
-            bridges: ['IBC', 'CCTP'],
-            allowMultiTx: true,
-          });
-        }
-        // Non cctp withdrawals
         return skipClient.msgsDirect({
           ...baseParams,
           chainIdsToAddresses: {
             [selectedDydxChainId]: dydxAddress,
             [toToken.chainID]: toAddress,
-            ...cosmosChainAddresses,
           },
-          bridges: ['IBC', 'AXELAR'],
-          swapVenues: COSMOS_SWAP_VENUES,
+          bridges: ['IBC', 'CCTP'],
+          allowMultiTx: true,
         });
       }
 
@@ -237,15 +234,11 @@ export const useTransfers = () => {
         swapVenues: SWAP_VENUES,
       });
     },
+
     enabled: hasAllParams,
   });
 
-  const route = routeQuery?.data;
-
-  // TODO: maybe abstract away the adding of transfer notifications to this hook instead of having
-  // withdrawal and deposit modals handle them separately in multiple places
-  // const { addOrUpdateTransferNotification } = useLocalNotifications();
-
+  const { route, txs } = routeQuery?.data ?? {};
   return {
     // TODO: Think about trimming this list
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties
@@ -269,9 +262,12 @@ export const useTransfers = () => {
     transferType,
     setTransferType,
     route,
+    txs,
     defaultChainId,
     defaultTokenDenom,
     toToken,
     fromToken,
+    debouncedAmount,
+    debouncedAmountBN,
   };
 };

@@ -1,5 +1,9 @@
 import { createContext, useContext, useMemo } from 'react';
 
+import {
+  MsgWithdrawFromSubaccount,
+  TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+} from '@dydxprotocol/v4-client-js';
 import { SkipClient } from '@skip-go/client';
 
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
@@ -44,6 +48,7 @@ const useSkipClientContext = () => {
             throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
           },
         },
+        registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
     [
       neutronValidator,

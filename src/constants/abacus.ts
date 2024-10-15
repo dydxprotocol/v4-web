@@ -89,6 +89,7 @@ export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualM
 
 // ------ Configs ------ //
 export const StatsigConfig = Abacus.exchange.dydx.abacus.state.manager.StatsigConfig;
+export const AutoSweepConfig = Abacus.exchange.dydx.abacus.state.manager.AutoSweepConfig;
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
 export type FeeDiscount = Abacus.exchange.dydx.abacus.output.FeeDiscount;
 export type FeeTier = Abacus.exchange.dydx.abacus.output.FeeTier;

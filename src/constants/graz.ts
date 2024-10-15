@@ -42,6 +42,10 @@ export const getNeutronChainId = () => {
   return isMainnet ? CosmosChainId.Neutron : CosmosChainId.NeutronTestnet;
 };
 
+export const getSolanaChainId = () => {
+  return isMainnet ? 'solana' : 'solana-devnet';
+};
+
 const osmosisChainId = getOsmosisChainId();
 const nobleChainId = getNobleChainId();
 const neutronChainId = getNeutronChainId();

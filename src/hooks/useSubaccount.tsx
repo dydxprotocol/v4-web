@@ -235,7 +235,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             amount.toFixed(usdcDecimals)
           );
           const ibcMsg: EncodeObject = {
-            typeUrl: transaction.msgTypeUrl,
+            typeUrl: transaction.msgTypeUrl ?? transaction.msgTypeURL,
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
@@ -1045,6 +1045,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   return {
+    // client
+    subaccountClient,
+
     // Deposit/Withdraw/Faucet Methods
     deposit,
     withdraw,
@@ -1053,6 +1056,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     sendSkipWithdraw,
+    sendSkipWithdrawFromSubaccount,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
 
