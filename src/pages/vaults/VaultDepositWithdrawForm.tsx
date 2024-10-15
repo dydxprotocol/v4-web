@@ -40,8 +40,13 @@ import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateCanViewAccount, calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import {
+  calculateCanAccountTrade,
+  calculateCanViewAccount,
+  calculateIsAccountViewOnly,
+} from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getVaultForm } from '@/state/vaultSelectors';
@@ -159,6 +164,12 @@ export const VaultDepositWithdrawForm = ({
   );
 
   const onSubmitInputForm = () => {
+    track(
+      AnalyticsEvents.VaultFormPreviewStep({
+        amount: MustBigNumber(amount).toNumber(),
+        operation,
+      })
+    );
     dispatch(setVaultFormConfirmationStep(true));
   };
 
@@ -172,10 +183,13 @@ export const VaultDepositWithdrawForm = ({
     if (isSubmitting) {
       return;
     }
+    const userOperationId = crypto?.randomUUID() ?? Date.now().toString();
+
     track(
       AnalyticsEvents.AttemptVaultOperation({
         amount: MustBigNumber(amount).toNumber(),
         operation,
+        userOperationId,
         slippage: validationResponse.summaryData.estimatedSlippage,
       })
     );
@@ -193,6 +207,7 @@ export const VaultDepositWithdrawForm = ({
           track(
             AnalyticsEvents.VaultOperationPreAborted({
               amount: MustBigNumber(amount).toNumber(),
+              userOperationId,
               operation,
             })
           );
@@ -216,6 +231,7 @@ export const VaultDepositWithdrawForm = ({
           AnalyticsEvents.SuccessfulVaultOperation({
             amount: MustBigNumber(amount).toNumber(),
             operation,
+            userOperationId,
             amountDiff: undefined,
             submissionTimeBase: intermediateTime - startTime,
             submissionTimeTotal: finalTime - startTime,
@@ -250,6 +266,7 @@ export const VaultDepositWithdrawForm = ({
           track(
             AnalyticsEvents.VaultOperationPreAborted({
               amount: MustBigNumber(amount).toNumber(),
+              userOperationId,
               operation,
             })
           );
@@ -284,6 +301,7 @@ export const VaultDepositWithdrawForm = ({
           AnalyticsEvents.SuccessfulVaultOperation({
             amount: realAmountReceived,
             operation,
+            userOperationId,
             amountDiff: Math.abs((preEstimate ?? 0) - (realAmountReceived ?? 0)),
             submissionTimeBase: intermediateTime - startTime,
             submissionTimeTotal: finalTime - startTime,
@@ -335,6 +353,7 @@ export const VaultDepositWithdrawForm = ({
       track(
         AnalyticsEvents.VaultOperationProtocolError({
           operation,
+          userOperationId,
         })
       );
       dd.error('Megavault transaction failed', { ...validationResponse.submissionData }, e);
@@ -511,6 +530,10 @@ export const VaultDepositWithdrawForm = ({
       </AlertMessage>
     ));
 
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const maybeConnectWalletButton = !canAccountTrade ? (
+    <OnboardingTriggerButton size={ButtonSize.Base} />
+  ) : undefined;
   const inputForm = (
     <$Form
       onSubmit={(e: FormEvent) => {
@@ -567,23 +590,25 @@ export const VaultDepositWithdrawForm = ({
       <$FlexFill />
 
       <WithDetailsReceipt detailItems={inputFormConfig.receiptItems}>
-        <Button
-          type={ButtonType.Submit}
-          action={ButtonAction.Primary}
-          state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
-            isLoading: isSubmitting,
-          }}
-          slotLeft={
-            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
-              <$WarningIcon iconName={IconName.Warning} />
-            ) : undefined
-          }
-        >
-          {hasInputErrors && errorsPreventingSubmit[0]?.short != null
-            ? errorsPreventingSubmit[0]?.short
-            : inputFormConfig.buttonLabel}
-        </Button>
+        {maybeConnectWalletButton ?? (
+          <Button
+            type={ButtonType.Submit}
+            action={ButtonAction.Primary}
+            state={{
+              isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
+              isLoading: isSubmitting,
+            }}
+            slotLeft={
+              errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
+                <$WarningIcon iconName={IconName.Warning} />
+              ) : undefined
+            }
+          >
+            {hasInputErrors && errorsPreventingSubmit[0]?.short != null
+              ? errorsPreventingSubmit[0]?.short
+              : inputFormConfig.buttonLabel}
+          </Button>
+        )}
       </WithDetailsReceipt>
     </$Form>
   );
@@ -644,37 +669,36 @@ export const VaultDepositWithdrawForm = ({
       )}
 
       <div tw="grid grid-cols-[min-content_1fr] gap-1">
-        <Button
-          type={ButtonType.Button}
-          action={ButtonAction.Secondary}
-          onClick={() => {
-            track(
-              AnalyticsEvents.VaultFormPreviewStep({
-                amount: MustBigNumber(amount).toNumber(),
-                operation,
-              })
-            );
-            dispatch(setVaultFormConfirmationStep(false));
-          }}
-          tw="pl-1 pr-1"
-        >
-          {stringGetter({ key: STRING_KEYS.EDIT })}
-        </Button>
-        <Button
-          type={ButtonType.Submit}
-          action={ButtonAction.Primary}
-          state={{
-            isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
-            isLoading: isSubmitting,
-          }}
-          slotLeft={
-            errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
-              <$WarningIcon iconName={IconName.Warning} />
-            ) : undefined
-          }
-        >
-          {hasInputErrors ? errorsPreventingSubmit[0]?.short : inputFormConfig.buttonLabel}
-        </Button>
+        {maybeConnectWalletButton ?? (
+          <>
+            <Button
+              type={ButtonType.Button}
+              action={ButtonAction.Secondary}
+              onClick={() => {
+                dispatch(setVaultFormConfirmationStep(false));
+              }}
+              tw="pl-1 pr-1"
+            >
+              {stringGetter({ key: STRING_KEYS.EDIT })}
+            </Button>
+            <Button
+              type={ButtonType.Submit}
+              action={ButtonAction.Primary}
+              state={{
+                isDisabled:
+                  hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
+                isLoading: isSubmitting,
+              }}
+              slotLeft={
+                errorsPreventingSubmit.find((f) => !lightErrorKeys.has(f.code)) != null ? (
+                  <$WarningIcon iconName={IconName.Warning} />
+                ) : undefined
+              }
+            >
+              {hasInputErrors ? errorsPreventingSubmit[0]?.short : inputFormConfig.buttonLabel}
+            </Button>
+          </>
+        )}
       </div>
     </$Form>
   );

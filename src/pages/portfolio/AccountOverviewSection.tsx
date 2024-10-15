@@ -11,16 +11,19 @@ import { AppRoute } from '@/constants/routes';
 import { ColorToken } from '@/constants/styles/base';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { Button } from '@/components/Button';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { mapIfPresent } from '@/lib/do';
@@ -83,7 +86,7 @@ export const AccountOverviewSection = () => {
       id: 'open-positions',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
       amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) => e - f),
-      color: ColorToken.Green2,
+      color: ColorToken.Yellow1,
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
@@ -92,6 +95,9 @@ export const AccountOverviewSection = () => {
       color: ColorToken.Purple1,
     },
   ].filter(isTruthy);
+
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   return (
     <$AccountOverviewWrapper>
@@ -128,11 +134,16 @@ export const AccountOverviewSection = () => {
                   section.amount != null &&
                   totalValue != null &&
                   section.amount > 0 && (
-                    <$LineSegment
+                    <WithTooltip
                       key={section.id}
-                      tw="h-full"
-                      $color={section.color}
-                      $widthPercent={section.amount / totalValue}
+                      tooltipStringTitle={`${section.label}: ${formatNumberOutput(section.amount, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} (${formatNumberOutput(section.amount / totalValue, OutputType.Percent, { fractionDigits: 0, decimalSeparator, groupSeparator, selectedLocale })})`}
+                      slotTrigger={
+                        <$LineSegment
+                          tw="h-full"
+                          $color={section.color}
+                          $widthPercent={section.amount / totalValue}
+                        />
+                      }
                     />
                   )
               )}
