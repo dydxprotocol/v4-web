@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import {
   AFFILIATES_FEE_DISCOUNT_USD,
+  AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
   DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
@@ -101,8 +102,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 : stringGetter({
                     key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
                     params: {
-                      // TODO: make this configurable or get from API
-                      AMOUNT_USD: '10K',
+                      AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
                     },
                   })}
             </div>
@@ -112,8 +112,9 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 : stringGetter({
                     key: STRING_KEYS.YOUVE_TRADED,
                     params: {
-                      // TODO: get the actual amount from the API
-                      AMOUNT_USD: '5K',
+                      AMOUNT_USD: data?.totalVolume
+                        ? Math.floor(data.totalVolume).toLocaleString()
+                        : '0',
                     },
                   })}
             </div>

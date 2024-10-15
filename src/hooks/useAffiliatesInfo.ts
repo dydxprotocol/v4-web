@@ -29,23 +29,43 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     if (!compositeClient || !dydxAddress) {
       return {};
     }
-    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
+    const metadataEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
+    const totalVolumeEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/total_volume`;
 
     try {
-      const response = await fetch(`${endpoint}?address=${encodeURIComponent(dydxAddress)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const affiliateInfo = await getAffiliateInfo(dydxAddress);
+      const metaDataPromise = fetch(
+        `${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const totalVolumePromise = fetch(
+        `${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const affiliateInfoPromise = getAffiliateInfo(dydxAddress);
 
-      const data: AffiliatesMetadata | undefined = await response.json();
+      const [metaDataResponse, totalVolumeResponse, affiliateInfo] = await Promise.all([
+        metaDataPromise,
+        totalVolumePromise,
+        affiliateInfoPromise,
+      ]);
+
+      const data: AffiliatesMetadata | undefined = await metaDataResponse.json();
+      const totalVolume = await totalVolumeResponse.json();
       const isEligible = Boolean(data?.isVolumeEligible) || Boolean(affiliateInfo?.isWhitelisted);
 
-      return { metadata: data, affiliateInfo, isEligible };
+      return { metadata: data, affiliateInfo, isEligible, totalVolume: totalVolume?.totalVolume };
     } catch (error) {
-      log('useAffiliatesInfo', error, { endpoint });
+      log('useAffiliatesInfo', error, { metadataEndpoint });
       throw error;
     }
   };
