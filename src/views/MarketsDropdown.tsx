@@ -290,7 +290,14 @@ export const MarketsDropdown = memo(
     useEffect(() => {
       // listen for '/' key to open the dropdown
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === '/') {
+        if (event.key !== '/' || !event.target) return;
+
+        const target = event.target as HTMLElement;
+        const targetTagName = target.tagName?.toLowerCase();
+        const isTypingInInput =
+          targetTagName === 'input' || targetTagName === 'textarea' || target.isContentEditable;
+
+        if (!isTypingInInput) {
           event.preventDefault();
           setIsOpen(true);
         }
@@ -301,7 +308,7 @@ export const MarketsDropdown = memo(
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
-    }, []);
+    }, [isOpen]);
 
     return (
       <$Popover
