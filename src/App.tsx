@@ -43,7 +43,8 @@ import { config, privyConfig } from '@/lib/wagmi';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
-import { SkipProvider } from './hooks/transfers/skipClient';
+import { SkipProvider, useSkipClient } from './hooks/transfers/skipClient';
+import { assetsQueryFn, chainsQueryFn } from './hooks/transfers/useTransfers';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -86,6 +87,8 @@ const Content = () => {
   const { complianceState } = useComplianceState();
   const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
 
+  const { skipClient } = useSkipClient();
+
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
       return '';
@@ -100,6 +103,17 @@ const Content = () => {
       dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    appQueryClient.prefetchQuery({
+      queryKey: ['transferEligibleChains', { skipClient }],
+      queryFn: chainsQueryFn,
+    });
+    appQueryClient.prefetchQuery({
+      queryKey: ['transferEligibleAssets', { skipClient }],
+      queryFn: assetsQueryFn,
+    });
+  }, [skipClient]);
 
   return (
     <>
