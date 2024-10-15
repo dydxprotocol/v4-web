@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { cctpTokensByDenom, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
+import { cctpTokensByDenomLowerCased, getMapOfLowestFeeTokensByDenom } from '@/constants/cctp';
 import { NEUTRON_USDC_IBC_DENOM, OSMO_USDC_IBC_DENOM, SOLANA_USDC_DENOM } from '@/constants/denoms';
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
@@ -86,16 +86,16 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       }
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
-        return !!cctpTokensByDenom[token.value];
+        return !!cctpTokensByDenomLowerCased[token.value.toLowerCase()];
       }
       // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
       if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
-        return !!cctpTokensByDenom[token.value];
+        return !!cctpTokensByDenomLowerCased[token.value.toLowerCase()];
       }
       return true;
     })
     // we want lowest fee tokens first followed by non-lowest fee cctp tokens
-    .sort((token) => (cctpTokensByDenom[token.value] ? -1 : 1))
+    .sort((token) => (cctpTokensByDenomLowerCased[token.value.toLowerCase()] ? -1 : 1))
     .sort((token) => (lowestFeeTokensByDenom[token.value] ? -1 : 1));
 
   return (

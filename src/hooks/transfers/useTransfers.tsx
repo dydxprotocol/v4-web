@@ -17,7 +17,7 @@ import {
   COSMOS_SWAP_VENUES,
   getDefaultChainIDFromNetworkType,
   getDefaultTokenDenomFromAssets,
-  getNetworkTypeFromWalletInfo,
+  getNetworkTypeFromWalletNetworkType,
   SWAP_VENUES,
   TransferType,
 } from '@/constants/transfers';
@@ -37,10 +37,10 @@ export const useTransfers = () => {
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const [fromTokenDenom, setFromTokenDenom] = useState<string | null>(null);
-  const [fromChainId, setFromChainId] = useState<string | null>(null);
-  const [toTokenDenom, setToTokenDenom] = useState<string | null>(null);
-  const [toChainId, setToChainId] = useState<string | null>(null);
+  const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>();
+  const [fromChainId, setFromChainId] = useState<string | undefined>();
+  const [toTokenDenom, setToTokenDenom] = useState<string | undefined>();
+  const [toChainId, setToChainId] = useState<string | undefined>();
   const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
     undefined
   );
@@ -90,7 +90,7 @@ export const useTransfers = () => {
   const { chainsByNetworkMap = {} } = chainsQuery.data ?? {};
   const { assetsByChain = {} } = assetsQuery.data ?? {};
 
-  const walletNetworkType = getNetworkTypeFromWalletInfo(sourceAccount?.walletInfo);
+  const walletNetworkType = getNetworkTypeFromWalletNetworkType(sourceAccount?.chain);
   const selectedChainId = transferType === TransferType.Deposit ? fromChainId : toChainId;
 
   const toToken = useMemo(() => {
@@ -165,6 +165,7 @@ export const useTransfers = () => {
         allowUnsafe: true,
         slippageTolerancePercent: '1',
         smartRelay: true,
+        // TODO: talk to skip about this, why are decimals optional? when would that happen?
         amountIn: parseUnits(amount, fromToken.decimals ?? 0).toString(),
       };
 
@@ -210,9 +211,6 @@ export const useTransfers = () => {
       }
 
       // DEPOSITS
-      // This should never happen. Consider moving to a useMemo hook
-      // and setting as part of allParams + query keys
-
       if (isTokenCctp(fromToken)) {
         // CCTP Deposits
         return skipClient.msgsDirect({
