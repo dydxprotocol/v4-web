@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { styled } from 'twin.macro';
 
-import { AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
+import { AFFILIATES_FEE_DISCOUNT_USD } from '@/constants/affiliates';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogProps, ReferralDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -92,7 +92,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
                       params: {
                         AMOUNT_USD: (
                           <span tw="text-color-success">
-                            ${AFFILIATES_FEE_DISCOUNT.toLocaleString()}
+                            ${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}
                           </span>
                         ),
                       },

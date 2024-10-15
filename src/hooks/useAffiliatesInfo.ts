@@ -5,7 +5,7 @@ import {
   DEFAULT_MAX_AFFILIATE_SHARE,
   DEFAULT_TAKER_3_FEE,
   MAX_AFFILIATE_VIP_SHARE,
-  REF_SHARE_VOLUME_CAP,
+  REF_SHARE_VOLUME_CAP_USD,
 } from '@/constants/affiliates';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -57,23 +57,23 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   });
 
   const fetchAffiliateMaxEarning = async () => {
-    const taker3FeeTier = feeTiers?.[2].taker ?? DEFAULT_TAKER_3_FEE;
     const allAffiliateTiers = await getAllAffiliateTiers();
     let maxRevshare = DEFAULT_MAX_AFFILIATE_SHARE;
-    if (allAffiliateTiers?.tiers?.tiers?.length) {
-      const lastTier = allAffiliateTiers.tiers.tiers[allAffiliateTiers.tiers.tiers.length - 1];
+    const lastTier = allAffiliateTiers?.at(-1);
+    if (lastTier) {
       maxRevshare = lastTier.takerFeeSharePpm / 1_000_000;
     }
+    const taker3FeeTier = feeTiers?.[2].taker ?? DEFAULT_TAKER_3_FEE;
 
-    const maxEarning = taker3FeeTier * maxRevshare * REF_SHARE_VOLUME_CAP;
-    const maxVipEarning = taker3FeeTier * MAX_AFFILIATE_VIP_SHARE * REF_SHARE_VOLUME_CAP;
+    const maxEarning = taker3FeeTier * maxRevshare * REF_SHARE_VOLUME_CAP_USD;
+    const maxVipEarning = taker3FeeTier * MAX_AFFILIATE_VIP_SHARE * REF_SHARE_VOLUME_CAP_USD;
     return { maxEarning, maxVipEarning };
   };
 
   const affiliateMaxEarningQuery = useQuery({
-    queryKey: ['affiliateMaxEarning', compositeClient],
+    queryKey: ['affiliateMaxEarning', compositeClient, feeTiers],
     queryFn: fetchAffiliateMaxEarning,
-    enabled: Boolean(compositeClient),
+    enabled: Boolean(compositeClient && feeTiers),
   });
 
   return { affiliateMetadataQuery, affiliateMaxEarningQuery };

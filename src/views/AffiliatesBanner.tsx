@@ -1,7 +1,10 @@
 import { css } from 'styled-components';
 import { styled } from 'twin.macro';
 
-import { AFFILIATES_FEE_DISCOUNT, DEFAULT_AFFILIATES_EARN_PER_MONTH } from '@/constants/affiliates';
+import {
+  AFFILIATES_FEE_DISCOUNT_USD,
+  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
+} from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -37,7 +40,7 @@ export const AffiliatesBanner = () => {
     params: {
       AMOUNT_USD:
         maxEarningData?.maxEarning.toLocaleString() ??
-        DEFAULT_AFFILIATES_EARN_PER_MONTH.toLocaleString(),
+        DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
     },
   });
 
@@ -46,7 +49,7 @@ export const AffiliatesBanner = () => {
       {stringGetter({
         key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
         params: {
-          AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT.toLocaleString()}`,
+          AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}`,
         },
       })}{' '}
       <br />

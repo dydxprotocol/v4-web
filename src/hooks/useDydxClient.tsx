@@ -501,7 +501,8 @@ const useDydxClientContext = () => {
   );
 
   const getAllAffiliateTiers = useCallback(async () => {
-    return compositeClient?.validatorClient.get.getAllAffiliateTiers();
+    const tiers = await compositeClient?.validatorClient.get.getAllAffiliateTiers();
+    return tiers?.tiers?.tiers;
   }, [compositeClient]);
 
   const getReferredBy = useCallback(

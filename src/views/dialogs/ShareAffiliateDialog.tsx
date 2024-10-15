@@ -2,9 +2,9 @@ import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
 import {
-  AFFILIATES_FEE_DISCOUNT,
-  DEFAULT_AFFILIATES_EARN_PER_MONTH,
-  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH,
+  AFFILIATES_FEE_DISCOUNT_USD,
+  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
+  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
@@ -60,7 +60,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         text: `${stringGetter({
           key: STRING_KEYS.TWEET_SHARE_AFFILIATES,
           params: {
-            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
+            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
           },
         })}\n\n${affiliatesUrl}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
@@ -78,12 +78,12 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       description={stringGetter({
         key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
         params: {
-          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
+          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
           VIP_AMOUNT_USD:
             maxVipEarning?.toLocaleString() ??
-            DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH.toLocaleString(),
+            DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString(),
           AMOUNT_PER_MONTH:
-            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH.toLocaleString(),
+            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
           LEARN_MORE_LINK: (
             <Link href={affiliateProgram} isInline>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
