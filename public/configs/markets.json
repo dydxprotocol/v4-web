@@ -8180,5 +8180,30 @@
         ],
         "websiteLink": "https://bubcat.onl/",
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/goodjobbub/"
+    },
+    "MOODENG-USD": {
+        "name": "Moo Deng (moodengsol.com)",
+        "tags": [
+            "Meme"
+        ],
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/moo-deng-solana/",
+        "websiteLink": "https://moodengsol.com/",
+        "whitepaperLink": null
+    },
+    "GIGA,RAYDIUM,63LFDMNB3MQ8MW9MTZ2TO9BEA2M71KZUUGQ5TIJXCQJ9-USD": {
+        "name": "Gigachad",
+        "tags": [
+            "Meme"
+        ],
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gigachad-meme/",
+        "websiteLink": "https://gigachadsolana.com/",
+        "whitepaperLink": null
+    },
+    "DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09-USD": {
+        "name": "Devve",
+        "tags": [],
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/devve/",
+        "websiteLink": "https://devve.io/",
+        "whitepaperLink": "https://assets-global.website-files.com/6509e01d2c57f1be928c4ad1/657734916a8fe48f1b8039cd_DevvE%20Whitepaper%20Dec%2011%20-%2023.pdf"
     }
 }
