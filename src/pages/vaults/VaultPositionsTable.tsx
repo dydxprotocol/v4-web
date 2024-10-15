@@ -30,6 +30,7 @@ import { orEmptyRecord } from '@/lib/typeUtils';
 type VaultTableRow = VaultPosition;
 
 const VAULT_PAGE_SIZE = 20 as const;
+const USDC_MARKET_HARDCODED = 'USDC-USD';
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
@@ -51,20 +52,27 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+
             return (
               // eslint-disable-next-line jsx-a11y/interactive-supports-focus
               <div
                 tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
                 role="button"
                 onClick={() =>
+                  asset != null &&
                   navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
                 }
               >
                 <TableCell
                   stacked
-                  slotLeft={<AssetIcon symbol={asset?.id} tw="[--asset-icon-size:2.5em]" />}
+                  slotLeft={
+                    <AssetIcon
+                      symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
+                      tw="[--asset-icon-size:2.5em]"
+                    />
+                  }
                 >
-                  {asset?.name}
+                  {marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.name}
                   <div tw="row gap-0.25">
                     <Output
                       type={OutputType.Multiple}

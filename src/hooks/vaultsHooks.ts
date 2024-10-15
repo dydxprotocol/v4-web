@@ -164,6 +164,8 @@ export const useLoadedVaultPositions = () => {
     ...vaultQueryOptions,
   });
 
+  const vaultTvl = useLoadedVaultDetails().data?.totalValue;
+
   const calculatedPositions = useMemo(() => {
     if (vaultPositions?.data == null || marketsMap.data == null || marketsMap.data.size === 0) {
       return undefined;
@@ -171,9 +173,10 @@ export const useLoadedVaultPositions = () => {
     return VaultCalculator.calculateVaultPositions(
       vaultPositions.data,
       subvaultHistories?.data,
-      marketsMap.data
+      marketsMap.data,
+      vaultTvl
     );
-  }, [subvaultHistories, vaultPositions, marketsMap]);
+  }, [vaultPositions?.data, marketsMap.data, subvaultHistories?.data, vaultTvl]);
 
   return calculatedPositions;
 };
