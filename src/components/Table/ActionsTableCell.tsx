@@ -8,9 +8,15 @@ type ElementProps = {
   children: React.ReactNode;
 };
 
-export const ActionsTableCell = ({ children }: ElementProps) => (
+type StyleProps = {
+  className?: string;
+};
+
+export const ActionsTableCell = ({ children, className }: ElementProps & StyleProps) => (
   <div tw="flex justify-end">
-    <$Toolbar $numChildren={React.Children.toArray(children).length}>{children}</$Toolbar>
+    <$Toolbar className={className} $numChildren={React.Children.toArray(children).length}>
+      {children}
+    </$Toolbar>
   </div>
 );
 const $Toolbar = styled(Toolbar)<{ $numChildren: number }>`
@@ -20,11 +26,13 @@ const $Toolbar = styled(Toolbar)<{ $numChildren: number }>`
       width: calc(${$numChildren} * 2rem + (${$numChildren} - 1) * 0.5rem);
     `}
 
+  --toolbar-margin: 0.5rem;
+
   display: flex;
   justify-content: flex-end;
   padding: 0;
 
   > *:not(:last-child) {
-    margin-right: 0.5rem;
+    margin-right: var(--toolbar-margin);
   }
 `;

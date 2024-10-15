@@ -144,18 +144,34 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   PositionsTableColumnKey.IndexEntry,
                   PositionsTableColumnKey.PnL,
                 ]
-              : [
-                  PositionsTableColumnKey.Market,
-                  PositionsTableColumnKey.Size,
-                  PositionsTableColumnKey.Margin,
-                  PositionsTableColumnKey.UnrealizedPnl,
-                  !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
-                  PositionsTableColumnKey.NetFunding,
-                  PositionsTableColumnKey.AverageOpenAndClose,
-                  PositionsTableColumnKey.LiquidationAndOraclePrice,
-                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions && PositionsTableColumnKey.Actions,
-                ].filter(isTruthy)
+              : uiRefresh
+                ? [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Leverage,
+                    PositionsTableColumnKey.Type,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Value,
+                    PositionsTableColumnKey.PnL,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.AverageOpen,
+                    PositionsTableColumnKey.Oracle,
+                    PositionsTableColumnKey.Liquidation,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    PositionsTableColumnKey.NetFunding,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
+                : [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.UnrealizedPnl,
+                    !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
+                    PositionsTableColumnKey.NetFunding,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
           }
           showClosePositionAction={shouldRenderActions}
           initialPageSize={initialPageSize}
@@ -174,6 +190,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       shouldRenderTriggers,
       numTotalPositions,
       onViewOrders,
+      uiRefresh,
     ]
   );
 
