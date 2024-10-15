@@ -34,7 +34,7 @@ import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { setCandles } from '@/state/perpetuals';
 import {
-  getCurrentMarketConfig,
+  getMarketConfig,
   getMarketData,
   getPerpetualBarsForPriceChart,
 } from '@/state/perpetualsSelectors';
@@ -109,7 +109,7 @@ export const useTradingViewDatafeed = (
           const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
 
           const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
-            getCurrentMarketConfig(store.getState())
+            getMarketConfig(store.getState(), symbolName)
           );
 
           const tickSizeDecimals = tickSizeDecimalsAbacus ?? initialTickSizeDecimals;
