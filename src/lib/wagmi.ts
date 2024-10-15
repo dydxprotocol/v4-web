@@ -1,7 +1,7 @@
 // Custom connectors
+import { createFunkitWagmiConfig } from '@funkit/connect';
 import type { PrivyClientConfig } from '@privy-io/react-auth';
-import { createConfig } from '@privy-io/wagmi';
-import { fallback, FallbackTransport, http, Transport, type Chain } from 'viem';
+import { FallbackTransport, Transport, http, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -211,7 +211,10 @@ const getWalletconnect2ConnectorOptions = (
   },
 });
 
-export const config = createConfig({
+export const config = createFunkitWagmiConfig({
+  appName: 'dYdX',
+  // This is a static placeholder config. The actual projectId gets set during render time at `getWalletconnect2ConnectorOptions` where it is dynamically determined.
+  projectId: 'placeholderProjectId',
   chains: [mainnet, ...WAGMI_SUPPORTED_CHAINS],
   transports: RPCTransports,
 });
