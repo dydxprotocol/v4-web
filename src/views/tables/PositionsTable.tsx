@@ -175,7 +175,7 @@ const getPositionsTableColumnDef = ({
           return uiRefresh ? (
             <TableCell>
               <$OutputSigned
-                sign={getNumberSign(unrealizedPnlPercent?.current)}
+                sign={getNumberSign(unrealizedPnl?.current)}
                 type={OutputType.Fiat}
                 value={unrealizedPnl?.current}
                 showSign={ShowSign.None}
@@ -693,10 +693,6 @@ export const PositionsTable = ({
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-
-  --table-cell-align: start;
-  --table-firstColumn-cell-align: start;
-  --table-lastColumn-cell-align: end;
 
   tr {
     &:after {

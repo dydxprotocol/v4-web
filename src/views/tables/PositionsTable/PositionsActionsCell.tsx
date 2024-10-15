@@ -166,13 +166,14 @@ const $ActionsTableCell = styled(ActionsTableCell)<{ $uiRefreshEnabled: boolean 
 `;
 
 const $TriggersButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
-  --button-icon-size: 1em;
+  --button-icon-size: 1.5em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
 
   ${({ $uiRefreshEnabled }) =>
     $uiRefreshEnabled &&
     css`
+      --button-icon-size: 1em;
       --button-backgroundColor: transparent;
       --button-border: none;
       width: min-content;
