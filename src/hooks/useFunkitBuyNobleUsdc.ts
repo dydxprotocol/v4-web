@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { useActiveTheme, useFunkitCheckout } from '@funkit/connect';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -9,6 +10,8 @@ import { AppTheme, AppThemeSetting } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 import { DepositType, setDepositType } from '@/state/deposit';
 import { openDialog } from '@/state/dialogs';
+
+import { track } from '@/lib/analytics/analytics';
 
 import { useAccounts } from './useAccounts';
 
@@ -27,7 +30,8 @@ export function useFunkitBuyNobleUsdc() {
   const config = useMemo(
     () => ({
       onConfirmation: () => {
-        // TODO: Handle the checkout confirmation (event listening / notification)
+        // TODO: Supply remaining transfer event data once Funkit provides it
+        track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
       },
       onDydxSwitch: () => {
         dispatch(setDepositType(DepositType.Standard));

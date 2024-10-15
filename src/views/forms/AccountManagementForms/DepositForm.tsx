@@ -496,6 +496,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
         toAmount: summary?.toAmount || undefined,
         toAmountMin: summary?.toAmountMin || undefined,
+        isFunkit: false,
       });
 
       abacusStateManager.clearTransferInputValues();
