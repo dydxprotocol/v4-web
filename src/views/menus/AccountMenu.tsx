@@ -1,6 +1,5 @@
 import { ElementType, memo } from 'react';
 
-import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
@@ -16,7 +15,7 @@ import {
   TOOLTIP_STRING_KEYS,
   type StringGetterFunction,
 } from '@/constants/localization';
-import { isDev, isMainnet } from '@/constants/networks';
+import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset, WalletNetworkType, wallets, WalletType } from '@/constants/wallets';
@@ -67,7 +66,6 @@ export const AccountMenu = () => {
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
 
   const dispatch = useAppDispatch();
-  const { openAccountModal: openFunkitAccountModal } = useAccountModal();
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -373,23 +371,6 @@ export const AccountMenu = () => {
                 icon: <Icon iconName={IconName.Lock} />,
                 label: stringGetter({ key: STRING_KEYS.MULTI_FACTOR_AUTH }),
                 onSelect: () => showMfaEnrollmentModal(),
-              },
-            ]
-          : []),
-        // TODO: Needs discussion and update copy & icons if confirmed
-        // Potentially only show if user has ever done a funkit checkout before
-        ...(isMainnet && onboardingState === OnboardingState.AccountConnected
-          ? [
-              {
-                value: 'InstantDepositHistory',
-                icon:
-                  theme === AppTheme.Light ? (
-                    <Icon iconName={IconName.History} />
-                  ) : (
-                    <Icon iconName={IconName.History} />
-                  ),
-                label: '[TBD] Fun.xyz deposit history',
-                onSelect: () => openFunkitAccountModal?.(SelectedHomeTab.CHECKOUTS),
               },
             ]
           : []),
