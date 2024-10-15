@@ -170,7 +170,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'combinedPnl',
         getCellValue: (row) => row.unrealizedPnl?.current,
         label: stringGetter({ key: STRING_KEYS.PNL }),
-        hideOnBreakpoint: MediaQueryKeys.isNotTablet && !uiRefresh, // xcxc
+        hideOnBreakpoint: uiRefresh ? undefined : MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => {
           return uiRefresh ? (
             <TableCell>
@@ -226,7 +226,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'leverage',
         getCellValue: (row) => row.leverage?.current,
         label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
-        hideOnBreakpoint: MediaQueryKeys.isMobile, // xcxc
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ leverage }) => (
           <TableCell>
             <Output type={OutputType.Multiple} value={leverage.current} showSign={ShowSign.None} />
@@ -237,7 +237,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'type',
         getCellValue: (row) => getMarginModeFromSubaccountNumber(row.childSubaccountNumber).name,
         label: stringGetter({ key: STRING_KEYS.TYPE }),
-        hideOnBreakpoint: MediaQueryKeys.isMobile, // xcxc
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ childSubaccountNumber }) => (
           <TableCell>
             <Tag>{getMarginModeFromSubaccountNumber(childSubaccountNumber).name}</Tag>
@@ -281,7 +281,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'value',
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.VALUE }),
-        hideOnBreakpoint: MediaQueryKeys.isMobile, // xcxc
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ displayId, asset, leverage, notionalTotal }) => {
           return uiRefresh ? (
             <TableCell>
@@ -309,7 +309,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'averageOpen',
         getCellValue: (row) => row.entryPrice?.current,
         label: stringGetter({ key: STRING_KEYS.AVG_OPEN }),
-        hideOnBreakpoint: MediaQueryKeys.isMobile, // xcxc
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
         renderCell: ({ entryPrice, tickSizeDecimals }) => (
           <TableCell>
