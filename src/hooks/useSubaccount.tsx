@@ -1047,6 +1047,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   return {
+    // client
+    subaccountClient,
+
     // Deposit/Withdraw/Faucet Methods
     deposit,
     withdraw,
