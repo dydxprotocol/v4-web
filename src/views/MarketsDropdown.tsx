@@ -34,6 +34,7 @@ import { Toolbar } from '@/components/Toolbar';
 
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
+import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
@@ -292,12 +293,9 @@ export const MarketsDropdown = memo(
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key !== '/' || !event.target) return;
 
-        const target = event.target as HTMLElement;
-        const targetTagName = target.tagName?.toLowerCase();
-        const isTypingInInput =
-          targetTagName === 'input' || targetTagName === 'textarea' || target.isContentEditable;
+        const isTextInput = elementIsTextInput(event.target as HTMLElement);
 
-        if (!isTypingInInput) {
+        if (!isTextInput) {
           event.preventDefault();
           setIsOpen(true);
         }
