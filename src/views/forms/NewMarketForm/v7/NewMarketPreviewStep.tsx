@@ -8,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -46,6 +47,7 @@ export const NewMarketPreviewStep = ({
   const [showAgreement, setShowAgreement] = useState(false);
   const baseAsset = getDisplayableAssetFromTicker(ticker);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
+  const { createPermissionlessMarket } = useSubaccount();
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -161,9 +163,12 @@ export const NewMarketPreviewStep = ({
           setErrorMessage(undefined);
 
           try {
+            const response = await createPermissionlessMarket(ticker);
+            // eslint-disable-next-line no-console
+            console.log('debug:createPermissionlessMarket', response);
             onSuccess(ticker);
           } catch (error) {
-            log('NewMarketPreviewForm/submitNewMarketProposal', error);
+            log('NewMarketPreviewForm/createPermissionlessMarket', error);
             setErrorMessage(error.message);
           } finally {
             setIsLoading(false);
