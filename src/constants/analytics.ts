@@ -73,6 +73,9 @@ export const AnalyticsUserProperties = unionize(
     // Account
     DydxAddress: ofType<DydxAddress | null>(),
     SubaccountNumber: ofType<number | null>(),
+
+    // Affiliate
+    AffiliateAddress: ofType<string | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -90,6 +93,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   WalletAddress: 'walletAddress',
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
+  AffiliateAddress: 'affiliateAddress',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
@@ -349,6 +353,9 @@ export const AnalyticsEvents = unionize(
       submissionTimeTotal: number;
     }>(),
     VaultOperationProtocolError: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW' }>(),
+
+    // Affiliate
+    AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

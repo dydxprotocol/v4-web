@@ -1,11 +1,12 @@
 import { css } from 'styled-components';
 import { styled } from 'twin.macro';
 
-import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
+import { AFFILIATES_FEE_DISCOUNT, DEFAULT_AFFILIATES_EARN_PER_MONTH } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -26,12 +27,18 @@ export const AffiliatesBanner = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { affiliateProgram } = useURLConfigs();
-
+  const {
+    affiliateMaxEarningQuery: { data: maxEarningData },
+  } = useAffiliatesInfo();
   const background = useAppSelector(getGridBackground);
 
   const titleString = stringGetter({
     key: STRING_KEYS.EARN_FOR_EACH_TRADER,
-    params: { AMOUNT_USD: AFFILIATES_EARN_PER_MONTH.toLocaleString() },
+    params: {
+      AMOUNT_USD:
+        maxEarningData?.maxEarning.toLocaleString() ??
+        DEFAULT_AFFILIATES_EARN_PER_MONTH.toLocaleString(),
+    },
   });
 
   const description = (

@@ -24,7 +24,7 @@ import type {
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
-import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -50,6 +50,7 @@ import {
 
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { track } from '@/lib/analytics/analytics';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -945,6 +946,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       mutationFn: async (affiliate: string) => {
         const tx = await registerAffiliate(affiliate);
         dispatch(removeLatestReferrer());
+        track(AnalyticsEvents.AffiliateRegistration({ affiliateAddress: affiliate }));
         return tx;
       },
     });
