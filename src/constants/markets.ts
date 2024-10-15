@@ -39,7 +39,7 @@ export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
   PREDICTION_MARKET = 'Prediction Market',
-  // FX = 'FX',
+  FX = 'fiat',
   LAYER_1 = 'layer-1',
   LAYER_2 = 'layer-2',
   DEFI = 'defi',
@@ -87,6 +87,9 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.GAMING]: {
     label: STRING_KEYS.GAMING,
+  },
+  [MarketFilters.FX]: {
+    label: STRING_KEYS.FOREX,
   },
   [MarketFilters.PREDICTION_MARKET]: {
     label: STRING_KEYS.PREDICTION_MARKET,

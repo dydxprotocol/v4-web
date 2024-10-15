@@ -37,6 +37,9 @@ const filterFunctions = {
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
   },
+  [MarketFilters.FX]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.FX);
+  },
   [MarketFilters.GAMING]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.GAMING);
   },
