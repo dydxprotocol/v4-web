@@ -735,6 +735,22 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, localDydxWallet, newMarketProposal]
   );
 
+  // ------ Listing Method ------ //
+  const createPermissionlessMarket = useCallback(
+    async (ticker: string) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      } else if (!subaccountClient?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const response = await compositeClient.createMarketPermissionless(subaccountClient, ticker);
+
+      return response;
+    },
+    [compositeClient, subaccountClient]
+  );
+
   // ------ Staking Methods ------ //
   const delegate = useCallback(
     async (validator: string, amount: number) => {
@@ -1050,6 +1066,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Governance Methods
     submitNewMarketProposal,
+
+    // Listing Methods
+    createPermissionlessMarket,
 
     // Staking methods
     delegate,
