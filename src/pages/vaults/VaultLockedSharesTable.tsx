@@ -79,9 +79,8 @@ const VaultLockedSharesTable = ({
             const estimatedUnlockMs = mapIfPresent(
               unlockBlockHeight,
               height,
-              // add a day so users don't get confused day of about why their money isn't unlocked
-              (unblock, actual) =>
-                new Date().valueOf() + (unblock - actual) * 1000 + timeUnits.hour * 24
+              // add a day so users don't get confused about why their money isn't unlocked when the day arrives
+              (unblock, actual) => new Date().valueOf() + (unblock - actual) * 1000 + timeUnits.day
             );
             return (
               <Output
