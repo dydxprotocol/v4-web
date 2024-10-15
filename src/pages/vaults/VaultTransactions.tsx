@@ -8,14 +8,19 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useLoadedVaultAccountTransfers } from '@/hooks/vaultsHooks';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { truncateAddress } from '@/lib/wallet';
 
 export const VaultTransactionsCard = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -59,59 +64,81 @@ export const VaultTransactionsTable = ({
   className,
   withOuterBorders,
   emptyString,
+  withTxHashLink,
 }: {
   className?: string;
   withOuterBorders?: boolean;
   emptyString?: string;
+  withTxHashLink?: boolean;
 }) => {
   const stringGetter = useStringGetter();
   const transactions = useLoadedVaultAccountTransfers() ?? EMPTY_ARR;
+  const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const columns = useMemo<ColumnDef<VaultTransfer>[]>(
     () =>
-      [
-        {
-          columnKey: 'time',
-          getCellValue: (row) => row.timestampMs,
-          label: stringGetter({ key: STRING_KEYS.TIME }),
-          renderCell: ({ timestampMs }) => (
-            <div tw="column">
-              <Output
-                value={timestampMs}
-                type={OutputType.Date}
-                dateOptions={{ format: 'medium' }}
-              />
-              <div tw="text-[0.75rem] leading-[0.7rem] text-color-text-0">
-                <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
+      (
+        [
+          {
+            columnKey: 'time',
+            getCellValue: (row) => row.timestampMs,
+            label: stringGetter({ key: STRING_KEYS.TIME }),
+            renderCell: ({ timestampMs }) => (
+              <div tw="column">
+                <Output
+                  value={timestampMs}
+                  type={OutputType.Date}
+                  dateOptions={{ format: 'medium' }}
+                />
+                <div tw="text-[0.75rem] leading-[0.7rem] text-color-text-0">
+                  <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
+                </div>
               </div>
-            </div>
-          ),
-        },
-        {
-          columnKey: 'action',
-          getCellValue: (row) => row.type?.name,
-          label: stringGetter({ key: STRING_KEYS.ACTION }),
-          renderCell: ({ type }) => (
-            <Output
-              value={
-                type?.name === 'DEPOSIT'
-                  ? stringGetter({ key: STRING_KEYS.DEPOSIT })
-                  : type?.name === 'WITHDRAWAL'
-                    ? stringGetter({ key: STRING_KEYS.WITHDRAW })
-                    : undefined
-              }
-              type={OutputType.Text}
-            />
-          ),
-        },
-        {
-          columnKey: 'amount',
-          getCellValue: (row) => row.amountUsdc,
-          label: stringGetter({ key: STRING_KEYS.AMOUNT }),
-          renderCell: ({ amountUsdc }) => <Output value={amountUsdc} type={OutputType.Fiat} />,
-        },
-      ] satisfies ColumnDef<VaultTransfer>[],
-    [stringGetter]
+            ),
+          },
+          {
+            columnKey: 'action',
+            getCellValue: (row) => row.type?.name,
+            label: stringGetter({ key: STRING_KEYS.ACTION }),
+            renderCell: ({ type }) => (
+              <Output
+                value={
+                  type?.name === 'DEPOSIT'
+                    ? stringGetter({ key: STRING_KEYS.DEPOSIT })
+                    : type?.name === 'WITHDRAWAL'
+                      ? stringGetter({ key: STRING_KEYS.WITHDRAW })
+                      : undefined
+                }
+                type={OutputType.Text}
+              />
+            ),
+          },
+          {
+            columnKey: 'amount',
+            getCellValue: (row) => row.amountUsdc,
+            label: stringGetter({ key: STRING_KEYS.AMOUNT }),
+            renderCell: ({ amountUsdc }) => <Output value={amountUsdc} type={OutputType.Fiat} />,
+          },
+          withTxHashLink && {
+            columnKey: 'tx-hash',
+            getCellValue: (row) => row.transactionHash,
+            label: stringGetter({ key: STRING_KEYS.TRANSACTION }),
+            renderCell: ({ transactionHash }) =>
+              transactionHash ? (
+                <Link
+                  withIcon
+                  href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
+                  tw="justify-end"
+                >
+                  {truncateAddress(transactionHash, '')}
+                </Link>
+              ) : (
+                '-'
+              ),
+          },
+        ] satisfies Array<ColumnDef<VaultTransfer> | false | undefined>
+      ).filter(isTruthy),
+    [mintscanTxUrl, stringGetter, withTxHashLink]
   );
   return (
     <$Table
