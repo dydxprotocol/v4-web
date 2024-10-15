@@ -211,6 +211,7 @@ export const AnalyticsEvents = unionize(
       estimatedRouteDuration?: number;
       toAmount?: number;
       toAmountMin?: number;
+      isFunkit?: boolean;
     }>(),
     TransferWithdraw: ofType<{
       chainId?: string;
