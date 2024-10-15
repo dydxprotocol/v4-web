@@ -1,7 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
-import { REF_SHARE_VOLUME_CAP } from '@/constants/affiliates';
+import {
+  DEFAULT_MAX_AFFILIATE_SHARE,
+  DEFAULT_TAKER_3_FEE,
+  MAX_AFFILIATE_VIP_SHARE,
+  REF_SHARE_VOLUME_CAP,
+} from '@/constants/affiliates';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
@@ -15,8 +20,6 @@ type AffiliatesMetadata = {
   isVolumeEligible: boolean;
   isAffiliate: boolean;
 };
-
-const DEFAULT_TAKER_3_FEE = 0.0004;
 
 export const useAffiliatesInfo = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo, getAllAffiliateTiers } = useDydxClient();
@@ -56,15 +59,14 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   const fetchAffiliateMaxEarning = async () => {
     const taker3FeeTier = feeTiers?.[2].taker ?? DEFAULT_TAKER_3_FEE;
     const allAffiliateTiers = await getAllAffiliateTiers();
-    let maxRevshare = 0.15;
-    const maxVipRevshare = 0.5;
+    let maxRevshare = DEFAULT_MAX_AFFILIATE_SHARE;
     if (allAffiliateTiers?.tiers?.tiers?.length) {
       const lastTier = allAffiliateTiers.tiers.tiers[allAffiliateTiers.tiers.tiers.length - 1];
       maxRevshare = lastTier.takerFeeSharePpm / 1_000_000;
     }
 
     const maxEarning = taker3FeeTier * maxRevshare * REF_SHARE_VOLUME_CAP;
-    const maxVipEarning = taker3FeeTier * maxVipRevshare * REF_SHARE_VOLUME_CAP;
+    const maxVipEarning = taker3FeeTier * MAX_AFFILIATE_VIP_SHARE * REF_SHARE_VOLUME_CAP;
     return { maxEarning, maxVipEarning };
   };
 
