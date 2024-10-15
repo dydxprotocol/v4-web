@@ -58,11 +58,10 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
   const fetchAffiliateMaxEarning = async () => {
     const allAffiliateTiers = await getAllAffiliateTiers();
-    let maxRevshare = DEFAULT_MAX_AFFILIATE_SHARE;
     const lastTier = allAffiliateTiers?.at(-1);
-    if (lastTier) {
-      maxRevshare = lastTier.takerFeeSharePpm / 1_000_000;
-    }
+    const maxRevshare = lastTier
+      ? lastTier.takerFeeSharePpm / 1_000_000
+      : DEFAULT_MAX_AFFILIATE_SHARE;
     const taker3FeeTier = feeTiers?.[2].taker ?? DEFAULT_TAKER_3_FEE;
 
     const maxEarning = taker3FeeTier * maxRevshare * REF_SHARE_VOLUME_CAP_USD;
