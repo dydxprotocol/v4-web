@@ -59,13 +59,13 @@ export const getMapOfLowestFeeTokensByChainId = (type: NullableTransferType) =>
 export const getMapOfHighestFeeTokensByChainId = (type: NullableTransferType) =>
   getMapOfChainsByChainId(getHighestFeeChains(type));
 
-export const cctpTokensByDenom = cctpTokens.reduce(
+export const cctpTokensByDenomLowerCased = cctpTokens.reduce(
   (acc, token) => {
-    const upperCasedAddress = token.tokenAddress.toUpperCase();
-    if (!acc[upperCasedAddress]) {
-      acc[upperCasedAddress] = [];
+    const lowerCasedAddress = token.tokenAddress.toLowerCase();
+    if (!acc[lowerCasedAddress]) {
+      acc[lowerCasedAddress] = [];
     }
-    acc[upperCasedAddress].push(token);
+    acc[lowerCasedAddress].push(token);
     return acc;
   },
   {} as Record<string, CctpTokenInfo[]>
@@ -88,5 +88,5 @@ export const isTokenCctp = (token: Asset | undefined) => {
 
 const isDenomCctp = (denom: string | undefined) => {
   if (!denom) return false;
-  return Boolean(cctpTokensByDenom[denom.toUpperCase()]);
+  return Boolean(cctpTokensByDenomLowerCased[denom.toLowerCase()]);
 };
