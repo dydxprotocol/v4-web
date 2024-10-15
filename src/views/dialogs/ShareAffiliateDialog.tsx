@@ -1,7 +1,11 @@
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
-import { AFFILIATES_FEE_DISCOUNT, DEFAULT_AFFILIATES_EARN_PER_MONTH } from '@/constants/affiliates';
+import {
+  AFFILIATES_FEE_DISCOUNT,
+  DEFAULT_AFFILIATES_EARN_PER_MONTH,
+  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH,
+} from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -76,7 +80,8 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         params: {
           AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT.toLocaleString(),
           VIP_AMOUNT_USD:
-            maxVipEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH.toLocaleString(),
+            maxVipEarning?.toLocaleString() ??
+            DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH.toLocaleString(),
           AMOUNT_PER_MONTH:
             maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH.toLocaleString(),
           LEARN_MORE_LINK: (
