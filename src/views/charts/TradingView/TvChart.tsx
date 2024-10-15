@@ -78,10 +78,10 @@ export const TvChart = () => {
     buySellMarksToggleOn,
   } = useTradingViewToggles();
 
-  const { datafeed, resetCache } = useTradingViewDatafeed({
+  const { datafeed, resetCache } = useTradingViewDatafeed(
     orderbookCandlesToggleOn,
-    tickSizeDecimals,
-  });
+    tickSizeDecimals
+  );
 
   const { savedResolution } = useTradingView({
     tvWidgetRef,
