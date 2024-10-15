@@ -47,8 +47,6 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
       />
     ) : undefined;
 
-  console.log(isUnlaunched);
-
   return (
     <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={symbol} />}>
       <$TableCellContent stacked={stacked}>
