@@ -1,6 +1,6 @@
 import { Asset } from '@skip-go/client';
 
-import { ConnectorType, WalletInfo } from '@/constants/wallets';
+import { WalletNetworkType } from '@/constants/wallets';
 
 import { isNativeDenom } from '@/lib/assetUtils';
 
@@ -11,7 +11,7 @@ export enum TransferType {
   Withdraw = 'WITHDRAW',
 }
 
-export type NetworkType = 'evm' | 'svm' | 'cosmos' | 'unknown';
+export type NetworkType = 'evm' | 'svm' | 'cosmos';
 
 // TODO: followup with skip about making logoUri an optional property
 const DUMMY_LOGO_URI = 'dummy-logo-uri';
@@ -74,14 +74,16 @@ export const COSMOS_SWAP_VENUES = [
 
 export const SWAP_VENUES = [...UNISWAP_VENUES, ...COSMOS_SWAP_VENUES];
 
-export const getNetworkTypeFromWalletInfo = (connectedWalletInfo?: WalletInfo): NetworkType => {
-  if (connectedWalletInfo?.connectorType === ConnectorType.Injected) {
+export const getNetworkTypeFromWalletNetworkType = (
+  walletNetworkType?: WalletNetworkType
+): NetworkType => {
+  if (walletNetworkType === WalletNetworkType.Evm) {
     return 'evm';
   }
-  if (connectedWalletInfo?.connectorType === ConnectorType.PhantomSolana) {
+  if (walletNetworkType === WalletNetworkType.Solana) {
     return 'svm';
   }
-  if (connectedWalletInfo?.connectorType === ConnectorType.Cosmos) {
+  if (walletNetworkType === WalletNetworkType.Cosmos) {
     return 'cosmos';
   }
   return 'evm';
