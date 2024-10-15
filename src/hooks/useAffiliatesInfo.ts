@@ -33,34 +33,24 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     const totalVolumeEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/total_volume`;
 
     try {
-      const metaDataPromise = fetch(
-        `${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const totalVolumePromise = fetch(
-        `${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const affiliateInfoPromise = getAffiliateInfo(dydxAddress);
-
       const [metaDataResponse, totalVolumeResponse, affiliateInfo] = await Promise.all([
-        metaDataPromise,
-        totalVolumePromise,
-        affiliateInfoPromise,
+        fetch(`${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        fetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        getAffiliateInfo(dydxAddress),
       ]);
 
       const data: AffiliatesMetadata | undefined = await metaDataResponse.json();
-      const totalVolume = await totalVolumeResponse.json();
+      const totalVolume: { totalVolume: number } | undefined = await totalVolumeResponse.json();
       const isEligible = Boolean(data?.isVolumeEligible) || Boolean(affiliateInfo?.isWhitelisted);
 
       return { metadata: data, affiliateInfo, isEligible, totalVolume: totalVolume?.totalVolume };
