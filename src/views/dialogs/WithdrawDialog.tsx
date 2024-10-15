@@ -9,7 +9,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
+import { WithdrawForm as WithdrawFormNew } from '@/views/forms/AccountManagementFormsNew/WithdrawForm/WithdrawForm';
 
 export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) => {
   const stringGetter = useStringGetter();
@@ -23,7 +23,8 @@ export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) 
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <$Content>
-        <WithdrawForm />
+        <WithdrawFormNew />
+        {/* <WithdrawForm /> */}
       </$Content>
     </Dialog>
   );
