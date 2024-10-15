@@ -51,7 +51,7 @@ const MarketsDropdownContent = ({
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const { filteredMarkets, marketFilters } = useMarketsData({ filter, searchFilter });
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
@@ -69,6 +69,7 @@ const MarketsDropdownContent = ({
             assetId,
             displayId,
             isNew,
+            isUnlaunched,
             effectiveInitialMarginFraction,
             initialMarginFraction,
           }: MarketData) => (
@@ -77,14 +78,18 @@ const MarketsDropdownContent = ({
               <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
-                <Output
-                  type={OutputType.Multiple}
-                  value={calculateMarketMaxLeverage({
-                    effectiveInitialMarginFraction,
-                    initialMarginFraction,
-                  })}
-                  fractionDigits={0}
-                />
+                {isUnlaunched ? (
+                  stringGetter({ key: STRING_KEYS.LAUNCHABLE })
+                ) : (
+                  <Output
+                    type={OutputType.Multiple}
+                    value={calculateMarketMaxLeverage({
+                      effectiveInitialMarginFraction,
+                      initialMarginFraction,
+                    })}
+                    fractionDigits={0}
+                  />
+                )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
@@ -212,8 +217,8 @@ const MarketsDropdownContent = ({
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
-          initialPageSize={15}
-          paginationBehavior="showAll"
+          initialPageSize={50}
+          paginationBehavior="paginate"
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

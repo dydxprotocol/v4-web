@@ -15,6 +15,7 @@ export type MarketData = {
   effectiveInitialMarginFraction: Nullable<number>;
   initialMarginFraction: Nullable<number>;
   isNew?: boolean;
+  isUnlaunched?: boolean;
   line?: Nullable<number[]>;
   name?: Nullable<string>;
   nextFundingRate?: Nullable<number>;
