@@ -40,6 +40,7 @@ const scrollSnapItem = css`
 // Applies a fade to beginning of a scrollable container. Apply to the parent of layoutMixins.scrollArea
 const scrollAreaFadeStart = css`
   /* Params */
+  --scrollArea-fade-zIndex: 1;
   --scrollArea-fadeWidth: 1.5rem;
 
   /* Rules */
@@ -53,13 +54,14 @@ const scrollAreaFadeStart = css`
     height: 100%;
     width: var(--scrollArea-fadeWidth);
     background: linear-gradient(to left, transparent 10%, var(--color-layer-2));
-    z-index: 1;
+    z-index: var(--scrollArea-fade-zIndex);
   }
 `;
 
 // Applies a fade to end of a scrollable container. Apply to the parent of layoutMixins.scrollArea
 const scrollAreaFadeEnd = css`
   /* Params */
+  --scrollArea-fade-zIndex: 1;
   --scrollArea-fadeWidth: 1.5rem;
 
   /* Rules */
@@ -73,7 +75,7 @@ const scrollAreaFadeEnd = css`
     height: 100%;
     width: var(--scrollArea-fadeWidth);
     background: linear-gradient(to right, transparent 10%, var(--color-layer-2));
-    z-index: 1;
+    z-index: var(--scrollArea-fade-zIndex);
   }
 `;
 
@@ -81,6 +83,16 @@ const scrollAreaFadeEnd = css`
 const scrollAreaFade = css`
   ${scrollAreaFadeStart}
   ${scrollAreaFadeEnd}
+`;
+
+const horizontalFadeScrollArea = css`
+  ${scrollAreaFade}
+
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  transition: opacity 0.3s var(--ease-out-expo);
 `;
 
 // Creates a scrollable container that can contain sticky and/or scroll-snapped descendants.
@@ -523,6 +535,7 @@ export const layoutMixins = {
   scrollAreaFadeStart,
   scrollAreaFadeEnd,
   scrollAreaFade,
+  horizontalFadeScrollArea,
 
   scrollArea,
 
