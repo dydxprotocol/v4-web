@@ -25,6 +25,7 @@ export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
 export type DepositDialogProps = {};
+export type FunkitDepositDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
 export type ExchangeOfflineDialogProps = { preventClose?: boolean };
@@ -107,6 +108,7 @@ export const DialogTypes = unionize(
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
+    FunkitDeposit: ofType<FunkitDepositDialogProps>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
