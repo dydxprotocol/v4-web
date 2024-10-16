@@ -18,7 +18,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
-import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -97,6 +97,7 @@ const getPositionsTableColumnDef = ({
   navigateToOrders,
   isSinglePosition,
   uiRefresh,
+  isTablet,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
@@ -106,6 +107,7 @@ const getPositionsTableColumnDef = ({
   navigateToOrders: (market: string) => void;
   isSinglePosition: boolean;
   uiRefresh: boolean;
+  isTablet: boolean;
 }) => ({
   width,
   ...(
@@ -172,7 +174,7 @@ const getPositionsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.PNL }),
         hideOnBreakpoint: uiRefresh ? undefined : MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => {
-          return uiRefresh ? (
+          return uiRefresh && !isTablet ? (
             <TableCell>
               <$OutputSigned
                 sign={getNumberSign(unrealizedPnl?.current)}
@@ -591,6 +593,7 @@ export const PositionsTable = ({
   const navigate = useNavigate();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
   const { uiRefresh } = testFlags;
+  const { isTablet } = useBreakpoints();
 
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
@@ -659,6 +662,7 @@ export const PositionsTable = ({
           navigateToOrders,
           isSinglePosition: positionsData.length === 1,
           uiRefresh,
+          isTablet,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
