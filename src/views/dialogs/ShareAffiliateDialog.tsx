@@ -1,7 +1,12 @@
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
-import { AFFILIATES_EARN_PER_MONTH, AFFILIATES_FEE_DISCOUNT } from '@/constants/affiliates';
+import {
+  AFFILIATES_FEE_DISCOUNT_USD,
+  AFFILIATES_REQUIRED_VOLUME_USD,
+  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
+  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
+} from '@/constants/affiliates';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -34,7 +39,13 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
   const { dydxAddress } = useAccounts();
-  const { data } = useAffiliatesInfo(dydxAddress as string);
+  const {
+    affiliateMetadataQuery: { data },
+    affiliateMaxEarningQuery: { data: maxEarningData },
+  } = useAffiliatesInfo(dydxAddress as string);
+
+  const maxEarning = maxEarningData?.maxEarning;
+  const maxVipEarning = maxEarningData?.maxVipEarning;
 
   const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -50,7 +61,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         text: `${stringGetter({
           key: STRING_KEYS.TWEET_SHARE_AFFILIATES,
           params: {
-            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT,
+            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
           },
         })}\n\n${affiliatesUrl}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
@@ -68,9 +79,12 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       description={stringGetter({
         key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
         params: {
-          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT,
-          VIP_AMOUNT_USD: AFFILIATES_EARN_PER_MONTH,
-          AMOUNT_PER_MONTH: AFFILIATES_EARN_PER_MONTH,
+          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
+          VIP_AMOUNT_USD:
+            maxVipEarning?.toLocaleString() ??
+            DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString(),
+          AMOUNT_PER_MONTH:
+            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
           LEARN_MORE_LINK: (
             <Link href={affiliateProgram} isInline>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
@@ -88,8 +102,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 : stringGetter({
                     key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
                     params: {
-                      // TODO: make this configurable or get from API
-                      AMOUNT_USD: '10K',
+                      AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
                     },
                   })}
             </div>
@@ -99,8 +112,9 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 : stringGetter({
                     key: STRING_KEYS.YOUVE_TRADED,
                     params: {
-                      // TODO: get the actual amount from the API
-                      AMOUNT_USD: '5K',
+                      AMOUNT_USD: data?.totalVolume
+                        ? Math.floor(data.totalVolume).toLocaleString()
+                        : '0',
                     },
                   })}
             </div>
