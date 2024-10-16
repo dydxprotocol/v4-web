@@ -3,9 +3,12 @@ import { datadogLogs } from '@datadog/browser-logs';
 import { CURRENT_MODE } from '@/constants/networks';
 
 const CLIENT_TOKEN = import.meta.env.VITE_DATADOG_CLIENT_TOKEN;
+const PROXY_URL = import.meta.env.VITE_DATADOG_PROXY_URL;
 const SERVICE_NAME = 'v4-web';
 const LOGGER_NAME = 'v4-web';
 const SITE_NAME = 'datadoghq.com';
+
+const LOG_ENDPOINT_PATH = (PROXY_URL ?? '').endsWith('/') ? 'api/v2/logs' : '/api/v2/logs';
 
 if (CLIENT_TOKEN) {
   datadogLogs.init({
@@ -15,7 +18,7 @@ if (CLIENT_TOKEN) {
     forwardErrorsToLogs: true,
     sessionSampleRate: 100,
     env: CURRENT_MODE,
-    proxy: import.meta.env.VITE_DATADOG_PROXY_URL,
+    proxy: PROXY_URL ? `${PROXY_URL}${LOG_ENDPOINT_PATH}` : undefined,
   });
 }
 
