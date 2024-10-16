@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 
 import { groupBy } from 'lodash';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationStatus, type Notification } from '@/constants/notifications';
 
@@ -14,8 +16,12 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Notification as NotificationCard } from '@/components/Notification';
 import { Toolbar } from '@/components/Toolbar';
+
+import { openDialog } from '@/state/dialogs';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -49,6 +55,8 @@ export const NotificationsMenu = ({
 
     hasUnreadNotifications,
   } = useNotifications();
+
+  const dispatch = useDispatch();
 
   const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
     () =>
@@ -125,7 +133,16 @@ export const NotificationsMenu = ({
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
       items={items}
-      title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
+      title={
+        <div tw="flex items-center justify-between">
+          {stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}{' '}
+          <IconButton
+            iconName={IconName.Gear}
+            onClick={() => dispatch(openDialog(DialogTypes.Preferences()))}
+            fullIcon
+          />
+        </div>
+      }
       slotTrigger={
         <div tw="stack">
           {slotTrigger}

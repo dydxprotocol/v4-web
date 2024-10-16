@@ -240,15 +240,18 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
+  const showNewFilter = markets.some((market) => market.isNew);
+
   const marketFilters = useMemo(
-    () => [
-      MarketFilters.ALL,
-      MarketFilters.NEW,
-      ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-        markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
-      ),
-    ],
-    [markets]
+    () =>
+      [
+        MarketFilters.ALL,
+        showNewFilter ? MarketFilters.NEW : null,
+        ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
+          markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
+        ),
+      ].filter(isTruthy),
+    [markets, showNewFilter]
   );
 
   return { marketFilters, filteredMarkets, markets };
