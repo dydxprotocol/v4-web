@@ -78,7 +78,7 @@ export const AccountInfoConnectedState = () => {
             <>
               <$Button
                 state={{ isDisabled: !dydxAccounts }}
-                onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+                onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
                 shape={ButtonShape.Rectangle}
                 size={ButtonSize.XSmall}
               >

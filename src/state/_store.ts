@@ -10,7 +10,6 @@ import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
-import { depositSlice } from './deposit';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
 import { inputsSlice } from './inputs';
@@ -31,7 +30,6 @@ const reducers = {
   app: appSlice.reducer,
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
-  deposit: depositSlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
   inputs: inputsSlice.reducer,

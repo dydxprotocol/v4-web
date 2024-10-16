@@ -24,7 +24,9 @@ export type ComplianceConfigDialogProps = {};
 export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
-export type DepositDialogProps = {};
+export type DepositDialogProps = {
+  depositType?: 'funkit' | 'standard';
+};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
 export type ExchangeOfflineDialogProps = { preventClose?: boolean };

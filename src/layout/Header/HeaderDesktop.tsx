@@ -217,7 +217,7 @@ export const HeaderDesktop = () => {
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+              onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Button>

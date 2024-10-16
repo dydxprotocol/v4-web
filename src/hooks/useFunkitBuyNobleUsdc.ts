@@ -8,7 +8,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme, AppThemeSetting } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
-import { DepositType, setDepositType } from '@/state/deposit';
 import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
@@ -34,8 +33,7 @@ export function useFunkitBuyNobleUsdc() {
         track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
       },
       onDydxSwitch: () => {
-        dispatch(setDepositType(DepositType.Standard));
-        dispatch(openDialog(DialogTypes.Deposit()));
+        dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
       },
     }),
     [dispatch]

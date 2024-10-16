@@ -71,8 +71,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getOnboardingGuards } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { DepositType, resetDepositType } from '@/state/deposit';
-import { getDepositType } from '@/state/depositSelectors';
 import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -189,17 +187,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const balanceBN = MustBigNumber(balance);
 
   // Funkit Deposit
-  const depositType = useAppSelector(getDepositType);
   const startCheckout = useFunkitBuyNobleUsdc();
-  useEffect(() => {
-    if (depositType === DepositType.Funkit) {
-      dispatch(closeDialog());
-      startCheckout();
-    }
-    return () => {
-      dispatch(resetDepositType());
-    };
-  }, []);
 
   useEffect(() => {
     setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);
@@ -755,7 +743,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }
   return (
     <$Form onSubmit={onSubmit}>
-      <FunkitToggle onToggle={() => dispatch(forceOpenDialog(DialogTypes.FunkitDeposit()))} />
+      <FunkitToggle
+        onToggle={() => {
+          dispatch(closeDialog());
+          startCheckout();
+        }}
+      />
       <div tw="text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
