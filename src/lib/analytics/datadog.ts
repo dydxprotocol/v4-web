@@ -8,7 +8,7 @@ const SERVICE_NAME = 'v4-web';
 const LOGGER_NAME = 'v4-web';
 const SITE_NAME = 'datadoghq.com';
 
-const LOG_ENDPOINT_PATH = (PROXY_URL ?? '').endsWith('/') ? '/api/v2/logs' : 'api/v2/logs';
+const LOG_ENDPOINT_PATH = (PROXY_URL ?? '').endsWith('/') ? 'api/v2/logs' : '/api/v2/logs';
 
 if (CLIENT_TOKEN) {
   datadogLogs.init({
