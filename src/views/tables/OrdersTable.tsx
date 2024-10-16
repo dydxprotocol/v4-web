@@ -29,7 +29,7 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
-import { TagSize } from '@/components/Tag';
+import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
@@ -351,7 +351,7 @@ const getOrdersTableColumnDef = ({
             marginMode === AbacusMarginMode.Cross
               ? stringGetter({ key: STRING_KEYS.CROSS })
               : stringGetter({ key: STRING_KEYS.ISOLATED });
-          return <Output type={OutputType.Text} value={marginModeLabel} />;
+          return <Tag> {marginModeLabel} </Tag>;
         },
       },
     } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>

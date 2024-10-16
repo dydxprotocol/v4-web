@@ -1035,5 +1035,5 @@ const $Row = styled.div<{ uiRefreshEnabled: boolean }>`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
 
-  gap: ${({ uiRefreshEnabled }) => (uiRefreshEnabled ? css`0.25ch;` : css`0.5ch`)};
+  gap: ${({ uiRefreshEnabled }) => (uiRefreshEnabled ? css`0.33ch;` : css`0.5ch`)};
 `;
