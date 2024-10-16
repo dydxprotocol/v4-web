@@ -63,16 +63,17 @@ export function useForceRefreshVaultDetails() {
   );
 }
 
+const toProcessedHistoricalPnlResponse = (res: any) =>
+  VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(res));
+
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
-      const toTyped = (res: any) =>
-        VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(res));
       const [dailyResult, hourlyResult] = await Promise.all([
-        getMegavaultHistoricalPnl().then(toTyped),
-        getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toTyped),
+        getMegavaultHistoricalPnl(PnlTickInterval.day).then(toProcessedHistoricalPnlResponse),
+        getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
       ]);
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
