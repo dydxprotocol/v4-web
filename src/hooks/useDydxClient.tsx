@@ -504,6 +504,11 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getAllAffiliateTiers = useCallback(async () => {
+    const tiers = await compositeClient?.validatorClient.get.getAllAffiliateTiers();
+    return tiers?.tiers?.tiers;
+  }, [compositeClient]);
+
   const getReferredBy = useCallback(
     async (address: string) => {
       return compositeClient?.validatorClient.get.getReferredBy(address);
@@ -542,6 +547,7 @@ const useDydxClientContext = () => {
     getValidators,
     getAccountBalance,
     getAffiliateInfo,
+    getAllAffiliateTiers,
     getReferredBy,
 
     // vault methods

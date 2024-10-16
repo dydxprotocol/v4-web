@@ -25,6 +25,7 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
+import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useAllStatsigGateValues } from './useStatsig';
 
@@ -258,4 +259,12 @@ export const useAnalytics = () => {
       setHasSelectedOrderTypeChanged(true);
     }
   }, [selectedOrderType]);
+
+  const { data: referredBy, isFetched: isReferredByFetched } = useReferredBy();
+
+  useEffect(() => {
+    if (isReferredByFetched && referredBy) {
+      identify(AnalyticsUserProperties.AffiliateAddress(referredBy.affiliateAddress ?? null));
+    }
+  }, [isReferredByFetched, referredBy]);
 };
