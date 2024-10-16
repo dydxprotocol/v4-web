@@ -68,13 +68,13 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.MEME,
   },
   [MarketFilters.AI]: {
-    label: STRING_KEYS.AI,
+    label: STRING_KEYS.AI_BIG_DATA,
   },
   [MarketFilters.DEFI]: {
     label: STRING_KEYS.DEFI,
   },
   [MarketFilters.DEPIN]: {
-    label: undefined,
+    label: STRING_KEYS.DEPIN,
   },
   [MarketFilters.LAYER_1]: {
     label: STRING_KEYS.LAYER_1,
