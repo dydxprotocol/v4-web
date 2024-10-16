@@ -59,7 +59,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
                 role="button"
                 onClick={() =>
-                  asset != null &&
+                  marketId != null &&
+                  marketsData[marketId] != null &&
                   navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
                 }
               >
