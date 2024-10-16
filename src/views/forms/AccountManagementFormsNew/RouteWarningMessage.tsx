@@ -45,7 +45,6 @@ export const RouteWarningMessage = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeWarning?.message, routeWarning?.type]);
   if (!warningMessage || !acknowledgementMessageStringKey) {
-    setHasAcknowledged(false);
     return null;
   }
 
