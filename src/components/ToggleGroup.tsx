@@ -118,7 +118,7 @@ const $HorizontalScrollContainer = styled.div<{
   showFadeStart: boolean;
   showFadeEnd: boolean;
 }>`
-  ${layoutMixins.horizontalFadeScrollArea}
+  /* ${layoutMixins.horizontalFadeScrollArea}
 
   ${({ showFadeStart }) =>
     !showFadeStart &&
@@ -134,5 +134,5 @@ const $HorizontalScrollContainer = styled.div<{
       &:after {
         opacity: 0;
       }
-    `};
+    `}; */
 `;
