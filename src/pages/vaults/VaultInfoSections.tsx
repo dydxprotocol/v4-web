@@ -131,7 +131,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
       value: (
         <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
-          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />
+          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} fractionDigits={0} />
         </$ColoredReturn>
       ),
     },

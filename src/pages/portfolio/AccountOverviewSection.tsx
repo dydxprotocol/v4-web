@@ -49,7 +49,12 @@ export const MegavaultYieldTag = () => {
         key: STRING_KEYS.APR,
         params: {
           PERCENT: (
-            <Output tw="mr-0.25" type={OutputType.Percent} value={vault?.thirtyDayReturnPercent} />
+            <Output
+              tw="mr-0.25"
+              type={OutputType.Percent}
+              value={vault?.thirtyDayReturnPercent}
+              fractionDigits={0}
+            />
           ),
         },
       })}
