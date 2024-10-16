@@ -203,7 +203,11 @@ export const useLoadedVaultAccount = () => {
         return wrapNullable(undefined);
       }
       const [acc, transfers] = await Promise.all([
-        getVaultAccountInfo(),
+        getVaultAccountInfo().then(
+          (a) => a,
+          // error is an expected result of this call when user has no balance
+          () => undefined
+        ),
         getAllAccountTransfersBetween(dydxAddress, '0', MEGAVAULT_MODULE_ADDRESS, '0'),
       ]);
 
@@ -214,7 +218,7 @@ export const useLoadedVaultAccount = () => {
         safeStringifyForAbacusParsing(transfers)
       );
 
-      if (parsedAccount == null || parsedTransfers == null) {
+      if (parsedTransfers == null) {
         return wrapNullable(undefined);
       }
       return wrapNullable(
