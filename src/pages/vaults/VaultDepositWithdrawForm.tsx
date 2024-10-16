@@ -56,6 +56,7 @@ import {
   setVaultFormConfirmationStep,
   setVaultFormOperation,
   setVaultFormSlippageAck,
+  setVaultFormTermsAck,
 } from '@/state/vaults';
 
 import { track } from '@/lib/analytics/analytics';
@@ -87,9 +88,10 @@ export const VaultDepositWithdrawForm = ({
 }: VaultDepositWithdrawFormProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { vaultsLearnMore } = useURLConfigs();
+  const { vaultsLearnMore, vaultTos } = useURLConfigs();
 
-  const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
+  const { amount, confirmationStep, slippageAck, termsAck, operation } =
+    useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
 
   const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
@@ -669,6 +671,31 @@ export const VaultDepositWithdrawForm = ({
                 key: STRING_KEYS.SLIPPAGE_ACK,
                 params: {
                   AMOUNT: <$InlineOutput type={OutputType.Percent} value={slippagePercent} />,
+                },
+              })}
+            </span>
+          }
+        />
+      )}
+
+      {validationResponse?.summaryData.needTermsAck && (
+        <Checkbox
+          checked={termsAck}
+          onCheckedChange={(checked) => dispatch(setVaultFormTermsAck(checked))}
+          id="terms-ack"
+          label={
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
+                params: {
+                  CONFIRM_BUTTON_TEXT: inputFormConfig.buttonLabel,
+                  LINK: (
+                    <Link isInline withIcon href={vaultTos}>
+                      {stringGetter({
+                        key: STRING_KEYS.MEGAVAULT_TERMS_LINK_TEXT,
+                      })}
+                    </Link>
+                  ),
                 },
               })}
             </span>

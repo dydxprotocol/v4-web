@@ -305,7 +305,7 @@ export const useVaultFormSlippage = () => {
 };
 
 export const useVaultFormValidationResponse = () => {
-  const { operation, slippageAck, confirmationStep } = useAppSelector(
+  const { operation, slippageAck, termsAck, confirmationStep } = useAppSelector(
     selectVaultFormStateExceptAmount
   );
   const accountInfo = useAppSelector(selectSubaccountStateForVaults);
@@ -319,9 +319,10 @@ export const useVaultFormValidationResponse = () => {
         operationStringToVaultFormAction(operation),
         amount != null && amount.trim().length > 0 ? MustBigNumber(amount).toNumber() : undefined,
         slippageAck,
+        termsAck,
         confirmationStep
       ),
-    [operation, amount, slippageAck, confirmationStep]
+    [operation, amount, slippageAck, termsAck, confirmationStep]
   );
   const vaultFormAccountInfo = useMemo(
     () =>
