@@ -2,6 +2,7 @@ import { Asset } from '@skip-go/client';
 
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
+import { TransferType as NewTransferType } from './transfers';
 
 export type CctpTokenInfo = {
   chainId: string;
@@ -34,8 +35,10 @@ export const getMapOfLowestFeeTokensByDenom = (type: NullableTransferType) =>
     (acc, token) => {
       if (!acc[token.tokenAddress]) {
         acc[token.tokenAddress] = [];
+        acc[token.tokenAddress.toLowerCase()] = [];
       }
       acc[token.tokenAddress]!.push(token);
+      acc[token.tokenAddress.toLowerCase()]!.push(token);
       return acc;
     },
     {} as Record<string, CctpTokenInfo[]>
@@ -53,11 +56,42 @@ const getMapOfChainsByChainId = (chains: CctpTokenInfo[]) =>
     {} as Record<string, CctpTokenInfo[]>
   );
 
+// TODO: Refactor/remove these once we delete old deposit/withdraw components
 export const getMapOfLowestFeeTokensByChainId = (type: NullableTransferType) =>
   getMapOfChainsByChainId(getLowestFeeChains(type));
 
 export const getMapOfHighestFeeTokensByChainId = (type: NullableTransferType) =>
   getMapOfChainsByChainId(getHighestFeeChains(type));
+
+const lowestFeeTokensByChainIdMapDeposit = getMapOfLowestFeeTokensByChainId(TransferType.deposit);
+const lowestFeeTokensByChainIdMapWithdrawal = getMapOfLowestFeeTokensByChainId(
+  TransferType.withdrawal
+);
+
+const lowestFeeTokensByDenomDeposit = getMapOfLowestFeeTokensByDenom(TransferType.deposit);
+const lowestFeeTokensByDenomWithdrawal = getMapOfLowestFeeTokensByDenom(TransferType.withdrawal);
+
+// TODO: refactor these functions to include cosmos chains and denoms in lowest fees.
+// This will probably involve a non trivial amount of work so do in separate PR.
+export const isLowFeeChainId = (chainId: string, type: NewTransferType) => {
+  const lowFeeChainIdMap =
+    type === NewTransferType.Deposit
+      ? lowestFeeTokensByChainIdMapDeposit
+      : lowestFeeTokensByChainIdMapWithdrawal;
+  return lowFeeChainIdMap[chainId];
+};
+
+export const isHighFeeChainId = (chainId: string, type: NewTransferType) => {
+  return type === NewTransferType.Withdraw && chainId === '1';
+};
+
+export const isLowFeeDenom = (denom: string, type: NewTransferType) => {
+  const lowFeeDenomMap =
+    type === NewTransferType.Deposit
+      ? lowestFeeTokensByDenomDeposit
+      : lowestFeeTokensByDenomWithdrawal;
+  return lowFeeDenomMap[denom.toLowerCase()];
+};
 
 export const cctpTokensByDenomLowerCased = cctpTokens.reduce(
   (acc, token) => {
