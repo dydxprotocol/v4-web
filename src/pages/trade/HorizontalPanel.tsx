@@ -224,17 +224,30 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
           columnKeys={
             isTablet
               ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
-              : [
-                  !showCurrentMarket && OrdersTableColumnKey.Market,
-                  OrdersTableColumnKey.Status,
-                  OrdersTableColumnKey.Side,
-                  OrdersTableColumnKey.AmountFill,
-                  OrdersTableColumnKey.Price,
-                  OrdersTableColumnKey.Trigger,
-                  OrdersTableColumnKey.MarginType,
-                  OrdersTableColumnKey.GoodTil,
-                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
-                ].filter(isTruthy)
+              : uiRefresh
+                ? [
+                    !showCurrentMarket && OrdersTableColumnKey.Market,
+                    OrdersTableColumnKey.Status,
+                    OrdersTableColumnKey.Side,
+                    OrdersTableColumnKey.Amount,
+                    OrdersTableColumnKey.Filled,
+                    OrdersTableColumnKey.Price,
+                    OrdersTableColumnKey.Trigger,
+                    OrdersTableColumnKey.MarginType,
+                    OrdersTableColumnKey.GoodTil,
+                    !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                  ].filter(isTruthy)
+                : [
+                    !showCurrentMarket && OrdersTableColumnKey.Market,
+                    OrdersTableColumnKey.Status,
+                    OrdersTableColumnKey.Side,
+                    OrdersTableColumnKey.AmountFill,
+                    OrdersTableColumnKey.Price,
+                    OrdersTableColumnKey.Trigger,
+                    OrdersTableColumnKey.MarginType,
+                    OrdersTableColumnKey.GoodTil,
+                    !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                  ].filter(isTruthy)
           }
           initialPageSize={initialPageSize}
         />
@@ -275,16 +288,28 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   FillsTableColumnKey.TypeAmount,
                   FillsTableColumnKey.PriceFee,
                 ]
-              : [
-                  !showCurrentMarket && FillsTableColumnKey.Market,
-                  FillsTableColumnKey.Time,
-                  FillsTableColumnKey.Type,
-                  FillsTableColumnKey.Side,
-                  FillsTableColumnKey.AmountTag,
-                  FillsTableColumnKey.Price,
-                  FillsTableColumnKey.TotalFee,
-                  FillsTableColumnKey.Liquidity,
-                ].filter(isTruthy)
+              : uiRefresh
+                ? [
+                    !showCurrentMarket && FillsTableColumnKey.Market,
+                    FillsTableColumnKey.Time,
+                    FillsTableColumnKey.Type,
+                    FillsTableColumnKey.Side,
+                    FillsTableColumnKey.AmountTag,
+                    FillsTableColumnKey.Price,
+                    FillsTableColumnKey.Total,
+                    FillsTableColumnKey.Fee,
+                    FillsTableColumnKey.Liquidity,
+                  ].filter(isTruthy)
+                : [
+                    !showCurrentMarket && FillsTableColumnKey.Market,
+                    FillsTableColumnKey.Time,
+                    FillsTableColumnKey.Type,
+                    FillsTableColumnKey.Side,
+                    FillsTableColumnKey.AmountTag,
+                    FillsTableColumnKey.Price,
+                    FillsTableColumnKey.TotalFee,
+                    FillsTableColumnKey.Liquidity,
+                  ].filter(isTruthy)
           }
           columnWidths={{
             [FillsTableColumnKey.TypeAmount]: '100%',
@@ -300,6 +325,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       isTablet,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      uiRefresh,
     ]
   );
 

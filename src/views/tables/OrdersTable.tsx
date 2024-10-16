@@ -63,12 +63,16 @@ export enum OrdersTableColumnKey {
   Market = 'Market',
   Status = 'Status',
   Side = 'Side',
-  AmountFill = 'Amount-Fill',
+  Amount = 'Amount',
+  Filled = 'Filled',
   Price = 'Price',
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
   Actions = 'Actions',
   MarginType = 'Margin-Type',
+
+  // TODO: CT-1292 remove deprecated fields
+  AmountFill = 'Amount-Fill',
 
   // Tablet Only
   StatusFill = 'Status-Fill',
@@ -159,6 +163,36 @@ const getOrdersTableColumnDef = ({
               value={size}
               fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
+            <Output
+              type={OutputType.Asset}
+              value={totalFilled}
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
+            />
+          </TableCell>
+        ),
+      },
+      [OrdersTableColumnKey.Amount]: {
+        columnKey: 'amount',
+        getCellValue: (row) => row.size,
+        label: stringGetter({ key: STRING_KEYS.AMOUNT }),
+        tag: symbol,
+        renderCell: ({ size, stepSizeDecimals }) => (
+          <TableCell>
+            <Output
+              type={OutputType.Asset}
+              value={size}
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
+            />
+          </TableCell>
+        ),
+      },
+      [OrdersTableColumnKey.Filled]: {
+        columnKey: 'filled',
+        getCellValue: (row) => row.totalFilled,
+        label: stringGetter({ key: STRING_KEYS.AMOUNT_FILLED }),
+        tag: symbol,
+        renderCell: ({ totalFilled, stepSizeDecimals }) => (
+          <TableCell>
             <Output
               type={OutputType.Asset}
               value={totalFilled}
