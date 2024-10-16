@@ -13,6 +13,7 @@ export const PreferencesDialog = ({ setIsOpen }: DialogProps<PreferencesDialogPr
   return (
     <ComboboxDialogMenu
       isOpen
+      withSearch={false}
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
       setIsOpen={setIsOpen}

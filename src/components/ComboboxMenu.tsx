@@ -3,7 +3,10 @@ import { Fragment, useState, type ReactNode } from 'react';
 import { Command } from 'cmdk';
 import styled, { css } from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { type MenuConfig } from '@/constants/menus';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -39,14 +42,15 @@ export const ComboboxMenu = <
   onItemSelected,
 
   title,
-  inputPlaceholder = 'Search…',
-  slotEmpty = 'No items found.',
+  inputPlaceholder,
+  slotEmpty,
   withSearch = true,
 
   className,
   withItemBorders,
   withStickyLayout,
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
+  const stringGetter = useStringGetter();
   const [searchValue, setSearchValue] = useState('');
 
   return (
@@ -72,7 +76,7 @@ export const ComboboxMenu = <
             autoFocus
             value={searchValue}
             onValueChange={setSearchValue}
-            placeholder={inputPlaceholder}
+            placeholder={inputPlaceholder ?? stringGetter({ key: STRING_KEYS.SEARCH })}
             data-hj-allow
           />
         </$Header>
@@ -172,7 +176,12 @@ export const ComboboxMenu = <
           </$Group>
         ))}
         {slotEmpty && searchValue.trim() !== '' && (
-          <Command.Empty tw="h-full p-1 text-color-text-0">{slotEmpty}</Command.Empty>
+          <Command.Empty tw="h-full p-1 text-color-text-0">
+            {slotEmpty ??
+              stringGetter({
+                key: STRING_KEYS.NO_RESULTS,
+              })}
+          </Command.Empty>
         )}
       </$List>
     </$Command>

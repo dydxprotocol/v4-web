@@ -25,7 +25,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
@@ -176,6 +175,7 @@ const MarketsDropdownContent = ({
           <$IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            fullIcon
           />
         </$MarketDropdownBanner>
       );
@@ -306,7 +306,7 @@ export const MarketsDropdown = memo(
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
-    }, [isOpen]);
+    }, []);
 
     return (
       <$Popover
@@ -490,11 +490,6 @@ const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
       --asset-icon-size: 1.5em;
     `}
   `}
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
 `;
 
 const $FlagGradient = styled.div`
