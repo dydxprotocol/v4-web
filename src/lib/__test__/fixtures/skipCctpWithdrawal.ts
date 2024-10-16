@@ -1,4 +1,4 @@
-import { TxStatusResponseJSON } from '@skip-router/core';
+import { TxStatusResponseJSON } from '@skip-go/client';
 
 export const withdrawToUsdcEthPending = {
   transfers: [

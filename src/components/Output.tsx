@@ -469,7 +469,7 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
     opacity: 0.5;
 
     &:after {
-      content: '-' var(--output-afterString);
+      content: '—' var(--output-afterString);
     }
   }
 

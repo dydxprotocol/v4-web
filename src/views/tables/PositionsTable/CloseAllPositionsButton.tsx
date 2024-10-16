@@ -35,7 +35,7 @@ export const CloseAllPositionsButton = () => {
 const $ActionTextButton = styled(Button)`
   --button-textColor: var(--color-red);
   --button-height: var(--item-height);
-  --button-padding: 0 0.25rem;
+  --button-padding: 0;
   --button-backgroundColor: transparent;
   --button-border: none;
   pointer-events: auto;
