@@ -47,10 +47,7 @@ export const MarketFilter = ({
     <$ToggleGroup
       items={
         Object.values(filters).map((value) => ({
-          label: stringGetter({
-            key: MARKET_FILTER_OPTIONS[value].label,
-            fallback: value.toUpperCase(),
-          }),
+          label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
           slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
             <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
           ),

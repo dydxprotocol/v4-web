@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.11.1
     version: 1.11.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.217
-    version: 1.1.217
+    specifier: ^1.1.221
+    version: 1.1.221
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -2331,8 +2331,8 @@ packages:
       - fp-ts
     dev: false
 
-  /@chain-registry/types@0.50.0:
-    resolution: {integrity: sha512-77TY/i3lPPQRQGBl0PFrb8+k3rbjIb4LOSsmK49mlMSPUNeJ3Wcx3Donnm2XvdpQDH5aeCofWOPonZ2/3XoibQ==}
+  /@chain-registry/types@0.50.1:
+    resolution: {integrity: sha512-HPPN4NPYXW9i7TRHNLJOdKK84z9m0mByy4mY+jHE3t9zIvOz0nK0qEG00uAlgakJvPeoh2ge7gWUAUOTNcbd6A==}
     dev: false
 
   /@coinbase/wallet-sdk@3.9.3:
@@ -3174,8 +3174,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.217:
-    resolution: {integrity: sha512-nD3fDRqqRzM44QHhyGg0MeeTIy8n2K7/V8fWaY6VXTrNP/KEE3zkXozXvL0ZXeOulA7+Kf+otwCh2aM5apYkLA==}
+  /@dydxprotocol/v4-localization@1.1.221:
+    resolution: {integrity: sha512-oYEW4BcbuKa2w5lODcLFbuJUUX02Kh1todm7fMvdAUawNA2bDdjpqLaRyJy3WDPdzt4HZNV9raBScxMSNn8CDQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -8913,7 +8913,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.0
+      chain-registry: 1.69.2
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -12905,10 +12905,10 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.0:
-    resolution: {integrity: sha512-jNDHQrtF7qwqvQBF+1FylyKxTkUofD5MD/wVFshlmGciOjLR8Amh4wC0zPzeWrJsOWUihvYFR8qPpjCgT1YvTw==}
+  /chain-registry@1.69.2:
+    resolution: {integrity: sha512-fsypMTHQOZW3LSZIFLYbh63G9cq6aKlIOENveF0xvdLiilLsqh1j/RFm62CmsENQ+dfcwHyZ6FyvyjJzH1uwMg==}
     dependencies:
-      '@chain-registry/types': 0.50.0
+      '@chain-registry/types': 0.50.1
     dev: false
 
   /chalk@2.4.2:
@@ -18130,7 +18130,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.0
+      chain-registry: 1.69.2
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
