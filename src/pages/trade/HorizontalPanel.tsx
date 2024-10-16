@@ -263,6 +263,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       isAccountViewOnly,
       ordersTagNumber,
       hasUnseenOrderUpdates,
+      uiRefresh,
     ]
   );
 
