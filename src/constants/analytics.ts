@@ -344,6 +344,8 @@ export const AnalyticsEvents = unionize(
       userOperationId: string;
       amount: number;
       slippage: number | null | undefined;
+      requiredSlippageAck: boolean | null | undefined;
+      showedSlippageWarning: boolean | null | undefined;
     }>(),
     VaultOperationPreAborted: ofType<{
       operation: 'DEPOSIT' | 'WITHDRAW';

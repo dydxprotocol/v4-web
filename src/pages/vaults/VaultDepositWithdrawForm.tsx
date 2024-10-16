@@ -191,6 +191,9 @@ export const VaultDepositWithdrawForm = ({
         operation,
         userOperationId,
         slippage: validationResponse.summaryData.estimatedSlippage,
+        requiredSlippageAck: validationResponse.summaryData.needSlippageAck,
+        showedSlippageWarning:
+          validationResponse.errors.toArray().find((e) => e.code === 'SLIPPAGE_TOO_HIGH') != null,
       })
     );
     setIsSubmitting(true);
