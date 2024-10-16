@@ -88,8 +88,6 @@ export const VaultDepositWithdrawForm = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { vaultsLearnMore } = useURLConfigs();
-  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const canViewAccount = useAppSelector(calculateCanViewAccount);
 
   const { amount, confirmationStep, slippageAck, operation } = useAppSelector(getVaultForm) ?? {};
   const validationResponse = useVaultFormValidationResponse();
@@ -530,10 +528,19 @@ export const VaultDepositWithdrawForm = ({
       </AlertMessage>
     ));
 
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const disableFormBecauseWallet = isAccountViewOnly || !canViewAccount;
+  // on wallet connect/disconnect, reset the form
+  useEffect(() => {
+    dispatch(resetVaultForm());
+  }, [disableFormBecauseWallet, dispatch]);
+
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const maybeConnectWalletButton = !canAccountTrade ? (
     <OnboardingTriggerButton size={ButtonSize.Base} />
   ) : undefined;
+
   const inputForm = (
     <$Form
       onSubmit={(e: FormEvent) => {
@@ -568,13 +575,13 @@ export const VaultDepositWithdrawForm = ({
           label={inputFormConfig.formLabel}
           value={amount}
           onChange={setAmount}
-          disabled={isAccountViewOnly || !canViewAccount}
+          disabled={disableFormBecauseWallet}
           slotRight={
             <FormMaxInputToggleButton
               size={ButtonSize.XSmall}
               isInputEmpty={amount === ''}
               isLoading={false}
-              disabled={isAccountViewOnly || !canViewAccount}
+              disabled={disableFormBecauseWallet}
               onPressedChange={(isPressed: boolean) =>
                 isPressed ? onClickMax() : setAmountState('')
               }
@@ -595,7 +602,7 @@ export const VaultDepositWithdrawForm = ({
             type={ButtonType.Submit}
             action={ButtonAction.Primary}
             state={{
-              isDisabled: hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
+              isDisabled: hasInputErrors || disableFormBecauseWallet || isSubmitting,
               isLoading: isSubmitting,
             }}
             slotLeft={
@@ -685,8 +692,7 @@ export const VaultDepositWithdrawForm = ({
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
               state={{
-                isDisabled:
-                  hasInputErrors || !!isAccountViewOnly || !canViewAccount || isSubmitting,
+                isDisabled: hasInputErrors || disableFormBecauseWallet || isSubmitting,
                 isLoading: isSubmitting,
               }}
               slotLeft={
