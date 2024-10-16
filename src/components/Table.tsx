@@ -91,6 +91,7 @@ export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> =
   isActionable?: boolean;
   hideOnBreakpoint?: MediaQueryKeys;
   width?: ColumnSize;
+  align?: 'start' | 'center' | 'end';
 } & (SortableColumnDef<TableRowData> | NonSortableColumnDef);
 
 export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowConfig> = {
@@ -406,17 +407,14 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
             state={state}
             withScrollSnapRows={withScrollSnapRows}
           >
-            {[...headerRow.childNodes].map(
-              (column) => (
-                <TableColumnHeader
-                  key={column.key}
-                  column={column}
-                  state={state}
-                  withScrollSnapColumns={withScrollSnapColumns}
-                />
-              )
-              // )
-            )}
+            {[...headerRow.childNodes].map((column) => (
+              <TableColumnHeader
+                key={column.key}
+                column={column}
+                state={state}
+                withScrollSnapColumns={withScrollSnapColumns}
+              />
+            ))}
           </TableHeaderRow>
         ))}
       </TableHeadRowGroup>
@@ -568,7 +566,10 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
     <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
       // data-focused={isFocusVisible || undefined}
-      style={{ width: column.props?.width }}
+      style={{
+        width: column.props?.width,
+        textAlign: (column?.value as any)?.align,
+      }}
       ref={ref}
       allowSorting={column.props?.allowsSorting ?? true}
       withScrollSnapColumns={withScrollSnapColumns}
