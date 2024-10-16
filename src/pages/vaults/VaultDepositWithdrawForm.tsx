@@ -519,6 +519,7 @@ export const VaultDepositWithdrawForm = ({
 
   const renderedErrors = errors
     ?.filter((e) => e.long != null)
+    ?.filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
     .map((alertMessage) => (
       <AlertMessage
         key={alertMessage.code}
