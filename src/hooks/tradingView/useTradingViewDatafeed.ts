@@ -33,7 +33,11 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { setCandles } from '@/state/perpetuals';
-import { getMarketData, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
+import {
+  getMarketConfig,
+  getMarketData,
+  getPerpetualBarsForPriceChart,
+} from '@/state/perpetualsSelectors';
 
 import { objectKeys } from '@/lib/objectHelpers';
 import { log } from '@/lib/telemetry';
@@ -41,6 +45,7 @@ import { lastBarsCache } from '@/lib/tradingView/dydxfeed/cache';
 import { subscribeOnStream, unsubscribeFromStream } from '@/lib/tradingView/dydxfeed/streaming';
 import { getMarkForOrderFills } from '@/lib/tradingView/dydxfeed/utils';
 import { getHistorySlice, getSymbol, mapCandle } from '@/lib/tradingView/utils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useStringGetter } from '../useStringGetter';
@@ -65,12 +70,10 @@ const configurationData: DatafeedConfiguration = {
   ],
 };
 
-type Props = {
-  orderbookCandlesToggleOn: boolean;
-  tickSizeDecimals?: number;
-};
-
-export const useTradingViewDatafeed = ({ tickSizeDecimals, orderbookCandlesToggleOn }: Props) => {
+export const useTradingViewDatafeed = (
+  orderbookCandlesToggleOn: boolean,
+  initialTickSizeDecimals?: number
+) => {
   const resetCacheRef = useRef<() => void | undefined>();
 
   const dispatch = useDispatch();
@@ -104,6 +107,12 @@ export const useTradingViewDatafeed = ({ tickSizeDecimals, orderbookCandlesToggl
 
         resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
           const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
+
+          const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
+            getMarketConfig(store.getState(), symbolName)
+          );
+
+          const tickSizeDecimals = tickSizeDecimalsAbacus ?? initialTickSizeDecimals;
           const initialPriceScale = BigNumber(10)
             .exponentiatedBy(tickSizeDecimals ?? 2)
             .toNumber();
@@ -282,6 +291,6 @@ export const useTradingViewDatafeed = ({ tickSizeDecimals, orderbookCandlesToggl
         },
       },
     }),
-    [tickSizeDecimals !== undefined, orderbookCandlesToggleOn]
+    [initialTickSizeDecimals !== undefined, orderbookCandlesToggleOn]
   );
 };

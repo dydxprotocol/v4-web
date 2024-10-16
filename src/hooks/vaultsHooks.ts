@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
+import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 
 import {
+  IndexerMegavaultHistoricalPnlResponse,
   Nullable,
   PerpetualMarket,
   VaultAccountCalculator,
@@ -67,10 +68,18 @@ export const useLoadedVaultDetails = () => {
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
-      const callResult = await getMegavaultHistoricalPnl();
+      const toTyped = (res: any) =>
+        VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(res));
+      const [dailyResult, hourlyResult] = await Promise.all([
+        getMegavaultHistoricalPnl().then(toTyped),
+        getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toTyped),
+      ]);
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
-          VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(callResult))
+          new IndexerMegavaultHistoricalPnlResponse([
+            ...(dailyResult?.megavaultPnl ?? []),
+            ...(hourlyResult?.megavaultPnl ?? []),
+          ])
         )
       );
     },
