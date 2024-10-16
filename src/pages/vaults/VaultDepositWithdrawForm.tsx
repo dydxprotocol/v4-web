@@ -183,7 +183,7 @@ export const VaultDepositWithdrawForm = ({
     if (isSubmitting) {
       return;
     }
-    const userOperationId = `${Date.now().toString()}-${Math.random() * 1e6}`;
+    const userOperationId = crypto.randomUUID();
 
     track(
       AnalyticsEvents.AttemptVaultOperation({
