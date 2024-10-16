@@ -11,6 +11,7 @@ export enum TriggerType {
   SearchSelect = 'SearchSelect',
   MarketDropdown = 'MarketDropdown',
   MobileDownloadTrigger = 'MobileDownloadTrigger',
+  TradeTableSettings = 'TradeTableSettings',
 }
 
 type ElementProps = {
@@ -91,7 +92,8 @@ const $Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType 
       `,
       [TriggerType.SearchSelect]: popoverMixins.searchSelectTrigger,
       [TriggerType.MarketDropdown]: popoverMixins.marketDropdownTrigger,
-      [TriggerType.MobileDownloadTrigger]: popoverMixins.mobileDownloadTrigger,
+      [TriggerType.MobileDownloadTrigger]: popoverMixins.tradeTableSettingsTrigger,
+      [TriggerType.TradeTableSettings]: css``,
     })[$triggerType]}
 
   ${({ $noBlur }) =>
