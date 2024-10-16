@@ -311,8 +311,9 @@ export const Icon = styled(
   }: ElementProps & StyleProps & { size?: string }) =>
     Component ? <Component className={className} {...props} /> : null
 )`
-  width: ${({ size }) => size ?? '1em'};
-  height: ${({ size }) => size ?? '1em'};
-  min-width: ${({ size }) => size ?? '1em'};
-  min-height: ${({ size }) => size ?? '1em'};
+  --icon-size: ${({ size }) => size ?? ''};
+  width: var(--icon-size, 1em);
+  height: var(--icon-size, 1em);
+  min-width: var(--icon-size, 1em);
+  min-height: var(--icon-size, 1em);
 `;

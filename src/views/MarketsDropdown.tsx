@@ -1,4 +1,4 @@
-import { Key, memo, useMemo, useState } from 'react';
+import { Key, memo, useEffect, useMemo, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
@@ -34,6 +34,7 @@ import { Toolbar } from '@/components/Toolbar';
 
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
+import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
@@ -291,6 +292,26 @@ export const MarketsDropdown = memo(
       ) : undefined;
 
     const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
+
+    useEffect(() => {
+      // listen for '/' key to open the dropdown
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== '/' || !event.target) return;
+
+        const isTextInput = elementIsTextInput(event.target as HTMLElement);
+
+        if (!isTextInput) {
+          event.preventDefault();
+          setIsOpen(true);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [isOpen]);
 
     return (
       <$Popover

@@ -261,6 +261,8 @@ export type VaultDepositWithdrawSlippageResponse =
   Abacus.indexer.models.chain.OnChainVaultDepositWithdrawSlippageResponse;
 export type VaultFormValidationResult =
   Abacus.exchange.dydx.abacus.functional.vault.VaultFormValidationResult;
+export const IndexerMegavaultHistoricalPnlResponse =
+  Abacus.indexer.codegen.IndexerMegavaultHistoricalPnlResponse;
 export const { VaultCalculator, VaultAccountCalculator, VaultDepositWithdrawFormValidator } =
   Abacus.exchange.dydx.abacus.functional.vault;
 

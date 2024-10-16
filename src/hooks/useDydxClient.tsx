@@ -8,6 +8,7 @@ import {
   IndexerConfig,
   LocalWallet,
   Network,
+  PnlTickInterval,
   SelectedGasDenom,
   ValidatorConfig,
   onboarding,
@@ -174,14 +175,17 @@ const useDydxClientContext = () => {
     }
   };
 
-  const getMegavaultHistoricalPnl = useCallback(async () => {
-    try {
-      return await indexerClient.vault.getMegavaultHistoricalPnl();
-    } catch (error) {
-      log('useDydxClient/getMegavaultHistoricalPnl', error);
-      return undefined;
-    }
-  }, [indexerClient.vault]);
+  const getMegavaultHistoricalPnl = useCallback(
+    async (resolution: PnlTickInterval = PnlTickInterval.day) => {
+      try {
+        return await indexerClient.vault.getMegavaultHistoricalPnl(resolution);
+      } catch (error) {
+        log('useDydxClient/getMegavaultHistoricalPnl', error);
+        return undefined;
+      }
+    },
+    [indexerClient.vault]
+  );
 
   const getMegavaultPositions = useCallback(async () => {
     try {
@@ -500,6 +504,11 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getAllAffiliateTiers = useCallback(async () => {
+    const tiers = await compositeClient?.validatorClient.get.getAllAffiliateTiers();
+    return tiers?.tiers?.tiers;
+  }, [compositeClient]);
+
   const getReferredBy = useCallback(
     async (address: string) => {
       return compositeClient?.validatorClient.get.getReferredBy(address);
@@ -538,6 +547,7 @@ const useDydxClientContext = () => {
     getValidators,
     getAccountBalance,
     getAffiliateInfo,
+    getAllAffiliateTiers,
     getReferredBy,
 
     // vault methods
