@@ -76,7 +76,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
-import { isNativeDenom, NATIVE_TOKEN_ADDRESS } from '@/lib/assetUtils';
+import { isNativeDenom, WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
@@ -176,7 +176,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   // Async Data
   const { balance } = useAccountBalance({
-    addressOrDenom: sourceToken?.address || NATIVE_TOKEN_ADDRESS,
+    addressOrDenom: sourceToken?.address || WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS,
     chainId,
     isCosmosChain: isKeplrWallet,
   });

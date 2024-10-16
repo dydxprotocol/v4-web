@@ -13,10 +13,10 @@ export enum TransferType {
 
 export type NetworkType = 'evm' | 'svm' | 'cosmos';
 
-// TODO: followup with skip about making logoUri an optional property
+// TODO [onboarding-rewrite]: followup with skip about making logoUri an optional property
 const DUMMY_LOGO_URI = 'dummy-logo-uri';
 
-// TODO: maybe unhardcode this. we can retrieve this via the skipclient and filter ourselves
+// TODO [onboarding-rewrite]: maybe unhardcode this. we can retrieve this via the skipclient and filter ourselves
 // but we don't have to? may be worth hardcoding to reduce an extra network call since this isn't going to change much
 // and we should have decent visibility into when this changes. TBD
 export const UNISWAP_VENUES = [
@@ -58,7 +58,7 @@ export const UNISWAP_VENUES = [
   },
 ].map((x) => ({ ...x, logoUri: DUMMY_LOGO_URI }));
 
-// TODO: maybe unhardcode this. same as above.
+// TODO [onboarding-rewrite]: maybe unhardcode this. same as above.
 export const COSMOS_SWAP_VENUES = [
   {
     name: 'osmosis-poolmanager',
@@ -96,6 +96,7 @@ export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
   const nativeChainToken = assets.find((asset) => {
     return isNativeDenom(asset.denom);
   });
+  // If not cctp or native chain token, default to the first item in the list
   const defaultTokenDenom = cctpToken?.denom ?? nativeChainToken?.denom ?? assets[0]?.denom;
   return defaultTokenDenom;
 };

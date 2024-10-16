@@ -41,6 +41,7 @@ export const useTransfers = () => {
   const [fromChainId, setFromChainId] = useState<string | undefined>();
   const [toTokenDenom, setToTokenDenom] = useState<string | undefined>();
   const [toChainId, setToChainId] = useState<string | undefined>();
+  // TODO [onboarding-rewrite]: add nobleAddress type when enabling coinbase withdrawals
   const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
     undefined
   );
@@ -155,7 +156,7 @@ export const useTransfers = () => {
     queryFn: async () => {
       // this should never happen, this is just to satisfy typescript
       // react queries should never return null.
-      if (!hasAllParams) return null;
+      if (!hasAllParams || !fromToken.decimals) return null;
 
       const baseParams = {
         sourceAssetDenom: fromToken.denom,
@@ -165,8 +166,8 @@ export const useTransfers = () => {
         allowUnsafe: true,
         slippageTolerancePercent: '1',
         smartRelay: true,
-        // TODO: talk to skip about this, why are decimals optional? when would that happen?
-        amountIn: parseUnits(amount, fromToken.decimals ?? 0).toString(),
+        // TODO [onboarding-rewrite]: talk to skip about this, why are decimals optional? when would that happen?
+        amountIn: parseUnits(amount, fromToken.decimals).toString(),
       };
 
       // consider moving to useMemo outside of this query
@@ -239,12 +240,12 @@ export const useTransfers = () => {
 
   const route = routeQuery?.data;
 
-  // TODO: maybe abstract away the adding of transfer notifications to this hook instead of having
+  // TODO [onboarding-rewrite]: maybe abstract away the adding of transfer notifications to this hook instead of having
   // withdrawal and deposit modals handle them separately in multiple places
   // const { addOrUpdateTransferNotification } = useLocalNotifications();
 
   return {
-    // TODO: Think about trimming this list
+    // TODO [onboarding-rewrite]: Think about trimming this list
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties
     // Or, bundle these properties into "depositFormProperties" and "withdrawFormProperties"
     assetsForSelectedChain,
