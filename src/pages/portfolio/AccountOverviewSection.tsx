@@ -134,30 +134,46 @@ export const AccountOverviewSection = () => {
         {!isTablet && (
           <div tw="flexColumn flex-1 pt-0.5">
             <div tw="row h-1 w-full overflow-hidden rounded-1">
-              {pieSections.map(
-                (section) =>
-                  section.amount != null &&
-                  totalValue != null &&
-                  section.amount > 0 && (
-                    <WithTooltip
-                      key={section.id}
-                      tooltipStringTitle={`${section.label}: ${formatNumberOutput(section.amount, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} (${formatNumberOutput(section.amount / totalValue, OutputType.Percent, { fractionDigits: 0, decimalSeparator, groupSeparator, selectedLocale })})`}
-                      slotTrigger={
-                        <$LineSegment
-                          tw="h-full"
-                          $color={section.color}
-                          $widthPercent={section.amount / totalValue}
-                        />
-                      }
-                    />
-                  )
-              )}
+              {pieSections.map((section) => {
+                if (
+                  section.amount == null ||
+                  totalValue == null ||
+                  totalValue <= 0 ||
+                  section.amount <= 0
+                ) {
+                  return undefined;
+                }
+                const formattedDollars = formatNumberOutput(section.amount, OutputType.Fiat, {
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                });
+                const formattedPercent = formatNumberOutput(
+                  section.amount / totalValue,
+                  OutputType.Percent,
+                  { fractionDigits: 0, decimalSeparator, groupSeparator, selectedLocale }
+                );
+                return (
+                  <WithTooltip
+                    key={section.id}
+                    tooltipStringTitle={`${section.label}: ${formattedDollars} (${formattedPercent})`}
+                    slotTrigger={
+                      <$LineSegment
+                        tw="h-full"
+                        $color={section.color}
+                        $widthPercent={section.amount / totalValue}
+                      />
+                    }
+                  />
+                );
+              })}
             </div>
             <div tw="row w-full flex-1 text-center">
               {pieSections.map(
                 (section) =>
                   section.amount != null &&
                   totalValue != null &&
+                  totalValue > 0 &&
                   section.amount > 0 && (
                     <$LineSegment key={section.id} $widthPercent={section.amount / totalValue}>
                       {section.amount / totalValue > 0.09 && (

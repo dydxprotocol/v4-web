@@ -30,7 +30,10 @@ import { orEmptyRecord } from '@/lib/typeUtils';
 type VaultTableRow = VaultPosition;
 
 const VAULT_PAGE_SIZE = 20 as const;
+// abacus adds a special line for unallocated usdc just for vaults, this isn't really done anywhere else so
+// happy to special case it just here
 const USDC_MARKET_HARDCODED = 'USDC-USD';
+
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
@@ -115,6 +118,29 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           ),
         },
         {
+          columnKey: 'pnl-sparkline',
+          allowsSorting: false,
+          label: stringGetter({ key: STRING_KEYS.PAST_30D }),
+          width: 50,
+          renderCell: ({ thirtyDayPnl }) => (
+            <TableCell>
+              <div style={{ width: 50, height: 50 }} tw="ml-0.5">
+                {thirtyDayPnl?.sparklinePoints != null && (
+                  <SparklineChart
+                    data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
+                      x: index + 1,
+                      y: elem,
+                    }))}
+                    xAccessor={(datum) => datum.x}
+                    yAccessor={(datum) => datum.y}
+                    positive={(thirtyDayPnl.absolute ?? 0) > 0}
+                  />
+                )}
+              </div>
+            </TableCell>
+          ),
+        },
+        {
           columnKey: 'pnl',
           getCellValue: (row) => row.thirtyDayPnl?.absolute,
           label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
@@ -125,24 +151,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               sparklinePoints: undefined,
             };
             return (
-              <TableCell
-                stacked
-                slotRight={
-                  <div style={{ width: 50, height: 50 }} tw="ml-0.5">
-                    {thirtyDayPnl.sparklinePoints != null && (
-                      <SparklineChart
-                        data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
-                          x: index + 1,
-                          y: elem,
-                        }))}
-                        xAccessor={(datum) => datum.x}
-                        yAccessor={(datum) => datum.y}
-                        positive={(thirtyDayPnl.absolute ?? 0) > 0}
-                      />
-                    )}
-                  </div>
-                }
-              >
+              <TableCell stacked>
                 <$OutputSigned
                   tw="w-5"
                   sign={getNumberSign(thirtyDayPnl.absolute)}
@@ -162,7 +171,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         {
           columnKey: 'margin',
           getCellValue: (row) => row.marginUsdc,
-          label: stringGetter({ key: STRING_KEYS.MARGIN }),
+          label: stringGetter({ key: STRING_KEYS.EQUITY }),
           renderCell: ({ marginUsdc }) => (
             <TableCell>
               <Output value={marginUsdc} type={OutputType.Fiat} fractionDigits={0} />
