@@ -173,6 +173,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
           }
+          columnWidths={
+            uiRefresh
+              ? {
+                  [PositionsTableColumnKey.Actions]: 100,
+                }
+              : undefined
+          }
           showClosePositionAction={shouldRenderActions}
           initialPageSize={initialPageSize}
           navigateToOrders={onViewOrders}

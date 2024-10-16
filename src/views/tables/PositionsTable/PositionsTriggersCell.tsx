@@ -16,6 +16,8 @@ import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -92,17 +94,16 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (align: 'left' | 'right') => (
-    <div tw="flex flex-1">
-      <$ActionButton
+    <$Container $align={align}>
+      <$ViewOrdersButton
         action={ButtonAction.Navigation}
         size={ButtonSize.XSmall}
         onClick={onViewOrders ?? undefined}
         disabled={isDisabled}
-        $align={align}
       >
-        {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-      </$ActionButton>
-    </div>
+        <$Label>{stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}</$Label>
+      </$ViewOrdersButton>
+    </$Container>
   );
 
   const editButton = (
@@ -127,13 +128,9 @@ export const PositionsTriggersCell = ({
   }) => {
     if (orders.length === 0) {
       return (
-        <$Output
-          type={OutputType.Fiat}
-          value={null}
-          $withLiquidationWarning={false}
-          $align={align}
-          tw="flex-1"
-        />
+        <$Container $align={align}>
+          <$Output type={OutputType.Fiat} value={null} $withLiquidationWarning={false} />
+        </$Container>
       );
     }
 
@@ -150,69 +147,66 @@ export const PositionsTriggersCell = ({
           value={triggerPrice ?? null}
           fractionDigits={tickSizeDecimals}
           $withLiquidationWarning={!!liquidationWarningSide}
-          $align={align}
         />
       );
 
       return (
-        <div tw="flex flex-1">
-          <$Container $align={align}>
-            {liquidationWarningSide != null ? (
-              <WithHovercard
-                align="start"
-                side="left"
-                hovercard={
-                  liquidationWarningSide === AbacusPositionSide.LONG
-                    ? 'liquidation-warning-long'
-                    : 'liquidation-warning-short'
-                }
-                slotButton={
-                  <Button
-                    action={ButtonAction.Primary}
-                    size={ButtonSize.Small}
-                    disabled={isDisabled}
-                    onClick={openTriggersDialog}
-                  >
-                    {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
-                  </Button>
-                }
-                slotTrigger={<div>{output}</div>}
-              />
-            ) : (
-              output
-            )}
-            {isPartialPosition && (
-              <WithHovercard
-                align="end"
-                side="top"
-                hovercard={
-                  isStopLossOrder(order, isSlTpLimitOrdersEnabled)
-                    ? 'partial-close-stop-loss'
-                    : 'partial-close-take-profit'
-                }
-                slotButton={
-                  <Button
-                    action={ButtonAction.Primary}
-                    size={ButtonSize.Small}
-                    onClick={openTriggersDialog}
-                    disabled={isDisabled}
-                  >
-                    {stringGetter({
-                      key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)
-                        ? STRING_KEYS.EDIT_STOP_LOSS
-                        : STRING_KEYS.EDIT_TAKE_PROFIT,
-                    })}
-                  </Button>
-                }
-                slotTrigger={
-                  <$PartialFillIcon>
-                    <Icon iconName={IconName.PositionPartial} size="0.875em" />
-                  </$PartialFillIcon>
-                }
-              />
-            )}
-          </$Container>
-        </div>
+        <$Container $align={align}>
+          {liquidationWarningSide != null ? (
+            <WithHovercard
+              align="start"
+              side="left"
+              hovercard={
+                liquidationWarningSide === AbacusPositionSide.LONG
+                  ? 'liquidation-warning-long'
+                  : 'liquidation-warning-short'
+              }
+              slotButton={
+                <Button
+                  action={ButtonAction.Primary}
+                  size={ButtonSize.Small}
+                  disabled={isDisabled}
+                  onClick={openTriggersDialog}
+                >
+                  {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
+                </Button>
+              }
+              slotTrigger={<div tw="flex min-w-[1px]">{output}</div>}
+            />
+          ) : (
+            output
+          )}
+          {isPartialPosition && (
+            <WithHovercard
+              align="end"
+              side="top"
+              hovercard={
+                isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+                  ? 'partial-close-stop-loss'
+                  : 'partial-close-take-profit'
+              }
+              slotButton={
+                <Button
+                  action={ButtonAction.Primary}
+                  size={ButtonSize.Small}
+                  onClick={openTriggersDialog}
+                  disabled={isDisabled}
+                >
+                  {stringGetter({
+                    key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+                      ? STRING_KEYS.EDIT_STOP_LOSS
+                      : STRING_KEYS.EDIT_TAKE_PROFIT,
+                  })}
+                </Button>
+              }
+              slotTrigger={
+                <$PartialFillIcon>
+                  <Icon iconName={IconName.PositionPartial} size="0.875em" />
+                </$PartialFillIcon>
+              }
+            />
+          )}
+        </$Container>
       );
     }
 
@@ -233,33 +227,24 @@ const $TableCell = styled(TableCell)`
   align-items: stretch;
   gap: 0.75em;
   justify-content: center;
-`;
 
-const $VerticalSeparator = styled(Separator)`
-  border-right: solid var(--border-width) var(--color-border);
-`;
-
-const $EditButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
-  --button-width: min-content;
-  --button-textColor: var(--color-text-0);
-  --button-padding: 0 1em 0 0;
+  --output-width: 70px;
 `;
 
 const $Container = styled.div<{ $align: 'right' | 'left' }>`
   display: inline-flex;
+  align-items: center;
   gap: 0.25em;
-  flex: 0 1 1px;
+  width: var(--output-width);
 
   ${({ $align }) =>
     $align &&
     {
       right: css`
-        margin-left: auto;
+        justify-content: end;
       `,
       left: css`
-        margin-right: auto;
+        justify-content: start;
       `,
     }[$align]}
 `;
@@ -267,8 +252,8 @@ const $Container = styled.div<{ $align: 'right' | 'left' }>`
 const $Output = styled(Output)<{
   value: number | null;
   $withLiquidationWarning: boolean;
-  $align: 'right' | 'left';
 }>`
+  ${layoutMixins.textTruncate}
   font: var(--font-mini-medium);
 
   ${({ value, $withLiquidationWarning }) =>
@@ -283,36 +268,27 @@ const $Output = styled(Output)<{
         : css`
             color: var(--color-text-0);
           `}
-
-  ${({ $align }) =>
-    $align &&
-    {
-      right: css`
-        justify-content: space-between;
-      `,
-      left: css``,
-    }[$align]}
 `;
 
-const $ActionButton = styled(Button)<{ $align: 'right' | 'left' }>`
-  --button-height: var(--item-height);
-  --button-padding: 0;
-  --button-textColor: var(--color-accent);
+const ButtonStyle = css`
   --button-backgroundColor: transparent;
   --button-border: none;
+  --button-width: min-content;
+`;
 
-  flex: 0 1 1px;
+const $EditButton = styled(IconButton)`
+  ${ButtonStyle}
+  --button-textColor: var(--color-text-0);
+  --button-padding: 0 1em 0 0;
+`;
 
-  ${({ $align }) =>
-    $align &&
-    {
-      right: css`
-        margin-left: auto;
-      `,
-      left: css`
-        margin-right: auto;
-      `,
-    }[$align]}
+const $ViewOrdersButton = styled(Button)`
+  ${ButtonStyle}
+  --button-height: var(--item-height);
+  --button-textColor: var(--color-accent);
+  --button-padding: 0;
+
+  max-width: 100%;
 `;
 
 const $PartialFillIcon = styled.span`
@@ -320,4 +296,12 @@ const $PartialFillIcon = styled.span`
   svg {
     display: block;
   }
+`;
+
+const $Label = styled.div`
+  ${layoutMixins.textTruncate}
+`;
+
+const $VerticalSeparator = styled(Separator)`
+  border-right: solid var(--border-width) var(--color-border);
 `;

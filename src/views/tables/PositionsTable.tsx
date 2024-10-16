@@ -465,8 +465,9 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.Triggers]: {
         columnKey: 'triggers',
         label: uiRefresh ? (
-          <$TriggersContainer>
-            <$Tag>TP</$Tag> <$VerticalSeparator /> <$Tag>SL</$Tag>
+          <$TriggersContainer tw="flex gap-[0.75em] pr-[2.75em]">
+            <$TriggerLabel>TP</$TriggerLabel> <$VerticalSeparator />
+            <$TriggerLabel>SL</$TriggerLabel>
           </$TriggersContainer>
         ) : (
           stringGetter({ key: STRING_KEYS.TRIGGERS })
@@ -474,7 +475,7 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        align: 'center',
+        align: uiRefresh ? 'center' : undefined,
         renderCell: ({
           id,
           assetId,
@@ -743,13 +744,10 @@ const $PositionSide = styled.span`
 `;
 
 const $TriggersContainer = styled.div`
-  display: flex;
-  gap: 0.75em;
-  padding-right: 2.75em;
   font: var(--font-small-book);
 `;
 
-const $Tag = styled(Tag)`
+const $TriggerLabel = styled(Tag)`
   background-color: transparent;
   border: var(--border);
   color: var(--tableStickyRow-textColor, var(--color-text-0));
