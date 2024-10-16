@@ -362,6 +362,7 @@ export const AnalyticsEvents = unionize(
       operation: 'DEPOSIT' | 'WITHDRAW';
       userOperationId: string;
     }>(),
+
     // Affiliate
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
   },
