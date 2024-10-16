@@ -99,7 +99,7 @@ export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
   const uusdcToken = assets.find((asset) => {
     return asset.denom === 'uusdc' || asset.originDenom === 'uusdc';
   });
-  // If not cctp or native chain token, default to the first item in the list
+  // If not cctp, native chain, or usdc token, default to the first item in the list
   const defaultTokenDenom =
     cctpToken?.denom ?? nativeChainToken?.denom ?? uusdcToken?.denom ?? assets[0]?.denom;
   return defaultTokenDenom;
