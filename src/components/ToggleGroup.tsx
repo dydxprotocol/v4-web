@@ -27,6 +27,7 @@ type ElementProps<MenuItemValue extends string> = {
 type StyleProps = {
   className?: string;
   overflow?: 'scroll' | 'wrap';
+  truncateLabel?: boolean;
 };
 
 export const ToggleGroup = forwardRefFn(
@@ -40,6 +41,7 @@ export const ToggleGroup = forwardRefFn(
 
       className,
       overflow = 'scroll',
+      truncateLabel = true,
       size,
       shape = ButtonShape.Pill,
 
@@ -82,7 +84,7 @@ export const ToggleGroup = forwardRefFn(
                 {...buttonProps}
               >
                 {item.slotBefore}
-                <$Label>{item.label}</$Label>
+                {truncateLabel ? <$Label>{item.label}</$Label> : item.label}
                 {item.slotAfter}
               </ToggleButton>
             </Item>
@@ -110,8 +112,6 @@ const $Root = styled(Root)<{
 
 const $Label = styled.div`
   ${layoutMixins.textTruncate}
-  // don't truncate 2 characters
-  min-width: 1rem;
 `;
 
 const $HorizontalScrollContainer = styled.div<{
