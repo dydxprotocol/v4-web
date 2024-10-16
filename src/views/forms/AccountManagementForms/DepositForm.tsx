@@ -47,6 +47,7 @@ import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccou
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
+import { useFunkitBuyNobleUsdc } from '@/hooks/useFunkitBuyNobleUsdc';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -70,7 +71,9 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getOnboardingGuards } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
+import { DepositType, resetDepositType } from '@/state/deposit';
+import { getDepositType } from '@/state/depositSelectors';
+import { closeDialog, forceOpenDialog } from '@/state/dialogs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -84,6 +87,7 @@ import { parseWalletError } from '@/lib/wallet';
 
 import { CoinbaseDeposit } from '../CoinbaseDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
+import { FunkitToggle } from './DepositForm/FunKitToggle';
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 
@@ -183,6 +187,19 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
+
+  // Funkit Deposit
+  const depositType = useAppSelector(getDepositType);
+  const startCheckout = useFunkitBuyNobleUsdc();
+  useEffect(() => {
+    if (depositType === DepositType.Funkit) {
+      dispatch(closeDialog());
+      startCheckout();
+    }
+    return () => {
+      dispatch(resetDepositType());
+    };
+  }, []);
 
   useEffect(() => {
     setSlippage(isCctp || isKeplrWallet ? 0 : 0.01);
@@ -480,6 +497,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         estimatedRouteDuration: summary?.estimatedRouteDurationSeconds || undefined,
         toAmount: summary?.toAmount || undefined,
         toAmountMin: summary?.toAmountMin || undefined,
+        isFunkit: false,
       });
 
       abacusStateManager.clearTransferInputValues();
@@ -737,6 +755,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }
   return (
     <$Form onSubmit={onSubmit}>
+      <FunkitToggle onToggle={() => dispatch(forceOpenDialog(DialogTypes.FunkitDeposit()))} />
       <div tw="text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
