@@ -7,6 +7,8 @@ const SERVICE_NAME = 'v4-web';
 const LOGGER_NAME = 'v4-web';
 const SITE_NAME = 'datadoghq.com';
 
+const LOG_ENDPOINT_PATH = '/api/v2/logs';
+
 if (CLIENT_TOKEN) {
   datadogLogs.init({
     clientToken: CLIENT_TOKEN,
@@ -15,7 +17,7 @@ if (CLIENT_TOKEN) {
     forwardErrorsToLogs: true,
     sessionSampleRate: 100,
     env: CURRENT_MODE,
-    proxy: import.meta.env.VITE_DATADOG_PROXY_URL,
+    proxy: `${import.meta.env.VITE_DATADOG_PROXY_URL}${LOG_ENDPOINT_PATH}`,
   });
 }
 
