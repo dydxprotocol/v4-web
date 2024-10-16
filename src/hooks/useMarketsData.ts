@@ -176,7 +176,7 @@ export const useMarketsData = ({
         );
       });
 
-      return [...listOfMarkets, ...unlaunchedMarketsData].filter(isTruthy);
+      return [...listOfMarkets, ...unlaunchedMarketsData.filter(isTruthy)];
     }
 
     return listOfMarkets;
