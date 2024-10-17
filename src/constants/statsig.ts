@@ -13,6 +13,7 @@ export enum StatsigFlags {
   ffLimitOrdersFromChart = 'ff_limit_orders_from_chart',
   ffEnableLimitClose = 'ff_enable_limit_close',
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
+  ffEnableOhlc = 'ff_enable_ohlc',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
