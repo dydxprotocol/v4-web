@@ -78,7 +78,6 @@ export const FooterDesktop = () => {
             size={ButtonSize.XSmall}
             state={{ isDisabled: !statusPage }}
             href={statusPage}
-            fullIcon
           >
             {label}
           </$FooterButton>
@@ -172,6 +171,8 @@ const $StatusDot = styled.div<{ exchangeStatus?: ExchangeStatus }>`
 const $FooterButton = styled(Button)`
   --button-height: 1.5rem;
   --button-radius: 0.25rem;
+  --button-backgroundColor: transparent;
+  --button-border: none;
   --button-textColor: var(--color-text-0);
 
   &:hover:not(:disabled) {
