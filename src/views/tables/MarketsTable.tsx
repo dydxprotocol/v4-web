@@ -44,7 +44,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const { filteredMarkets, marketFilters } = useMarketsData({ filter, searchFilter });
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
@@ -58,11 +58,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
+                isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
@@ -114,11 +121,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
+                isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
@@ -248,7 +262,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           direction: 'descending',
         }}
         columns={columns}
-        paginationBehavior="showAll"
+        initialPageSize={50}
+        paginationBehavior="paginate"
         className={className}
         slotEmpty={
           <$MarketNotFound>

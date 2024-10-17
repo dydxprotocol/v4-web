@@ -23,10 +23,12 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
 import { Tag, TagSign } from '@/components/Tag';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -52,6 +54,8 @@ export const SharePNLAnalyticsDialog = ({
 }: DialogProps<SharePNLAnalyticsDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const symbol = getDisplayableAssetFromBaseAsset(assetId);
 
   const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -67,9 +71,9 @@ export const SharePNLAnalyticsDialog = ({
         text: `${stringGetter({
           key: STRING_KEYS.TWEET_MARKET_POSITION,
           params: {
-            MARKET: assetId,
+            MARKET: symbol,
           },
-        })}\n\n#dYdX #${assetId}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        })}\n\n#dYdX #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
       });
 
@@ -104,7 +108,7 @@ export const SharePNLAnalyticsDialog = ({
       >
         <div tw="flexColumn h-full">
           <div tw="row mb-0.75 gap-0.5">
-            <AssetIcon symbol={assetId} tw="h-[1.625rem]" />
+            <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="h-[1.625rem]" />
 
             <span>
               <span tw="text-color-text-2 font-base-bold">{assetLeft}</span>/{assetRight}

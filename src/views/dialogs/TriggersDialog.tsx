@@ -7,7 +7,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 
 export const TriggersDialog = ({
@@ -20,13 +21,14 @@ export const TriggersDialog = ({
 }: DialogProps<TriggersDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
 
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS })}
-      slotIcon={<AssetIcon symbol={assetId} />}
+      slotIcon={<AssetIcon logoUrl={logoUrl} symbol={assetId} />}
     >
       <TriggersForm
         marketId={marketId}

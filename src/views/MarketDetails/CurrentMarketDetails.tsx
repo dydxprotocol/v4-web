@@ -14,6 +14,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
@@ -85,7 +86,7 @@ export const CurrentMarketDetails = () => {
           useGrouping
           value={stepSize}
           type={OutputType.Asset}
-          tag={id}
+          tag={getDisplayableAssetFromBaseAsset(id)}
           fractionDigits={stepSizeDecimals}
         />
       ),
@@ -98,7 +99,7 @@ export const CurrentMarketDetails = () => {
           useGrouping
           value={minOrderSize}
           type={OutputType.Asset}
-          tag={id}
+          tag={getDisplayableAssetFromBaseAsset(id)}
           fractionDigits={stepSizeDecimals}
         />
       ),

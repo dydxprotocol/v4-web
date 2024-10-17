@@ -13,7 +13,10 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   localCancelAll: LocalCancelAllData;
@@ -34,7 +37,8 @@ export const CancelAllNotification = ({
   const numCanceled = localCancelAll.canceledOrderIds?.length ?? 0;
   const numFailed = localCancelAll.failedOrderIds?.length ?? 0;
 
-  const { assetId } = marketData ?? {};
+  const { assetId } = orEmptyObj(marketData);
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
 
   // Check if all orders have been confirmed canceled or failed
   const isCancellationConfirmed = numCanceled + numFailed >= numOrders;
@@ -64,7 +68,7 @@ export const CancelAllNotification = ({
     <Notification
       isToast={isToast}
       notification={notification}
-      slotIcon={assetId ? <AssetIcon symbol={assetId} /> : null}
+      slotIcon={assetId ? <AssetIcon logoUrl={logoUrl} symbol={assetId} /> : null}
       slotTitle={stringGetter({
         key: isCancelForSingleMarket
           ? STRING_KEYS.CANCELING_ALL_ORDERS_IN_MARKET

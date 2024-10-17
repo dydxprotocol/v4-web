@@ -38,6 +38,7 @@ import {
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
@@ -78,6 +79,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const currentMarketAssetId = useAppSelector(getCurrentMarketAssetId);
+  const currentMarketAssetImgUrl = useAppSelector((s) => getAssetImageUrl(s, currentMarketAssetId));
 
   const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
     useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
@@ -387,7 +389,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     value: PanelView.CurrentMarket,
                     ...(currentMarketAssetId
                       ? {
-                          slotBefore: <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />,
+                          slotBefore: (
+                            <AssetIcon
+                              logoUrl={currentMarketAssetImgUrl}
+                              symbol={currentMarketAssetId}
+                              tw="text-[1.5em]"
+                            />
+                          ),
                           label: currentMarketAssetId,
                         }
                       : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),

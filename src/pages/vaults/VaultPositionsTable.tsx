@@ -24,6 +24,7 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -55,6 +56,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+            const logoUrl =
+              marketId === USDC_MARKET_HARDCODED ? undefined : asset?.resources?.imageUrl;
 
             return (
               // eslint-disable-next-line jsx-a11y/interactive-supports-focus
@@ -71,6 +74,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   stacked
                   slotLeft={
                     <AssetIcon
+                      logoUrl={logoUrl}
                       symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
                       tw="[--asset-icon-size:2.5em]"
                     />
@@ -111,7 +115,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               <Output
                 value={currentPosition?.asset}
                 type={OutputType.Asset}
-                tag={marketsData[marketId ?? '']?.assetId}
+                tag={getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
                 fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
               />
             </TableCell>
