@@ -24,6 +24,7 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -114,7 +115,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               <Output
                 value={currentPosition?.asset}
                 type={OutputType.Asset}
-                tag={marketsData[marketId ?? '']?.assetId}
+                tag={getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
                 fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
               />
             </TableCell>
