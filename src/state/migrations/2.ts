@@ -23,6 +23,7 @@ export function migration2(state: PersistedState | undefined): V2State {
     ...state,
     dismissable: {
       hasSeenPredictionMarketIntroDialog: hasSeenPredictionMarketsIntro ?? false,
+      dismissedAffiliateBanner: false,
     },
   };
 }
