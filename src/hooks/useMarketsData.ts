@@ -61,6 +61,38 @@ const filterFunctions = {
   [MarketFilters.RWA]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.RWA);
   },
+
+  // Soon to be deprecated filters
+  [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.AI_DEPRECATED);
+  },
+  [MarketFilters.DEFI_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.DEFI_DEPRECATED);
+  },
+  [MarketFilters.ENT_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.ENT_DEPRECATED);
+  },
+  [MarketFilters.FX_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.FX_DEPRECATED);
+  },
+  [MarketFilters.GAMING_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.GAMING_DEPRECATED);
+  },
+  [MarketFilters.LAYER_1_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.LAYER_1_DEPRECATED);
+  },
+  [MarketFilters.LAYER_2_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.LAYER_2_DEPRECATED);
+  },
+  [MarketFilters.MEME_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.MEME_DEPRECATED);
+  },
+  [MarketFilters.NFT_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.NFT_DEPRECATED);
+  },
+  [MarketFilters.RWA_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.RWA_DEPRECATED);
+  },
 };
 
 export const useMarketsData = (
