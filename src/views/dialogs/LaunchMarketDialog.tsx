@@ -5,9 +5,11 @@ import styled from 'styled-components';
 
 import { DialogProps, LaunchMarketDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -23,6 +25,8 @@ export const LaunchMarketDialog = ({
   const { isMobile } = useBreakpoints();
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
+  const vault = useLoadedVaultDetails().data;
+  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
 
   const { title, description } = useMemo(() => {
     switch (formStep) {
@@ -44,11 +48,16 @@ export const LaunchMarketDialog = ({
                 <Output
                   type={OutputType.Percent}
                   tw="inline-block text-color-success"
-                  value={0.3456}
+                  value={depositApr}
                 />
               ),
               DEPOSIT_AMOUNT: (
-                <Output useGrouping type={OutputType.Fiat} tw="inline-block" value={10_000} />
+                <Output
+                  useGrouping
+                  type={OutputType.Fiat}
+                  tw="inline-block"
+                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                />
               ),
               PAST_DAYS: 30,
             },

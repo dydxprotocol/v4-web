@@ -1,17 +1,17 @@
 import { FormEvent, useMemo } from 'react';
 
 import { LightningBoltIcon } from '@radix-ui/react-icons';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,7 +19,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details, type DetailsItem } from '@/components/Details';
-import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -30,16 +29,16 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 type NewMarketSelectionStepProps = {
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
+  freeCollateralDetailItem: DetailsItem;
   receiptItems: DetailsItem[];
   shouldHideTitleAndDescription?: boolean;
 };
@@ -48,6 +47,7 @@ export const NewMarketSelectionStep = ({
   tickerToAdd,
   setTickerToAdd,
   onConfirmMarket,
+  freeCollateralDetailItem,
   receiptItems,
   shouldHideTitleAndDescription,
 }: NewMarketSelectionStepProps) => {
@@ -55,8 +55,8 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
-  const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
-  const { freeCollateral } = subAccount;
+  const vault = useLoadedVaultDetails().data;
+  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -84,11 +84,16 @@ export const NewMarketSelectionStep = ({
                 <Output
                   type={OutputType.Percent}
                   tw="inline-block text-color-success"
-                  value={0.3456}
+                  value={depositApr}
                 />
               ),
               DEPOSIT_AMOUNT: (
-                <Output useGrouping type={OutputType.Fiat} tw="inline-block" value={10_000} />
+                <Output
+                  useGrouping
+                  type={OutputType.Fiat}
+                  tw="inline-block"
+                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                />
               ),
               PAST_DAYS: 30,
             },
@@ -142,21 +147,7 @@ export const NewMarketSelectionStep = ({
 
           <WithDetailsReceipt
             side="bottom"
-            detailItems={[
-              {
-                key: 'cross-free-collateral',
-                label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-                value: (
-                  <DiffOutput
-                    withDiff
-                    type={OutputType.Fiat}
-                    value={freeCollateral?.current}
-                    newValue={88000}
-                    fractionDigits={USD_DECIMALS}
-                  />
-                ),
-              },
-            ]}
+            detailItems={[freeCollateralDetailItem]}
             tw="[--withReceipt-backgroundColor:--color-layer-2]"
           >
             <FormInput
@@ -164,7 +155,7 @@ export const NewMarketSelectionStep = ({
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"
-              value="$10000"
+              value={`$${DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}`}
             />
           </WithDetailsReceipt>
 
