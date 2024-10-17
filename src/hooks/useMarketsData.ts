@@ -24,7 +24,8 @@ import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useMetadataService } from './useLaunchableMarkets';
 import { useAllStatsigGateValues } from './useStatsig';
@@ -112,10 +113,11 @@ export const useMarketsData = ({
           perpetual,
         } = marketData;
         const { nextFundingRate, line, openInterest, openInterestUSDC, trades24H, volume24H } =
-          perpetual ?? {};
-        const { name, tags } = allAssets[assetId] ?? {};
+          orEmptyObj(perpetual);
+        const { name, tags, resources } = orEmptyObj(allAssets[assetId]);
+        const { imageUrl } = orEmptyObj(resources);
         const { effectiveInitialMarginFraction, initialMarginFraction, tickSizeDecimals } =
-          configs ?? {};
+          orEmptyObj(configs);
 
         return safeAssign(
           {},
@@ -125,6 +127,7 @@ export const useMarketsData = ({
             displayId,
             clobPairId,
             effectiveInitialMarginFraction,
+            imageUrl,
             initialMarginFraction,
             isNew,
             line: line?.toArray(),
@@ -143,9 +146,9 @@ export const useMarketsData = ({
         );
       });
 
-    if (unlaunchedMarkets.data && !hideUnlaunchedMarkets) {
+    if (unlaunchedMarkets.data && !hideUnlaunchedMarkets && testFlags.pml) {
       const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data).map((market) => {
-        const { id, name, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
+        const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
 
         if (listOfMarkets.some((m) => m.assetId === id)) return null;
 
@@ -154,9 +157,10 @@ export const useMarketsData = ({
           {
             id: `${id}-USD`,
             assetId: id,
-            displayId: getDisplayableAssetFromBaseAsset(id),
+            displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
             clobPairId: -1,
             effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
+            imageUrl: logo,
             initialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
             isNew: false,
             isUnlaunched: true,

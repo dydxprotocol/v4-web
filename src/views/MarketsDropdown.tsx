@@ -3,6 +3,7 @@ import { Key, memo, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
@@ -69,6 +70,7 @@ const MarketsDropdownContent = ({
           renderCell: ({
             assetId,
             displayId,
+            imageUrl,
             isNew,
             isUnlaunched,
             effectiveInitialMarginFraction,
@@ -76,7 +78,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
+              <$AssetIcon uiRefreshEnabled={uiRefresh} logoUrl={imageUrl} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 {isUnlaunched ? (
@@ -269,11 +271,11 @@ export const MarketsDropdown = memo(
   ({
     currentMarketId,
     launchableMarketId,
-    symbol = '',
+    logoUrl = '',
   }: {
     currentMarketId?: string;
     launchableMarketId?: string;
-    symbol: string | null;
+    logoUrl: Nullable<string>;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
@@ -348,7 +350,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <$AssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
+                      <$AssetIcon logoUrl={logoUrl} uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}

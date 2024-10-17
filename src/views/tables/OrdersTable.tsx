@@ -255,7 +255,7 @@ const getOrdersTableColumnDef = ({
                     tw="text-color-text-0"
                   />
                   <$AssetIconWithStatus>
-                    <$AssetIcon symbol={asset?.id} />
+                    <$AssetIcon logoUrl={asset?.resources?.imageUrl} symbol={asset?.id} />
                     <$StatusDot color={statusIconColor} />
                   </$AssetIconWithStatus>
                 </>

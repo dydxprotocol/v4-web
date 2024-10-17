@@ -54,12 +54,13 @@ export const MarketsCompactTable = ({
           renderCell: ({
             assetId,
             effectiveInitialMarginFraction,
+            imageUrl,
             initialMarginFraction,
             name,
           }) => (
             <AssetTableCell
               stacked
-              configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+              configs={{ imageUrl, effectiveInitialMarginFraction, initialMarginFraction }}
               name={name}
               symbol={assetId}
             />

@@ -58,12 +58,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
                 isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction, isUnlaunched }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
@@ -115,12 +121,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
                 isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction, isUnlaunched }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
