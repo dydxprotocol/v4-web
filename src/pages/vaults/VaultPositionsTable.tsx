@@ -13,6 +13,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
+import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -111,7 +112,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               <Output
                 value={currentPosition?.asset}
                 type={OutputType.Asset}
-                tag={marketsData[marketId ?? '']?.assetId}
+                tag={<$Label>{marketsData[marketId ?? '']?.assetId}</$Label>}
                 fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
               />
             </TableCell>
@@ -218,4 +219,9 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
     })[sign]};
+`;
+
+const $Label = styled.div`
+  max-width: 6rem;
+  ${layoutMixins.textTruncate}
 `;
