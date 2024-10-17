@@ -9,10 +9,11 @@ import type { MenuItem } from '@/constants/menus';
 import { DydxNetwork } from '@/constants/networks';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
+import { usePreferenceMenu } from '@/hooks/usePreferenceMenu';
 import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { ComingSoonSpace } from '@/components/ComingSoon';
+import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { PageMenu } from '@/components/PageMenu';
 import { PageMenuItemType } from '@/components/PageMenu/PageMenuItem';
 import { useNetworks } from '@/views/menus/useNetworks';
@@ -42,12 +43,6 @@ const SettingsPage = () => {
       labelRight: SUPPORTED_LOCALE_STRING_LABELS[selectedLocale],
     },
     {
-      value: 'notification-nav-item',
-      type: PageMenuItemType.Navigation,
-      href: `${AppRoute.Settings}/${MobileSettingsRoute.Notifications}`,
-      label: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
-    },
-    {
       value: 'network-nav-item',
       type: PageMenuItemType.Navigation,
       href: `${AppRoute.Settings}/${MobileSettingsRoute.Network}`,
@@ -57,6 +52,12 @@ const SettingsPage = () => {
           {selectedNetworkConfig?.slotBefore} <span>{selectedNetworkConfig?.label}</span>
         </>
       ),
+    },
+    {
+      value: 'preferences-nav-item',
+      type: PageMenuItemType.Navigation,
+      href: `${AppRoute.Settings}/${MobileSettingsRoute.Preferences}`,
+      label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
     },
   ];
 
@@ -81,6 +82,8 @@ const SettingsPage = () => {
     subitems: networks as MenuItem<DydxNetwork, PageMenuItemType>[],
   };
 
+  const preferencesMenuItems = usePreferenceMenu();
+
   return (
     <>
       <SettingsHeader pathname={pathname} stringGetter={stringGetter} />
@@ -91,8 +94,8 @@ const SettingsPage = () => {
           element={<PageMenu group="language" items={[languages]} />}
         />
         <Route
-          path={MobileSettingsRoute.Notifications}
-          element={<ComingSoonSpace />} // <PageMenu group="notifications" items={[]} />
+          path={MobileSettingsRoute.Preferences}
+          element={<ComboboxMenu items={preferencesMenuItems} withSearch={false} />}
         />
         <Route
           path={MobileSettingsRoute.Network}

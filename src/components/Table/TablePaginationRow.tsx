@@ -59,6 +59,7 @@ export const TablePaginationRow = ({
           value={pageNumberToDisplay(currentPage)}
           items={pages}
           onValueChange={(pageNumber: string) => setCurrentPage(Number(pageNumber) - 1)}
+          truncateLabel={false}
         />
         <IconButton
           {...buttonProps}

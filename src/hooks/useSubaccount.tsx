@@ -24,7 +24,7 @@ import type {
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
-import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -50,6 +50,7 @@ import {
 
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { track } from '@/lib/analytics/analytics';
 import { getValidErrorParamsFromParsingError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -735,6 +736,22 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, localDydxWallet, newMarketProposal]
   );
 
+  // ------ Listing Method ------ //
+  const createPermissionlessMarket = useCallback(
+    async (ticker: string) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      } else if (!subaccountClient?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const response = await compositeClient.createMarketPermissionless(subaccountClient, ticker);
+
+      return response;
+    },
+    [compositeClient, subaccountClient]
+  );
+
   // ------ Staking Methods ------ //
   const delegate = useCallback(
     async (validator: string, amount: number) => {
@@ -942,9 +959,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const { mutateAsync: registerAffiliateMutate, isPending: isRegisterAffiliatePending } =
     useMutation({
-      mutationFn: async (affiliate: string) => {
-        const tx = await registerAffiliate(affiliate);
+      mutationFn: async (affiliateAddress: string) => {
+        const tx = await registerAffiliate(affiliateAddress);
         dispatch(removeLatestReferrer());
+        track(AnalyticsEvents.AffiliateRegistration({ affiliateAddress }));
         return tx;
       },
     });
@@ -1050,6 +1068,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Governance Methods
     submitNewMarketProposal,
+
+    // Listing Methods
+    createPermissionlessMarket,
 
     // Staking methods
     delegate,

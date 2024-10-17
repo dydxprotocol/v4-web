@@ -1,5 +1,6 @@
 import { Key, useMemo } from 'react';
 
+import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
-import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -31,6 +32,7 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { Tag } from '@/components/Tag';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -41,6 +43,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
+import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -48,22 +51,31 @@ import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButto
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
+import { PositionsTriggersCellDeprecated } from './PositionsTable/PositionsTriggersCellDeprecated';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
   IndexEntry = 'IndexEntry',
-  PnL = 'PnL',
 
   Market = 'Market',
+  Leverage = 'Leverage',
+  Type = 'Type',
   Size = 'Size',
-  LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
+  Value = 'Value',
+  PnL = 'PnL',
   Margin = 'Margin',
-  UnrealizedPnl = 'UnrealizedPnl',
-  RealizedPnl = 'RealizedPnl',
-  AverageOpenAndClose = 'AverageOpenAndClose',
-  NetFunding = 'NetFunding',
+  AverageOpen = 'AverageOpen',
+  Oracle = 'Oracle',
+  Liquidation = 'Liquidation',
   Triggers = 'Triggers',
+  NetFunding = 'NetFunding',
   Actions = 'Actions',
+
+  // TODO: CT-1292 remove deprecated fields
+  LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
+  RealizedPnl = 'RealizedPnl',
+  UnrealizedPnl = 'UnrealizedPnl',
+  AverageOpenAndClose = 'AverageOpenAndClose',
 }
 
 type PositionTableRow = {
@@ -84,6 +96,8 @@ const getPositionsTableColumnDef = ({
   showClosePositionAction,
   navigateToOrders,
   isSinglePosition,
+  uiRefresh,
+  isTablet,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
@@ -92,6 +106,8 @@ const getPositionsTableColumnDef = ({
   showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
   isSinglePosition: boolean;
+  uiRefresh: boolean;
+  isTablet: boolean;
 }) => ({
   width,
   ...(
@@ -156,56 +172,125 @@ const getPositionsTableColumnDef = ({
         columnKey: 'combinedPnl',
         getCellValue: (row) => row.unrealizedPnl?.current,
         label: stringGetter({ key: STRING_KEYS.PNL }),
-        hideOnBreakpoint: MediaQueryKeys.isNotTablet,
-        renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
-          <TableCell stacked>
-            <$OutputSigned
-              sign={getNumberSign(unrealizedPnlPercent?.current)}
-              type={OutputType.Percent}
-              value={unrealizedPnlPercent?.current}
-              showSign={ShowSign.None}
-            />
-            <$HighlightOutput
-              isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
-              type={OutputType.Fiat}
-              value={unrealizedPnl?.current}
-              showSign={ShowSign.Both}
-            />
-          </TableCell>
-        ),
+        hideOnBreakpoint: uiRefresh ? undefined : MediaQueryKeys.isNotTablet,
+        renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => {
+          return uiRefresh && !isTablet ? (
+            <TableCell>
+              <$OutputSigned
+                sign={getNumberSign(unrealizedPnl?.current)}
+                type={OutputType.Fiat}
+                value={unrealizedPnl?.current}
+                showSign={ShowSign.None}
+              />
+            </TableCell>
+          ) : (
+            <TableCell stacked>
+              <$OutputSigned
+                sign={getNumberSign(unrealizedPnlPercent?.current)}
+                type={OutputType.Percent}
+                value={unrealizedPnlPercent?.current}
+                showSign={ShowSign.None}
+              />
+              <$HighlightOutput
+                isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
+                type={OutputType.Fiat}
+                value={unrealizedPnl?.current}
+                showSign={ShowSign.Both}
+              />
+            </TableCell>
+          );
+        },
       },
       [PositionsTableColumnKey.Market]: {
         columnKey: 'market',
         getCellValue: (row) => row.displayId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ displayId, asset, leverage }) => (
-          <MarketTableCell
-            asset={asset}
-            marketId={displayId}
-            leverage={leverage?.current ?? undefined}
-            isHighlighted
-          />
+        renderCell: ({ displayId, asset, leverage }) => {
+          return (
+            <MarketTableCell
+              asset={asset}
+              marketId={displayId}
+              leverage={leverage?.current ?? undefined}
+              isHighlighted
+            />
+          );
+        },
+      },
+      [PositionsTableColumnKey.Leverage]: {
+        columnKey: 'leverage',
+        getCellValue: (row) => row.leverage?.current,
+        label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        renderCell: ({ leverage }) => (
+          <TableCell>
+            <Output type={OutputType.Multiple} value={leverage.current} showSign={ShowSign.None} />
+          </TableCell>
+        ),
+      },
+      [PositionsTableColumnKey.Type]: {
+        columnKey: 'type',
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.childSubaccountNumber).name,
+        label: stringGetter({ key: STRING_KEYS.TYPE }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        renderCell: ({ childSubaccountNumber }) => (
+          <TableCell>
+            <Tag>{getMarginModeFromSubaccountNumber(childSubaccountNumber).name}</Tag>
+          </TableCell>
         ),
       },
       [PositionsTableColumnKey.Size]: {
         columnKey: 'size',
-        getCellValue: (row) => row.notionalTotal?.current,
+        getCellValue: (row) => {
+          return uiRefresh ? row.size?.current : row.notionalTotal?.current;
+        },
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, stepSizeDecimals }) => (
-          <TableCell stacked>
-            <$OutputSigned
-              type={OutputType.Asset}
-              value={size?.current}
-              tag={assetId}
-              showSign={ShowSign.Negative}
-              sign={getNumberSign(size?.current)}
-              fractionDigits={stepSizeDecimals}
+        renderCell: ({ assetId, size, notionalTotal, stepSizeDecimals }) => {
+          return uiRefresh ? (
+            <TableCell>
+              <$OutputSigned
+                type={OutputType.Asset}
+                value={size?.current}
+                showSign={ShowSign.Negative}
+                sign={getNumberSign(size?.current)}
+                fractionDigits={stepSizeDecimals}
+              />
+            </TableCell>
+          ) : (
+            <TableCell stacked>
+              <$OutputSigned
+                type={OutputType.Asset}
+                value={size?.current}
+                tag={assetId}
+                showSign={ShowSign.Negative}
+                sign={getNumberSign(size?.current)}
+                fractionDigits={stepSizeDecimals}
+              />
+              <Output type={OutputType.Fiat} value={notionalTotal?.current} />
+            </TableCell>
+          );
+        },
+      },
+      [PositionsTableColumnKey.Value]: {
+        columnKey: 'value',
+        getCellValue: (row) => row.notionalTotal?.current,
+        label: stringGetter({ key: STRING_KEYS.VALUE }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        renderCell: ({ displayId, asset, leverage, notionalTotal }) => {
+          return uiRefresh ? (
+            <TableCell>
+              <Output type={OutputType.Fiat} value={notionalTotal?.current} />
+            </TableCell>
+          ) : (
+            <MarketTableCell
+              asset={asset}
+              marketId={displayId}
+              leverage={leverage?.current ?? undefined}
+              isHighlighted
             />
-            <Output type={OutputType.Fiat} value={notionalTotal?.current} />
-          </TableCell>
-        ),
+          );
+        },
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
@@ -215,26 +300,88 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         renderCell: (row) => <PositionsMarginCell position={row} />,
       },
+      [PositionsTableColumnKey.AverageOpen]: {
+        columnKey: 'averageOpen',
+        getCellValue: (row) => row.entryPrice?.current,
+        label: stringGetter({ key: STRING_KEYS.AVG_OPEN }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
+        renderCell: ({ entryPrice, tickSizeDecimals }) => (
+          <TableCell>
+            <Output
+              type={OutputType.Fiat}
+              value={entryPrice?.current}
+              fractionDigits={tickSizeDecimals}
+            />
+          </TableCell>
+        ),
+      },
+      [PositionsTableColumnKey.Oracle]: {
+        columnKey: 'oracle',
+        getCellValue: (row) => row.oraclePrice,
+        label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED }),
+        renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
+          <TableCell stacked={!uiRefresh}>
+            {!uiRefresh && (
+              <Output
+                type={OutputType.Fiat}
+                value={liquidationPrice?.current}
+                fractionDigits={tickSizeDecimals}
+              />
+            )}
+            <Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+          </TableCell>
+        ),
+      },
+      [PositionsTableColumnKey.Liquidation]: {
+        columnKey: 'liquidation',
+        getCellValue: (row) => row.liquidationPrice?.current,
+        label: stringGetter({ key: STRING_KEYS.LIQUIDATION }),
+        renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
+          <TableCell stacked={!uiRefresh}>
+            <Output
+              type={OutputType.Fiat}
+              value={liquidationPrice?.current}
+              fractionDigits={tickSizeDecimals}
+            />
+            {!uiRefresh && (
+              <Output
+                type={OutputType.Fiat}
+                value={oraclePrice}
+                fractionDigits={tickSizeDecimals}
+              />
+            )}
+          </TableCell>
+        ),
+      },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
         getCellValue: (row) => row.netFunding,
-        label: (
+        label: uiRefresh ? (
+          stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })
+        ) : (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })}</span>
             <span>{stringGetter({ key: STRING_KEYS.RATE })}</span>
           </TableColumnHeader>
         ),
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ netFunding, fundingRate }) => (
-          <TableCell stacked>
-            <$OutputSigned
-              sign={getNumberSign(netFunding)}
-              type={OutputType.Fiat}
-              value={netFunding}
-            />
-            <Output showSign={ShowSign.Negative} type={OutputType.Percent} value={fundingRate} />
-          </TableCell>
-        ),
+        renderCell: ({ netFunding, fundingRate }) => {
+          return uiRefresh ? (
+            <TableCell>
+              <Output type={OutputType.Fiat} value={netFunding} />
+            </TableCell>
+          ) : (
+            <TableCell stacked>
+              <$OutputSigned
+                sign={getNumberSign(netFunding)}
+                type={OutputType.Fiat}
+                value={netFunding}
+              />
+              <Output showSign={ShowSign.Negative} type={OutputType.Percent} value={fundingRate} />
+            </TableCell>
+          );
+        },
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
         columnKey: 'price',
@@ -312,10 +459,18 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Triggers]: {
         columnKey: 'triggers',
-        label: stringGetter({ key: STRING_KEYS.TRIGGERS }),
+        label: uiRefresh ? (
+          <$TriggersContainer tw="flex gap-[0.75em] pr-[2.75em]">
+            <$TriggerLabel>TP</$TriggerLabel> <$VerticalSeparator />
+            <$TriggerLabel>SL</$TriggerLabel>
+          </$TriggersContainer>
+        ) : (
+          stringGetter({ key: STRING_KEYS.TRIGGERS })
+        ),
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
+        align: uiRefresh ? 'center' : undefined,
         renderCell: ({
           id,
           assetId,
@@ -325,20 +480,35 @@ const getPositionsTableColumnDef = ({
           size,
           stopLossOrders,
           takeProfitOrders,
-        }) => (
-          <PositionsTriggersCell
-            marketId={id}
-            assetId={assetId}
-            tickSizeDecimals={tickSizeDecimals}
-            liquidationPrice={liquidationPrice?.current}
-            stopLossOrders={stopLossOrders}
-            takeProfitOrders={takeProfitOrders}
-            positionSide={side.current}
-            positionSize={size?.current}
-            isDisabled={isAccountViewOnly}
-            onViewOrdersClick={navigateToOrders}
-          />
-        ),
+        }) => {
+          return uiRefresh ? (
+            <PositionsTriggersCell
+              marketId={id}
+              assetId={assetId}
+              tickSizeDecimals={tickSizeDecimals}
+              liquidationPrice={liquidationPrice?.current}
+              stopLossOrders={stopLossOrders}
+              takeProfitOrders={takeProfitOrders}
+              positionSide={side.current}
+              positionSize={size?.current}
+              isDisabled={isAccountViewOnly}
+              onViewOrdersClick={navigateToOrders}
+            />
+          ) : (
+            <PositionsTriggersCellDeprecated
+              marketId={id}
+              assetId={assetId}
+              tickSizeDecimals={tickSizeDecimals}
+              liquidationPrice={liquidationPrice?.current}
+              stopLossOrders={stopLossOrders}
+              takeProfitOrders={takeProfitOrders}
+              positionSide={side.current}
+              positionSize={size?.current}
+              isDisabled={isAccountViewOnly}
+              onViewOrdersClick={navigateToOrders}
+            />
+          );
+        },
       },
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
@@ -415,6 +585,8 @@ export const PositionsTable = ({
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
+  const { uiRefresh } = testFlags;
+  const { isTablet } = useBreakpoints();
 
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
@@ -482,6 +654,8 @@ export const PositionsTable = ({
           showClosePositionAction,
           navigateToOrders,
           isSinglePosition: positionsData.length === 1,
+          uiRefresh,
+          isTablet,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
@@ -514,6 +688,7 @@ export const PositionsTable = ({
     />
   );
 };
+
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
@@ -538,6 +713,7 @@ const $Table = styled(Table)`
     }
   }
 ` as typeof Table;
+
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -562,4 +738,18 @@ const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
+`;
+
+const $TriggersContainer = styled.div`
+  font: var(--font-small-book);
+`;
+
+const $TriggerLabel = styled(Tag)`
+  background-color: transparent;
+  border: var(--border);
+  color: var(--tableStickyRow-textColor, var(--color-text-0));
+`;
+
+const $VerticalSeparator = styled(Separator)`
+  border-right: solid var(--border-width) var(--color-border);
 `;

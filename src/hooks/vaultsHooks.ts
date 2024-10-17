@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
+import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 
 import {
+  IndexerMegavaultHistoricalPnlResponse,
   Nullable,
   PerpetualMarket,
   VaultAccountCalculator,
@@ -62,15 +63,24 @@ export function useForceRefreshVaultDetails() {
   );
 }
 
+const toProcessedHistoricalPnlResponse = (res: any) =>
+  VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(res));
+
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
-      const callResult = await getMegavaultHistoricalPnl();
+      const [dailyResult, hourlyResult] = await Promise.all([
+        getMegavaultHistoricalPnl(PnlTickInterval.day).then(toProcessedHistoricalPnlResponse),
+        getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
+      ]);
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
-          VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(callResult))
+          new IndexerMegavaultHistoricalPnlResponse([
+            ...(dailyResult?.megavaultPnl ?? []),
+            ...(hourlyResult?.megavaultPnl ?? []),
+          ])
         )
       );
     },
@@ -164,6 +174,8 @@ export const useLoadedVaultPositions = () => {
     ...vaultQueryOptions,
   });
 
+  const vaultTvl = useLoadedVaultDetails().data?.totalValue;
+
   const calculatedPositions = useMemo(() => {
     if (vaultPositions?.data == null || marketsMap.data == null || marketsMap.data.size === 0) {
       return undefined;
@@ -171,9 +183,10 @@ export const useLoadedVaultPositions = () => {
     return VaultCalculator.calculateVaultPositions(
       vaultPositions.data,
       subvaultHistories?.data,
-      marketsMap.data
+      marketsMap.data,
+      vaultTvl
     );
-  }, [subvaultHistories, vaultPositions, marketsMap]);
+  }, [vaultPositions?.data, marketsMap.data, subvaultHistories?.data, vaultTvl]);
 
   return calculatedPositions;
 };
@@ -200,7 +213,11 @@ export const useLoadedVaultAccount = () => {
         return wrapNullable(undefined);
       }
       const [acc, transfers] = await Promise.all([
-        getVaultAccountInfo(),
+        getVaultAccountInfo().then(
+          (a) => a,
+          // error is an expected result of this call when user has no balance
+          () => undefined
+        ),
         getAllAccountTransfersBetween(dydxAddress, '0', MEGAVAULT_MODULE_ADDRESS, '0'),
       ]);
 
@@ -211,7 +228,7 @@ export const useLoadedVaultAccount = () => {
         safeStringifyForAbacusParsing(transfers)
       );
 
-      if (parsedAccount == null || parsedTransfers == null) {
+      if (parsedTransfers == null) {
         return wrapNullable(undefined);
       }
       return wrapNullable(
@@ -288,7 +305,7 @@ export const useVaultFormSlippage = () => {
 };
 
 export const useVaultFormValidationResponse = () => {
-  const { operation, slippageAck, confirmationStep } = useAppSelector(
+  const { operation, slippageAck, termsAck, confirmationStep } = useAppSelector(
     selectVaultFormStateExceptAmount
   );
   const accountInfo = useAppSelector(selectSubaccountStateForVaults);
@@ -302,9 +319,10 @@ export const useVaultFormValidationResponse = () => {
         operationStringToVaultFormAction(operation),
         amount != null && amount.trim().length > 0 ? MustBigNumber(amount).toNumber() : undefined,
         slippageAck,
+        termsAck,
         confirmationStep
       ),
-    [operation, amount, slippageAck, confirmationStep]
+    [operation, amount, slippageAck, termsAck, confirmationStep]
   );
   const vaultFormAccountInfo = useMemo(
     () =>

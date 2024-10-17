@@ -302,7 +302,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
-      const tradeUSElectionExpirationDate = new Date('2024-08-16T23:59:59'); // TODO: (TRA-528): Update this date
+      const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {

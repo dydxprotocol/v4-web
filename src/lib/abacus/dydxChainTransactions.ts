@@ -122,6 +122,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         USDC_GAS_DENOM,
         CHAINTOKEN_DENOM,
         CHAINTOKEN_DECIMALS,
+        enableTimestampNonce,
       } = parsedParams;
 
       const compositeClient = await CompositeClient.connect(
@@ -142,7 +143,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastPollIntervalMs: 3_000,
               broadcastTimeoutMs: 60_000,
             },
-            DEFAULT_TRANSACTION_MEMO
+            DEFAULT_TRANSACTION_MEMO,
+            enableTimestampNonce
           )
         )
       );

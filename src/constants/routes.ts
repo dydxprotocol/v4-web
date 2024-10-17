@@ -41,7 +41,7 @@ export enum HistoryRoute {
 
 export enum MobileSettingsRoute {
   Language = 'language',
-  Notifications = 'notifications',
+  Preferences = 'preferences',
   Network = 'network',
 }
 

@@ -2,7 +2,13 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import { MARKET_FILTER_OPTIONS, MarketFilters, type MarketData } from '@/constants/markets';
+import {
+  MARKET_FILTER_OPTIONS,
+  MarketFilters,
+  PREDICTION_MARKET,
+  type MarketData,
+} from '@/constants/markets';
+import { StatsigFlags } from '@/constants/statsig';
 
 import {
   SEVEN_DAY_SPARKLINE_ENTRIES,
@@ -18,43 +24,74 @@ import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
+import { useAllStatsigGateValues } from './useStatsig';
+
 const filterFunctions = {
   [MarketFilters.AI]: (market: MarketData) => {
-    return market.tags?.includes('AI');
+    return market.tags?.includes(MarketFilters.AI);
   },
   [MarketFilters.ALL]: () => true,
   [MarketFilters.DEFI]: (market: MarketData) => {
-    return market.tags?.includes('Defi');
+    return market.tags?.includes(MarketFilters.DEFI);
   },
-  [MarketFilters.ENT]: (market: MarketData) => {
-    return market.tags?.includes('Entertainment');
+  [MarketFilters.DEPIN]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.DEPIN);
   },
   [MarketFilters.FX]: (market: MarketData) => {
-    return market.tags?.includes('FX');
+    return market.tags?.includes(MarketFilters.FX);
   },
   [MarketFilters.GAMING]: (market: MarketData) => {
-    return market.tags?.includes('Gaming');
+    return market.tags?.includes(MarketFilters.GAMING);
   },
   [MarketFilters.LAYER_1]: (market: MarketData) => {
-    return market.tags?.includes('Layer 1');
+    return market.tags?.includes(MarketFilters.LAYER_1);
   },
   [MarketFilters.LAYER_2]: (market: MarketData) => {
-    return market.tags?.includes('Layer 2');
+    return market.tags?.includes(MarketFilters.LAYER_2);
   },
-  [MarketFilters.MEME]: (market: MarketData) => {
-    return market.tags?.includes('Meme');
+  [MarketFilters.MEMES]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.MEMES);
   },
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
-  [MarketFilters.NFT]: (market: MarketData) => {
-    return market.tags?.includes('NFT');
-  },
   [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
-    return market.tags?.includes('Prediction Market');
+    return Object.values(PREDICTION_MARKET).includes(market.id);
   },
   [MarketFilters.RWA]: (market: MarketData) => {
-    return market.tags?.includes('RWA');
+    return market.tags?.includes(MarketFilters.RWA);
+  },
+
+  // Soon to be deprecated filters
+  [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.AI_DEPRECATED);
+  },
+  [MarketFilters.DEFI_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.DEFI_DEPRECATED);
+  },
+  [MarketFilters.ENT_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.ENT_DEPRECATED);
+  },
+  [MarketFilters.FX_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.FX_DEPRECATED);
+  },
+  [MarketFilters.GAMING_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.GAMING_DEPRECATED);
+  },
+  [MarketFilters.LAYER_1_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.LAYER_1_DEPRECATED);
+  },
+  [MarketFilters.LAYER_2_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.LAYER_2_DEPRECATED);
+  },
+  [MarketFilters.MEME_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.MEME_DEPRECATED);
+  },
+  [MarketFilters.NFT_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.NFT_DEPRECATED);
+  },
+  [MarketFilters.RWA_DEPRECATED]: (market: MarketData) => {
+    return market.tags?.includes(MarketFilters.RWA_DEPRECATED);
   },
 };
 
@@ -72,10 +109,15 @@ export const useMarketsData = (
   );
   const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
+  const featureFlags = useAllStatsigGateValues();
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
+      // temporary filterout TRUMPWIN until the backend is working
+      .filter(
+        (m) => m.assetId !== 'TRUMPWIN' || featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi]
+      )
       .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
         const isNew = Boolean(

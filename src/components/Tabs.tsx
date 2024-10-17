@@ -1,9 +1,11 @@
-import { type ReactNode, type Ref } from 'react';
+import { useRef, type ReactNode, type Ref } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
+
+import { useFadeOnHorizontalScrollContainer } from '@/hooks/useFadeOnHorizontalScrollContainer';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -71,6 +73,11 @@ export const Tabs = <TabItemsValue extends string>({
   const withBorders = dividerStyle === 'border';
   const withUnderline = dividerStyle === 'underline';
 
+  const headerRef = useRef<HTMLDivElement>(null);
+  const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
+    scrollRef: headerRef,
+  });
+
   const triggers = (
     <>
       <$List $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
@@ -84,7 +91,7 @@ export const Tabs = <TabItemsValue extends string>({
                 $withUnderline={withUnderline}
                 disabled={disabled}
               >
-                {item.label}
+                <$Label>{item.label}</$Label>
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
               </$Trigger>
@@ -103,7 +110,7 @@ export const Tabs = <TabItemsValue extends string>({
               }
               disabled={disabled}
             >
-              {item.label}
+              <$Label>{item.label}</$Label>
             </$DropdownSelectMenu>
           )
         )}
@@ -128,7 +135,17 @@ export const Tabs = <TabItemsValue extends string>({
       $withInnerBorder={withBorders || withUnderline}
       $uiRefreshEnabled={uiRefresh}
     >
-      <$Header $side={side}>{triggers}</$Header>
+      {showFadeStart || showFadeEnd ? (
+        <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
+          <$Header $side={side} ref={headerRef}>
+            {triggers}
+          </$Header>
+        </$HorizontalScrollContainer>
+      ) : (
+        <$Header $side={side} ref={headerRef}>
+          {triggers}
+        </$Header>
+      )}
 
       {sharedContent ?? (
         <div tw="stack shadow-none">
@@ -212,8 +229,33 @@ const $Root = styled(Root)<{
   }
 `;
 
+const $HorizontalScrollContainer = styled.div<{
+  showFadeStart: boolean;
+  showFadeEnd: boolean;
+}>`
+  ${layoutMixins.horizontalFadeScrollArea}
+  --scrollArea-fade-zIndex: calc(var(--stickyHeader-zIndex) + 1);
+
+  ${({ showFadeStart }) =>
+    !showFadeStart &&
+    css`
+      &:before {
+        opacity: 0;
+      }
+    `}
+
+  ${({ showFadeEnd }) =>
+    !showFadeEnd &&
+    css`
+      &:after {
+        opacity: 0;
+      }
+    `};
+`;
+
 const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
   ${layoutMixins.contentSectionDetachedScrollable}
+  flex: 1;
 
   ${({ $side }) =>
     ({
@@ -269,6 +311,11 @@ const $Trigger = styled(Trigger)<{
       ${tabMixins.tabTriggerUnderlineStyle}
     `}
 `;
+
+const $Label = styled.div`
+  ${layoutMixins.textTruncate}
+`;
+
 const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
   ${layoutMixins.flexColumn}
   outline: none;
