@@ -175,7 +175,7 @@ export const ComboboxMenu = <
             ))}
           </$Group>
         ))}
-        {slotEmpty && searchValue.trim() !== '' && (
+        {searchValue.trim() !== '' && (
           <Command.Empty tw="h-full p-1 text-color-text-0">
             {slotEmpty ??
               stringGetter({
