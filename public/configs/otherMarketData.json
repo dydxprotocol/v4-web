@@ -12999,56 +12999,6 @@
       "cmcId": 15463.0
     }
   },
-  "REN": {
-    "title": "Add REN-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a REN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 335,
-      "ticker": "REN-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "RENUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "renusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "REN-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "REN-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Ren",
-      "referencePrice": 0.03856368992,
-      "cmcId": 2539.0
-    }
-  },
   "PRCL": {
     "title": "Add PRCL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PRCL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
