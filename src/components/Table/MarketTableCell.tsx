@@ -3,6 +3,7 @@ import type { Asset } from '@/constants/abacus';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { testFlags } from '@/lib/testFlags';
 
 import { Output, OutputType, ShowSign } from '../Output';
@@ -27,9 +28,15 @@ export const MarketTableCell = ({
   return uiRefresh ? (
     <TableCell
       tw="font-bold text-color-text-2"
-      slotLeft={<AssetIcon symbol={asset?.id} tw="text-[1.25rem] tablet:text-[2.25rem]" />}
+      slotLeft={
+        <AssetIcon
+          logoUrl={asset?.resources?.imageUrl}
+          symbol={asset?.id}
+          tw="text-[1.25rem] tablet:text-[2.25rem]"
+        />
+      }
     >
-      {asset?.id}
+      {getDisplayableAssetFromBaseAsset(asset?.id ?? '')}
     </TableCell>
   ) : (
     <TableCell
@@ -39,7 +46,11 @@ export const MarketTableCell = ({
       slotLeft={
         <>
           {showFavorite && <Icon iconName={IconName.Star} />}
-          <AssetIcon symbol={asset?.id} tw="text-[1.25rem] tablet:text-[2.25rem]" />
+          <AssetIcon
+            logoUrl={asset?.resources?.imageUrl}
+            symbol={asset?.id}
+            tw="text-[1.25rem] tablet:text-[2.25rem]"
+          />
         </>
       }
     >

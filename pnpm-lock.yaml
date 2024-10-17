@@ -30,14 +30,14 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.12.31
-    version: 1.12.31
+    specifier: 1.13.0
+    version: 1.13.0
   '@dydxprotocol/v4-client-js':
-    specifier: 1.11.0
-    version: 1.11.0
+    specifier: 1.11.1
+    version: 1.11.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.220
-    version: 1.1.220
+    specifier: ^1.1.222
+    version: 1.1.222
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -2744,7 +2744,7 @@ packages:
   /@cosmjs/json-rpc@0.32.2:
     resolution: {integrity: sha512-lan2lOgmz4yVE/HR8eCOSiII/1OudIulk8836koyIDCsPEpt6eKBuctnAD168vABGArKccLAo7Mr2gy9nrKrOQ==}
     dependencies:
-      '@cosmjs/stream': 0.32.2
+      '@cosmjs/stream': 0.32.3
       xstream: 11.14.0
     dev: false
 
@@ -2866,7 +2866,7 @@ packages:
   /@cosmjs/socket@0.32.2:
     resolution: {integrity: sha512-Qc8jaw4uSBJm09UwPgkqe3g9TBFx4ZR9HkXpwT6Z9I+6kbLerXPR0Gy3NSJFSUgxIfTpO8O1yqoWAyf0Ay17Mw==}
     dependencies:
-      '@cosmjs/stream': 0.32.2
+      '@cosmjs/stream': 0.32.3
       isomorphic-ws: 4.0.1(ws@7.5.9)
       ws: 7.5.9
       xstream: 11.14.0
@@ -3138,15 +3138,15 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.12.31:
-    resolution: {integrity: sha512-tXwfvsm2VIfQwRYh6+o3GNpN0Eg91sKKLWRfnPY1S7+d4l+EhofYgLz0iL3kGEjT8I9whjP82Yt6piWUgXfZ0g==}
+  /@dydxprotocol/v4-abacus@1.13.0:
+    resolution: {integrity: sha512-cZQ0VttLnydxOingtoFgMSp4qAlVbLJ3W2NsF7lP0vFT9kgIXvDBjBhH2B6wqvWMrthYaq3Yz7S4uB5flXkw/g==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.11.0:
-    resolution: {integrity: sha512-P8lvkLh3umx+URuPyEAxDS1JuHBS7ABocJQi9XkJR24vrjvDd3iYUZoUQMslyCDiiJZ9/cgvnu9rle5wp+Q0Ng==}
+  /@dydxprotocol/v4-client-js@1.11.1:
+    resolution: {integrity: sha512-Wo22Q/NweJIiUj2C/3K3CXYAPTN68hKo2/udR6SkRfiZFbRC7Q6YnYLmA2KgsBihlFVXjgL3zlUD80dXdnmomw==}
     dependencies:
       '@cosmjs/amino': 0.32.3
       '@cosmjs/encoding': 0.32.3
@@ -3174,8 +3174,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.220:
-    resolution: {integrity: sha512-pUS6fTUKS7ZzLG6FAx1xmRNN43Kjka+GvH+KEF88fsWl7f0OzKqNmo5FWaAOCb8diJcdApN0OZ9ZxqlgTNewPw==}
+  /@dydxprotocol/v4-localization@1.1.222:
+    resolution: {integrity: sha512-YR/YQrPpoZqOlb6kRV+uwi6F9eABLYDpW3/XbNkF6TyqM0DJWF6W5acAcmDycCc2qR9+RFhcZLJ7a6LRW4pbfg==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -8913,7 +8913,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.2
+      chain-registry: 1.69.3
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -12905,8 +12905,8 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.2:
-    resolution: {integrity: sha512-fsypMTHQOZW3LSZIFLYbh63G9cq6aKlIOENveF0xvdLiilLsqh1j/RFm62CmsENQ+dfcwHyZ6FyvyjJzH1uwMg==}
+  /chain-registry@1.69.3:
+    resolution: {integrity: sha512-yjKe+kDhqr25/G4N+rESr8GKCw4snaQy06dTI0FnCmQTAtxwGXdygSBRZYW7mf6Y/C5STSWE/hgOYKMAKhErpA==}
     dependencies:
       '@chain-registry/types': 0.50.1
     dev: false
@@ -18130,7 +18130,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.2
+      chain-registry: 1.69.3
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
