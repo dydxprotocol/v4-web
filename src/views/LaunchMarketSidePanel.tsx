@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -42,7 +43,7 @@ export const LaunchMarketSidePanel = ({
             <Output
               tw="inline-block"
               type={OutputType.Asset}
-              value={10_000}
+              value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
               slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
               fractionDigits={0}
             />
@@ -94,7 +95,7 @@ export const LaunchMarketSidePanel = ({
               <Output
                 tw="inline text-color-text-1"
                 type={OutputType.Asset}
-                value={10_000}
+                value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" symbol="USDC" />}
                 fractionDigits={0}
               />

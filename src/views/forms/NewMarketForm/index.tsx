@@ -3,6 +3,7 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from
 import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
@@ -58,7 +59,9 @@ export const NewMarketForm = ({
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
 
-  const summaryData = useVaultCalculationForLaunchingMarket({ amount: 10_000 }).summaryData;
+  const summaryData = useVaultCalculationForLaunchingMarket({
+    amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+  }).summaryData;
   const { freeCollateral: freeCollateralUpdated, marginUsage: marginUsageUpdated } =
     orEmptyObj(summaryData);
   const vault = useLoadedVaultDetails().data;

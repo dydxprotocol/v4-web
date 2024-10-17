@@ -7,9 +7,11 @@ import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -53,6 +55,8 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
+  const vault = useLoadedVaultDetails().data;
+  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -80,11 +84,16 @@ export const NewMarketSelectionStep = ({
                 <Output
                   type={OutputType.Percent}
                   tw="inline-block text-color-success"
-                  value={0.3456}
+                  value={depositApr}
                 />
               ),
               DEPOSIT_AMOUNT: (
-                <Output useGrouping type={OutputType.Fiat} tw="inline-block" value={10_000} />
+                <Output
+                  useGrouping
+                  type={OutputType.Fiat}
+                  tw="inline-block"
+                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                />
               ),
               PAST_DAYS: 30,
             },
@@ -146,7 +155,7 @@ export const NewMarketSelectionStep = ({
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"
-              value="$10000"
+              value={`$${DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}}`
             />
           </WithDetailsReceipt>
 
