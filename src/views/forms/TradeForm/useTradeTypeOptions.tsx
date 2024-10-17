@@ -31,7 +31,7 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
   const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
 
   const allTradeTypeItems = useMemo((): Array<MenuItem<TradeTypes>> | undefined => {
-    const allItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
+    const allItems = typeOptions?.toArray().map(({ type, stringKey }) => ({
       value: type as TradeTypes,
       label: stringGetter({
         key:

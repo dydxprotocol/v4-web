@@ -66,7 +66,7 @@ export const TransferButtonAndReceipt = ({
       key: 'fees',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
+          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{tokensConfigs[selectedAsset].name}</Tag>
         </span>
       ),
       value: <Output type={OutputType.Asset} value={fee} />,
@@ -76,7 +76,7 @@ export const TransferButtonAndReceipt = ({
       label: (
         <span>
           {stringGetter({ key: STRING_KEYS.BALANCE })}{' '}
-          <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
+          <Tag>{tokensConfigs[selectedAsset].name}</Tag>
         </span>
       ),
       value: (

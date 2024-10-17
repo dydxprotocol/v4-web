@@ -371,7 +371,7 @@ export const ClosePositionForm = ({
 
         <PlaceOrderButtonAndReceipt
           hasValidationErrors={hasInputErrors}
-          actionStringKey={inputAlert?.actionStringKey}
+          actionStringKey={inputAlert.actionStringKey}
           validationErrorString={alertContent}
           summary={summary ?? undefined}
           currentStep={currentStep}

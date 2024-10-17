@@ -139,8 +139,8 @@ export const TimeSeriesChart = <Datum extends {}>({
   // Chart data
   const { xAccessor, yAccessor } = series[0];
 
-  const earliestDatum = data?.[0];
-  const latestDatum = data?.[data.length - 1];
+  const earliestDatum = data[0];
+  const latestDatum = data[data.length - 1];
 
   // Chart state
   const getClampedZoomDomain = useCallback(
@@ -361,8 +361,8 @@ export const TimeSeriesChart = <Datum extends {}>({
                           colorAccessor={
                             childSeries.threshold ? () => 'transparent' : childSeries.colorAccessor
                           }
-                          onPointerMove={childSeries?.onPointerMove}
-                          onPointerOut={childSeries?.onPointerOut}
+                          onPointerMove={childSeries.onPointerMove}
+                          onPointerOut={childSeries.onPointerOut}
                         />
 
                         {(childSeries.glyphSize ?? childSeries.getGlyphSize) && (

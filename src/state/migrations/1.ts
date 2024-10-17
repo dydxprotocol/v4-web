@@ -89,7 +89,7 @@ export function migration1(state: PersistedState): V1State {
         address: evmAddress,
         chain: WalletNetworkType.Evm,
         encryptedSignature: shouldCopyOverEvmSignature
-          ? evmDerivedAddresses?.[evmAddress]?.encryptedSignature
+          ? evmDerivedAddresses[evmAddress].encryptedSignature
           : undefined,
         walletInfo: selectedWallet,
       },

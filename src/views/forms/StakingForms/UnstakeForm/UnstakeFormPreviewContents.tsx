@@ -17,11 +17,12 @@ import { Output, OutputType } from '@/components/Output';
 import { ValidatorIcons } from '@/components/ValidatorIcons';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 
 import { StakePreviewContents } from '../shared/StakePreviewContents';
 
 type ElementProps = {
-  amounts: Record<string, number | undefined>;
+  amounts: MapOf<number>;
   detailItems: DetailsItem[];
   isLoading: boolean;
   setCurrentStep: Dispatch<SetStateAction<StakeFormSteps>>;
@@ -41,7 +42,7 @@ export const UnstakeFormPreviewContents = ({
       MustBigNumber(amounts[delegation.validator]).gt(0)
     ) ?? [];
   const unstakingValidators = stakingValidators
-    ? delegationsToUnstake.map((delegation) => stakingValidators[delegation.validator]?.[0])
+    ? delegationsToUnstake.map((delegation) => stakingValidators[delegation.validator][0])
     : [];
 
   return (
@@ -49,7 +50,7 @@ export const UnstakeFormPreviewContents = ({
       submitText={stringGetter({ key: STRING_KEYS.CONFIRM_UNSTAKE })}
       isLoading={isLoading}
       slotLeftHeading={stringGetter({
-        key: unstakingValidators?.length === 1 ? STRING_KEYS.VALIDATOR : STRING_KEYS.VALIDATORS,
+        key: unstakingValidators.length === 1 ? STRING_KEYS.VALIDATOR : STRING_KEYS.VALIDATORS,
       })}
       slotRightHeading={stringGetter({
         key: STRING_KEYS.AMOUNT_TO_UNSTAKE,

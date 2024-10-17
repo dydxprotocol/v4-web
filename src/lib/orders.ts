@@ -22,6 +22,8 @@ import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
 
+import { MapOf } from './objectHelpers';
+
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
     case AbacusOrderStatus.Open.rawValue: {
@@ -135,11 +137,11 @@ export const getHydratedTradingData = <
   perpetualMarkets,
 }: {
   data: T;
-  assets: Record<string, Asset>;
-  perpetualMarkets: Record<string, PerpetualMarket>;
+  assets: MapOf<Asset>;
+  perpetualMarkets: MapOf<PerpetualMarket>;
 }): T & AddedProps => ({
   ...data,
-  asset: assets[perpetualMarkets[data.marketId]?.assetId],
+  asset: assets[perpetualMarkets[data.marketId]?.assetId ?? ''],
   stepSizeDecimals: perpetualMarkets[data.marketId]?.configs?.stepSizeDecimals,
   tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),

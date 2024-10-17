@@ -40,7 +40,7 @@ describe('migration1', () => {
     localStorage.setItem('dydx.EvmAddress', JSON.stringify(MOCK_EVM_ADDRESS));
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBeUndefined();
+    expect(newState.wallet.sourceAccount.address).toBeUndefined();
     expect(newState.wallet.sourceAccount.walletInfo).toBeUndefined();
   });
 
@@ -106,8 +106,8 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_EVM_ADDRESS);
-    expect(newState.wallet.sourceAccount?.encryptedSignature).toBe(MOCK_EVM_SIGNATURE);
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_EVM_ADDRESS);
+    expect(newState.wallet.sourceAccount.encryptedSignature).toBe(MOCK_EVM_SIGNATURE);
   });
 
   it('should not migrate over saved encrypted v1 signatures', () => {
@@ -123,7 +123,7 @@ describe('migration1', () => {
 
     const newState = migration1(V0_STATE);
     expect(newState).toBeDefined();
-    expect(newState.wallet.sourceAccount?.address).toBe(MOCK_EVM_ADDRESS);
-    expect(newState.wallet.sourceAccount?.encryptedSignature).toBeUndefined();
+    expect(newState.wallet.sourceAccount.address).toBe(MOCK_EVM_ADDRESS);
+    expect(newState.wallet.sourceAccount.encryptedSignature).toBeUndefined();
   });
 });

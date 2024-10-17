@@ -21,7 +21,7 @@ export const signComplianceSignature = async (
   status: string,
   hdkey: Hdkey
 ): Promise<{ signedMessage: string; timestamp: number }> => {
-  if (!hdkey?.privateKey || !hdkey?.publicKey) {
+  if (!hdkey.privateKey || !hdkey.publicKey) {
     throw new Error('Missing hdkey');
   }
 
@@ -50,8 +50,8 @@ export const signComplianceSignatureKeplr = async (
     key: LocalStorageKey.KeplrCompliance,
   });
 
-  const storedSignature = stored[signer]?.signature;
-  const storedPubKey = stored[signer]?.pubKey;
+  const storedSignature = stored[signer].signature;
+  const storedPubKey = stored[signer].pubKey;
 
   if (storedPubKey && storedSignature) {
     return {

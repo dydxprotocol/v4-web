@@ -6,6 +6,8 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/
 
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import { BaseButton, BaseButtonProps } from './BaseButton';
 
 export type ButtonStateConfig = {
@@ -27,7 +29,7 @@ type ElementProps = {
 
 type StyleProps = {
   action?: ButtonAction;
-  state: Record<string, boolean | undefined>;
+  state: MapOf<boolean>;
   className?: string;
 };
 
@@ -50,7 +52,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     },
     ref
   ) => {
-    const state: Record<string, boolean | undefined> =
+    const state: MapOf<boolean> =
       typeof stateConfig === 'string'
         ? { [stateConfig]: true }
         : {

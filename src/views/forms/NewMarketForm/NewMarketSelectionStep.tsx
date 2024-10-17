@@ -194,7 +194,7 @@ export const NewMarketSelectionStep = ({
                   >
                     <$Header style={{ marginLeft: '1rem' }}>
                       {label}
-                      {Number(tier) === assetToAdd?.params.liquidityTier && (
+                      {Number(tier) === assetToAdd.params.liquidityTier && (
                         <Tag style={{ marginLeft: '0.5ch' }}>
                           ✨ {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
                         </Tag>
@@ -259,7 +259,7 @@ export const NewMarketSelectionStep = ({
                   value: (
                     <Output
                       type={OutputType.Fiat}
-                      value={assetToAdd.meta?.referencePrice}
+                      value={assetToAdd.meta.referencePrice}
                       fractionDigits={tickSizeDecimals}
                     />
                   ),

@@ -65,7 +65,7 @@ export const getSeparator = ({
 }) =>
   Intl.NumberFormat(browserLanguage)
     .formatToParts(1000.1)
-    .find?.((part) => part.type === separatorType)?.value;
+    .find((part) => part.type === separatorType)?.value;
 
 /**
  * Converts a byte array (representing an arbitrary-size signed integer) into a bigint.

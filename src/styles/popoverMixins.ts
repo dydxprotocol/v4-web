@@ -1,5 +1,7 @@
 import { css, keyframes } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import { headerMixins } from './headerMixins';
 import { layoutMixins } from './layoutMixins';
 
@@ -250,4 +252,4 @@ export const popoverMixins = {
       color: var(--item-checked-textColor, var(--trigger-textColor, inherit));
     }
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

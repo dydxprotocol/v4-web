@@ -1,5 +1,7 @@
 import { css, keyframes } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 const withOuterBorder = css`
   box-shadow: 0 0 0 var(--border-width) var(--border-color);
 `;
@@ -1022,4 +1024,4 @@ export const layoutMixins = {
     min-height: 100%;
     place-items: center;
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

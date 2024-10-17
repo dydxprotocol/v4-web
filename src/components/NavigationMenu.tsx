@@ -148,9 +148,9 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
           <$List
             data-orientation={depth > 0 ? 'menu' : orientation === 'vertical' ? 'vertical' : 'menu'}
           >
-            {item?.subitems?.map((subitem) => (
+            {item.subitems?.map((subitem) => (
               <$ListItem key={subitem.value} value={subitem.value} data-item={subitem.value}>
-                {subitem?.subitems ? (
+                {subitem.subitems ? (
                   renderSubitems({ item: subitem, depth: depth + 1 })
                 ) : (
                   <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...subitem} />

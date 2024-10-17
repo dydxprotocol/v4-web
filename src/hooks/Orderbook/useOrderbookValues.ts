@@ -94,7 +94,7 @@ export const useOrderbookValuesForDepthChart = () => {
     const highestAsk = asks[asks.length - 1];
 
     const midMarketPrice = orderbook?.midPrice;
-    const spread = MustBigNumber(lowestAsk?.price ?? 0).minus(highestBid?.price ?? 0);
+    const spread = MustBigNumber(lowestAsk.price ?? 0).minus(highestBid.price ?? 0);
     const spreadPercent = orderbook?.spreadPercent;
 
     return {

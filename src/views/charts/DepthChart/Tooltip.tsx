@@ -51,9 +51,9 @@ export const DepthChartTooltipContent = ({
 
       return {
         [DepthChartSeries.Bids]: MustBigNumber(midMarketPrice)
-          .minus(nearestDatum?.datum.price)
+          .minus(nearestDatum.datum.price)
           .div(midMarketPrice),
-        [DepthChartSeries.Asks]: MustBigNumber(nearestDatum?.datum.price)
+        [DepthChartSeries.Asks]: MustBigNumber(nearestDatum.datum.price)
           .minus(midMarketPrice)
           .div(midMarketPrice),
         [DepthChartSeries.MidMarket]: undefined,

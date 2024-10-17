@@ -1,9 +1,11 @@
 // implemntation based on https://github.com/stefalda/react-localization/blob/master/src/LocalizedStrings.js
 import React from 'react';
 
+import { MapOf } from './objectHelpers';
+
 const PLACEHOLDER_REGEX = /(\{[\d|\w]+\})/;
 
-export type StringGetterParams = Record<string, any>;
+export type StringGetterParams = MapOf<any>;
 
 const formatString = <T extends StringGetterParams>(
   str: string,

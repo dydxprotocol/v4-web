@@ -26,6 +26,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 
 type CancelAllOrdersInMarketFormProps = {
   marketId: string;
@@ -51,9 +52,9 @@ export const CancelAllOrdersInMarketForm = ({
   const pendingPositionOrders = allPending[marketId] ?? EMPTY_ARR;
   const assetsData = useAppSelector(getAssets, shallowEqual);
 
-  const [cancellingStatus, setCancellingStatus] = useState<Record<string, OrderCancelStatus>>({});
+  const [cancellingStatus, setCancellingStatus] = useState<MapOf<OrderCancelStatus>>({});
   const isCancelling = useMemo(
-    () => Object.values(cancellingStatus).some((s) => s.type === 'pending'),
+    () => Object.values(cancellingStatus).some((s) => s?.type === 'pending'),
     [cancellingStatus]
   );
   const { cancelOrder } = useSubaccount();
@@ -91,7 +92,7 @@ export const CancelAllOrdersInMarketForm = ({
       return;
     }
     // if there are errors, user should be able to see the error notifications so we won't display inline.
-    if (allResults.every((r) => r.type === 'success' || r.type === 'error')) {
+    if (allResults.every((r) => r?.type === 'success' || r?.type === 'error')) {
       onCancelComplete();
     }
   }, [cancellingStatus, onCancelComplete]);

@@ -175,7 +175,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 ? undefined
                 : Number(newFormattedValue.replace(',', '.'));
 
-              onInput?.({ value: newValue, floatValue, formattedValue: newFormattedValue, ...e });
+              onInput({ value: newValue, floatValue, formattedValue: newFormattedValue, ...e });
             }}
             // Native
             disabled={disabled}

@@ -1,3 +1,5 @@
+import { MapOf } from '@/lib/objectHelpers';
+
 // Good Til Time Timescales
 export enum TimeUnitShort {
   Minutes = 'M',
@@ -20,11 +22,11 @@ const smallTimeUnits = {
   decisecond: 100,
   centisecond: 10,
   millisecond: 1,
-} satisfies Partial<Record<string, number>>;
+} satisfies MapOf<number>;
 
 const otherTimeUnits = {
   threeDays: 3 * timeUnits.day,
-} satisfies Partial<Record<string, number>>;
+} satisfies MapOf<number>;
 
 export const allTimeUnits = {
   ...timeUnits,

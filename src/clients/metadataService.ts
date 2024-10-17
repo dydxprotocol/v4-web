@@ -6,6 +6,7 @@ import {
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
 
+import { MapOf } from '@/lib/objectHelpers';
 import { log } from '@/lib/telemetry';
 
 /**
@@ -37,7 +38,7 @@ class MetadataServiceClient {
     return fetch(`${this.host}/${endpoint}`).then((res) => res.json());
   }
 
-  async getMarketmap(): Promise<Record<string, string>> {
+  async getMarketmap(): Promise<MapOf<string>> {
     return this._get(MetadataServicePath.MARKET_MAP);
   }
 

@@ -56,7 +56,7 @@ export const AdvancedTradeOptions = () => {
   const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
 
   const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
-  const hasTimeInForce = !!timeInForceOptions?.toArray()?.length;
+  const hasTimeInForce = !!timeInForceOptions?.toArray().length;
   const needsTimeRow = !!needsGoodUntil || hasTimeInForce;
 
   useEffect(() => {

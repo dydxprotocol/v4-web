@@ -128,7 +128,7 @@ export const LaunchableMarketChart = ({
   );
 
   const renderTooltip = (tooltipParam: RenderTooltipParams<TradingViewBar>) => {
-    const datum = tooltipParam?.tooltipData?.nearestDatum?.datum;
+    const datum = tooltipParam.tooltipData?.nearestDatum?.datum;
     if (!datum) return <div />;
 
     return (

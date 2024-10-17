@@ -116,14 +116,14 @@ export const useMarketsData = (
       .filter(isTruthy)
       // temporary filterout TRUMPWIN until the backend is working
       .filter(
-        (m) => m.assetId !== 'TRUMPWIN' || featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi]
+        (m) => m.assetId !== 'TRUMPWIN' || featureFlags[StatsigFlags.ffShowPredictionMarketsUi]
       )
       .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
         const isNew = Boolean(
           sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
         );
-        const clobPairId = allPerpetualClobIds?.[marketData.id] ?? 0;
+        const clobPairId = allPerpetualClobIds[marketData.id] ?? 0;
         const {
           assetId,
           displayId,

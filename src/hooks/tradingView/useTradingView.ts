@@ -187,8 +187,8 @@ export const useTradingView = ({
           }
         });
 
-        tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => {
+        tvWidgetRef.current?.subscribe('onAutoSaveNeeded', () =>
+          tvWidgetRef.current?.save((chartConfig: object) => {
             dispatch(updateChartConfig(chartConfig));
           })
         );

@@ -31,16 +31,17 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 
 import { ValidatorName } from '../shared/ValidatorName';
 
 type ElementProps = {
-  amounts: Record<string, number | undefined>;
+  amounts: MapOf<number>;
   detailItems: DetailsItem[];
   fee?: BigNumberish;
   error?: StakeButtonAlert;
   isLoading: boolean;
-  setUnstakedAmounts: Dispatch<SetStateAction<Record<string, number | undefined>>>;
+  setUnstakedAmounts: Dispatch<SetStateAction<MapOf<number>>>;
 };
 
 export const UnstakeFormInputContents = ({
@@ -180,7 +181,7 @@ export const UnstakeFormInputContents = ({
               const balance = MustBigNumber(delegation.amount).toNumber();
               return (
                 <React.Fragment key={delegation.validator}>
-                  <ValidatorName validator={stakingValidators[delegation.validator]?.[0]} />
+                  <ValidatorName validator={stakingValidators[delegation.validator][0]} />
                   <FormInput
                     key={delegation.validator}
                     type={InputType.Number}

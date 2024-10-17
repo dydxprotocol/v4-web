@@ -17,6 +17,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
 export const useMetadataService = () => {
@@ -42,7 +43,7 @@ export const useMetadataService = () => {
     combine: (results) => {
       const info = results[0].data;
       const prices = results[1].data;
-      const data: Record<string, MetadataServiceAsset> = {};
+      const data: MapOf<MetadataServiceAsset> = {};
 
       Object.keys(info ?? {}).forEach((key) => {
         if (info?.[key] && prices?.[key]) {
@@ -90,7 +91,7 @@ export const useMetadataServiceAssetFromId = (marketId?: string) => {
     }
 
     const assetId = getAssetFromMarketId(marketId);
-    return metadataServiceData.data?.[assetId];
+    return metadataServiceData.data[assetId];
   }, [metadataServiceData.data, marketId]);
 
   return launchableAsset;

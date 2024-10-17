@@ -18,7 +18,7 @@ export const BackButton = ({
     const navigation = globalThis.navigation;
 
     if (!navigation) {
-      globalThis.history?.back();
+      globalThis.history.back();
       // @ts-ignore
     } else if (navigation.canGoBack) {
       navigation.back();

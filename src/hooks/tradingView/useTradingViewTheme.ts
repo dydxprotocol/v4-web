@@ -8,6 +8,7 @@ import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
+import { MapOf } from '@/lib/objectHelpers';
 import { getChartLineColors, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 /**
@@ -28,7 +29,7 @@ export const useTradingViewTheme = ({
   tvWidget,
   isWidgetReady,
 }: {
-  chartLines?: Record<string, ChartLine>;
+  chartLines?: MapOf<ChartLine>;
   tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
 }) => {
@@ -37,25 +38,25 @@ export const useTradingViewTheme = ({
 
   useEffect(() => {
     if (tvWidget && isWidgetReady) {
-      tvWidget.changeTheme?.(THEME_NAMES[appTheme]).then(() => {
-        const tvChartId = tvWidget?._id;
+      tvWidget.changeTheme(THEME_NAMES[appTheme]).then(() => {
+        const tvChartId = tvWidget._id;
 
         if (tvChartId) {
-          const frame = document?.getElementById(tvChartId);
+          const frame = document.getElementById(tvChartId);
 
           if (isIFrame(frame) && frame.contentWindow) {
             const innerHtml = frame.contentWindow.document.documentElement;
             switch (appTheme) {
               case AppTheme.Classic:
-                innerHtml?.classList.remove('theme-dark', 'theme-light');
+                innerHtml.classList.remove('theme-dark', 'theme-light');
                 break;
               case AppTheme.Dark:
-                innerHtml?.classList.remove('theme-light');
-                innerHtml?.classList.add('theme-dark');
+                innerHtml.classList.remove('theme-light');
+                innerHtml.classList.add('theme-dark');
                 break;
               case AppTheme.Light:
-                innerHtml?.classList.remove('theme-dark');
-                innerHtml?.classList.add('theme-light');
+                innerHtml.classList.remove('theme-dark');
+                innerHtml.classList.add('theme-light');
                 break;
               default:
                 assertNever(appTheme);
@@ -66,17 +67,17 @@ export const useTradingViewTheme = ({
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { overrides, studies_overrides } = getWidgetOverrides({ appTheme, appColorMode });
-        tvWidget?.applyOverrides(overrides);
-        tvWidget?.applyStudiesOverrides(studies_overrides);
+        tvWidget.applyOverrides(overrides);
+        tvWidget.applyStudiesOverrides(studies_overrides);
 
         // Necessary to update existing indicators
         const volumeStudyId = tvWidget
-          ?.activeChart()
-          ?.getAllStudies()
-          ?.find((x) => x.name === 'Volume')?.id;
+          .activeChart()
+          .getAllStudies()
+          .find((x) => x.name === 'Volume')?.id;
 
         if (volumeStudyId) {
-          const volume = tvWidget?.activeChart()?.getStudyById(volumeStudyId);
+          const volume = tvWidget.activeChart().getStudyById(volumeStudyId);
           volume.applyOverrides({
             'volume.color.0': studies_overrides['volume.volume.color.0'],
             'volume.color.1': studies_overrides['volume.volume.color.1'],
@@ -85,15 +86,20 @@ export const useTradingViewTheme = ({
 
         if (chartLines) {
           // Necessary to update existing chart lines
-          Object.values(chartLines).forEach(({ chartLineType, line }) => {
+          Object.values(chartLines).forEach((line) => {
+            if (line == null) {
+              return;
+            }
             const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-              getChartLineColors({ chartLineType, appTheme, appColorMode });
+              getChartLineColors({ chartLineType: line.chartLineType, appTheme, appColorMode });
 
             if (maybeQuantityColor) {
-              line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+              line.line
+                .setLineColor(maybeQuantityColor)
+                .setQuantityBackgroundColor(maybeQuantityColor);
             }
 
-            line
+            line.line
               .setQuantityBorderColor(borderColor)
               .setBodyBackgroundColor(backgroundColor)
               .setBodyBorderColor(borderColor)

@@ -1,3 +1,5 @@
+import { MapOf } from '@/lib/objectHelpers';
+
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
 
@@ -33,10 +35,10 @@ export const getMapOfLowestFeeTokensByDenom = (type: NullableTransferType) =>
       if (!acc[token.tokenAddress]) {
         acc[token.tokenAddress] = [];
       }
-      acc[token.tokenAddress].push(token);
+      acc[token.tokenAddress]!.push(token);
       return acc;
     },
-    {} as Record<string, CctpTokenInfo[]>
+    {} as MapOf<CctpTokenInfo[]>
   );
 
 const getMapOfChainsByChainId = (chains: CctpTokenInfo[]) =>
@@ -45,10 +47,10 @@ const getMapOfChainsByChainId = (chains: CctpTokenInfo[]) =>
       if (!acc[token.chainId]) {
         acc[token.chainId] = [];
       }
-      acc[token.chainId].push(token);
+      acc[token.chainId]!.push(token);
       return acc;
     },
-    {} as Record<string, CctpTokenInfo[]>
+    {} as MapOf<CctpTokenInfo[]>
   );
 
 export const getMapOfLowestFeeTokensByChainId = (type: NullableTransferType) =>
@@ -62,10 +64,10 @@ export const cctpTokensByDenom = cctpTokens.reduce(
     if (!acc[token.tokenAddress]) {
       acc[token.tokenAddress] = [];
     }
-    acc[token.tokenAddress].push(token);
+    acc[token.tokenAddress]!.push(token);
     return acc;
   },
-  {} as Record<string, CctpTokenInfo[]>
+  {} as MapOf<CctpTokenInfo[]>
 );
 
 export const cctpTokensByChainId = cctpTokens.reduce(
@@ -73,8 +75,8 @@ export const cctpTokensByChainId = cctpTokens.reduce(
     if (!acc[token.chainId]) {
       acc[token.chainId] = [];
     }
-    acc[token.chainId].push(token);
+    acc[token.chainId]!.push(token);
     return acc;
   },
-  {} as Record<string, CctpTokenInfo[]>
+  {} as MapOf<CctpTokenInfo[]>
 );

@@ -23,5 +23,5 @@ export type PerpetualMarketResponse = {
 };
 
 export type PerpetualMarketSparklineResponse = {
-  [key: string]: number[];
+  [key: string]: number[] | undefined;
 };

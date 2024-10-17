@@ -42,9 +42,9 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         </span>
       </$YourPosition>
       <PositionTile
-        currentSize={positionSize?.current}
-        notionalTotal={notionalTotal?.current}
-        postOrderSize={positionSize?.postOrder}
+        currentSize={positionSize.current}
+        notionalTotal={notionalTotal.current}
+        postOrderSize={positionSize.postOrder}
         stepSizeDecimals={stepSizeDecimals}
         symbol={id}
         tickSizeDecimals={tickSizeDecimals}

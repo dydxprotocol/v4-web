@@ -1,7 +1,7 @@
 import { isDev } from '@/constants/networks';
 
 class TestFlags {
-  public queryParams: { [key: string]: string };
+  public queryParams: { [key: string]: string | undefined };
 
   constructor() {
     this.queryParams = {};
@@ -30,7 +30,7 @@ class TestFlags {
     return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get addressOverride(): string {
+  get addressOverride(): string | undefined {
     return this.queryParams.address;
   }
 

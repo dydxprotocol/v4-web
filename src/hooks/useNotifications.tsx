@@ -25,6 +25,7 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 import { isAbacusNotificationSingleSession } from '@/lib/notifications';
+import { MapOf } from '@/lib/objectHelpers';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -96,11 +97,11 @@ const useNotificationsContext = () => {
 
   // Display data
   const [notificationsDisplayData, setNotificationsDisplayData] = useState(
-    {} as Record<string, NotificationDisplayData>
+    {} as MapOf<NotificationDisplayData>
   );
 
   const getDisplayData = useCallback(
-    (notification: Notification) => notificationsDisplayData[getKey(notification)],
+    (notification: Notification) => notificationsDisplayData[getKey(notification)]!,
     [getKey, notificationsDisplayData]
   );
 

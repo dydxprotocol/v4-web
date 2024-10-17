@@ -34,6 +34,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 
 import { Icon, IconName } from './Icon';
@@ -99,7 +100,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   columns: ColumnDef<TableRowData>[];
   data: Array<TableRowData | CustomRowConfig>;
   getRowKey: (rowData: TableRowData, rowIndex?: number) => Key;
-  getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
+  getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => MapOf<any>;
   defaultSortDescriptor?: SortDescriptor;
   selectionMode?: 'multiple' | 'single';
   selectionBehavior?: 'replace' | 'toggle';
@@ -215,10 +216,10 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(defaultSortDescriptor ?? {});
   const items = useMemo(() => {
-    return sortDescriptor?.column
-      ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
+    return sortDescriptor.column
+      ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor.column, sortDescriptor.direction))
       : data;
-  }, [data, sortDescriptor?.column, sortDescriptor?.direction, sortFn]);
+  }, [data, sortDescriptor.column, sortDescriptor.direction, sortFn]);
 
   const isEmpty = data.length === 0;
   const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
@@ -299,7 +300,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
                 {(columnKey) => (
                   <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
                     {isTableRowData(item) &&
-                      columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                      columns.find((column) => column.columnKey === columnKey)?.renderCell(item)}
                   </Cell>
                 )}
               </Row>
@@ -325,7 +326,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   getRowAttributes?: (
     rowData: TableRowData,
     rowIndex?: number
-  ) => Record<string, string | number | Record<string, string | number>>;
+  ) => MapOf<string | number | MapOf<string | number>>;
   onRowAction?: (key: Key) => void;
   children: TableStateProps<TableRowData>['children'];
   numColumns: number;
@@ -425,7 +426,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
         withOuterBorder={withOuterBorder}
       >
         {[...collection.body.childNodes].map((row) =>
-          (row.value as CustomRowConfig)?.slotCustomRow ? (
+          (row.value as CustomRowConfig).slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
               item: row,
               state,
@@ -452,7 +453,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
                     state={state}
                     isActionable={
                       ((cell as GridNode<TableRowData>).column?.value as ColumnDef<TableRowData>)
-                        ?.isActionable
+                        .isActionable
                     }
                   />
                 )
@@ -568,7 +569,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
       // data-focused={isFocusVisible || undefined}
       style={{
         width: column.props?.width,
-        textAlign: (column?.value as any)?.align,
+        textAlign: (column.value as any)?.align,
       }}
       ref={ref}
       allowSorting={column.props?.allowsSorting ?? true}
@@ -580,8 +581,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
           (uiRefresh ? (
             <SortIcon
               sortDirection={
-                state.sortDescriptor?.column === column.key
-                  ? state.sortDescriptor?.direction ?? 'none'
+                state.sortDescriptor.column === column.key
+                  ? state.sortDescriptor.direction ?? 'none'
                   : 'none'
               }
             />
@@ -589,8 +590,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
             <$SortArrow
               aria-hidden="true"
               sortDirection={
-                state.sortDescriptor?.column === column.key
-                  ? state.sortDescriptor?.direction ?? 'none'
+                state.sortDescriptor.column === column.key
+                  ? state.sortDescriptor.direction ?? 'none'
                   : 'none'
               }
             >

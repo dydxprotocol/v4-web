@@ -138,10 +138,10 @@ export const getLaunchableMarketDatafeed = (
           });
 
           const fetchedCandles: MetadataServiceCandlesResponse[string] | undefined =
-            candlesResponse?.[asset] ?? [];
+            candlesResponse[asset] ?? [];
 
           if (fetchedCandles) {
-            bars = [...(fetchedCandles?.map(mapMetadataServiceCandles) ?? [])];
+            bars = [...(fetchedCandles.map(mapMetadataServiceCandles) ?? [])];
             launchableMarketCandlesCache.set(cacheKey, bars);
           }
         } else {

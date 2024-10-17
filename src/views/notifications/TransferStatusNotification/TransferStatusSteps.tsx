@@ -44,8 +44,8 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
 
   const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
-    const fromChain = status?.fromChain?.chainData?.chainId;
-    const toChain = status?.toChain?.chainData?.chainId;
+    const fromChain = status?.fromChain?.chainData.chainId;
+    const toChain = status?.toChain?.chainData.chainId;
 
     const currentStatus =
       routeStatus != null && routeStatus.length != null
@@ -65,7 +65,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
           type === TransferNotificationTypes.Deposit
             ? status?.fromChain?.transactionUrl
             : routeStatus?.[0]?.chainId === selectedDydxChainId && routeStatus[0].txHash
-              ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
+              ? `${mintscanTxUrl.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
               : undefined,
       },
       {
@@ -83,15 +83,15 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
             CHAIN:
               type === TransferNotificationTypes.Deposit
                 ? chainTokenLabel
-                : status?.toChain?.chainData?.chainName ?? '...',
+                : status?.toChain?.chainData.chainName ?? '...',
           },
         }),
         step: TransferStatusStep.ToChain,
         link:
           type === TransferNotificationTypes.Withdrawal
             ? status?.toChain?.transactionUrl
-            : currentStatus?.chainId === selectedDydxChainId && currentStatus?.txHash
-              ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
+            : currentStatus?.chainId === selectedDydxChainId && currentStatus.txHash
+              ? `${mintscanTxUrl.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
               : undefined,
       },
     ];

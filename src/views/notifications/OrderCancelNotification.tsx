@@ -35,7 +35,7 @@ export const OrderCancelNotification = ({
   const marketData = useAppSelector((s) => getMarketData(s, order.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
-  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
+  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
   const indexedOrderStatus = order.status.rawValue;
   const cancelStatus = localCancel.submissionStatus;
 

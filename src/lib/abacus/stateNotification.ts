@@ -43,6 +43,7 @@ import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { isTruthy } from '../isTruthy';
+import { MapOf } from '../objectHelpers';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -72,9 +73,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() ?? [])
+              (updatedState.assetIds()?.toArray() ?? [])
                 .map((assetId: string) => {
-                  const assetData = updatedState?.asset(assetId);
+                  const assetData = updatedState.asset(assetId);
                   if (assetData == null) {
                     return undefined;
                   }
@@ -88,13 +89,13 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = fromPairs(
+          const balances: MapOf<AccountBalance> = fromPairs(
             updatedState.account.balances.toArray().map(({ k, v }) => [k, v])
           );
           dispatch(setBalances(balances));
         }
         if (updatedState.account?.stakingBalances) {
-          const stakingBalances: Record<string, AccountBalance> = fromPairs(
+          const stakingBalances: MapOf<AccountBalance> = fromPairs(
             updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
           );
           dispatch(setStakingBalances(stakingBalances));
@@ -112,7 +113,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.tradingRewards)) {
         if (updatedState.account?.tradingRewards) {
-          dispatch(setTradingRewards(updatedState.account?.tradingRewards));
+          dispatch(setTradingRewards(updatedState.account.tradingRewards));
         }
       }
 

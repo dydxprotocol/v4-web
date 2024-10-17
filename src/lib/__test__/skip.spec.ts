@@ -28,7 +28,7 @@ const toChainPending = (chainId: string | undefined): SkipTransactionStatus => (
   transactionId: undefined,
 });
 
-const chainIdsToNames: { [key: string]: TransferChainInfo } = {
+const chainIdsToNames = {
   1: {
     chainName: 'Ethereum',
     chainId: 'noop',
@@ -69,7 +69,7 @@ const chainIdsToNames: { [key: string]: TransferChainInfo } = {
     equals: vi.fn(),
     hashCode: vi.fn(),
   },
-};
+} satisfies { [key: string]: TransferChainInfo };
 
 let mockGetChainById: SpyInstance;
 

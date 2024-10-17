@@ -55,7 +55,7 @@ export const getStringGetterForLocaleData = (
         }
       }
 
-      return formatString(formattedString, props?.params);
+      return formatString(formattedString, props.params);
     }
 
     return '';

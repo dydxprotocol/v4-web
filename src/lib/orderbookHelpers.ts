@@ -1,6 +1,8 @@
 //  ------ Canvas helper methods ------ //
 import type { MarketOrderbook, Nullable, PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 
+import { MapOf } from './objectHelpers';
+
 /**
  * @returns top left x,y and bottom x,y from array idx
  */
@@ -100,8 +102,8 @@ export const processOrderbookToCreateMap = ({
   newOrderbook,
 }: {
   orderbookMap?: {
-    asks: Record<string, number>;
-    bids: Record<string, number>;
+    asks: MapOf<number>;
+    bids: MapOf<number>;
   };
   newOrderbook: Nullable<MarketOrderbook>;
 }) => {

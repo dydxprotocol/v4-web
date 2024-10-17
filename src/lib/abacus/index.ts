@@ -435,8 +435,8 @@ class AbacusStateManager {
   getCancelableOrderIds = (marketId: Nullable<string>): string[] =>
     this.stateManager
       .cancelAllOrdersPayload(marketId)
-      ?.payloads?.toArray()
-      ?.map((p) => p.orderId) ?? [];
+      ?.payloads.toArray()
+      .map((p) => p.orderId) ?? [];
 
   adjustIsolatedMarginOfPosition = (
     callback: (

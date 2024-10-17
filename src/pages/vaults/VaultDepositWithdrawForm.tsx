@@ -108,7 +108,7 @@ export const VaultDepositWithdrawForm = ({
     vaultBalance: userBalanceUpdated,
     marginUsage: marginUsageUpdated,
     withdrawableVaultBalance: userAvailableUpdated,
-  } = orEmptyObj(validationResponse?.summaryData);
+  } = orEmptyObj(validationResponse.summaryData);
 
   // save initial type to state if it is provided
   useEffect(() => {
@@ -131,7 +131,7 @@ export const VaultDepositWithdrawForm = ({
 
   const errors = useMemo(
     () =>
-      validationResponse?.errors.toArray().map((error) => {
+      validationResponse.errors.toArray().map((error) => {
         const errorStrings: { long?: string | JSX.Element; short?: string } = runFn(() => {
           const longKey = error.resources.text?.stringKey;
           const shortKey = error.resources.title?.stringKey;
@@ -160,7 +160,7 @@ export const VaultDepositWithdrawForm = ({
         });
         return safeAssign({}, error, errorStrings);
       }),
-    [slippagePercent, stringGetter, validationResponse?.errors, vaultsLearnMore]
+    [slippagePercent, stringGetter, validationResponse.errors, vaultsLearnMore]
   );
 
   const onSubmitInputForm = () => {
@@ -257,10 +257,7 @@ export const VaultDepositWithdrawForm = ({
           }),
         });
       } else if (operation === 'WITHDRAW') {
-        if (
-          submissionData?.withdraw?.shares == null ||
-          submissionData?.withdraw?.minAmount == null
-        ) {
+        if (submissionData?.withdraw?.shares == null || submissionData.withdraw.minAmount == null) {
           notify({
             slotTitleLeft: <$SmallIcon iconName={IconName.OrderCanceled} $hasError />,
             title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
@@ -287,16 +284,16 @@ export const VaultDepositWithdrawForm = ({
 
         const startTime = new Date().valueOf();
         const result = await withdrawFromMegavault(
-          submissionData?.withdraw?.shares,
-          submissionData?.withdraw?.minAmount
+          submissionData.withdraw.shares,
+          submissionData.withdraw.minAmount
         );
         const intermediateTime = new Date().valueOf();
         await sleep(INDEXER_LAG_ALLOWANCE);
         const finalTime = new Date().valueOf();
 
-        const events = (result as IndexedTx)?.events;
+        const events = (result as IndexedTx).events;
         const actualAmount = events
-          ?.find((e) => e.type === 'withdraw_from_megavault')
+          .find((e) => e.type === 'withdraw_from_megavault')
           ?.attributes.find((a) => a.key === 'redeemed_quote_quantums')?.value;
         const realAmountReceived = MustBigNumber(actualAmount).div(QUANTUM_MULTIPLIER).toNumber();
 
@@ -519,12 +516,12 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorsPreventingSubmit = errors?.filter((e) => e.type.name === 'error') ?? [];
+  const errorsPreventingSubmit = errors.filter((e) => e.type.name === 'error') ?? [];
   const hasInputErrors = validationResponse == null || errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
-    ?.filter((e) => e.long != null)
-    ?.filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
+    .filter((e) => e.long != null)
+    .filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
     .map((alertMessage) => (
       <AlertMessage
         key={alertMessage.code}
@@ -663,7 +660,7 @@ export const VaultDepositWithdrawForm = ({
         items={[...inputFormConfig.inputReceiptItems, ...inputFormConfig.receiptItems]}
       />
 
-      {validationResponse?.summaryData.needSlippageAck && (
+      {validationResponse.summaryData.needSlippageAck && (
         <Checkbox
           checked={slippageAck}
           onCheckedChange={(checked) => dispatch(setVaultFormSlippageAck(checked))}
@@ -681,7 +678,7 @@ export const VaultDepositWithdrawForm = ({
         />
       )}
 
-      {validationResponse?.summaryData.needTermsAck && (
+      {validationResponse.summaryData.needTermsAck && (
         <Checkbox
           checked={termsAck}
           onCheckedChange={(checked) => dispatch(setVaultFormTermsAck(checked))}

@@ -76,7 +76,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
 
     const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
       if (success) {
-        setIsOpen?.(false);
+        setIsOpen(false);
       } else {
         log('useWithdrawalInfo/getWithdrawalCapacityByDenom', new Error(parsingError?.message));
       }

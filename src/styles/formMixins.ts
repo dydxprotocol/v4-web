@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import breakpoints from './breakpoints';
 import { layoutMixins } from './layoutMixins';
 
@@ -191,4 +193,4 @@ export const formMixins = {
       --form-input-gap: 1rem;
     }
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;
