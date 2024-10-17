@@ -4,7 +4,6 @@ import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -14,15 +13,10 @@ import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
-import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
-import { Popover, TriggerType } from '@/components/Popover';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { VerticalSeparator } from '@/components/Separator';
 import { MobileTabs } from '@/components/Tabs';
@@ -52,19 +46,15 @@ import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
+import { TradeTableSettings } from './TradeTableSettings';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
-import { MarketTypeFilter } from './types';
+import { MarketTypeFilter, PanelView } from './types';
 
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
   Fills = 'Fills',
   Payments = 'Payments',
-}
-
-enum PanelView {
-  AllMarkets = 'AllMarkets',
-  CurrentMarket = 'CurrentMarket',
 }
 
 type ElementProps = {
@@ -351,70 +341,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         dividerStyle={uiRefresh ? 'underline' : 'border'}
         slotToolbar={
           uiRefresh ? (
-            <Popover
-              align="end"
-              sideOffset={4}
-              triggerType={TriggerType.TradeTableSettings}
-              slotTrigger={<$IconButton iconName={IconName.Settings} shape={ButtonShape.Square} />}
-            >
-              <$Settings>
-                <$Row>
-                  {stringGetter({ key: STRING_KEYS.VIEW })}{' '}
-                  <ToggleGroup
-                    withSeparators
-                    items={[
-                      {
-                        value: PanelView.AllMarkets,
-                        label: stringGetter({ key: STRING_KEYS.ALL }),
-                      },
-                      {
-                        value: PanelView.CurrentMarket,
-                        ...(currentMarketAssetId
-                          ? {
-                              slotBefore: (
-                                <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />
-                              ),
-                              label: currentMarketAssetId,
-                            }
-                          : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
-                      },
-                    ]}
-                    value={view}
-                    onValueChange={setView}
-                    onInteraction={() => {
-                      setIsOpen?.(true);
-                    }}
-                  />
-                </$Row>
-                <$Row>
-                  {stringGetter({ key: STRING_KEYS.TYPE })}{' '}
-                  <ToggleGroup
-                    withSeparators
-                    items={[
-                      {
-                        value: MarketTypeFilter.AllMarkets,
-                        label: stringGetter({ key: STRING_KEYS.ALL }),
-                      },
-                      {
-                        value: MarketTypeFilter.Isolated,
-                        label: stringGetter({ key: STRING_KEYS.ISOLATED }),
-                      },
-                      {
-                        value: MarketTypeFilter.Cross,
-                        label: stringGetter({ key: STRING_KEYS.CROSS }),
-                      },
-                    ]}
-                    value={viewIsolated}
-                    onValueChange={(newViewIsolated: string) => {
-                      setViewIsolated(newViewIsolated as MarketTypeFilter);
-                    }}
-                    onInteraction={() => {
-                      setIsOpen?.(true);
-                    }}
-                  />
-                </$Row>
-              </$Settings>
-            </Popover>
+            <TradeTableSettings
+              panelView={view}
+              marketTypeFilter={viewIsolated}
+              setPanelView={setView}
+              setMarketTypeFilter={setViewIsolated}
+              onOpenChange={setIsOpen}
+            />
           ) : (
             <>
               <ToggleGroup
@@ -491,23 +424,3 @@ const $SelectMenu = styled(SelectMenu)`
 const $SelectItem = styled(SelectItem)`
   ${formMixins.inputInnerSelectMenuItem}
 ` as typeof SelectItem;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-  --button-icon-size: 1.66em;
-  --button-textColor: var(--color-text-0);
-`;
-
-const $Settings = styled.div`
-  ${popoverMixins.popover}
-  --popover-padding: 0.5rem 1rem;
-  z-index: 2;
-`;
-
-const $Row = styled.div`
-  ${layoutMixins.spacedRow}
-  color: var(--color-text-0);
-  font: var(--font-mini-book);
-  gap: 0.75rem;
-`;

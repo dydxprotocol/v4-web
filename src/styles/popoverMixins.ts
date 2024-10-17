@@ -83,8 +83,6 @@ export const popoverMixins = {
 
   tradeTableSettingsTrigger: css`
     --trigger-backgroundColor: transparent;
-    --trigger-open-backgroundColor: var(--button-hover-backgroundColor);
-    --trigger-border: none;
   `,
 
   popover: css`

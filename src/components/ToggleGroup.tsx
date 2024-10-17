@@ -57,7 +57,7 @@ export const ToggleGroup = forwardRefFn(
     const innerRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => innerRef.current!, []);
 
-    // TODO: re-enable
+    // TODO: re-enable CT-1296
     // const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
     //   scrollRef: innerRef,
     // });
