@@ -1,7 +1,7 @@
 // Custom connectors
 import type { PrivyClientConfig } from '@privy-io/react-auth';
 import { createConfig } from '@privy-io/wagmi';
-import { fallback, FallbackTransport, http, Transport, type Chain } from 'viem';
+import { FallbackTransport, Transport, http, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -37,6 +37,7 @@ import {
   scroll,
   sepolia,
 } from 'viem/chains';
+import { fallback } from 'wagmi';
 import {
   coinbaseWallet as coinbaseWalletConnector,
   walletConnect as walletConnectConnector,
@@ -106,53 +107,43 @@ enum ChainId {
   BASE_SEPOLIA = '84532',
 }
 
-const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
-  const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
-  if (!alchemyKey) return undefined;
+const getAlchemyRPCUrls = (chainId: ChainId, apiKey: string) => {
   switch (chainId) {
     case ChainId.ETH_MAINNET:
-      return `https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`;
     case ChainId.ETH_SEPOLIA:
-      return `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://eth-sepolia.g.alchemy.com/v2/${apiKey}`;
     case ChainId.POLYGON_MAINNET:
-      return `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://polygon-mainnet.g.alchemy.com/v2/${apiKey}`;
     case ChainId.POLYGON_MUMBAI:
-      return `https://polygon-amoy.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://polygon-amoy.g.alchemy.com/v2/${apiKey}`;
     case ChainId.OPT_MAINNET:
-      return `https://opt-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://opt-mainnet.g.alchemy.com/v2/${apiKey}`;
     case ChainId.OPT_SEPOLIA:
-      return `https://opt-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://opt-sepolia.g.alchemy.com/v2/${apiKey}`;
     case ChainId.ARB_MAINNET:
-      return `https://arb-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://arb-mainnet.g.alchemy.com/v2/${apiKey}`;
     case ChainId.ARB_SEPOLIA:
-      return `https://arb-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://arb-sepolia.g.alchemy.com/v2/${apiKey}`;
     case ChainId.BASE_MAINNET:
-      return `https://base-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://base-mainnet.g.alchemy.com/v2/${apiKey}`;
     case ChainId.BASE_SEPOLIA:
-      return `https://base-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return `https://base-sepolia.g.alchemy.com/v2/${apiKey}`;
     default:
       return undefined;
   }
 };
 
-export const RPCUrlsByChainId = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
-  (chainIdToRpcMap, chain) => {
-    const alchemyRPCUrl = getAlchemyRPCUrlForChainId(chain.id.toString() as ChainId);
-    const defaultRPCUrl = chain.rpcUrls.default.http[0];
-    return {
-      [chain.id]: [alchemyRPCUrl, defaultRPCUrl].filter(isTruthy),
-      ...chainIdToRpcMap,
-    };
-  },
-  {} as Record<string, string[]>
-);
-
 const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
-    const rpcUrls = RPCUrlsByChainId[chain.id];
-    const rpcTransports = rpcUrls.map((rpcUrl) => http(rpcUrl));
-    const rpcTransportsWithDefault = [...rpcTransports, http()];
-    transports[chain.id] = fallback(rpcTransportsWithDefault);
+    const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
+    const alchemyRPCUrls =
+      alchemyKey && getAlchemyRPCUrls(chain.id.toString() as ChainId, alchemyKey);
+    transports[chain.id] = fallback(
+      [alchemyRPCUrls && http(alchemyRPCUrls), http(chain.rpcUrls.default.http[0]), http()].filter(
+        isTruthy
+      )
+    );
     return transports;
   },
   {} as Record<string, FallbackTransport<Transport[]>>
