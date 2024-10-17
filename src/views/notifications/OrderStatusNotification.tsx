@@ -59,10 +59,8 @@ export const OrderStatusNotification = ({
 
   const { assetId } = marketData ?? {};
   const { equityTiersLearnMore } = useURLConfigs();
-  const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
-  const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
-    typeof AbacusOrderStatus
-  >;
+  const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType].orderTypeKey;
+  const indexedOrderStatus = order?.status.rawValue as KotlinIrEnumValues<typeof AbacusOrderStatus>;
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;

@@ -7,11 +7,11 @@ import {
   type Nullable,
   type StakingDelegation,
   type StakingRewards,
-  type SubAccountHistoricalPNLs,
   type Subaccount,
   type SubaccountFill,
   type SubaccountFills,
   type SubaccountFundingPayments,
+  type SubAccountHistoricalPNLs,
   type SubaccountOrder,
   type SubaccountTransfers,
   type TradingRewards,
@@ -23,11 +23,12 @@ import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { MapOf } from '@/lib/objectHelpers';
 import { isOrderStatusClearable } from '@/lib/orders';
 
 export type AccountState = {
-  balances?: Record<string, AccountBalance>;
-  stakingBalances?: Record<string, AccountBalance>;
+  balances?: MapOf<AccountBalance>;
+  stakingBalances?: MapOf<AccountBalance>;
   stakingDelegations?: StakingDelegation[];
   unbondingDelegations?: UnbondingDelegation[];
   stakingRewards?: StakingRewards;
@@ -56,7 +57,7 @@ export type AccountState = {
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
   clearedOrderIds?: string[];
-  unseenFillsCountPerMarket: Record<string, number>;
+  unseenFillsCountPerMarket: MapOf<number>;
   hasUnseenOrderUpdates: boolean;
   historicalPnlPeriod?: HistoricalPnlPeriods;
 
@@ -228,10 +229,10 @@ export const accountSlice = createSlice({
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
     },
-    setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
+    setBalances: (state, action: PayloadAction<MapOf<AccountBalance>>) => {
       state.balances = action.payload;
     },
-    setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
+    setStakingBalances: (state, action: PayloadAction<MapOf<AccountBalance>>) => {
       state.stakingBalances = action.payload;
     },
     setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {

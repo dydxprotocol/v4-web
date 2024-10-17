@@ -32,7 +32,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
       <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
         {label ? (
-          <$WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+          <$WithLabel label={label} inputID={id} disabled={otherProps.disabled}>
             <Input ref={ref} id={id} {...otherProps} />
           </$WithLabel>
         ) : (

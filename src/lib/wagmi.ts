@@ -1,7 +1,7 @@
 // Custom connectors
 import type { PrivyClientConfig } from '@privy-io/react-auth';
 import { createConfig } from '@privy-io/wagmi';
-import { fallback, FallbackTransport, http, Transport, type Chain } from 'viem';
+import { FallbackTransport, Transport, fallback, http, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -55,6 +55,7 @@ import { getMipdConnectorByRdns } from '@/hooks/useMipdInjectedWallets';
 import { isTruthy } from './isTruthy';
 import { getLocalStorage } from './localStorage';
 import { validateAgainstAvailableEnvironments } from './network';
+import { MapOf } from './objectHelpers';
 
 // Config
 
@@ -144,12 +145,12 @@ export const RPCUrlsByChainId = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
       ...chainIdToRpcMap,
     };
   },
-  {} as Record<string, string[]>
+  {} as MapOf<string[]>
 );
 
 const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
-    const rpcUrls = RPCUrlsByChainId[chain.id];
+    const rpcUrls = RPCUrlsByChainId[chain.id]!;
     const rpcTransports = rpcUrls.map((rpcUrl) => http(rpcUrl));
     const rpcTransportsWithDefault = [...rpcTransports, http()];
     transports[chain.id] = fallback(rpcTransportsWithDefault);

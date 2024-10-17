@@ -3,6 +3,8 @@ import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import type { AbacusRestProtocol } from '@/constants/abacus';
 import { lastSuccessfulRestRequestByOrigin } from '@/constants/analytics';
 
+import { MapOf } from '../objectHelpers';
+
 type Headers = Nullable<kollections.Map<string, string>>;
 type FetchResponseCallback = (p0: Nullable<string>, p1: number, p2: Nullable<string>) => void;
 
@@ -54,7 +56,7 @@ class AbacusRest implements AbacusRestProtocol {
     fetch(url, options)
       .then(async (response) => {
         const data = await response.text();
-        const headersObj: Record<string, string> = {};
+        const headersObj: MapOf<string> = {};
         response.headers.forEach((value: string, key: string | number) => {
           headersObj[key] = value;
         });

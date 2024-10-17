@@ -213,7 +213,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
 
       // Place order
-      const tx = await this.compositeClient?.placeOrder(
+      const tx = await this.compositeClient.placeOrder(
         subaccountClient,
         marketId,
         type as OrderType,
@@ -234,7 +234,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       // Handle stateful orders
-      if ((tx as IndexedTx)?.code !== 0) {
+      if ((tx as IndexedTx).code !== 0) {
         throw new StatefulOrderError('Stateful order has failed to commit.', tx);
       }
 
@@ -268,7 +268,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       params ?? {};
 
     try {
-      const tx = await this.compositeClient?.cancelRawOrder(
+      const tx = await this.compositeClient.cancelRawOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
         parseInt(clientId, 10),
         orderFlags,
@@ -339,11 +339,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             if (!this.localWallet) {
               throw new Error('Missing compositeClient or localWallet');
             }
-            const msg = compositeClient?.sendTokenMessage(this.localWallet, amount, recipient);
+            const msg = compositeClient.sendTokenMessage(this.localWallet, amount, recipient);
 
             resolve([msg]);
           }),
-        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice
+        this.compositeClient.validatorClient.post.defaultDydxGasPrice
       );
 
       const parsedTx = parseToPrimitives(tx);
@@ -443,7 +443,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       dd.info('withdrawToNobleIBC tx submitted', { tx, ibcMsg });
 
       return JSON.stringify({
-        txHash: hashFromTx(tx?.hash),
+        txHash: hashFromTx(tx.hash),
       });
     } catch (error) {
       log('DydxChainTransactions/withdrawToNobleIBC', error);
@@ -537,7 +537,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   }): Promise<string> {
     const address = this.localWallet?.address;
     try {
-      if (this.hdkey?.privateKey && this.hdkey?.publicKey) {
+      if (this.hdkey?.privateKey && this.hdkey.publicKey) {
         const { signedMessage, timestamp } = await signComplianceSignature(
           params.message,
           params.action,

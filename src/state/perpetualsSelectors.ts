@@ -5,6 +5,7 @@ import { Candle, TradingViewChartBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
+import { MapOf } from '@/lib/objectHelpers';
 import { mapCandle } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -26,7 +27,7 @@ export const getCurrentMarketId = (state: RootState) => state.perpetuals.current
  */
 export const getCurrentMarketDisplayId = (state: RootState) => {
   const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals?.markets?.[currentMarketId]?.displayId;
+  return state.perpetuals.markets?.[currentMarketId]?.displayId;
 };
 
 /**
@@ -34,7 +35,7 @@ export const getCurrentMarketDisplayId = (state: RootState) => {
  */
 export const getCurrentMarketAssetId = (state: RootState) => {
   const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals?.markets?.[currentMarketId]?.assetId;
+  return state.perpetuals.markets?.[currentMarketId]?.assetId;
 };
 
 /**
@@ -59,16 +60,13 @@ export const getMarketIds = (state: RootState) =>
  * @returns clobPairIds of all markets, mapped by marketId.
  */
 export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
-  return Object.entries(markets ?? {}).reduce(
-    (acc, [marketId, market]) => {
-      const clobPairId: Nullable<string> = market?.configs?.clobPairId;
-      if (clobPairId !== undefined) {
-        acc[marketId] = Number(clobPairId);
-      }
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  return Object.entries(markets ?? {}).reduce((acc, [marketId, market]) => {
+    const clobPairId: Nullable<string> = market?.configs?.clobPairId;
+    if (clobPairId !== undefined) {
+      acc[marketId] = Number(clobPairId);
+    }
+    return acc;
+  }, {} as MapOf<number>);
 });
 
 /**
@@ -139,7 +137,7 @@ export const getHistoricalFundings = (state: RootState) => state.perpetuals.hist
 export const getCurrentMarketHistoricalFundings = createAppSelector(
   [getHistoricalFundings, getCurrentMarketId],
   (historicalFundings, currentMarketId) =>
-    currentMarketId ? historicalFundings?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR
+    currentMarketId ? historicalFundings[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR
 );
 
 /**
@@ -171,7 +169,7 @@ export const getPerpetualCandlesForMarket = (
   state: RootState,
   marketId: string,
   resolution: string
-): Candle[] => state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? EMPTY_ARR;
+): Candle[] => state.perpetuals.candles[marketId]?.data[resolution] ?? EMPTY_ARR;
 
 /**
  *
@@ -194,7 +192,7 @@ export const getPerpetualBarsForPriceChart = (orderbookCandlesToggleOn: boolean)
  * @returns TvChart resolution for specified marketId
  */
 export const getSelectedResolutionForMarket = (state: RootState, marketId: string) =>
-  state.perpetuals.candles?.[marketId]?.selectedResolution;
+  state.perpetuals.candles[marketId]?.selectedResolution;
 
 /**
  * @returns Current market's next funding rate
@@ -207,7 +205,7 @@ export const getCurrentMarketNextFundingRate = createAppSelector(
 export const getMarketIdToAssetMetadataMap = createAppSelector(
   [(state: RootState) => state.perpetuals.markets, (state: RootState) => state.assets.assets],
   (markets, assets) => {
-    const mapping = mapValues(markets ?? {}, (v) => assets?.[v.assetId]);
+    const mapping = mapValues(markets ?? {}, (v) => assets?.[v?.assetId ?? '']);
     return mapping;
   }
 );

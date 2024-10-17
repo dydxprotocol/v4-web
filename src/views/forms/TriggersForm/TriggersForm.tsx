@@ -124,7 +124,7 @@ export const TriggersForm = ({
             symbol={symbol}
             existsLimitOrder={existsLimitOrder}
             size={inputSize}
-            positionSize={size?.current ? Math.abs(size?.current) : null}
+            positionSize={size?.current ? Math.abs(size.current) : null}
             differingOrderSizes={differingOrderSizes}
             multipleTakeProfitOrders={multipleTakeProfitOrders}
             multipleStopLossOrders={multipleStopLossOrders}
@@ -135,7 +135,7 @@ export const TriggersForm = ({
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_AUTOMATICALLY_CANCELED })}{' '}
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
           </div>
-          <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
+          <WithTooltip tooltipString={hasInputErrors ? inputAlert.alertString : undefined}>
             <Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
@@ -149,7 +149,7 @@ export const TriggersForm = ({
             >
               {hasInputErrors
                 ? stringGetter({
-                    key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+                    key: inputAlert.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
                   })
                 : !!existingStopLossOrder || !!existingTakeProfitOrder
                   ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })

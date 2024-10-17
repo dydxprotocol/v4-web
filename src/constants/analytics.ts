@@ -4,6 +4,8 @@ import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
@@ -231,7 +233,7 @@ export const AnalyticsEvents = unionize(
     TransferNotification: ofType<{
       type: TransferNotificationTypes | undefined;
       toAmount: number | undefined;
-      timeSpent: Record<string, number> | number | undefined;
+      timeSpent: MapOf<number> | number | undefined;
       txHash: string;
       status: 'new' | 'success' | 'error';
       triggeredAt: number | undefined;

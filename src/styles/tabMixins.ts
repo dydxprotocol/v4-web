@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import { layoutMixins } from './layoutMixins';
 
 const tabTriggerStyle = css`
@@ -43,4 +45,4 @@ export const tabMixins = {
   tabTriggerStyle,
   tabTriggerActiveUnderlineStyle,
   tabTriggerUnderlineStyle,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

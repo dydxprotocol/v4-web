@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 export const tradeViewMixins = {
   horizontalTable: css`
     --tableCell-padding: 0.25rem;
@@ -29,4 +31,4 @@ export const tradeViewMixins = {
       --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
     }
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

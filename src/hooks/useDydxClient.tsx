@@ -81,9 +81,9 @@ const useDydxClientContext = () => {
     (async () => {
       if (
         networkConfig?.chainId &&
-        networkConfig?.indexerUrl &&
-        networkConfig?.websocketUrl &&
-        networkConfig?.validatorUrl
+        networkConfig.indexerUrl &&
+        networkConfig.websocketUrl &&
+        networkConfig.validatorUrl
       ) {
         try {
           const initializedClient = await CompositeClient.connect(

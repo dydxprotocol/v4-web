@@ -51,7 +51,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   // Chart data
   const data = useAppSelector(calculateFundingRateHistory, shallowEqual);
 
-  const latestDatum = data?.[data.length - 1];
+  const latestDatum = data[data.length - 1];
 
   // Chart state
   const [fundingRateView, setFundingRateView] = useState(FundingRateResolution.OneHour);
@@ -82,8 +82,8 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       series={[
         {
           dataKey: 'funding-rate',
-          xAccessor: (datum) => datum?.time,
-          yAccessor: (datum) => datum?.fundingRate,
+          xAccessor: (datum) => datum.time,
+          yAccessor: (datum) => datum.fundingRate,
           colorAccessor: () => 'var(--color-text-1)',
           getCurve: ({ zoom }) => (zoom > 12 ? curveMonotoneX : curveStepAfter),
         },

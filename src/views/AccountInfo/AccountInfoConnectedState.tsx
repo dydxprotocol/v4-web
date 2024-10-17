@@ -59,7 +59,7 @@ export const AccountInfoConnectedState = () => {
   const portfolioValue = subAccount?.equity;
 
   const isPostOrderBalanceNegative =
-    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance?.postOrder).lt(0);
+    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance.postOrder).lt(0);
 
   return (
     <$ConnectedAccountInfoContainer>

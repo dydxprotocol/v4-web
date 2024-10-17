@@ -10,9 +10,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 type ElementProps = {
   hovercard?: TooltipStringKeys;
-  stringParams?: Record<string, string | undefined>;
+  stringParams?: MapOf<string>;
   slotTrigger?: ReactNode;
   slotButton?: ReactNode;
 };

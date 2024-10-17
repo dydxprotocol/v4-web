@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 import { layoutMixins } from './layoutMixins';
 
 /** Use as a direct child of tableMixins.cellContent */
@@ -55,4 +57,4 @@ export const tableMixins = {
       }
     }
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

@@ -65,7 +65,7 @@ export const AdjustTargetLeverageForm = ({
           field: TradeInputField.targetLeverage,
         });
 
-        onSetTargetLeverage?.(leverage);
+        onSetTargetLeverage(leverage);
       }}
     >
       <$Description>

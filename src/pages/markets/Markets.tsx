@@ -35,7 +35,7 @@ const Markets = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   const marketsPageBanner = useMemo(() => {
-    if (featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi]) {
+    if (featureFlags[StatsigFlags.ffShowPredictionMarketsUi]) {
       return (
         <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
           <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>

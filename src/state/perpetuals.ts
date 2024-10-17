@@ -13,28 +13,28 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { objectKeys } from '@/lib/objectHelpers';
+import { MapOf, objectKeys } from '@/lib/objectHelpers';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 interface CandleDataByMarket {
-  data: Record<string, Candle[]>;
+  data: MapOf<Candle[]>;
   selectedResolution: string;
 }
 
 export interface PerpetualsState {
   currentMarketId?: string;
-  candles: Record<string, CandleDataByMarket>;
-  liveTrades?: Record<string, MarketTrade[]>;
-  markets?: Record<string, PerpetualMarket>;
-  orderbooks?: Record<string, MarketOrderbook>;
+  candles: MapOf<CandleDataByMarket>;
+  liveTrades?: MapOf<MarketTrade[]>;
+  markets?: MapOf<PerpetualMarket>;
+  orderbooks?: MapOf<MarketOrderbook>;
   orderbooksMap?: Record<
     string,
     {
-      asks: Record<string, number>;
-      bids: Record<string, number>;
+      asks: MapOf<number>;
+      bids: MapOf<number>;
     }
   >;
-  historicalFundings: Record<string, MarketHistoricalFunding[]>;
+  historicalFundings: MapOf<MarketHistoricalFunding[]>;
   marketFilter: MarketFilters;
 }
 
@@ -100,7 +100,7 @@ export const perpetualsSlice = createSlice({
     }),
     setMarkets: (
       state: PerpetualsState,
-      action: PayloadAction<{ markets: Record<string, PerpetualMarket>; update?: boolean }>
+      action: PayloadAction<{ markets: MapOf<PerpetualMarket>; update?: boolean }>
     ) => ({
       ...state,
       markets: action.payload.update

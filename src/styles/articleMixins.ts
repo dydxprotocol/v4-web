@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 export const articleMixins = {
   article: css`
     padding: 2rem;
@@ -42,4 +44,4 @@ export const articleMixins = {
       padding: 0.5rem 1rem;
     }
   `,
-} satisfies Record<string, ReturnType<typeof css>>;
+} satisfies MapOf<ReturnType<typeof css>>;

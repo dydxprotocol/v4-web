@@ -36,8 +36,7 @@ export const Overview = () => {
   const { dydxAddress } = useAccounts();
 
   const dynamicConfigs = useAllStatsigDynamicConfigValues();
-  const feedbackRequestWalletAddresses =
-    dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+  const feedbackRequestWalletAddresses = dynamicConfigs[StatsigDynamicConfigs.dcHighestVolumeUsers];
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);

@@ -117,9 +117,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
                 label: stringGetter({ key: STRING_KEYS.SWAP }),
                 value: selectedToken && (
                   <>
-                    <Tag>{type === TransferType.deposit ? selectedToken?.symbol : 'USDC'}</Tag>
+                    <Tag>{type === TransferType.deposit ? selectedToken.symbol : 'USDC'}</Tag>
                     <DiffArrow />
-                    <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
+                    <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken.symbol}</Tag>
                   </>
                 ),
               },
@@ -130,8 +130,8 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedToken ? (
           <>
-            <$Img src={selectedToken?.iconUrl ?? undefined} alt="" /> {selectedToken?.name}{' '}
-            <Tag>{selectedToken?.symbol}</Tag>
+            <$Img src={selectedToken.iconUrl ?? undefined} alt="" /> {selectedToken.name}{' '}
+            <Tag>{selectedToken.symbol}</Tag>
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_ASSET })

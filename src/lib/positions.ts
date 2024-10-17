@@ -1,7 +1,7 @@
 import { Nullable, SubaccountPosition, type Asset, type PerpetualMarket } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
-import { safeAssign } from './objectHelpers';
+import { MapOf, safeAssign } from './objectHelpers';
 
 type HydratedPositionData = SubaccountPosition & {
   asset?: Asset;
@@ -16,8 +16,8 @@ export const getHydratedPositionData = ({
   perpetualMarkets,
 }: {
   data: SubaccountPosition;
-  assets?: Record<string, Asset>;
-  perpetualMarkets?: Record<string, PerpetualMarket>;
+  assets?: MapOf<Asset>;
+  perpetualMarkets?: MapOf<PerpetualMarket>;
 }): HydratedPositionData => {
   return safeAssign({}, data, {
     asset: assets?.[data.assetId],

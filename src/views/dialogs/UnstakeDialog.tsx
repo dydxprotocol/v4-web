@@ -24,7 +24,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
   const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
   const { chainTokenLabel } = useTokenConfigs();
 
-  const closeDialog = () => setIsOpen?.(false);
+  const closeDialog = () => setIsOpen(false);
 
   const dialogProps: {
     [key in StakeFormSteps]: {

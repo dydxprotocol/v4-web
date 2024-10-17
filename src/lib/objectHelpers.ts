@@ -10,3 +10,7 @@ export const objectKeys = <T extends object>(t: T) => Object.keys(t) as Array<ke
 // can be safely splatted like {...someObject}. Object.assign is slightly slower but guarantees all the properties will get copied
 // and the result is typed correctly by the type system
 export const safeAssign = Object.assign;
+
+// you should only ever use Record if you know the set of valid string keys. Otherwise use this, which correctly
+// types string accesses as sometimes yielding undefined
+export type MapOf<T> = Record<string, T | undefined>;

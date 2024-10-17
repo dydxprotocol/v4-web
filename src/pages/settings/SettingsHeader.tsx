@@ -42,7 +42,7 @@ export const SettingsHeader = ({
   return (
     <$SettingsHeader>
       <BackButton />
-      <h1 tw="p-0.5 font-extra-medium">{currentRoute?.label}</h1>
+      <h1 tw="p-0.5 font-extra-medium">{currentRoute.label}</h1>
     </$SettingsHeader>
   );
 };

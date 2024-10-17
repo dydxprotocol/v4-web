@@ -78,10 +78,10 @@ export const PortfolioNavMobile = () => {
     <$MobilePortfolioHeader>
       <DropdownHeaderMenu
         key="portfolioRoute"
-        items={portfolioRouteItems.filter(({ value }) => value !== currentRoute?.value)}
+        items={portfolioRouteItems.filter(({ value }) => value !== currentRoute.value)}
         onValueChange={navigate}
       >
-        {currentRoute?.label}
+        {currentRoute.label}
       </DropdownHeaderMenu>
     </$MobilePortfolioHeader>
   );

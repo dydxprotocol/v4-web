@@ -32,6 +32,7 @@ import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardB
 
 import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
@@ -63,7 +64,7 @@ export const UnstakeForm = ({
   // Form states
   const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
-  const [amounts, setAmounts] = useState<Record<string, number | undefined>>({});
+  const [amounts, setAmounts] = useState<MapOf<number>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const isEachAmountValid = useMemo(() => {

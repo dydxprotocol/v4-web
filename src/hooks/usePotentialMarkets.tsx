@@ -4,6 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LIQUIDITY_TIERS } from '@/constants/markets';
 import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
+import { MapOf } from '@/lib/objectHelpers';
 import { log } from '@/lib/telemetry';
 
 import { useStringGetter } from './useStringGetter';
@@ -32,9 +33,9 @@ const usePotentialMarketsContext = () => {
     try {
       fetch(POTENTIAL_MARKETS_FILE_PATH)
         .then((response) => response.json())
-        .then((data: Record<string, Omit<NewMarketProposal, 'baseAsset'>>) => {
+        .then((data: MapOf<Omit<NewMarketProposal, 'baseAsset'>>) => {
           const newPotentialMarkets = Object.entries(data).map(([key, value]) => ({
-            ...value,
+            ...value!,
             baseAsset: key,
           }));
           setPotentialMarkets(newPotentialMarkets);

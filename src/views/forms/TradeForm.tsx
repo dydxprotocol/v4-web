@@ -156,7 +156,7 @@ export const TradeForm = ({
     }
 
     const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
-      (errorCode) => inputAlertInner?.code === errorCode
+      (errorCode) => inputAlertInner.code === errorCode
     );
     return {
       shortAlertContent: alertContentInner,
@@ -323,11 +323,11 @@ export const TradeForm = ({
       )}
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
-        actionStringKey={inputAlert?.actionStringKey}
+        actionStringKey={inputAlert.actionStringKey}
         validationErrorString={shortAlertContent}
         summary={summary ?? undefined}
         currentStep={currentStep}
-        showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+        showDeposit={inputAlert.errorAction === TradeInputErrorAction.DEPOSIT}
         confirmButtonConfig={{
           stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
           buttonTextStringKey: STRING_KEYS.PLACE_ORDER,

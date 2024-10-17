@@ -34,6 +34,7 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
+import { MapOf } from '@/lib/objectHelpers';
 import {
   cancelOrderAsync,
   canModifyOrderTypeFromChart,
@@ -70,7 +71,7 @@ export const useChartLines = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const chartLinesRef = useRef<Record<string, ChartLine>>({});
+  const chartLinesRef = useRef<MapOf<ChartLine>>({});
 
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -195,9 +196,9 @@ export const useChartLines = ({
       return;
     }
 
-    const entryPrice = currentMarketPositionData.entryPrice?.current;
-    const liquidationPrice = currentMarketPositionData.liquidationPrice?.current;
-    const size = currentMarketPositionData.size?.current;
+    const entryPrice = currentMarketPositionData.entryPrice.current;
+    const liquidationPrice = currentMarketPositionData.liquidationPrice.current;
+    const size = currentMarketPositionData.size.current;
 
     maybeDrawPositionLine({
       key: entryLineKey,
@@ -218,7 +219,9 @@ export const useChartLines = ({
 
   // Cache for order modification that stores the new orders that are submitted but not yet placed
   const pendingOrderAdjustmentsRef = useRef<{
-    [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
+    [clientId: string]:
+      | { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string }
+      | undefined;
   }>({});
 
   const removePendingOrderAdjustment = (clientId: string) => {
@@ -338,7 +341,7 @@ export const useChartLines = ({
       const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
       const pendingReplacementOrder = Object.values(pendingOrderAdjustments).find(
-        (adjustment) => adjustment.oldOrderId === id
+        (adjustment) => adjustment?.oldOrderId === id
       );
       const replacementOrderPlaced = !!currentMarketOrders.find(
         (o) => o.clientId === pendingReplacementOrder?.orderPayload.clientId
@@ -413,8 +416,8 @@ export const useChartLines = ({
   ]);
 
   const clearChartLines = useCallback(() => {
-    Object.values(chartLinesRef.current).forEach(({ line }) => {
-      line.remove();
+    Object.values(chartLinesRef.current).forEach((line) => {
+      line?.line.remove();
     });
     chartLinesRef.current = {};
   }, []);
@@ -436,9 +439,9 @@ export const useChartLines = ({
       if (isChartReady) {
         runOnChartReady(() => {
           if (orderLinesToggleOn) {
-            orderLineToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
+            orderLineToggle?.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderLineToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
+            orderLineToggle?.classList.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
         });
       }

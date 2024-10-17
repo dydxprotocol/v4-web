@@ -79,8 +79,8 @@ export const NotificationsMenu = ({
             )
             .map((notification) => ({
               notification,
-              key: getKey?.(notification),
-              displayData: getDisplayData?.(notification),
+              key: getKey(notification),
+              displayData: getDisplayData(notification),
             }))
             .map(({ notification, key, displayData }) => ({
               value: key,
@@ -110,8 +110,8 @@ export const NotificationsMenu = ({
               ),
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
-                onNotificationAction?.(notification);
-                markSeen?.(notification);
+                onNotificationAction(notification);
+                markSeen(notification);
               },
             })),
         }))

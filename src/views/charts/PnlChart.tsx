@@ -137,8 +137,8 @@ export const PnlChart = ({
 
   const msForPeriod = useCallback(
     (period: HistoricalPnlPeriods, clampMax: Boolean = true) => {
-      const earliestCreatedAt = data?.[0]?.createdAt;
-      const latestCreatedAt = data?.[data.length - 1]?.createdAt;
+      const earliestCreatedAt = data[0]?.createdAt;
+      const latestCreatedAt = data[data.length - 1]?.createdAt;
       const maxPeriod =
         earliestCreatedAt && latestCreatedAt
           ? latestCreatedAt - earliestCreatedAt
@@ -236,8 +236,8 @@ export const PnlChart = ({
     [chartDotsBackground, isTablet]
   );
 
-  const xAccessorFunc = useCallback((datum: PnlDatum) => datum?.createdAt, []);
-  const yAccessorFunc = useCallback((datum: PnlDatum) => datum?.equity, []);
+  const xAccessorFunc = useCallback((datum: PnlDatum) => datum.createdAt, []);
+  const yAccessorFunc = useCallback((datum: PnlDatum) => datum.equity, []);
 
   const series = useMemo(
     () => [

@@ -119,7 +119,7 @@ export const NewMarketSelectionStep = ({
                 group: 'markets',
                 groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
                 items:
-                  launchableMarkets.data?.map((launchableMarket) => ({
+                  launchableMarkets.data.map((launchableMarket) => ({
                     value: launchableMarket.id,
                     label: getDisplayableTickerFromMarket(launchableMarket.id),
                     tag: getDisplayableAssetFromBaseAsset(launchableMarket.asset),

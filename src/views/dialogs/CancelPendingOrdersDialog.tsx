@@ -26,7 +26,7 @@ export const CancelPendingOrdersDialog = ({
     [allPending, marketId]
   );
 
-  const onSuccessfulCancel = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const onSuccessfulCancel = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <Dialog

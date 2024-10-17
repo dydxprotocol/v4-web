@@ -4,6 +4,8 @@ import type {
   SubscribeBarsCallback,
 } from 'public/tradingview/charting_library';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 export const lastBarsCache = new Map();
 export const subscriptionsByChannelId: Map<
   string,
@@ -11,6 +13,6 @@ export const subscriptionsByChannelId: Map<
     subscribeUID: string;
     resolution: ResolutionString;
     lastBar: Bar;
-    handlers: Record<string, { id: string; callback: SubscribeBarsCallback }>;
+    handlers: MapOf<{ id: string; callback: SubscribeBarsCallback }>;
   }
 > = new Map();

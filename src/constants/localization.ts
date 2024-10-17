@@ -15,6 +15,7 @@ import { StatsigConfigType } from '@/constants/statsig';
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
 import formatString from '@/lib/formatString';
+import { MapOf } from '@/lib/objectHelpers';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -52,7 +53,7 @@ export type StringKey = keyof typeof STRING_KEYS;
 
 export type LocaleData = typeof EN_LOCALE_DATA;
 
-export type StringGetterParams = Record<string, any>;
+export type StringGetterParams = MapOf<any>;
 
 export type StringGetterProps<T extends StringGetterParams> =
   | {

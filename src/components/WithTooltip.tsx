@@ -16,11 +16,13 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
+import { MapOf } from '@/lib/objectHelpers';
+
 type ElementProps = {
   tooltip?: TooltipStringKeys;
   tooltipString?: string;
   tooltipStringTitle?: string;
-  stringParams?: Record<string, string | undefined>;
+  stringParams?: MapOf<string>;
   withIcon?: boolean;
   children?: ReactNode;
   slotTooltip?: ReactNode;

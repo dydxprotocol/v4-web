@@ -1,7 +1,9 @@
 import { EMPTY_OBJ } from '@/constants/objects';
 
+import { MapOf } from './objectHelpers';
+
 // preserves reference and empty object never churns
-export function orEmptyRecord<T>(obj: Record<string, T> | null | undefined): Record<string, T> {
+export function orEmptyRecord<T>(obj: MapOf<T> | null | undefined): MapOf<T> {
   return obj ?? (EMPTY_OBJ as any);
 }
 
