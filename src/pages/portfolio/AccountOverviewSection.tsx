@@ -11,16 +11,19 @@ import { AppRoute } from '@/constants/routes';
 import { ColorToken } from '@/constants/styles/base';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { Button } from '@/components/Button';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { mapIfPresent } from '@/lib/do';
@@ -46,7 +49,12 @@ export const MegavaultYieldTag = () => {
         key: STRING_KEYS.APR,
         params: {
           PERCENT: (
-            <Output tw="mr-0.25" type={OutputType.Percent} value={vault?.thirtyDayReturnPercent} />
+            <Output
+              tw="mr-0.25"
+              type={OutputType.Percent}
+              value={vault?.thirtyDayReturnPercent}
+              fractionDigits={0}
+            />
           ),
         },
       })}
@@ -83,7 +91,7 @@ export const AccountOverviewSection = () => {
       id: 'open-positions',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
       amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) => e - f),
-      color: ColorToken.Green2,
+      color: ColorToken.Yellow1,
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
@@ -92,6 +100,9 @@ export const AccountOverviewSection = () => {
       color: ColorToken.Purple1,
     },
   ].filter(isTruthy);
+
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   return (
     <$AccountOverviewWrapper>
@@ -123,25 +134,46 @@ export const AccountOverviewSection = () => {
         {!isTablet && (
           <div tw="flexColumn flex-1 pt-0.5">
             <div tw="row h-1 w-full overflow-hidden rounded-1">
-              {pieSections.map(
-                (section) =>
-                  section.amount != null &&
-                  totalValue != null &&
-                  section.amount > 0 && (
-                    <$LineSegment
-                      key={section.id}
-                      tw="h-full"
-                      $color={section.color}
-                      $widthPercent={section.amount / totalValue}
-                    />
-                  )
-              )}
+              {pieSections.map((section) => {
+                if (
+                  section.amount == null ||
+                  totalValue == null ||
+                  totalValue <= 0 ||
+                  section.amount <= 0
+                ) {
+                  return undefined;
+                }
+                const formattedDollars = formatNumberOutput(section.amount, OutputType.Fiat, {
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                });
+                const formattedPercent = formatNumberOutput(
+                  section.amount / totalValue,
+                  OutputType.Percent,
+                  { fractionDigits: 0, decimalSeparator, groupSeparator, selectedLocale }
+                );
+                return (
+                  <WithTooltip
+                    key={section.id}
+                    tooltipStringTitle={`${section.label}: ${formattedDollars} (${formattedPercent})`}
+                    slotTrigger={
+                      <$LineSegment
+                        tw="h-full"
+                        $color={section.color}
+                        $widthPercent={section.amount / totalValue}
+                      />
+                    }
+                  />
+                );
+              })}
             </div>
             <div tw="row w-full flex-1 text-center">
               {pieSections.map(
                 (section) =>
                   section.amount != null &&
                   totalValue != null &&
+                  totalValue > 0 &&
                   section.amount > 0 && (
                     <$LineSegment key={section.id} $widthPercent={section.amount / totalValue}>
                       {section.amount / totalValue > 0.09 && (

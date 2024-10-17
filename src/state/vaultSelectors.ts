@@ -7,11 +7,13 @@ export const selectVaultFormStateExceptAmount = createAppSelector(
   [
     (state) => state.vaults.vaultForm.operation,
     (state) => state.vaults.vaultForm.slippageAck,
+    (state) => state.vaults.vaultForm.termsAck,
     (state) => state.vaults.vaultForm.confirmationStep,
   ],
-  (operation, slippageAck, confirmationStep) => ({
+  (operation, slippageAck, termsAck, confirmationStep) => ({
     operation,
     slippageAck,
+    termsAck,
     confirmationStep,
   })
 );

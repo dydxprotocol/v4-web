@@ -4,6 +4,7 @@ export interface VaultForm {
   amount: string;
   operation: 'DEPOSIT' | 'WITHDRAW';
   slippageAck: boolean;
+  termsAck: boolean;
   confirmationStep: boolean;
 }
 export interface VaultsState {
@@ -15,6 +16,7 @@ const initialState: VaultsState = {
     amount: '',
     confirmationStep: false,
     slippageAck: false,
+    termsAck: false,
     operation: 'DEPOSIT',
   },
 };
@@ -29,6 +31,9 @@ export const vaultsSlice = createSlice({
     setVaultFormSlippageAck: (state, action: PayloadAction<boolean>) => {
       state.vaultForm.slippageAck = action.payload;
     },
+    setVaultFormTermsAck: (state, action: PayloadAction<boolean>) => {
+      state.vaultForm.termsAck = action.payload;
+    },
     setVaultFormConfirmationStep: (state, action: PayloadAction<boolean>) => {
       state.vaultForm.confirmationStep = action.payload;
     },
@@ -40,6 +45,7 @@ export const vaultsSlice = createSlice({
         amount: '',
         confirmationStep: false,
         slippageAck: false,
+        termsAck: false,
         operation: 'DEPOSIT',
       };
     },
@@ -51,5 +57,6 @@ export const {
   setVaultFormOperation,
   setVaultFormConfirmationStep,
   setVaultFormSlippageAck,
+  setVaultFormTermsAck,
   resetVaultForm,
 } = vaultsSlice.actions;
