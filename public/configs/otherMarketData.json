@@ -4808,46 +4808,6 @@
       "cmcId": 3640.0
     }
   },
-  "NFT": {
-    "title": "Add NFT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NFT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 94,
-      "ticker": "NFT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -16,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "nftusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "NFT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 1.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "APENFT",
-      "referencePrice": 4.3017292e-07,
-      "cmcId": 9816.0
-    }
-  },
   "TWT": {
     "title": "Add TWT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TWT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -4937,44 +4897,6 @@
       "assetName": "IOTA",
       "referencePrice": 0.1337549763,
       "cmcId": 1720.0
-    }
-  },
-  "GNO": {
-    "title": "Add GNO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GNO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 97,
-      "ticker": "GNO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -7,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "GNO-USD"
-        },
-        {
-          "exchangeName": "kraken_api",
-          "ticker": "GNOUSD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -8.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Gnosis",
-      "referencePrice": 158.6699999,
-      "cmcId": 1659.0
     }
   },
   "CELO": {
@@ -5341,50 +5263,6 @@
       "assetName": "IoTeX",
       "referencePrice": 0.043440432279999996,
       "cmcId": 2777.0
-    }
-  },
-  "KAVA": {
-    "title": "Add KAVA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KAVA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 105,
-      "ticker": "KAVA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "KAVAUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "KAVA-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "KAVA-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Kava",
-      "referencePrice": 0.36049782010000003,
-      "cmcId": 4846.0
     }
   },
   "DOGS": {
@@ -6059,55 +5937,6 @@
       "cmcId": 5034.0
     }
   },
-  "DASH": {
-    "title": "Add DASH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DASH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 120,
-      "ticker": "DASH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -8,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "DASH-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "DASH_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "dashusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "DASH-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -7.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Dash",
-      "referencePrice": 22.89113,
-      "cmcId": 131.0
-    }
-  },
   "ETHFI": {
     "title": "Add ETHFI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ETHFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -6161,51 +5990,6 @@
       "assetName": "ether.fi",
       "referencePrice": 1.6008764000000002,
       "cmcId": 29814.0
-    }
-  },
-  "ELF": {
-    "title": "Add ELF-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ELF-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 122,
-      "ticker": "ELF-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ELF_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "elfeth",
-          "adjustByMarket": "ETH-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "ELF-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "aelf",
-      "referencePrice": 0.40182198,
-      "cmcId": 2299.0
     }
   },
   "MEME": {
@@ -6557,53 +6341,6 @@
       "assetName": "Ankr",
       "referencePrice": 0.02599,
       "cmcId": 3783.0
-    }
-  },
-  "SC": {
-    "title": "Add SC-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 131,
-      "ticker": "SC-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "SCUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SC-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "SOL,RAYDIUM,SO11111111111111111111111111111111111111112/SC,RAYDIUM,6D7NAB2XSLD7CAUWU1WKK6KBSJOHJMP2QZH9GEFVI5UI",
-          "adjustByMarket": "SOL-USD",
-          "invert": true,
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"DQPzUPZ5GFVVyNSf7tvMLu5NkN2UxUt1VijXGMxJfU8q\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"5ZgybxRW9AMd2U3P3wpzsgCY8UUDCBR488ievHuNiG8B\",\"token_decimals\":6},\"amm_info_address\":\"BSzedbEvWRqVksaF558epPWCM16avEpyhm2HgSq9WZyy\",\"open_orders_address\":\"H3Pbn9sMF8wA7hUGgV18YTt6LdR6ALpKaNf4y6j8ep9Q\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Siacoin",
-      "referencePrice": 0.0047916094,
-      "cmcId": 1042.0
     }
   },
   "QTUM": {
@@ -7202,60 +6939,6 @@
       "cmcId": 29835.0
     }
   },
-  "RPL": {
-    "title": "Add RPL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RPL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 145,
-      "ticker": "RPL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -8,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "RPLUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "RPL-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "RPL_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "rplusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "RPL-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -7.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Rocket Pool",
-      "referencePrice": 10.41,
-      "cmcId": 2943.0
-    }
-  },
   "METIS": {
     "title": "Add METIS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a METIS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -7623,134 +7306,6 @@
       "cmcId": 30083.0
     }
   },
-  "NPC": {
-    "title": "Add NPC-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NPC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 154,
-      "ticker": "NPC-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "NPC_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006/NPC,UNISWAP_V3_BASE,0XB166E8B140D35D9D8226E40C09F757BAC5A4D87D",
-          "adjustByMarket": "ETH-USD",
-          "invert": true,
-          "metadata_JSON": "{\"address\":\"0x96e727835c5ec965aae8cbbad34901e3be33befb\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Non-Playable Coin",
-      "referencePrice": 0.028611119969999998,
-      "cmcId": 27960.0
-    }
-  },
-  "CAT": {
-    "title": "Add CAT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CAT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 155,
-      "ticker": "CAT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -14,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "catusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "CAT-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CAT,RAYDIUM,3WKZQDH3ZW3TP2PHATAUDU4E1XSEZFHK7QNN8MAPM3S2/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"5ezZ425K5cRiZLYuYtPacFEpnZfx68PS7pFNpxnJWLKg\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"5qRnDE3vcBQrAY3YM2K6gu3UksahWfPtjAGvLqy2cs6r\",\"token_decimals\":9},\"amm_info_address\":\"A8WteoYJdxxir2zN7oGKe27e8xfZyq2C9xUW2vNJXWJt\",\"open_orders_address\":\"HMj9zn5zobGvVkPwYt4boP2F3o9gE5MWcR3n54311sHC\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -1.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Simon's Cat",
-      "referencePrice": 3.4001092e-05,
-      "cmcId": 32724.0
-    }
-  },
-  "FLUX": {
-    "title": "Add FLUX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FLUX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 156,
-      "ticker": "FLUX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "fluxusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "FLUX-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Flux",
-      "referencePrice": 0.6015569669,
-      "cmcId": 3029.0
-    }
-  },
   "SKL": {
     "title": "Add SKL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SKL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -7935,45 +7490,6 @@
       "assetName": "Convex Finance",
       "referencePrice": 1.9380000000000002,
       "cmcId": 9903.0
-    }
-  },
-  "XRD": {
-    "title": "Add XRD-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XRD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 161,
-      "ticker": "XRD-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bitfinex_ws",
-          "ticker": "XRDUSD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "XRD-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Radix",
-      "referencePrice": 0.018883218719999997,
-      "cmcId": 11948.0
     }
   },
   "SUSHI": {
@@ -8346,45 +7862,6 @@
       "cmcId": 3945.0
     }
   },
-  "BAND": {
-    "title": "Add BAND-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BAND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 170,
-      "ticker": "BAND-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "BAND-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "BAND-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Band Protocol",
-      "referencePrice": 1.114,
-      "cmcId": 4679.0
-    }
-  },
   "YFI": {
     "title": "Add YFI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a YFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -8534,47 +8011,6 @@
       "cmcId": 10688.0
     }
   },
-  "DSYNC": {
-    "title": "Add DSYNC-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DSYNC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 174,
-      "ticker": "DSYNC-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "DSYNC_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "DSYNC,UNISWAP_V3,0XF94E7D0710709388BCE3161C32B4EEA56D3F91CC/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xbe24f9952bf2a15bc4d2661151049d9588d6c0cb\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Destra Network",
-      "referencePrice": 0.17551536,
-      "cmcId": 29884.0
-    }
-  },
   "KDA": {
     "title": "Add KDA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KDA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -8669,47 +8105,6 @@
       "assetName": "Ponke",
       "referencePrice": 0.328575373,
       "cmcId": 29150.0
-    }
-  },
-  "CHEX": {
-    "title": "Add CHEX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHEX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 177,
-      "ticker": "CHEX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "CHEX_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CHEX,RAYDIUM,6DKCOWJPJ5MFU5GWDEFDPUUEBASBLK3WLEWHUZQPAA1E/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"2qmJC3SVFSkK2fYz7fswkPn7ySqtf9xH2AkLBZ999sbr\",\"token_decimals\":8},\"quote_token_vault\":{\"token_vault_address\":\"AD7qRvY14byTLY19tWZTvXLaMF7AZj4dw4Gb1nHbgaW6\",\"token_decimals\":9},\"amm_info_address\":\"D8JjVpFdXjFvHmsX7LyFy8iHXEqzhbQo576Rt8rZkyiq\",\"open_orders_address\":\"5ePrmurwh3HGL67udZ3jkTJBPeMwtQK9Ey7uUqt12jRw\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Chintai",
-      "referencePrice": 0.17391248,
-      "cmcId": 8534.0
     }
   },
   "LRC": {
@@ -9296,48 +8691,6 @@
       "cmcId": 2394.0
     }
   },
-  "SPX": {
-    "title": "Add SPX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SPX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 191,
-      "ticker": "SPX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "SPX,RAYDIUM,J3NKXXXZCNNIMJKW9HYB2K4LUXGWB6T1FTPTQVSV3KFR/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"rFkn84fuSQ3ovZECNLF7JnX5xy1to6KR7LM6TSQtKgT\",\"token_decimals\":8},\"quote_token_vault\":{\"token_vault_address\":\"DGUVmREQ4hpRmkf9sRP4Fb48az5ACCLoxH4FMrvEPrZN\",\"token_decimals\":9},\"amm_info_address\":\"9t1H1uDJ558iMPNkEPSN1fqkpC4XSPQ6cqSf6uEsTfTR\",\"open_orders_address\":\"AxTb8hkmnVcAtSJFY96dPhD1biYS7Q1vS5AjZGJPNP4P\"}"
-        },
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "SPX,UNISWAP_V3,0XE0F63A424A4439CBE457D80E4F4B51AD25B2C56C/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x7c706586679af2ba6d1a9fc2da9c6af59883fdd3\",\"base_decimals\":8,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "SPX6900",
-      "referencePrice": 0.009965081145,
-      "cmcId": 28081.0
-    }
-  },
   "CSPR": {
     "title": "Add CSPR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CSPR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -9572,92 +8925,6 @@
       "cmcId": 32966.0
     }
   },
-  "SXP": {
-    "title": "Add SXP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SXP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 197,
-      "ticker": "SXP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SXP_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "sxpusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "SXP-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Solar",
-      "referencePrice": 0.2394302,
-      "cmcId": 4279.0
-    }
-  },
-  "TRUMP": {
-    "title": "Add TRUMP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRUMP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 198,
-      "ticker": "TRUMP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "TRUMP_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "TRUMP,UNISWAP_V3_BASE,0X57F5FBD3DE65DFC0BD3630F732969E5FB97E6D37/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xaa4bdf13c4ca0594daebb38ae7d772b7e975b284\",\"base_decimals\":9,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "MAGA",
-      "referencePrice": 2.9212262630000003,
-      "cmcId": 27872.0
-    }
-  },
   "ICX": {
     "title": "Add ICX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -9842,48 +9109,6 @@
       "cmcId": 31278.0
     }
   },
-  "ANDY": {
-    "title": "Add ANDY-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ANDY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 203,
-      "ticker": "ANDY-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "ANDY,UNISWAP_V3_BASE,0X18A8BD1FE17A1BB9FFB39ECD83E9489CFD17A022/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xcc4fab1466f0acf4c837216096a55924057252e4\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        },
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "ANDY,UNISWAP_V3,0X68BBED6A47194EFF1CF514B50EA91895597FC91E/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x2b8574482d62d8df670dfd3be15f2f092941284e\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "ANDY (ETH)",
-      "referencePrice": 0.000150054,
-      "cmcId": 29879.0
-    }
-  },
   "TAIKO": {
     "title": "Add TAIKO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TAIKO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -10018,45 +9243,6 @@
       "cmcId": 28230.0
     }
   },
-  "BAL": {
-    "title": "Add BAL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BAL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 207,
-      "ticker": "BAL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "BAL-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "BAL-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Balancer",
-      "referencePrice": 2.17,
-      "cmcId": 5728.0
-    }
-  },
   "BITCOIN,UNISWAP_V3,0X72E4F9F808C49A2A61DE9C5896298920DC4EEEA9": {
     "title": "Add BITCOIN,UNISWAP_V3,0X72E4F9F808C49A2A61DE9C5896298920DC4EEEA9-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BITCOIN,UNISWAP_V3,0X72E4F9F808C49A2A61DE9C5896298920DC4EEEA9-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -10181,46 +9367,6 @@
       "assetName": "Reef",
       "referencePrice": 0.0005062706498,
       "cmcId": 6951.0
-    }
-  },
-  "JOE": {
-    "title": "Add JOE-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JOE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 211,
-      "ticker": "JOE-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "joeusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "JOE-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "JOE",
-      "referencePrice": 0.34652262,
-      "cmcId": 11396.0
     }
   },
   "LCX": {
@@ -10352,45 +9498,6 @@
       "cmcId": 23756.0
     }
   },
-  "ORCA": {
-    "title": "Add ORCA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORCA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 215,
-      "ticker": "ORCA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "ORCA-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ORCA_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Orca",
-      "referencePrice": 2.2310086,
-      "cmcId": 11165.0
-    }
-  },
   "API3": {
     "title": "Add API3-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a API3-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -10438,86 +9545,6 @@
       "assetName": "API3",
       "referencePrice": 1.4616262,
       "cmcId": 7737.0
-    }
-  },
-  "AZERO": {
-    "title": "Add AZERO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AZERO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 217,
-      "ticker": "AZERO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "AZERO_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "AZERO-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Aleph Zero",
-      "referencePrice": 0.4047272,
-      "cmcId": 11976.0
-    }
-  },
-  "WAXP": {
-    "title": "Add WAXP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WAXP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 218,
-      "ticker": "WAXP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "WAXPUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "WAXP-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "WAX",
-      "referencePrice": 0.035243324,
-      "cmcId": 2300.0
     }
   },
   "TLOS": {
@@ -10626,46 +9653,6 @@
       "assetName": "Velo",
       "referencePrice": 0.0164566287,
       "cmcId": 7127.0
-    }
-  },
-  "AITECH": {
-    "title": "Add AITECH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AITECH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 221,
-      "ticker": "AITECH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "AITECH_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "AITECH-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Solidus Ai Tech",
-      "referencePrice": 0.011245491509999999,
-      "cmcId": 19055.0
     }
   },
   "NMR": {
@@ -10823,45 +9810,6 @@
       "cmcId": 2405.0
     }
   },
-  "CTSI": {
-    "title": "Add CTSI-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CTSI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 226,
-      "ticker": "CTSI-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "CTSI-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "CTSI_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Cartesi",
-      "referencePrice": 0.123391706,
-      "cmcId": 5444.0
-    }
-  },
   "MUMU,RAYDIUM,5LAFQURVCO6O7KMZ42EQVEJ9LW31STPYGJEEU5SKOMTA": {
     "title": "Add MUMU,RAYDIUM,5LAFQURVCO6O7KMZ42EQVEJ9LW31STPYGJEEU5SKOMTA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MUMU,RAYDIUM,5LAFQURVCO6O7KMZ42EQVEJ9LW31STPYGJEEU5SKOMTA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -10946,130 +9894,6 @@
       "assetName": "Nakamoto Games",
       "referencePrice": 0.11955481200000001,
       "cmcId": 12749.0
-    }
-  },
-  "TRU": {
-    "title": "Add TRU-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRU-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 229,
-      "ticker": "TRU-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "TRU-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "truusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "TRU-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "TrueFi",
-      "referencePrice": 0.08860019379999999,
-      "cmcId": 7725.0
-    }
-  },
-  "SLP": {
-    "title": "Add SLP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SLP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 230,
-      "ticker": "SLP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "SLP-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SLP-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Smooth Love Potion",
-      "referencePrice": 0.0026507628,
-      "cmcId": 5824.0
-    }
-  },
-  "PHB": {
-    "title": "Add PHB-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PHB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 231,
-      "ticker": "PHB-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "PHB_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "phbusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Phoenix",
-      "referencePrice": 1.6669952000000001,
-      "cmcId": 13969.0
     }
   },
   "UXLINK": {
@@ -11446,46 +10270,6 @@
       "cmcId": 24600.0
     }
   },
-  "SNT": {
-    "title": "Add SNT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SNT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 240,
-      "ticker": "SNT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "sntusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SNT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Status",
-      "referencePrice": 0.023902948,
-      "cmcId": 1759.0
-    }
-  },
   "ORAI": {
     "title": "Add ORAI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORAI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -11582,45 +10366,6 @@
       "cmcId": 3835.0
     }
   },
-  "CXT": {
-    "title": "Add CXT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CXT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 243,
-      "ticker": "CXT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "kraken_api",
-          "ticker": "CXTUSD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "CXT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Covalent X Token",
-      "referencePrice": 0.09401999999999999,
-      "cmcId": 32526.0
-    }
-  },
   "DAR": {
     "title": "Add DAR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -11663,51 +10408,6 @@
       "assetName": "Mines of Dalarnia",
       "referencePrice": 0.1409999999,
       "cmcId": 11374.0
-    }
-  },
-  "MOVR": {
-    "title": "Add MOVR-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MOVR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 245,
-      "ticker": "MOVR-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "MOVRUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "MOVR-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "MOVR-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Moonriver",
-      "referencePrice": 1.076935,
-      "cmcId": 9285.0
     }
   },
   "AUCTION": {
@@ -11759,50 +10459,6 @@
       "cmcId": 8602.0
     }
   },
-  "PHA": {
-    "title": "Add PHA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PHA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 247,
-      "ticker": "PHA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "kraken_api",
-          "ticker": "PHAUSD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "PHA-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "PHA-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Phala Network",
-      "referencePrice": 0.012691584799999999,
-      "cmcId": 6841.0
-    }
-  },
   "DADDY": {
     "title": "Add DADDY-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DADDY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -11843,85 +10499,6 @@
       "assetName": "Daddy Tate",
       "referencePrice": 0.08806138557,
       "cmcId": 31830.0
-    }
-  },
-  "DODO": {
-    "title": "Add DODO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DODO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 249,
-      "ticker": "DODO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "DODO_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "DODO-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "DODO",
-      "referencePrice": 0.12375439760000001,
-      "cmcId": 7224.0
-    }
-  },
-  "RARE": {
-    "title": "Add RARE-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RARE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 250,
-      "ticker": "RARE-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "RARE-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "RARE_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "SuperRare",
-      "referencePrice": 0.011951474,
-      "cmcId": 11294.0
     }
   },
   "PORTAL": {
@@ -12071,46 +10648,6 @@
       "assetName": "Kyber Network Crystal v2",
       "referencePrice": 0.43620000000000003,
       "cmcId": 9444.0
-    }
-  },
-  "CYBER": {
-    "title": "Add CYBER-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CYBER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 254,
-      "ticker": "CYBER-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "CYBERUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "CYBER_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Cyber",
-      "referencePrice": 3.0765278,
-      "cmcId": 24781.0
     }
   },
   "OMNI": {
@@ -12291,46 +10828,6 @@
       "cmcId": 29779.0
     }
   },
-  "ISLM": {
-    "title": "Add ISLM-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ISLM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 259,
-      "ticker": "ISLM-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ISLM_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "ISLM-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Islamic Coin",
-      "referencePrice": 0.067110582,
-      "cmcId": 26220.0
-    }
-  },
   "RDNT": {
     "title": "Add RDNT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RDNT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -12460,46 +10957,6 @@
       "cmcId": 7429.0
     }
   },
-  "SYS": {
-    "title": "Add SYS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SYS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 263,
-      "ticker": "SYS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SYS_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "SYS-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Syscoin",
-      "referencePrice": 0.01066790673,
-      "cmcId": 541.0
-    }
-  },
   "EVER": {
     "title": "Add EVER-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EVER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -12538,45 +10995,6 @@
       "assetName": "Everscale",
       "referencePrice": 0.03486264,
       "cmcId": 7505.0
-    }
-  },
-  "SYN": {
-    "title": "Add SYN-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SYN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 265,
-      "ticker": "SYN-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "SYN-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SYN_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Synapse",
-      "referencePrice": 0.406,
-      "cmcId": 12147.0
     }
   },
   "TAI": {
@@ -12953,46 +11371,6 @@
       "cmcId": 5026.0
     }
   },
-  "BAKE": {
-    "title": "Add BAKE-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BAKE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 274,
-      "ticker": "BAKE-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "BAKE_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "bakeusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "BakeryToken",
-      "referencePrice": 0.23532282000000002,
-      "cmcId": 7064.0
-    }
-  },
   "MYRO": {
     "title": "Add MYRO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MYRO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -13260,45 +11638,6 @@
       "cmcId": 17591.0
     }
   },
-  "ALICE": {
-    "title": "Add ALICE-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALICE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 281,
-      "ticker": "ALICE-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "ALICE-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "aliceusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "MyNeighborAlice",
-      "referencePrice": 0.9730000000000001,
-      "cmcId": 8766.0
-    }
-  },
   "KARRAT": {
     "title": "Add KARRAT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KARRAT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -13336,86 +11675,6 @@
       "assetName": "KARRAT",
       "referencePrice": 0.6436259451,
       "cmcId": 30825.0
-    }
-  },
-  "ACA": {
-    "title": "Add ACA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ACA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 283,
-      "ticker": "ACA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "acausdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "ACA-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Acala Token",
-      "referencePrice": 0.06601862,
-      "cmcId": 6756.0
-    }
-  },
-  "ZCX": {
-    "title": "Add ZCX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZCX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 285,
-      "ticker": "ZCX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ZCX_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "ZCX-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Unizen",
-      "referencePrice": 0.010348519859999999,
-      "cmcId": 9263.0
     }
   },
   "REZ": {
@@ -13505,89 +11764,6 @@
       "cmcId": 31921.0
     }
   },
-  "ARPA": {
-    "title": "Add ARPA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ARPA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 288,
-      "ticker": "ARPA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "ARPA-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "arpausdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "ARPA",
-      "referencePrice": 0.0414875434,
-      "cmcId": 4039.0
-    }
-  },
-  "BNT": {
-    "title": "Add BNT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BNT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 289,
-      "ticker": "BNT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "BNTUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "BNT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "BNT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Bancor",
-      "referencePrice": 0.4802,
-      "cmcId": 1727.0
-    }
-  },
   "AIDOGE": {
     "title": "Add AIDOGE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AIDOGE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -13628,51 +11804,6 @@
       "cmcId": 24477.0
     }
   },
-  "POKT": {
-    "title": "Add POKT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a POKT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 291,
-      "ticker": "POKT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "POKTUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "POKT_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "POKT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Pocket Network",
-      "referencePrice": 0.03703947125,
-      "cmcId": 11823.0
-    }
-  },
   "GODS": {
     "title": "Add GODS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GODS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -13710,46 +11841,6 @@
       "assetName": "Gods Unchained",
       "referencePrice": 0.17667,
       "cmcId": 10631.0
-    }
-  },
-  "SHDW": {
-    "title": "Add SHDW-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SHDW-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 293,
-      "ticker": "SHDW-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "SHDW-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "SHDW,RAYDIUM,SHDWYBXIHQICJ6YEKG2GUR7WQKLELAMK1GHZCK9PL6Y/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"GVzektnh6TDocY4FTdLm3F5Aha5XBfXmYKadc82BHJEV\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"7naoUqLwTWYpQSDj259mRb7hAqCAmiKG3og1MWYoMqBu\",\"token_decimals\":9},\"amm_info_address\":\"DY9DeyKj9T6yCXf8UM6FGMGeh7arfmmePf9E9jzdaymg\",\"open_orders_address\":\"5gTJDU2uA81Nsf6dWGrmo7Z6dfZ5pkPbr8kdcFJ4BGVV\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Shadow Token",
-      "referencePrice": 0.41372336120000003,
-      "cmcId": 16868.0
     }
   },
   "LADYS": {
@@ -13794,85 +11885,6 @@
       "assetName": "Milady Meme Coin",
       "referencePrice": 7.9963676e-08,
       "cmcId": 25023.0
-    }
-  },
-  "GHX": {
-    "title": "Add GHX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GHX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 295,
-      "ticker": "GHX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "GHX_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "GHX-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "GamerCoin",
-      "referencePrice": 0.085744062,
-      "cmcId": 6554.0
-    }
-  },
-  "RAD": {
-    "title": "Add RAD-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RAD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 296,
-      "ticker": "RAD-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "RAD-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "radusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Radworks",
-      "referencePrice": 1.1155043,
-      "cmcId": 6843.0
     }
   },
   "WOLF": {
@@ -13954,45 +11966,6 @@
       "assetName": "Origin Protocol",
       "referencePrice": 0.08555372,
       "cmcId": 5117.0
-    }
-  },
-  "NKN": {
-    "title": "Add NKN-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NKN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 299,
-      "ticker": "NKN-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "NKN-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "nknusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "NKN",
-      "referencePrice": 0.0720274164,
-      "cmcId": 2780.0
     }
   },
   "BADGER": {
@@ -14163,47 +12136,6 @@
       "cmcId": 25114.0
     }
   },
-  "ATLAS": {
-    "title": "Add ATLAS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ATLAS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 304,
-      "ticker": "ATLAS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ATLAS_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "ATLAS,RAYDIUM,ATLASXMBPQXBUYBXPSV97USA3FPQYEQZQBUHGIFCUSXX/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"CBz2GGWNissxivNRXk5UFJHiZUmm1x5pWWuhSaoM8ULK\",\"token_decimals\":8},\"quote_token_vault\":{\"token_vault_address\":\"5VhBQ77aqytGZ8QWtV6eq4p4yNHsWrH3bALKFisTp18n\",\"token_decimals\":9},\"amm_info_address\":\"7Mu9zK6qV3wGp5deSkhCeWqaDnL3kdD4gKL87ui6GtmX\",\"open_orders_address\":\"AAL5LQpnHbSpp7R84kqP7RC8qLEBmK6tdVPwoenhE2sQ\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Star Atlas",
-      "referencePrice": 0.00196977345,
-      "cmcId": 11212.0
-    }
-  },
   "LYX": {
     "title": "Add LYX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LYX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -14288,51 +12220,6 @@
       "cmcId": 7046.0
     }
   },
-  "SWEAT": {
-    "title": "Add SWEAT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SWEAT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 307,
-      "ticker": "SWEAT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "SWEATUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "sweatusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SWEAT-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Sweat Economy",
-      "referencePrice": 0.007473428,
-      "cmcId": 21351.0
-    }
-  },
   "TOKEN": {
     "title": "Add TOKEN-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TOKEN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -14376,45 +12263,6 @@
       "assetName": "TokenFi",
       "referencePrice": 0.049659225999999994,
       "cmcId": 28299.0
-    }
-  },
-  "RARI": {
-    "title": "Add RARI-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RARI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 309,
-      "ticker": "RARI-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "RARI-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "RARI_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "RARI",
-      "referencePrice": 1.9700000000000002,
-      "cmcId": 5877.0
     }
   },
   "TNSR": {
@@ -14753,89 +12601,6 @@
       "cmcId": 1552.0
     }
   },
-  "BWB": {
-    "title": "Add BWB-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BWB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 317,
-      "ticker": "BWB-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "SOL,RAYDIUM,SO11111111111111111111111111111111111111112/BWB,RAYDIUM,6FVYLVHQSSHWVUSCQ2FJRR1MRECGSHC3QXBWWTGIVFWK",
-          "adjustByMarket": "SOL-USD",
-          "invert": true,
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"4ePLhRVWCAkYwZrxWP8XfDL4qZ8GkLXWkj1mZ4kKvkrP\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"F4PaCs96hXkftVonsBfhkfaok7yKM3vdTr9EMYM2mpFk\",\"token_decimals\":8},\"amm_info_address\":\"AoLJD4ZMjRdHrcv3RxwyTXYHMWhDpoNhzvkD6NjinBRF\",\"open_orders_address\":\"3cYNCgGmC7Xa2kouifMmw85Y9D7zKyLKu6SAN8e1eNKd\"}"
-        },
-        {
-          "exchangeName": "uniswapv3_api-base",
-          "ticker": "BWB,UNISWAP_V3_BASE,0X619C4BBBD65F836B78B36CBE781513861D57F39D/WETH,UNISWAP_V3_BASE,0X4200000000000000000000000000000000000006",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xe11d03bef391ee0a4b670176e23eb44aad490f12\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Bitget Wallet Token",
-      "referencePrice": 0.290729625,
-      "cmcId": 31503.0
-    }
-  },
-  "LOOKS": {
-    "title": "Add LOOKS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LOOKS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 318,
-      "ticker": "LOOKS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "LOOKSUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "LOOKS-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "LooksRare",
-      "referencePrice": 0.042175779999999996,
-      "cmcId": 17081.0
-    }
-  },
   "NAVX": {
     "title": "Add NAVX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NAVX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -14974,84 +12739,6 @@
       "cmcId": 31914.0
     }
   },
-  "FORTH": {
-    "title": "Add FORTH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FORTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 322,
-      "ticker": "FORTH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "FORTH-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "FORTH-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Ampleforth Governance Token",
-      "referencePrice": 2.77,
-      "cmcId": 9421.0
-    }
-  },
-  "ALEPH": {
-    "title": "Add ALEPH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALEPH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 323,
-      "ticker": "ALEPH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "ALEPH-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "ALEPH-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Aleph.im",
-      "referencePrice": 0.1654871716,
-      "cmcId": 5821.0
-    }
-  },
   "BOBA": {
     "title": "Add BOBA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BOBA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -15140,136 +12827,6 @@
       "cmcId": 5631.0
     }
   },
-  "ULTI": {
-    "title": "Add ULTI-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ULTI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 326,
-      "ticker": "ULTI-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "ULTIUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "ULTI_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "ULTI-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "ULTI-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Ultiverse",
-      "referencePrice": 0.01573827799,
-      "cmcId": 31504.0
-    }
-  },
-  "SLF": {
-    "title": "Add SLF-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SLF-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 327,
-      "ticker": "SLF-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SLF_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "SLF-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Self Chain",
-      "referencePrice": 0.3848054052,
-      "cmcId": 32854.0
-    }
-  },
-  "BEL": {
-    "title": "Add BEL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BEL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 328,
-      "ticker": "BEL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "BELUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "BEL_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Bella Protocol",
-      "referencePrice": 0.52614536,
-      "cmcId": 6928.0
-    }
-  },
   "PERP": {
     "title": "Add PERP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PERP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -15319,46 +12876,6 @@
       "cmcId": 6950.0
     }
   },
-  "VR": {
-    "title": "Add VR-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a VR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 330,
-      "ticker": "VR-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "vrusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "VR-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Victoria VR",
-      "referencePrice": 0.006847182784,
-      "cmcId": 14822.0
-    }
-  },
   "ACX": {
     "title": "Add ACX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ACX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -15396,56 +12913,6 @@
       "assetName": "Across Protocol",
       "referencePrice": 0.25034982,
       "cmcId": 22620.0
-    }
-  },
-  "OMG": {
-    "title": "Add OMG-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OMG-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 332,
-      "ticker": "OMG-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "OMGUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "OMG_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "omgusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "OMG-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "OMG Network",
-      "referencePrice": 0.2564608,
-      "cmcId": 1808.0
     }
   },
   "PIRATE": {
@@ -15582,55 +13049,6 @@
       "cmcId": 2539.0
     }
   },
-  "LOKA": {
-    "title": "Add LOKA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LOKA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 336,
-      "ticker": "LOKA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "LOKA-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "LOKA_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "lokausdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "LOKA-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "League of Kingdoms Arena",
-      "referencePrice": 0.20456756,
-      "cmcId": 17145.0
-    }
-  },
   "PRCL": {
     "title": "Add PRCL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PRCL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -15674,51 +13092,6 @@
       "assetName": "Parcl",
       "referencePrice": 0.23702588000000002,
       "cmcId": 30661.0
-    }
-  },
-  "NULS": {
-    "title": "Add NULS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NULS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 338,
-      "ticker": "NULS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "NULS_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "nulsusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "NULS-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "NULS",
-      "referencePrice": 0.33019328000000003,
-      "cmcId": 2092.0
     }
   },
   "MAGA": {
@@ -15942,51 +13315,6 @@
       "cmcId": 2348.0
     }
   },
-  "OPUL": {
-    "title": "Add OPUL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OPUL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 344,
-      "ticker": "OPUL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "OPUL_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "opulusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "OPUL-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Opulous",
-      "referencePrice": 0.09044549937999999,
-      "cmcId": 10409.0
-    }
-  },
   "GLQ": {
     "title": "Add GLQ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GLQ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -16026,46 +13354,6 @@
       "assetName": "Graphlinq Chain",
       "referencePrice": 0.08575130501,
       "cmcId": 9029.0
-    }
-  },
-  "KISHU": {
-    "title": "Add KISHU-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KISHU-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 346,
-      "ticker": "KISHU-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -19,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "KISHU_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "KISHU-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Kishu Inu",
-      "referencePrice": 3.426156e-10,
-      "cmcId": 9386.0
     }
   },
   "MUBI": {
@@ -16191,47 +13479,6 @@
       "cmcId": 30097.0
     }
   },
-  "CAW": {
-    "title": "Add CAW-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CAW-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 350,
-      "ticker": "CAW-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -17,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "cawusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CAW,RAYDIUM,9NIFQK8MSPARJSXHYQ3YS2A6ZHMSEUKSB1M7WWDVZ7BJ/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"95eYAV2RnhR3dabJ4KMKVSvHGrJ6pBuCM1PHeo5568N3\",\"token_decimals\":0},\"quote_token_vault\":{\"token_vault_address\":\"3hbccNdoopmvtGrT5shtGFckvNgD9q1vX1gMCnZ6Rtpn\",\"token_decimals\":9},\"amm_info_address\":\"r5ZNvv1VUBhPdJjyF6JftLkTAYiJKvuLRwWR8pTi19A\",\"open_orders_address\":\"BncD2zAqbiLDJxVyRvNqcS4KAemkpkCZYauMyzZMtJc7\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "crow with knife",
-      "referencePrice": 4.3563934610000006e-08,
-      "cmcId": 30402.0
-    }
-  },
   "IOT,RAYDIUM,IOTEVVZLEYWOTN1QDWNPDDXPWSZN3ZFHEOT3MFL9FNS": {
     "title": "Add IOT,RAYDIUM,IOTEVVZLEYWOTN1QDWNPDDXPWSZN3ZFHEOT3MFL9FNS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IOT,RAYDIUM,IOTEVVZLEYWOTN1QDWNPDDXPWSZN3ZFHEOT3MFL9FNS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -16351,46 +13598,6 @@
       "assetName": "MON Protocol",
       "referencePrice": 0.1312358,
       "cmcId": 30950.0
-    }
-  },
-  "UNFI": {
-    "title": "Add UNFI-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a UNFI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 354,
-      "ticker": "UNFI-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "UNFI_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "UNFI-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Unifi Protocol DAO",
-      "referencePrice": 3.116882447,
-      "cmcId": 7672.0
     }
   },
   "ORDER": {
@@ -16686,42 +13893,6 @@
       "cmcId": 31456.0
     }
   },
-  "DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09": {
-    "title": "Add DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 362,
-      "ticker": "DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "DEVVE,UNISWAP_V3,0X8248270620AA532E4D64316017BE5E873E37CC09/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x18bbe20f81bdcb340325e28a6ee6bb426b7ccbc1\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Devve",
-      "referencePrice": 0.36915784900000004,
-      "cmcId": 29461.0
-    }
-  },
   "A8": {
     "title": "Add A8-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a A8-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -16895,130 +14066,6 @@
       "assetName": "zkLink",
       "referencePrice": 0.124092966,
       "cmcId": 13039.0
-    }
-  },
-  "SD": {
-    "title": "Add SD-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 367,
-      "ticker": "SD-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "SD-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SD_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SD-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Stader",
-      "referencePrice": 0.42200000000000004,
-      "cmcId": 12623.0
-    }
-  },
-  "MBS": {
-    "title": "Add MBS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MBS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 368,
-      "ticker": "MBS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "MBSUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "MBS_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "UNKJD",
-      "referencePrice": 0.00227027916,
-      "cmcId": 13011.0
-    }
-  },
-  "NATIX": {
-    "title": "Add NATIX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NATIX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 369,
-      "ticker": "NATIX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "NATIX_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "NATIX-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "NATIX Network",
-      "referencePrice": 0.0011246206799999999,
-      "cmcId": 31342.0
     }
   },
   "DMAIL": {
@@ -17218,46 +14265,6 @@
       "cmcId": 9868.0
     }
   },
-  "TROLL": {
-    "title": "Add TROLL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TROLL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 375,
-      "ticker": "TROLL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -17,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "TROLL_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "trollusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Troll",
-      "referencePrice": 1.4877731800000001e-08,
-      "cmcId": 29505.0
-    }
-  },
   "MAD,RAYDIUM,MADHPJRN6BD8T78RSY7NUSUNWWA2HU8BYPOBZPRHBHV": {
     "title": "Add MAD,RAYDIUM,MADHPJRN6BD8T78RSY7NUSUNWWA2HU8BYPOBZPRHBHV-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MAD,RAYDIUM,MADHPJRN6BD8T78RSY7NUSUNWWA2HU8BYPOBZPRHBHV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -17328,42 +14335,6 @@
       "assetName": "Ginnan The Cat",
       "referencePrice": 2.15678596e-06,
       "cmcId": 32524.0
-    }
-  },
-  "BENDOG,RAYDIUM,AHW5N8IQZOBTCBEPKSJZZ61XTAUSZBDCPXTRLG6KUKPK": {
-    "title": "Add BENDOG,RAYDIUM,AHW5N8IQZOBTCBEPKSJZZ61XTAUSZBDCPXTRLG6KUKPK-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BENDOG,RAYDIUM,AHW5N8IQZOBTCBEPKSJZZ61XTAUSZBDCPXTRLG6KUKPK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 378,
-      "ticker": "BENDOG,RAYDIUM,AHW5N8IQZOBTCBEPKSJZZ61XTAUSZBDCPXTRLG6KUKPK-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "BENDOG,RAYDIUM,AHW5N8IQZOBTCBEPKSJZZ61XTAUSZBDCPXTRLG6KUKPK/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"2Pza1YUczgc4RWLhAgdXSJh4oYUspvhhAiSecFDd7ZJ3\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"2BFpMzi33JtpY4CGUjY7x5JPApy6f2AdkuLZsd1QGqRv\",\"token_decimals\":9},\"amm_info_address\":\"47857wX96Tb4Ud3M3ka949iVRFmUqS33KLBxoVsqgfLK\",\"open_orders_address\":\"H1FPc9WQpA3GPnXMmzSjtt6gMuYuyDqYndBscaHNyCbv\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Ben the Dog",
-      "referencePrice": 0.009127925704,
-      "cmcId": 29574.0
     }
   },
   "SWFTC": {
@@ -17595,46 +14566,6 @@
       "cmcId": 31284.0
     }
   },
-  "BOND": {
-    "title": "Add BOND-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BOND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 385,
-      "ticker": "BOND-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "BOND_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "BOND-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "BarnBridge",
-      "referencePrice": 1.4966892,
-      "cmcId": 7440.0
-    }
-  },
   "APRS": {
     "title": "Add APRS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APRS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -17673,90 +14604,6 @@
       "assetName": "Apeiron",
       "referencePrice": 0.14285668,
       "cmcId": 29978.0
-    }
-  },
-  "TIME": {
-    "title": "Add TIME-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TIME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 387,
-      "ticker": "TIME-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -8,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "TIMEUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "coinbase_ws",
-          "ticker": "TIME-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -7.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Chrono.tech",
-      "referencePrice": 15.82753838,
-      "cmcId": 1556.0
-    }
-  },
-  "SIS": {
-    "title": "Add SIS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SIS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 388,
-      "ticker": "SIS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "SISUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SIS_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "SIS-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Symbiosis",
-      "referencePrice": 0.18974092,
-      "cmcId": 15084.0
     }
   },
   "HEGE,RAYDIUM,ULWSJMMPXMNRFPU6BJNK6RPRKXQD5JXUMPPS1FXHXFY": {
@@ -18139,46 +14986,6 @@
       "cmcId": 31163.0
     }
   },
-  "DUEL": {
-    "title": "Add DUEL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DUEL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 400,
-      "ticker": "DUEL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "DUELUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "DUEL_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "GameGPT",
-      "referencePrice": 0.0032037564,
-      "cmcId": 28868.0
-    }
-  },
   "SILLY": {
     "title": "Add SILLY-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SILLY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -18223,46 +15030,6 @@
       "assetName": "Silly Dragon",
       "referencePrice": 0.01005068873,
       "cmcId": 28789.0
-    }
-  },
-  "OVR": {
-    "title": "Add OVR-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OVR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 402,
-      "ticker": "OVR-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "OVR_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "OVR-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "OVR",
-      "referencePrice": 0.1619512384,
-      "cmcId": 8144.0
     }
   },
   "SRM,RAYDIUM,SRMUAPVNDXXOKK5GT7XD5CUUGXMBCOAZ2LHEUAOKWRT": {
@@ -18814,51 +15581,6 @@
       "cmcId": 23246.0
     }
   },
-  "SOCIAL": {
-    "title": "Add SOCIAL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOCIAL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 416,
-      "ticker": "SOCIAL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "SOCIALUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "SOCIAL_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "SOCIAL-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Phavercoin",
-      "referencePrice": 0.07120523914,
-      "cmcId": 33060.0
-    }
-  },
   "NGL": {
     "title": "Add NGL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NGL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -19157,82 +15879,6 @@
       "cmcId": 10186.0
     }
   },
-  "CATDOG,RAYDIUM,CATTZAWLYADD2EKZVJTJX8TVUBYFROZDKJBKUTJGGDB7": {
-    "title": "Add CATDOG,RAYDIUM,CATTZAWLYADD2EKZVJTJX8TVUBYFROZDKJBKUTJGGDB7-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CATDOG,RAYDIUM,CATTZAWLYADD2EKZVJTJX8TVUBYFROZDKJBKUTJGGDB7-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 425,
-      "ticker": "CATDOG,RAYDIUM,CATTZAWLYADD2EKZVJTJX8TVUBYFROZDKJBKUTJGGDB7-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -14,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CATDOG,RAYDIUM,CATTZAWLYADD2EKZVJTJX8TVUBYFROZDKJBKUTJGGDB7/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"87CSWDJRS9c3CVCnzp6WrohXJLtPjnhPGp9fjhCdUDfE\",\"token_decimals\":8},\"quote_token_vault\":{\"token_vault_address\":\"ALTTB76kXsiwERgJZz6KXTauRyj92n9FhQ4Uoc82pVXp\",\"token_decimals\":9},\"amm_info_address\":\"mh2TEd7H29EZ4YTXPvgzysBWHFqtPQbT2MVy6kDUwSh\",\"open_orders_address\":\"9RzG9FtdSihXanxBDJYmxu4miKnj6wZe4c4oDbEes3RJ\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -1.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "CatDog",
-      "referencePrice": 9.305244948e-05,
-      "cmcId": 32638.0
-    }
-  },
-  "MV": {
-    "title": "Add MV-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 426,
-      "ticker": "MV-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "MVUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "MV_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "GensoKishi Metaverse",
-      "referencePrice": 0.09386865999999999,
-      "cmcId": 17704.0
-    }
-  },
   "COK,RAYDIUM,DNB9DLSXXAARXVEXEHZEH8W8NFMLMNJSUGOADDZSWTOG": {
     "title": "Add COK,RAYDIUM,DNB9DLSXXAARXVEXEHZEH8W8NFMLMNJSUGOADDZSWTOG-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a COK,RAYDIUM,DNB9DLSXXAARXVEXEHZEH8W8NFMLMNJSUGOADDZSWTOG-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -19267,46 +15913,6 @@
       "assetName": "Cat Own Kimono",
       "referencePrice": 1.381803405e-06,
       "cmcId": 31779.0
-    }
-  },
-  "LAMB": {
-    "title": "Add LAMB-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LAMB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 428,
-      "ticker": "LAMB-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "LAMB_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "okx_ws",
-          "ticker": "LAMB-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Lambda",
-      "referencePrice": 0.002649761,
-      "cmcId": 3657.0
     }
   },
   "LADYF,RAYDIUM,3X8GCLIH2HTTJYQEPG7MAZPMBWBGQ5URUMTYDZ5TKMDE": {
@@ -19345,47 +15951,6 @@
       "cmcId": 30071.0
     }
   },
-  "ANALOS": {
-    "title": "Add ANALOS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ANALOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 430,
-      "ticker": "ANALOS-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -14,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "ANALOS-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "ANALOS,RAYDIUM,7IT1GRYYHEOP2NV1DYCWK2MGYLMPHQ47WHPGSWIQCUG5/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"9ibeYfpgDxyoSYNvsc37EwGua6Z1NQpp7LH6e7CvBabM\",\"token_decimals\":8},\"quote_token_vault\":{\"token_vault_address\":\"5JFikPKzw3JeXKaJZaKTEAHfF3pJAoFJbHXUB5p2Ns5S\",\"token_decimals\":9},\"amm_info_address\":\"69grLw4PcSypZnn3xpsozCJFT8vs8WA5817VUVnzNGTh\",\"open_orders_address\":\"2QoiVyXa8Bfgx35yTcJhQJVvZYouKZutj5r5CEDPgQUm\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -1.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "analoS",
-      "referencePrice": 4.327776e-05,
-      "cmcId": 28805.0
-    }
-  },
   "DUST,RAYDIUM,DUSTAWUCRTSGU8HCQRDHDCBUYHCPADMLM2VCCB8VNFNQ": {
     "title": "Add DUST,RAYDIUM,DUSTAWUCRTSGU8HCQRDHDCBUYHCPADMLM2VCCB8VNFNQ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DUST,RAYDIUM,DUSTAWUCRTSGU8HCQRDHDCBUYHCPADMLM2VCCB8VNFNQ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -19422,82 +15987,6 @@
       "cmcId": 18802.0
     }
   },
-  "INSP": {
-    "title": "Add INSP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a INSP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 432,
-      "ticker": "INSP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "INSPUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "INSP-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Inspect",
-      "referencePrice": 0.017691788,
-      "cmcId": 28610.0
-    }
-  },
-  "CHEEMS,RAYDIUM,3FOUASGDBVTD6YZ4WVKJGTB76ONJUKZ7GPEBNIR5B8WC": {
-    "title": "Add CHEEMS,RAYDIUM,3FOUASGDBVTD6YZ4WVKJGTB76ONJUKZ7GPEBNIR5B8WC-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHEEMS,RAYDIUM,3FOUASGDBVTD6YZ4WVKJGTB76ONJUKZ7GPEBNIR5B8WC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 433,
-      "ticker": "CHEEMS,RAYDIUM,3FOUASGDBVTD6YZ4WVKJGTB76ONJUKZ7GPEBNIR5B8WC-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CHEEMS,RAYDIUM,3FOUASGDBVTD6YZ4WVKJGTB76ONJUKZ7GPEBNIR5B8WC/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"G2Quo8iai75CEUDvT2g9PwWUGHnMD8cQZ3fHKDpHgYK5\",\"token_decimals\":4},\"quote_token_vault\":{\"token_vault_address\":\"4m8vE64U9MbnXojPVgRZx8a1mH6P2Y9PAJFY6Z4Y2Eki\",\"token_decimals\":9},\"amm_info_address\":\"CVGxQpCFJYKky38bUEVghucWCAf3THN6hLFtMQtfeEn\",\"open_orders_address\":\"72VkdcbwUTD8FXhGFXG6qbZdBkqbQUoacaCyyXLYhdGD\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Cheems",
-      "referencePrice": 0.0001087727914,
-      "cmcId": 10269.0
-    }
-  },
   "DOAI,RAYDIUM,3VMFEATR9M2PP5JCFNC8C8U6U4EFUBDQ6FQJGPPCNFKS": {
     "title": "Add DOAI,RAYDIUM,3VMFEATR9M2PP5JCFNC8C8U6U4EFUBDQ6FQJGPPCNFKS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOAI,RAYDIUM,3VMFEATR9M2PP5JCFNC8C8U6U4EFUBDQ6FQJGPPCNFKS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -19532,46 +16021,6 @@
       "assetName": "DOJO Protocol",
       "referencePrice": 0.03437194639,
       "cmcId": 32425.0
-    }
-  },
-  "AGLA": {
-    "title": "Add AGLA-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AGLA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 435,
-      "ticker": "AGLA-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "AGLAUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "AGLA_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Angola",
-      "referencePrice": 0.05620098,
-      "cmcId": 22031.0
     }
   },
   "SOLCEX,RAYDIUM,AMJZRN1TBQWQFNAJHFEBB7UGBBQBJB7FZXANGGDFPK6K": {
@@ -20539,46 +16988,6 @@
       "assetName": "Exverse",
       "referencePrice": 0.020496827989999997,
       "cmcId": 30772.0
-    }
-  },
-  "EGO": {
-    "title": "Add EGO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EGO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 462,
-      "ticker": "EGO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "EGOUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "EGO-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "EGO",
-      "referencePrice": 0.010328558,
-      "cmcId": 21513.0
     }
   },
   "CAIR,RAYDIUM,D7Z8T6FADMQDYGHY3LSMN3BZFRABMVVUNAFURKFUWZ8F": {
@@ -21944,42 +18353,6 @@
       "cmcId": 30049.0
     }
   },
-  "BODEN,RAYDIUM,3PSH1MJ1F7YUFAD5GH6ZJ7EPE8HHRMKMETGV5TSHQA4O": {
-    "title": "Add BODEN,RAYDIUM,3PSH1MJ1F7YUFAD5GH6ZJ7EPE8HHRMKMETGV5TSHQA4O-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BODEN,RAYDIUM,3PSH1MJ1F7YUFAD5GH6ZJ7EPE8HHRMKMETGV5TSHQA4O-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 498,
-      "ticker": "BODEN,RAYDIUM,3PSH1MJ1F7YUFAD5GH6ZJ7EPE8HHRMKMETGV5TSHQA4O-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "BODEN,RAYDIUM,3PSH1MJ1F7YUFAD5GH6ZJ7EPE8HHRMKMETGV5TSHQA4O/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"54zedUwxuSnmHHYg9oY1AfykeBDaCF6ZFZDW3ym2Nea4\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"DzpiXKsTUCacKyahLBUC5sfjj2fiWbwCpiCPEgyS3zDC\",\"token_decimals\":9},\"amm_info_address\":\"6UYbX1x8YUcFj8YstPYiZByG7uQzAq2s46ZWphUMkjg5\",\"open_orders_address\":\"9ndGwmmTcFLut1TNjWFA8pDvcrxgmqPEJTZ2Y3jTipva\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Jeo Boden",
-      "referencePrice": 0.004687964904,
-      "cmcId": 29687.0
-    }
-  },
   "L3": {
     "title": "Add L3-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a L3-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -22054,46 +18427,6 @@
       "assetName": "Mars",
       "referencePrice": 2.5009e-05,
       "cmcId": 33162.0
-    }
-  },
-  "DAPP": {
-    "title": "Add DAPP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DAPP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 501,
-      "ticker": "DAPP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "DAPPUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "kucoin_ws",
-          "ticker": "DAPP-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Pencils Protocol",
-      "referencePrice": 0.28521246,
-      "cmcId": 30100.0
     }
   },
   "CLOUD": {
@@ -23694,42 +20027,6 @@
       "cmcId": 30993.0
     }
   },
-  "CHUCHU,RAYDIUM,ELST1OAP3CZKRRRWGETGTTGSEQKD2QJDRJXR4ASMKK5Y": {
-    "title": "Add CHUCHU,RAYDIUM,ELST1OAP3CZKRRRWGETGTTGSEQKD2QJDRJXR4ASMKK5Y-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHUCHU,RAYDIUM,ELST1OAP3CZKRRRWGETGTTGSEQKD2QJDRJXR4ASMKK5Y-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 545,
-      "ticker": "CHUCHU,RAYDIUM,ELST1OAP3CZKRRRWGETGTTGSEQKD2QJDRJXR4ASMKK5Y-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "CHUCHU,RAYDIUM,ELST1OAP3CZKRRRWGETGTTGSEQKD2QJDRJXR4ASMKK5Y/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"6ZqR3Bxy9bCMom15gqQ3Uqi8yyCvdpP47qQkNAemjidN\",\"token_decimals\":6},\"quote_token_vault\":{\"token_vault_address\":\"Anr1et9cXzf3ASLYFdWQ6S8ryNVxbda9ZMT1KcTcQJ5\",\"token_decimals\":9},\"amm_info_address\":\"AMswHNEeiL18H5DZmtE18XeNCtMBEU7kCAZZkxjqjbrr\",\"open_orders_address\":\"3NNgyiJH1KW5Pb6JuHb5F37ATSRXH6jzcPsUpcaqqW9P\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "CHUCHU",
-      "referencePrice": 0.03646880667,
-      "cmcId": 30312.0
-    }
-  },
   "TMPL,RAYDIUM,2UPVXDXU6GLELDJG1ASMRGPDT322Y2WCXNXNVVWOFHSA": {
     "title": "Add TMPL,RAYDIUM,2UPVXDXU6GLELDJG1ASMRGPDT322Y2WCXNXNVVWOFHSA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TMPL,RAYDIUM,2UPVXDXU6GLELDJG1ASMRGPDT322Y2WCXNXNVVWOFHSA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -23837,78 +20134,6 @@
       "assetName": "Caprisun Monkey",
       "referencePrice": 0.00047200864860000004,
       "cmcId": 31715.0
-    }
-  },
-  "BIAO,RAYDIUM,3W52UCB8NW8RUMF9MMJX3OKIYAJDPAI4633SRSZFQCS6": {
-    "title": "Add BIAO,RAYDIUM,3W52UCB8NW8RUMF9MMJX3OKIYAJDPAI4633SRSZFQCS6-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BIAO,RAYDIUM,3W52UCB8NW8RUMF9MMJX3OKIYAJDPAI4633SRSZFQCS6-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 549,
-      "ticker": "BIAO,RAYDIUM,3W52UCB8NW8RUMF9MMJX3OKIYAJDPAI4633SRSZFQCS6-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -14,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "BIAO,RAYDIUM,3W52UCB8NW8RUMF9MMJX3OKIYAJDPAI4633SRSZFQCS6/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"9AuZEF919WKwfT5h72x9QCBqxbTerMgvYrRwMGZxAvws\",\"token_decimals\":6},\"quote_token_vault\":{\"token_vault_address\":\"6Xf5qJfiRB9Y4biee7oXLxbQXX28BBUcWfDY12RJMLK7\",\"token_decimals\":9},\"amm_info_address\":\"GpGQUMGzMPFfCiK8oRZBpzTEEtc4g8iU2ysVTpPSznNz\",\"open_orders_address\":\"GfDa2N7XUdBDz8gzgfy6tKPeGPTYv6DwQK3WjWAbbswq\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -1.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Biao Coin",
-      "referencePrice": 4.010543563e-05,
-      "cmcId": 30997.0
-    }
-  },
-  "DOG,UNISWAP_V3,0XBAAC2B4491727D78D2B78815144570B9F2FE8899": {
-    "title": "Add DOG,UNISWAP_V3,0XBAAC2B4491727D78D2B78815144570B9F2FE8899-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOG,UNISWAP_V3,0XBAAC2B4491727D78D2B78815144570B9F2FE8899-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 550,
-      "ticker": "DOG,UNISWAP_V3,0XBAAC2B4491727D78D2B78815144570B9F2FE8899-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "DOG,UNISWAP_V3,0XBAAC2B4491727D78D2B78815144570B9F2FE8899/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x9b3423373e6e786c9ac367120533abe4ee398373\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "The Doge NFT",
-      "referencePrice": 0.0034512419999999998,
-      "cmcId": 11557.0
     }
   },
   "LAIKA,RAYDIUM,EUOQ6CYQFCJCVSLR9WFAUPDW19Y6ZHWECJOZSEI643I1": {
@@ -24574,42 +20799,6 @@
       "cmcId": 30157.0
     }
   },
-  "PEAS,UNISWAP_V3,0X02F92800F57BCD74066F5709F1DAA1A4302DF875": {
-    "title": "Add PEAS,UNISWAP_V3,0X02F92800F57BCD74066F5709F1DAA1A4302DF875-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEAS,UNISWAP_V3,0X02F92800F57BCD74066F5709F1DAA1A4302DF875-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 569,
-      "ticker": "PEAS,UNISWAP_V3,0X02F92800F57BCD74066F5709F1DAA1A4302DF875-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "PEAS,UNISWAP_V3,0X02F92800F57BCD74066F5709F1DAA1A4302DF875/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x44c95bf226a6a1385beaced2bb3328d6afb044a3\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Peapods Finance",
-      "referencePrice": 2.999204325,
-      "cmcId": 29186.0
-    }
-  },
   "BORK,RAYDIUM,4JZXKSNGTQKCDB36ECZ6A2ANZCUNIGCDEXGTDTM2HXAX": {
     "title": "Add BORK,RAYDIUM,4JZXKSNGTQKCDB36ECZ6A2ANZCUNIGCDEXGTDTM2HXAX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BORK,RAYDIUM,4JZXKSNGTQKCDB36ECZ6A2ANZCUNIGCDEXGTDTM2HXAX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -24792,42 +20981,6 @@
       "cmcId": 31537.0
     }
   },
-  "MONK,RAYDIUM,FYA25XNBSXQXADTNSYKBKD5GZ1VZHCHBRF57CQFRXJZX": {
-    "title": "Add MONK,RAYDIUM,FYA25XNBSXQXADTNSYKBKD5GZ1VZHCHBRF57CQFRXJZX-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MONK,RAYDIUM,FYA25XNBSXQXADTNSYKBKD5GZ1VZHCHBRF57CQFRXJZX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 575,
-      "ticker": "MONK,RAYDIUM,FYA25XNBSXQXADTNSYKBKD5GZ1VZHCHBRF57CQFRXJZX-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "MONK,RAYDIUM,FYA25XNBSXQXADTNSYKBKD5GZ1VZHCHBRF57CQFRXJZX/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"CeLZLhC2nScSpsKqRL1eRr3L3LLfjDzakZLCUKcUHW1m\",\"token_decimals\":6},\"quote_token_vault\":{\"token_vault_address\":\"Be6DM12uTWtxHMSRJeah3J5PRP4CumR28Yy2qpLQFTE7\",\"token_decimals\":9},\"amm_info_address\":\"5mYCuaXmqW1McUe18Ry6gbWUQhtk1f4GxJ9j7vRj34HJ\",\"open_orders_address\":\"F1KFumMDuNonPprwUxarH6bbip9TR5wfsCZzRuKM8XBM\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "monkeyhaircut",
-      "referencePrice": 0.002097191233,
-      "cmcId": 31194.0
-    }
-  },
   "NOMNOM,RAYDIUM,6ZRYHKWVOYE4QQZPDZJ7HTEHWT2U2546EKTNJ7QEPUMP": {
     "title": "Add NOMNOM,RAYDIUM,6ZRYHKWVOYE4QQZPDZJ7HTEHWT2U2546EKTNJ7QEPUMP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NOMNOM,RAYDIUM,6ZRYHKWVOYE4QQZPDZJ7HTEHWT2U2546EKTNJ7QEPUMP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -24863,43 +21016,6 @@
       "assetName": "nomnom",
       "referencePrice": 0.0017313211599999999,
       "cmcId": 32611.0
-    }
-  },
-  "WW3,RAYDIUM,7M2TUKPPZCSCBHPJNGJWJBH75KKDNNWADD7I74M8AWAD": {
-    "title": "Add WW3,RAYDIUM,7M2TUKPPZCSCBHPJNGJWJBH75KKDNNWADD7I74M8AWAD-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WW3,RAYDIUM,7M2TUKPPZCSCBHPJNGJWJBH75KKDNNWADD7I74M8AWAD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 577,
-      "ticker": "WW3,RAYDIUM,7M2TUKPPZCSCBHPJNGJWJBH75KKDNNWADD7I74M8AWAD-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "SOL,RAYDIUM,SO11111111111111111111111111111111111111112/WW3,RAYDIUM,7M2TUKPPZCSCBHPJNGJWJBH75KKDNNWADD7I74M8AWAD",
-          "adjustByMarket": "SOL-USD",
-          "invert": true,
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"CJLtTFw6tZwsCXyKiPKUG2qncxvQQ1CfuNSMFFnBMKyd\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"2rqaWuzb9R3Asr1DDjGnPi5QHVzQmgpgojfQBdRzwmCL\",\"token_decimals\":6},\"amm_info_address\":\"AU48WDisqPvwUM431WkhhkFoJg76ek44eRnf7NpStc9B\",\"open_orders_address\":\"Gq6KGJwQdhKaUEqRWqM6xinyHtzAemaUbvTfBEoPr6Zy\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "WW3",
-      "referencePrice": 0.0003746189868,
-      "cmcId": 30722.0
     }
   },
   "ADASOL,RAYDIUM,E4Q5PLAEIEJWEQHCM9GEYSQFMYGY8DJ4BPWGEYTHN24V": {
@@ -24939,190 +21055,6 @@
       "cmcId": 28835.0
     }
   },
-  "KIZUNA,UNISWAP_V3,0X470C8950C0C3AA4B09654BC73B004615119A44B5": {
-    "title": "Add KIZUNA,UNISWAP_V3,0X470C8950C0C3AA4B09654BC73B004615119A44B5-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KIZUNA,UNISWAP_V3,0X470C8950C0C3AA4B09654BC73B004615119A44B5-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 579,
-      "ticker": "KIZUNA,UNISWAP_V3,0X470C8950C0C3AA4B09654BC73B004615119A44B5-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -18,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "KIZUNA,UNISWAP_V3,0X470C8950C0C3AA4B09654BC73B004615119A44B5/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0xb7f27e5ebf97d88f37e16eddecc59523361a60e1\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": 3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "KIZUNA",
-      "referencePrice": 1.730639305e-09,
-      "cmcId": 28217.0
-    }
-  },
-  "GURU,UNISWAP_V3,0X525574C899A7C877A11865339E57376092168258": {
-    "title": "Add GURU,UNISWAP_V3,0X525574C899A7C877A11865339E57376092168258-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GURU,UNISWAP_V3,0X525574C899A7C877A11865339E57376092168258-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 580,
-      "ticker": "GURU,UNISWAP_V3,0X525574C899A7C877A11865339E57376092168258-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "uniswapv3_api-ethereum",
-          "ticker": "GURU,UNISWAP_V3,0X525574C899A7C877A11865339E57376092168258/WETH,UNISWAP_V3,0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2",
-          "adjustByMarket": "ETH-USD",
-          "metadata_JSON": "{\"address\":\"0x2818ea851dcfaeeb4633fc8aae08b7063d32e4f5\",\"base_decimals\":18,\"quote_decimals\":18,\"invert\":false}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Guru Network",
-      "referencePrice": 0.09403384,
-      "cmcId": 32388.0
-    }
-  },
-  "JIN,RAYDIUM,GGZJWHQWTPV2VHQVJNX5UEWQZNKFQSNCDEWUDGQK4FVH": {
-    "title": "Add JIN,RAYDIUM,GGZJWHQWTPV2VHQVJNX5UEWQZNKFQSNCDEWUDGQK4FVH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JIN,RAYDIUM,GGZJWHQWTPV2VHQVJNX5UEWQZNKFQSNCDEWUDGQK4FVH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 581,
-      "ticker": "JIN,RAYDIUM,GGZJWHQWTPV2VHQVJNX5UEWQZNKFQSNCDEWUDGQK4FVH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -13,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "JIN,RAYDIUM,GGZJWHQWTPV2VHQVJNX5UEWQZNKFQSNCDEWUDGQK4FVH/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"679Ra3SmkzfvimWhRz4BUa24p97iMEGpeE24qs6ZbnSq\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"HCK7kdCJd3rz1RQEo2pjK28K5gcYSPigDk5TfmGcfhzm\",\"token_decimals\":9},\"amm_info_address\":\"7ax1wVCoRr192G5cjS3pvdqkbJfqEsecir874424AkpR\",\"open_orders_address\":\"527xMCHNnka7wwAd2Um7TGUEiX93d9Qt6vni6pmCV4hy\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -2.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "JinPeng",
-      "referencePrice": 0.00023670549410000001,
-      "cmcId": 33051.0
-    }
-  },
-  "BAG,RAYDIUM,D8R8XTUCRUHLHEWEGXSWC3G92RHASFICV3YA7B2XWCLV": {
-    "title": "Add BAG,RAYDIUM,D8R8XTUCRUHLHEWEGXSWC3G92RHASFICV3YA7B2XWCLV-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BAG,RAYDIUM,D8R8XTUCRUHLHEWEGXSWC3G92RHASFICV3YA7B2XWCLV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 582,
-      "ticker": "BAG,RAYDIUM,D8R8XTUCRUHLHEWEGXSWC3G92RHASFICV3YA7B2XWCLV-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "BAG,RAYDIUM,D8R8XTUCRUHLHEWEGXSWC3G92RHASFICV3YA7B2XWCLV/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"7eLwyCqfhxKLsKeFwcN4JdfspKK22rSC4uQHNy3zWNPB\",\"token_decimals\":9},\"quote_token_vault\":{\"token_vault_address\":\"Cr7Yo8Uf5f8pzMsY3ZwgDFNx85nb3UDvPfQxuWG4acxc\",\"token_decimals\":9},\"amm_info_address\":\"Bv7mM5TwLxsukrRrwzEc6TFAj22GAdVCcH5ViAZFNZC\",\"open_orders_address\":\"Du6ZaABu8cxmCAvwoGMixZgZuw57cCQc8xE8yRenaxL4\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "catwifbag",
-      "referencePrice": 0.001378894775,
-      "cmcId": 30088.0
-    }
-  },
-  "KCAL": {
-    "title": "Add KCAL-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KCAL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 583,
-      "ticker": "KCAL-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "bybit_ws",
-          "ticker": "KCALUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "kcalusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "KCAL",
-      "referencePrice": 0.0395711,
-      "cmcId": 22368.0
-    }
-  },
   "ORC,RAYDIUM,CZYWQYWNZACQC7NPHTAPHC8CB2H7OU6U9TEHBRVNZJKX": {
     "title": "Add ORC,RAYDIUM,CZYWQYWNZACQC7NPHTAPHC8CB2H7OU6U9TEHBRVNZJKX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORC,RAYDIUM,CZYWQYWNZACQC7NPHTAPHC8CB2H7OU6U9TEHBRVNZJKX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
@@ -25157,42 +21089,6 @@
       "assetName": "ORC",
       "referencePrice": 0.01137273677,
       "cmcId": 32285.0
-    }
-  },
-  "WYNN,RAYDIUM,4VQYQTJMKJXRWGTBL2TVKBAU1EVAZ9JWCYTD2VE3PBVU": {
-    "title": "Add WYNN,RAYDIUM,4VQYQTJMKJXRWGTBL2TVKBAU1EVAZ9JWCYTD2VE3PBVU-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WYNN,RAYDIUM,4VQYQTJMKJXRWGTBL2TVKBAU1EVAZ9JWCYTD2VE3PBVU-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 585,
-      "ticker": "WYNN,RAYDIUM,4VQYQTJMKJXRWGTBL2TVKBAU1EVAZ9JWCYTD2VE3PBVU-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "raydium_api",
-          "ticker": "WYNN,RAYDIUM,4VQYQTJMKJXRWGTBL2TVKBAU1EVAZ9JWCYTD2VE3PBVU/SOL,RAYDIUM,SO11111111111111111111111111111111111111112",
-          "adjustByMarket": "SOL-USD",
-          "metadata_JSON": "{\"base_token_vault\":{\"token_vault_address\":\"BMeEgXXKNpL6bEEeuvEoN2MPiNdidfJ6DwaYHpTSyJHV\",\"token_decimals\":6},\"quote_token_vault\":{\"token_vault_address\":\"8D1WcUWmA9d7G84dXedFUbzLGR7aXaZAmRedN2HEXayD\",\"token_decimals\":9},\"amm_info_address\":\"EcHXwaRp26ChgAsmfdrVki44XRr8tibwJ17DbsUTiJGe\",\"open_orders_address\":\"QAyk1uw7SJixmGZhR18rhFi6EMH6eD5AHRE1Y7rr1dT\"}"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -3.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Anita Max Wynn",
-      "referencePrice": 0.001038468713,
-      "cmcId": 29134.0
     }
   },
   "HOBBES,RAYDIUM,6N7JANARY9FQZXKAJVRHL9TG2F61VBATWUMU1YZSCAQS": {
@@ -25230,46 +21126,6 @@
       "assetName": "Ansem's Cat",
       "referencePrice": 0.0006089417421,
       "cmcId": 30345.0
-    }
-  },
-  "MYTH": {
-    "title": "Add MYTH-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MYTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 587,
-      "ticker": "MYTH-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10,
-      "minPriceChange": 800,
-      "minExchanges": 1.0,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "gate_ws",
-          "ticker": "MYTH_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "huobi_ws",
-          "ticker": "mythusdt",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 4,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Mythos",
-      "referencePrice": 0.20637080000000002,
-      "cmcId": 22125.0
     }
   },
   "JUNGLE,RAYDIUM,9P32YQUCXFZNDOXMMJNZBPQXQGFOU4TA4SB1RAQH9CYW": {
