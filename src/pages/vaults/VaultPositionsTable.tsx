@@ -55,6 +55,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+            const logoUrl =
+              marketId === USDC_MARKET_HARDCODED ? undefined : asset?.resources?.imageUrl;
 
             return (
               // eslint-disable-next-line jsx-a11y/interactive-supports-focus
@@ -71,6 +73,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   stacked
                   slotLeft={
                     <AssetIcon
+                      logoUrl={logoUrl}
                       symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
                       tw="[--asset-icon-size:2.5em]"
                     />

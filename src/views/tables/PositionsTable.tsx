@@ -119,7 +119,13 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ asset, leverage, resources, size }) => (
           <TableCell
             stacked
-            slotLeft={<AssetIcon symbol={asset?.id} tw="inlineRow min-w-[unset] text-[2.25rem]" />}
+            slotLeft={
+              <AssetIcon
+                logoUrl={asset?.resources?.imageUrl}
+                symbol={asset?.id}
+                tw="inlineRow min-w-[unset] text-[2.25rem]"
+              />
+            }
           >
             <$HighlightOutput
               type={OutputType.Asset}

@@ -224,7 +224,9 @@ export const OrderDetailsDialog = ({
 
   return (
     <DetailsDialog
-      slotIcon={<AssetIcon symbol={asset?.id} tw="text-[1em]" />}
+      slotIcon={
+        <AssetIcon logoUrl={asset?.resources?.imageUrl} symbol={asset?.id} tw="text-[1em]" />
+      }
       title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
       slotFooter={
         isAccountViewOnly ? null : isOrderStatusClearable(status) ? (

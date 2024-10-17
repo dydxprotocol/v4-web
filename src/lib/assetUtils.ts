@@ -1,3 +1,5 @@
+import { Nullable } from '@/constants/abacus';
+
 /**
  *
  * @param fullBaseAsset contains base asset, occassionally accompanied (comma-separated) by dex and address. i.e. 'baseAsset,dex,address'
@@ -5,9 +7,10 @@
  * @returns base asset or dex or address from the full base asset.
  */
 export const getDisplayableAssetFromBaseAsset = (
-  fullBaseAsset: string,
+  fullBaseAsset: Nullable<string>,
   part?: 'base' | 'dex' | 'address'
 ): string => {
+  if (!fullBaseAsset) return '';
   const [base = '', dex = '', address = ''] = fullBaseAsset.split(',');
   if (part === 'dex') return dex;
   if (part === 'address') return address;
