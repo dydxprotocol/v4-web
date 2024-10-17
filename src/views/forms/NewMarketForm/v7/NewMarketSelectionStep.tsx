@@ -155,7 +155,7 @@ export const NewMarketSelectionStep = ({
               type={InputType.Currency}
               label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
               placeholder="$10,000"
-              value={`$${DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}}`
+              value={`$${DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}`}
             />
           </WithDetailsReceipt>
 
