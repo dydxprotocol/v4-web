@@ -158,18 +158,20 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           />
         </div>
 
-        <div tw="flex gap-1">
-          <Button
-            action={data?.isEligible ? ButtonAction.Base : ButtonAction.Primary}
-            slotLeft={<Icon iconName={IconName.Rocket} />}
-            state={{
-              isLoading: isCopying,
-            }}
-            tw="flex-1"
-            href={affiliateProgram}
-          >
-            {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-          </Button>
+        <div tw="flex justify-center gap-1">
+          <a href="https://dydx-affiliates.fuul.xyz/" className="w-full">
+            <Button
+              action={data?.isEligible ? ButtonAction.Base : ButtonAction.Primary}
+              slotLeft={<Icon iconName={IconName.Rocket} />}
+              state={{
+                isLoading: isCopying,
+              }}
+              tw="w-full flex-1"
+              href={affiliateProgram}
+            >
+              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+            </Button>
+          </a>
           {data?.isEligible && (
             <Button
               action={ButtonAction.Base}
