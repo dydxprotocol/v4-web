@@ -26,6 +26,7 @@ export enum InputType {
 
 type StyleProps = {
   className?: string;
+  backgroundColorOverride?: string;
 };
 
 type ElementProps = {
@@ -81,6 +82,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onFocus,
       onInput,
       type = InputType.Number,
+      backgroundColorOverride,
       ...otherProps
     },
     ref
@@ -126,6 +128,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <$InputContainer className={className}>
         {type === InputType.Text || type === InputType.Search ? (
           <$Input
+            backgroundColorOverride={backgroundColorOverride}
             // React
             ref={ref}
             id={id}
@@ -145,6 +148,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           />
         ) : (
           <$NumericFormat
+            backgroundColorOverride={backgroundColorOverride}
             // React
             getInputRef={ref}
             id={id}
@@ -234,11 +238,21 @@ const InputStyle = css`
   }
 `;
 
-const $NumericFormat = styled(NumericFormat)`
+const $NumericFormat = styled(NumericFormat)<{ backgroundColorOverride?: string }>`
   ${InputStyle}
   font-feature-settings: var(--fontFeature-monoNumbers);
+  ${({ backgroundColorOverride }) =>
+    backgroundColorOverride &&
+    css`
+      background-color: ${backgroundColorOverride};
+    `}
 `;
 
-const $Input = styled.input`
+const $Input = styled.input<{ backgroundColorOverride?: string }>`
   ${InputStyle}
+  ${({ backgroundColorOverride }) =>
+    backgroundColorOverride &&
+    css`
+      background-color: ${backgroundColorOverride};
+    `}
 `;
