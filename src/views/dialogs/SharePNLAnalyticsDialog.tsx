@@ -28,6 +28,7 @@ import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -54,6 +55,7 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const symbol = getDisplayableAssetFromBaseAsset(assetId);
 
   const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -69,9 +71,9 @@ export const SharePNLAnalyticsDialog = ({
         text: `${stringGetter({
           key: STRING_KEYS.TWEET_MARKET_POSITION,
           params: {
-            MARKET: assetId,
+            MARKET: symbol,
           },
-        })}\n\n#dYdX #${assetId}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        })}\n\n#dYdX #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
         related: 'dYdX',
       });
 

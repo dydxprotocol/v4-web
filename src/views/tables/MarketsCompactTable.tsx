@@ -24,6 +24,7 @@ import { TableCell } from '@/components/Table/TableCell';
 import { NewTag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 interface MarketsCompactTableProps {
@@ -132,7 +133,7 @@ export const MarketsCompactTable = ({
                     <Output
                       type={OutputType.CompactNumber}
                       value={openInterest}
-                      slotRight={` ${assetId}`}
+                      slotRight={` ${getDisplayableAssetFromBaseAsset(assetId)}`}
                       tw="text-color-text-0 font-mini-medium"
                     />
                   </$RecentlyListed>

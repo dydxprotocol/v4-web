@@ -41,6 +41,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
@@ -268,7 +269,7 @@ const getPositionsTableColumnDef = ({
               <$OutputSigned
                 type={OutputType.Asset}
                 value={size?.current}
-                tag={assetId}
+                tag={getDisplayableAssetFromBaseAsset(assetId)}
                 showSign={ShowSign.Negative}
                 sign={getNumberSign(size?.current)}
                 fractionDigits={stepSizeDecimals}
