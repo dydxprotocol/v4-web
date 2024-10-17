@@ -341,18 +341,29 @@ export const AnalyticsEvents = unionize(
     VaultFormPreviewStep: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
     AttemptVaultOperation: ofType<{
       operation: 'DEPOSIT' | 'WITHDRAW';
+      userOperationId: string;
       amount: number;
       slippage: number | null | undefined;
+      requiredSlippageAck: boolean | null | undefined;
+      showedSlippageWarning: boolean | null | undefined;
     }>(),
-    VaultOperationPreAborted: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW'; amount: number }>(),
+    VaultOperationPreAborted: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      userOperationId: string;
+      amount: number;
+    }>(),
     SuccessfulVaultOperation: ofType<{
       operation: 'DEPOSIT' | 'WITHDRAW';
+      userOperationId: string;
       amount: number;
       amountDiff: number | null | undefined;
       submissionTimeBase: number;
       submissionTimeTotal: number;
     }>(),
-    VaultOperationProtocolError: ofType<{ operation: 'DEPOSIT' | 'WITHDRAW' }>(),
+    VaultOperationProtocolError: ofType<{
+      operation: 'DEPOSIT' | 'WITHDRAW';
+      userOperationId: string;
+    }>(),
 
     // Affiliate
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),

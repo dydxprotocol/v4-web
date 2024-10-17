@@ -22,7 +22,6 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -185,7 +184,6 @@ export const AccountDetailsAndHistory = () => {
                     }[onboardingState],
                   })}
                 </p>
-                <OnboardingTriggerButton />
               </$EmptyCard>
             ) : null}
           </div>
