@@ -33,6 +33,8 @@ import { useAccounts } from '../useAccounts';
 import { useDebounce } from '../useDebounce';
 import { useSkipClient } from './skipClient';
 
+const ROUTE_QUERY_REFETCH_INTERVAL = 5_000;
+
 export const chainsQueryFn = async (skipClient: SkipClient) => {
   const skipSupportedChains = await skipClient.chains({
     includeEVM: true,
@@ -230,7 +232,7 @@ export const useTransfers = () => {
         swapVenues: SWAP_VENUES,
       });
     },
-
+    refetchInterval: ROUTE_QUERY_REFETCH_INTERVAL,
     enabled: hasAllParams,
   });
 
