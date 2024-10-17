@@ -173,9 +173,10 @@ const MarketsDropdownContent = ({
           >
             🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
-          <$IconButton
+          <IconButton
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            fullIcon
           />
         </$MarketDropdownBanner>
       );
@@ -306,7 +307,7 @@ export const MarketsDropdown = memo(
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
-    }, [isOpen]);
+    }, []);
 
     return (
       <$Popover
@@ -490,11 +491,6 @@ const $AssetIcon = styled(AssetIcon)<{ $uiRefreshEnabled: boolean }>`
       --asset-icon-size: 1.5em;
     `}
   `}
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
 `;
 
 const $FlagGradient = styled.div`
