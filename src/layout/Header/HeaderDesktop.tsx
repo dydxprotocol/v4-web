@@ -83,21 +83,6 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        ...(showLaunchMarkets
-          ? [
-              {
-                value: 'LAUNCH_MARKET',
-                label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
-                href: AppRoute.LaunchMarket,
-              },
-              // TODO (@jaredvu): Remove this after adding updated markets-table
-              {
-                value: 'TEST_MARKET',
-                label: 'TIME-USD',
-                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M-USD?pml=true',
-              },
-            ]
-          : []),
         showVaults && {
           value: 'VAULT',
           label: (
