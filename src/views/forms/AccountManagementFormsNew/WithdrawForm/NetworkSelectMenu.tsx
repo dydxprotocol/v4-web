@@ -133,17 +133,24 @@ export const NetworkSelectMenu = ({
   ];
 
   return (
-    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination">
+    <SearchSelectMenu
+      items={items.filter(isTruthy)}
+      label="Network"
+      useSearchInputComponent
+      inputPlaceholder="Search networks"
+    >
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (
           <>
             <$Img src={selectedChainOption.logoURI ?? undefined} alt="" />{' '}
             {selectedChainOption.chainName}
+            {getFeeDecoratorComponentForChainId(selectedChainOption.chainID)}
           </>
         ) : selectedExchangeOption ? (
           <>
             <$Img src={selectedExchangeOption.icon ?? undefined} alt="" />{' '}
             {selectedExchangeOption.name}
+            <LowestFeesDecoratorText />
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })
