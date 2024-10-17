@@ -1,4 +1,4 @@
-import { TxStatusResponseJSON } from '@skip-go/client';
+import { TxStatusResponseJSON } from '@skip-router/core';
 
 export const depositFromUsdcEthPending = {
   transfers: [
