@@ -536,11 +536,11 @@ export const VaultDepositWithdrawForm = ({
 
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
-  const disableFormBecauseWallet = isAccountViewOnly || !canViewAccount;
+  const shouldDisableFormBecauseWallet = isAccountViewOnly || !canViewAccount;
   // on wallet connect/disconnect, reset the form
   useEffect(() => {
     dispatch(resetVaultForm());
-  }, [disableFormBecauseWallet, dispatch]);
+  }, [shouldDisableFormBecauseWallet, dispatch]);
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const maybeConnectWalletButton = !canAccountTrade ? (
@@ -581,13 +581,13 @@ export const VaultDepositWithdrawForm = ({
           label={inputFormConfig.formLabel}
           value={amount}
           onChange={setAmount}
-          disabled={disableFormBecauseWallet}
+          disabled={shouldDisableFormBecauseWallet}
           slotRight={
             <FormMaxInputToggleButton
               size={ButtonSize.XSmall}
               isInputEmpty={amount === ''}
               isLoading={false}
-              disabled={disableFormBecauseWallet}
+              disabled={shouldDisableFormBecauseWallet}
               onPressedChange={(isPressed: boolean) =>
                 isPressed ? onClickMax() : setAmountState('')
               }
@@ -608,7 +608,7 @@ export const VaultDepositWithdrawForm = ({
             type={ButtonType.Submit}
             action={ButtonAction.Primary}
             state={{
-              isDisabled: hasInputErrors || disableFormBecauseWallet || isSubmitting,
+              isDisabled: hasInputErrors || shouldDisableFormBecauseWallet || isSubmitting,
               isLoading: isSubmitting,
             }}
             slotLeft={
@@ -723,7 +723,7 @@ export const VaultDepositWithdrawForm = ({
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
               state={{
-                isDisabled: hasInputErrors || disableFormBecauseWallet || isSubmitting,
+                isDisabled: hasInputErrors || shouldDisableFormBecauseWallet || isSubmitting,
                 isLoading: isSubmitting,
               }}
               slotLeft={
