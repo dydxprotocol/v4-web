@@ -6,7 +6,7 @@ import {
   TransferInfoJSON,
   TransferStatusJSON,
   TxStatusResponseJSON,
-} from '@skip-go/client';
+} from '@skip-router/core';
 
 import {
   RouteStatus,
