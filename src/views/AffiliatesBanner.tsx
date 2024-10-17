@@ -5,7 +5,7 @@ import {
   AFFILIATES_FEE_DISCOUNT_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -19,13 +19,15 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getGridBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
+import { setDismissedAffiliateBanner } from '@/state/dismissable';
 
-export const AffiliatesBanner = () => {
+export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
@@ -89,8 +91,16 @@ export const AffiliatesBanner = () => {
   return (
     <$Background
       backgroundImagePath={background}
-      tw="row mb-1 mt-1 justify-between gap-0.5 bg-color-layer-1 pl-1 pr-2"
+      tw="row mb-1 justify-between gap-0.5 bg-color-layer-1 pl-1 pr-2"
     >
+      {withClose && (
+        <$CloseButton
+          iconName={IconName.Close}
+          shape={ButtonShape.Circle}
+          size={ButtonSize.XSmall}
+          onClick={() => dispatch(setDismissedAffiliateBanner(true))}
+        />
+      )}
       <div tw="row">
         <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-8" />
         <div tw="column items-start gap-0.5">
@@ -123,6 +133,8 @@ const $Background = styled.div<{ backgroundImagePath: string }>`
   --color-border: transparent;
   ${layoutMixins.withOuterBorderClipped}
 
+  position: relative;
+
   ${({ backgroundImagePath }) => css`
     background: url(${backgroundImagePath});
   `}
@@ -144,4 +156,10 @@ const $Triangle = styled.div`
   border-top: 0.5rem solid transparent;
   border-bottom: 0.5rem solid transparent;
   border-right: 0.5rem solid var(--color-layer-6);
+`;
+
+const $CloseButton = styled(IconButton)`
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
 `;
