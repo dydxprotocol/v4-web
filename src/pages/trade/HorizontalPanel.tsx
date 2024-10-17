@@ -42,24 +42,19 @@ import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSel
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
-import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
+import { TradeTableSettings } from './TradeTableSettings';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
-import { MarketTypeFilter } from './types';
+import { MarketTypeFilter, PanelView } from './types';
 
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
   Fills = 'Fills',
   Payments = 'Payments',
-}
-
-enum PanelView {
-  AllMarkets = 'AllMarkets',
-  CurrentMarket = 'CurrentMarket',
 }
 
 type ElementProps = {
@@ -364,7 +359,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
-      <$CollapsibleTabs
+      <CollapsibleTabs
         defaultTab={InfoSection.Position}
         tab={tab}
         setTab={setTab}
@@ -372,56 +367,66 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         onOpenChange={setIsOpen}
         dividerStyle={uiRefresh ? 'underline' : 'border'}
         slotToolbar={
-          <>
-            <ToggleGroup
-              items={[
-                {
-                  value: PanelView.AllMarkets,
-                  label: stringGetter({ key: STRING_KEYS.ALL }),
-                },
-                {
-                  value: PanelView.CurrentMarket,
-                  ...(currentMarketAssetId
-                    ? {
-                        slotBefore: <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />,
-                        label: currentMarketAssetId,
-                      }
-                    : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
-                },
-              ]}
-              value={view}
-              onValueChange={setView}
-              onInteraction={() => {
-                setIsOpen?.(true);
-              }}
+          uiRefresh ? (
+            <TradeTableSettings
+              panelView={view}
+              marketTypeFilter={viewIsolated}
+              setPanelView={setView}
+              setMarketTypeFilter={setViewIsolated}
+              onOpenChange={setIsOpen}
             />
-            <$VerticalSeparator />
-            <$SelectMenu
-              value={viewIsolated}
-              onValueChange={(newViewIsolated: string) => {
-                setViewIsolated(newViewIsolated as MarketTypeFilter);
-              }}
-            >
-              <$SelectItem
-                key={MarketTypeFilter.AllMarkets}
-                value={MarketTypeFilter.AllMarkets}
-                label={`${stringGetter({ key: STRING_KEYS.CROSS })} / ${stringGetter({
-                  key: STRING_KEYS.ISOLATED,
-                })}`}
+          ) : (
+            <>
+              <ToggleGroup
+                items={[
+                  {
+                    value: PanelView.AllMarkets,
+                    label: stringGetter({ key: STRING_KEYS.ALL }),
+                  },
+                  {
+                    value: PanelView.CurrentMarket,
+                    ...(currentMarketAssetId
+                      ? {
+                          slotBefore: <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />,
+                          label: currentMarketAssetId,
+                        }
+                      : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
+                  },
+                ]}
+                value={view}
+                onValueChange={setView}
+                onInteraction={() => {
+                  setIsOpen?.(true);
+                }}
               />
-              <$SelectItem
-                key={MarketTypeFilter.Isolated}
-                value={MarketTypeFilter.Isolated}
-                label={stringGetter({ key: STRING_KEYS.ISOLATED })}
-              />
-              <$SelectItem
-                key={MarketTypeFilter.Cross}
-                value={MarketTypeFilter.Cross}
-                label={stringGetter({ key: STRING_KEYS.CROSS })}
-              />
-            </$SelectMenu>
-            <$VerticalSeparator />
-          </>
+              <$VerticalSeparator />
+              <$SelectMenu
+                value={viewIsolated}
+                onValueChange={(newViewIsolated: string) => {
+                  setViewIsolated(newViewIsolated as MarketTypeFilter);
+                }}
+              >
+                <$SelectItem
+                  key={MarketTypeFilter.AllMarkets}
+                  value={MarketTypeFilter.AllMarkets}
+                  label={`${stringGetter({ key: STRING_KEYS.CROSS })} / ${stringGetter({
+                    key: STRING_KEYS.ISOLATED,
+                  })}`}
+                />
+                <$SelectItem
+                  key={MarketTypeFilter.Isolated}
+                  value={MarketTypeFilter.Isolated}
+                  label={stringGetter({ key: STRING_KEYS.ISOLATED })}
+                />
+                <$SelectItem
+                  key={MarketTypeFilter.Cross}
+                  value={MarketTypeFilter.Cross}
+                  label={stringGetter({ key: STRING_KEYS.CROSS })}
+                />
+              </$SelectMenu>
+              <$VerticalSeparator />
+            </>
+          )
         }
         tabItems={tabItems}
       />
@@ -435,15 +440,7 @@ const $VerticalSeparator = styled(VerticalSeparator)`
     height: 1em;
   }
 `;
-const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs);
 
-const $CollapsibleTabs = styled(CollapsibleTabs)`
-  --tableHeader-backgroundColor: var(--color-layer-3);
-
-  header {
-    background-color: var(--color-layer-2);
-  }
-` as typeof collapsibleTabsType;
 const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputInnerSelectMenu}
   --trigger-height: 1.75rem;
