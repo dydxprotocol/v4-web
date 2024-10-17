@@ -1,3 +1,5 @@
+import { Asset } from '@skip-go/client';
+
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
 
@@ -57,12 +59,13 @@ export const getMapOfLowestFeeTokensByChainId = (type: NullableTransferType) =>
 export const getMapOfHighestFeeTokensByChainId = (type: NullableTransferType) =>
   getMapOfChainsByChainId(getHighestFeeChains(type));
 
-export const cctpTokensByDenom = cctpTokens.reduce(
+export const cctpTokensByDenomLowerCased = cctpTokens.reduce(
   (acc, token) => {
-    if (!acc[token.tokenAddress]) {
-      acc[token.tokenAddress] = [];
+    const lowerCasedAddress = token.tokenAddress.toLowerCase();
+    if (!acc[lowerCasedAddress]) {
+      acc[lowerCasedAddress] = [];
     }
-    acc[token.tokenAddress].push(token);
+    acc[lowerCasedAddress].push(token);
     return acc;
   },
   {} as Record<string, CctpTokenInfo[]>
@@ -78,3 +81,12 @@ export const cctpTokensByChainId = cctpTokens.reduce(
   },
   {} as Record<string, CctpTokenInfo[]>
 );
+
+export const isTokenCctp = (token: Asset | undefined) => {
+  return isDenomCctp(token?.denom);
+};
+
+const isDenomCctp = (denom: string | undefined) => {
+  if (!denom) return false;
+  return Boolean(cctpTokensByDenomLowerCased[denom.toLowerCase()]);
+};
