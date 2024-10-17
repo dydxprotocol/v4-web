@@ -304,6 +304,40 @@ export const useVaultFormSlippage = () => {
   return mapNullableQueryResult(slippageQueryResult);
 };
 
+export const useVaultCalculationForLaunchingMarket = ({ amount }: { amount: number }) => {
+  const accountInfo = useAppSelector(selectSubaccountStateForVaults);
+  const slippageResponse = useVaultFormSlippage().data;
+  const vaultAccount = useLoadedVaultAccount().data;
+
+  const vaultFormInfo = useMemo(
+    () => new VaultFormData(operationStringToVaultFormAction('DEPOSIT'), amount, true, true, true),
+    [amount]
+  );
+
+  const vaultFormAccountInfo = useMemo(
+    () =>
+      new VaultFormAccountData(
+        accountInfo.marginUsage,
+        accountInfo.freeCollateral,
+        accountInfo.canViewAccount
+      ),
+    [accountInfo.marginUsage, accountInfo.freeCollateral, accountInfo.canViewAccount]
+  );
+
+  const validationResponse = useMemo(
+    () =>
+      VaultDepositWithdrawFormValidator.validateVaultForm(
+        vaultFormInfo,
+        vaultFormAccountInfo,
+        vaultAccount,
+        slippageResponse
+      ),
+    [slippageResponse, vaultAccount, vaultFormInfo, vaultFormAccountInfo]
+  );
+
+  return validationResponse;
+};
+
 export const useVaultFormValidationResponse = () => {
   const { operation, slippageAck, termsAck, confirmationStep } = useAppSelector(
     selectVaultFormStateExceptAmount
