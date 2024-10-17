@@ -1,4 +1,10 @@
-import { darkTheme, FunkitConfig, lightTheme } from '@funkit/connect';
+import { darkTheme, FunkitConfig, lightTheme, PurifiedCheckoutHistoryItem } from '@funkit/connect';
+
+export type FunkitDeposit = {
+  checkoutId: string;
+  timestamp: number;
+  status?: PurifiedCheckoutHistoryItem['state'];
+};
 
 export const funkitConfig = {
   appName: 'dYdX',

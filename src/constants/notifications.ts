@@ -7,6 +7,7 @@ export enum NotificationType {
   // So the notifications don't get retriggered
   // It's pretty scary getting a bunch of unexpected withdrawal notifications
   SkipTransfer = 'SquidTransfer',
+  FunkitDeposit = 'FunkitDeposit',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',

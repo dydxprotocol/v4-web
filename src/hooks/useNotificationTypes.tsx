@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { groupBy, isEqual } from 'lodash';
+import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
@@ -45,6 +46,7 @@ import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
+import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -56,6 +58,7 @@ import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelector
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getFunkitDeposits } from '@/state/funkitDepositsSelector';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -65,7 +68,7 @@ import {
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { formatSeconds } from '@/lib/timeUtils';
+import { formatSeconds, getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -208,6 +211,42 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         }
       };
+    },
+  },
+  {
+    type: NotificationType.FunkitDeposit,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const funkitDeposits = useAppSelector(getFunkitDeposits, shallowEqual);
+
+      useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const deposit of Object.values(funkitDeposits)) {
+          const { checkoutId, status, timestamp } = deposit;
+          const timeDiff = getStringsForDateTimeDiff(DateTime.fromSeconds(timestamp));
+          trigger(
+            checkoutId,
+            {
+              icon: <Icon iconName={IconName.FunkitInstant} />,
+              title: status === 'COMPLETED' ? 'Instant deposit' : 'Instant deposit in progress',
+              body:
+                status === 'COMPLETED'
+                  ? 'Deposit completed'
+                  : `Deposit started ${timeDiff.timeString} ago`,
+              toastSensitivity: 'foreground',
+              renderCustomBody: ({ isToast, notification }) => (
+                <FunkitDepositNotification
+                  isToast={isToast}
+                  notification={notification}
+                  deposit={deposit}
+                />
+              ),
+              groupKey: NotificationType.FunkitDeposit,
+            },
+            []
+          );
+        }
+      }, [funkitDeposits, stringGetter, trigger]);
     },
   },
   {
