@@ -1,5 +1,9 @@
 import { createContext, useContext, useMemo } from 'react';
 
+import {
+  MsgWithdrawFromSubaccount,
+  TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+} from '@dydxprotocol/v4-client-js';
 import { SkipClient } from '@skip-go/client';
 
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
@@ -28,9 +32,9 @@ const useSkipClientContext = () => {
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const skipClient = useMemo(
-    () =>
-      new SkipClient({
+  const { skipClient, skipClientId } = useMemo(
+    () => ({
+      skipClient: new SkipClient({
         endpointOptions: {
           getRpcEndpointForChain: async (chainId: string) => {
             if (chainId === getNobleChainId()) return nobleValidator;
@@ -44,7 +48,10 @@ const useSkipClientContext = () => {
             throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
           },
         },
+        registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
+      skipClientId: crypto.randomUUID(),
+    }),
     [
       compositeClient?.network.validatorConfig.restEndpoint,
       neutronValidator,
@@ -55,5 +62,5 @@ const useSkipClientContext = () => {
       validators,
     ]
   );
-  return { skipClient };
+  return { skipClient, skipClientId };
 };
