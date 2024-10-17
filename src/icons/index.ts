@@ -65,6 +65,7 @@ export { default as RocketIcon } from './rocket.svg';
 export { default as RoundedArrowIcon } from './rounded-arrow.svg';
 export { default as SearchIcon } from './search.svg';
 export { default as SendIcon } from './send.svg';
+export { default as SettingsIcon } from './settings.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as ShowIcon } from './show.svg';
 export { default as SocialXIcon } from './social-x.svg';

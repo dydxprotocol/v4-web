@@ -7,7 +7,6 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useFadeOnHorizontalScrollContainer } from '@/hooks/useFadeOnHorizontalScrollContainer';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -15,6 +14,8 @@ import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
+
+import { WithSeparators } from './Separator';
 
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];
@@ -28,6 +29,7 @@ type StyleProps = {
   className?: string;
   overflow?: 'scroll' | 'wrap';
   truncateLabel?: boolean;
+  withSeparators?: boolean;
 };
 
 export const ToggleGroup = forwardRefFn(
@@ -42,6 +44,7 @@ export const ToggleGroup = forwardRefFn(
       className,
       overflow = 'scroll',
       truncateLabel = true,
+      withSeparators = false,
       size,
       shape = ButtonShape.Pill,
 
@@ -54,50 +57,65 @@ export const ToggleGroup = forwardRefFn(
     const innerRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => innerRef.current!, []);
 
-    const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
-      scrollRef: innerRef,
-    });
+    // TODO: re-enable CT-1296
+    // const { showFadeStart, showFadeEnd } = useFadeOnHorizontalScrollContainer({
+    //   scrollRef: innerRef,
+    // });
+
+    const toggleItems = items.map((item) => (
+      <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
+        <$ToggleButton
+          size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
+          shape={shape}
+          disabled={item.disabled}
+          $withSeparators={withSeparators}
+          {...buttonProps}
+        >
+          {item.slotBefore}
+          {truncateLabel ? <$Label>{item.label}</$Label> : item.label}
+          {item.slotAfter}
+        </$ToggleButton>
+      </Item>
+    ));
 
     return (
-      <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
-        <$Root
-          ref={innerRef}
-          type="single"
-          value={value}
-          onValueChange={(newValue: MenuItemValue) => {
-            if ((ensureSelected && newValue) || !ensureSelected) {
-              onValueChange(newValue);
-            }
-            onInteraction?.();
-          }}
-          className={className}
-          loop
-          overflow={overflow}
-          tw="row gap-[0.33em]"
-        >
-          {items.map((item) => (
-            <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
-              <ToggleButton
-                size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
-                shape={shape}
-                disabled={item.disabled}
-                {...buttonProps}
-              >
-                {item.slotBefore}
-                {truncateLabel ? <$Label>{item.label}</$Label> : item.label}
-                {item.slotAfter}
-              </ToggleButton>
-            </Item>
-          ))}
-        </$Root>
-      </$HorizontalScrollContainer>
+      <$Root
+        ref={innerRef}
+        type="single"
+        value={value}
+        onValueChange={(newValue: MenuItemValue) => {
+          if ((ensureSelected && newValue) || !ensureSelected) {
+            onValueChange(newValue);
+          }
+          onInteraction?.();
+        }}
+        className={className}
+        loop
+        overflow={overflow}
+        tw="row gap-[0.33em]"
+        $withSeparators={withSeparators}
+      >
+        {withSeparators ? (
+          <$WithSeparators layout="row" withSeparators>
+            {toggleItems}
+          </$WithSeparators>
+        ) : (
+          toggleItems
+        )}
+      </$Root>
     );
   }
 );
 
 const $Root = styled(Root)<{
   overflow: 'scroll' | 'wrap';
+  $withSeparators: boolean;
 }>`
+  ${({ $withSeparators }) =>
+    $withSeparators &&
+    css`
+      align-self: stretch;
+    `}
   ${({ overflow }) =>
     ({
       scroll: css`
@@ -114,25 +132,20 @@ const $Label = styled.div`
   ${layoutMixins.textTruncate}
 `;
 
-const $HorizontalScrollContainer = styled.div<{
-  showFadeStart: boolean;
-  showFadeEnd: boolean;
-}>`
-  /* ${layoutMixins.horizontalFadeScrollArea}
+const $WithSeparators = styled(WithSeparators)`
+  --separatorHeight-padding: 0.5rem;
+`;
 
-  ${({ showFadeStart }) =>
-    !showFadeStart &&
+const $ToggleButton = styled(ToggleButton)<{ $withSeparators: boolean }>`
+  ${({ $withSeparators }) =>
+    $withSeparators &&
     css`
-      &:before {
-        opacity: 0;
-      }
+      --button-toggle-on-border: none;
+      --button-toggle-off-border: none;
+      --button-toggle-off-backgroundColor: transparent;
+      --button-toggle-on-backgroundColor: transparent;
+      --button-padding: 0 0.25rem;
+
+      width: min-content;
     `}
-
-  ${({ showFadeEnd }) =>
-    !showFadeEnd &&
-    css`
-      &:after {
-        opacity: 0;
-      }
-    `}; */
 `;
