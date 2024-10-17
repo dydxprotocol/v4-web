@@ -51,6 +51,7 @@ const useSkipClientContext = () => {
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
     [
+      compositeClient?.network.validatorConfig.restEndpoint,
       neutronValidator,
       nobleValidator,
       osmosisValidator,

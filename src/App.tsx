@@ -106,12 +106,12 @@ const Content = () => {
 
   useEffect(() => {
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleChains', { skipClient }],
-      queryFn: chainsQueryFn,
+      queryKey: ['transferEligibleChains'],
+      queryFn: () => chainsQueryFn(skipClient),
     });
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleAssets', { skipClient }],
-      queryFn: assetsQueryFn,
+      queryKey: ['transferEligibleAssets'],
+      queryFn: () => assetsQueryFn(skipClient),
     });
   }, [skipClient]);
 

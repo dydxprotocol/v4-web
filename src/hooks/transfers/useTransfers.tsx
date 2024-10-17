@@ -33,17 +33,12 @@ import { useAccounts } from '../useAccounts';
 import { useDebounce } from '../useDebounce';
 import { useSkipClient } from './skipClient';
 
-type TransferQueryFnProps = {
-  queryKey: [string, { skipClient: SkipClient }];
-};
-
-export const chainsQueryFn = async ({ queryKey }: TransferQueryFnProps) => {
-  const [, { skipClient }] = queryKey;
+export const chainsQueryFn = async (skipClient: SkipClient) => {
   const skipSupportedChains = await skipClient.chains({
     includeEVM: true,
     includeSVM: true,
   });
-  const chainsByNetworkMap = skipSupportedChains.reduce<Record<string, Chain[]>>(
+  const chainsByNetworkMap = skipSupportedChains.reduce<{ [key: string]: Chain[] }>(
     (chainsMap, nextChain) => {
       const chainsListForNetworkType = chainsMap[nextChain.chainType] ?? [];
       chainsMap[nextChain.chainType] = [...chainsListForNetworkType, nextChain];
@@ -57,8 +52,7 @@ export const chainsQueryFn = async ({ queryKey }: TransferQueryFnProps) => {
   };
 };
 
-export const assetsQueryFn = async ({ queryKey }: TransferQueryFnProps) => {
-  const [, { skipClient }] = queryKey;
+export const assetsQueryFn = async (skipClient: SkipClient) => {
   const assetsByChain = await skipClient.assets({
     includeEvmAssets: true,
     includeSvmAssets: true,
@@ -85,19 +79,19 @@ export const useTransfers = () => {
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 
-  const debouncedAmount = useDebounce<string>(amount, 500);
+  const debouncedAmount = useDebounce(amount, 500);
   const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
 
   const chainsQuery = useQuery({
-    queryKey: ['transferEligibleChains', { skipClient }],
-    queryFn: chainsQueryFn,
+    queryKey: ['transferEligibleChains'],
+    queryFn: () => chainsQueryFn(skipClient),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
   const assetsQuery = useQuery({
-    queryKey: ['transferEligibleAssets', { skipClient }],
-    queryFn: assetsQueryFn,
+    queryKey: ['transferEligibleAssets'],
+    queryFn: () => assetsQueryFn(skipClient),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
