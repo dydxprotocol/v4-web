@@ -312,6 +312,7 @@ const useAccountsContext = () => {
   return {
     // Wallet connection
     sourceAccount,
+    localNobleWallet,
 
     // Wallet selection
     selectWallet,
