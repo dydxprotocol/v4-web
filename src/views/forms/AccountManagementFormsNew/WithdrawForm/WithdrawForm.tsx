@@ -2,7 +2,6 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
-import { Asset } from '@skip-go/client';
 import { parseUnits } from 'ethers';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -11,12 +10,12 @@ import styled from 'styled-components';
 import { AutoSweepConfig } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { isTokenCctp } from '@/constants/cctp';
 import { getNobleChainId, getSolanaChainId, GRAZ_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
-import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { TransferType } from '@/constants/transfers';
 import { WalletType } from '@/constants/wallets';
 
@@ -31,15 +30,12 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { formMixins } from '@/styles/formMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { DiffOutput } from '@/components/DiffOutput';
+import { ArrowIcon } from '@/components/ArrowIcon';
+import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
-import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -53,7 +49,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
-import { TokenSelectMenu } from './TokenSelectMenu';
+import { WithdrawButtonAndReceipt } from './WithdrawButtonAndReceipt';
 import { useValidation } from './useValidation';
 
 const DUMMY_TX_HASH = 'withdraw_dummy_tx_hash';
@@ -92,13 +88,11 @@ export const WithdrawForm = () => {
     route,
     txs,
     toToken,
-    assetsForSelectedChain,
     chainsForNetwork,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
   const isCctp = isTokenCctp(toToken);
-  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const isValidDestinationAddress = useMemo(() => {
     const grazChainPrefix =
       GRAZ_CHAINS.find((chain) => chain.chainId === toChainId)?.bech32Config.bech32PrefixAccAddr ??
@@ -172,7 +166,8 @@ export const WithdrawForm = () => {
         chainId: toChainId,
         tokenAddress: toToken?.denom ?? undefined,
         tokenSymbol: toToken?.symbol ?? undefined,
-        slippage: slippage ?? undefined,
+        // TODO [onboarding-rewrite]: remove unused properties
+        slippage: undefined,
         gasFee: undefined,
         bridgeFee: Number(route?.usdAmountIn) - Number(route?.usdAmountOut),
         exchangeRate: undefined,
@@ -192,7 +187,6 @@ export const WithdrawForm = () => {
       isCctp,
       route,
       setAmount,
-      slippage,
       toChainId,
       toToken,
     ]
@@ -359,13 +353,6 @@ export const WithdrawForm = () => {
     [setAmount]
   );
 
-  const onSetSlippage = useCallback(
-    (newSlippage: number) => {
-      setSlippage(newSlippage);
-    },
-    [setSlippage]
-  );
-
   const onClickMax = useCallback(() => {
     setAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setAmount]);
@@ -392,37 +379,6 @@ export const WithdrawForm = () => {
     [setAmount, setToChainId]
   );
 
-  const onSelectToken = useCallback((asset: Asset) => {
-    if (asset) {
-      setToTokenDenom(asset.denom);
-      setAmount('');
-    }
-  }, []);
-
-  const amountInputReceipt = [
-    {
-      key: 'freeCollateral',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.FREE_COLLATERAL })} <Tag>USDC</Tag>
-        </span>
-      ),
-      value: (
-        <DiffOutput
-          type={OutputType.Fiat}
-          value={freeCollateral?.current}
-          newValue={(freeCollateral?.current ?? 0) + Number(route?.usdAmountOut ?? 0)}
-          sign={NumberSign.Negative}
-          hasInvalidNewValue={MustBigNumber(debouncedAmount).minus(freeCollateralBN).isNegative()}
-          withDiff={
-            Boolean(debouncedAmount) && !debouncedAmountBN.isNaN() && !debouncedAmountBN.isZero()
-          }
-          tw="[--diffOutput-valueWithDiff-fontSize:1em]"
-        />
-      ),
-    },
-  ];
-
   const { errorMessage, alertType } = useValidation({
     isCctp,
     debouncedAmountBN,
@@ -443,22 +399,29 @@ export const WithdrawForm = () => {
     isLoading ||
     !isValidDestinationAddress;
 
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  if (isPreviewing) {
+    return (
+      <$Form onSubmit={onSubmit}>
+        <div tw="text-color-text-0">
+          Make sure everything looks correct with your withdrawal before confirming
+        </div>
+        <WithdrawButtonAndReceipt
+          withdrawToken={toToken}
+          route={route}
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+        />
+
+        <button type="button" onClick={() => setIsPreviewing(false)}>
+          Go Back
+        </button>
+      </$Form>
+    );
+  }
+
   return (
-    <$Form onSubmit={onSubmit}>
-      <div tw="text-color-text-0">
-        {stringGetter({
-          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS_SKIP,
-          params: {
-            LOWEST_FEE_TOKENS_TOOLTIP: (
-              <WithTooltip tooltip="lowest-fees">
-                {stringGetter({
-                  key: STRING_KEYS.SELECT_CHAINS,
-                })}
-              </WithTooltip>
-            ),
-          },
-        })}
-      </div>
+    <$Form>
       <NetworkSelectMenu
         selectedExchange={exchange ?? undefined}
         selectedChain={toChainId ?? undefined}
@@ -489,40 +452,65 @@ export const WithdrawForm = () => {
               }
             : undefined
         }
+        slotRight={
+          <FormMaxInputToggleButton
+            size={ButtonSize.XSmall}
+            isInputEmpty={false}
+            isLoading={isLoading}
+            onPressedChange={() => setToAddress('')}
+          />
+        }
       />
-      <TokenSelectMenu
-        selectedToken={toToken ?? undefined}
-        onSelectToken={onSelectToken}
-        isExchange={Boolean(exchange)}
-        assets={assetsForSelectedChain}
+      <FormInput
+        type={InputType.Number}
+        decimals={USD_DECIMALS}
+        onChange={onChangeAmount}
+        value={debouncedAmount}
+        label={
+          <div tw="flex">
+            <div>{stringGetter({ key: STRING_KEYS.AMOUNT })}</div>
+            <div tw="ml-0.25 mr-0.25"> • </div>
+            <div>{freeCollateral?.current?.toFixed(2)} USDC Held</div>
+          </div>
+        }
+        slotRight={
+          <FormMaxInputToggleButton
+            size={ButtonSize.XSmall}
+            isInputEmpty={debouncedAmount === ''}
+            isLoading={isLoading}
+            onPressedChange={(isPressed: boolean) => (isPressed ? onClickMax() : setAmount(''))}
+          />
+        }
       />
-      <WithDetailsReceipt
-        side="bottom"
-        detailItems={amountInputReceipt}
-        tw="[--withReceipt-backgroundColor:--color-layer-2]"
-      >
-        <FormInput
-          type={InputType.Number}
-          decimals={USD_DECIMALS}
-          onChange={onChangeAmount}
-          value={debouncedAmount}
-          label={stringGetter({ key: STRING_KEYS.AMOUNT })}
-          slotRight={
-            <FormMaxInputToggleButton
-              size={ButtonSize.XSmall}
-              isInputEmpty={debouncedAmount === ''}
-              isLoading={isLoading}
-              onPressedChange={(isPressed: boolean) => (isPressed ? onClickMax() : setAmount(''))}
-            />
-          }
-        />
-      </WithDetailsReceipt>
+      <ArrowContainer tw="z-1 mx-auto -mb-1.25 -mt-1.25 flex h-1.5 w-1.5 items-center justify-center rounded-0.25 border-color-layer-7 bg-color-layer-4">
+        <ArrowIcon direction="down" color="--color-layer-8" />
+      </ArrowContainer>
+      <FormInput
+        type={InputType.Number}
+        decimals={USD_DECIMALS}
+        onChange={onChangeAmount}
+        value={route?.usdAmountOut ?? 0}
+        label={stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
+        disabled
+        backgroundColorOverride="var(--color-layer-2)"
+      />
       {errorMessage && (
         <AlertMessage type={alertType ?? AlertType.Error} tw="inline">
           {errorMessage}
         </AlertMessage>
       )}
-      <$Footer>{/* TODO [onboarding-rewrite]: add preview */}</$Footer>
+      <div tw="grid">
+        <Button
+          action={ButtonAction.Primary}
+          state={{
+            isDisabled,
+            isLoading,
+          }}
+          onClick={() => setIsPreviewing(true)}
+        >
+          Preview
+        </Button>
+      </div>
     </$Form>
   );
 };
@@ -530,7 +518,6 @@ const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
+const ArrowContainer = styled.div`
+  border: solid var(--border-width) var(--color-layer-6);
 `;

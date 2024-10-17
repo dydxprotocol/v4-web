@@ -65,6 +65,10 @@ class TestFlags {
   get uiRefresh() {
     return !!this.queryParams.uirefresh || isDev;
   }
+
+  get onboardingRewrite() {
+    return !!this.queryParams.onboarding_rewrite;
+  }
 }
 
 export const testFlags = new TestFlags();
