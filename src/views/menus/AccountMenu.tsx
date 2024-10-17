@@ -1,6 +1,7 @@
 import { ElementType, memo } from 'react';
 
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
+import { Item } from '@radix-ui/react-dropdown-menu';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -449,42 +450,47 @@ const AssetActions = memo(
     stringGetter: StringGetterFunction;
   }) => (
     <div tw="inlineRow">
-      {[
-        withOnboarding &&
-          complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Deposit(),
-            iconName: IconName.Deposit,
-            tooltipStringKey: STRING_KEYS.DEPOSIT,
-          },
-        withOnboarding &&
-          hasBalance && {
-            dialog: DialogTypes.Withdraw(),
-            iconName: IconName.Withdraw,
-            tooltipStringKey: STRING_KEYS.WITHDRAW,
-          },
-        hasBalance &&
-          complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Transfer({ selectedAsset: asset }),
-            iconName: IconName.Send,
-            tooltipStringKey: STRING_KEYS.TRANSFER,
-          },
-      ]
-        .filter(isTruthy)
-        .map(({ iconName, tooltipStringKey, dialog }) => (
-          <WithTooltip
-            key={tooltipStringKey}
-            tooltipString={stringGetter({ key: tooltipStringKey })}
-            tw="[--tooltip-backgroundColor:--color-layer-5]"
-          >
-            <$IconButton
-              key={dialog.type}
-              action={ButtonAction.Base}
-              shape={ButtonShape.Square}
-              iconName={iconName}
-              onClick={() => dispatch(openDialog(dialog))}
-            />
-          </WithTooltip>
-        ))}
+      {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
+          In general, any CTA in a dropdown should be wrapped in an Item tag
+       */}
+      <Item>
+        {[
+          withOnboarding &&
+            complianceState === ComplianceStates.FULL_ACCESS && {
+              dialog: DialogTypes.Deposit(),
+              iconName: IconName.Deposit,
+              tooltipStringKey: STRING_KEYS.DEPOSIT,
+            },
+          withOnboarding &&
+            hasBalance && {
+              dialog: DialogTypes.Withdraw(),
+              iconName: IconName.Withdraw,
+              tooltipStringKey: STRING_KEYS.WITHDRAW,
+            },
+          hasBalance &&
+            complianceState === ComplianceStates.FULL_ACCESS && {
+              dialog: DialogTypes.Transfer({ selectedAsset: asset }),
+              iconName: IconName.Send,
+              tooltipStringKey: STRING_KEYS.TRANSFER,
+            },
+        ]
+          .filter(isTruthy)
+          .map(({ iconName, tooltipStringKey, dialog }) => (
+            <WithTooltip
+              key={tooltipStringKey}
+              tooltipString={stringGetter({ key: tooltipStringKey })}
+              tw="[--tooltip-backgroundColor:--color-layer-5]"
+            >
+              <$IconButton
+                key={dialog.type}
+                action={ButtonAction.Base}
+                shape={ButtonShape.Square}
+                iconName={iconName}
+                onClick={() => dispatch(openDialog(dialog))}
+              />
+            </WithTooltip>
+          ))}
+      </Item>
     </div>
   )
 );
