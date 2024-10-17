@@ -26,17 +26,12 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 import { RouteWarningMessage } from '../RouteWarningMessage';
-import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
-  setSlippage: (slippage: number) => void;
-
-  slippage: number;
   withdrawToken?: Asset;
   route?: RouteResponse;
 
@@ -45,28 +40,40 @@ type ElementProps = {
 };
 
 export const WithdrawButtonAndReceipt = ({
-  setSlippage,
-
-  slippage,
   withdrawToken,
   route,
 
   isDisabled,
   isLoading,
 }: ElementProps) => {
-  const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  // TODO: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
-  const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
-  const { usdcLabel } = useTokenConfigs();
+  const { usdcDecimals } = useTokenConfigs();
   const { connectionError } = useApiState();
 
   const fees = Number(route?.usdAmountIn) - Number(route?.usdAmountOut);
   const submitButtonReceipt = [
+    {
+      key: 'amount-inputted',
+      label: <span>Amount</span>,
+      value: (
+        <Output
+          type={OutputType.Asset}
+          value={
+            route?.amountIn
+              ? formatUnits(
+                  BigInt(route.amountIn ?? '0'),
+                  withdrawToken?.decimals ?? usdcDecimals
+                ).toString()
+              : undefined
+          }
+          fractionDigits={TOKEN_DECIMALS}
+        />
+      ),
+    },
     {
       key: 'expected-amount-received',
 
@@ -81,31 +88,16 @@ export const WithdrawButtonAndReceipt = ({
           type={OutputType.Asset}
           value={
             route?.amountOut
-              ? formatUnits(BigInt(route.amountOut ?? '0'), withdrawToken?.decimals ?? 0).toString()
+              ? formatUnits(
+                  BigInt(route.amountOut ?? '0'),
+                  withdrawToken?.decimals ?? usdcDecimals
+                ).toString()
               : undefined
           }
           fractionDigits={TOKEN_DECIMALS}
         />
       ),
     },
-    withdrawToken &&
-      !withdrawToken.symbol?.toLowerCase().includes('usd') && {
-        key: 'expected-amount-received-usd',
-
-        label: (
-          <$RowWithGap>
-            {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
-            {withdrawToken && <Tag>{usdcLabel}</Tag>}
-          </$RowWithGap>
-        ),
-        value: (
-          <Output
-            type={OutputType.Asset}
-            value={route?.usdAmountOut}
-            fractionDigits={TOKEN_DECIMALS}
-          />
-        ),
-      },
     fees && {
       key: 'bridge-fees',
       label: (
@@ -114,17 +106,6 @@ export const WithdrawButtonAndReceipt = ({
         </WithTooltip>
       ),
       value: <Output type={OutputType.Fiat} value={fees} />,
-    },
-    !exchange && {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
     },
     {
       key: 'estimated-route-duration',
@@ -167,7 +148,6 @@ export const WithdrawButtonAndReceipt = ({
   const requiresAcknowledgement = Boolean(route?.warning && !hasAcknowledged);
   const isFormValid =
     !isDisabled &&
-    !isEditingSlippage &&
     connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
     !requiresAcknowledgement;
 
@@ -181,11 +161,13 @@ export const WithdrawButtonAndReceipt = ({
 
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
-      <RouteWarningMessage
-        hasAcknowledged={hasAcknowledged}
-        setHasAcknowledged={setHasAcknowledged}
-        routeWarning={route?.warning}
-      />
+      {route?.warning && (
+        <RouteWarningMessage
+          hasAcknowledged={hasAcknowledged}
+          setHasAcknowledged={setHasAcknowledged}
+          routeWarning={route.warning}
+        />
+      )}
       <Button
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
