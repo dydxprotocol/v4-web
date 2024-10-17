@@ -87,7 +87,7 @@ const Content = () => {
   const { complianceState } = useComplianceState();
   const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
 
-  const { skipClient } = useSkipClient();
+  const { skipClient, skipClientId } = useSkipClient();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -106,11 +106,11 @@ const Content = () => {
 
   useEffect(() => {
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleChains'],
+      queryKey: ['transferEligibleChains', skipClientId],
       queryFn: () => chainsQueryFn(skipClient),
     });
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleAssets'],
+      queryKey: ['transferEligibleAssets', skipClientId],
       queryFn: () => assetsQueryFn(skipClient),
     });
   }, [skipClient]);

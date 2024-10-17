@@ -61,7 +61,7 @@ export const assetsQueryFn = async (skipClient: SkipClient) => {
 };
 
 export const useTransfers = () => {
-  const { skipClient } = useSkipClient();
+  const { skipClient, skipClientId } = useSkipClient();
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
@@ -83,14 +83,14 @@ export const useTransfers = () => {
   const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
 
   const chainsQuery = useQuery({
-    queryKey: ['transferEligibleChains'],
+    queryKey: ['transferEligibleChains', skipClientId],
     queryFn: () => chainsQueryFn(skipClient),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
   const assetsQuery = useQuery({
-    queryKey: ['transferEligibleAssets'],
+    queryKey: ['transferEligibleAssets', skipClientId],
     queryFn: () => assetsQueryFn(skipClient),
     refetchOnWindowFocus: false,
     refetchOnMount: false,

@@ -32,9 +32,9 @@ const useSkipClientContext = () => {
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const skipClient = useMemo(
-    () =>
-      new SkipClient({
+  const { skipClient, skipClientId } = useMemo(
+    () => ({
+      skipClient: new SkipClient({
         endpointOptions: {
           getRpcEndpointForChain: async (chainId: string) => {
             if (chainId === getNobleChainId()) return nobleValidator;
@@ -50,6 +50,8 @@ const useSkipClientContext = () => {
         },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
+      skipClientId: crypto.randomUUID(),
+    }),
     [
       compositeClient?.network.validatorConfig.restEndpoint,
       neutronValidator,
@@ -60,5 +62,5 @@ const useSkipClientContext = () => {
       validators,
     ]
   );
-  return { skipClient };
+  return { skipClient, skipClientId };
 };
