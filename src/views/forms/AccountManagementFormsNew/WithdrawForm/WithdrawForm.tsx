@@ -63,7 +63,7 @@ export const WithdrawForm = () => {
   const { dydxAddress, sourceAccount, localDydxWallet, localNobleWallet } = useAccounts();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
-  // TODO: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
+  // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
   const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
@@ -110,7 +110,7 @@ export const WithdrawForm = () => {
   const freeCollateralBN = useMemo(() => MustBigNumber(freeCollateral?.current), [freeCollateral]);
 
   // Set default values for withdraw from
-  // TODO: https://linear.app/dydx/issue/OTE-875/calculate-default-withdrawal-address-for-keplr
+  // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-875/calculate-default-withdrawal-address-for-keplr
   // if wallet type is cosmos (keplr), change toAddress based on the chainid
   // B/C cosmos handles multiple chains and each have their own address
   useEffect(() => {
@@ -142,71 +142,30 @@ export const WithdrawForm = () => {
   const { screenAddresses } = useDydxClient();
   const nobleChainId = getNobleChainId();
 
-  const onSubmitComplete = useCallback(
-    (txHash: string | undefined, notificationId: string) => {
-      if (!txHash || !fromChainId || !toChainId) {
-        throw new Error('No transaction hash returned');
-      }
-      setAmount('');
-
-      const notificationParams = {
-        id: notificationId,
-        txHash,
-        type: TransferNotificationTypes.Withdrawal,
-        toChainId,
-        fromChainId,
-        toAmount: Number(debouncedAmount),
-        triggeredAt: Date.now(),
-        isCctp,
-        isExchange: Boolean(exchange),
-        requestId: undefined,
-      };
-      addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
-      const transferWithdrawContext = {
-        chainId: toChainId,
-        tokenAddress: toToken?.denom ?? undefined,
-        tokenSymbol: toToken?.symbol ?? undefined,
-        // TODO [onboarding-rewrite]: remove unused properties
-        slippage: undefined,
-        gasFee: undefined,
-        bridgeFee: Number(route?.usdAmountIn) - Number(route?.usdAmountOut),
-        exchangeRate: undefined,
-        estimatedRouteDuration: route?.estimatedRouteDurationSeconds ?? undefined,
-        toAmount: Number(route?.amountOut) ?? undefined,
-        toAmountMin: Number(route?.estimatedAmountOut) ?? undefined,
-        txHash,
-      };
-      track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
-      dd.info('Transfer withdraw submitted', transferWithdrawContext);
-    },
-    [
-      addOrUpdateTransferNotification,
-      debouncedAmount,
-      exchange,
-      fromChainId,
-      isCctp,
-      route,
-      setAmount,
-      toChainId,
-      toToken,
-    ]
-  );
   const submitCCTPWithdrawal = useCallback(
     async (notificationId: string) => {
-      if (!route || !dydxAddress || !toAddress || !toChainId || !localNobleWallet?.address) return;
+      if (
+        !route ||
+        !dydxAddress ||
+        !toAddress ||
+        !toChainId ||
+        !localNobleWallet?.address ||
+        !toToken
+      )
+        return;
       AutoSweepConfig.disable_autosweep = true;
       await skipClient.executeRoute({
         route,
         getCosmosSigner: async (chainID) => {
           if (chainID === getNobleChainId()) {
-            if (!localNobleWallet?.offlineSigner) {
+            if (!localNobleWallet.offlineSigner) {
               throw new Error('No local noblewallet offline signer. Cannot submit tx');
             }
-            return localNobleWallet?.offlineSigner;
+            return localNobleWallet.offlineSigner;
           }
           if (!localDydxWallet?.offlineSigner)
             throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-          return localDydxWallet?.offlineSigner;
+          return localDydxWallet.offlineSigner;
         },
         beforeMsg: {
           msg: JSON.stringify({
@@ -220,7 +179,7 @@ export const WithdrawForm = () => {
           }),
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
-        // TODO: think about building this dynamically
+        // TODO [onboarding-rewrite]: think about building this dynamically
         // Right now we don't need to because every withdrawal follows the same cctp route
         // dydx -> noble -> final destination
         userAddresses: [
@@ -235,8 +194,41 @@ export const WithdrawForm = () => {
           },
         ],
         onTransactionBroadcast: async ({ txHash, chainID }) => {
-          // TODO: enable transfer notifications. This does not work yet
-          if (chainID === toChainId) onSubmitComplete(txHash, notificationId);
+          // TODO [onboarding-rewrite]: enable transfer notifications. This does not work yet
+          // https://linear.app/dydx/issue/OTE-868/transfer-status-notifications
+          if (chainID === toChainId) {
+            const notificationParams = {
+              id: notificationId,
+              txHash,
+              type: TransferNotificationTypes.Withdrawal,
+              toChainId,
+              fromChainId,
+              toAmount: Number(debouncedAmount),
+              triggeredAt: Date.now(),
+              isCctp,
+              isExchange: Boolean(exchange),
+              requestId: undefined,
+            };
+            addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
+            const transferWithdrawContext = {
+              chainId: toChainId,
+              tokenAddress: toToken.denom,
+              tokenSymbol: toToken.symbol,
+              slippage: undefined,
+              // TODO [onboarding-rewrite]: connect slippage
+              bridgeFee:
+                route.usdAmountIn && route.usdAmountOut
+                  ? Number(route.usdAmountIn) - Number(route.usdAmountOut)
+                  : undefined,
+              exchangeRate: undefined,
+              estimatedRouteDuration: route.estimatedRouteDurationSeconds,
+              toAmount: route.amountOut ? Number(route.amountOut) : undefined,
+              toAmountMin: route.estimatedAmountOut ? Number(route.estimatedAmountOut) : undefined,
+              txHash,
+            };
+            track(AnalyticsEvents.TransferWithdraw(transferWithdrawContext));
+            dd.info('Transfer withdraw submitted', transferWithdrawContext);
+          }
         },
         onTransactionCompleted: async (chainID) => {
           // once the transaction in noble is complete, we can be confident that
@@ -254,18 +246,22 @@ export const WithdrawForm = () => {
       toChainId,
       localNobleWallet?.address,
       localNobleWallet?.offlineSigner,
+      toToken,
       skipClient,
       debouncedAmount,
       usdcDecimals,
       selectedDydxChainId,
       localDydxWallet?.offlineSigner,
-      onSubmitComplete,
+      fromChainId,
+      isCctp,
+      exchange,
+      addOrUpdateTransferNotification,
     ]
   );
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
-      const notificationId = crypto?.randomUUID() ?? Date.now().toString();
+      const notificationId = crypto.randomUUID();
 
       try {
         e.preventDefault();
@@ -359,7 +355,7 @@ export const WithdrawForm = () => {
 
   useEffect(() => {
     if (sourceAccount?.walletInfo?.name === WalletType.Privy) {
-      // TODO: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
+      // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
       // abacusStateManager.setTransferValue({
       //   field: TransferInputField.exchange,
       //   value: 'coinbase',
