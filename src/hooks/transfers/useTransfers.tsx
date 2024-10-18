@@ -169,6 +169,8 @@ export const useTransfers = () => {
     queryFn: async () => {
       // this should never happen since all params are required in order for the query to be enabled
       // this is mostly just to satisfy typescript
+      // fromToken.decimals needs to be checked separately since it's listed as optional in the skip types.
+      // this is because users are allowed to request assets that don't have metadata (decimals is part of metadata)
       if (!hasAllParams || !fromToken.decimals) {
         throw new Error(
           JSON.stringify({
@@ -197,7 +199,6 @@ export const useTransfers = () => {
         allowUnsafe: true,
         slippageTolerancePercent: '1',
         smartRelay: true,
-        // TODO [onboarding-rewrite]: talk to skip about this, why are decimals optional? when would that happen?
         amountIn: parseUnits(amount, fromToken.decimals).toString(),
       };
 

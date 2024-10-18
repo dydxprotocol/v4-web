@@ -32,6 +32,9 @@ const useSkipClientContext = () => {
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  // reactQuery only accepts serializable objects/values, so we return a string id
+  // so any useQuery that uses the skipClient can use that id as a query key
+  // to ensure it has the most up-to-date skipClient
   const { skipClient, skipClientId } = useMemo(
     () => ({
       skipClient: new SkipClient({
