@@ -205,7 +205,7 @@ export const NewMarketPreviewStep = ({
               state={{ isDisabled, isLoading }}
             >
               {hasAcceptedTerms
-                ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
+                ? stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })
                 : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
             </Button>
           </div>
