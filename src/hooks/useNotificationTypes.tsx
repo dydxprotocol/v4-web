@@ -236,7 +236,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished =
             (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
-            <$AssetIcon symbol="USDC" />
+            <$AssetIcon logoUrl="/currencies/usdc.png" />
           ) : (
             <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
           );
@@ -296,7 +296,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const { discoveryProgram } = useURLConfigs();
-      const { chainTokenLabel } = useTokenConfigs();
+      const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
@@ -310,7 +310,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             ReleaseUpdateNotificationIds.DiscoveryProgram,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.TITLE',
               }),
@@ -421,7 +421,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             incentivesDistributedSeasonId,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
                 params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
@@ -451,7 +451,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter, dydxAddress, status, dydxRewards]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel, dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -476,14 +476,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
       const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
       const currentDate = new Date();
-      const { chainTokenLabel } = useTokenConfigs();
+      const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
       useEffect(() => {
         if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
           trigger(
             MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
               body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
               toastSensitivity: 'foreground',
@@ -492,7 +492,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel]);
     },
     useNotificationAction: () => {
       return () => {};

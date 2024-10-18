@@ -72,7 +72,7 @@ export const TradingRewardsChart = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
   const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
   const now = useNow({ intervalMs: timeUnits.minute });
@@ -276,7 +276,7 @@ export const TradingRewardsChart = ({
               tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
                 totalTradingRewards
             ).toFixed(TOKEN_DECIMALS)}
-            <AssetIcon symbol={chainTokenLabel} />
+            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
           </$Value>
         )}
       </TimeSeriesChart>

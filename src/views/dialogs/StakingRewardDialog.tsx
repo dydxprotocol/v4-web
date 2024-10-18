@@ -159,7 +159,7 @@ export const StakingRewardDialog = ({
             />
             {usdcLabel}
           </$Pill>
-          <AssetIcon symbol="USDC" tw="text-[5rem]" />
+          <AssetIcon logoUrl="/currencies/usdc.png" tw="text-[5rem]" />
         </div>
         <h3 tw="z-[1] text-color-text-2 font-extra-bold">
           {stringGetter({ key: STRING_KEYS.YOU_EARNED })}

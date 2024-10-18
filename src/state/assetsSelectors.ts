@@ -1,7 +1,6 @@
 import { Nullable } from '@/constants/abacus';
 
 import type { RootState } from './_store';
-import { createAppSelector } from './appTypes';
 import { getCurrentMarketData } from './perpetualsSelectors';
 
 /**
@@ -26,7 +25,5 @@ export const getCurrentMarketAssetData = (state: RootState) => {
 export const getAssetData = (state: RootState, assetId: Nullable<string>) =>
   getAssets(state)?.[assetId ?? ''];
 
-export const getAssetImageUrl = createAppSelector(
-  [getAssetData],
-  (assetData) => assetData?.resources?.imageUrl
-);
+export const getAssetImageUrl = (s: RootState, assetId: Nullable<string>) =>
+  getAssetData(s, assetId)?.resources?.imageUrl;

@@ -220,8 +220,10 @@ export const useMarketsData = ({
     allPerpetualClobIds,
     allPerpetualMarkets,
     allAssets,
+    featureFlags,
+    hideUnlaunchedMarkets,
     sevenDaysSparklineData,
-    unlaunchedMarkets,
+    unlaunchedMarkets.data,
   ]);
 
   const filteredMarkets = useMemo(() => {

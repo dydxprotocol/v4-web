@@ -44,7 +44,12 @@ export const LaunchMarketSidePanel = ({
               tw="inline-block"
               type={OutputType.Asset}
               value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
-              slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
+              slotRight={
+                <AssetIcon
+                  tw="mb-[-0.125rem] ml-0.25 inline-block"
+                  logoUrl="/currencies/usdc.png"
+                />
+              }
               fractionDigits={0}
             />
           ),
@@ -96,7 +101,9 @@ export const LaunchMarketSidePanel = ({
                 tw="inline text-color-text-1"
                 type={OutputType.Asset}
                 value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
-                slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" symbol="USDC" />}
+                slotRight={
+                  <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl="/currencies/usdc.png" />
+                }
                 fractionDigits={0}
               />
             ),

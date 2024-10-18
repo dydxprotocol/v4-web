@@ -34,7 +34,7 @@ export const UnstakeFormPreviewContents = ({
   setCurrentStep,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
   const delegationsToUnstake =
     currentDelegations?.filter((delegation) =>
@@ -69,6 +69,7 @@ export const UnstakeFormPreviewContents = ({
       slotRight={
         <>
           <AssetIcon
+            logoUrl={chainTokenImage}
             symbol={chainTokenLabel}
             tw="text-[length:--icon-size] [--icon-size:2.25rem]"
           />
