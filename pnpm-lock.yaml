@@ -149,9 +149,9 @@ dependencies:
   '@scure/bip39':
     specifier: ^1.2.0
     version: 1.2.1
-  '@skip-router/core':
-    specifier: ^5.1.0
-    version: 5.1.0(@types/react@18.3.3)(chain-registry@1.69.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)
+  '@skip-go/client':
+    specifier: 0.10.3
+    version: 0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)
   '@solana/web3.js':
     specifier: ^1.93.0
     version: 1.93.2
@@ -2425,25 +2425,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@cosmjs/cosmwasm-stargate@0.32.3:
-    resolution: {integrity: sha512-pqkt+QsLIPNMTRh9m+igJgIpzXXgn1BxmxfAb9zlC23kvsuzY/12un9M7iAdim1NwKXDFeYw46xC2YkprwQp+g==}
-    dependencies:
-      '@cosmjs/amino': 0.32.4
-      '@cosmjs/crypto': 0.32.4
-      '@cosmjs/encoding': 0.32.4
-      '@cosmjs/math': 0.32.4
-      '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4
-      '@cosmjs/utils': 0.32.4
-      cosmjs-types: 0.9.0
-      pako: 2.1.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
   /@cosmjs/cosmwasm-stargate@0.32.4:
     resolution: {integrity: sha512-Fuo9BGEiB+POJ5WeRyBGuhyKR1ordvxZGLPuPosFJOH9U0gKMgcjwKMCgAlWFkMlHaTB+tNdA8AifWiHrI7VgA==}
     dependencies:
@@ -2570,12 +2551,6 @@ packages:
 
   /@cosmjs/math@0.31.3:
     resolution: {integrity: sha512-kZ2C6glA5HDb9hLz1WrftAjqdTBb3fWQsRR+Us2HsjAYdeE6M3VdXMsYCP5M3yiihal1WDwAY2U7HmfJw7Uh4A==}
-    dependencies:
-      bn.js: 5.2.1
-    dev: false
-
-  /@cosmjs/math@0.32.3:
-    resolution: {integrity: sha512-amumUtZs8hCCnV+lSBaJIiZkGabQm22QGg/IotYrhcmoOEOjt82n7hMNlNXRs7V6WLMidGrGYcswB5zcmp0Meg==}
     dependencies:
       bn.js: 5.2.1
     dev: false
@@ -3850,8 +3825,8 @@ packages:
       zod: 3.23.8
     dev: false
 
-  /@initia/initia-registry@0.1.9:
-    resolution: {integrity: sha512-zXIP9Gk0OG4SJkcrileCHJNgZU8LyHzTHdcNO5bjEoxeuvM8mvlhsGQvKeJcefBcvhvIyeX5LOlSBCTeIofngg==}
+  /@initia/initia-registry@0.1.16:
+    resolution: {integrity: sha512-zqVa+fOZXxX0AzsNqIHCYU2sWr0+JICkj5Xaq4vw4kVPSey3mveU8dUFfdCcmfH8CXSeQ34wx8v1OIwQ3Fld6A==}
     dependencies:
       '@initia/initia-registry-types': 0.0.17
     dev: false
@@ -5040,6 +5015,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.3
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -8583,27 +8559,24 @@ packages:
       '@sinonjs/commons': 3.0.1
     dev: false
 
-  /@skip-router/core@5.1.0(@types/react@18.3.3)(chain-registry@1.69.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3):
-    resolution: {integrity: sha512-js0ru+Y/taoHs27us25eqqE9kS+mE/0byOXOAt6LIomZnD6th5BGJoKFWSZ/0XGGHi69blnGnLCw8swClbKDqg==}
-    deprecated: This package is no longer actively maintained and may not receive future updates or bug fixes. Please use the now maintained and developed @skip-go/core as a replacement.
-    peerDependencies:
-      chain-registry: ^1.33.11
+  /@skip-go/client@0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3):
+    resolution: {integrity: sha512-7sA4abXuIB8bHYcM/cdUKqWOsduVq3ORrIehRGgZOJdQsztYEnsrUdqGCtN4PLuPc9VIlXhAXueejiaySAGjig==}
     dependencies:
-      '@cosmjs/amino': 0.32.3
-      '@cosmjs/cosmwasm-stargate': 0.32.3
-      '@cosmjs/encoding': 0.32.3
-      '@cosmjs/math': 0.32.3
-      '@cosmjs/proto-signing': 0.32.3
-      '@cosmjs/stargate': 0.32.3
-      '@cosmjs/tendermint-rpc': 0.32.3
-      '@initia/initia-registry': 0.1.9
+      '@cosmjs/amino': 0.32.4
+      '@cosmjs/cosmwasm-stargate': 0.32.4
+      '@cosmjs/encoding': 0.32.4
+      '@cosmjs/math': 0.32.4
+      '@cosmjs/proto-signing': 0.32.4
+      '@cosmjs/stargate': 0.32.4
+      '@cosmjs/tendermint-rpc': 0.32.4
+      '@initia/initia-registry': 0.1.16
       '@injectivelabs/core-proto-ts': 0.0.21
       '@injectivelabs/sdk-ts': 1.14.5(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
       '@keplr-wallet/unit': 0.12.121
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.3
+      chain-registry: 1.69.4
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -12569,8 +12542,8 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.3:
-    resolution: {integrity: sha512-yjKe+kDhqr25/G4N+rESr8GKCw4snaQy06dTI0FnCmQTAtxwGXdygSBRZYW7mf6Y/C5STSWE/hgOYKMAKhErpA==}
+  /chain-registry@1.69.4:
+    resolution: {integrity: sha512-+p8Nb7YNFudtUibf8aWfqmaqxBxjwQy0IU6YMeT6tV4nRy0RPOeJ/xhob826YzWzz6+Ym9kzDPfkbpBknKehgg==}
     dependencies:
       '@chain-registry/types': 0.50.1
     dev: false
@@ -17792,7 +17765,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.3
+      chain-registry: 1.69.4
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
@@ -19449,6 +19422,10 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /napi-wasm@1.1.3:
+    resolution: {integrity: sha512-h/4nMGsHjZDCYmQVNODIrYACVJ+I9KItbG+0si6W/jSjdA9JbWDoU4LLeMXVcEQGHjttI2tuXqDrbGF7qkUHHg==}
+    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
