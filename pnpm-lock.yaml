@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.13.0
-    version: 1.13.0
+    specifier: 1.13.2
+    version: 1.13.2
   '@dydxprotocol/v4-client-js':
     specifier: 1.11.1
     version: 1.11.1
@@ -2800,8 +2800,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.13.0:
-    resolution: {integrity: sha512-cZQ0VttLnydxOingtoFgMSp4qAlVbLJ3W2NsF7lP0vFT9kgIXvDBjBhH2B6wqvWMrthYaq3Yz7S4uB5flXkw/g==}
+  /@dydxprotocol/v4-abacus@1.13.2:
+    resolution: {integrity: sha512-+B44zHpwn4K9N3lXCc39JSWGiWzxewOeTlSNteUOm2MWeXxAPSCu2k+eUzoN2nnWsSrlxmALH67j6CPUPp0qGA==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -5277,6 +5277,7 @@ packages:
     resolution: {integrity: sha512-x4BEjr2SjOPowNeiguzjozQbsc6h437ovD/wu+JpaenxVLm3jkgzHY2xOslMTp50HoTvQreMjiexiGQw1sqZlQ==}
     engines: {node: '>=16.3.0'}
     hasBin: true
+    requiresBuild: true
     peerDependencies:
       typescript: '>= 4.7.4'
     peerDependenciesMeta:
@@ -20715,6 +20716,7 @@ packages:
   /puppeteer-core@20.9.0(typescript@5.5.3):
     resolution: {integrity: sha512-H9fYZQzMTRrkboEfPmf7m3CLDN6JvbxXA3qTtS+dFt27tR+CsFHzPsT6pzp6lYL6bJbAPaR0HaPO6uSi+F94Pg==}
     engines: {node: '>=16.3.0'}
+    requiresBuild: true
     peerDependencies:
       typescript: '>= 4.7.4'
     peerDependenciesMeta:

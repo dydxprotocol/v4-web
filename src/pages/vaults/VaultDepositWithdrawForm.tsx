@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { IndexedTx } from '@cosmjs/stargate';
+import BigNumber from 'bignumber.js';
 import { NumberFormatValues } from 'react-number-format';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -382,6 +383,7 @@ export const VaultDepositWithdrawForm = ({
   const freeCollateralDiff = (
     <DiffOutput
       type={OutputType.Fiat}
+      roundingMode={BigNumber.ROUND_FLOOR}
       value={freeCollateral?.current}
       newValue={freeCollateralUpdated}
       sign={getNumberSign(
@@ -401,6 +403,7 @@ export const VaultDepositWithdrawForm = ({
   const vaultDiff = (
     <DiffOutput
       type={OutputType.Fiat}
+      roundingMode={BigNumber.ROUND_FLOOR}
       value={userBalance}
       newValue={userBalanceUpdated}
       sign={getNumberSign(
@@ -416,6 +419,7 @@ export const VaultDepositWithdrawForm = ({
   const availableToWithdrawDiff = (
     <DiffOutput
       type={OutputType.Fiat}
+      roundingMode={BigNumber.ROUND_FLOOR}
       value={userAvailableBalance}
       newValue={userAvailableUpdated}
       sign={getNumberSign(
@@ -512,7 +516,13 @@ export const VaultDepositWithdrawForm = ({
               key: 'est amount',
               tooltip: 'vault-estimated-amount',
               label: stringGetter({ key: STRING_KEYS.ESTIMATED_AMOUNT_RECEIVED }),
-              value: <Output type={OutputType.Fiat} value={estimatedWithdrawalAmount} />,
+              value: (
+                <Output
+                  type={OutputType.Fiat}
+                  roundingMode={BigNumber.ROUND_FLOOR}
+                  value={estimatedWithdrawalAmount}
+                />
+              ),
             },
           ] satisfies DetailsItem[],
           transactionTarget: {
