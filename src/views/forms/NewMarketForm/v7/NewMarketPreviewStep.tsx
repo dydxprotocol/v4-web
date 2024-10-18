@@ -96,7 +96,7 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" symbol="USDC" />
+          <AssetIcon tw="h-2 w-2" logoUrl="/currencies/usdc.png" />
           <Output useGrouping type={OutputType.Fiat} value={10_000} />
         </div>
       </div>

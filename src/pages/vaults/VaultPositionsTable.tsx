@@ -56,6 +56,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+
+            // Rely on logoUrl="/currencies/usdc.png" for the USDC market and pass undefined for logoUrl
             const logoUrl =
               marketId === USDC_MARKET_HARDCODED ? undefined : asset?.resources?.imageUrl;
 

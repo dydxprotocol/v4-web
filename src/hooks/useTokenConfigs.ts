@@ -25,6 +25,7 @@ export const useTokenConfigs = (): {
   usdcLabel: string;
   chainTokenDenom: string;
   chainTokenDecimals: number;
+  chainTokenImage: string;
   chainTokenLabel: string;
 } => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -38,6 +39,7 @@ export const useTokenConfigs = (): {
     usdcLabel: tokensConfigs[DydxChainAsset.USDC].name,
     chainTokenDenom: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
     chainTokenDecimals: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,
+    chainTokenImage: tokensConfigs[DydxChainAsset.CHAINTOKEN].image,
     chainTokenLabel: tokensConfigs[DydxChainAsset.CHAINTOKEN].name,
   };
 };
