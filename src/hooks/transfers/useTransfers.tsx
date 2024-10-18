@@ -14,8 +14,6 @@ import {
   OSMO_BECH32_PREFIX,
 } from '@/constants/graz';
 import {
-  getDefaultChainIDFromNetworkType,
-  getDefaultTokenDenomFromAssets,
   getNetworkTypeFromWalletNetworkType,
   SWAP_VENUES,
   TransferType,
@@ -26,7 +24,11 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { convertBech32Address } from '@/lib/addressUtils';
-import { isNativeDenom } from '@/lib/assetUtils';
+import {
+  getDefaultChainIDFromNetworkType,
+  getDefaultTokenDenomFromAssets,
+  isNativeDenom,
+} from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from '../useAccounts';
