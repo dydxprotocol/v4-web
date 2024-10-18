@@ -23,7 +23,7 @@ import { isOrderStatusClearable } from '@/lib/orders';
 import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
-g  orderId: string;
+  orderId: string;
   orderFlags: Nullable<number>;
   status: OrderStatus;
   isDisabled?: boolean;
