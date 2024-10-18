@@ -450,32 +450,32 @@ const AssetActions = memo(
     stringGetter: StringGetterFunction;
   }) => (
     <div tw="inlineRow">
-      {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
+      {[
+        withOnboarding &&
+          complianceState === ComplianceStates.FULL_ACCESS && {
+            dialog: DialogTypes.Deposit(),
+            iconName: IconName.Deposit,
+            tooltipStringKey: STRING_KEYS.DEPOSIT,
+          },
+        withOnboarding &&
+          hasBalance && {
+            dialog: DialogTypes.Withdraw(),
+            iconName: IconName.Withdraw,
+            tooltipStringKey: STRING_KEYS.WITHDRAW,
+          },
+        hasBalance &&
+          complianceState === ComplianceStates.FULL_ACCESS && {
+            dialog: DialogTypes.Transfer({ selectedAsset: asset }),
+            iconName: IconName.Send,
+            tooltipStringKey: STRING_KEYS.TRANSFER,
+          },
+      ]
+        .filter(isTruthy)
+        .map(({ iconName, tooltipStringKey, dialog }) => (
+          <Item key={tooltipStringKey}>
+            {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
           In general, any CTA in a dropdown should be wrapped in an Item tag
        */}
-      <Item>
-        {[
-          withOnboarding &&
-            complianceState === ComplianceStates.FULL_ACCESS && {
-              dialog: DialogTypes.Deposit(),
-              iconName: IconName.Deposit,
-              tooltipStringKey: STRING_KEYS.DEPOSIT,
-            },
-          withOnboarding &&
-            hasBalance && {
-              dialog: DialogTypes.Withdraw(),
-              iconName: IconName.Withdraw,
-              tooltipStringKey: STRING_KEYS.WITHDRAW,
-            },
-          hasBalance &&
-            complianceState === ComplianceStates.FULL_ACCESS && {
-              dialog: DialogTypes.Transfer({ selectedAsset: asset }),
-              iconName: IconName.Send,
-              tooltipStringKey: STRING_KEYS.TRANSFER,
-            },
-        ]
-          .filter(isTruthy)
-          .map(({ iconName, tooltipStringKey, dialog }) => (
             <WithTooltip
               key={tooltipStringKey}
               tooltipString={stringGetter({ key: tooltipStringKey })}
@@ -489,8 +489,8 @@ const AssetActions = memo(
                 onClick={() => dispatch(openDialog(dialog))}
               />
             </WithTooltip>
-          ))}
-      </Item>
+          </Item>
+        ))}
     </div>
   )
 );
