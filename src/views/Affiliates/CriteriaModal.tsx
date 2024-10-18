@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import {
+  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
+  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
+} from '@/constants/affiliates';
 import { CriteriaModalProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -12,6 +16,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
@@ -112,14 +117,22 @@ export const CriteriaModal = ({
               : stringGetter({
                   key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
                   params: {
-                    VIP_VALUE: <span className="text-color-text-1">{'{VIP Value}'}</span>,
-                    REGULAR_VALUE: <span className="text-color-text-1">{'{Regular Value}'}</span>,
+                    VIP_VALUE: (
+                      <span className="text-color-text-1">
+                        ${DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
+                      </span>
+                    ),
+                    REGULAR_VALUE: (
+                      <span className="text-color-text-1">
+                        ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
+                      </span>
+                    ),
                     APPLY_HERE: (
-                      <a href={affiliateProgram}>
+                      <Link isInline href={affiliateProgram}>
                         <span className="text-color-accent">
                           {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                         </span>
-                      </a>
+                      </Link>
                     ),
                   },
                 })}
@@ -158,6 +171,7 @@ const CriteriaTable = ({
   tiers: ITierDefinition[];
 }) => {
   const stringGetter = useStringGetter();
+  const { affiliateProgram } = useURLConfigs();
 
   const columns: ColumnDef<ITierDefinition>[] = [
     {
@@ -182,7 +196,7 @@ const CriteriaTable = ({
       allowsSorting: false,
 
       renderCell: ({ tier, requirements }) =>
-        tier === 'vip' ? (
+        tier === 'vip' && userTier !== 'vip' ? (
           <$TableCell>
             <Tag className="bg-color-layer-5 p-0.5 text-small text-color-text-1">
               <div className="flex flex-col gap-x-0.25 notTablet:flex-row">
@@ -190,15 +204,24 @@ const CriteriaTable = ({
                   key: STRING_KEYS.BY_APPLICATION_ONLY,
                 })}
                 <div className="flex flex-row">
-                  <a href="https://dydx-affiliates.fuul.xyz/">
+                  <Link href={affiliateProgram}>
                     <span className="capitalize text-color-accent">
                       {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                     </span>
-                  </a>
+                  </Link>
                   !
                 </div>
               </div>
             </Tag>
+          </$TableCell>
+        ) : tier === 'vip' && userTier == 'vip' ? (
+          <$TableCell className="text-color-text-2">
+            {stringGetter({
+              key: STRING_KEYS.YOURE_A_VIP,
+              params: {
+                VIP: <>{stringGetter({ key: STRING_KEYS.VIP })}!</>,
+              },
+            })}
           </$TableCell>
         ) : !requirements.referredVol && !requirements.staked ? (
           <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>

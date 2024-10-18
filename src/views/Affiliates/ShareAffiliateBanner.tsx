@@ -1,7 +1,11 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { IAffiliateStats } from '@/constants/affiliates';
+import {
+  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
+  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
+  IAffiliateStats,
+} from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -27,8 +31,16 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
           key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
           params: {
             AMOUNT_DISCOUNT: 550,
-            VIP_AMOUNT_USD: <span className="text-color-text-1">{'{VIP Value}'}</span>,
-            AMOUNT_PER_MONTH: <span className="text-color-text-1">{'{Value}'}</span>,
+            VIP_AMOUNT_USD: (
+              <span className="text-color-text-1">
+                {DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
+              </span>
+            ),
+            AMOUNT_PER_MONTH: (
+              <span className="text-color-text-1">
+                {DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
+              </span>
+            ),
           },
         })}
       </div>

@@ -47,6 +47,7 @@ export interface LinksConfigs {
   deployerTermsAndConditions?: string;
   dydxLearnMore?: string;
   affiliateProgram?: string;
+  supportEmail?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -97,5 +98,6 @@ export const useURLConfigs = (): LinksConfigs => {
     deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
     dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
     affiliateProgram: linksConfigs.affiliateProgram,
+    supportEmail: linksConfigs.supportEmail,
   };
 };

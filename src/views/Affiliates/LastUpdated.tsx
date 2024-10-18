@@ -74,6 +74,10 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
 
     const days = Math.floor(diffInSeconds / 86400);
 
+    if (days == 1) {
+      return stringGetter({ key: STRING_KEYS['1_DAY_AGO'] });
+    }
+
     return stringGetter({
       key: STRING_KEYS.X_DAY_AGO,
       params: {

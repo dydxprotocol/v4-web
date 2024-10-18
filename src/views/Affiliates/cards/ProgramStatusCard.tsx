@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -36,7 +37,7 @@ export const ProgramStatusCard = ({
   isVip = false,
 }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgram } = useURLConfigs();
+  const { affiliateProgram, community, supportEmail } = useURLConfigs();
 
   const title: ReactNode = isVip
     ? stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE_VIP })
@@ -56,7 +57,11 @@ export const ProgramStatusCard = ({
       {stringGetter({
         key: STRING_KEYS.PROGRAM_CARD_BODY,
         params: {
-          VIP_VALUE: <span className="text-color-text-2">{'{VIP Value}'}</span>,
+          VIP_VALUE: (
+            <span className="text-color-text-2">
+              {DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
+            </span>
+          ),
         },
       })}
     </p>
@@ -90,9 +95,26 @@ export const ProgramStatusCard = ({
               {buttonText}
             </Button>
           ) : (
-            <Button className="w-full" action={ButtonAction.Base}>
-              {buttonText}
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                className="w-full"
+                action={ButtonAction.Base}
+                onClick={() => {
+                  window.open(`mailto:${supportEmail}`, '_blank');
+                }}
+              >
+                {buttonText}
+              </Button>
+              <Button
+                className="w-full"
+                action={ButtonAction.Base}
+                onClick={() => {
+                  window.open(community, '_blank');
+                }}
+              >
+                {stringGetter({ key: STRING_KEYS.JOIN_DISCORD })}
+              </Button>
+            </div>
           )}
         </div>
       )}

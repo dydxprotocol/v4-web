@@ -11,6 +11,7 @@ export const DEFAULT_MAX_AFFILIATE_SHARE = 0.15;
 
 export interface IAffiliateStats {
   rank: number;
+  code: string;
   account: string;
   referredFees: number;
   referredVolume: number;

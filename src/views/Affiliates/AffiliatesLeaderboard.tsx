@@ -26,8 +26,6 @@ import { Toolbar } from '@/components/Toolbar';
 
 enum AffiliateEpochsFilter {
   ALL = 'all',
-  EPOCH_1 = 'Epoch 1',
-  EPOCH_2 = 'Epoch 2',
 }
 
 export const AFFILIATE_FILTERS_OPTIONS: Record<
@@ -37,13 +35,7 @@ export const AFFILIATE_FILTERS_OPTIONS: Record<
   }
 > = {
   [AffiliateEpochsFilter.ALL]: {
-    label: STRING_KEYS.ALL,
-  },
-  [AffiliateEpochsFilter.EPOCH_1]: {
-    // label: 'APP.GENERAL.EPOCH_1',
-  },
-  [AffiliateEpochsFilter.EPOCH_2]: {
-    // label: 'APP.GENERAL.EPOCH_2',
+    label: STRING_KEYS.ALL_TIME,
   },
 };
 
@@ -123,7 +115,7 @@ export const AffiliatesLeaderboard = ({
           label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
           allowsSorting: false,
 
-          renderCell: ({ account }) => `${account.slice(0, 8)}...${account.slice(-5)}`,
+          renderCell: ({ code }) => <$AccountOutput type={OutputType.Text} value={code} />,
         },
         {
           columnKey: 'total-earnings',
@@ -138,7 +130,7 @@ export const AffiliatesLeaderboard = ({
                   value={totalEarnings}
                   slotRight={
                     <span className="ml-0.25 text-color-text-2">
-                      {stringGetter({ key: STRING_KEYS.EARNINGS })}
+                      {stringGetter({ key: STRING_KEYS.EARNINGS }).toLocaleLowerCase()}
                     </span>
                   }
                 />
@@ -157,7 +149,7 @@ export const AffiliatesLeaderboard = ({
           label: stringGetter({ key: STRING_KEYS.RANK }),
           allowsSorting: false,
           renderCell: ({ rank, account }) => (
-            <TableCell className="align-center flex text-color-text-1 font-medium-book">
+            <TableCell className="align-center flex text-color-text-1 font-base-medium">
               {rank}
               {accountStats?.account && account === accountStats.account && (
                 <Tag className="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
@@ -170,13 +162,7 @@ export const AffiliatesLeaderboard = ({
           label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
           allowsSorting: false,
 
-          renderCell: ({ account }) => (
-            <$DesktopOutput
-              type={OutputType.Text}
-              // value={`${account.slice(0, 8)}...${account.slice(-5)}`}
-              value={account}
-            />
-          ),
+          renderCell: ({ code }) => <$AccountOutput type={OutputType.Text} value={code} />,
         },
         {
           columnKey: 'total-earnings',
@@ -260,17 +246,8 @@ const $Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;
   margin-bottom: 0.625rem;
-  padding-left: 0.375rem;
-  padding-right: 0;
-
-  @media ${breakpoints.desktopSmall} {
-    padding-right: 0.375rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+  padding-left: 1rem;
+  padding-right: 1rem;
 `;
 
 const $Table = styled(Table)<AllTableProps<any>>`
@@ -281,7 +258,7 @@ const $Table = styled(Table)<AllTableProps<any>>`
   }
 `;
 
-const $DesktopOutput = tw(Output)`font-medium-book text-color-text-1`;
+const $AccountOutput = tw(Output)`font-base-medium text-color-text-1`;
 
 const $NumberOutput = tw(Output)`font-base-medium text-color-text-1`;
 
@@ -297,14 +274,14 @@ const $AffiliatesFilter = styled.div<{ $compactLayout: boolean }>`
   gap: 0.75rem;
   flex: 1;
   overflow: hidden;
-
+  padding: 0;
   ${({ $compactLayout }) =>
     $compactLayout &&
     css`
       @media ${breakpoints.mobile} {
         flex-direction: column;
       }
-    `}
+    `};
 `;
 
 const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
