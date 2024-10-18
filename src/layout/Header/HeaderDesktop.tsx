@@ -83,21 +83,6 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        ...(showLaunchMarkets
-          ? [
-              {
-                value: 'LAUNCH_MARKET',
-                label: stringGetter({ key: STRING_KEYS.LAUNCH_MARKETS }),
-                href: AppRoute.LaunchMarket,
-              },
-              // TODO (@jaredvu): Remove this after adding updated markets-table
-              {
-                value: 'TEST_MARKET',
-                label: 'TIME-USD',
-                href: '/trade/TIME,RAYDIUM,ED5WBEYAYTLM4WRGNOHPXJEWNIAIKEFIOVMJYZH6K31M-USD?pml=true',
-              },
-            ]
-          : []),
         showVaults && {
           value: 'VAULT',
           label: (
@@ -178,14 +163,14 @@ export const HeaderDesktop = () => {
   ];
 
   return (
-    <$Header uiRefreshEnabled={uiRefreshEnabled}>
+    <$Header $uiRefreshEnabled={uiRefreshEnabled}>
       <$LogoLink to="/">
         <LogoShortIcon />
       </$LogoLink>
 
       <VerticalSeparator />
 
-      <$NavBefore uiRefreshEnabled={uiRefreshEnabled}>
+      <$NavBefore $uiRefreshEnabled={uiRefreshEnabled}>
         <LanguageSelector sideOffset={16} />
         <VerticalSeparator />
         <NetworkSelectMenu sideOffset={16} />
@@ -252,7 +237,7 @@ export const HeaderDesktop = () => {
   );
 };
 const $Header = styled.header<{
-  uiRefreshEnabled: boolean;
+  $uiRefreshEnabled: boolean;
 }>`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
@@ -270,8 +255,8 @@ const $Header = styled.header<{
   display: grid;
   align-items: stretch;
   grid-auto-flow: column;
-  grid-template: ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled
+  grid-template: ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled
       ? css`'Logo . NavBefore . Nav . NavAfter' 100%
       / var(--logo-width) var(--border-width) auto
       var(--border-width) 1fr var(--border-width) auto`
@@ -317,10 +302,10 @@ const $NavigationMenu = styled(NavigationMenu)`
 ` as typeof NavigationMenu;
 
 const $NavBefore = styled.div<{
-  uiRefreshEnabled: boolean;
+  $uiRefreshEnabled: boolean;
 }>`
-  ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled
+  ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled
       ? css`
           ${layoutMixins.row}
         `

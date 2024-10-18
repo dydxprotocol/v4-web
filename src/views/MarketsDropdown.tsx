@@ -75,7 +75,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <$AssetIcon uiRefreshEnabled={uiRefresh} symbol={assetId} />
+              <$AssetIcon $uiRefreshEnabled={uiRefresh} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 <Output
@@ -310,14 +310,14 @@ export const MarketsDropdown = memo(
 
     return (
       <$Popover
-        uiRefreshEnabled={uiRefreshEnabled}
+        $uiRefreshEnabled={uiRefreshEnabled}
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
           <>
             {triggerBackground}
-            <$TriggerContainer $isOpen={isOpen} uiRefreshEnabled={uiRefreshEnabled}>
+            <$TriggerContainer $isOpen={isOpen} $uiRefreshEnabled={uiRefreshEnabled}>
               {!uiRefreshEnabled && isOpen ? (
                 <h2 tw="text-color-text-2 font-medium-medium">
                   {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
@@ -343,7 +343,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <$AssetIcon symbol={symbol} uiRefreshEnabled={uiRefreshEnabled} />
+                      <$AssetIcon symbol={symbol} $uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}
@@ -392,7 +392,7 @@ const $MarketName = styled.div<{ isFavorited: boolean }>`
     `}
 `;
 
-const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boolean }>`
+const $TriggerContainer = styled.div<{ $isOpen: boolean; $uiRefreshEnabled: boolean }>`
   position: relative;
 
   ${layoutMixins.spacedRow}
@@ -400,8 +400,8 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boole
 
   transition: width 0.1s;
 
-  ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled
+  ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled
       ? css`
           gap: 1rem;
         `
@@ -411,10 +411,10 @@ const $TriggerContainer = styled.div<{ $isOpen: boolean; uiRefreshEnabled: boole
   `}
 `;
 
-const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
+const $Popover = styled(Popover)<{ $uiRefreshEnabled: boolean }>`
   ${popoverMixins.popover}
-  --popover-item-height: ${({ uiRefreshEnabled }) =>
-    uiRefreshEnabled ? css`2.75rem` : css`3.375rem`};
+  --popover-item-height: ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled ? css`2.75rem` : css`3.375rem`};
 
   --popover-backgroundColor: var(--color-layer-2);
   display: flex;
@@ -424,8 +424,8 @@ const $Popover = styled(Popover)<{ uiRefreshEnabled: boolean }>`
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
 
-  ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled
+  ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled
       ? css`
           width: var(--marketsDropdown-openWidth);
         `
@@ -483,9 +483,9 @@ const $MarketDropdownBanner = styled.div`
   }
 `;
 
-const $AssetIcon = styled(AssetIcon)<{ uiRefreshEnabled: boolean }>`
-  ${({ uiRefreshEnabled }) => css`
-    ${uiRefreshEnabled &&
+const $AssetIcon = styled(AssetIcon)<{ $uiRefreshEnabled: boolean }>`
+  ${({ $uiRefreshEnabled }) => css`
+    ${$uiRefreshEnabled &&
     css`
       --asset-icon-size: 1.5em;
     `}

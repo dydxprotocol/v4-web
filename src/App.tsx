@@ -46,7 +46,6 @@ import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
-import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -208,7 +207,6 @@ const providers = [
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
-  wrapProvider(SkipProvider),
 ];
 
 const App = () => {

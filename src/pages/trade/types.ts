@@ -12,3 +12,8 @@ export function marketTypeMatchesFilter(type: 'Isolated' | 'Cross', filter?: Mar
     (type === 'Cross' && filter === MarketTypeFilter.Cross)
   );
 }
+
+export enum PanelView {
+  AllMarkets = 'AllMarkets',
+  CurrentMarket = 'CurrentMarket',
+}
