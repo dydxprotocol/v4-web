@@ -53,6 +53,7 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch } from './state/appTypes';
 import { openDialog } from './state/dialogs';
@@ -115,6 +116,8 @@ const Content = () => {
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
+              <Route path={`${AppRoute.Affiliates}/*`} element={<AffiliatesPage />} />
+
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />
