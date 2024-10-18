@@ -167,9 +167,27 @@ export const useTransfers = () => {
       selectedDydxChainId,
     ],
     queryFn: async () => {
-      // this should never happen, this is just to satisfy typescript
-      // react queries should never return null.
-      if (!hasAllParams || !fromToken.decimals) return null;
+      // this should never happen since all params are required in order for the query to be enabled
+      // this is mostly just to satisfy typescript
+      if (!hasAllParams || !fromToken.decimals) {
+        throw new Error(
+          JSON.stringify({
+            message: 'Error! Missing at least one required param for requesting transfer route',
+            params: {
+              fromToken,
+              toToken,
+              fromChainId,
+              toChainId,
+              fromAddress,
+              toAddress,
+              transferType,
+              debouncedAmount,
+              dydxAddress,
+              selectedDydxChainId,
+            },
+          })
+        );
+      }
 
       const baseParams = {
         sourceAssetDenom: fromToken.denom,
