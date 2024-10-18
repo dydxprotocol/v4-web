@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { Chain, MsgsDirectRequest, SkipClient } from '@skip-go/client';
+import { Chain, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
@@ -215,7 +215,7 @@ export const useTransfers = () => {
       if (isTokenCctp(fromToken)) {
         // CCTP Deposits
         return skipClient.msgsDirect({
-          ...(baseParams as MsgsDirectRequest),
+          ...baseParams,
           chainIdsToAddresses: {
             [fromToken.chainID]: fromAddress,
             [toToken.chainID]: dydxAddress,
@@ -224,7 +224,7 @@ export const useTransfers = () => {
         });
       }
       return skipClient.msgsDirect({
-        ...(baseParams as MsgsDirectRequest),
+        ...baseParams,
         chainIdsToAddresses: {
           [fromToken.chainID]: fromAddress,
           [toToken.chainID]: dydxAddress,
