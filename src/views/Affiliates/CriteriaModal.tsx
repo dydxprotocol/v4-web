@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { IAffiliateStats } from '@/constants/affiliates';
+import { CriteriaModalProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -27,18 +27,12 @@ interface ITierDefinition {
 }
 
 export const CriteriaModal = ({
-  isCriteriaVisible,
+  setIsOpen,
   accountStats,
-  toggleCriteria,
+  // toggleCriteria,
   stakedAmount,
   userTier,
-}: {
-  isCriteriaVisible: boolean;
-  toggleCriteria: () => void;
-  accountStats?: IAffiliateStats;
-  stakedAmount?: string;
-  userTier: number | 'vip';
-}) => {
+}: DialogProps<CriteriaModalProps>) => {
   const { isConnectedWagmi } = useWalletConnection();
   const { affiliateProgram } = useURLConfigs();
 
@@ -79,8 +73,8 @@ export const CriteriaModal = ({
 
   return (
     <$Dialog
-      isOpen={isCriteriaVisible}
-      setIsOpen={toggleCriteria}
+      isOpen
+      {...{ setIsOpen }}
       placement={DialogPlacement.Default}
       title={
         !isConnectedWagmi

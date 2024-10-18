@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { IAffiliateStats } from '@/constants/affiliates';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -12,7 +13,9 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 
-import { CriteriaModal } from '../CriteriaModal';
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
+
 import { BorderStatCell, StatCell } from '../StatBox';
 
 const MobileView = ({
@@ -115,7 +118,16 @@ const DesktopView = ({
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
-          <Link isInline href="#" ref={linkRef} onClick={toggleCriteria}>
+          <Link
+            isInline
+            href="#"
+            ref={linkRef}
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleCriteria();
+            }}
+          >
             <p className="text-base text-color-accent">
               {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })}
             </p>
@@ -183,11 +195,19 @@ export const AffiliateStatsCard = ({
   stakedDydx,
   currentAffiliateTier,
 }: IAffiliateStatsProps) => {
-  const [isCriteriaVisible, setIsCriteriaVisible] = useState(false);
   const { isNotTablet } = useBreakpoints();
+  const dispatch = useAppDispatch();
 
   const toggleCriteria = () => {
-    setIsCriteriaVisible(!isCriteriaVisible);
+    dispatch(
+      openDialog(
+        DialogTypes.Criteria({
+          userTier: isVip ? 'vip' : currentAffiliateTier ?? 0,
+          accountStats,
+          stakedAmount: stakedDydx,
+        })
+      )
+    );
   };
 
   return (
@@ -204,16 +224,6 @@ export const AffiliateStatsCard = ({
           accountStats={accountStats}
           currentAffiliateTier={currentAffiliateTier}
           isVip={isVip}
-          toggleCriteria={toggleCriteria}
-        />
-      )}
-
-      {isCriteriaVisible && (
-        <CriteriaModal
-          userTier={isVip ? 'vip' : currentAffiliateTier ?? 0}
-          accountStats={accountStats}
-          isCriteriaVisible={isCriteriaVisible}
-          stakedAmount={stakedDydx}
           toggleCriteria={toggleCriteria}
         />
       )}
