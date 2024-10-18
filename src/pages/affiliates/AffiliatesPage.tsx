@@ -1,6 +1,6 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { IAffiliateStats, IProgramStats } from '@/constants/affiliates';
@@ -37,9 +37,17 @@ export const AffiliatesPage: React.FC = () => {
   const { data: programStats } = programStatsQuery;
   const { data: affiliateMetadata } = affiliateMetadataQuery;
 
+  const location = useLocation();
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    if (currentPath.includes(AffiliateRoute.ProgramStats)) {
+      setCurrTab(AffiliateRoute.ProgramStats);
+    }
+  }, []);
 
   const userStatus = {
     isAffiliate: affiliateMetadata?.metadata?.isAffiliate ?? false,
