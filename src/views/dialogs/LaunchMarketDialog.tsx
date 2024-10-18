@@ -63,13 +63,7 @@ export const LaunchMarketDialog = ({
             params: {
               NUM_DAYS: <span tw="text-color-text-1">30</span>,
               PAST_DAYS: 30,
-              APR_PERCENTAGE: (
-                <Output
-                  type={OutputType.Percent}
-                  tw="inline-block text-color-success"
-                  value={0.3456}
-                />
-              ),
+              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
             },
           }),
         };
