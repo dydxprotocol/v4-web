@@ -41,13 +41,12 @@ export const StakingRewardDialog = ({
   validators,
 }: DialogProps<StakingRewardDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { usdcLabel, usdcDecimals } = useTokenConfigs();
+  const { usdcImage, usdcLabel, usdcDecimals } = useTokenConfigs();
 
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
-
   const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);
@@ -159,7 +158,7 @@ export const StakingRewardDialog = ({
             />
             {usdcLabel}
           </$Pill>
-          <AssetIcon logoUrl="/currencies/usdc.png" tw="text-[5rem]" />
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="text-[5rem]" />
         </div>
         <h3 tw="z-[1] text-color-text-2 font-extra-bold">
           {stringGetter({ key: STRING_KEYS.YOU_EARNED })}

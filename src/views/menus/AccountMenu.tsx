@@ -71,7 +71,7 @@ export const AccountMenu = () => {
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
-  const { usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
+  const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
   const {
@@ -203,7 +203,7 @@ export const AccountMenu = () => {
                         key: STRING_KEYS.WALLET_BALANCE,
                         params: { ASSET: usdcLabel },
                       })}
-                      <AssetIcon logoUrl="/currencies/usdc.png" />
+                      <AssetIcon logoUrl={usdcImage} symbol="USDC" />
                     </$label>
                     <$BalanceOutput
                       type={OutputType.Asset}
@@ -220,7 +220,7 @@ export const AccountMenu = () => {
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: usdcLabel },
                     })}
-                    <AssetIcon logoUrl="/currencies/usdc.png" />
+                    <AssetIcon logoUrl={usdcImage} symbol="USDC" />
                   </$label>
                   <$BalanceOutput
                     type={OutputType.Asset}

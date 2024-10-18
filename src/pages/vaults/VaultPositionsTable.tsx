@@ -10,6 +10,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
@@ -38,6 +39,7 @@ const USDC_MARKET_HARDCODED = 'USDC-USD';
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const { usdcImage } = useTokenConfigs();
 
   const vaultsDataRaw = useLoadedVaultPositions();
   const vaultsData = useMemo(
@@ -57,9 +59,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
 
-            // Rely on logoUrl="/currencies/usdc.png" for the USDC market and pass undefined for logoUrl
             const logoUrl =
-              marketId === USDC_MARKET_HARDCODED ? undefined : asset?.resources?.imageUrl;
+              marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
 
             return (
               // eslint-disable-next-line jsx-a11y/interactive-supports-focus
@@ -185,7 +186,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter]
+    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter, usdcImage]
   );
 
   return (

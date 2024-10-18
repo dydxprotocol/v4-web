@@ -216,6 +216,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
       const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+      const { usdcImage } = useTokenConfigs();
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
@@ -236,7 +237,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished =
             (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
-            <$AssetIcon logoUrl="/currencies/usdc.png" />
+            <$AssetIcon logoUrl={usdcImage} symbol="USDC" />
           ) : (
             <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
           );
@@ -286,7 +287,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter, selectedDydxChainId]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId, usdcImage]);
     },
     useNotificationAction: () => {
       return () => {};
