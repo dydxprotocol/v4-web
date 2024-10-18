@@ -57,7 +57,7 @@ const DUMMY_TX_HASH = 'withdraw_dummy_tx_hash';
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { dydxAddress, sourceAccount, localDydxWallet, localNobleWallet } = useAccounts();
@@ -89,6 +89,7 @@ export const WithdrawForm = () => {
     txs,
     toToken,
     chainsForNetwork,
+    routeLoading,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
@@ -270,7 +271,7 @@ export const WithdrawForm = () => {
           throw new Error('Invalid request payload');
         }
 
-        setIsLoading(true);
+        setIsSubmitting(true);
         setError(undefined);
 
         const screenResults = await screenAddresses({
@@ -318,7 +319,7 @@ export const WithdrawForm = () => {
           status: { error: stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }) },
         });
       } finally {
-        setIsLoading(false);
+        setIsSubmitting(false);
       }
     },
     [
@@ -392,7 +393,7 @@ export const WithdrawForm = () => {
     (!toChainId && !exchange) ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
-    isLoading ||
+    isSubmitting ||
     !isValidDestinationAddress;
 
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -406,7 +407,7 @@ export const WithdrawForm = () => {
           withdrawToken={toToken}
           route={route}
           isDisabled={isDisabled}
-          isLoading={isLoading}
+          isLoading={isSubmitting}
         />
 
         <button type="button" onClick={() => setIsPreviewing(false)}>
@@ -452,7 +453,7 @@ export const WithdrawForm = () => {
           <FormMaxInputToggleButton
             size={ButtonSize.XSmall}
             isInputEmpty={false}
-            isLoading={isLoading}
+            isLoading={isSubmitting}
             onPressedChange={() => setToAddress('')}
           />
         }
@@ -473,7 +474,7 @@ export const WithdrawForm = () => {
           <FormMaxInputToggleButton
             size={ButtonSize.XSmall}
             isInputEmpty={debouncedAmount === ''}
-            isLoading={isLoading}
+            isLoading={isSubmitting}
             onPressedChange={(isPressed: boolean) => (isPressed ? onClickMax() : setAmount(''))}
           />
         }
@@ -500,7 +501,7 @@ export const WithdrawForm = () => {
           action={ButtonAction.Primary}
           state={{
             isDisabled,
-            isLoading,
+            isLoading: routeLoading || isSubmitting,
           }}
           onClick={() => setIsPreviewing(true)}
         >
