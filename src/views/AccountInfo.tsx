@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -23,6 +24,8 @@ type StyleProps = {
 
 export const AccountInfo: React.FC = ({ className }: StyleProps) => {
   const stringGetter = useStringGetter();
+  const { isTablet } = useBreakpoints();
+
   const onboardingState = useAppSelector(getOnboardingState);
   const canViewAccountInfo = useAppSelector(calculateCanViewAccount);
 
@@ -34,7 +37,9 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
       showAccountInfo={canViewAccountInfo}
       $uiRefreshEnabled={uiRefresh}
     >
-      {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo || uiRefresh ? (
+      {onboardingState === OnboardingState.AccountConnected ||
+      canViewAccountInfo ||
+      (uiRefresh && !isTablet) ? (
         <AccountInfoSection />
       ) : (
         <$DisconnectedAccountInfoContainer>

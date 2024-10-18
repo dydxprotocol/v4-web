@@ -67,14 +67,14 @@ export const AccountInfoSection = () => {
   const portfolioValue = subAccount?.equity;
 
   const isPostOrderBalanceNegative =
-    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance?.postOrder).lt(0);
+    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance.postOrder).lt(0);
 
   const withdrawButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
       shape={ButtonShape.Rectangle}
-      size={ButtonSize.XSmall}
+      size={uiRefresh ? ButtonSize.Small : ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
@@ -88,7 +88,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
       shape={ButtonShape.Rectangle}
-      size={ButtonSize.XSmall}
+      size={uiRefresh ? ButtonSize.Small : ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
@@ -134,7 +134,11 @@ export const AccountInfoSection = () => {
       isPositive: MustBigNumber(portfolioValue?.postOrder).gt(
         MustBigNumber(portfolioValue?.current)
       ),
-      label: stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
+      label: (
+        <WithTooltip tooltip="portfolio-value" side="right">
+          {stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE })}
+        </WithTooltip>
+      ),
       type: OutputType.Fiat,
       value: portfolioValue,
     },
@@ -152,19 +156,22 @@ export const AccountInfoSection = () => {
           ? undefined
           : availableBalance,
       slotRight: (
-        <WithTooltip tooltip="cross-margin-usage">
+        <WithTooltip tooltip="cross-margin-usage" side="right">
           <MarginUsageRing value={getUsageValue(marginUsage)} />
         </WithTooltip>
       ),
     },
   ].map(({ key, hasError, hideDiff = false, isPositive, label, type, value, slotRight }) => ({
     key,
-    label: (
-      <$WithUsage>
-        {label}
-        {hasError ? <Icon iconName={IconName.CautionCircle} tw="text-color-error" /> : slotRight}
-      </$WithUsage>
-    ),
+    label:
+      hasError || slotRight ? (
+        <$WithUsage>
+          {label}
+          {hasError ? <Icon iconName={IconName.CautionCircle} tw="text-color-error" /> : slotRight}
+        </$WithUsage>
+      ) : (
+        label
+      ),
     value: (
       <AccountInfoDiffOutput
         hasError={hasError}
@@ -180,7 +187,7 @@ export const AccountInfoSection = () => {
     {
       key: AccountInfoItem.PortfolioValue,
       label: (
-        <WithTooltip tooltip="margin-used">
+        <WithTooltip tooltip="portfolio-value" side="left">
           {stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE })}
         </WithTooltip>
       ),
@@ -199,18 +206,17 @@ export const AccountInfoSection = () => {
     {
       key: AccountInfoItem.MarginUsed,
       label: (
-        <WithTooltip tooltip="margin-used">
+        <WithTooltip tooltip="margin-used" side="left">
           {stringGetter({ key: STRING_KEYS.MARGIN_USED })}
         </WithTooltip>
       ),
       value: (
         <>
-          <WithTooltip tooltip="cross-margin-usage">
+          <WithTooltip tooltip="cross-margin-usage" side="left">
             <MarginUsageRing value={getUsageValue(marginUsage)} />
           </WithTooltip>
           <AccountInfoDiffOutput
             hasError={false}
-            hideDiff
             isPositive={MustBigNumber(marginUsage?.postOrder).gt(
               MustBigNumber(marginUsage?.current)
             )}
@@ -218,11 +224,6 @@ export const AccountInfoSection = () => {
             value={marginUsage}
           />
         </>
-      ),
-      valueSlotLeft: (
-        <WithTooltip tooltip="cross-margin-usage">
-          <MarginUsageRing value={getUsageValue(marginUsage)} />
-        </WithTooltip>
       ),
     },
   ];
@@ -261,22 +262,18 @@ const $WithUsage = styled.div`
 `;
 
 const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
-  font: var(--font-mini-book);
-
   ${({ $uiRefreshEnabled }) =>
     $uiRefreshEnabled
       ? css`
+          font: var(--font-small-book);
           padding: 0 1rem;
 
-          > :first-child {
-            padding: 0;
-          }
-
-          > *:not(:first-child) {
-            padding: 0.5rem 0 0;
+          > * {
+            padding: 0 0 0.5rem;
           }
         `
       : css`
+          font: var(--font-mini-book);
           padding: 0.25rem 1rem;
 
           > * {
