@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -20,6 +21,7 @@ import { Button } from '@/components/Button';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { log } from '@/lib/telemetry';
@@ -78,13 +80,7 @@ export const NewMarketPreviewStep = ({
           params: {
             NUM_DAYS: <span tw="text-color-text-1">30</span>,
             PAST_DAYS: 30,
-            APR_PERCENTAGE: (
-              <Output
-                type={OutputType.Percent}
-                tw="inline-block text-color-success"
-                value={0.3456}
-              />
-            ),
+            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           },
         })}
       </span>
@@ -99,7 +95,7 @@ export const NewMarketPreviewStep = ({
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
           <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
-          <Output useGrouping type={OutputType.Fiat} value={10_000} />
+          <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
         </div>
       </div>
 
