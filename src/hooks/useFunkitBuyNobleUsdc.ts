@@ -34,7 +34,6 @@ export function useFunkitBuyNobleUsdc() {
         // TODO: Supply remaining transfer event data once Funkit provides it
         track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
         dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
-        console.log('checkoutId', checkoutId);
       },
       onDydxSwitch: () => {
         dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
