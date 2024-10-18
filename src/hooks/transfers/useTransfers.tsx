@@ -261,6 +261,7 @@ export const useTransfers = () => {
   });
 
   const { route, txs } = routeQuery.data ?? {};
+  const routeLoading = routeQuery.isLoading;
   return {
     // TODO [onboarding-rewrite]: Think about trimming this list
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties
@@ -291,5 +292,6 @@ export const useTransfers = () => {
     fromToken,
     debouncedAmount,
     debouncedAmountBN,
+    routeLoading,
   };
 };
