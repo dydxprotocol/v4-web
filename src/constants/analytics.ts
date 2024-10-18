@@ -92,6 +92,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   WalletType: 'walletType',
   WalletConnectorType: 'walletConnectorType',
   WalletAddress: 'walletAddress',
+  IsRememberMe: 'isRememberMe',
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
