@@ -167,11 +167,7 @@ export const PlaceOrderButtonAndReceipt = ({
       {
         key: 'liquidation-price',
         label: (
-          <WithTooltip
-            tooltip="liquidation-price"
-            stringParams={{ SYMBOL: id ?? '' }}
-            side="right"
-          >
+          <WithTooltip tooltip="liquidation-price" stringParams={{ SYMBOL: id ?? '' }} side="right">
             {stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}
           </WithTooltip>
         ),
