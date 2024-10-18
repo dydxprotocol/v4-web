@@ -306,7 +306,6 @@ export const useVaultFormSlippage = () => {
 
 export const useVaultCalculationForLaunchingMarket = ({ amount }: { amount: number }) => {
   const accountInfo = useAppSelector(selectSubaccountStateForVaults);
-  const slippageResponse = useVaultFormSlippage().data;
   const vaultAccount = useLoadedVaultAccount().data;
 
   const vaultFormInfo = useMemo(
@@ -330,9 +329,9 @@ export const useVaultCalculationForLaunchingMarket = ({ amount }: { amount: numb
         vaultFormInfo,
         vaultFormAccountInfo,
         vaultAccount,
-        slippageResponse
+        null
       ),
-    [slippageResponse, vaultAccount, vaultFormInfo, vaultFormAccountInfo]
+    [vaultAccount, vaultFormInfo, vaultFormAccountInfo]
   );
 
   return validationResponse;
