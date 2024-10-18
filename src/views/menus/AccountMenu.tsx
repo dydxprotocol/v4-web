@@ -1,6 +1,7 @@
 import { ElementType, memo } from 'react';
 
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
+import { Item } from '@radix-ui/react-dropdown-menu';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -471,19 +472,24 @@ const AssetActions = memo(
       ]
         .filter(isTruthy)
         .map(({ iconName, tooltipStringKey, dialog }) => (
-          <WithTooltip
-            key={tooltipStringKey}
-            tooltipString={stringGetter({ key: tooltipStringKey })}
-            tw="[--tooltip-backgroundColor:--color-layer-5]"
-          >
-            <$IconButton
-              key={dialog.type}
-              action={ButtonAction.Base}
-              shape={ButtonShape.Square}
-              iconName={iconName}
-              onClick={() => dispatch(openDialog(dialog))}
-            />
-          </WithTooltip>
+          <Item key={tooltipStringKey}>
+            {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
+          In general, any CTA in a dropdown should be wrapped in an Item tag
+       */}
+            <WithTooltip
+              key={tooltipStringKey}
+              tooltipString={stringGetter({ key: tooltipStringKey })}
+              tw="[--tooltip-backgroundColor:--color-layer-5]"
+            >
+              <$IconButton
+                key={dialog.type}
+                action={ButtonAction.Base}
+                shape={ButtonShape.Square}
+                iconName={iconName}
+                onClick={() => dispatch(openDialog(dialog))}
+              />
+            </WithTooltip>
+          </Item>
         ))}
     </div>
   )

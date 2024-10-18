@@ -113,6 +113,14 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
   }, [dydxAddress]);
 
+  useEffect(() => {
+    identify(
+      AnalyticsUserProperties.IsRememberMe(
+        dydxAddress ? Boolean(sourceAccount.encryptedSignature) : null
+      )
+    );
+  }, [dydxAddress, sourceAccount.encryptedSignature]);
+
   // AnalyticsUserProperty.SubaccountNumber
   const subaccountNumber = useAppSelector(getSubaccountId);
   useEffect(() => {
@@ -235,8 +243,8 @@ export const useAnalytics = () => {
     if (selectedWallet) {
       track(
         AnalyticsEvents.ConnectWallet({
-          walletType: selectedWallet?.name,
-          walletConnectorType: selectedWallet?.connectorType!,
+          walletType: selectedWallet.name,
+          walletConnectorType: selectedWallet.connectorType!,
         })
       );
     } else if (previousSelectedWallet) {
