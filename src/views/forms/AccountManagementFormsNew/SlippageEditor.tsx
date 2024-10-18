@@ -99,10 +99,11 @@ export const SlippageEditor = ({
       onCancel={onCancel}
       onConfirm={editorState === EditorState.Editing ? onConfirmSlippage : undefined}
       slotTrigger={
-        // eslint-disable-next-line jsx-a11y/control-has-associated-label, react/button-has-type
         <button
           onClick={() => setEditorState(EditorState.Selecting)}
           tw="row gap-[0.5ch] underline"
+          type="button"
+          aria-label="edit slippage"
         >
           <Output type={OutputType.Percent} value={slippage} />
           <Icon iconName={IconName.Pencil} />
