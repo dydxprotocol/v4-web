@@ -27,34 +27,6 @@ import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { CommunityChartContainer } from '@/views/Affiliates/community-chart/ProgramChartContainer';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
-const $Page = styled.div`
-  ${layoutMixins.contentContainerPage}
-  background-image: url('/wave.svg');
-  background-size: cover;
-`;
-
-const $AffiliatesLeaderboard = styled(AffiliatesLeaderboard)`
-  ${layoutMixins.contentSectionAttached}
-`;
-
-const $CommunityChart = styled(CommunityChartContainer)`
-  ${layoutMixins.contentSectionAttached}
-`;
-
-const $Section = styled.section`
-  ${layoutMixins.contentSectionDetached}
-  ${layoutMixins.flexColumn}
-`;
-
-const $NavigationMenu = styled(NavigationMenu)`
-  --navigationMenu-item-checked-backgroundColor: var(--color-layer-1);
-  --navigationMenu-item-checked-textColor: var(--color-text-2);
-
-  h3 {
-    font-size: 1.25em;
-  }
-`;
-
 export const AffiliatesPage: React.FC = () => {
   const { isConnectedWagmi } = useWalletConnection();
   const { dydxAddress } = useAccounts();
@@ -69,7 +41,6 @@ export const AffiliatesPage: React.FC = () => {
   const stringGetter = useStringGetter();
   const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
 
-  // Mocked user status data
   const userStatus = {
     isAffiliate: affiliateMetadata?.metadata?.isAffiliate ?? false,
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
@@ -159,3 +130,31 @@ export const AffiliatesPage: React.FC = () => {
     </$Page>
   );
 };
+
+const $Page = styled.div`
+  ${layoutMixins.contentContainerPage}
+  background-image: url('/wave.svg');
+  background-size: cover;
+`;
+
+const $AffiliatesLeaderboard = styled(AffiliatesLeaderboard)`
+  ${layoutMixins.contentSectionAttached}
+`;
+
+const $CommunityChart = styled(CommunityChartContainer)`
+  ${layoutMixins.contentSectionAttached}
+`;
+
+const $Section = styled.section`
+  ${layoutMixins.contentSectionDetached}
+  ${layoutMixins.flexColumn}
+`;
+
+const $NavigationMenu = styled(NavigationMenu)`
+  --navigationMenu-item-checked-backgroundColor: var(--color-layer-1);
+  --navigationMenu-item-checked-textColor: var(--color-text-2);
+
+  h3 {
+    font-size: 1.25em;
+  }
+`;

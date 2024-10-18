@@ -16,12 +16,6 @@ interface IProgramStatsProps {
   programStats: IProgramStats;
 }
 
-const $Container = tw.div`rounded-0.625 bg-color-layer-3`;
-
-const MobileStatsHeader = styled.div`
-  border-bottom: 1px solid var(--color-border);
-`;
-
 const MobileView = ({ programStats }: { programStats: IProgramStats }) => {
   const stringGetter = useStringGetter();
 
@@ -143,3 +137,9 @@ export const ProgramStatsCard = ({ className, programStats }: IProgramStatsProps
     </$Container>
   );
 };
+
+const $Container = tw.div`rounded-0.625 bg-color-layer-3`;
+
+const MobileStatsHeader = styled.div`
+  border-bottom: 1px solid var(--color-border);
+`;

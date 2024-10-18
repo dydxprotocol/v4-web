@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 
 import { CriteriaModal } from '../CriteriaModal';
@@ -37,11 +38,11 @@ const MobileView = ({
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
-          <a href="#" onClick={toggleCriteria}>
+          <Link isInline href="#" onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
               {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })}
             </p>
-          </a>
+          </Link>
         </StatCell>
         <StatCell
           valueSize="large"
@@ -114,11 +115,11 @@ const DesktopView = ({
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
-          <a href="#" ref={linkRef} onClick={toggleCriteria}>
+          <Link isInline href="#" ref={linkRef} onClick={toggleCriteria}>
             <p className="text-base text-color-accent">
               {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })}
             </p>
-          </a>
+          </Link>
         </StatCell>
         <StatCell
           valueSize="large"
@@ -209,7 +210,7 @@ export const AffiliateStatsCard = ({
 
       {isCriteriaVisible && (
         <CriteriaModal
-          userTier={isVip ? 'vip' : (currentAffiliateTier ?? 0)}
+          userTier={isVip ? 'vip' : currentAffiliateTier ?? 0}
           accountStats={accountStats}
           isCriteriaVisible={isCriteriaVisible}
           stakedAmount={stakedDydx}

@@ -7,20 +7,11 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
-
-const $Container = tw.div`h-full rounded-0.625 bg-color-layer-3`;
-
-const $Header = styled.div`
-  font-size: 18px;
-`;
-
-const $Icon = styled(Icon)`
-  font-size: 24px;
-`;
 
 interface IProgramCardProps {
   className?: string;
@@ -45,6 +36,7 @@ export const ProgramStatusCard = ({
   isVip = false,
 }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
+  const { affiliateProgram } = useURLConfigs();
 
   const title: ReactNode = isVip
     ? stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE_VIP })
@@ -90,11 +82,13 @@ export const ProgramStatusCard = ({
           <div>{body}</div>
 
           {!isVip ? (
-            <a className="w-full" href="https://dydx-affiliates.fuul.xyz/">
-              <Button className="w-full" action={ButtonAction.Base}>
-                {buttonText}
-              </Button>
-            </a>
+            <Button
+              className="w-full"
+              action={ButtonAction.Base}
+              onClick={() => window.open(affiliateProgram)}
+            >
+              {buttonText}
+            </Button>
           ) : (
             <Button className="w-full" action={ButtonAction.Base}>
               {buttonText}
@@ -105,3 +99,13 @@ export const ProgramStatusCard = ({
     </$Container>
   );
 };
+
+const $Container = tw.div`h-full rounded-0.625 bg-color-layer-3`;
+
+const $Header = styled.div`
+  font-size: 18px;
+`;
+
+const $Icon = styled(Icon)`
+  font-size: 24px;
+`;

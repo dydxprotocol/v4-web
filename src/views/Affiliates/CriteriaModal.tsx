@@ -5,6 +5,7 @@ import { IAffiliateStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import breakpoints from '@/styles/breakpoints';
@@ -39,6 +40,7 @@ export const CriteriaModal = ({
   userTier: number | 'vip';
 }) => {
   const { isConnectedWagmi } = useWalletConnection();
+  const { affiliateProgram } = useURLConfigs();
 
   const stringGetter = useStringGetter();
   const stakedDYdX = stakedAmount ?? '0';
@@ -119,7 +121,7 @@ export const CriteriaModal = ({
                     VIP_VALUE: <span className="text-color-text-1">{'{VIP Value}'}</span>,
                     REGULAR_VALUE: <span className="text-color-text-1">{'{Regular Value}'}</span>,
                     APPLY_HERE: (
-                      <a href="https://dydx-affiliates.fuul.xyz/">
+                      <a href={affiliateProgram}>
                         <span className="text-color-accent">
                           {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                         </span>
@@ -268,7 +270,7 @@ const CriteriaTable = ({
 
   return (
     <$Table
-      affiliateTierIdx={userTier === 'vip' ? 4 : (userTier ?? 0)}
+      affiliateTierIdx={userTier === 'vip' ? 4 : userTier ?? 0}
       withInnerBorders
       withOuterBorder
       getRowKey={(row) => row.tier}
