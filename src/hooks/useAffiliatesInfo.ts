@@ -21,8 +21,6 @@ type AffiliatesMetadata = {
   isAffiliate: boolean;
 };
 
-process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000';
-
 export const useAffiliatesInfo = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo, getAllAffiliateTiers } = useDydxClient();
   const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
@@ -63,9 +61,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchProgramStats = async () => {
-    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
-
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/program-stats`;
+    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/program-stats`;
 
     try {
       const res = await fetch(endpoint, {
@@ -84,9 +80,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchAccountStats = async () => {
-    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
-
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/account/${dydxAddress}`;
+    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/account/${dydxAddress}`;
 
     try {
       const res = await fetch(endpoint, {
@@ -106,9 +100,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchLastUpdated = async () => {
-    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; Local
-
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/last-updated`;
+    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/last-updated`;
 
     try {
       const res = await fetch(endpoint, {

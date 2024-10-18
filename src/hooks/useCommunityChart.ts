@@ -40,9 +40,7 @@ export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) 
 
   // TODO: Leverage react-query with a refactor of the chart. Implementation is the same as trading rewards chart
   const fetchMetricData = async () => {
-    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; // Local
-
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
+    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
     try {
       const response = await fetch(endpoint, {
         headers: {

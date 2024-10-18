@@ -14,8 +14,7 @@ export const useAffiliatesLeaderboard = () => {
   }, [page]);
 
   const fetchAffiliateStats = async () => {
-    // process.env.VITE_AFFILIATES_SERVER_BASE_URL = 'http://localhost:3000'; // Local
-    const endpoint = `${process.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/search`;
+    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/search`;
 
     try {
       const response = await fetch(endpoint, {
