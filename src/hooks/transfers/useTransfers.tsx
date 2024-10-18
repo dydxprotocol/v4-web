@@ -101,19 +101,23 @@ export const useTransfers = () => {
   const { chainsByNetworkMap = {} } = chainsQuery.data ?? {};
   const { assetsByChain = {} } = assetsQuery.data ?? {};
 
-  const walletNetworkType = getNetworkTypeFromWalletNetworkType(sourceAccount?.chain);
+  const walletNetworkType = getNetworkTypeFromWalletNetworkType(sourceAccount.chain);
   const selectedChainId = transferType === TransferType.Deposit ? fromChainId : toChainId;
 
   const toToken = useMemo(() => {
+    // AssetsByChain is not guaranteed to return a list on access. This is a type error
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return assetsByChain[toChainId ?? '']?.find((token) => token.denom === toTokenDenom);
   }, [toChainId, toTokenDenom, assetsByChain]);
 
   const fromToken = useMemo(() => {
+    // AssetsByChain is not guaranteed to return a list on access. This is a type error
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return assetsByChain[fromChainId ?? '']?.find((token) => token.denom === fromTokenDenom);
   }, [fromChainId, fromTokenDenom, assetsByChain]);
 
   const chainsForNetwork = useMemo(
-    () => chainsByNetworkMap?.[walletNetworkType] ?? [],
+    () => chainsByNetworkMap[walletNetworkType] ?? [],
     [walletNetworkType, chainsByNetworkMap]
   );
 
@@ -139,13 +143,12 @@ export const useTransfers = () => {
   const hasAllParams =
     !!fromToken?.denom &&
     !!toToken?.denom &&
-    !!fromToken?.decimals &&
-    !!toToken?.decimals &&
+    !!fromToken.decimals &&
+    !!toToken.decimals &&
     !!fromChainId &&
     !!toChainId &&
     !!fromAddress &&
     !!toAddress &&
-    !!transferType &&
     !!debouncedAmount &&
     !!dydxAddress;
 
