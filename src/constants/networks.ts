@@ -5,7 +5,7 @@ export const CURRENT_MODE = ({
   testnet: 'TESTNET',
   staging: 'DEV',
   development: 'DEV',
-}[import.meta.env.MODE] ?? 'MAINNET') as 'MAINNET' | 'TESTNET' | 'DEV';
+}.production ?? 'MAINNET') as 'MAINNET' | 'TESTNET' | 'DEV';
 
 export const isMainnet = CURRENT_MODE === 'MAINNET';
 export const isTestnet = CURRENT_MODE === 'TESTNET';
