@@ -53,3 +53,16 @@ export const getTickerFromMarketmapId = (marketmapId: string): string => {
 export const getAssetFromMarketId = (marketId: string): string => {
   return marketId.split('-')[0];
 };
+
+const SKIP_NATIVE_DENOM_SUFFIX = 'native';
+
+/**
+ * cosmjs and wagmi expect this 0x address to represent a chain's native token address.
+ * skip has a unique format that differs from this.
+ */
+export const WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+export const isNativeDenom = (denom: string | undefined): boolean => {
+  if (!denom) return false;
+  return denom === WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS || denom?.endsWith(SKIP_NATIVE_DENOM_SUFFIX);
+};
