@@ -41,7 +41,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
             setValue('');
             onTextChange?.('');
           }}
-          fullIcon
+          withoutBackground
         />
       )}
     </$Search>

@@ -175,7 +175,7 @@ export const ComboboxMenu = <
             ))}
           </$Group>
         ))}
-        {searchValue.trim() !== '' && (
+        {slotEmpty && searchValue.trim() !== '' && (
           <Command.Empty tw="h-full p-1 text-color-text-0">
             {slotEmpty ??
               stringGetter({
@@ -252,7 +252,7 @@ const $Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLa
   color: var(--color-text-0);
 
   > [cmdk-group-heading] {
-    padding: 0.5rem 0.75rem 0.3rem;
+    padding: 0.5rem 1rem 0.3rem;
     font: var(--font-base-medium);
     background-color: var(--comboboxMenu-backgroundColor, inherit);
   }

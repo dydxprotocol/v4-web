@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { groupBy } from 'lodash';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -21,7 +21,9 @@ import { IconButton } from '@/components/IconButton';
 import { Notification as NotificationCard } from '@/components/Notification';
 import { Toolbar } from '@/components/Toolbar';
 
+import { useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -127,6 +129,9 @@ export const NotificationsMenu = ({
     [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 
+  const activeDialog = useAppSelector(getActiveDialog);
+  const isPreferencesDialogOpen = activeDialog?.type === DialogTypes.Preferences().type;
+
   return (
     <$ComboboxDialogMenu
       withItemBorders
@@ -135,11 +140,11 @@ export const NotificationsMenu = ({
       items={items}
       title={
         <div tw="flex items-center justify-between">
-          {stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}{' '}
+          {stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
           <IconButton
             iconName={IconName.Gear}
             onClick={() => dispatch(openDialog(DialogTypes.Preferences()))}
-            fullIcon
+            withoutBackground
           />
         </div>
       }
@@ -183,16 +188,23 @@ export const NotificationsMenu = ({
       }
       placement={placement}
       preventClose={isTablet}
+      $noPointerEvents={isPreferencesDialogOpen}
     />
   );
 };
 
-const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)<{ $noPointerEvents?: boolean }>`
   --comboboxDialogMenu-item-padding: 0;
 
   [cmdk-list] > [cmdk-list-sizer] > * {
     box-shadow: none;
   }
+
+  ${({ $noPointerEvents }) =>
+    $noPointerEvents &&
+    css`
+      pointer-events: none !important;
+    `}
 `;
 
 const $UnreadIndicator = styled.div`

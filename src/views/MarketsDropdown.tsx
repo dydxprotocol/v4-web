@@ -181,9 +181,10 @@ const MarketsDropdownContent = ({
             🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
           <IconButton
+            tw="[--button-icon-size:0.8em]"
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
-            fullIcon
+            withoutBackground
           />
         </$MarketDropdownBanner>
       );

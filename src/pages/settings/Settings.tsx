@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import {
   STRING_KEYS,
@@ -109,6 +109,7 @@ const SettingsPage = () => {
           element={<PageMenu group="network" items={[networkMenuItems]} />}
         />
         <Route path={MobileSettingsRoute.Display} element={<DisplaySettings tw="px-1.5 py-1" />} />
+        <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
     </>
   );

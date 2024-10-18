@@ -32,6 +32,6 @@ export const NumberValue = ({ className, value, withSubscript }: NumberValueProp
 };
 
 const $Sub = styled.sub`
-  font-size: 0.85em;
+  font-size: var(--fontSize-mini);
   line-height: 0;
 `;

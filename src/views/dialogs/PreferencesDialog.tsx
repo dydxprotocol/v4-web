@@ -17,7 +17,7 @@ export const PreferencesDialog = ({ setIsOpen }: DialogProps<PreferencesDialogPr
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
       setIsOpen={setIsOpen}
-      tw="[--dialog-content-paddingBottom:0.5rem]"
+      tw="[--comboboxDialogMenu-item-padding: 0.5rem 1.25rem;] [--dialog-content-paddingBottom:0.5rem]"
     />
   );
 };

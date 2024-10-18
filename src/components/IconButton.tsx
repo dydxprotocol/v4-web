@@ -18,7 +18,7 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  fullIcon?: boolean;
+  withoutBackground?: boolean;
 };
 
 export type IconButtonProps = ElementProps & ToggleButtonProps & StyleProps;
@@ -38,7 +38,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
       onClick,
       onPressedChange,
       className,
-      fullIcon = false,
+      withoutBackground = false,
 
       ...otherProps
     },
@@ -52,7 +52,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onPressedChange={onPressedChange ?? (onClick as any)} // TODO fix types
-        $fullIcon={fullIcon}
+        $withoutBackground={withoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
@@ -65,7 +65,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onClick={onClick}
-        $fullIcon={fullIcon}
+        $withoutBackground={withoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
@@ -84,20 +84,20 @@ const buttonMixin = css`
   }
 `;
 
-const fullIconMixin = css`
+const withoutBackgroundMixin = css`
   --button-icon-size: 1.5em;
   --button-border: none;
   --button-backgroundColor: transparent;
 `;
 
-const $IconButton = styled(Button)<{ $fullIcon?: boolean }>`
+const $IconButton = styled(Button)<{ $withoutBackground?: boolean }>`
   ${buttonMixin}
 
-  ${({ $fullIcon }) => $fullIcon && fullIconMixin}
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
 `;
 
-const $IconToggleButton = styled(ToggleButton)<{ $fullIcon?: boolean }>`
+const $IconToggleButton = styled(ToggleButton)<{ $withoutBackground?: boolean }>`
   ${buttonMixin}
 
-  ${({ $fullIcon }) => $fullIcon && fullIconMixin}
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
 `;
