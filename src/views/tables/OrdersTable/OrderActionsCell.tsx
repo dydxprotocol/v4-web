@@ -23,7 +23,7 @@ import { isOrderStatusClearable } from '@/lib/orders';
 import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
-  orderId: string;
+g  orderId: string;
   orderFlags: Nullable<number>;
   status: OrderStatus;
   isDisabled?: boolean;
@@ -53,7 +53,15 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 
   return (
     <ActionsTableCell>
-      <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CANCEL_ORDER })}>
+      <WithTooltip
+        side="left"
+        tw="[--tooltip-backgroundColor:--color-layer-5]"
+        tooltipString={
+          isOrderStatusClearable(status)
+            ? stringGetter({ key: STRING_KEYS.CLEAR })
+            : stringGetter({ key: STRING_KEYS.CANCEL_ORDER })
+        }
+      >
         <$CancelButton
           key="cancelorder"
           iconName={IconName.Close}
