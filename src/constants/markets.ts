@@ -65,6 +65,7 @@ export enum MarketFilters {
   GAMING = 'gaming',
   MEMES = 'memes',
   RWA = 'real-world-assets',
+  LAUNCHABLE = 'launchable',
 }
 
 // ORDER IS INTENTIONAL
@@ -140,6 +141,10 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.PREDICTION_MARKET]: {
     label: STRING_KEYS.PREDICTION_MARKET,
+    isNew: true,
+  },
+  [MarketFilters.LAUNCHABLE]: {
+    label: STRING_KEYS.LAUNCHABLE,
     isNew: true,
   },
 };
