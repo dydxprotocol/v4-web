@@ -42,7 +42,7 @@ export const RadioButtonCardsStory: Story<RadioButtonCardStoryProps> = ({
   withSlotTop,
   withSlotBottom,
 }: RadioButtonCardStoryProps) => {
-  const [item, setItem] = useState(exampleItems[0].value);
+  const [item, setItem] = useState(exampleItems[0]!.value);
   return (
     <StoryWrapper>
       <StyledRadioButtonCards

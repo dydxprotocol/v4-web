@@ -135,7 +135,7 @@ export const PositionsTriggersCell = ({
     }
 
     if (orders.length === 1) {
-      const order = orders[0];
+      const order = orders[0]!;
       const { size, triggerPrice } = order;
 
       const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));

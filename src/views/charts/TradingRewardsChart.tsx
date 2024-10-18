@@ -169,7 +169,7 @@ export const TradingRewardsChart = ({
           } else {
             // Update period to new selected period
             setIsZooming(false);
-            setSelectedPeriod(periodOptions[predefinedPeriodIx]);
+            setSelectedPeriod(periodOptions[predefinedPeriodIx]!);
           }
         }
       }, NORMAL_DEBOUNCE_MS),

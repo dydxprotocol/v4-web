@@ -83,7 +83,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     size,
     unrealizedPnl,
     unrealizedPnlPercent,
-  } = currentMarketPosition || {};
+  } = currentMarketPosition ?? {};
 
   const netFundingBN = MustBigNumber(netFunding);
 
@@ -162,7 +162,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     }
   }
 
-  const mainFieldsContent: PositionInfoItems[] = [
+  const mainFieldsContent = [
     {
       key: 'leverage',
       type: OutputType.Multiple,
@@ -224,7 +224,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },
-  ];
+  ] as const satisfies readonly PositionInfoItems[];
 
   const createDetailItem = ({
     key,

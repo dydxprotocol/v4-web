@@ -11,7 +11,12 @@ export const WalletIcon = ({ wallet, size = '1em' }: { wallet: WalletInfo; size?
     return <$Image src={wallet.icon} alt={wallet.name} size={size} />;
   }
 
-  return <Icon iconComponent={wallets[wallet.name].icon as ElementType} size={size} />;
+  return (
+    <Icon
+      iconComponent={wallets[wallet.name as keyof typeof wallets].icon as ElementType}
+      size={size}
+    />
+  );
 };
 
 const $Image = styled.img<{ size: string }>`

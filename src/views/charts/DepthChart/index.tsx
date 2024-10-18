@@ -8,9 +8,9 @@ import {
   AreaSeries,
   Axis,
   DataProvider,
-  EventEmitterProvider, // AnimatedAxis,
-  Grid, // AnimatedGrid,
-  LineSeries, // AnimatedAreaSeries,
+  EventEmitterProvider,
+  Grid,
+  LineSeries,
   buildChartTheme,
   darkTheme,
   type EventHandlerParams,
@@ -94,9 +94,9 @@ export const DepthChart = ({
           // Mid-market price ± 1.5%
           midMarketPrice * 0.015,
           // Mid-market price ± halfway to lowest bid
-          (midMarketPrice - lowestBid.price) / 2,
+          (midMarketPrice - (lowestBid?.price ?? 0)) / 2,
           // Mid-market price ± halfway to highest ask
-          (highestAsk.price - midMarketPrice) / 2
+          ((highestAsk?.price ?? midMarketPrice) - midMarketPrice) / 2
         )
       );
     }
@@ -109,8 +109,8 @@ export const DepthChart = ({
       return { domain: [0, 0] as const, range: [0, 0] as const };
 
     const newDomain = [
-      clamp(midMarketPrice - zoomDomain, 0, highestBid.price),
-      clamp(midMarketPrice + zoomDomain, lowestAsk.price, highestAsk.price),
+      clamp(midMarketPrice - zoomDomain, 0, highestBid?.price ?? 0),
+      clamp(midMarketPrice + zoomDomain, lowestAsk?.price ?? 0, highestAsk?.price ?? 0),
     ] as const;
 
     const newRange = [
@@ -175,8 +175,14 @@ export const DepthChart = ({
           1e-320,
           Math.min(Number.MAX_SAFE_INTEGER, zoomDomain * Math.exp(wheelDelta / 1000))
         ),
-        Math.min(midMarketPrice - highestBid.price, lowestAsk.price - midMarketPrice),
-        Math.max(midMarketPrice - lowestBid.price, highestAsk.price - midMarketPrice)
+        Math.min(
+          midMarketPrice - (highestBid?.price ?? 0),
+          (lowestAsk?.price ?? 0) - midMarketPrice
+        ),
+        Math.max(
+          midMarketPrice - (lowestBid?.price ?? 0),
+          (highestAsk?.price ?? 0) - midMarketPrice
+        )
       )
     );
   };
@@ -227,15 +233,15 @@ export const DepthChart = ({
             <AreaSeries
               dataKey={DepthChartSeries.Bids}
               data={
-                bids.length
+                bids.length > 0
                   ? [
                       {
-                        ...highestBid,
+                        ...highestBid!,
                         depth: 0,
                       },
                       ...bids,
                       {
-                        ...lowestBid,
+                        ...lowestBid!,
                         price: 0,
                       },
                     ].reverse()
@@ -258,10 +264,10 @@ export const DepthChart = ({
             <AreaSeries
               dataKey={DepthChartSeries.Asks}
               data={
-                asks.length
+                asks.length > 0
                   ? [
                       {
-                        ...lowestAsk,
+                        ...lowestAsk!,
                         depth: 0,
                       },
                       ...asks,

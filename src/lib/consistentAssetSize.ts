@@ -61,7 +61,7 @@ export const getConsistentAssetSizeString = (
       return { displayDivisor: 1, displaySuffix: '' };
     }
     return {
-      displayDivisor: 10 ** supportedLocaleToSuffixPowers[selectedLocale][unitToUse],
+      displayDivisor: 10 ** supportedLocaleToSuffixPowers[selectedLocale]![unitToUse]!,
       displaySuffix: unitToUse,
     };
   })();

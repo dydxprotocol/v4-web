@@ -79,7 +79,7 @@ export enum PositionsTableColumnKey {
 }
 
 type PositionTableRow = {
-  asset: Asset;
+  asset: Asset | undefined;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
   fundingRate: Nullable<number>;

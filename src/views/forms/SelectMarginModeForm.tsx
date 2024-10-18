@@ -42,7 +42,7 @@ export const SelectMarginModeForm = ({
         radioItems={[
           {
             value: AbacusMarginMode.Cross.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue] }),
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue]! }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
@@ -51,7 +51,7 @@ export const SelectMarginModeForm = ({
           },
           {
             value: AbacusMarginMode.Isolated.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue] }),
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue]! }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}

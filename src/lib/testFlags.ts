@@ -30,7 +30,7 @@ class TestFlags {
     return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get addressOverride(): string {
+  get addressOverride(): string | undefined {
     return this.queryParams.address;
   }
 

@@ -17,6 +17,7 @@ import { Output, OutputType } from '@/components/Output';
 import { ValidatorIcons } from '@/components/ValidatorIcons';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { isPresent } from '@/lib/typeUtils';
 
 import { StakePreviewContents } from '../shared/StakePreviewContents';
 
@@ -35,13 +36,15 @@ export const UnstakeFormPreviewContents = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
+  const { stakingValidators, currentDelegations } = useStakingValidator();
   const delegationsToUnstake =
     currentDelegations?.filter((delegation) =>
       MustBigNumber(amounts[delegation.validator]).gt(0)
     ) ?? [];
   const unstakingValidators = stakingValidators
-    ? delegationsToUnstake.map((delegation) => stakingValidators[delegation.validator]?.[0])
+    ? delegationsToUnstake
+        .map((delegation) => stakingValidators[delegation.validator]?.[0])
+        .filter(isPresent)
     : [];
 
   return (
@@ -49,7 +52,7 @@ export const UnstakeFormPreviewContents = ({
       submitText={stringGetter({ key: STRING_KEYS.CONFIRM_UNSTAKE })}
       isLoading={isLoading}
       slotLeftHeading={stringGetter({
-        key: unstakingValidators?.length === 1 ? STRING_KEYS.VALIDATOR : STRING_KEYS.VALIDATORS,
+        key: unstakingValidators.length === 1 ? STRING_KEYS.VALIDATOR : STRING_KEYS.VALIDATORS,
       })}
       slotRightHeading={stringGetter({
         key: STRING_KEYS.AMOUNT_TO_UNSTAKE,

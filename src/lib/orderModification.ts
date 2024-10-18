@@ -1,5 +1,6 @@
 import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
+// ts-ignore
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 

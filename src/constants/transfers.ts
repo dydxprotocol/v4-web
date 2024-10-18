@@ -89,7 +89,7 @@ export const getNetworkTypeFromWalletNetworkType = (
   return 'evm';
 };
 
-export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
+export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string | undefined => {
   const cctpToken = assets.find((asset) => {
     return isTokenCctp(asset);
   });

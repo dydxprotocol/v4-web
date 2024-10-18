@@ -23,7 +23,7 @@ export const useEndpointsConfig = () => {
   const endpointsConfig: EndpointsConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints;
 
   return {
-    indexer: endpointsConfig.indexers[0], // assume there's only one option for indexer endpoints
+    indexer: endpointsConfig.indexers[0]!, // assume there's only one option for indexer endpoints
     validators: endpointsConfig.validators,
     skip: endpointsConfig.skip,
     nobleValidator: endpointsConfig.nobleValidator,

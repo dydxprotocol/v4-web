@@ -35,6 +35,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
@@ -349,9 +350,11 @@ export const FillsTable = ({
     return () => {
       dispatch(viewedFills(currentMarket));
     };
-  }, [currentMarket]);
+  }, [currentMarket, dispatch]);
 
-  const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
+  const symbol = mapIfPresent(currentMarket, (market) =>
+    mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
+  );
 
   const fillsData = useMemo(
     () =>

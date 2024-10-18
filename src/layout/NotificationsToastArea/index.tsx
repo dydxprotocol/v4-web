@@ -46,10 +46,11 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
       .map((notification) => ({
         notification,
         key: getKey(notification),
-        displayData: getDisplayData(notification),
+        displayData: getDisplayData(notification)!, // verified below
       }))
       .filter(
         ({ displayData, notification }) =>
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           displayData && notification.status < NotificationStatus.Unseen
       )
       .slice(-MAX_NUM_TOASTS);
@@ -61,7 +62,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
   return (
     <StyledToastArea className={className}>
       {Object.keys(notificationMapByType).map((groupKey) => (
-        <NotificationStack notifications={notificationMapByType[groupKey]} key={groupKey} />
+        <NotificationStack notifications={notificationMapByType[groupKey]!} key={groupKey} />
       ))}
     </StyledToastArea>
   );

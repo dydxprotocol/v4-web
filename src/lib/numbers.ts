@@ -76,7 +76,7 @@ export function bytesToBigInt(u: Uint8Array): bigint {
     return BigInt(0);
   }
   // eslint-disable-next-line no-bitwise
-  const negated: boolean = (u[0] & 1) === 1;
+  const negated: boolean = (u[0]! & 1) === 1;
   const hex: string = Buffer.from(u.slice(1)).toString('hex');
   const abs: bigint = BigInt(`0x${hex}`);
   return negated ? -abs : abs;

@@ -18,6 +18,7 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "useUnknownInCatchVariables": false,
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "@/*": ["src/*"]
     },

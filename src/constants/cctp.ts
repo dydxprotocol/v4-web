@@ -24,7 +24,7 @@ const getHighestFeeChains = (type: NullableTransferType) =>
   type === TransferType.withdrawal ? mainnetChains.filter(({ chainId }) => chainId === '1') : [];
 
 // move this out if we need it in another module
-const capitalizeNames = (str: string) => str[0].toUpperCase() + str.slice(1);
+const capitalizeNames = (str: string) => str[0]!.toUpperCase() + str.slice(1);
 
 export const getLowestFeeChainNames = (type: NullableTransferType) =>
   getLowestFeeChains(type).map((token) => capitalizeNames(token.name.toLowerCase()));
@@ -35,7 +35,7 @@ export const getMapOfLowestFeeTokensByDenom = (type: NullableTransferType) =>
       if (!acc[token.tokenAddress]) {
         acc[token.tokenAddress] = [];
       }
-      acc[token.tokenAddress].push(token);
+      acc[token.tokenAddress]!.push(token);
       return acc;
     },
     {} as Record<string, CctpTokenInfo[]>
@@ -47,7 +47,7 @@ const getMapOfChainsByChainId = (chains: CctpTokenInfo[]) =>
       if (!acc[token.chainId]) {
         acc[token.chainId] = [];
       }
-      acc[token.chainId].push(token);
+      acc[token.chainId]!.push(token);
       return acc;
     },
     {} as Record<string, CctpTokenInfo[]>
@@ -65,7 +65,7 @@ export const cctpTokensByDenomLowerCased = cctpTokens.reduce(
     if (!acc[lowerCasedAddress]) {
       acc[lowerCasedAddress] = [];
     }
-    acc[lowerCasedAddress].push(token);
+    acc[lowerCasedAddress]!.push(token);
     return acc;
   },
   {} as Record<string, CctpTokenInfo[]>
@@ -76,7 +76,7 @@ export const cctpTokensByChainId = cctpTokens.reduce(
     if (!acc[token.chainId]) {
       acc[token.chainId] = [];
     }
-    acc[token.chainId].push(token);
+    acc[token.chainId]!.push(token);
     return acc;
   },
   {} as Record<string, CctpTokenInfo[]>

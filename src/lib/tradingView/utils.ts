@@ -156,7 +156,7 @@ export const getHistorySlice = ({
   firstDataRequest: boolean;
   orderbookCandlesToggleOn: boolean;
 }): TradingViewChartBar[] => {
-  if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0].time)) {
+  if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0]!.time)) {
     return [];
   }
 

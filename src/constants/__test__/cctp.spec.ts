@@ -275,12 +275,12 @@ describe('isTokenCctp', () => {
     recommendedSymbol: 'test-recommendedSymbol',
   });
   it('returns true for cctp token', () => {
-    const denom = cctpTokens[0].tokenAddress;
+    const denom = cctpTokens[0]!.tokenAddress;
     const asset = getTestAssetWithDenom(denom);
     expect(isTokenCctp(asset)).toBe(true);
   });
   it('returns true for cctp token case insensitive', () => {
-    const denom = cctpTokens[0].tokenAddress.toLowerCase();
+    const denom = cctpTokens[0]!.tokenAddress.toLowerCase();
     const asset = getTestAssetWithDenom(denom);
     expect(isTokenCctp(asset)).toBe(true);
   });

@@ -35,9 +35,9 @@ export const useMatchingEvmNetwork = ({
   const matchNetwork = useCallback(async () => {
     if (!isMatchingNetwork) {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
-        await wallets?.[0].switchChain(Number(chainId));
+        await wallets[0]?.switchChain(Number(chainId));
       } else {
-        await switchChainAsync?.({ chainId: Number(chainId) }, { onError, onSuccess });
+        await switchChainAsync({ chainId: Number(chainId) }, { onError, onSuccess });
       }
     }
   }, [chainId, chain]);
