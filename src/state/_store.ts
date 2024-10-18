@@ -12,6 +12,7 @@ import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
+import { funkitDepositsSlice } from './funkitDeposits';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
@@ -32,6 +33,7 @@ const reducers = {
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
+  funkitDeposits: funkitDepositsSlice.reducer,
   inputs: inputsSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
@@ -49,7 +51,7 @@ const persistConfig = {
   key: 'root',
   version: 2,
   storage,
-  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet'],
+  whitelist: ['affiliates', 'dismissable', 'funkitDeposits', 'tradingView', 'wallet'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 

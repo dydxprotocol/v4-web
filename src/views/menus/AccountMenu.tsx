@@ -130,6 +130,7 @@ export const AccountMenu = () => {
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
   ) : (
     <$DropdownMenu
+      modal={false}
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
@@ -452,7 +453,7 @@ const AssetActions = memo(
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Deposit(),
+            dialog: DialogTypes.Deposit({}),
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
           },
