@@ -39,16 +39,30 @@ export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
   PREDICTION_MARKET = 'Prediction Market',
-  FX = 'FX',
-  LAYER_1 = 'Layer 1',
-  LAYER_2 = 'Layer 2',
-  DEFI = 'Defi',
-  AI = 'AI',
-  NFT = 'NFT',
-  GAMING = 'Gaming',
-  MEME = 'Meme',
-  RWA = 'RWA',
-  ENT = 'Entertainment',
+
+  // Existing Custom Tags from public/configs/markets.json
+  // TODO: Remove when metadataService is default
+  FX_DEPRECATED = 'FX',
+  LAYER_1_DEPRECATED = 'Layer 1',
+  LAYER_2_DEPRECATED = 'Layer 2',
+  DEFI_DEPRECATED = 'Defi',
+  AI_DEPRECATED = 'AI',
+  NFT_DEPRECATED = 'NFT',
+  GAMING_DEPRECATED = 'Gaming',
+  MEME_DEPRECATED = 'Meme',
+  RWA_DEPRECATED = 'RWA',
+  ENT_DEPRECATED = 'Entertainment',
+
+  // CMC Sector Tags.
+  FX = 'fiat',
+  LAYER_1 = 'layer-1',
+  LAYER_2 = 'layer-2',
+  DEFI = 'defi',
+  AI = 'ai-big-data',
+  DEPIN = 'depin',
+  GAMING = 'gaming',
+  MEMES = 'memes',
+  RWA = 'real-world-assets',
 }
 
 // ORDER IS INTENTIONAL
@@ -65,35 +79,61 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.NEW]: {
     label: STRING_KEYS.RECENTLY_LISTED,
   },
-  [MarketFilters.MEME]: {
+  [MarketFilters.MEME_DEPRECATED]: {
     label: STRING_KEYS.MEME,
   },
-  [MarketFilters.AI]: {
+  [MarketFilters.MEMES]: {
+    label: STRING_KEYS.MEME,
+  },
+  [MarketFilters.AI_DEPRECATED]: {
     label: STRING_KEYS.AI,
+  },
+  [MarketFilters.AI]: {
+    label: STRING_KEYS.AI_BIG_DATA,
+  },
+  [MarketFilters.DEFI_DEPRECATED]: {
+    label: STRING_KEYS.DEFI,
   },
   [MarketFilters.DEFI]: {
     label: STRING_KEYS.DEFI,
   },
+  [MarketFilters.DEPIN]: {
+    label: STRING_KEYS.DEPIN,
+  },
+  [MarketFilters.LAYER_1_DEPRECATED]: {
+    label: STRING_KEYS.LAYER_1,
+  },
   [MarketFilters.LAYER_1]: {
     label: STRING_KEYS.LAYER_1,
+  },
+  [MarketFilters.LAYER_2_DEPRECATED]: {
+    label: STRING_KEYS.LAYER_2,
   },
   [MarketFilters.LAYER_2]: {
     label: STRING_KEYS.LAYER_2,
   },
+  [MarketFilters.RWA_DEPRECATED]: {
+    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  },
   [MarketFilters.RWA]: {
     label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+  },
+  [MarketFilters.GAMING_DEPRECATED]: {
+    label: STRING_KEYS.GAMING,
   },
   [MarketFilters.GAMING]: {
     label: STRING_KEYS.GAMING,
   },
+  [MarketFilters.FX_DEPRECATED]: {
+    label: STRING_KEYS.FOREX,
+  },
   [MarketFilters.FX]: {
     label: STRING_KEYS.FOREX,
-    isNew: true,
   },
-  [MarketFilters.NFT]: {
+  [MarketFilters.NFT_DEPRECATED]: {
     label: STRING_KEYS.NFT,
   },
-  [MarketFilters.ENT]: {
+  [MarketFilters.ENT_DEPRECATED]: {
     label: STRING_KEYS.ENTERTAINMENT,
   },
   [MarketFilters.PREDICTION_MARKET]: {

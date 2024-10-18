@@ -137,5 +137,5 @@ const $DownloadLinksInPopover = styled.div`
   ${popoverMixins.popover}
   display: flex;
   gap: 0.5rem;
-  --popover-padding: 0.5rem 0.5rem;
+  --popover-padding: 0.5rem;
 `;

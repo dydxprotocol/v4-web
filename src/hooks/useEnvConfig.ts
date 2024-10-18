@@ -10,6 +10,7 @@ interface EnvironmentConfig {
   chainName: string;
   chainLogo: string;
   deployerName: string;
+  megavaultOperatorName: string;
   rewardsHistoryStartDateMs: string;
   megavaultHistoryStartDateMs: string;
 }

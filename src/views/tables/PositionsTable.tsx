@@ -207,14 +207,7 @@ const getPositionsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ displayId, asset, leverage }) => {
-          return uiRefresh ? (
-            <TableCell
-              tw="font-bold text-color-text-2"
-              slotLeft={<AssetIcon symbol={asset?.id} tw="text-[1.25rem] tablet:text-[2.25rem]" />}
-            >
-              {asset?.id}
-            </TableCell>
-          ) : (
+          return (
             <MarketTableCell
               asset={asset}
               marketId={displayId}

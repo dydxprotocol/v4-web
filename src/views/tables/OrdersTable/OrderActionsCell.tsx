@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -17,6 +17,7 @@ import { clearOrder } from '@/state/account';
 import { useAppDispatch } from '@/state/appTypes';
 
 import { isOrderStatusClearable } from '@/lib/orders';
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   orderId: string;
@@ -27,6 +28,7 @@ type ElementProps = {
 
 export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
   const dispatch = useAppDispatch();
+  const { uiRefresh } = testFlags;
 
   const [isCanceling, setIsCanceling] = useState(false);
 
@@ -51,6 +53,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
         iconName={IconName.Close}
         iconSize="0.875em"
         shape={ButtonShape.Square}
+        $uiRefreshEnabled={uiRefresh}
         {...(isOrderStatusClearable(status)
           ? { onClick: () => dispatch(clearOrder(orderId)) }
           : {
@@ -64,6 +67,14 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
     </ActionsTableCell>
   );
 };
-const $CancelButton = styled(IconButton)`
+const $CancelButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
   --button-hover-textColor: var(--color-red);
+
+  ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled &&
+    css`
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      width: min-content;
+    `}
 `;

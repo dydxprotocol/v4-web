@@ -96,7 +96,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
           <Toolbar tw="inlineRow">
             {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
-              <$IconButton iconName={IconName.Caret} isToggle />
+              <$IconButton iconName={IconName.Caret} isToggle $uiRefreshEnabled={uiRefresh} />
             </CollapsibleTrigger>
           </Toolbar>
         </$Header>
@@ -232,11 +232,20 @@ const $Header = styled.header`
   ${$CollapsibleRoot}[data-state='closed'] & {
     box-shadow: none;
   }
+
+  z-index: 2;
 `;
 
-const $IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
   --button-icon-size: 1em;
   ${$CollapsibleRoot}[data-state='closed'] & {
     rotate: -0.5turn;
   }
+
+  ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled &&
+    css`
+      --button-border: none;
+      --button-backgroundColor: transparent;
+    `};
 `;

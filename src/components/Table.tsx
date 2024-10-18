@@ -574,7 +574,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
       allowSorting={column.props?.allowsSorting ?? true}
       withScrollSnapColumns={withScrollSnapColumns}
     >
-      <$Row uiRefreshEnabled={uiRefresh}>
+      <$Row $uiRefreshEnabled={uiRefresh}>
         {column.rendered}
         {(column.props.allowsSorting ?? true) &&
           (uiRefresh ? (
@@ -1031,9 +1031,9 @@ const $Tbody = styled.tbody<TableStyleProps>`
     `}
 `;
 
-const $Row = styled.div<{ uiRefreshEnabled: boolean }>`
+const $Row = styled.div<{ $uiRefreshEnabled: boolean }>`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
 
-  gap: ${({ uiRefreshEnabled }) => (uiRefreshEnabled ? css`0.25ch;` : css`0.5ch`)};
+  gap: ${({ $uiRefreshEnabled }) => ($uiRefreshEnabled ? css`0.33ch;` : css`0.5ch`)};
 `;

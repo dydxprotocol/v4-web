@@ -47,6 +47,7 @@ export const ToggleButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, To
     );
   }
 );
+
 const $BaseButton = styled(BaseButton)`
   --button-toggle-off-backgroundColor: var(--color-layer-3);
   --button-toggle-off-textColor: var(--color-text-0);

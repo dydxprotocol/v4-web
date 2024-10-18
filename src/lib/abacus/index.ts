@@ -121,6 +121,7 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.staticTyping = testFlags.enableStaticTyping;
+    appConfigs.metadataService = testFlags.pml;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',

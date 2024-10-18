@@ -8,7 +8,9 @@ import { NumberSign } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 import {
   useLoadedVaultAccount,
   useLoadedVaultDetails,
@@ -19,6 +21,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
@@ -96,9 +99,21 @@ const $DetailCard = styled.div`
 `;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
+  const { vaultOperatorLearnMore } = useURLConfigs();
+  const operatorName = useEnvConfig('megavaultOperatorName');
   return (
     <div className={className} tw="text-color-text-0 font-small-medium">
-      {stringGetter({ key: STRING_KEYS.VAULT_DESCRIPTION })}
+      {stringGetter({
+        key: STRING_KEYS.VAULT_DESCRIPTION,
+        params: {
+          OPERATOR_NAME: operatorName,
+          OPERATOR_LEARN_MORE: (
+            <Link isInline withIcon href={vaultOperatorLearnMore}>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            </Link>
+          ),
+        },
+      })}
     </div>
   );
 };
@@ -131,7 +146,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
       value: (
         <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
-          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} />
+          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} fractionDigits={0} />
         </$ColoredReturn>
       ),
     },

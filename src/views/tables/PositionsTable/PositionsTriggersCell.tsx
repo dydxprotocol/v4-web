@@ -128,7 +128,7 @@ export const PositionsTriggersCell = ({
   }) => {
     if (orders.length === 0) {
       return (
-        <$Container $align={align}>
+        <$Container $align={align} onClick={openTriggersDialog}>
           <$Output type={OutputType.Fiat} value={null} $withLiquidationWarning={false} />
         </$Container>
       );
@@ -151,7 +151,7 @@ export const PositionsTriggersCell = ({
       );
 
       return (
-        <$Container $align={align}>
+        <$Container $align={align} onClick={openTriggersDialog}>
           {liquidationWarningSide != null ? (
             <WithHovercard
               align="start"
@@ -284,7 +284,7 @@ const $EditButton = styled(IconButton)`
 
 const $ViewOrdersButton = styled(Button)`
   ${ButtonStyle}
-  --button-height: var(--item-height);
+  --button-height: 100%;
   --button-textColor: var(--color-accent);
   --button-padding: 0;
 

@@ -79,7 +79,7 @@ export const MarketFilter = ({
   );
 
   return (
-    <$MarketFilter $compactLayout={compactLayout} uiRefreshEnabled={uiRefresh}>
+    <$MarketFilter $compactLayout={compactLayout} $uiRefreshEnabled={uiRefresh}>
       <div tw="flex items-center gap-0.5">
         <$SearchInput
           placeholder={stringGetter({ key: searchPlaceholderKey })}
@@ -102,7 +102,7 @@ export const MarketFilter = ({
     </$MarketFilter>
   );
 };
-const $MarketFilter = styled.div<{ $compactLayout: boolean; uiRefreshEnabled: boolean }>`
+const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -110,8 +110,8 @@ const $MarketFilter = styled.div<{ $compactLayout: boolean; uiRefreshEnabled: bo
   flex: 1;
   overflow: hidden;
 
-  ${({ uiRefreshEnabled }) =>
-    uiRefreshEnabled &&
+  ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled &&
     css`
       button {
         --button-toggle-off-border: none;

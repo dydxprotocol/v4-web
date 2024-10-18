@@ -4,6 +4,8 @@ import { Separator } from '@radix-ui/react-separator';
 import styled, { css } from 'styled-components';
 
 const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
+  --separatorHeight-padding: 1.5rem;
+
   flex: 0 !important;
   z-index: -1;
 
@@ -26,7 +28,7 @@ const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
             height: 100%;
           `
         : css`
-            height: calc(100% - 1.5rem);
+            height: calc(100% - var(--separatorHeight-padding));
           `}
   }
 `;
@@ -53,11 +55,13 @@ export const WithSeparators = ({
   children,
   withSeparators = true,
   fullHeight = false,
+  className,
 }: {
   layout: 'column' | 'row';
   children: React.ReactNode;
   withSeparators?: boolean;
   fullHeight?: boolean;
+  className?: string;
 }) =>
   withSeparators
     ? [children].flat().map((child, i, { length }) => (
@@ -66,6 +70,7 @@ export const WithSeparators = ({
           {child}
           {i < length - 1 && (
             <StyledSeparator
+              className={className}
               $fullHeight={fullHeight}
               orientation={
                 (
@@ -81,6 +86,7 @@ export const WithSeparators = ({
         </Fragment>
       ))
     : children;
+
 export const HorizontalSeparatorFiller = ({ className }: { className?: string }) => (
   <Separator
     className={className}

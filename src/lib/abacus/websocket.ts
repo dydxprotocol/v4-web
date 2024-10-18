@@ -28,7 +28,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
   private isConnecting: boolean = false;
 
-  orderbookCandlesToggleOn: boolean = true;
+  orderbookCandlesToggleOn: boolean = false;
 
   connect(url: string, connected: (p0: boolean) => void, received: (p0: string) => void): void {
     this.url = url;

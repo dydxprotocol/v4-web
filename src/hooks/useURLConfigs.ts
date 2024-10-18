@@ -39,6 +39,8 @@ export interface LinksConfigs {
   protocolStaking: string;
   stakingAndClaimingRewardsLearnMore?: string;
   vaultsLearnMore: string;
+  vaultTos?: string;
+  vaultOperatorLearnMore?: string;
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
   getInTouch?: string;
@@ -87,6 +89,8 @@ export const useURLConfigs = (): LinksConfigs => {
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
     // todo add to the link configs objects
     vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
+    vaultTos: linksConfigs.vaultTos ?? FALLBACK_URL,
+    vaultOperatorLearnMore: linksConfigs.vaultOperatorLearnMore ?? FALLBACK_URL,
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
     discoveryProgram: linksConfigs.discoveryProgram,
     getInTouch: linksConfigs.getInTouch,

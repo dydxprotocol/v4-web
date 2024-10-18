@@ -144,14 +144,14 @@ export const RPCUrlsByChainId = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
       ...chainIdToRpcMap,
     };
   },
-  {} as Record<string, string[]>
+  {} as { [key: string]: string[] | undefined }
 );
 
 const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
-    const rpcUrls = RPCUrlsByChainId[chain.id];
+    const rpcUrls = RPCUrlsByChainId[chain.id] ?? [];
     const rpcTransports = rpcUrls.map((rpcUrl) => http(rpcUrl));
-    const rpcTransportsWithDefault = [...rpcTransports, http()];
+    const rpcTransportsWithDefault = [...rpcTransports, http()].filter(isTruthy);
     transports[chain.id] = fallback(rpcTransportsWithDefault);
     return transports;
   },

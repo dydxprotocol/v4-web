@@ -201,7 +201,7 @@ const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
   --tableCell-padding: 0.625rem 1.25rem;
   --tableRow-backgroundColor: var(--color-layer-3);
-  --tableHeader-backgroundColor: var(--color-layer-3);
+
   border-bottom-right-radius: 0.625rem;
   border-bottom-left-radius: 0.625rem;
 

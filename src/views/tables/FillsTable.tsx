@@ -52,8 +52,12 @@ export enum FillsTableColumnKey {
   Liquidity = 'Liquidity',
   AmountPrice = 'Amount-Price',
   AmountTag = 'Amount-Tag',
-  TotalFee = 'Total-Fee',
+  Total = 'Total',
+  Fee = 'Fee',
   TypeLiquidity = 'Type-Liquidity',
+
+  // TODO: CT-1292 remove deprecated fields
+  TotalFee = 'Total-Fee',
 
   // Tablet Only
   TypeAmount = 'Type-Amount',
@@ -193,6 +197,26 @@ const getFillsTableColumnDef = ({
         renderCell: ({ size, fee, price }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />
+            <Output type={OutputType.Fiat} value={fee} />
+          </TableCell>
+        ),
+      },
+      [FillsTableColumnKey.Total]: {
+        columnKey: 'total',
+        getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
+        label: stringGetter({ key: STRING_KEYS.TOTAL }),
+        renderCell: ({ size, price }) => (
+          <TableCell>
+            <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />
+          </TableCell>
+        ),
+      },
+      [FillsTableColumnKey.Fee]: {
+        columnKey: 'fee',
+        getCellValue: (row) => row.fee,
+        label: stringGetter({ key: STRING_KEYS.FEE }),
+        renderCell: ({ fee }) => (
+          <TableCell>
             <Output type={OutputType.Fiat} value={fee} />
           </TableCell>
         ),

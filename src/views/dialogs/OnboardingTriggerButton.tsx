@@ -1,6 +1,6 @@
 import { OnboardingState } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -49,6 +49,7 @@ export const OnboardingTriggerButton = ({
       className={className}
       action={ButtonAction.Primary}
       size={size}
+      type={ButtonType.Button}
       state={{
         isDisabled: disableConnectButton,
       }}

@@ -12,6 +12,7 @@ import {
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
@@ -25,7 +26,7 @@ import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
-import { useAllStatsigGateValues } from '../useStatsig';
+import { useAllStatsigGateValues, useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useURLConfigs } from '../useURLConfigs';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
@@ -75,6 +76,7 @@ export const useTradingView = ({
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
+  const ffEnableOrderbookCandles = useStatsigGateValue(StatsigFlags.ffEnableOhlc);
 
   const savedResolution = useMemo(
     () => getSavedResolution({ savedConfig: savedTvChartConfig }),
@@ -149,23 +151,25 @@ export const useTradingView = ({
               }),
             });
 
-            // Orderbook Candles (OHLC)
-            const getOhlcTooltipString = tooltipStrings.ohlc;
-            const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
-              stringGetter,
-              stringParams: {},
-              urlConfigs,
-              featureFlags,
-            });
+            if (ffEnableOrderbookCandles) {
+              // Orderbook Candles (OHLC)
+              const getOhlcTooltipString = tooltipStrings.ohlc;
+              const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
+                stringGetter,
+                stringParams: {},
+                urlConfigs,
+                featureFlags,
+              });
 
-            initializeToggle({
-              toggleRef: orderbookCandlesToggleRef,
-              tvWidget: tvWidgetRef.current,
-              isOn: orderbookCandlesToggleOn,
-              setToggleOn: setOrderbookCandlesToggleOn,
-              label: `${ohlcTitle}*`,
-              tooltip: ohlcBody as string,
-            });
+              initializeToggle({
+                toggleRef: orderbookCandlesToggleRef,
+                tvWidget: tvWidgetRef.current,
+                isOn: orderbookCandlesToggleOn,
+                setToggleOn: setOrderbookCandlesToggleOn,
+                label: `${ohlcTitle}*`,
+                tooltip: ohlcBody as string,
+              });
+            }
 
             // Buy/Sell Marks
             initializeToggle({
