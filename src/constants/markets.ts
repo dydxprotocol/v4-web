@@ -206,3 +206,5 @@ export const LIQUIDITY_TIERS = {
     impactNotional: 2_500,
   },
 };
+
+export const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];

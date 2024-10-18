@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
@@ -119,9 +120,7 @@ export const NewMarketPreviewStep = ({
         {stringGetter({
           key: STRING_KEYS.LIQUIDITY_TIER_IS,
           params: {
-            TIER: (
-              <span tw="text-color-text-1">{stringGetter({ key: STRING_KEYS.LONG_TAIL })}</span>
-            ),
+            TIER: <span tw="text-color-text-1">{stringGetter({ key: STRING_KEYS.ISOLATED })}</span>,
           },
         })}
       </span>
@@ -132,17 +131,31 @@ export const NewMarketPreviewStep = ({
           {
             key: 'imf',
             label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION_SHORT }),
-            value: <Output type={OutputType.Number} value={0.2} fractionDigits={1} />,
+            value: (
+              <Output
+                type={OutputType.Number}
+                value={ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction}
+                fractionDigits={2}
+              />
+            ),
           },
           {
             key: 'mainetnanace-margin',
             label: stringGetter({ key: STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_SHORT }),
-            value: <Output type={OutputType.Number} value={0.1} fractionDigits={1} />,
+            value: (
+              <Output
+                type={OutputType.Number}
+                value={ISOLATED_LIQUIDITY_TIER_INFO.maintenanceMarginFraction}
+                fractionDigits={2}
+              />
+            ),
           },
           {
             key: 'impact-notional',
             label: stringGetter({ key: STRING_KEYS.IMPACT_NOTIONAL }),
-            value: <Output type={OutputType.Fiat} value={2_500} />,
+            value: (
+              <Output type={OutputType.Fiat} value={ISOLATED_LIQUIDITY_TIER_INFO.impactNotional} />
+            ),
           },
         ]}
       />
