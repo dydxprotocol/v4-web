@@ -132,7 +132,7 @@ export const AffiliatesPage: React.FC = () => {
       {currTab === AffiliateRoute.Leaderboard ? (
         <$AffiliatesLeaderboard accountStats={accountStats} />
       ) : (
-        <$CommunityChart />
+        <$CommunityChart programStats={programStats as IProgramStats} />
       )}
       {routesComponent}
     </$Page>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
+import { IProgramStats } from '@/constants/affiliates';
 import { AffiliatesProgramMetric } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -17,7 +18,11 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { ProgramHistoricalChart } from './ProgramHistoricalChart';
 
-export const CommunityChartContainer = () => {
+interface CommunityChartContainerProps {
+  programStats: IProgramStats;
+}
+
+export const CommunityChartContainer = ({ programStats }: CommunityChartContainerProps) => {
   const [chartMetric, setChartMetric] = useState(AffiliatesProgramMetric.ReferredVolume);
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -49,6 +54,7 @@ export const CommunityChartContainer = () => {
 
       <$ChartContainer className="bg-color-layer-3 p-2">
         <ProgramHistoricalChart
+          {...{ programStats }}
           selectedChartMetric={chartMetric}
           selectedLocale={selectedLocale}
           slotEmpty={
@@ -56,7 +62,7 @@ export const CommunityChartContainer = () => {
               <$EmptyCard>
                 <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
                 {stringGetter({
-                  key: STRING_KEYS.TRADING_REWARD_CHART_EMPTY_STATE,
+                  key: STRING_KEYS.AFFILIATE_CHART_EMPTY_STATE,
                 })}
               </$EmptyCard>
             </div>

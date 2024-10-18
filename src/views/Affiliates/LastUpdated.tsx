@@ -38,7 +38,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
 
     const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
-    if (diffInSeconds === 3600) {
+    if (diffInSeconds >= 3600 && diffInSeconds < 7200) {
       return stringGetter({ key: STRING_KEYS['1_HOUR_AGO'] });
     }
     if (diffInSeconds === 86400) return stringGetter({ key: STRING_KEYS['1_DAY_AGO'] });
@@ -47,7 +47,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     }
 
     if (diffInSeconds < 60) {
-      return 'updated just now';
+      return 'just now';
     }
 
     if (diffInSeconds < 3600) {
@@ -56,7 +56,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
       return stringGetter({
         key: STRING_KEYS.X_MIN_AGO,
         params: {
-          X: rtf.format(-minutes, 'minute'),
+          X: minutes.toLocaleString(),
         },
       });
     }
@@ -67,7 +67,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
       return stringGetter({
         key: STRING_KEYS.X_HOUR_AGO,
         params: {
-          X: rtf.format(-hours, 'hour'),
+          X: hours.toLocaleString(),
         },
       });
     }
@@ -81,7 +81,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     return stringGetter({
       key: STRING_KEYS.X_DAY_AGO,
       params: {
-        X: rtf.format(-days, 'day'),
+        X: days.toLocaleString(),
       },
     });
   }

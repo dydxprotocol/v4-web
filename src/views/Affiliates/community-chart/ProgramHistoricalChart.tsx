@@ -5,6 +5,7 @@ import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
+import { IProgramStats } from '@/constants/affiliates';
 import {
   AffiliatesProgramMetric,
   AffiliatesProgramPeriod,
@@ -36,6 +37,7 @@ import { MustBigNumber } from '@/lib/numbers';
 type ElementProps = {
   selectedLocale: string;
   slotEmpty: React.ReactNode;
+  programStats?: IProgramStats;
 };
 
 type StyleProps = {
@@ -58,6 +60,7 @@ export const ProgramHistoricalChart = ({
   selectedChartMetric,
   selectedLocale,
   slotEmpty,
+  programStats,
   className,
 }: ElementProps & StyleProps & { selectedChartMetric: AffiliatesProgramMetric }) => {
   const stringGetter = useStringGetter();
@@ -83,6 +86,24 @@ export const ProgramHistoricalChart = ({
     [AffiliatesProgramMetric.ReferredTrades]: stringGetter({ key: STRING_KEYS.TRADES_REFERRED }),
     [AffiliatesProgramMetric.ReferredUsers]: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
     [AffiliatesProgramMetric.ReferredVolume]: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
+  };
+
+  const chartTotales = {
+    [AffiliatesProgramMetric.AffiliateEarnings]: programStats
+      ? MustBigNumber(programStats.totalEarnings).toFixed(TOKEN_DECIMALS)
+      : 0,
+    [AffiliatesProgramMetric.ReferredTrades]: programStats ? programStats.referredTrades : 0,
+    [AffiliatesProgramMetric.ReferredUsers]: programStats ? programStats.totalReferredUsers : 0,
+    [AffiliatesProgramMetric.ReferredVolume]: programStats
+      ? MustBigNumber(programStats.referredVolume).toFixed(TOKEN_DECIMALS)
+      : 0,
+  };
+
+  const chartDecimals = {
+    [AffiliatesProgramMetric.AffiliateEarnings]: TOKEN_DECIMALS,
+    [AffiliatesProgramMetric.ReferredTrades]: 0,
+    [AffiliatesProgramMetric.ReferredUsers]: 0,
+    [AffiliatesProgramMetric.ReferredVolume]: TOKEN_DECIMALS,
   };
 
   const msForPeriod = useCallback(
@@ -214,13 +235,17 @@ export const ProgramHistoricalChart = ({
         tickSpacingX={210}
         tickSpacingY={50}
       >
-        {metricData.length > 0 && (
+        {programStats && metricData.length > 0 ? (
           <$Value>
-            {MustBigNumber(
-              tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ?? 1000
-            ).toFixed(TOKEN_DECIMALS)}
+            {tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount != undefined
+              ? MustBigNumber(
+                  tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount
+                ).toFixed(chartDecimals[selectedChartMetric])
+              : chartTotales[selectedChartMetric]}
             <AssetIcon symbol={chainTokenLabel} />
           </$Value>
+        ) : (
+          <$Value>-</$Value>
         )}
       </TimeSeriesChart>
     </>
