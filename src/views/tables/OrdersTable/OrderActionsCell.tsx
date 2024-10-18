@@ -6,12 +6,15 @@ import styled, { css } from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
+import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { clearOrder } from '@/state/account';
 import { useAppDispatch } from '@/state/appTypes';
@@ -28,6 +31,8 @@ type ElementProps = {
 
 export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
   const dispatch = useAppDispatch();
+  const stringGetter = useStringGetter();
+
   const { uiRefresh } = testFlags;
 
   const [isCanceling, setIsCanceling] = useState(false);
@@ -48,22 +53,24 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 
   return (
     <ActionsTableCell>
-      <$CancelButton
-        key="cancelorder"
-        iconName={IconName.Close}
-        iconSize="0.875em"
-        shape={ButtonShape.Square}
-        $uiRefreshEnabled={uiRefresh}
-        {...(isOrderStatusClearable(status)
-          ? { onClick: () => dispatch(clearOrder(orderId)) }
-          : {
-              onClick: onCancel,
-              state: {
-                isLoading: isCanceling,
-                isDisabled: isCancelDisabled,
-              },
-            })}
-      />
+      <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CANCEL_ORDER })}>
+        <$CancelButton
+          key="cancelorder"
+          iconName={IconName.Close}
+          iconSize="0.875em"
+          shape={ButtonShape.Square}
+          $uiRefreshEnabled={uiRefresh}
+          {...(isOrderStatusClearable(status)
+            ? { onClick: () => dispatch(clearOrder(orderId)) }
+            : {
+                onClick: onCancel,
+                state: {
+                  isLoading: isCanceling,
+                  isDisabled: isCancelDisabled,
+                },
+              })}
+        />
+      </WithTooltip>
     </ActionsTableCell>
   );
 };

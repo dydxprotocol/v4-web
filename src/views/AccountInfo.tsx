@@ -13,6 +13,8 @@ import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { AccountInfoConnectedState } from './AccountInfo/AccountInfoConnectedState';
 
 type StyleProps = {
@@ -24,9 +26,15 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const canViewAccountInfo = useAppSelector(calculateCanViewAccount);
 
+  const { uiRefresh } = testFlags;
+
   return (
-    <$AccountInfoSectionContainer className={className} showAccountInfo={canViewAccountInfo}>
-      {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo ? (
+    <$AccountInfoSectionContainer
+      className={className}
+      showAccountInfo={canViewAccountInfo}
+      $uiRefreshEnabled={uiRefresh}
+    >
+      {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo || uiRefresh ? (
         <AccountInfoConnectedState />
       ) : (
         <$DisconnectedAccountInfoContainer>
@@ -59,13 +67,26 @@ const $DisconnectedAccountInfoContainer = styled.div`
   }
 `;
 
-const $AccountInfoSectionContainer = styled.div<{ showAccountInfo?: boolean }>`
+const $AccountInfoSectionContainer = styled.div<{
+  showAccountInfo?: boolean;
+  $uiRefreshEnabled: boolean;
+}>`
   ${layoutMixins.column}
-  height: var(--account-info-section-height);
-  min-height: var(--account-info-section-height);
 
-  ${({ showAccountInfo }) =>
+  ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled
+      ? css`
+          height: var(--account-info-section-height);
+          min-height: var(--account-info-section-height);
+        `
+      : css`
+          height: var(--account-info-section-height-deprecated);
+          min-height: var(--account-info-section-height-deprecated);
+        `}
+
+  ${({ showAccountInfo, $uiRefreshEnabled }) =>
     !showAccountInfo &&
+    !$uiRefreshEnabled &&
     css`
       padding: 1.125em 1.25em 0.875em;
     `}
