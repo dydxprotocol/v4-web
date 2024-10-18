@@ -5,8 +5,10 @@ import {
   getMapOfHighestFeeTokensByChainId,
   getMapOfLowestFeeTokensByChainId,
   getMapOfLowestFeeTokensByDenom,
+  isTokenCctp,
 } from '@/constants/cctp';
 
+import cctpTokens from '../../../public/configs/cctp.json';
 import { TransferType } from '../abacus';
 
 describe('getLowestFeeChainNames', () => {
@@ -250,5 +252,41 @@ describe('getMapOfHighestFeeTokensByChainId', () => {
         },
       ],
     });
+  });
+});
+
+describe('isTokenCctp', () => {
+  const getTestAssetWithDenom = (denom: string) => ({
+    denom,
+    chainID: '1',
+    originDenom: denom,
+    originChainID: '1',
+    trace: 'test-trace',
+    isCW20: false,
+    isEVM: true,
+    isSVM: false,
+    symbol: 'test-symbol',
+    name: 'test-name',
+    logoURI: 'test-logoURI',
+    decimals: 10,
+    tokenContract: 'test-contract',
+    description: 'test-description',
+    coingeckoID: 'test-coingeckoID',
+    recommendedSymbol: 'test-recommendedSymbol',
+  });
+  it('returns true for cctp token', () => {
+    const denom = cctpTokens[0].tokenAddress;
+    const asset = getTestAssetWithDenom(denom);
+    expect(isTokenCctp(asset)).toBe(true);
+  });
+  it('returns true for cctp token case insensitive', () => {
+    const denom = cctpTokens[0].tokenAddress.toLowerCase();
+    const asset = getTestAssetWithDenom(denom);
+    expect(isTokenCctp(asset)).toBe(true);
+  });
+  it('returns false for non-cctp tokens', () => {
+    const denom = 'non-cctp-denom';
+    const asset = getTestAssetWithDenom(denom);
+    expect(isTokenCctp(asset)).toBe(false);
   });
 });

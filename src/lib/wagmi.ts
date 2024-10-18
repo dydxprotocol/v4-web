@@ -1,7 +1,7 @@
 // Custom connectors
 import type { PrivyClientConfig } from '@privy-io/react-auth';
 import { createConfig } from '@privy-io/wagmi';
-import { fallback, FallbackTransport, http, Transport, type Chain } from 'viem';
+import { FallbackTransport, Transport, http, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -37,6 +37,7 @@ import {
   scroll,
   sepolia,
 } from 'viem/chains';
+import { fallback } from 'wagmi';
 import {
   coinbaseWallet as coinbaseWalletConnector,
   walletConnect as walletConnectConnector,
@@ -144,14 +145,14 @@ export const RPCUrlsByChainId = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
       ...chainIdToRpcMap,
     };
   },
-  {} as Record<string, string[]>
+  {} as { [key: string]: string[] | undefined }
 );
 
 const RPCTransports = [mainnet, ...WAGMI_SUPPORTED_CHAINS].reduce(
   (transports, chain) => {
-    const rpcUrls = RPCUrlsByChainId[chain.id];
+    const rpcUrls = RPCUrlsByChainId[chain.id] ?? [];
     const rpcTransports = rpcUrls.map((rpcUrl) => http(rpcUrl));
-    const rpcTransportsWithDefault = [...rpcTransports, http()];
+    const rpcTransportsWithDefault = [...rpcTransports, http()].filter(isTruthy);
     transports[chain.id] = fallback(rpcTransportsWithDefault);
     return transports;
   },

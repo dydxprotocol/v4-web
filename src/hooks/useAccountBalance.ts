@@ -23,6 +23,7 @@ import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { isNativeDenom } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
@@ -39,13 +40,6 @@ type UseAccountBalanceProps = {
 
   isCosmosChain?: boolean;
 };
-
-/**
- * cosmjs uses this 0x address as the chain's native token.
- * skip does not, but we add this value in order to be able to send payloads to cosmjs
- * @todo We may need to add additional logic here if we 'useAccountBalance' on forms that do not follow this format.
- */
-export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const useAccountBalance = ({
   addressOrDenom,
@@ -77,7 +71,7 @@ export const useAccountBalance = ({
       : undefined;
   const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
-  const isEVMnativeToken = addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS;
+  const isEVMnativeToken = isNativeDenom(addressOrDenom);
 
   const evmNative = useBalance({
     address: evmAddress,

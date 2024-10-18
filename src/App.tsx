@@ -43,12 +43,12 @@ import { config, privyConfig } from '@/lib/wagmi';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
-import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
+import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
@@ -77,6 +77,7 @@ const Content = () => {
   useInitializePage();
   useAnalytics();
   useCommandMenu();
+  usePrefetchedQueries();
 
   const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
@@ -208,7 +209,6 @@ const providers = [
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
-  wrapProvider(SkipProvider),
 ];
 
 const App = () => {
