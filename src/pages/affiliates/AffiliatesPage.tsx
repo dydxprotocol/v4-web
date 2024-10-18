@@ -1,6 +1,6 @@
-import React, { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { IAffiliateStats, IProgramStats } from '@/constants/affiliates';
@@ -18,16 +18,17 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
-import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import LastUpdated from '@/views/Affiliates/LastUpdated';
 import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
 import { ProgramStatsCard } from '@/views/Affiliates/cards/ProgramStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
-import { CommunityChartContainer } from '@/views/Affiliates/community-chart/ProgramChartContainer';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
-export const AffiliatesPage: React.FC = () => {
+export const AffiliatesPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const { isConnectedWagmi } = useWalletConnection();
   const { dydxAddress } = useAccounts();
   const { programStatsQuery, affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
@@ -39,7 +40,10 @@ export const AffiliatesPage: React.FC = () => {
 
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
-  const [currTab, setCurrTab] = useState<AffiliateRoute>(AffiliateRoute.Leaderboard);
+
+  const currentTab = location.pathname.includes(AffiliateRoute.ProgramStats)
+    ? AffiliateRoute.ProgramStats
+    : AffiliateRoute.Leaderboard;
 
   const userStatus = {
     isAffiliate: affiliateMetadata?.metadata?.isAffiliate ?? false,
@@ -48,86 +52,75 @@ export const AffiliatesPage: React.FC = () => {
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount.toString(),
   };
 
-  const routesComponent = (
-    <Suspense fallback={<LoadingSpace id="affiliates" />}>
-      <Routes>
-        <Route index path="*" element={<Navigate to={AffiliateRoute.Leaderboard} />} />
-        <Route path={AffiliateRoute.Leaderboard} />
-        <Route path={AffiliateRoute.ProgramStats} />
-      </Routes>
-    </Suspense>
-  );
-
   return (
-    <$Page>
-      <$Section className="p-1">
-        {isNotTablet && lastUpdated && <LastUpdated lastUpdatedDate={new Date(lastUpdated)} />}
-        <AffiliatesBanner />
+    <Suspense fallback={<LoadingSpace id="affiliates" />}>
+      <$Page>
+        <$Section className="p-1">
+          {isNotTablet && lastUpdated && <LastUpdated lastUpdatedDate={new Date(lastUpdated)} />}
+          <AffiliatesBanner />
 
-        <AttachedExpandingSection>
-          <$NavigationMenu
-            orientation="horizontal"
-            items={[
-              {
-                group: 'navigation',
-                items: [
-                  {
-                    value: AffiliateRoute.Leaderboard,
-                    href: AffiliateRoute.Leaderboard,
-                    label: <h3>{stringGetter({ key: STRING_KEYS.YOUR_STATS })}</h3>,
-                    onClick: () => setCurrTab(AffiliateRoute.Leaderboard),
-                  },
-                  {
-                    value: AffiliateRoute.ProgramStats,
-                    href: AffiliateRoute.ProgramStats,
-                    label: <h3>{stringGetter({ key: STRING_KEYS.PROGRAM_STATS })}</h3>,
-                    onClick: () => setCurrTab(AffiliateRoute.ProgramStats),
-                  },
-                ],
-              },
-            ]}
-          />
-        </AttachedExpandingSection>
-
-        {currTab === AffiliateRoute.Leaderboard && (
-          <section className="mt-0.5 flex flex-row flex-wrap items-center justify-between gap-y-1">
-            {isConnectedWagmi && !userStatus.isAffiliate && !userStatus.isVip ? (
-              <div className="w-full notTablet:w-7/12">
-                <ShareAffiliateBanner accountStats={accountStats as IAffiliateStats} />
-              </div>
-            ) : (
-              <AffiliateStatsCard
-                currentAffiliateTier={userStatus.currentAffiliateTier}
-                isVip={userStatus.isVip}
-                stakedDydx={userStatus.stakedDydx}
-                className="h-fit w-full notTablet:h-full notTablet:w-7/12"
-                accountStats={accountStats}
-              />
-            )}
-
-            <ProgramStatusCard
-              className="h-fit w-full notTablet:h-full notTablet:w-4/12"
-              isWalletConnected={isConnectedWagmi}
-              isVip={!!userStatus.isVip}
+          <AttachedExpandingSection>
+            <$NavigationMenu
+              orientation="horizontal"
+              items={[
+                {
+                  group: 'navigation',
+                  items: [
+                    {
+                      value: AffiliateRoute.Leaderboard,
+                      href: AffiliateRoute.Leaderboard,
+                      label: <h3>{stringGetter({ key: STRING_KEYS.YOUR_STATS })}</h3>,
+                      onClick: () => navigate(AffiliateRoute.Leaderboard),
+                    },
+                    {
+                      value: AffiliateRoute.ProgramStats,
+                      href: AffiliateRoute.ProgramStats,
+                      label: <h3>{stringGetter({ key: STRING_KEYS.PROGRAM_STATS })}</h3>,
+                      onClick: () => navigate(AffiliateRoute.ProgramStats),
+                    },
+                  ],
+                },
+              ]}
             />
-          </section>
-        )}
+          </AttachedExpandingSection>
 
-        {currTab === AffiliateRoute.ProgramStats && (
-          <ProgramStatsCard
-            className="mt-0.5 h-fit notTablet:h-full"
-            programStats={programStats as IProgramStats}
-          />
-        )}
-      </$Section>
+          {currentTab === AffiliateRoute.Leaderboard && (
+            <section className="mt-0.5 flex flex-row flex-wrap items-center justify-between gap-y-1">
+              {isConnectedWagmi && !userStatus.isAffiliate && !userStatus.isVip ? (
+                <div className="w-full notTablet:w-7/12">
+                  <ShareAffiliateBanner accountStats={accountStats as IAffiliateStats} />
+                </div>
+              ) : (
+                <AffiliateStatsCard
+                  currentAffiliateTier={userStatus.currentAffiliateTier}
+                  isVip={userStatus.isVip}
+                  stakedDydx={userStatus.stakedDydx}
+                  className="h-fit w-full notTablet:h-full notTablet:w-7/12"
+                  accountStats={accountStats}
+                />
+              )}
 
-      {currTab === AffiliateRoute.Leaderboard ? (
-        <$AffiliatesLeaderboard accountStats={accountStats} />
-      ) : (
-        <$CommunityChart />
-      )}
-      {routesComponent}
-    </$Page>
+              <ProgramStatusCard
+                className="h-fit w-full notTablet:h-full notTablet:w-4/12"
+                isWalletConnected={isConnectedWagmi}
+                isVip={!!userStatus.isVip}
+              />
+            </section>
+          )}
+
+          {currentTab === AffiliateRoute.ProgramStats && (
+            <ProgramStatsCard
+              className="mt-0.5 h-fit notTablet:h-full"
+              programStats={programStats as IProgramStats}
+            />
+          )}
+        </$Section>
+
+        <$ContentAttached>
+          <Outlet context={{ accountStats }} />
+        </$ContentAttached>
+      </$Page>
+    </Suspense>
   );
 };
 
@@ -137,11 +130,7 @@ const $Page = styled.div`
   background-size: cover;
 `;
 
-const $AffiliatesLeaderboard = styled(AffiliatesLeaderboard)`
-  ${layoutMixins.contentSectionAttached}
-`;
-
-const $CommunityChart = styled(CommunityChartContainer)`
+const $ContentAttached = styled.div`
   ${layoutMixins.contentSectionAttached}
 `;
 
