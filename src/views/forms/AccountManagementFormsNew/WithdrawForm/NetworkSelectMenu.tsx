@@ -105,7 +105,7 @@ export const NetworkSelectMenu = ({
     }
   );
 
-  // TODO: actually configure exchanges
+  // TODO [onboarding-rewrite]: configure exchanges
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.name,
     label: exchange.label,
