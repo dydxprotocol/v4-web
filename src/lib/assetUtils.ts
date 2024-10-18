@@ -1,4 +1,8 @@
+import { Asset } from '@skip-go/client';
+
 import { Nullable } from '@/constants/abacus';
+import { isTokenCctp } from '@/constants/cctp';
+import { NetworkType } from '@/constants/transfers';
 
 /**
  *
@@ -65,4 +69,27 @@ export const WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeee
 export const isNativeDenom = (denom: string | undefined): boolean => {
   if (!denom) return false;
   return denom === WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS || denom?.endsWith(SKIP_NATIVE_DENOM_SUFFIX);
+};
+
+export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
+  const cctpToken = assets.find((asset) => {
+    return isTokenCctp(asset);
+  });
+  const nativeChainToken = assets.find((asset) => {
+    return isNativeDenom(asset.denom);
+  });
+  const uusdcToken = assets.find((asset) => {
+    return asset.denom === 'uusdc' || asset.originDenom === 'uusdc';
+  });
+  // If not cctp, native chain, or usdc token, default to the first item in the list
+  const defaultTokenDenom =
+    cctpToken?.denom ?? nativeChainToken?.denom ?? uusdcToken?.denom ?? assets[0]?.denom;
+  return defaultTokenDenom;
+};
+
+export const getDefaultChainIDFromNetworkType = (networkType: NetworkType): string | undefined => {
+  if (networkType === 'evm') return '1';
+  if (networkType === 'svm') return 'solana';
+  if (networkType === 'cosmos') return 'noble-1';
+  return undefined;
 };
