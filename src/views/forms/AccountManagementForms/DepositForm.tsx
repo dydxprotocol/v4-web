@@ -41,6 +41,7 @@ import {
   NumberSign,
 } from '@/constants/numbers';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
+import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, type EvmAddress, WalletNetworkType, WalletType } from '@/constants/wallets';
 
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
@@ -50,6 +51,7 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import { useFunkitBuyNobleUsdc } from '@/hooks/useFunkitBuyNobleUsdc';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -111,6 +113,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
+  const ffEnableFunkit = useStatsigGateValue(StatsigFlags.ffEnableFunkit);
 
   const {
     dydxAddress,
@@ -743,12 +746,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }
   return (
     <$Form onSubmit={onSubmit}>
-      <FunkitToggle
-        onToggle={() => {
-          dispatch(closeDialog());
-          startCheckout();
-        }}
-      />
+      {ffEnableFunkit && (
+        <FunkitToggle
+          onToggle={() => {
+            dispatch(closeDialog());
+            startCheckout();
+          }}
+        />
+      )}
       <div tw="text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,

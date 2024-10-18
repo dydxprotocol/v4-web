@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme, AppThemeSetting } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
+import { updateFunkitDeposit } from '@/state/funkitDeposits';
 
 import { track } from '@/lib/analytics/analytics';
 
@@ -26,11 +27,14 @@ export function useFunkitBuyNobleUsdc() {
   const { lightMode, darkMode, setTheme } = useActiveTheme();
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
+
   const config = useMemo(
     () => ({
-      onConfirmation: () => {
+      onConfirmation: (checkoutId: string) => {
         // TODO: Supply remaining transfer event data once Funkit provides it
         track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
+        dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
+        console.log('checkoutId', checkoutId);
       },
       onDydxSwitch: () => {
         dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
