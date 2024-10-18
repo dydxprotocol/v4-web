@@ -46,6 +46,7 @@ const useSkipClientContext = () => {
         },
       }),
     [
+      compositeClient?.network.validatorConfig.restEndpoint,
       neutronValidator,
       nobleValidator,
       osmosisValidator,
