@@ -279,7 +279,6 @@ const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
           > * {
             padding: 0;
             display: flex;
-            clip-path: inset(0.5rem 1px);
           }
         `}
 

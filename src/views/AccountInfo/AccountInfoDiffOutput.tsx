@@ -45,13 +45,8 @@ export const AccountInfoDiffOutput = ({
   );
 };
 const $DiffOutput = styled(DiffOutput)<{ withDiff?: boolean; $uiRefreshEnabled: boolean }>`
-  --diffOutput-value-font: ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled ? css`var(--font-small-book)` : css`var(--font-mini-book)`};
-  --diffOutput-newValue-font: ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled ? css`var(--font-small-book)` : css`var(--font-mini-book)`};
-  --diffOutput-valueWithDiff-font: ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled ? css`var(--font-small-book)` : css`var(--font-mini-book)`};
-
   --diffOutput-gap: 0.125rem;
-  font: var(--font-base-book);
+
+  font: ${({ $uiRefreshEnabled }) =>
+    $uiRefreshEnabled ? css`var(--font-small-book)` : css`var(--font-mini-book)`};
 `;
