@@ -139,6 +139,7 @@ export const AnalyticsEvents = unionize(
     // Navigation
     NavigatePage: ofType<{
       path: string;
+      previousPath: string;
     }>(),
     NavigateDialog: ofType<{
       type: DialogTypesTypes;

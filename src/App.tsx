@@ -48,6 +48,7 @@ import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
+import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
@@ -73,6 +74,7 @@ const Content = () => {
   useInitializePage();
   useAnalytics();
   useCommandMenu();
+  usePrefetchedQueries();
 
   const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
