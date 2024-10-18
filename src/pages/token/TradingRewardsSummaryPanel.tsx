@@ -24,7 +24,7 @@ import abacusStateManager from '@/lib/abacus';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const currentWeekTradingReward = useAppSelector(
     getHistoricalTradingRewardsForCurrentWeek,
@@ -54,7 +54,13 @@ export const TradingRewardsSummaryPanel = () => {
               value: (
                 <div tw="flexColumn gap-[0.33rem]">
                   <Output
-                    slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
+                    slotRight={
+                      <AssetIcon
+                        logoUrl={chainTokenImage}
+                        symbol={chainTokenLabel}
+                        tw="ml-[0.5ch]"
+                      />
+                    }
                     type={OutputType.Asset}
                     value={currentWeekTradingReward.amount}
                   />

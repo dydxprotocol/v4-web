@@ -66,7 +66,7 @@ export const PlaceOrderButtonAndReceipt = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
   const { complianceState } = useComplianceState();
   const { selectedTradeType } = useTradeTypeOptions();
@@ -208,7 +208,7 @@ export const PlaceOrderButtonAndReceipt = ({
         label: (
           <>
             {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
-            <AssetIcon symbol={chainTokenLabel} />
+            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
           </>
         ),
         value: (

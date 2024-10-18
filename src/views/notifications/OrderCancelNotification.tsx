@@ -15,9 +15,11 @@ import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getOrderById } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { getTradeType } from '@/lib/orders';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 
@@ -33,7 +35,8 @@ export const OrderCancelNotification = ({
   const stringGetter = useStringGetter();
   const order = useParameterizedSelector(getOrderById, localCancel.orderId)!;
   const marketData = useAppSelector((s) => getMarketData(s, order.marketId), shallowEqual);
-  const { assetId } = marketData ?? {};
+  const { assetId } = orEmptyObj(marketData);
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
   const indexedOrderStatus = order.status.rawValue;
@@ -78,7 +81,7 @@ export const OrderCancelNotification = ({
     <Notification
       isToast={isToast}
       notification={notification}
-      slotIcon={<AssetIcon symbol={assetId} />}
+      slotIcon={<AssetIcon logoUrl={logoUrl} symbol={assetId} />}
       slotTitle={orderTypeKey && stringGetter({ key: orderTypeKey })}
       slotTitleRight={
         <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">

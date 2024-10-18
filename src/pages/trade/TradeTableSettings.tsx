@@ -17,7 +17,9 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketTypeFilter, PanelView } from './types';
 
@@ -37,7 +39,10 @@ export const TradeTableSettings = ({
   onOpenChange,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const currentMarketAssetId = useAppSelector(getCurrentMarketAssetId);
+  const { id: currentMarketAssetId, resources } = orEmptyObj(
+    useAppSelector(getCurrentMarketAssetData)
+  );
+  const { imageUrl } = orEmptyObj(resources);
 
   return (
     <Popover
@@ -60,7 +65,13 @@ export const TradeTableSettings = ({
                 value: PanelView.CurrentMarket,
                 ...(currentMarketAssetId
                   ? {
-                      slotBefore: <AssetIcon symbol={currentMarketAssetId} tw="text-[1.5em]" />,
+                      slotBefore: (
+                        <AssetIcon
+                          logoUrl={imageUrl}
+                          symbol={currentMarketAssetId}
+                          tw="text-[1.5em]"
+                        />
+                      ),
                       label: currentMarketAssetId,
                     }
                   : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),

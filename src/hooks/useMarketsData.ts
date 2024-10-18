@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import {
+  LIQUIDITY_TIERS,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
   PREDICTION_MARKET,
@@ -19,11 +20,14 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
+import { useMetadataService } from './useLaunchableMarkets';
 import { useAllStatsigGateValues } from './useStatsig';
 
 const filterFunctions = {
@@ -95,10 +99,15 @@ const filterFunctions = {
   },
 };
 
-export const useMarketsData = (
-  filter: MarketFilters = MarketFilters.ALL,
-  searchFilter?: string
-): {
+export const useMarketsData = ({
+  filter = MarketFilters.ALL,
+  searchFilter,
+  hideUnlaunchedMarkets,
+}: {
+  filter: MarketFilters;
+  searchFilter?: string;
+  hideUnlaunchedMarkets?: boolean;
+}): {
   markets: MarketData[];
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
@@ -110,6 +119,7 @@ export const useMarketsData = (
   const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
+  const unlaunchedMarkets = useMetadataService();
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -135,10 +145,11 @@ export const useMarketsData = (
           perpetual,
         } = marketData;
         const { nextFundingRate, line, openInterest, openInterestUSDC, trades24H, volume24H } =
-          perpetual ?? {};
-        const { name, tags } = allAssets[assetId] ?? {};
+          orEmptyObj(perpetual);
+        const { name, tags, resources } = orEmptyObj(allAssets[assetId]);
+        const { imageUrl } = orEmptyObj(resources);
         const { effectiveInitialMarginFraction, initialMarginFraction, tickSizeDecimals } =
-          configs ?? {};
+          orEmptyObj(configs);
 
         return safeAssign(
           {},
@@ -148,6 +159,7 @@ export const useMarketsData = (
             displayId,
             clobPairId,
             effectiveInitialMarginFraction,
+            imageUrl,
             initialMarginFraction,
             isNew,
             line: line?.toArray(),
@@ -166,8 +178,53 @@ export const useMarketsData = (
         );
       });
 
+    if (unlaunchedMarkets.data && !hideUnlaunchedMarkets && testFlags.pml) {
+      const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data).map((market) => {
+        const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
+
+        if (listOfMarkets.some((m) => m.assetId === id)) return null;
+
+        return safeAssign(
+          {},
+          {
+            id: `${id}-USD`,
+            assetId: id,
+            displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
+            clobPairId: -1,
+            effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
+            imageUrl: logo,
+            initialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
+            isNew: false,
+            isUnlaunched: true,
+            line: undefined,
+            name,
+            nextFundingRate: undefined,
+            openInterest: undefined,
+            openInterestUSDC: undefined,
+            oraclePrice: price,
+            priceChange24H: price && percentChange24h ? price * percentChange24h : undefined,
+            priceChange24HPercent: percentChange24h,
+            tags: sectorTags ?? [],
+            tickSizeDecimals,
+            trades24H: 0,
+            volume24H: 0,
+          }
+        );
+      });
+
+      return [...listOfMarkets, ...unlaunchedMarketsData.filter(isTruthy)];
+    }
+
     return listOfMarkets;
-  }, [allPerpetualClobIds, allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
+  }, [
+    allPerpetualClobIds,
+    allPerpetualMarkets,
+    allAssets,
+    featureFlags,
+    hideUnlaunchedMarkets,
+    sevenDaysSparklineData,
+    unlaunchedMarkets.data,
+  ]);
 
   const filteredMarkets = useMemo(() => {
     const filtered = markets.filter(filterFunctions[filter]);

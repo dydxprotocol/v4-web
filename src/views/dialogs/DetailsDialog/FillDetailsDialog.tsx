@@ -87,7 +87,9 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
 
   return (
     <DetailsDialog
-      slotIcon={<AssetIcon symbol={asset?.id} tw="text-[1em]" />}
+      slotIcon={
+        <AssetIcon logoUrl={asset?.resources?.imageUrl} symbol={asset?.id} tw="text-[1em]" />
+      }
       title={resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
       items={detailItems}
       setIsOpen={setIsOpen}
