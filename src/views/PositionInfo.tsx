@@ -83,7 +83,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     size,
     unrealizedPnl,
     unrealizedPnlPercent,
-  } = currentMarketPosition || {};
+  } = currentMarketPosition ?? {};
 
   const netFundingBN = MustBigNumber(netFunding);
 
