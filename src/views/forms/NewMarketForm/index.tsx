@@ -128,7 +128,7 @@ export const NewMarketForm = ({
       {
         key: 'megavault-balance',
         label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-        value: <Output type={OutputType.Fiat} value={10000} />,
+        value: <Output type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />,
       },
     ].filter(isTruthy);
   }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
