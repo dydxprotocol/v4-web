@@ -10,6 +10,8 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Tag } from '@/components/Tag';
 
+import { SearchInput } from './SearchInput';
+
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onItemSelected?: () => void;
@@ -18,6 +20,7 @@ type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends 
   inputPlaceholder?: string;
   slotEmpty?: ReactNode;
   withSearch?: boolean;
+  useSearchInputComponent?: boolean;
 };
 
 type StyleProps = {
@@ -42,6 +45,7 @@ export const ComboboxMenu = <
   inputPlaceholder = 'Search…',
   slotEmpty = 'No items found.',
   withSearch = true,
+  useSearchInputComponent,
 
   className,
   withItemBorders,
@@ -64,17 +68,26 @@ export const ComboboxMenu = <
     >
       {withSearch && (
         <$Header $withStickyLayout={withStickyLayout}>
-          <$Input
-            /**
-             * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
-             * https://github.com/pacocoursey/cmdk/issues/127
-             */
-            autoFocus
-            value={searchValue}
-            onValueChange={setSearchValue}
-            placeholder={inputPlaceholder}
-            data-hj-allow
-          />
+          {useSearchInputComponent ? (
+            <$SearchInput
+              autoFocus
+              value={searchValue}
+              onChange={setSearchValue}
+              placeholder={inputPlaceholder}
+            />
+          ) : (
+            <$Input
+              /**
+               * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
+               * https://github.com/pacocoursey/cmdk/issues/127
+               */
+              autoFocus
+              value={searchValue}
+              onValueChange={setSearchValue}
+              placeholder={inputPlaceholder}
+              data-hj-allow
+            />
+          )}
         </$Header>
       )}
 
@@ -214,6 +227,14 @@ const $Command = styled(Command)<{ $withStickyLayout?: boolean }>`
             overflow-y: auto;
           }
         `}
+
+  /*
+  Layout mixins withInnerHorizontalBorders forces all children components to have box shadow
+  This creates a border-like effect that we don't want for this dropdown component
+  */
+  && > * {
+    box-shadow: none;
+  }
 `;
 
 const $Header = styled.header<{ $withStickyLayout?: boolean }>`
@@ -341,4 +362,9 @@ const $ItemLabel = styled.div`
   }
 
   min-width: 0;
+`;
+
+const $SearchInput = styled(SearchInput)`
+  margin-top: 0.75em;
+  margin-bottom: 0.5em;
 `;
