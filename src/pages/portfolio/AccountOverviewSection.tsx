@@ -53,7 +53,7 @@ export const MegavaultYieldTag = () => {
             <Output
               tw="mr-0.25"
               type={OutputType.Percent}
-              value={vault.thirtyDayReturnPercent / 100}
+              value={vault.thirtyDayReturnPercent}
               fractionDigits={0}
             />
           ),

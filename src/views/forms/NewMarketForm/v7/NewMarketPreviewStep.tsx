@@ -51,7 +51,7 @@ export const NewMarketPreviewStep = ({
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
   const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
+  const depositApr = vault?.thirtyDayReturnPercent;
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -85,6 +85,7 @@ export const NewMarketPreviewStep = ({
                 type={OutputType.Percent}
                 tw="inline-block text-color-success"
                 value={depositApr}
+                fractionDigits={0}
               />
             ),
           },

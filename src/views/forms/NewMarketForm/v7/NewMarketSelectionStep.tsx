@@ -56,7 +56,7 @@ export const NewMarketSelectionStep = ({
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
+  const depositApr = vault?.thirtyDayReturnPercent;
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -85,6 +85,7 @@ export const NewMarketSelectionStep = ({
                   type={OutputType.Percent}
                   tw="inline-block text-color-success"
                   value={depositApr}
+                  fractionDigits={0}
                 />
               ),
               DEPOSIT_AMOUNT: (

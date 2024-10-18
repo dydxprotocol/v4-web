@@ -65,7 +65,7 @@ export const NewMarketForm = ({
   const { freeCollateral: freeCollateralUpdated, marginUsage: marginUsageUpdated } =
     orEmptyObj(summaryData);
   const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
+  const depositApr = vault?.thirtyDayReturnPercent;
 
   const tickSizeDecimals = useMemo(() => {
     return getTickSizeDecimalsFromPrice(assetToAdd?.meta.referencePrice);
@@ -101,7 +101,7 @@ export const NewMarketForm = ({
       {
         key: 'deposit-apr',
         label: `${stringGetter({ key: STRING_KEYS.DEPOSIT_APR })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
-        value: <Output type={OutputType.Percent} value={depositApr} />,
+        value: <Output type={OutputType.Percent} value={depositApr} fractionDigits={0} />,
       },
       {
         key: 'deposit-lockup',

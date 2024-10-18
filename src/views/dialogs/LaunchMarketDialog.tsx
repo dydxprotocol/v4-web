@@ -26,7 +26,7 @@ export const LaunchMarketDialog = ({
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent && vault.thirtyDayReturnPercent / 100;
+  const depositApr = vault?.thirtyDayReturnPercent;
 
   const { title, description } = useMemo(() => {
     switch (formStep) {
@@ -49,6 +49,7 @@ export const LaunchMarketDialog = ({
                   type={OutputType.Percent}
                   tw="inline-block text-color-success"
                   value={depositApr}
+                  fractionDigits={0}
                 />
               ),
               DEPOSIT_AMOUNT: (
