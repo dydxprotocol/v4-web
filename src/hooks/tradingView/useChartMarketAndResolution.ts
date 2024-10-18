@@ -69,7 +69,7 @@ export const useChartMarketAndResolution = ({
     // Different resolutions have different timeframes to display data efficiently.
     const defaultRange: number | undefined = isViewingUnlaunchedMarket
       ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS[resolution]?.defaultRange
-      : RESOLUTION_CHART_CONFIGS[resolution].defaultRange;
+      : RESOLUTION_CHART_CONFIGS[resolution]!.defaultRange;
 
     if (defaultRange) {
       const to = Date.now() / 1000;

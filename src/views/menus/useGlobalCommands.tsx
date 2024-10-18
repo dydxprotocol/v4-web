@@ -34,7 +34,8 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
   const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
-    (market): PerpetualMarket & Asset => safeAssign({}, market, allAssets[market?.assetId] ?? {})
+    (market): PerpetualMarket & Asset =>
+      safeAssign({}, market, allAssets[market?.assetId] ?? ({} as Asset))
   );
 
   return [

@@ -174,7 +174,7 @@ export const PnlChart = ({
             setIsZooming(true);
           } else {
             setIsZooming(false);
-            setSelectedPeriod(periodOptions[defaultPeriodIx]);
+            setSelectedPeriod(periodOptions[defaultPeriodIx]!);
           }
         }
       }, NORMAL_DEBOUNCE_MS),

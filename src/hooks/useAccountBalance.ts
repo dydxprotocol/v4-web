@@ -200,7 +200,7 @@ export const useAccountBalance = ({
         const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount;
         const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount;
         return currentBalance >= largestBalance ? current : largest;
-      }, accounts[0]);
+      }, accounts[0]!);
 
       return {
         data: {

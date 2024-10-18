@@ -356,7 +356,7 @@ function getErrorToRenderFromErrorMessage(
   if (errorMessage.indexOf('insufficient funds: insufficient funds') > 0) {
     return stringGetter({ key: STRING_KEYS.BROADCAST_ERROR_SDK_5 });
   }
-  return errorMessage.split('\n')[0];
+  return errorMessage.split('\n')[0]!;
 }
 
 export const useVaultFormErrorState = () => {

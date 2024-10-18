@@ -13,7 +13,6 @@ import { spawn } from 'child_process';
 import * as fs from 'fs';
 import Long from 'long';
 
-
 const VOTE_FEE: StdFee = {
   amount: [
     {
@@ -73,7 +72,6 @@ export interface Proposal {
   summary: string;
   params: Params;
 }
-
 
 export enum PerpetualMarketType {
   /** PERPETUAL_MARKET_TYPE_UNSPECIFIED - Unspecified market type. */
@@ -180,7 +178,7 @@ export async function createAndSendMarketMapProposal(
   proposals: Proposal[],
   validatorEndpoint: string,
   chainId: string,
-  binary: string,
+  binary: string
 ) {
   const markets: Market[] = proposals.map((proposal) => {
     const { ticker, priceExponent, minExchanges, exchangeConfigJson } = proposal.params;
@@ -193,7 +191,7 @@ export async function createAndSendMarketMapProposal(
 
       if (config.adjustByMarket) {
         const [Base, Quote] = config.adjustByMarket.split('-');
-        normalize_by_pair = { Base, Quote };
+        normalize_by_pair = { Base: Base!, Quote: Quote! };
       }
 
       return {
@@ -208,8 +206,8 @@ export async function createAndSendMarketMapProposal(
     return {
       ticker: {
         currency_pair: {
-          Base: modifiedTicker.split('/')[0],
-          Quote: modifiedTicker.split('/')[1],
+          Base: modifiedTicker.split('/')[0]!,
+          Quote: modifiedTicker.split('/')[1]!,
         },
         decimals: Math.abs(priceExponent).toString(),
         enabled: false,
@@ -221,17 +219,17 @@ export async function createAndSendMarketMapProposal(
   });
 
   const proposal = {
-    "title": "Add markets to market map",
-    "summary":"Add markets to market map",
-    "messages": [
+    title: 'Add markets to market map',
+    summary: 'Add markets to market map',
+    messages: [
       {
-        "@type": "/slinky.marketmap.v1.MsgUpsertMarkets",
-        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
-        "markets": markets,
+        '@type': '/slinky.marketmap.v1.MsgUpsertMarkets',
+        authority: 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky',
+        markets: markets,
       },
     ],
-    "deposit":"5000000000000000000adv4tnt",
-    "expedited": true,
+    deposit: '5000000000000000000adv4tnt',
+    expedited: true,
   };
 
   const proposalFile = 'marketMapProposal.json';
@@ -244,30 +242,34 @@ export async function createAndSendMarketMapProposal(
       binary,
       ['keys', 'add', 'alice', '--recover'],
       'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small'
-    )
+    );
   }
 
   await execCLI(
     binary,
     [
-      '--node', validatorEndpoint,
-      'tx', 'gov', 'submit-proposal', 'marketMapProposal.json',
-      '--from', 'alice',
-      '--fees', '2000000000000000000adv4tnt',
-      '--chain-id', chainId,
-      '--gas', 'auto'
+      '--node',
+      validatorEndpoint,
+      'tx',
+      'gov',
+      'submit-proposal',
+      'marketMapProposal.json',
+      '--from',
+      'alice',
+      '--fees',
+      '2000000000000000000adv4tnt',
+      '--chain-id',
+      chainId,
+      '--gas',
+      'auto',
     ],
-    'y',
-  )
+    'y'
+  );
 
   fs.unlinkSync(proposalFile);
 }
 
-export function execCLI(
-  command: string,
-  args?: string[],
-  input?: string,
-): Promise<string> {
+export function execCLI(command: string, args?: string[], input?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const process = spawn(command, args);
 

@@ -71,7 +71,8 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
 };
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
-  return skipStatusResponse.transfers[0];
+  // todo - are we sure this is always present?
+  return skipStatusResponse.transfers[0]!;
 };
 
 const getChainNameFromId = (chainId: string | undefined) => {

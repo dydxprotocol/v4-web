@@ -98,9 +98,9 @@ export const LaunchableMarketChart = ({
   const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
 
   const colorString = useMemo(() => {
-    if (!candlesQuery.data) return 'var(--color-text-1)';
-    const first = candlesQuery.data[0];
-    const last = candlesQuery.data[candlesQuery.data.length - 1];
+    if (!candlesQuery.data || candlesQuery.data.length < 1) return 'var(--color-text-1)';
+    const first = candlesQuery.data[0]!;
+    const last = candlesQuery.data[candlesQuery.data.length - 1]!;
     if (first.close > last.close) return 'var(--color-negative)';
     return 'var(--color-positive)';
   }, [candlesQuery.data]);

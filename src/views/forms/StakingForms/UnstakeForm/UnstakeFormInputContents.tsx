@@ -53,12 +53,12 @@ export const UnstakeFormInputContents = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
+  const { stakingValidators, currentDelegations } = useStakingValidator();
 
   const allAmountsEmpty =
-    !amounts || Object.values(amounts).filter((amount) => amount !== undefined).length === 0;
+    Object.values(amounts).filter((amount) => amount !== undefined).length === 0;
   const showClearButton =
-    amounts && Object.values(amounts).filter((amount) => amount !== undefined).length > 0;
+    Object.values(amounts).filter((amount) => amount !== undefined).length > 0;
 
   const debouncedChangeTrack = useMemo(
     () =>
@@ -110,19 +110,19 @@ export const UnstakeFormInputContents = ({
               value: (
                 <DiffOutput
                   type={OutputType.Asset}
-                  value={parseFloat(currentDelegations[0].amount)}
+                  value={parseFloat(currentDelegations[0]!.amount)}
                   sign={NumberSign.Negative}
                   newValue={
-                    parseFloat(currentDelegations[0].amount) -
-                    (amounts[currentDelegations[0].validator] ?? 0)
+                    parseFloat(currentDelegations[0]!.amount) -
+                    (amounts[currentDelegations[0]!.validator] ?? 0)
                   }
                   hasInvalidNewValue={
-                    (amounts[currentDelegations[0].validator] ?? 0) >
-                    parseFloat(currentDelegations[0].amount)
+                    (amounts[currentDelegations[0]!.validator] ?? 0) >
+                    parseFloat(currentDelegations[0]!.amount)
                   }
                   withDiff={Boolean(
-                    (amounts[currentDelegations[0].validator] ?? 0) &&
-                      parseFloat(currentDelegations[0].amount)
+                    (amounts[currentDelegations[0]!.validator] ?? 0) &&
+                      parseFloat(currentDelegations[0]!.amount)
                   )}
                 />
               ),
@@ -135,20 +135,20 @@ export const UnstakeFormInputContents = ({
             label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_UNSTAKE })}
             type={InputType.Number}
             onChange={({ floatValue }: NumberFormatValues) =>
-              onChangeAmount(currentDelegations[0].validator, floatValue)
+              onChangeAmount(currentDelegations[0]!.validator, floatValue)
             }
-            value={amounts[currentDelegations[0].validator] ?? undefined}
+            value={amounts[currentDelegations[0]!.validator] ?? undefined}
             slotRight={
               <FormMaxInputToggleButton
-                isInputEmpty={!amounts[currentDelegations[0].validator]}
+                isInputEmpty={!amounts[currentDelegations[0]!.validator]}
                 isLoading={isLoading}
                 onPressedChange={(isPressed: boolean) =>
                   isPressed
                     ? onChangeAmount(
-                        currentDelegations[0].validator,
-                        parseFloat(currentDelegations[0].amount)
+                        currentDelegations[0]!.validator,
+                        parseFloat(currentDelegations[0]!.amount)
                       )
-                    : onChangeAmount(currentDelegations[0].validator, undefined)
+                    : onChangeAmount(currentDelegations[0]!.validator, undefined)
                 }
               />
             }

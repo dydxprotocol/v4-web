@@ -40,21 +40,21 @@ export const useBreakpoints = () => {
     const callbacks: { [key: string]: (e: MediaQueryListEvent) => void } = {};
 
     objectEntries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
-      const [, setMatches] = state[key];
+      const [, setMatches] = state[key]!;
 
       callbacks[key] = (e) => {
         setMatches(e.matches);
       };
 
       if (mediaQueryList.addEventListener) {
-        mediaQueryList.addEventListener('change', callbacks[key]);
+        mediaQueryList.addEventListener('change', callbacks[key]!);
       }
     });
 
     return () => {
       objectEntries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
         if (mediaQueryList.removeEventListener) {
-          mediaQueryList.removeEventListener('change', callbacks[key]);
+          mediaQueryList.removeEventListener('change', callbacks[key]!);
         }
       });
     };
