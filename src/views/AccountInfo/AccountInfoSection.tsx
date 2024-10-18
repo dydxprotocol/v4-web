@@ -228,7 +228,7 @@ export const AccountInfoSection = () => {
   ];
 
   return (
-    <$ConnectedAccountInfoContainer $uiRefreshEnabled={uiRefresh}>
+    <$Container $uiRefreshEnabled={uiRefresh}>
       <header tw="spacedRow px-1 py-0 font-small-book">
         <span>
           {stringGetter({ key: uiRefresh ? STRING_KEYS.YOUR_ACCOUNT : STRING_KEYS.ACCOUNT })}
@@ -244,7 +244,7 @@ export const AccountInfoSection = () => {
           $uiRefreshEnabled={uiRefresh}
         />
       </$StackContainer>
-    </$ConnectedAccountInfoContainer>
+    </$Container>
   );
 };
 
@@ -294,7 +294,7 @@ const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
     }
   }
 `;
-const $ConnectedAccountInfoContainer = styled.div<{ $uiRefreshEnabled: boolean }>`
+const $Container = styled.div<{ $uiRefreshEnabled: boolean }>`
   ${({ $uiRefreshEnabled }) =>
     $uiRefreshEnabled
       ? css`
