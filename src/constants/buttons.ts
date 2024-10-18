@@ -36,3 +36,8 @@ export enum ButtonState {
   Disabled = 'Disabled',
   Loading = 'Loading',
 }
+
+export enum ButtonStyle {
+  Default = 'Default',
+  WithoutBackground = 'WithoutBackground',
+}

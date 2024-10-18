@@ -25,6 +25,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
@@ -74,6 +75,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
+
+  const { id } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
   const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
@@ -163,7 +166,11 @@ export const PlaceOrderButtonAndReceipt = ({
       },
       {
         key: 'liquidation-price',
-        label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
+        label: (
+          <WithTooltip tooltip="liquidation-price" stringParams={{ SYMBOL: id ?? '' }} side="right">
+            {stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}
+          </WithTooltip>
+        ),
         value: (
           <DiffOutput
             useGrouping
@@ -177,12 +184,20 @@ export const PlaceOrderButtonAndReceipt = ({
       },
       {
         key: 'position-margin',
-        label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
+        label: (
+          <WithTooltip tooltip="position-margin" side="right">
+            {stringGetter({ key: STRING_KEYS.POSITION_MARGIN })}
+          </WithTooltip>
+        ),
         value: renderMarginValue(),
       },
       {
         key: 'position-leverage',
-        label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+        label: (
+          <WithTooltip tooltip="position-leverage" side="right">
+            {stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE })}
+          </WithTooltip>
+        ),
         value: (
           <DiffOutput
             useGrouping

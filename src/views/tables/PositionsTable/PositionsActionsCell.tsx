@@ -127,14 +127,16 @@ export const PositionsActionsCell = ({
           />
         </WithTooltip>
       )}
-      <$TriggersButton
-        key="share"
-        onClick={openShareDialog}
-        iconName={IconName.Share}
-        shape={ButtonShape.Square}
-        disabled={isDisabled}
-        $uiRefreshEnabled={uiRefresh}
-      />
+      <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.SHARE })}>
+        <$TriggersButton
+          key="share"
+          onClick={openShareDialog}
+          iconName={IconName.Share}
+          shape={ButtonShape.Square}
+          disabled={isDisabled}
+          $uiRefreshEnabled={uiRefresh}
+        />
+      </WithTooltip>
       {showClosePositionAction && (
         <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}>
           <$CloseButtonToggle

@@ -2,7 +2,13 @@ import { forwardRef } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonStyle,
+} from '@/constants/buttons';
 
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 
@@ -28,6 +34,7 @@ type ElementProps = {
 type StyleProps = {
   action?: ButtonAction;
   state: Record<string, boolean | undefined>;
+  buttonStyle?: ButtonStyle;
   className?: string;
 };
 
@@ -40,6 +47,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       size = ButtonSize.Base,
       shape = ButtonShape.Rectangle,
       state: stateConfig = ButtonState.Default,
+      buttonStyle = ButtonStyle.Default,
 
       children,
       slotLeft = null,
@@ -61,7 +69,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     return (
       <StyledBaseButton
         disabled={!!state[ButtonState.Disabled] || !!state[ButtonState.Loading]}
-        {...{ ref, action, size, shape, state, ...otherProps }}
+        {...{ ref, action, size, shape, state, buttonStyle, ...otherProps }}
       >
         {state[ButtonState.Loading] ? (
           <>
@@ -83,92 +91,145 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 );
 
 const buttonActionVariants = {
-  [ButtonAction.Base]: css`
-    --button-textColor: var(--color-text-1);
-    --button-backgroundColor: var(--color-layer-5);
-    --button-border: solid var(--border-width) var(--color-border);
-  `,
-  [ButtonAction.Primary]: css`
-    --button-textColor: var(--color-text-button);
-    --button-backgroundColor: var(--color-accent);
-    --button-border: solid var(--border-width) var(--color-border-white);
-    --button-hover-filter: brightness(var(--hover-filter-variant));
-  `,
+  [ButtonAction.Base]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-1);
+      --button-backgroundColor: var(--color-layer-5);
+      --button-border: solid var(--border-width) var(--color-border);
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-text-1);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+    `,
+  },
+  [ButtonAction.Primary]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-button);
+      --button-backgroundColor: var(--color-accent);
+      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-accent);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+  },
 
-  [ButtonAction.Secondary]: css`
-    --button-textColor: var(--color-text-1);
-    --button-backgroundColor: var(--color-layer-3);
-    --button-border: solid var(--border-width) var(--color-border);
-  `,
+  [ButtonAction.Secondary]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-1);
+      --button-backgroundColor: var(--color-layer-3);
+      --button-border: solid var(--border-width) var(--color-border);
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-text-0);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+    `,
+  },
 
-  [ButtonAction.Create]: css`
-    --button-textColor: var(--color-text-button);
-    --button-backgroundColor: var(--color-green);
-    --button-border: solid var(--border-width) var(--color-border-white);
-    --button-hover-filter: brightness(var(--hover-filter-variant));
-  `,
+  [ButtonAction.Create]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-button);
+      --button-backgroundColor: var(--color-green);
+      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-green);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+  },
 
-  [ButtonAction.Destroy]: css`
-    --button-textColor: var(--color-text-button);
-    --button-backgroundColor: var(--color-red);
-    --button-border: solid var(--border-width) var(--color-border-white);
-    --button-hover-filter: brightness(var(--hover-filter-variant));
-  `,
+  [ButtonAction.Destroy]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-button);
+      --button-backgroundColor: var(--color-red);
+      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-red);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+  },
 
-  [ButtonAction.Navigation]: css`
-    --button-textColor: var(--color-text-1);
-    --button-backgroundColor: transparent;
-    --button-border: none;
-  `,
+  [ButtonAction.Navigation]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-1);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-text-1);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+    `,
+  },
 
-  [ButtonAction.Reset]: css`
-    --button-textColor: var(--color-red);
-    --button-backgroundColor: var(--color-layer-3);
-    --button-border: solid var(--border-width) var(--color-border-red);
-    --button-hover-filter: brightness(var(--hover-filter-variant));
-  `,
+  [ButtonAction.Reset]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-red);
+      --button-backgroundColor: var(--color-layer-3);
+      --button-border: solid var(--border-width) var(--color-border-red);
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-red);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      --button-hover-filter: brightness(var(--hover-filter-variant));
+    `,
+  },
 };
 
-const getDisabledStateForButtonAction = (action?: ButtonAction) => {
-  switch (action) {
-    case ButtonAction.Navigation:
-      return css`
-        --button-textColor: var(--color-text-0);
-        --button-hover-filter: none;
-        --button-cursor: not-allowed;
-      `;
-    default:
-      return css`
-        --button-textColor: var(--color-text-0);
-        --button-backgroundColor: var(--color-layer-2);
-        --button-border: solid var(--border-width) var(--color-layer-6);
-        --button-hover-filter: none;
-        --button-cursor: not-allowed;
-      `;
+const getDisabledStateForButtonAction = (action?: ButtonAction, buttonStyle?: ButtonStyle) => {
+  if (action === ButtonAction.Navigation || buttonStyle === ButtonStyle.WithoutBackground) {
+    return css`
+      --button-textColor: var(--color-text-0);
+      --button-hover-filter: none;
+      --button-cursor: not-allowed;
+    `;
   }
+  return css`
+    --button-textColor: var(--color-text-0);
+    --button-backgroundColor: var(--color-layer-2);
+    --button-border: solid var(--border-width) var(--color-layer-6);
+    --button-hover-filter: none;
+    --button-cursor: not-allowed;
+  `;
 };
 
 const buttonStateVariants = (
-  action?: ButtonAction
+  action?: ButtonAction,
+  buttonStyle?: ButtonStyle
 ): Record<ButtonState, ReturnType<typeof css>> => ({
   [ButtonState.Default]: css``,
 
-  [ButtonState.Disabled]: getDisabledStateForButtonAction(action),
+  [ButtonState.Disabled]: getDisabledStateForButtonAction(action, buttonStyle),
 
   [ButtonState.Loading]: css`
-    ${() => buttonStateVariants(action)[ButtonState.Disabled]}
+    ${() => buttonStateVariants(action, buttonStyle)[ButtonState.Disabled]}
     min-width: 4em;
   `,
 });
 
 const StyledBaseButton = styled(BaseButton)<StyleProps>`
-  ${({ action }) => action && buttonActionVariants[action]}
+  ${({ action, buttonStyle }) => action && buttonStyle && buttonActionVariants[action][buttonStyle]}
 
-  ${({ action, state }) =>
+  ${({ action, state, buttonStyle }) =>
     state &&
     css`
       // Ordered from lowest to highest priority (ie. Disabled should overwrite Active and Loading states)
-      ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
-      ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
+      ${state[ButtonState.Loading] && buttonStateVariants(action, buttonStyle)[ButtonState.Loading]}
+      ${state[ButtonState.Disabled] &&
+      buttonStateVariants(action, buttonStyle)[ButtonState.Disabled]}
     `}
 `;
