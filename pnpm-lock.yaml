@@ -48,8 +48,8 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@funkit/connect':
-    specifier: ^3.4.3
-    version: 3.4.3(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)(wagmi@2.10.9)
+    specifier: ^3.4.4
+    version: 3.4.4(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)(wagmi@2.10.9)
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
@@ -4248,8 +4248,8 @@ packages:
       big.js: 6.2.2
     dev: false
 
-  /@funkit/connect@3.4.3(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)(wagmi@2.10.9):
-    resolution: {integrity: sha512-KGWyBUowFUL4XMHRecEiLSe7pxxDfgtsVBjOtf/lLqn2qz8sSq4VzKQIigrt5BqrtiVoQDDzmcnqdET+hoDULw==}
+  /@funkit/connect@3.4.4(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)(wagmi@2.10.9):
+    resolution: {integrity: sha512-3ITehPy7xlazqgv477beVFo9fQHRQi52FfH8BPUPNOP34BwpctxFcVj7vfnIuYBRnUoHA3v8aS4fvez0dclNGw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -6118,6 +6118,7 @@ packages:
     resolution: {integrity: sha512-x4BEjr2SjOPowNeiguzjozQbsc6h437ovD/wu+JpaenxVLm3jkgzHY2xOslMTp50HoTvQreMjiexiGQw1sqZlQ==}
     engines: {node: '>=16.3.0'}
     hasBin: true
+    requiresBuild: true
     peerDependencies:
       typescript: '>= 4.7.4'
     peerDependenciesMeta:
@@ -22596,6 +22597,7 @@ packages:
   /puppeteer-core@20.9.0(typescript@5.5.3):
     resolution: {integrity: sha512-H9fYZQzMTRrkboEfPmf7m3CLDN6JvbxXA3qTtS+dFt27tR+CsFHzPsT6pzp6lYL6bJbAPaR0HaPO6uSi+F94Pg==}
     engines: {node: '>=16.3.0'}
+    requiresBuild: true
     peerDependencies:
       typescript: '>= 4.7.4'
     peerDependenciesMeta:

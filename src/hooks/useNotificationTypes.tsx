@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
+import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, isEqual } from 'lodash';
-import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
@@ -68,7 +68,7 @@ import {
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { formatSeconds, getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -218,35 +218,41 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const funkitDeposits = useAppSelector(getFunkitDeposits, shallowEqual);
+      const { openAccountModal } = useAccountModal();
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const deposit of Object.values(funkitDeposits)) {
-          const { checkoutId, status, timestamp } = deposit;
-          const timeDiff = getStringsForDateTimeDiff(DateTime.fromSeconds(timestamp));
+          const { checkoutId, status } = deposit;
           trigger(
             checkoutId,
             {
-              icon: <Icon iconName={IconName.FunkitInstant} />,
-              title: status === 'COMPLETED' ? 'Instant deposit' : 'Instant deposit in progress',
+              icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
+              title: status === 'COMPLETED' ? 'Instant Deposit' : 'Instant deposit in progress',
               body:
-                status === 'COMPLETED'
-                  ? 'Deposit completed'
-                  : `Deposit started ${timeDiff.timeString} ago`,
+                status === 'COMPLETED' ? 'Deposit completed' : `Your deposit should arrive shortly`,
               toastSensitivity: 'foreground',
-              renderCustomBody: ({ isToast, notification }) => (
-                <FunkitDepositNotification
-                  isToast={isToast}
-                  notification={notification}
-                  deposit={deposit}
-                />
-              ),
+              renderCustomBody:
+                status !== 'COMPLETED'
+                  ? ({ isToast, notification }) => (
+                      <FunkitDepositNotification
+                        isToast={isToast}
+                        notification={notification}
+                        deposit={deposit}
+                      />
+                    )
+                  : undefined,
               groupKey: NotificationType.FunkitDeposit,
+              renderActionSlot: () => (
+                <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
+                  View instant deposits history →
+                </Link>
+              ),
             },
             []
           );
         }
-      }, [funkitDeposits, stringGetter, trigger]);
+      }, [funkitDeposits, stringGetter, trigger, openAccountModal]);
     },
   },
   {
