@@ -26,6 +26,7 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -138,17 +139,13 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
+  const { totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {
       key: '30d-apr',
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
-      value: (
-        <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
-          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} fractionDigits={0} />
-        </$ColoredReturn>
-      ),
+      value: <MegaVaultYieldOutput />,
     },
     {
       key: 'balance',

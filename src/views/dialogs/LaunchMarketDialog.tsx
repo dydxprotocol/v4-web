@@ -9,13 +9,13 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 
+import { MegaVaultYieldOutput } from '../MegaVaultYieldOutput';
 import { NewMarketForm, NewMarketFormStep } from '../forms/NewMarketForm';
 
 export const LaunchMarketDialog = ({
@@ -25,8 +25,6 @@ export const LaunchMarketDialog = ({
   const { isMobile } = useBreakpoints();
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
-  const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
 
   const { title, description } = useMemo(() => {
     switch (formStep) {
@@ -44,14 +42,7 @@ export const LaunchMarketDialog = ({
           description: stringGetter({
             key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
-              APR_PERCENTAGE: (
-                <Output
-                  type={OutputType.Percent}
-                  tw="inline-block text-color-success"
-                  value={depositApr}
-                  fractionDigits={0}
-                />
-              ),
+              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
               DEPOSIT_AMOUNT: (
                 <Output
                   useGrouping

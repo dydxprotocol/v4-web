@@ -10,12 +10,13 @@ import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-import { useLoadedVaultDetails, useVaultCalculationForLaunchingMarket } from '@/hooks/vaultsHooks';
+import { useVaultCalculationForLaunchingMarket } from '@/hooks/vaultsHooks';
 
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -64,8 +65,6 @@ export const NewMarketForm = ({
   }).summaryData;
   const { freeCollateral: freeCollateralUpdated, marginUsage: marginUsageUpdated } =
     orEmptyObj(summaryData);
-  const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
 
   const tickSizeDecimals = useMemo(() => {
     return getTickSizeDecimalsFromPrice(assetToAdd?.meta.referencePrice);
@@ -101,7 +100,7 @@ export const NewMarketForm = ({
       {
         key: 'deposit-apr',
         label: `${stringGetter({ key: STRING_KEYS.DEPOSIT_APR })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
-        value: <Output type={OutputType.Percent} value={depositApr} fractionDigits={0} />,
+        value: <MegaVaultYieldOutput />,
       },
       {
         key: 'deposit-lockup',
@@ -132,7 +131,7 @@ export const NewMarketForm = ({
         value: <Output type={OutputType.Fiat} value={10000} />,
       },
     ].filter(isTruthy);
-  }, [depositApr, freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
+  }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
 
   /**
    * Permissionless Markets Flow

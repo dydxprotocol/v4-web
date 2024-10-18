@@ -10,7 +10,6 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
-import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -21,6 +20,7 @@ import { Button } from '@/components/Button';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { log } from '@/lib/telemetry';
@@ -50,8 +50,6 @@ export const NewMarketPreviewStep = ({
   const baseAsset = getDisplayableAssetFromTicker(ticker);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
-  const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -80,14 +78,7 @@ export const NewMarketPreviewStep = ({
           params: {
             NUM_DAYS: <span tw="text-color-text-1">30</span>,
             PAST_DAYS: 30,
-            APR_PERCENTAGE: (
-              <Output
-                type={OutputType.Percent}
-                tw="inline-block text-color-success"
-                value={depositApr}
-                fractionDigits={0}
-              />
-            ),
+            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           },
         })}
       </span>

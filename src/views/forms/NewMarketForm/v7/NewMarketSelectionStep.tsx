@@ -11,7 +11,6 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -27,6 +26,7 @@ import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';
@@ -55,8 +55,6 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
-  const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -80,14 +78,7 @@ export const NewMarketSelectionStep = ({
           {stringGetter({
             key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
-              APR_PERCENTAGE: (
-                <Output
-                  type={OutputType.Percent}
-                  tw="inline-block text-color-success"
-                  value={depositApr}
-                  fractionDigits={0}
-                />
-              ),
+              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
               DEPOSIT_AMOUNT: (
                 <Output
                   useGrouping

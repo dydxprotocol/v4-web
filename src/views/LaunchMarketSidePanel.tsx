@@ -18,6 +18,8 @@ import { openDialog } from '@/state/dialogs';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 
+import { MegaVaultYieldOutput } from './MegaVaultYieldOutput';
+
 export const LaunchMarketSidePanel = ({
   className,
   launchableMarketId,
@@ -29,8 +31,6 @@ export const LaunchMarketSidePanel = ({
   const stringGetter = useStringGetter();
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
-  const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
 
   const items = [
     {
@@ -55,14 +55,7 @@ export const LaunchMarketSidePanel = ({
               fractionDigits={0}
             />
           ),
-          APR_PERCENTAGE: (
-            <Output
-              tw="inline-block"
-              type={OutputType.Percent}
-              value={depositApr}
-              fractionDigits={0}
-            />
-          ),
+          APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           PAST_DAYS: 30,
         },
       }),
