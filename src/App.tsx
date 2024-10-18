@@ -119,6 +119,7 @@ const Content = () => {
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
               <Route path={`${AppRoute.Affiliates}/*`} element={<AffiliatesPage />}>
+                <Route index element={<Navigate to="leaderboard" replace />} />
                 <Route path="leaderboard" element={<AffiliatesLeaderboard />} />
                 <Route path="program-stats" element={<CommunityChartContainer />} />
               </Route>
