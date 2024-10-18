@@ -221,7 +221,7 @@ const MarketsDropdownContent = ({
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           initialPageSize={50}
-          paginationBehavior="paginate"
+          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
