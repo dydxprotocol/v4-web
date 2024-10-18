@@ -15,7 +15,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { testFlags } from '@/lib/testFlags';
 
-import { AccountInfoConnectedState } from './AccountInfo/AccountInfoConnectedState';
+import { AccountInfoSection } from './AccountInfo/AccountInfoSection';
 
 type StyleProps = {
   className?: string;
@@ -35,7 +35,7 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
       $uiRefreshEnabled={uiRefresh}
     >
       {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo || uiRefresh ? (
-        <AccountInfoConnectedState />
+        <AccountInfoSection />
       ) : (
         <$DisconnectedAccountInfoContainer>
           <p>

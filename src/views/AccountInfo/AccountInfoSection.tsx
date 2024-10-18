@@ -38,7 +38,6 @@ import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 enum AccountInfoItem {
   PortfolioValue = 'portfolio-value',
   MarginUsed = 'margin-used',
-  RewardsEarned = 'rewards-earned',
 
   // TODO: CT-1292 remove deprecated fields
   AvailableBalance = 'available-balance',
@@ -51,7 +50,7 @@ const getUsageValue = (value: Nullable<TradeState<number>>) => {
   return (hasDiffPostOrder ? postOrderValue : currentValue) ?? 0;
 };
 
-export const AccountInfoConnectedState = () => {
+export const AccountInfoSection = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
