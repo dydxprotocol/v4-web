@@ -22,6 +22,7 @@ export const useTokenConfigs = (): {
   usdcDenom: string;
   usdcDecimals: number;
   usdcGasDenom: string;
+  usdcImage: string;
   usdcLabel: string;
   chainTokenDenom: string;
   chainTokenDecimals: number;
@@ -36,6 +37,7 @@ export const useTokenConfigs = (): {
     usdcDenom: tokensConfigs[DydxChainAsset.USDC].denom,
     usdcDecimals: tokensConfigs[DydxChainAsset.USDC].decimals,
     usdcGasDenom: tokensConfigs[DydxChainAsset.USDC].gasDenom,
+    usdcImage: tokensConfigs[DydxChainAsset.USDC].image,
     usdcLabel: tokensConfigs[DydxChainAsset.USDC].name,
     chainTokenDenom: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
     chainTokenDecimals: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,

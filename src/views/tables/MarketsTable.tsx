@@ -35,6 +35,7 @@ import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -263,7 +264,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         }}
         columns={columns}
         initialPageSize={50}
-        paginationBehavior="paginate"
+        paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
         className={className}
         slotEmpty={
           <$MarketNotFound>

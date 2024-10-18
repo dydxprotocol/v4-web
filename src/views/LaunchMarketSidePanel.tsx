@@ -7,6 +7,7 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -31,6 +32,7 @@ export const LaunchMarketSidePanel = ({
   const stringGetter = useStringGetter();
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
+  const { usdcImage } = useTokenConfigs();
 
   const items = [
     {
@@ -49,7 +51,8 @@ export const LaunchMarketSidePanel = ({
               slotRight={
                 <AssetIcon
                   tw="mb-[-0.125rem] ml-0.25 inline-block"
-                  logoUrl="/currencies/usdc.png"
+                  logoUrl={usdcImage}
+                  symbol="USDC"
                 />
               }
               fractionDigits={0}
@@ -104,7 +107,7 @@ export const LaunchMarketSidePanel = ({
                 type={OutputType.Asset}
                 value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 slotRight={
-                  <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl="/currencies/usdc.png" />
+                  <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl={usdcImage} symbol="USDC" />
                 }
                 fractionDigits={0}
               />

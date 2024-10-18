@@ -1,5 +1,6 @@
 import React from 'react';
 
+import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -46,7 +47,11 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
         myVaultMetadata == null || myVaultMetadata.balanceUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <Output value={myVaultMetadata?.balanceUsdc} type={OutputType.Fiat} />
+          <Output
+            value={myVaultMetadata.balanceUsdc}
+            roundingMode={BigNumber.ROUND_FLOOR}
+            type={OutputType.Fiat}
+          />
         ),
     },
     {
@@ -55,14 +60,14 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
       tooltip: 'vault-all-time-pnl' as const,
       value:
         myVaultMetadata == null ||
-        myVaultMetadata?.allTimeReturnUsdc == null ||
-        myVaultMetadata?.allTimeReturnUsdc === 0 ? (
+        myVaultMetadata.allTimeReturnUsdc == null ||
+        myVaultMetadata.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc, 0.01)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
               <Output
-                value={myVaultMetadata?.allTimeReturnUsdc}
+                value={myVaultMetadata.allTimeReturnUsdc}
                 type={OutputType.Fiat}
                 fractionDigits={0}
               />

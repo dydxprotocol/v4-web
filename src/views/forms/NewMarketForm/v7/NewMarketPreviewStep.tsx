@@ -10,6 +10,7 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -50,6 +51,7 @@ export const NewMarketPreviewStep = ({
   const baseAsset = getDisplayableAssetFromTicker(ticker);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
+  const { usdcImage } = useTokenConfigs();
 
   const alertMessage = useMemo(() => {
     let alert;
@@ -92,7 +94,7 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" logoUrl="/currencies/usdc.png" />
+          <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
           <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
         </div>
       </div>
