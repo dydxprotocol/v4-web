@@ -18,7 +18,8 @@ import { FeeLevelTag } from '../FeeLevelTag';
 type ElementProps = {
   selectedExchange?: string;
   selectedChain?: string;
-  onSelect: (name: string, type: 'chain' | 'exchange') => void;
+  onSelectNetwork: (chainID: string) => void;
+  onSelectExchange: (exchangeName: string) => void;
   chains: Chain[];
 };
 
@@ -27,7 +28,8 @@ const DEFAULT_NETWORKS_LABEL = 'Networks';
 export const NetworkSelectMenu = ({
   selectedExchange,
   selectedChain,
-  onSelect,
+  onSelectNetwork,
+  onSelectExchange,
   chains,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -43,7 +45,7 @@ export const NetworkSelectMenu = ({
       value: chain.chainID,
       label: chain.chainName,
       onSelect: () => {
-        onSelect(chain.chainID, 'chain');
+        onSelectNetwork(chain.chainID);
       },
       slotBefore: <$Img src={chain.logoURI ?? undefined} alt="" />,
       slotAfter: getFeeDecoratorComponentForChainId(chain.chainID),
@@ -65,12 +67,11 @@ export const NetworkSelectMenu = ({
     }
   );
 
-  // TODO [onboarding-rewrite]: configure exchanges
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.name,
     label: exchange.label,
     onSelect: () => {
-      onSelect(exchange.name, 'exchange');
+      onSelectExchange(exchange.name);
     },
     slotBefore: <$Img src={exchange.icon} alt="" />,
     slotAfter: <FeeLevelTag feeLevel="low" />,
@@ -78,16 +79,15 @@ export const NetworkSelectMenu = ({
   const selectedChainOption = chains.find((item) => item.chainID === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.name === selectedExchange);
 
-  // If there's only one group, no need to differentiate between Low Fee or not
   const items = [
-    lowFeeChains.length && {
+    {
       group: 'low-fees',
-      groupLabel: nonLowFeeChains.length ? 'Low Fees' : DEFAULT_NETWORKS_LABEL,
+      groupLabel: 'Low Fees',
       items: [...exchangeItems, ...lowFeeChains],
     },
-    nonLowFeeChains.length && {
+    {
       group: 'other-networks',
-      groupLabel: lowFeeChains.length ? 'Other networks' : DEFAULT_NETWORKS_LABEL,
+      groupLabel: 'Other networks',
       items: nonLowFeeChains,
     },
   ];
@@ -98,11 +98,11 @@ export const NetworkSelectMenu = ({
         {selectedChainOption ? (
           <>
             <$Img src={selectedChainOption.logoURI ?? undefined} alt="" />{' '}
-            {selectedChainOption.chainName}
+            {selectedChainOption.prettyName}
           </>
         ) : selectedExchangeOption ? (
           <>
-            <$Img src={selectedExchangeOption.icon} alt="" /> {selectedExchangeOption.name}
+            <$Img src={selectedExchangeOption.icon} alt="" /> {selectedExchangeOption.label}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })
