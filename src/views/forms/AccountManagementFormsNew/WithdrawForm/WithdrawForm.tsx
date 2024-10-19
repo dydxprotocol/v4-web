@@ -90,6 +90,7 @@ export const WithdrawForm = () => {
     toToken,
     chainsForNetwork,
     routeLoading,
+    cosmosChainAddresses,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
@@ -119,7 +120,9 @@ export const WithdrawForm = () => {
     setFromChainId(selectedDydxChainId);
     setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
-    setToAddress(sourceAccount.address);
+    // Cosmos chains connect to the keplr wallet, which has a unique address per chain id
+    const calculatedCosmosAddress = toChainId && cosmosChainAddresses[toChainId];
+    setToAddress(calculatedCosmosAddress ?? sourceAccount.address);
   }, [
     setTransferType,
     setFromChainId,
@@ -130,6 +133,8 @@ export const WithdrawForm = () => {
     usdcDenom,
     setToAddress,
     sourceAccount.address,
+    toChainId,
+    cosmosChainAddresses,
   ]);
 
   useEffect(() => {
