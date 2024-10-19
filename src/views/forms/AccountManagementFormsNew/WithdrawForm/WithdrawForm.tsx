@@ -112,9 +112,6 @@ export const WithdrawForm = () => {
   const freeCollateralBN = useMemo(() => MustBigNumber(freeCollateral?.current), [freeCollateral]);
 
   // Set default values for withdraw from
-  // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-875/calculate-default-withdrawal-address-for-keplr
-  // if wallet type is cosmos (keplr), change toAddress based on the chainid
-  // B/C cosmos handles multiple chains and each have their own address
   useEffect(() => {
     setTransferType(TransferType.Withdraw);
     setFromChainId(selectedDydxChainId);
