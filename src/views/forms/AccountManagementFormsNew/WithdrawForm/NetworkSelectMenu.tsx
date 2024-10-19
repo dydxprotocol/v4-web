@@ -19,8 +19,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { isTruthy } from '@/lib/isTruthy';
 
 import exchanges from '../../../../../public/configs/exchanges.json';
-import { HighestFeesDecoratorText } from '../HighestFeesText';
-import { LowestFeesDecoratorText } from '../LowestFeesText';
+import { FeeLevel, FeeLevelTag } from '../FeeLevelTag';
 
 type ElementProps = {
   selectedExchange?: string;
@@ -58,8 +57,10 @@ export const NetworkSelectMenu = ({
   const isKeplrWallet = sourceAccount.walletInfo?.name === WalletType.Keplr;
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
-    if (isLowFeeChainId(chainId, TransferType.Withdraw)) return <LowestFeesDecoratorText />;
-    if (isHighFeeChainId(chainId, TransferType.Withdraw)) return <HighestFeesDecoratorText />;
+    if (isLowFeeChainId(chainId, TransferType.Withdraw))
+      return <FeeLevelTag feeLevel={FeeLevel.Low} />;
+    if (isHighFeeChainId(chainId, TransferType.Withdraw))
+      return <FeeLevelTag feeLevel={FeeLevel.High} />;
     return undefined;
   };
 
@@ -112,8 +113,8 @@ export const NetworkSelectMenu = ({
     onSelect: () => {
       onSelect(exchange.name, 'exchange');
     },
-    slotBefore: <$Img src={exchange.icon ?? undefined} alt="" />,
-    slotAfter: <LowestFeesDecoratorText />,
+    slotBefore: <$Img src={exchange.icon} alt="" />,
+    slotAfter: <FeeLevelTag feeLevel={FeeLevel.Low} />,
   }));
   const selectedChainOption = chains.find((item) => item.chainID === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.name === selectedExchange);
@@ -142,8 +143,7 @@ export const NetworkSelectMenu = ({
           </>
         ) : selectedExchangeOption ? (
           <>
-            <$Img src={selectedExchangeOption.icon ?? undefined} alt="" />{' '}
-            {selectedExchangeOption.name}
+            <$Img src={selectedExchangeOption.icon} alt="" /> {selectedExchangeOption.name}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })
