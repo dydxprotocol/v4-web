@@ -42,6 +42,11 @@ export const SlippageEditor = ({
 
   const stringGetter = useStringGetter();
 
+  const slippageOptionItems = [
+    { label: '0.1%', value: '0.001' },
+    { label: '0.25%', value: '0.0025' },
+    { label: stringGetter({ key: STRING_KEYS.CUSTOM }), value: 'custom' },
+  ];
   const toggleGroupRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -49,9 +54,9 @@ export const SlippageEditor = ({
     setIsEditing?.(editorState !== EditorState.Viewing);
 
     if (editorState === EditorState.Selecting) {
-      toggleGroupRef?.current?.focus();
+      toggleGroupRef.current?.focus();
     } else if (editorState === EditorState.Editing) {
-      inputRef?.current?.focus();
+      inputRef.current?.focus();
     }
   }, [editorState, setIsEditing]);
 
@@ -98,16 +103,12 @@ export const SlippageEditor = ({
       asChild
       onCancel={onCancel}
       onConfirm={editorState === EditorState.Editing ? onConfirmSlippage : undefined}
+      onClickTrigger={() => setEditorState(EditorState.Selecting)}
       slotTrigger={
-        <button
-          onClick={() => setEditorState(EditorState.Selecting)}
-          tw="row gap-[0.5ch] underline"
-          type="button"
-          aria-label="edit slippage"
-        >
+        <div tw="row gap-[0.5ch] underline">
           <Output type={OutputType.Percent} value={slippage} />
           <Icon iconName={IconName.Pencil} />
-        </button>
+        </div>
       }
       tw="w-10 text-[0.625rem]"
     >
@@ -118,11 +119,7 @@ export const SlippageEditor = ({
             <div tw="inlineRow justify-center rounded-[0.5em] bg-color-layer-2">
               <ToggleGroup
                 ref={toggleGroupRef}
-                items={[
-                  { label: '0.1%', value: '0.001' },
-                  { label: '0.25%', value: '0.0025' },
-                  { label: stringGetter({ key: STRING_KEYS.CUSTOM }), value: 'custom' },
-                ]}
+                items={slippageOptionItems}
                 value={slippage.toString()}
                 onValueChange={onSelectSlippage}
                 shape={ButtonShape.Rectangle}
