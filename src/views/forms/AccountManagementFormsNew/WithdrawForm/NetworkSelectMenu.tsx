@@ -23,8 +23,6 @@ type ElementProps = {
   chains: Chain[];
 };
 
-const DEFAULT_NETWORKS_LABEL = 'Networks';
-
 export const NetworkSelectMenu = ({
   selectedExchange,
   selectedChain,

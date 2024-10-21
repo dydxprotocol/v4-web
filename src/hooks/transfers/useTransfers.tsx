@@ -18,7 +18,7 @@ import {
   SWAP_VENUES,
   TransferType,
 } from '@/constants/transfers';
-import { DydxAddress, EvmAddress, SolAddress } from '@/constants/wallets';
+import { DydxAddress, EvmAddress, NobleAddress, SolAddress } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -69,18 +69,18 @@ export const useTransfers = () => {
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const [exchangeName, setExchangeName] = useState<string | undefined>();
+  // coinbase is the only exchange we currently support
+  const [exchangeName, setExchangeName] = useState<'coinbase' | undefined>();
   const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>();
   const [fromChainId, setFromChainId] = useState<string | undefined>();
   const [toTokenDenom, setToTokenDenom] = useState<string | undefined>();
   const [toChainId, setToChainId] = useState<string | undefined>();
-  // TODO [onboarding-rewrite]: add nobleAddress type when enabling coinbase withdrawals
-  const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
-    undefined
-  );
-  const [toAddress, setToAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
-    undefined
-  );
+  const [fromAddress, setFromAddress] = useState<
+    EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
+  >(undefined);
+  const [toAddress, setToAddress] = useState<
+    EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
+  >(undefined);
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 

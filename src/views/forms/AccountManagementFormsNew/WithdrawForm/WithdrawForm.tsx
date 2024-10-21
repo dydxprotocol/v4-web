@@ -355,11 +355,7 @@ export const WithdrawForm = () => {
 
   useEffect(() => {
     if (sourceAccount?.walletInfo?.name === WalletType.Privy) {
-      // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
-      // abacusStateManager.setTransferValue({
-      //   field: TransferInputField.exchange,
-      //   value: 'coinbase',
-      // });
+      setExchangeName('coinbase');
     }
   }, [sourceAccount, nobleChainId, setToChainId]);
 
