@@ -4,7 +4,7 @@ import { groupBy } from 'lodash';
 import { useDispatch } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationStatus, type Notification } from '@/constants/notifications';
@@ -144,7 +144,7 @@ export const NotificationsMenu = ({
           <IconButton
             iconName={IconName.Gear}
             onClick={() => dispatch(openDialog(DialogTypes.Preferences()))}
-            withoutBackground
+            buttonStyle={ButtonStyle.WithoutBackground}
           />
         </div>
       }

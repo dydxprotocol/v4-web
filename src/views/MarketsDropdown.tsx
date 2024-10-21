@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
@@ -184,7 +184,7 @@ const MarketsDropdownContent = ({
             tw="[--button-icon-size:0.8em]"
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
-            withoutBackground
+            buttonStyle={ButtonStyle.WithoutBackground}
           />
         </$MarketDropdownBanner>
       );
