@@ -71,7 +71,9 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
 };
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
-  // todo - are we sure this is always present?
+  if (!skipStatusResponse.transfers.length) {
+    throw new Error('Skip status response was empty.');
+  }
   return skipStatusResponse.transfers[0]!;
 };
 

@@ -273,7 +273,7 @@ async function main(): Promise<void> {
   // Get which env and how many markets to add.
   const args = process.argv.slice(2);
   const env = args[0] as Env;
-  const numMarkets = parseInt(args[1]!, 10);
+  const numMarkets = args[1] != null ? parseInt(args[1], 10) : 0;
   const binary = args[2];
 
   // Validate inputs.

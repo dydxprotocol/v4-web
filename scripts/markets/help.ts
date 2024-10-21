@@ -211,7 +211,7 @@ export async function createAndSendMarketMapProposal(
         name: config.exchangeName,
         normalize_by_pair,
         off_chain_ticker: config.ticker,
-        invert: config.invert || false,
+        invert: !!config.invert,
         metadata_JSON: config.metadata_JSON ?? '',
       };
     });
