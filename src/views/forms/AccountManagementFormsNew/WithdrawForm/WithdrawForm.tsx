@@ -50,7 +50,7 @@ import { log } from '@/lib/telemetry';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawButtonAndReceipt';
-import { useValidation } from './useValidation';
+import { useWithdrawFormValidation } from './useValidation';
 
 const DUMMY_TX_HASH = 'withdraw_dummy_tx_hash';
 
@@ -376,7 +376,7 @@ export const WithdrawForm = () => {
     [setAmount, setToChainId]
   );
 
-  const { errorMessage, alertType } = useValidation({
+  const { errorMessage, alertType } = useWithdrawFormValidation({
     isCctp,
     debouncedAmountBN,
     toAddress,
