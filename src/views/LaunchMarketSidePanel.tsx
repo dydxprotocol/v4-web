@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -17,6 +18,8 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+
+import { MegaVaultYieldOutput } from './MegaVaultYieldOutput';
 
 export const LaunchMarketSidePanel = ({
   className,
@@ -44,7 +47,7 @@ export const LaunchMarketSidePanel = ({
             <Output
               tw="inline-block"
               type={OutputType.Asset}
-              value={10_000}
+              value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
               slotRight={
                 <AssetIcon
                   tw="mb-[-0.125rem] ml-0.25 inline-block"
@@ -55,7 +58,7 @@ export const LaunchMarketSidePanel = ({
               fractionDigits={0}
             />
           ),
-          APR_PERCENTAGE: <Output tw="inline-block" type={OutputType.Percent} value={0.3456} />,
+          APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           PAST_DAYS: 30,
         },
       }),
@@ -102,7 +105,7 @@ export const LaunchMarketSidePanel = ({
               <Output
                 tw="inline text-color-text-1"
                 type={OutputType.Asset}
-                value={10_000}
+                value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 slotRight={
                   <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl={usdcImage} symbol="USDC" />
                 }

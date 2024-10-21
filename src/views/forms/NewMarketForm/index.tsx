@@ -3,17 +3,20 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from
 import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+import { useVaultCalculationForLaunchingMarket } from '@/hooks/vaultsHooks';
 
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -57,6 +60,12 @@ export const NewMarketForm = ({
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
 
+  const summaryData = useVaultCalculationForLaunchingMarket({
+    amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+  }).summaryData;
+  const { freeCollateral: freeCollateralUpdated, marginUsage: marginUsageUpdated } =
+    orEmptyObj(summaryData);
+
   const tickSizeDecimals = useMemo(() => {
     return getTickSizeDecimalsFromPrice(assetToAdd?.meta.referencePrice);
   }, [assetToAdd]);
@@ -71,12 +80,27 @@ export const NewMarketForm = ({
 
   const shouldHideTitleAndDescription = setFormStep !== undefined;
 
+  const freeCollateralDetailItem = useMemo(() => {
+    return {
+      key: 'cross-free-collateral',
+      label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
+      value: (
+        <DiffOutput
+          withDiff={!!freeCollateral?.current}
+          type={OutputType.Fiat}
+          value={freeCollateral?.current}
+          newValue={freeCollateralUpdated}
+        />
+      ),
+    };
+  }, [freeCollateral, freeCollateralUpdated, stringGetter]);
+
   const receiptItems: DetailsItem[] = useMemo(() => {
     return [
       {
         key: 'deposit-apr',
         label: `${stringGetter({ key: STRING_KEYS.DEPOSIT_APR })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
-        value: <Output type={OutputType.Percent} value={0.3256} />,
+        value: <MegaVaultYieldOutput />,
       },
       {
         key: 'deposit-lockup',
@@ -93,32 +117,21 @@ export const NewMarketForm = ({
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
         value: (
           <DiffOutput
-            withDiff
+            withDiff={!!marginUsage?.current}
             type={OutputType.Percent}
             value={marginUsage?.current}
-            newValue={0.4}
+            newValue={marginUsageUpdated}
           />
         ),
       },
-      step === NewMarketFormStep.PREVIEW && {
-        key: 'cross-free-collateral',
-        label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-        value: (
-          <DiffOutput
-            withDiff
-            type={OutputType.Fiat}
-            value={freeCollateral?.current}
-            newValue={88000}
-          />
-        ),
-      },
+      step === NewMarketFormStep.PREVIEW && freeCollateralDetailItem,
       {
         key: 'megavault-balance',
         label: stringGetter({ key: STRING_KEYS.YOUR_VAULT_BALANCE }),
-        value: <Output type={OutputType.Fiat} value={10000} />,
+        value: <Output type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />,
       },
     ].filter(isTruthy);
-  }, [freeCollateral?.current, marginUsage?.current, step, stringGetter]);
+  }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
 
   /**
    * Permissionless Markets Flow
@@ -147,6 +160,7 @@ export const NewMarketForm = ({
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
         }}
+        freeCollateralDetailItem={freeCollateralDetailItem}
         receiptItems={receiptItems}
         setTickerToAdd={setTickerToAdd}
         shouldHideTitleAndDescription={shouldHideTitleAndDescription}
