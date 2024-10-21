@@ -320,8 +320,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (!sourceToken?.address || !sourceToken.decimals)
       throw new Error('Missing source token address');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
-    if (!requestPayload?.value) throw new Error('Missing transaction value');
-    if (isNativeDenom(sourceToken?.address)) return;
+    if (!requestPayload.value) throw new Error('Missing transaction value');
+    if (isNativeDenom(sourceToken.address)) return;
 
     const allowance = await publicClientWagmi.readContract({
       address: sourceToken.address as EvmAddress,
@@ -550,7 +550,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           if (!signerWagmi) {
             throw new Error('Missing signer');
           }
-          if (!requestPayload?.targetAddress || !requestPayload?.data || !requestPayload?.value) {
+          if (!requestPayload?.targetAddress || !requestPayload.data || !requestPayload.value) {
             throw new Error('Missing request payload');
           }
           await validateTokenApproval();

@@ -59,12 +59,12 @@ export const TransferStatusNotification = ({
     transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
-  const error = status?.errors?.length ? status?.errors[0] : status?.error;
+  const error = status?.errors?.length ? status.errors[0] : status?.error;
   const hasError = error && Object.keys(error).length !== 0;
 
   const updateSecondsLeft = useCallback(() => {
-    const fromEstimatedRouteDuration = status?.fromChain?.chainData?.estimatedRouteDuration;
-    const toEstimatedRouteDuration = status?.toChain?.chainData?.estimatedRouteDuration;
+    const fromEstimatedRouteDuration = status?.fromChain?.chainData.estimatedRouteDuration;
+    const toEstimatedRouteDuration = status?.toChain?.chainData.estimatedRouteDuration;
     // TODO: remove typeguards once skip implements estimatedrouteduration
     // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
     if (

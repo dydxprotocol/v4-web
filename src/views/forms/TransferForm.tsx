@@ -161,13 +161,13 @@ export const TransferForm = ({
         addresses: [recipientAddress!, dydxAddress!],
       });
 
-      if (screenResults?.[dydxAddress!]) {
+      if (screenResults[dydxAddress!]) {
         setError(
           stringGetter({
             key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
           })
         );
-      } else if (screenResults?.[recipientAddress!]) {
+      } else if (screenResults[recipientAddress!]) {
         setError(
           stringGetter({
             key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
@@ -177,13 +177,13 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress!,
-          tokensConfigs[asset]?.denom,
+          tokensConfigs[asset].denom,
           memo ?? undefined
         );
 
         if (txResponse?.code === 0) {
           // eslint-disable-next-line no-console
-          console.log('TransferForm > txReceipt > ', txResponse?.hash);
+          console.log('TransferForm > txReceipt > ', txResponse.hash);
           onDone?.();
         } else {
           throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
@@ -285,7 +285,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset]?.name}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset].name}</Tag>
         </span>
       ),
       value: (
@@ -340,6 +340,7 @@ export const TransferForm = ({
       <$Row>
         <FormInput
           id="destination"
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
             <span tw="inlineRow">
@@ -420,6 +421,7 @@ export const TransferForm = ({
           label={stringGetter({ key: STRING_KEYS.MEMO })}
           placeholder={stringGetter({ key: STRING_KEYS.REQUIRED_FOR_TRANSFERS_TO_CEX })}
           type={InputType.Text}
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           onInput={(e: SyntheticInputEvent) => onChangeMemo(e.target?.value || '')}
           value={memo ?? undefined}
           slotRight={renderFormInputButton({

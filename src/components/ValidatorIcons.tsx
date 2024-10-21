@@ -21,7 +21,7 @@ export const ValidatorIcons = ({
   const validatorNames = validators.map((validator) => validator.description?.moniker).join(', ');
   return (
     <$ValidatorIcons className={className}>
-      {validators?.length <= numToShow
+      {validators.length <= numToShow
         ? validators.map((validator) => (
             <$ValidatorIcon
               key={validator.description?.moniker}

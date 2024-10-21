@@ -208,7 +208,7 @@ export const AdjustIsolatedMarginForm = ({
         };
       }
 
-      if (marginUsage?.postOrder && MustBigNumber(marginUsage?.postOrder).gte(1)) {
+      if (marginUsage?.postOrder && MustBigNumber(marginUsage.postOrder).gte(1)) {
         return {
           message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
           type: AlertType.Error,

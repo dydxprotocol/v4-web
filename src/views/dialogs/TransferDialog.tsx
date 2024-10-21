@@ -16,7 +16,7 @@ export const TransferDialog = ({ selectedAsset, setIsOpen }: DialogProps<Transfe
       title={stringGetter({ key: STRING_KEYS.TRANSFER })}
       tw="[--dialog-content-paddingTop:--default-border-width]"
     >
-      <TransferForm selectedAsset={selectedAsset} onDone={() => setIsOpen?.(false)} />
+      <TransferForm selectedAsset={selectedAsset} onDone={() => setIsOpen(false)} />
     </Dialog>
   );
 };

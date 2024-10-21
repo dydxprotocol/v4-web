@@ -120,8 +120,8 @@ export const NotificationsMenu = ({
               ),
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
-                onNotificationAction?.(notification);
-                markSeen?.(notification);
+                onNotificationAction(notification);
+                markSeen(notification);
               },
             })),
         }))

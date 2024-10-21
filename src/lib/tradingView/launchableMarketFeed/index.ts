@@ -137,13 +137,11 @@ export const getLaunchableMarketDatafeed = (
             timeframe: RESOLUTION_TO_TIMEFRAME_MAP[resolution]!,
           });
 
-          const fetchedCandles: MetadataServiceCandlesResponse[string] | undefined =
-            candlesResponse?.[asset] ?? [];
+          const fetchedCandles: MetadataServiceCandlesResponse[string] =
+            candlesResponse[asset] ?? [];
 
-          if (fetchedCandles) {
-            bars = [...(fetchedCandles?.map(mapMetadataServiceCandles) ?? [])];
-            launchableMarketCandlesCache.set(cacheKey, bars);
-          }
+          bars = [...fetchedCandles.map(mapMetadataServiceCandles)];
+          launchableMarketCandlesCache.set(cacheKey, bars);
         } else {
           bars = cachedBars;
         }
