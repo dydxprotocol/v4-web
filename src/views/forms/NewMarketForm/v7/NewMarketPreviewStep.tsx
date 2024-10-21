@@ -60,35 +60,36 @@ export const NewMarketPreviewStep = ({
   const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);
 
   const { alertInfo, shouldDisableForm } = useMemo(() => {
-    let alert: { type: AlertType; message: string } | null = null;
-    let shouldDisable: boolean = false;
-
     if (errorMessage) {
-      alert = {
-        type: AlertType.Error,
-        message: errorMessage,
+      return {
+        alertInfo: {
+          type: AlertType.Error,
+          message: errorMessage,
+        },
+        shouldDisableForm: false,
       };
-    } else if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
-      alert = {
-        type: AlertType.Error,
-        message: stringGetter({
-          key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
-          params: {
-            USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
-          },
-        }),
-      };
+    }
 
-      shouldDisable = true;
+    if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
+      return {
+        alertInfo: {
+          type: AlertType.Error,
+          message: stringGetter({
+            key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
+            params: {
+              USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+            },
+          }),
+        },
+        shouldDisableForm: true,
+      };
     }
 
     return {
-      alertInfo: alert,
-      shouldDisableForm: shouldDisable,
+      alertInfo: undefined,
+      shouldDisableForm: false,
     };
   }, [errorMessage, freeCollateral, stringGetter]);
-
-  const isDisabled = shouldDisableForm;
 
   const heading = shouldHideTitleAndDescription ? null : (
     <>
@@ -181,7 +182,7 @@ export const NewMarketPreviewStep = ({
   );
 
   const alertMessage = alertInfo && (
-    <AlertMessage type={alertInfo.type}>{alertInfo.message} </AlertMessage>
+    <AlertMessage type={alertInfo.type}>{alertInfo.message}</AlertMessage>
   );
 
   return (
@@ -237,7 +238,7 @@ export const NewMarketPreviewStep = ({
             <Button
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
-              state={{ isDisabled, isLoading }}
+              state={{ isDisabled: shouldDisableForm, isLoading }}
             >
               {hasAcceptedTerms
                 ? stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })
