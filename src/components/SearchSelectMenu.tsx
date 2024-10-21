@@ -28,6 +28,8 @@ type ElementProps = {
   items: MenuConfig<string, string>;
   withSearch?: boolean;
   withReceiptItems?: DetailsItem[];
+  alternateSearchInputComponent?: boolean;
+  inputPlaceholder?: string;
 };
 
 type StyleProps = {
@@ -45,6 +47,8 @@ export const SearchSelectMenu = ({
   items,
   withSearch = true,
   withReceiptItems,
+  alternateSearchInputComponent,
+  inputPlaceholder,
 }: SearchSelectMenuProps) => {
   const [open, setOpen] = useState(false);
   const searchSelectMenuRef = useRef<HTMLDivElement & HTMLButtonElement>(null);
@@ -83,6 +87,8 @@ export const SearchSelectMenu = ({
             onItemSelected={() => setOpen(false)}
             withStickyLayout
             $withSearch={withSearch}
+            inputPlaceholder={inputPlaceholder}
+            alternateSearchInputComponent={alternateSearchInputComponent}
           />
         </$Popover>
       </$WithDetailsReceipt>
@@ -123,7 +129,6 @@ const $Popover = styled(Popover)`
   border: var(--border-width) solid var(--color-layer-6);
   border-radius: 0.5rem;
   z-index: 2;
-  box-shadow: none;
 `;
 
 type ComboboxMenuStyleProps = { $withSearch?: boolean };

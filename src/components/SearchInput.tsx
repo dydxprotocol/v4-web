@@ -50,8 +50,8 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
 const $Search = styled.div`
   ${layoutMixins.row}
   width: auto;
-  height: 2rem;
-  background-color: var(--color-layer-3);
+  height: 2.5rem;
+  background-color: var(--color-layer-5);
   color: ${({ theme }) => theme.textTertiary};
   border-radius: 2.5rem;
   border: solid var(--border-width) var(--color-layer-6);
