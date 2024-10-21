@@ -5,7 +5,9 @@ import { cctpTokensByChainId, isHighFeeChainId, isLowFeeChainId } from '@/consta
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
 import { TransferType } from '@/constants/transfers';
+import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -19,7 +21,7 @@ type ElementProps = {
   selectedExchange?: string;
   selectedChain?: string;
   onSelectNetwork: (chainID: string) => void;
-  onSelectExchange: (exchangeName: string) => void;
+  onSelectExchange: (exchangeName: 'coinbase') => void;
   chains: Chain[];
 };
 
@@ -31,6 +33,7 @@ export const NetworkSelectMenu = ({
   chains,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const { sourceAccount } = useAccounts();
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
     if (isLowFeeChainId(chainId, TransferType.Withdraw)) return <FeeLevelTag feeLevel="low" />;
@@ -69,7 +72,8 @@ export const NetworkSelectMenu = ({
     value: exchange.name,
     label: exchange.label,
     onSelect: () => {
-      onSelectExchange(exchange.name);
+      // TODO: remove typecast once we add more exchanges
+      onSelectExchange(exchange.name as 'coinbase');
     },
     slotBefore: <$Img src={exchange.icon} alt="" />,
     slotAfter: <FeeLevelTag feeLevel="low" />,
@@ -89,9 +93,10 @@ export const NetworkSelectMenu = ({
       items: nonLowFeeChains,
     },
   ];
+  const isPrivyDeposit = sourceAccount.walletInfo?.name === WalletType.Privy;
 
   return (
-    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination">
+    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination" disabled={isPrivyDeposit}>
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (
           <>

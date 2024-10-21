@@ -380,7 +380,8 @@ export const WithdrawForm = () => {
   });
 
   const onSelectExchange = useCallback(
-    (_exchangeName: string) => {
+    // TODO: remove typecast once we add more exchanges
+    (_exchangeName: 'coinbase') => {
       setAmount('');
       setToChainId(undefined);
       setExchangeName(_exchangeName);

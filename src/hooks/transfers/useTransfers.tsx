@@ -70,6 +70,7 @@ export const useTransfers = () => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   // coinbase is the only exchange we currently support
+  // TODO: remove typecast once we add more exchanges
   const [exchangeName, setExchangeName] = useState<'coinbase' | undefined>();
   const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>();
   const [fromChainId, setFromChainId] = useState<string | undefined>();
