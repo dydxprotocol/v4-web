@@ -17,7 +17,11 @@ type ElementProps = {
   state?: ButtonState | ButtonStateConfig;
 };
 
-export type IconButtonProps = ElementProps & ToggleButtonProps;
+type StyleProps = {
+  withoutBackground?: boolean;
+};
+
+export type IconButtonProps = ElementProps & ToggleButtonProps & StyleProps;
 
 export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, IconButtonProps>(
   (
@@ -34,6 +38,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
       onClick,
       onPressedChange,
       className,
+      withoutBackground = false,
 
       ...otherProps
     },
@@ -47,6 +52,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onPressedChange={onPressedChange ?? (onClick as any)} // TODO fix types
+        $withoutBackground={withoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
@@ -59,6 +65,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onClick={onClick}
+        $withoutBackground={withoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
@@ -77,10 +84,20 @@ const buttonMixin = css`
   }
 `;
 
-const $IconButton = styled(Button)`
-  ${buttonMixin}
+const withoutBackgroundMixin = css`
+  --button-icon-size: 1.5em;
+  --button-border: none;
+  --button-backgroundColor: transparent;
 `;
 
-const $IconToggleButton = styled(ToggleButton)`
+const $IconButton = styled(Button)<{ $withoutBackground?: boolean }>`
   ${buttonMixin}
+
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
+`;
+
+const $IconToggleButton = styled(ToggleButton)<{ $withoutBackground?: boolean }>`
+  ${buttonMixin}
+
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
 `;

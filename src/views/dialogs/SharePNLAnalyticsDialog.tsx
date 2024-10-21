@@ -108,7 +108,7 @@ export const SharePNLAnalyticsDialog = ({
       >
         <div tw="flexColumn h-full">
           <div tw="row mb-0.75 gap-0.5">
-            <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="h-[1.625rem]" />
+            <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="[--asset-icon-size:1.625rem]" />
 
             <span>
               <span tw="text-color-text-2 font-base-bold">{assetLeft}</span>/{assetRight}
