@@ -36,6 +36,7 @@ const EMBARRASSING_APR_THRESHOLD = 0.02;
 export const MegavaultYieldTag = () => {
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
+
   if (
     vault?.thirtyDayReturnPercent == null ||
     vault.thirtyDayReturnPercent < EMBARRASSING_APR_THRESHOLD
@@ -52,7 +53,7 @@ export const MegavaultYieldTag = () => {
             <Output
               tw="mr-0.25"
               type={OutputType.Percent}
-              value={vault?.thirtyDayReturnPercent}
+              value={vault.thirtyDayReturnPercent}
               fractionDigits={0}
             />
           ),
