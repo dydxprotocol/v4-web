@@ -22,6 +22,7 @@ import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetu
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
+import { MustBigNumber } from '@/lib/numbers';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { testFlags } from '@/lib/testFlags';
@@ -65,7 +66,9 @@ const filterFunctions = {
   [MarketFilters.RWA]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.RWA);
   },
-
+  [MarketFilters.LAUNCHABLE]: (market: MarketData) => {
+    return market.isUnlaunched;
+  },
   // Soon to be deprecated filters
   [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.AI_DEPRECATED);
@@ -202,8 +205,11 @@ export const useMarketsData = ({
             openInterest: undefined,
             openInterestUSDC: undefined,
             oraclePrice: price,
-            priceChange24H: price && percentChange24h ? price * percentChange24h : undefined,
-            priceChange24HPercent: percentChange24h,
+            priceChange24H:
+              price && percentChange24h
+                ? MustBigNumber(price).times(MustBigNumber(percentChange24h).div(100)).toNumber()
+                : undefined,
+            priceChange24HPercent: MustBigNumber(percentChange24h).div(100).toNumber(),
             tags: sectorTags ?? [],
             tickSizeDecimals,
             trades24H: 0,
@@ -240,18 +246,27 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
-  const showNewFilter = markets.some((market) => market.isNew);
+  const { hasPredictionMarkets, showNewFilter } = useMemo(() => {
+    return {
+      hasPredictionMarkets: markets.some((market) =>
+        Object.values(PREDICTION_MARKET).includes(market.id)
+      ),
+      showNewFilter: markets.some((market) => market.isNew),
+    };
+  }, [markets]);
 
   const marketFilters = useMemo(
     () =>
       [
         MarketFilters.ALL,
         showNewFilter ? MarketFilters.NEW : null,
+        testFlags.pml && MarketFilters.LAUNCHABLE,
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
           markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
         ),
+        hasPredictionMarkets && MarketFilters.PREDICTION_MARKET,
       ].filter(isTruthy),
-    [markets, showNewFilter]
+    [hasPredictionMarkets, markets, showNewFilter]
   );
 
   return { marketFilters, filteredMarkets, markets };

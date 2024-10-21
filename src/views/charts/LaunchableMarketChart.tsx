@@ -9,7 +9,7 @@ import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
 import { TradingViewBar } from '@/constants/candles';
 import { STRING_KEYS } from '@/constants/localization';
-import { LIQUIDITY_TIERS } from '@/constants/markets';
+import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { timeUnits } from '@/constants/time';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
@@ -37,8 +37,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
-
-const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];
 
 export const LaunchableMarketChart = ({
   className,
