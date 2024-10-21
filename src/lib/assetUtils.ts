@@ -68,10 +68,10 @@ export const WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeee
 
 export const isNativeDenom = (denom: string | undefined): boolean => {
   if (!denom) return false;
-  return denom === WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS || denom?.endsWith(SKIP_NATIVE_DENOM_SUFFIX);
+  return denom === WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS || denom.endsWith(SKIP_NATIVE_DENOM_SUFFIX);
 };
 
-export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
+export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string | undefined => {
   const cctpToken = assets.find((asset) => {
     return isTokenCctp(asset);
   });
