@@ -76,7 +76,6 @@ export const ComboboxMenu = <
         <$Header $withStickyLayout={withStickyLayout}>
           {alternateSearchInputComponent ? (
             <$SearchInput
-              autoFocus
               value={searchValue}
               onChange={setSearchValue}
               placeholder={placeholderWithDefault}
