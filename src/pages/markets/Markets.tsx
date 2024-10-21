@@ -20,6 +20,8 @@ import { Switch } from '@/components/Switch';
 import { MarketsStats } from '@/views/MarketsStats';
 import { MarketsTable } from '@/views/tables/MarketsTable';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { MarketsBanners } from './MarketsBanners';
 
 const Markets = () => {
@@ -30,21 +32,35 @@ const Markets = () => {
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
+  const renderSlotRightActions = () => {
+    if (testFlags.pml) {
+      return (
+        <Button action={ButtonAction.Primary} onClick={() => navigate(AppRoute.LaunchMarket)}>
+          {stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET })}
+        </Button>
+      );
+    }
+
+    if (hasPotentialMarketsData) {
+      return (
+        <Button
+          action={ButtonAction.Primary}
+          onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+        >
+          {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
+        </Button>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <$Page>
       <$HeaderSection>
         <$ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.MARKETS })}
-          slotRight={
-            hasPotentialMarketsData && (
-              <Button
-                action={ButtonAction.Primary}
-                onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-              >
-                {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-              </Button>
-            )
-          }
+          slotRight={renderSlotRightActions()}
         />
         <MarketsBanners />
         <$Highlights htmlFor="highlights">

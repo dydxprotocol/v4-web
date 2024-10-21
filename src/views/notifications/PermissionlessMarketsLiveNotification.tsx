@@ -35,7 +35,7 @@ export const PermissionlessMarketsLiveNotification = ({
           <div tw="flex flex-col">
             <span>{stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING })}</span>
             <Link
-              tw="mt-0.75 text-color-accent underline visited:text-color-accent"
+              tw="mt-0.75 text-color-accent visited:text-color-accent hover:underline"
               to={AppRoute.LaunchMarket}
             >
               {stringGetter({ key: STRING_KEYS.READY_FOR_LAUNCH })} →

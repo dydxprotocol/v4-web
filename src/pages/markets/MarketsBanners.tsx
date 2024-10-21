@@ -107,6 +107,14 @@ const $PmlBanner = styled($MarketsPageBanner)`
   button {
     z-index: 1;
   }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
+  }
 `;
 
 const $StarsOverlay = styled.div`
