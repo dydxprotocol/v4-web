@@ -28,7 +28,7 @@ type ElementProps = {
   items: MenuConfig<string, string>;
   withSearch?: boolean;
   withReceiptItems?: DetailsItem[];
-  useSearchInputComponent?: boolean;
+  alternateSearchInputComponent?: boolean;
   inputPlaceholder?: string;
 };
 
@@ -47,7 +47,7 @@ export const SearchSelectMenu = ({
   items,
   withSearch = true,
   withReceiptItems,
-  useSearchInputComponent,
+  alternateSearchInputComponent,
   inputPlaceholder,
 }: SearchSelectMenuProps) => {
   const [open, setOpen] = useState(false);
@@ -88,7 +88,7 @@ export const SearchSelectMenu = ({
             withStickyLayout
             $withSearch={withSearch}
             inputPlaceholder={inputPlaceholder}
-            useSearchInputComponent={useSearchInputComponent}
+            alternateSearchInputComponent={alternateSearchInputComponent}
           />
         </$Popover>
       </$WithDetailsReceipt>

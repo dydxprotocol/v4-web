@@ -23,7 +23,7 @@ type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends 
   inputPlaceholder?: string;
   slotEmpty?: ReactNode;
   withSearch?: boolean;
-  useSearchInputComponent?: boolean;
+  alternateSearchInputComponent?: boolean;
 };
 
 type StyleProps = {
@@ -48,7 +48,7 @@ export const ComboboxMenu = <
   inputPlaceholder,
   slotEmpty,
   withSearch = true,
-  useSearchInputComponent,
+  alternateSearchInputComponent,
 
   className,
   withItemBorders,
@@ -74,7 +74,7 @@ export const ComboboxMenu = <
     >
       {withSearch && (
         <$Header $withStickyLayout={withStickyLayout}>
-          {useSearchInputComponent ? (
+          {alternateSearchInputComponent ? (
             <$SearchInput
               autoFocus
               value={searchValue}
