@@ -23,6 +23,7 @@ import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { testFlags } from '@/lib/testFlags';
+import { ButtonShape } from '@/constants/buttons';
 
 type ElementProps<TabItemsValue> = {
   defaultTab?: TabItemsValue;
@@ -96,7 +97,12 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
           <Toolbar tw="inlineRow">
             {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
-              <$IconButton iconName={IconName.Caret} isToggle $uiRefreshEnabled={uiRefresh} />
+              <$IconButton
+                iconName={IconName.Caret}
+                isToggle
+                $uiRefreshEnabled={uiRefresh}
+                shape={uiRefresh ? ButtonShape.Square : ButtonShape.Circle}
+              />
             </CollapsibleTrigger>
           </Toolbar>
         </$Header>

@@ -5,7 +5,7 @@ import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
-import { ButtonShape } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -55,6 +55,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
     <ActionsTableCell>
       <WithTooltip
         side="left"
+        sideOffset={0}
         tw="[--tooltip-backgroundColor:--color-layer-5]"
         tooltipString={
           isOrderStatusClearable(status)
@@ -67,7 +68,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
           iconName={IconName.Close}
           iconSize="0.875em"
           shape={ButtonShape.Square}
-          $uiRefreshEnabled={uiRefresh}
+          buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
           {...(isOrderStatusClearable(status)
             ? { onClick: () => dispatch(clearOrder(orderId)) }
             : {
@@ -82,14 +83,8 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
     </ActionsTableCell>
   );
 };
-const $CancelButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
+const $CancelButton = styled(IconButton)`
   --button-hover-textColor: var(--color-red);
-
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --button-backgroundColor: transparent;
-      --button-border: none;
-      width: min-content;
-    `}
+  --button-textColor: var(--color-text-0);
+  min-width: var(--button-width);
 `;

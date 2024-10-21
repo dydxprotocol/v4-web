@@ -30,6 +30,7 @@ type ElementProps = {
 type StyleProps = {
   align?: 'start' | 'center' | 'end';
   side?: 'top' | 'right' | 'bottom' | 'left';
+  sideOffset?: number;
   className?: string;
 };
 
@@ -43,6 +44,7 @@ export const WithTooltip = ({
   children,
   align,
   side,
+  sideOffset,
   className,
   slotTooltip,
 }: ElementProps & StyleProps) => {
@@ -85,7 +87,7 @@ export const WithTooltip = ({
         </Trigger>
 
         <Portal>
-          <$Content sideOffset={8} side={side} align={align} className={className} asChild>
+          <$Content sideOffset={sideOffset ?? 8} side={side} align={align} className={className} asChild>
             {slotTooltip ?? (
               <dl>
                 {tooltipTitle && <dt>{tooltipTitle}</dt>}

@@ -7,6 +7,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Input, InputType, type InputProps } from '@/components/Input';
+import { ButtonStyle } from '@/constants/buttons';
 
 type ElementProps = {
   onTextChange?: (value: string) => void;
@@ -41,7 +42,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
             setValue('');
             onTextChange?.('');
           }}
-          withoutBackground
+          buttonStyle={ButtonStyle.WithoutBackground}
         />
       )}
     </$Search>
