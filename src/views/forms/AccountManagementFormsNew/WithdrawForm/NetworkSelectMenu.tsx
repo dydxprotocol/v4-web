@@ -2,19 +2,13 @@ import { Chain } from '@skip-go/client';
 import tw from 'twin.macro';
 
 import { cctpTokensByChainId, isHighFeeChainId, isLowFeeChainId } from '@/constants/cctp';
-import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
+import { MenuItem } from '@/constants/menus';
 import { TransferType } from '@/constants/transfers';
-import { ConnectorType, WalletType } from '@/constants/wallets';
 
-import { useAccounts } from '@/hooks/useAccounts';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
-
-import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -28,18 +22,6 @@ type ElementProps = {
   chains: Chain[];
 };
 
-// TODO: fix this
-// our menu item types are wrong (has label typed as a react node even though we use string)
-// so we have to make our own type.
-type SelectableItem = {
-  value: string;
-  label: string;
-  onSelect: () => void;
-  slotBefore: JSX.Element;
-  slotAfter?: JSX.Element;
-};
-
-const solanaChainIdPrefix = 'solana';
 const DEFAULT_NETWORKS_LABEL = 'Networks';
 
 export const NetworkSelectMenu = ({
@@ -48,13 +30,7 @@ export const NetworkSelectMenu = ({
   onSelect,
   chains,
 }: ElementProps) => {
-  const { sourceAccount } = useAccounts();
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const { CCTPWithdrawalOnly } = useEnvFeatures();
-
   const stringGetter = useStringGetter();
-
-  const isKeplrWallet = sourceAccount.walletInfo?.name === WalletType.Keplr;
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
     if (isLowFeeChainId(chainId, TransferType.Withdraw))
@@ -75,22 +51,7 @@ export const NetworkSelectMenu = ({
       slotAfter: getFeeDecoratorComponentForChainId(chain.chainID),
     }))
     .filter((chain) => {
-      // only cosmos chains are supported on kepler
-      if (isKeplrWallet) {
-        return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
-      }
-      // only solana chains are supported on phantom
-      if (sourceAccount.walletInfo?.connectorType === ConnectorType.PhantomSolana) {
-        return selectedDydxChainId !== chain.value && chain.value.startsWith(solanaChainIdPrefix);
-      }
-      // other wallets do not support solana
-      if (chain.value.startsWith(solanaChainIdPrefix)) return false;
-
-      if (CCTPWithdrawalOnly) {
-        return !!cctpTokensByChainId[chain.value];
-      }
-
-      return true;
+      return !!cctpTokensByChainId[chain.value];
     });
 
   const { lowFeeChains, nonLowFeeChains } = chainItems.reduce(
@@ -101,8 +62,8 @@ export const NetworkSelectMenu = ({
       return allChains;
     },
     { lowFeeChains: [], nonLowFeeChains: [] } as {
-      lowFeeChains: SelectableItem[];
-      nonLowFeeChains: SelectableItem[];
+      lowFeeChains: MenuItem<string>[];
+      nonLowFeeChains: MenuItem<string>[];
     }
   );
 
