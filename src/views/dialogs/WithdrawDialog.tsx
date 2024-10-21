@@ -23,10 +23,14 @@ export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) 
       isOpen
       setIsOpen={setIsOpen}
       title={
-        <span tw="row gap-[0.5ch]">
-          <Icon iconName={IconName.Usdc} size="1.5em" />
-          {stringGetter({ key: STRING_KEYS.WITHDRAW })} USDC
-        </span>
+        testFlags.onboardingRewrite ? (
+          <span tw="row gap-[0.5ch]">
+            <Icon iconName={IconName.Usdc} size="1.5em" />
+            {stringGetter({ key: STRING_KEYS.WITHDRAW })} USDC
+          </span>
+        ) : (
+          stringGetter({ key: STRING_KEYS.WITHDRAW })
+        )
       }
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
