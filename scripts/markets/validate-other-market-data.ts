@@ -332,7 +332,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     network.validatorConfig.chainId,
     'v4-chain/protocol/build/dydxprotocold'
   );
-  console.log("Submitted market map proposal");
+  console.log('Submitted market map proposal');
   await sleep(5000);
   for (const wallet of wallets) {
     retry(() => voteOnProposals([1], client, wallet));
@@ -352,7 +352,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     const proposalIds: number[] = [];
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
-      const proposal = proposalsToSend[j];
+      const proposal = proposalsToSend[j]!;
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -361,7 +361,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       )}}`;
       const tx = await retry(() =>
         client.submitGovAddNewMarketProposal(
-          wallets[j],
+          wallets[j]!,
           // @ts-ignore: marketType is not a valid parameter for addNewMarketProposal
           {
             id: marketId,
@@ -734,7 +734,7 @@ function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<str
       continue;
     }
 
-    const oldParams = removeIdFromParams(oldProposals[name].params);
+    const oldParams = removeIdFromParams(oldProposals[name]!.params);
     const newParams = removeIdFromParams(newProposal.params);
     if (JSON.stringify(oldParams) !== JSON.stringify(newParams)) {
       marketsToValidate.add(name);
@@ -780,7 +780,7 @@ async function main(): Promise<void> {
   if (proposalsToValidate.size === 0) {
     return;
   }
-  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]));
+  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]!));
 
   console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
 }

@@ -143,6 +143,7 @@ export const useAnalytics = () => {
 
       const lastSuccessfulIndexerRpcQuery =
         (websocketEndpoint &&
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           lastSuccessfulWebsocketRequestByOrigin[new URL(websocketEndpoint).origin]) ||
         undefined;
 

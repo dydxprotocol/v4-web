@@ -89,8 +89,8 @@ export const NotificationsMenu = ({
             )
             .map((notification) => ({
               notification,
-              key: getKey?.(notification),
-              displayData: getDisplayData?.(notification),
+              key: getKey(notification),
+              displayData: getDisplayData(notification)!,
             }))
             .map(({ notification, key, displayData }) => ({
               value: key,

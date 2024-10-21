@@ -28,8 +28,8 @@ export const getDisplayableAssetFromTicker = (
   part?: 'base' | 'dex' | 'address' | 'full'
 ): string => {
   const [fullBaseAsset] = ticker.split('-');
-  if (part === 'full') return fullBaseAsset;
-  return getDisplayableAssetFromBaseAsset(fullBaseAsset, part);
+  if (part === 'full') return fullBaseAsset!;
+  return getDisplayableAssetFromBaseAsset(fullBaseAsset!, part);
 };
 
 /**
@@ -39,7 +39,7 @@ export const getDisplayableAssetFromTicker = (
  */
 export const getDisplayableTickerFromMarket = (market: string): string => {
   const [fullBaseAsset, quoteAsset] = market.split('-');
-  const base = getDisplayableAssetFromBaseAsset(fullBaseAsset);
+  const base = getDisplayableAssetFromBaseAsset(fullBaseAsset!);
 
   if (!base || !quoteAsset || !fullBaseAsset) return '';
 
@@ -51,7 +51,7 @@ export const getTickerFromMarketmapId = (marketmapId: string): string => {
 };
 
 export const getAssetFromMarketId = (marketId: string): string => {
-  return marketId.split('-')[0];
+  return marketId.split('-')[0]!;
 };
 
 const SKIP_NATIVE_DENOM_SUFFIX = 'native';

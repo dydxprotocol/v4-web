@@ -21,10 +21,10 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
   const [currentStep, setCurrentStep] = useState<StakeFormSteps>(StakeFormSteps.EditInputs);
 
   const { nativeStakingBalance } = useAccountBalance();
-  const { stakingValidators, currentDelegations } = useStakingValidator() ?? {};
-  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
+  const { stakingValidators, currentDelegations } = useStakingValidator();
+  const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
 
-  const closeDialog = () => setIsOpen?.(false);
+  const closeDialog = () => setIsOpen(false);
 
   const dialogProps: {
     [key in StakeFormSteps]: {
@@ -43,7 +43,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
                 params: {
                   VALIDATOR: (
                     <ValidatorName
-                      validator={stakingValidators?.[currentDelegations[0].validator]?.[0]}
+                      validator={stakingValidators?.[currentDelegations[0]!.validator]?.[0]}
                       tw="inline-flex"
                     />
                   ),
