@@ -40,13 +40,13 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             label={label}
             inputID={id}
             disabled={otherProps?.disabled}
-            backgroundColorOverride={backgroundColorOverride}
+            $backgroundColorOverride={backgroundColorOverride}
           >
             <Input
               ref={ref}
               id={id}
               {...otherProps}
-              backgroundColorOverride={backgroundColorOverride}
+              $backgroundColorOverride={backgroundColorOverride}
             />
           </$WithLabel>
         ) : (
@@ -54,7 +54,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             ref={ref}
             id={id}
             {...otherProps}
-            backgroundColorOverride={backgroundColorOverride}
+            $backgroundColorOverride={backgroundColorOverride}
           />
         )}
         {slotRight}
@@ -110,12 +110,12 @@ const $InputContainer = styled.div<{
     `}
 `;
 
-const $WithLabel = styled(WithLabel)<{ disabled?: boolean; backgroundColorOverride?: string }>`
+const $WithLabel = styled(WithLabel)<{ disabled?: boolean; $backgroundColorOverride?: string }>`
   ${formMixins.inputLabel}
-  ${({ backgroundColorOverride }) =>
-    backgroundColorOverride &&
+  ${({ $backgroundColorOverride }) =>
+    $backgroundColorOverride &&
     css`
-      background-color: ${backgroundColorOverride};
+      background-color: ${$backgroundColorOverride};
     `}
 
   label {
