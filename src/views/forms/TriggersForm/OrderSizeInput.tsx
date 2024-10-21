@@ -14,6 +14,7 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import abacusStateManager from '@/lib/abacus';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderSizeSlider } from './OrderSizeSlider';
@@ -112,7 +113,7 @@ export const OrderSizeInput = ({
         <FormInput
           type={InputType.Number}
           value={orderSize?.toString()}
-          slotRight={<Tag>{symbol}</Tag>}
+          slotRight={<Tag>{getDisplayableAssetFromBaseAsset(symbol)}</Tag>}
           onInput={onSizeInput}
         />
       </div>

@@ -10,6 +10,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
@@ -25,6 +26,7 @@ import { SparklineChart } from '@/components/visx/SparklineChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -38,6 +40,7 @@ const USDC_MARKET_HARDCODED = 'USDC-USD';
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const { usdcImage } = useTokenConfigs();
 
   const vaultsDataRaw = useLoadedVaultPositions();
   const vaultsData = useMemo(
@@ -57,6 +60,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           renderCell: ({ marketId, currentLeverageMultiple }) => {
             const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
 
+            const logoUrl =
+              marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
+
             return (
               // eslint-disable-next-line jsx-a11y/interactive-supports-focus
               <div
@@ -72,6 +78,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   stacked
                   slotLeft={
                     <AssetIcon
+                      logoUrl={logoUrl}
                       symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
                       tw="[--asset-icon-size:2.5em]"
                     />
@@ -112,7 +119,11 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               <Output
                 value={currentPosition?.asset}
                 type={OutputType.Asset}
-                tag={<$Label>{marketsData[marketId ?? '']?.assetId}</$Label>}
+                tag={
+                  <$Label>
+                    {getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
+                  </$Label>
+                }
                 fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
               />
             </TableCell>
@@ -180,7 +191,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           ),
         },
       ] satisfies ColumnDef<VaultTableRow>[],
-    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter]
+    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter, usdcImage]
   );
 
   return (

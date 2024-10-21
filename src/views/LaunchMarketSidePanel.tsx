@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -28,6 +29,7 @@ export const LaunchMarketSidePanel = ({
   const stringGetter = useStringGetter();
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
+  const { usdcImage } = useTokenConfigs();
 
   const items = [
     {
@@ -43,7 +45,13 @@ export const LaunchMarketSidePanel = ({
               tw="inline-block"
               type={OutputType.Asset}
               value={10_000}
-              slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
+              slotRight={
+                <AssetIcon
+                  tw="mb-[-0.125rem] ml-0.25 inline-block"
+                  logoUrl={usdcImage}
+                  symbol="USDC"
+                />
+              }
               fractionDigits={0}
             />
           ),
@@ -95,7 +103,9 @@ export const LaunchMarketSidePanel = ({
                 tw="inline text-color-text-1"
                 type={OutputType.Asset}
                 value={10_000}
-                slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" symbol="USDC" />}
+                slotRight={
+                  <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl={usdcImage} symbol="USDC" />
+                }
                 fractionDigits={0}
               />
             ),

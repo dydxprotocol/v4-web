@@ -22,7 +22,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
 
   const { nativeStakingBalance } = useAccountBalance();
   const { stakingValidators, currentDelegations } = useStakingValidator();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
 
   const closeDialog = () => setIsOpen(false);
 
@@ -62,7 +62,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
               })}
         </div>
       ),
-      slotIcon: <AssetIcon symbol={chainTokenLabel} />,
+      slotIcon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
     },
     [StakeFormSteps.PreviewOrder]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRM_UNSTAKE }),

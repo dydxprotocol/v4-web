@@ -16,6 +16,7 @@ import { timeUnits } from '@/constants/time';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import {
   useForceRefreshVaultAccount,
@@ -90,6 +91,7 @@ export const VaultDepositWithdrawForm = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { vaultsLearnMore, vaultTos } = useURLConfigs();
+  const { usdcImage } = useTokenConfigs();
 
   const { amount, confirmationStep, slippageAck, termsAck, operation } =
     useAppSelector(getVaultForm) ?? {};
@@ -646,7 +648,7 @@ export const VaultDepositWithdrawForm = ({
         <$SourceLabel>{inputFormConfig.formLabel}</$SourceLabel>
         <$TargetLabel>{stringGetter({ key: STRING_KEYS.DESTINATION })}</$TargetLabel>
         <$SourceBox>
-          <AssetIcon symbol="USDC" tw="h-2 w-2" />
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="h-2 w-2" />
           <Output value={amount} type={OutputType.Fiat} />
         </$SourceBox>
         <$Arrow>
@@ -657,7 +659,7 @@ export const VaultDepositWithdrawForm = ({
           {inputFormConfig.transactionTarget.icon === 'cross' ? (
             <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-color-layer-6">C</div>
           ) : (
-            <img src="/dydx-chain.png" tw="h-2 w-2" />
+            <img src="/dydx-chain.png" alt="dydx-chain" tw="h-2 w-2" />
           )}
           <div>{inputFormConfig.transactionTarget.label}</div>
         </$TargetBox>

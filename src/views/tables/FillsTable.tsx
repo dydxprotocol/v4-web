@@ -96,7 +96,16 @@ const getFillsTableColumnDef = ({
           </TableColumnHeader>
         ),
         renderCell: ({ resources, size, stepSizeDecimals, asset }) => (
-          <TableCell stacked slotLeft={<AssetIcon symbol={asset?.id} tw="text-[2.25rem]" />}>
+          <TableCell
+            stacked
+            slotLeft={
+              <AssetIcon
+                logoUrl={asset?.resources?.imageUrl}
+                symbol={asset?.id}
+                tw="text-[2.25rem]"
+              />
+            }
+          >
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>

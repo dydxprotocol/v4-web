@@ -72,7 +72,7 @@ export const AccountMenu = () => {
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
-  const { usdcLabel, chainTokenLabel } = useTokenConfigs();
+  const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
   const {
@@ -135,7 +135,11 @@ export const AccountMenu = () => {
         onboardingState === OnboardingState.AccountConnected && (
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
             <$AddressRow>
-              <AssetIcon symbol="DYDX" tw="z-[2] text-[1.75rem]" />
+              <AssetIcon
+                logoUrl={chainTokenImage}
+                symbol={chainTokenLabel}
+                tw="z-[2] text-[1.75rem]"
+              />
               <$Column>
                 {walletInfo && walletInfo?.name !== WalletType.Keplr ? (
                   <DydxDerivedAddress address={address} />
@@ -180,7 +184,7 @@ export const AccountMenu = () => {
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: chainTokenLabel },
                     })}
-                    <AssetIcon symbol={chainTokenLabel} />
+                    <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
                   </$label>
                   <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
@@ -200,7 +204,7 @@ export const AccountMenu = () => {
                         key: STRING_KEYS.WALLET_BALANCE,
                         params: { ASSET: usdcLabel },
                       })}
-                      <AssetIcon symbol="USDC" />
+                      <AssetIcon logoUrl={usdcImage} symbol="USDC" />
                     </$label>
                     <$BalanceOutput
                       type={OutputType.Asset}
@@ -217,7 +221,7 @@ export const AccountMenu = () => {
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: usdcLabel },
                     })}
-                    <AssetIcon symbol="USDC" />
+                    <AssetIcon logoUrl={usdcImage} symbol="USDC" />
                   </$label>
                   <$BalanceOutput
                     type={OutputType.Asset}

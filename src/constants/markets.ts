@@ -13,8 +13,10 @@ export type MarketData = {
 
   clobPairId: number;
   effectiveInitialMarginFraction: Nullable<number>;
+  imageUrl: Nullable<string>;
   initialMarginFraction: Nullable<number>;
   isNew?: boolean;
+  isUnlaunched?: boolean;
   line?: Nullable<number[]>;
   name?: Nullable<string>;
   nextFundingRate?: Nullable<number>;

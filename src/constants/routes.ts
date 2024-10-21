@@ -37,6 +37,7 @@ export enum MobileSettingsRoute {
   Language = 'language',
   Preferences = 'preferences',
   Network = 'network',
+  Display = 'display',
 }
 
 export const BASE_ROUTE = import.meta.env.VITE_ROUTER_TYPE === 'hash' ? '/#' : '';

@@ -18,6 +18,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
@@ -123,11 +124,11 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
     {
       group: 'markets',
       groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
-      items: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
+      items: joinedPerpetualMarketsAndAssets.map(({ market, name, id, resources }) => ({
         value: market ?? '',
-        slotBefore: <AssetIcon symbol={id} />,
+        slotBefore: <AssetIcon logoUrl={resources?.imageUrl} symbol={id} />,
         label: name ?? '',
-        tag: id,
+        tag: getDisplayableAssetFromBaseAsset(id),
         onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
       })),
     },

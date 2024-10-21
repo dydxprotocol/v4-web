@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -36,6 +37,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
+  const { usdcImage } = useTokenConfigs();
 
   const openStakingRewardDialog = useCallback(
     () =>
@@ -77,7 +79,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
           showSign={ShowSign.Both}
           minimumFractionDigits={SMALL_USD_DECIMALS}
         />
-        <AssetIcon symbol="USDC" />
+        <AssetIcon logoUrl={usdcImage} symbol="USDC" />
       </$InlineRow>
     </$Panel>
   );

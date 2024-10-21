@@ -10,6 +10,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/configs';
 import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+
 import { Tag } from './Tag';
 
 type ElementProps = {
@@ -40,7 +42,7 @@ export const DisplayUnitTag = ({ entryPoint, assetId, className }: ElementProps)
     <Tag onClick={onToggle} tw="cursor-pointer" className={className}>
       {
         {
-          [DisplayUnit.Asset]: assetId,
+          [DisplayUnit.Asset]: getDisplayableAssetFromBaseAsset(assetId),
           [DisplayUnit.Fiat]: 'USD',
         }[displayUnit]
       }

@@ -68,7 +68,7 @@ const Profile = () => {
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
   const { sourceAccount, dydxAddress } = useAccounts();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
 
   const { data: ensName } = useEnsName({
@@ -225,7 +225,9 @@ const Profile = () => {
               label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
               value: (
                 <Output
-                  slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-[0.5ch]" />}
+                  slotRight={
+                    <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} tw="ml-[0.5ch]" />
+                  }
                   type={OutputType.Asset}
                   value={currentWeekTradingReward?.amount}
                 />

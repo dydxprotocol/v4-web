@@ -66,11 +66,24 @@ export interface Params {
   delayBlocks: number;
 }
 
+export interface InitialDeposit {
+  denom: string;
+  amount: string;
+}
+
+export interface Metadata {
+  assetName: string;
+  referencePrice: number;
+  cmcId: number;
+}
+
 export interface Proposal {
   id: Long.Long;
   title: string;
   summary: string;
   params: Params;
+  initialDeposit: InitialDeposit;
+  meta: Metadata;
 }
 
 export enum PerpetualMarketType {

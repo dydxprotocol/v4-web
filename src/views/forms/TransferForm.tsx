@@ -67,7 +67,8 @@ export const TransferForm = ({
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
+  const { tokensConfigs, usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } =
+    useTokenConfigs();
   useWithdrawalInfo({ transferType: 'transfer' });
 
   const {
@@ -253,7 +254,7 @@ export const TransferForm = ({
       value: DydxChainAsset.USDC,
       label: (
         <$InlineRow>
-          <AssetIcon symbol="USDC" /> {usdcLabel}
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" /> {usdcLabel}
         </$InlineRow>
       ),
     },
@@ -261,7 +262,7 @@ export const TransferForm = ({
       value: DydxChainAsset.CHAINTOKEN,
       label: (
         <$InlineRow>
-          <AssetIcon symbol={chainTokenLabel} />
+          <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
           {chainTokenLabel}
         </$InlineRow>
       ),

@@ -41,6 +41,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
             setValue('');
             onTextChange?.('');
           }}
+          withoutBackground
         />
       )}
     </$Search>
@@ -60,8 +61,6 @@ const $Search = styled.div`
 `;
 const $IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
-  --button-border: none;
-  --button-backgroundColor: transparent;
   color: ${({ theme }) => theme.textSecondary};
   width: 1.5rem;
   height: 1.5rem;
