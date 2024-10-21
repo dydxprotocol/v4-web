@@ -1,53 +1,59 @@
 import { useEffect, useState } from 'react';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { IAffiliateStats } from '@/constants/affiliates';
 
-const fetchAffiliateStats = async ({ pageParam = 1 }) => {
-  const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/search`;
+import { log } from '@/lib/telemetry';
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ pagination: { page: pageParam, pageSize: 10 } }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to fetch leaderboard data');
-  }
-
-  const data = await response.json();
-  return data;
-};
+import { useEndpointsConfig } from './useEndpointsConfig';
 
 export const useAffiliatesLeaderboard = () => {
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [affiliatesPages, setAffiliatesPages] = useState<Record<number, IAffiliateStats[]>>({});
+  const { affiliatesBaseUrl } = useEndpointsConfig();
 
-  const { data, fetchNextPage } = useInfiniteQuery({
-    queryKey: ['affiliatesLeaderboard'],
+  const fetchAffiliateStats = async () => {
+    const endpoint = `${affiliatesBaseUrl}/v1/leaderboard/search`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pagination: { page, pageSize: 10 } }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      log('useAffiliateLeaderboard', error, { endpoint });
+      throw error;
+    }
+  };
+
+  const affiliatesLeaderboardQuery = useQuery({
+    queryKey: ['affiliatesLeaderboard', page],
     queryFn: fetchAffiliateStats,
-    initialPageParam: page,
-    getNextPageParam: (lastPage, allPages) => {
-      if (allPages.length * 10 < lastPage.total) {
-        return allPages.length + 1;
-      } else {
-        return undefined;
-      }
-    },
+    enabled: Boolean(page),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (page > 1) {
-      fetchNextPage();
+    if (affiliatesLeaderboardQuery.data?.results) {
+      setAffiliatesPages((prev) => ({
+        ...prev,
+        [affiliatesLeaderboardQuery.data.page]: affiliatesLeaderboardQuery.data.results,
+      }));
+      setTotal(affiliatesLeaderboardQuery.data.total);
     }
-  }, [page, fetchNextPage]);
+  }, [affiliatesLeaderboardQuery.data]);
 
-  const affiliates: IAffiliateStats[] = data?.pages.flatMap((page) => page.results) || [];
-  const total: number = data?.pages[0]?.total || 0;
+  // merge all the affiliatesPages into a single array
+  const affiliates = Object.values(affiliatesPages).flat();
 
   return { affiliates, total, page, setPage };
 };

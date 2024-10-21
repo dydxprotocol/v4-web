@@ -69,6 +69,7 @@ export const AnalyticsUserProperties = unionize(
     WalletType: ofType<WalletType | string | null>(),
     WalletConnectorType: ofType<ConnectorType | null>(),
     WalletAddress: ofType<string | null>(),
+    IsRememberMe: ofType<boolean | null>(),
 
     // Account
     DydxAddress: ofType<DydxAddress | null>(),
@@ -91,6 +92,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   WalletType: 'walletType',
   WalletConnectorType: 'walletConnectorType',
   WalletAddress: 'walletAddress',
+  IsRememberMe: 'isRememberMe',
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
@@ -139,6 +141,7 @@ export const AnalyticsEvents = unionize(
     // Navigation
     NavigatePage: ofType<{
       path: string;
+      previousPath: string;
     }>(),
     NavigateDialog: ofType<{
       type: DialogTypesTypes;

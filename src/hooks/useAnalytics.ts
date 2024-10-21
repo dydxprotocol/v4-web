@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -113,6 +113,14 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
   }, [dydxAddress]);
 
+  useEffect(() => {
+    identify(
+      AnalyticsUserProperties.IsRememberMe(
+        dydxAddress ? Boolean(sourceAccount.encryptedSignature) : null
+      )
+    );
+  }, [dydxAddress, sourceAccount.encryptedSignature]);
+
   // AnalyticsUserProperty.SubaccountNumber
   const subaccountNumber = useAppSelector(getSubaccountId);
   useEffect(() => {
@@ -150,14 +158,16 @@ export const useAnalytics = () => {
       );
     }
   }, [status]);
-
   // AnalyticsEvent.NavigatePage
   const location = useLocation();
-
+  const previousPathRef = useRef(location.pathname);
   useEffect(() => {
     // Ignore hashchange events from <iframe>s x_x
-    if (location.pathname.startsWith('/'))
-      track(AnalyticsEvents.NavigatePage({ path: location.pathname }));
+    if (location.pathname.startsWith('/')) {
+      const previousPath = previousPathRef.current;
+      track(AnalyticsEvents.NavigatePage({ path: location.pathname, previousPath }));
+      previousPathRef.current = location.pathname;
+    }
   }, [location]);
 
   // AnalyticsEvent.NavigateDialog
@@ -232,8 +242,8 @@ export const useAnalytics = () => {
     if (selectedWallet) {
       track(
         AnalyticsEvents.ConnectWallet({
-          walletType: selectedWallet?.name,
-          walletConnectorType: selectedWallet?.connectorType!,
+          walletType: selectedWallet.name,
+          walletConnectorType: selectedWallet.connectorType!,
         })
       );
     } else if (previousSelectedWallet) {

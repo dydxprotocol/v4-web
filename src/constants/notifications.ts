@@ -207,6 +207,7 @@ export enum TransferNotificationTypes {
   Deposit = 'deposit',
 }
 
+// TODO: fix typo
 export type TransferNotifcation = {
   id?: string;
   txHash: string;

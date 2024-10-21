@@ -6,7 +6,10 @@ import { AffiliatesProgramMetric, AffiliatesProgramPeriod } from '@/constants/ch
 
 import { log } from '@/lib/telemetry';
 
+import { useEndpointsConfig } from './useEndpointsConfig';
+
 export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) => {
+  const { affiliatesBaseUrl } = useEndpointsConfig();
   // State to keep track of selected period
   const [selectedPeriod, setSelectedPeriod] = useState<AffiliatesProgramPeriod>(
     AffiliatesProgramPeriod.PeriodAllTime
@@ -40,7 +43,7 @@ export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) 
 
   // TODO: Leverage react-query with a refactor of the chart. Implementation is the same as trading rewards chart
   const fetchMetricData = async () => {
-    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
+    const endpoint = `${affiliatesBaseUrl}/v1/community/chart-metrics?start_date=${getStartDate()}&end_date=${new Date().toISOString()}`;
     try {
       const response = await fetch(endpoint, {
         headers: {

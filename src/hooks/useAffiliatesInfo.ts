@@ -14,6 +14,7 @@ import { getFeeTiers } from '@/state/configsSelectors';
 import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
+import { useEndpointsConfig } from './useEndpointsConfig';
 
 type AffiliatesMetadata = {
   referralCode: string;
@@ -24,6 +25,7 @@ type AffiliatesMetadata = {
 export const useAffiliatesInfo = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo, getAllAffiliateTiers } = useDydxClient();
   const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
+  const { affiliatesBaseUrl } = useEndpointsConfig();
 
   const fetchAffiliateMetadata = async () => {
     if (!compositeClient || !dydxAddress) {
@@ -61,7 +63,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchProgramStats = async () => {
-    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/community/program-stats`;
+    const endpoint = `${affiliatesBaseUrl}/v1/community/program-stats`;
 
     try {
       const res = await fetch(endpoint, {
@@ -80,7 +82,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchAccountStats = async () => {
-    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/leaderboard/account/${dydxAddress}`;
+    const endpoint = `${affiliatesBaseUrl}/v1/leaderboard/account/${dydxAddress}`;
 
     try {
       const res = await fetch(endpoint, {
@@ -100,7 +102,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchLastUpdated = async () => {
-    const endpoint = `${import.meta.env.VITE_AFFILIATES_SERVER_BASE_URL}/v1/last-updated`;
+    const endpoint = `${affiliatesBaseUrl}/v1/last-updated`;
 
     try {
       const res = await fetch(endpoint, {

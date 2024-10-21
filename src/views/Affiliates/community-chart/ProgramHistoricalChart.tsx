@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
-import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import { IProgramStats } from '@/constants/affiliates';
@@ -12,7 +11,6 @@ import {
   affiliatesProgramPeriods,
   type TradingRewardsDatum,
 } from '@/constants/charts';
-import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
@@ -129,28 +127,6 @@ export const ProgramHistoricalChart = ({
     [now, historyStartDate, newestDataPointDate, oldestDataPointDate]
   );
 
-  // Update selected period in toggle if user zooms in/out
-  const onZoomSnap = useMemo(
-    () =>
-      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
-        if (zoomDomain) {
-          const predefinedPeriodIx = affiliatesProgramPeriods.findIndex(
-            // To account for slight variance from zoom animation
-            (period) => Math.abs(msForPeriod(period) - zoomDomain) <= 1
-          );
-          if (predefinedPeriodIx < 0) {
-            // Unselect period
-            setIsZooming(true);
-          } else {
-            // Update period to new selected period
-            setIsZooming(false);
-            setSelectedPeriod(affiliatesProgramPeriods[predefinedPeriodIx]);
-          }
-        }
-      }, NORMAL_DEBOUNCE_MS),
-    [msForPeriod]
-  );
-
   useEffect(() => {
     if (isZooming) {
       setDefaultZoomDomain(undefined);
@@ -227,7 +203,6 @@ export const ProgramHistoricalChart = ({
         tickFormatY={tickFormatY}
         renderTooltip={renderTooltip}
         onTooltipContext={setTooltipContext}
-        onZoom={onZoomSnap}
         slotEmpty={slotEmpty}
         defaultZoomDomain={defaultZoomDomain}
         minZoomDomain={PROGRAM_DATA_TIME_RESOLUTION * 2}

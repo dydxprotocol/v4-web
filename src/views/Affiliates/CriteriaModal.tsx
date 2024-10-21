@@ -214,7 +214,7 @@ const CriteriaTable = ({
               </div>
             </Tag>
           </$TableCell>
-        ) : tier === 'vip' && userTier == 'vip' ? (
+        ) : tier === 'vip' && userTier === 'vip' ? (
           <$TableCell className="text-color-text-2">
             {stringGetter({
               key: STRING_KEYS.YOURE_A_VIP,
@@ -274,12 +274,11 @@ const CriteriaTable = ({
           ) : (
             affiliateEarnRate
           )}
-          {(userTier || userTier === 0) &&
-            userTier.toString().toLowerCase() === tier.toString().toLowerCase() && (
-              <Tag className="bg-color-accent">
-                <span className="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>
-              </Tag>
-            )}
+          {userTier?.toString().toLowerCase() === tier.toString().toLowerCase() && (
+            <Tag className="bg-color-accent">
+              <span className="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>
+            </Tag>
+          )}
         </$TableCell>
       ),
     },
