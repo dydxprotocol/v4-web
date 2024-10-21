@@ -9,6 +9,7 @@ import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
@@ -27,6 +28,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { isTruthy } from '@/lib/isTruthy';
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -47,151 +49,157 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
     () => vaultsDataRaw?.positions?.toArray() ?? EMPTY_ARR,
     [vaultsDataRaw?.positions]
   );
-  const marketIdToAssetMetadataMap = useAppSelector(getMarketIdToAssetMetadataMap) ?? EMPTY_ARR;
+  const marketIdToAssetMetadataMap = useAppSelector(getMarketIdToAssetMetadataMap);
   const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
+
+  const { isTablet } = useBreakpoints();
 
   const columns = useMemo<ColumnDef<VaultTableRow>[]>(
     () =>
-      [
-        {
-          columnKey: 'market',
-          getCellValue: (row) => row.marketId,
-          label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ marketId, currentLeverageMultiple }) => {
-            const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
+      (
+        [
+          {
+            columnKey: 'market',
+            getCellValue: (row) => row.marketId,
+            label: stringGetter({ key: STRING_KEYS.MARKET }),
+            renderCell: ({ marketId, currentLeverageMultiple }) => {
+              const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
 
-            const logoUrl =
-              marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
+              const logoUrl =
+                marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
 
-            return (
-              // eslint-disable-next-line jsx-a11y/interactive-supports-focus
-              <div
-                tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
-                role="button"
-                onClick={() =>
-                  marketId != null &&
-                  marketsData[marketId] != null &&
-                  navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
-                }
-              >
-                <TableCell
-                  stacked
-                  slotLeft={
-                    <AssetIcon
-                      logoUrl={logoUrl}
-                      symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
-                      tw="[--asset-icon-size:2.5em]"
-                    />
+              return (
+                // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+                <div
+                  tw="cursor-pointer rounded-0.5 hover:bg-color-layer-3"
+                  role="button"
+                  onClick={() =>
+                    marketId != null &&
+                    marketsData[marketId] != null &&
+                    navigate(`${AppRoute.Trade}/${marketId}`, { state: { from: AppRoute.Vault } })
                   }
                 >
-                  {marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.name}
-                  <div tw="row gap-0.25">
-                    <Output
-                      type={OutputType.Multiple}
-                      value={
-                        currentLeverageMultiple != null
-                          ? Math.abs(currentLeverageMultiple)
-                          : undefined
-                      }
-                    />
-                    <$OutputSigned
-                      value={
-                        (currentLeverageMultiple ?? 0) < 0
-                          ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
-                          : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-                      }
-                      sign={getNumberSign(currentLeverageMultiple ?? 0)}
-                      type={OutputType.Text}
-                    />
-                  </div>
-                </TableCell>
-              </div>
-            );
+                  <TableCell
+                    stacked
+                    slotLeft={
+                      <AssetIcon
+                        logoUrl={logoUrl}
+                        symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
+                        tw="[--asset-icon-size:2.5em]"
+                      />
+                    }
+                  >
+                    {marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.name}
+                    <div tw="row gap-0.25">
+                      <$OutputSigned
+                        value={
+                          (currentLeverageMultiple ?? 0) === 0
+                            ? stringGetter({ key: STRING_KEYS.NONE })
+                            : (currentLeverageMultiple ?? 0) < 0
+                              ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
+                              : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+                        }
+                        sign={getNumberSign(currentLeverageMultiple ?? 0)}
+                        type={OutputType.Text}
+                      />
+                      <Output
+                        type={OutputType.Multiple}
+                        value={
+                          currentLeverageMultiple != null
+                            ? Math.abs(currentLeverageMultiple)
+                            : undefined
+                        }
+                      />
+                    </div>
+                  </TableCell>
+                </div>
+              );
+            },
           },
-        },
-        {
-          columnKey: 'size',
-          getCellValue: (row) => row.currentPosition?.usdc,
-          label: stringGetter({ key: STRING_KEYS.SIZE }),
-          renderCell: ({ currentPosition, marketId }) => (
-            <TableCell stacked>
-              <Output value={currentPosition?.usdc} type={OutputType.Fiat} fractionDigits={0} />
-              <Output
-                value={currentPosition?.asset}
-                type={OutputType.Asset}
-                tag={
-                  <$Label>
-                    {getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
-                  </$Label>
-                }
-                fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
-              />
-            </TableCell>
-          ),
-        },
-        {
-          columnKey: 'pnl-sparkline',
-          allowsSorting: false,
-          label: stringGetter({ key: STRING_KEYS.PAST_30D }),
-          width: 50,
-          renderCell: ({ thirtyDayPnl }) => (
-            <TableCell>
-              <div style={{ width: 50, height: 50 }} tw="ml-0.5">
-                {thirtyDayPnl?.sparklinePoints != null && (
-                  <SparklineChart
-                    data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
-                      x: index + 1,
-                      y: elem,
-                    }))}
-                    xAccessor={(datum) => datum.x}
-                    yAccessor={(datum) => datum.y}
-                    positive={(thirtyDayPnl.absolute ?? 0) > 0}
-                  />
-                )}
-              </div>
-            </TableCell>
-          ),
-        },
-        {
-          columnKey: 'pnl',
-          getCellValue: (row) => row.thirtyDayPnl?.absolute,
-          label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
-          renderCell: ({ thirtyDayPnl: thirtyDayPnlRaw }) => {
-            const thirtyDayPnl = thirtyDayPnlRaw ?? {
-              absolute: 0,
-              percent: 0,
-              sparklinePoints: undefined,
-            };
-            return (
+          {
+            columnKey: 'size',
+            getCellValue: (row) => row.currentPosition?.usdc,
+            label: stringGetter({ key: STRING_KEYS.SIZE }),
+            renderCell: ({ currentPosition, marketId }) => (
               <TableCell stacked>
-                <$OutputSigned
-                  tw="w-5"
-                  sign={getNumberSign(thirtyDayPnl.absolute)}
-                  value={thirtyDayPnl.absolute}
-                  type={OutputType.Fiat}
-                  fractionDigits={0}
-                />
+                <Output value={currentPosition?.usdc} type={OutputType.Fiat} fractionDigits={0} />
                 <Output
-                  value={thirtyDayPnl.percent}
-                  type={OutputType.Percent}
-                  showSign={ShowSign.Both}
+                  value={currentPosition?.asset}
+                  type={OutputType.Asset}
+                  tag={
+                    <$Label>
+                      {getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
+                    </$Label>
+                  }
+                  fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
                 />
               </TableCell>
-            );
+            ),
           },
-        },
-        {
-          columnKey: 'margin',
-          getCellValue: (row) => row.marginUsdc,
-          label: stringGetter({ key: STRING_KEYS.EQUITY }),
-          renderCell: ({ marginUsdc }) => (
-            <TableCell>
-              <Output value={marginUsdc} type={OutputType.Fiat} fractionDigits={0} />
-            </TableCell>
-          ),
-        },
-      ] satisfies ColumnDef<VaultTableRow>[],
-    [marketIdToAssetMetadataMap, marketsData, navigate, stringGetter, usdcImage]
+          !isTablet && {
+            columnKey: 'pnl-sparkline',
+            allowsSorting: false,
+            label: stringGetter({ key: STRING_KEYS.PAST_30D }),
+            width: 50,
+            renderCell: ({ thirtyDayPnl }) => (
+              <TableCell>
+                <div style={{ width: 50, height: 50 }} tw="ml-0.5">
+                  {thirtyDayPnl?.sparklinePoints != null && (
+                    <SparklineChart
+                      data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
+                        x: index + 1,
+                        y: elem,
+                      }))}
+                      xAccessor={(datum) => datum.x}
+                      yAccessor={(datum) => datum.y}
+                      positive={(thirtyDayPnl.absolute ?? 0) > 0}
+                    />
+                  )}
+                </div>
+              </TableCell>
+            ),
+          },
+          !isTablet && {
+            columnKey: 'pnl',
+            getCellValue: (row) => row.thirtyDayPnl?.absolute,
+            label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
+            renderCell: ({ thirtyDayPnl: thirtyDayPnlRaw }) => {
+              const thirtyDayPnl = thirtyDayPnlRaw ?? {
+                absolute: 0,
+                percent: 0,
+                sparklinePoints: undefined,
+              };
+              return (
+                <TableCell stacked>
+                  <$OutputSigned
+                    tw="w-5"
+                    sign={getNumberSign(thirtyDayPnl.absolute)}
+                    value={thirtyDayPnl.absolute}
+                    type={OutputType.Fiat}
+                    fractionDigits={0}
+                  />
+                  <Output
+                    value={thirtyDayPnl.percent}
+                    type={OutputType.Percent}
+                    showSign={ShowSign.Both}
+                  />
+                </TableCell>
+              );
+            },
+          },
+          {
+            columnKey: 'margin',
+            getCellValue: (row) => row.marginUsdc,
+            label: stringGetter({ key: STRING_KEYS.EQUITY }),
+            renderCell: ({ marginUsdc }) => (
+              <TableCell>
+                <Output value={marginUsdc} type={OutputType.Fiat} fractionDigits={0} />
+              </TableCell>
+            ),
+          },
+        ] satisfies Array<ColumnDef<VaultTableRow> | false>
+      ).filter(isTruthy),
+    [isTablet, marketIdToAssetMetadataMap, marketsData, navigate, stringGetter, usdcImage]
   );
 
   return (
