@@ -2,12 +2,13 @@ import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
+import { ButtonStyle } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Input, InputType, type InputProps } from '@/components/Input';
-import { ButtonStyle } from '@/constants/buttons';
 
 type ElementProps = {
   onTextChange?: (value: string) => void;

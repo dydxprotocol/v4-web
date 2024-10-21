@@ -87,7 +87,13 @@ export const WithTooltip = ({
         </Trigger>
 
         <Portal>
-          <$Content sideOffset={sideOffset ?? 8} side={side} align={align} className={className} asChild>
+          <$Content
+            sideOffset={sideOffset ?? 8}
+            side={side}
+            align={align}
+            className={className}
+            asChild
+          >
             {slotTooltip ?? (
               <dl>
                 {tooltipTitle && <dt>{tooltipTitle}</dt>}
