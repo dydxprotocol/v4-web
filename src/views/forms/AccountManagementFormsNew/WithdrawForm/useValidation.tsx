@@ -31,14 +31,14 @@ type UseValidationProps = {
   debouncedAmountBN: BigNumber;
   freeCollateralBN: BigNumber;
   isValidDestinationAddress: boolean;
-  error?: string;
+  onSubmitError?: string;
   toAddress?: string;
   toChainId?: string;
   toToken?: Asset;
 };
 
-export const useValidation = ({
-  error,
+export const useWithdrawFormValidation = ({
+  onSubmitError,
   isCctp,
   debouncedAmountBN,
   toAddress,
@@ -46,7 +46,10 @@ export const useValidation = ({
   toChainId,
   toToken,
   freeCollateralBN,
-}: UseValidationProps) => {
+}: UseValidationProps): {
+  alertType?: AlertType | undefined;
+  errorMessage: string | undefined;
+} => {
   const stringGetter = useStringGetter();
   const { sanctionedAddresses } = useRestrictions();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
@@ -54,7 +57,7 @@ export const useValidation = ({
   const { usdcLabel } = useTokenConfigs();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
-  const { alertType, errorMessage } = useMemo(() => {
+  return useMemo(() => {
     if (isCctp) {
       if (debouncedAmountBN.gte(MAX_CCTP_TRANSFER_AMOUNT)) {
         return {
@@ -81,9 +84,9 @@ export const useValidation = ({
         };
       }
     }
-    if (error) {
+    if (onSubmitError) {
       return {
-        errorMessage: error,
+        errorMessage: onSubmitError,
       };
     }
 
@@ -135,17 +138,16 @@ export const useValidation = ({
     //   };
     // }
 
-    if (debouncedAmountBN) {
-      if (!toChainId && !exchange) {
-        return {
-          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
-        };
-      }
-      if (!toToken) {
-        return {
-          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET }),
-        };
-      }
+    // TODO [onboarding-rewrite]: implement coinbase withdrawals
+    if (!toChainId && !exchange) {
+      return {
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
+      };
+    }
+    if (!toToken) {
+      return {
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET }),
+      };
     }
 
     if (debouncedAmountBN.gt(MustBigNumber(freeCollateralBN))) {
@@ -181,7 +183,7 @@ export const useValidation = ({
     };
   }, [
     isCctp,
-    error,
+    onSubmitError,
     toAddress,
     sanctionedAddresses,
     stringGetter,
@@ -196,8 +198,4 @@ export const useValidation = ({
     groupSeparator,
     selectedLocale,
   ]);
-  return {
-    alertType,
-    errorMessage,
-  };
 };

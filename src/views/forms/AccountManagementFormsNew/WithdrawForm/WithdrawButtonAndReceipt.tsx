@@ -10,7 +10,6 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -28,6 +27,7 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { MustBigNumber } from '@/lib/numbers';
 
 import { RouteWarningMessage } from '../RouteWarningMessage';
 
@@ -52,9 +52,17 @@ export const WithdrawButtonAndReceipt = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcDecimals } = useTokenConfigs();
-  const { connectionError } = useApiState();
 
-  const fees = Number(route?.usdAmountIn) - Number(route?.usdAmountOut);
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const requiresAcknowledgement = Boolean(route?.warning && !hasAcknowledged);
+  const isFormValid = !isDisabled && !requiresAcknowledgement;
+
+  const fees = MustBigNumber(route?.usdAmountIn).minus(MustBigNumber(route?.usdAmountOut));
+
+  if (!withdrawToken?.decimals || Number(withdrawToken.decimals) !== usdcDecimals)
+    throw new Error(
+      'WithdrawToken does not have decimals. This should never happen. WithdrawToken should always be a usdc token and have usdc decimals (6)'
+    );
   const submitButtonReceipt = [
     {
       key: 'amount-inputted',
@@ -64,10 +72,7 @@ export const WithdrawButtonAndReceipt = ({
           type={OutputType.Asset}
           value={
             route?.amountIn
-              ? formatUnits(
-                  BigInt(route.amountIn ?? '0'),
-                  withdrawToken?.decimals ?? usdcDecimals
-                ).toString()
+              ? formatUnits(BigInt(route.amountIn), withdrawToken.decimals).toString()
               : undefined
           }
           fractionDigits={TOKEN_DECIMALS}
@@ -80,7 +85,7 @@ export const WithdrawButtonAndReceipt = ({
       label: (
         <$RowWithGap>
           {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
-          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+          <Tag>{withdrawToken.symbol}</Tag>
         </$RowWithGap>
       ),
       value: (
@@ -88,17 +93,14 @@ export const WithdrawButtonAndReceipt = ({
           type={OutputType.Asset}
           value={
             route?.amountOut
-              ? formatUnits(
-                  BigInt(route.amountOut ?? '0'),
-                  withdrawToken?.decimals ?? usdcDecimals
-                ).toString()
+              ? formatUnits(BigInt(route.amountOut), withdrawToken.decimals).toString()
               : undefined
           }
           fractionDigits={TOKEN_DECIMALS}
         />
       ),
     },
-    fees && {
+    fees.absoluteValue().gt(0) && {
       key: 'bridge-fees',
       label: (
         <WithTooltip tooltip="bridge-fees-deposit">
@@ -143,13 +145,6 @@ export const WithdrawButtonAndReceipt = ({
       ),
     },
   ].filter(isTruthy);
-
-  const [hasAcknowledged, setHasAcknowledged] = useState(false);
-  const requiresAcknowledgement = Boolean(route?.warning && !hasAcknowledged);
-  const isFormValid =
-    !isDisabled &&
-    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION &&
-    !requiresAcknowledgement;
 
   if (!canAccountTrade) {
     return (
