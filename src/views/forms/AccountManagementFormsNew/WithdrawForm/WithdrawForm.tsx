@@ -117,10 +117,6 @@ export const WithdrawForm = () => {
     setFromChainId(selectedDydxChainId);
     setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
-    // Cosmos chains connect to the keplr wallet, which has a unique address per chain id
-    const calculatedCosmosAddress = toChainId && cosmosChainAddresses[toChainId];
-    // If there is an exchange, we cannot know what to populate the address as
-    setToAddress(exchangeName ? undefined : calculatedCosmosAddress ?? sourceAccount.address);
   }, [
     setTransferType,
     setFromChainId,
@@ -132,7 +128,6 @@ export const WithdrawForm = () => {
     setToAddress,
     sourceAccount.address,
     toChainId,
-    cosmosChainAddresses,
   ]);
 
   useEffect(() => {
