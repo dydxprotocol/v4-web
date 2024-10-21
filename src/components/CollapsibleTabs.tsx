@@ -13,6 +13,8 @@ import {
 } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
 
+import { ButtonShape, ButtonStyle } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tabMixins } from '@/styles/tabMixins';
 
@@ -23,7 +25,6 @@ import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { testFlags } from '@/lib/testFlags';
-import { ButtonShape } from '@/constants/buttons';
 
 type ElementProps<TabItemsValue> = {
   defaultTab?: TabItemsValue;
@@ -100,7 +101,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
               <$IconButton
                 iconName={IconName.Caret}
                 isToggle
-                $uiRefreshEnabled={uiRefresh}
+                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
                 shape={uiRefresh ? ButtonShape.Square : ButtonShape.Circle}
               />
             </CollapsibleTrigger>
@@ -242,16 +243,9 @@ const $Header = styled.header`
   z-index: 2;
 `;
 
-const $IconButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
+const $IconButton = styled(IconButton)`
   --button-icon-size: 1em;
   ${$CollapsibleRoot}[data-state='closed'] & {
     rotate: -0.5turn;
   }
-
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --button-border: none;
-      --button-backgroundColor: transparent;
-    `};
 `;

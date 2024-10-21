@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react';
 
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonStyle } from '@/constants/buttons';
+import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
