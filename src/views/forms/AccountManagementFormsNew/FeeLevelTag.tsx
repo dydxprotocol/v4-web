@@ -1,19 +1,10 @@
 import { Tag, TagSign } from '@/components/Tag';
 
-export enum FeeLevel {
-  High = 'High',
-  Low = 'Low',
-}
-
-type FeeLevelTagProps = {
-  feeLevel: FeeLevel;
-};
-
-const feeLevelToSign = {
-  [FeeLevel.High]: TagSign.Negative,
-  [FeeLevel.Low]: TagSign.Positive,
-};
 // TODO [onboarding-rewrite]: add localization
-export const FeeLevelTag = ({ feeLevel }: FeeLevelTagProps) => {
-  return <Tag sign={feeLevelToSign[feeLevel]}>{feeLevel} Fees</Tag>;
+export const FeeLevelTag = ({ feeLevel }: { feeLevel: 'high' | 'low' }) => {
+  if (feeLevel === 'high') {
+    return <Tag sign={TagSign.Negative}>High fees</Tag>;
+  }
+
+  return <Tag sign={TagSign.Positive}>Low fees</Tag>;
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useRef, useState } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
@@ -23,19 +23,13 @@ enum EditorState {
 
 type ElementProps = {
   slippage: number;
-  setIsEditing?: Dispatch<SetStateAction<boolean>>;
   setSlippage: (slippage: number) => void;
   disabled?: boolean;
 };
 
 export type SlippageEditorProps = ElementProps;
 
-export const SlippageEditor = ({
-  disabled,
-  slippage,
-  setIsEditing,
-  setSlippage,
-}: SlippageEditorProps) => {
+export const SlippageEditor = ({ disabled, slippage, setSlippage }: SlippageEditorProps) => {
   const percentSlippage = slippage * 100;
   const [slippageInputValue, setSlippageInputValue] = useState(percentSlippage.toString());
   const [editorState, setEditorState] = useState(EditorState.Viewing);
@@ -49,16 +43,6 @@ export const SlippageEditor = ({
   ];
   const toggleGroupRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setIsEditing?.(editorState !== EditorState.Viewing);
-
-    if (editorState === EditorState.Selecting) {
-      toggleGroupRef.current?.focus();
-    } else if (editorState === EditorState.Editing) {
-      inputRef.current?.focus();
-    }
-  }, [editorState, setIsEditing]);
 
   const onOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
