@@ -49,6 +49,7 @@ import { IncentiveSeasonDistributionNotification } from '@/views/notifications/I
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { PermissionlessMarketsLiveNotification } from '@/views/notifications/PermissionlessMarketsLiveNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -65,6 +66,7 @@ import {
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -304,6 +306,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         useIncentivesSeason();
 
       const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
+      const pmlLiveExpirationDate = new Date('2024-11-21T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
@@ -385,6 +388,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
+            },
+            []
+          );
+        }
+
+        if (currentDate < pmlLiveExpirationDate && testFlags.pml) {
+          trigger(
+            ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
+            {
+              title: stringGetter({ key: STRING_KEYS.PERMISSIONLESS_LIVE }),
+              body: stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
+              renderCustomBody({ isToast, notification }) {
+                return (
+                  <PermissionlessMarketsLiveNotification
+                    isToast={isToast}
+                    notification={notification}
+                  />
+                );
+              },
             },
             []
           );
