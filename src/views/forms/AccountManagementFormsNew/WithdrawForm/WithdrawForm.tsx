@@ -111,7 +111,9 @@ export const WithdrawForm = () => {
 
   const freeCollateralBN = useMemo(() => MustBigNumber(freeCollateral?.current), [freeCollateral]);
 
-  // Set default values for withdraw from
+  // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-869/optimize-usetransfers
+  // Stop doing this. This is pretty slow and requires multiple render cycles to set initial state
+  // Set default values for withdraw form
   useEffect(() => {
     setTransferType(TransferType.Withdraw);
     setFromChainId(selectedDydxChainId);
