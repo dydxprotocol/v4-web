@@ -13,7 +13,7 @@ import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { isTruthy } from '@/lib/isTruthy';
 
 import exchanges from '../../../../../public/configs/exchanges.json';
-import { FeeLevel, FeeLevelTag } from '../FeeLevelTag';
+import { FeeLevelTag } from '../FeeLevelTag';
 
 type ElementProps = {
   selectedExchange?: string;
@@ -33,10 +33,8 @@ export const NetworkSelectMenu = ({
   const stringGetter = useStringGetter();
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
-    if (isLowFeeChainId(chainId, TransferType.Withdraw))
-      return <FeeLevelTag feeLevel={FeeLevel.Low} />;
-    if (isHighFeeChainId(chainId, TransferType.Withdraw))
-      return <FeeLevelTag feeLevel={FeeLevel.High} />;
+    if (isLowFeeChainId(chainId, TransferType.Withdraw)) return <FeeLevelTag feeLevel="low" />;
+    if (isHighFeeChainId(chainId, TransferType.Withdraw)) return <FeeLevelTag feeLevel="high" />;
     return undefined;
   };
 
@@ -75,7 +73,7 @@ export const NetworkSelectMenu = ({
       onSelect(exchange.name, 'exchange');
     },
     slotBefore: <$Img src={exchange.icon} alt="" />,
-    slotAfter: <FeeLevelTag feeLevel={FeeLevel.Low} />,
+    slotAfter: <FeeLevelTag feeLevel="low" />,
   }));
   const selectedChainOption = chains.find((item) => item.chainID === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.name === selectedExchange);
