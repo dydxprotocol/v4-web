@@ -31,14 +31,14 @@ type UseValidationProps = {
   debouncedAmountBN: BigNumber;
   freeCollateralBN: BigNumber;
   isValidDestinationAddress: boolean;
-  onSubmitError?: string;
+  onSubmitErrorMessage?: string;
   toAddress?: string;
   toChainId?: string;
   toToken?: Asset;
 };
 
 export const useWithdrawFormValidation = ({
-  onSubmitError,
+  onSubmitErrorMessage,
   isCctp,
   debouncedAmountBN,
   toAddress,
@@ -84,9 +84,9 @@ export const useWithdrawFormValidation = ({
         };
       }
     }
-    if (onSubmitError) {
+    if (onSubmitErrorMessage) {
       return {
-        errorMessage: onSubmitError,
+        errorMessage: onSubmitErrorMessage,
       };
     }
 
@@ -183,7 +183,7 @@ export const useWithdrawFormValidation = ({
     };
   }, [
     isCctp,
-    onSubmitError,
+    onSubmitErrorMessage,
     toAddress,
     sanctionedAddresses,
     stringGetter,
