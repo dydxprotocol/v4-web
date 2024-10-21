@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
+import { ButtonStyle } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -41,7 +43,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
             setValue('');
             onTextChange?.('');
           }}
-          withoutBackground
+          buttonStyle={ButtonStyle.WithoutBackground}
         />
       )}
     </$Search>
