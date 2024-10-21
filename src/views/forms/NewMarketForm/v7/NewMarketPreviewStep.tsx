@@ -24,7 +24,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
+import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
+
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { NewMarketAgreement } from '../NewMarketAgreement';
@@ -45,7 +49,7 @@ export const NewMarketPreviewStep = ({
   shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
   const stringGetter = useStringGetter();
-  const [errorMessage, setErrorMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
@@ -53,24 +57,38 @@ export const NewMarketPreviewStep = ({
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
   const { usdcImage } = useTokenConfigs();
+  const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);
 
-  const alertMessage = useMemo(() => {
-    let alert;
+  const { alertInfo, shouldDisableForm } = useMemo(() => {
+    let alert: { type: AlertType; message: string } | null = null;
+    let shouldDisable: boolean = false;
+
     if (errorMessage) {
       alert = {
         type: AlertType.Error,
         message: errorMessage,
       };
+    } else if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
+      alert = {
+        type: AlertType.Error,
+        message: stringGetter({
+          key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
+          params: {
+            USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+          },
+        }),
+      };
+
+      shouldDisable = true;
     }
 
-    if (alert) {
-      <AlertMessage type={alert.type}>{alert.message} </AlertMessage>;
-    }
+    return {
+      alertInfo: alert,
+      shouldDisableForm: shouldDisable,
+    };
+  }, [errorMessage, freeCollateral, stringGetter]);
 
-    return null;
-  }, [errorMessage]);
-
-  const isDisabled = alertMessage !== null;
+  const isDisabled = shouldDisableForm;
 
   const heading = shouldHideTitleAndDescription ? null : (
     <>
@@ -160,6 +178,10 @@ export const NewMarketPreviewStep = ({
         ]}
       />
     </div>
+  );
+
+  const alertMessage = alertInfo && (
+    <AlertMessage type={alertInfo.type}>{alertInfo.message} </AlertMessage>
   );
 
   return (
