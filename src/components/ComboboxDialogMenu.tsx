@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -60,7 +60,7 @@ export const ComboboxDialogMenu = <
   inputPlaceholder,
   slotEmpty,
   withItemBorders,
-  withSearch,
+  withSearch = true,
   withStickyLayout = true,
   children,
 
@@ -83,6 +83,7 @@ export const ComboboxDialogMenu = <
     placement={placement}
     preventClose={preventClose}
     className={className}
+    $withSearch={withSearch}
   >
     <$ComboboxMenu
       items={items}
@@ -97,7 +98,7 @@ export const ComboboxDialogMenu = <
     {children}
   </$Dialog>
 );
-const $Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)<{ $withSearch?: boolean }>`
   /* Params */
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
   --comboboxDialogMenu-item-gap: 0.5rem;
@@ -109,10 +110,14 @@ const $Dialog = styled(Dialog)`
 
     --dialog-paddingX: 1rem;
 
-    --dialog-header-z: 0; /* allow input field to scroll on top of header */
-    --dialog-header-paddingTop: 1rem;
-    --dialog-header-height: 2.75rem;
-    --dialog-header-paddingBottom: 0rem;
+    ${({ $withSearch }) =>
+      $withSearch &&
+      css`
+        --dialog-header-z: 0; /* allow input field to scroll on top of header */
+        --dialog-header-paddingTop: 1rem;
+        --dialog-header-height: 2.75rem;
+        --dialog-header-paddingBottom: 0rem;
+      `}
 
     --dialog-content-paddingLeft: 0rem;
     --dialog-content-paddingRight: 0rem;

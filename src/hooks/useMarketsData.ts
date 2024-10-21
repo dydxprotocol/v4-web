@@ -246,22 +246,27 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
-  const hasPredictionMarkets = markets.some((market) =>
-    Object.values(PREDICTION_MARKET).includes(market.id)
-  );
+  const { hasPredictionMarkets, showNewFilter } = useMemo(() => {
+    return {
+      hasPredictionMarkets: markets.some((market) =>
+        Object.values(PREDICTION_MARKET).includes(market.id)
+      ),
+      showNewFilter: markets.some((market) => market.isNew),
+    };
+  }, [markets]);
 
   const marketFilters = useMemo(
     () =>
       [
         MarketFilters.ALL,
-        MarketFilters.NEW,
+        showNewFilter ? MarketFilters.NEW : null,
         testFlags.pml && MarketFilters.LAUNCHABLE,
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
           markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
         ),
         hasPredictionMarkets && MarketFilters.PREDICTION_MARKET,
       ].filter(isTruthy),
-    [hasPredictionMarkets, markets]
+    [hasPredictionMarkets, markets, showNewFilter]
   );
 
   return { marketFilters, filteredMarkets, markets };

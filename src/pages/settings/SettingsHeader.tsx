@@ -31,6 +31,10 @@ export const SettingsHeader = ({
       value: `${AppRoute.Settings}/${MobileSettingsRoute.Preferences}`,
       label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
     },
+    {
+      value: `${AppRoute.Settings}/${MobileSettingsRoute.Display}`,
+      label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
+    },
   ];
 
   const routeMap = Object.fromEntries(
