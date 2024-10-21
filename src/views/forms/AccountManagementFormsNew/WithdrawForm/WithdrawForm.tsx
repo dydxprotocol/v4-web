@@ -50,13 +50,13 @@ import { log } from '@/lib/telemetry';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawButtonAndReceipt';
-import { useWithdrawFormValidation } from './useValidation';
+import { useWithdrawFormValidation } from './useWithdrawFormValidation';
 
 const DUMMY_TX_HASH = 'withdraw_dummy_tx_hash';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
-  const [error, setError] = useState<string>();
+  const [onSubmitErrorMessage, setOnSubmitErrorMessage] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
@@ -272,20 +272,20 @@ export const WithdrawForm = () => {
         }
 
         setIsSubmitting(true);
-        setError(undefined);
+        setOnSubmitErrorMessage(undefined);
 
         const screenResults = await screenAddresses({
           addresses: [toAddress, dydxAddress],
         });
 
         if (screenResults?.[dydxAddress]) {
-          setError(
+          setOnSubmitErrorMessage(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
             })
           );
         } else if (screenResults?.[toAddress]) {
-          setError(
+          setOnSubmitErrorMessage(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
             })
@@ -299,9 +299,11 @@ export const WithdrawForm = () => {
       } catch (err) {
         log('WithdrawForm/onSubmit', err);
         if (err?.code === 429) {
-          setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
+          setOnSubmitErrorMessage(
+            stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE })
+          );
         } else {
-          setError(
+          setOnSubmitErrorMessage(
             err.message
               ? stringGetter({
                   key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
@@ -345,7 +347,7 @@ export const WithdrawForm = () => {
   const onChangeAmount = useCallback(
     ({ value }: NumberFormatValues) => {
       setAmount(value);
-      setError(undefined);
+      setOnSubmitErrorMessage(undefined);
     },
     [setAmount]
   );
@@ -381,7 +383,7 @@ export const WithdrawForm = () => {
     debouncedAmountBN,
     toAddress,
     isValidDestinationAddress,
-    error,
+    onSubmitErrorMessage,
     toChainId,
     toToken,
     freeCollateralBN,
