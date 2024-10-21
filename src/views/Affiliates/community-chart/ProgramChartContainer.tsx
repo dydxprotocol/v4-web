@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { IProgramStats } from '@/constants/affiliates';
@@ -18,14 +19,11 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { ProgramHistoricalChart } from './ProgramHistoricalChart';
 
-interface CommunityChartContainerProps {
-  programStats: IProgramStats;
-}
-
-export const CommunityChartContainer = ({ programStats }: CommunityChartContainerProps) => {
+export const CommunityChartContainer = () => {
   const [chartMetric, setChartMetric] = useState(AffiliatesProgramMetric.ReferredVolume);
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { programStats } = useOutletContext<{ programStats: IProgramStats }>();
 
   return (
     <div className="notTablet:px-1">

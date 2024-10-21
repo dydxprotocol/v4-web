@@ -117,7 +117,7 @@ export const AffiliatesPage = () => {
         </$Section>
 
         <$ContentAttached>
-          <Outlet context={{ accountStats }} />
+          <Outlet context={{ accountStats, programStats }} />
         </$ContentAttached>
       </$Page>
     </Suspense>
