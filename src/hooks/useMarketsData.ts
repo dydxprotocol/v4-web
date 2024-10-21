@@ -246,6 +246,10 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
+  const hasPredictionMarkets = markets.some((market) =>
+    Object.values(PREDICTION_MARKET).includes(market.id)
+  );
+
   const marketFilters = useMemo(
     () =>
       [
@@ -255,8 +259,9 @@ export const useMarketsData = ({
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
           markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
         ),
+        hasPredictionMarkets && MarketFilters.PREDICTION_MARKET,
       ].filter(isTruthy),
-    [markets]
+    [hasPredictionMarkets, markets]
   );
 
   return { marketFilters, filteredMarkets, markets };
