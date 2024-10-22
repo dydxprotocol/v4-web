@@ -20,6 +20,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { forwardRefFn, getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isExternalLink } from '@/lib/isExternalLink';
+import { testFlags } from '@/lib/testFlags';
 
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
@@ -40,6 +41,7 @@ type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> =
 
 type StyleProps = {
   orientation?: 'vertical' | 'horizontal';
+  dividerStyle?: 'tab' | 'underline';
   itemOrientation?: 'vertical' | 'horizontal';
   submenuPlacement?: 'inline' | 'viewport';
   dir?: 'ltr' | 'rtl';
@@ -62,6 +64,7 @@ const NavItemWithRef = <MenuItemValue extends string>(
   ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
 ) => {
   const location = useLocation();
+  const { uiRefresh } = testFlags;
 
   const children = (
     <>
@@ -76,7 +79,12 @@ const NavItemWithRef = <MenuItemValue extends string>(
         )}
       </span>
       {slotAfter}
-      {subitems?.length && <$Icon iconName={IconName.Triangle} />}
+      {subitems?.length && (
+        <$Icon
+          iconName={uiRefresh ? IconName.Caret : IconName.Triangle}
+          size={uiRefresh ? '1.5em' : '1em'}
+        />
+      )}
     </>
   );
 
@@ -116,6 +124,7 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
   onSelectItem,
   items,
   orientation = 'vertical',
+  dividerStyle = 'tab',
   itemOrientation = 'horizontal',
   submenuPlacement = 'inline', // orientation === 'horizontal' ? 'viewport' : 'inline',
   dir = 'ltr',
@@ -135,8 +144,14 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
         asChild
         onPointerMove={(e: React.MouseEvent) => e.preventDefault()}
         onPointerLeave={(e: React.MouseEvent) => e.preventDefault()}
+        $dividerStyling={dividerStyle}
       >
-        <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...item} />
+        <$NavItem
+          onSelect={onSelectItem}
+          orientation={itemOrientation}
+          $dividerStyling={dividerStyle}
+          {...item}
+        />
       </$SubMenuTrigger>
 
       <$Content
@@ -153,7 +168,12 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
                 {subitem?.subitems ? (
                   renderSubitems({ item: subitem, depth: depth + 1 })
                 ) : (
-                  <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...subitem} />
+                  <$NavItem
+                    onSelect={onSelectItem}
+                    orientation={itemOrientation}
+                    $dividerStyling="tab" // subitems should always be rendered with tab styling in the dropdown
+                    {...subitem}
+                  />
                 )}
               </$ListItem>
             ))}
@@ -164,7 +184,7 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
   );
 
   return (
-    <$Root orientation={orientation} dir={dir} className={className}>
+    <$Root orientation={orientation} dir={dir} className={className} $dividerStyling={dividerStyle}>
       {slotBefore}
 
       {items.map((group) => (
@@ -181,7 +201,12 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
                 {item.subitems ? (
                   renderSubitems({ item, depth: 0 })
                 ) : (
-                  <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...item} />
+                  <$NavItem
+                    onSelect={onSelectItem}
+                    orientation={itemOrientation}
+                    $dividerStyling={dividerStyle}
+                    {...item}
+                  />
                 )}
               </$ListItem>
             ))}
@@ -195,18 +220,23 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
     </$Root>
   );
 };
-const $Root = styled(Root)`
+const $Root = styled(Root)<{ $dividerStyling: 'tab' | 'underline' }>`
   /* Params */
   --navigationMenu-height: auto;
 
   --navigationMenu-item-height: 2rem;
 
-  --navigationMenu-item-checked-backgroundColor: var(--color-layer-1);
+  --navigationMenu-tab-item-checked-backgroundColor: var(--color-layer-1);
+  --navigationMenu-underline-item-checked-backgroundColor: var(transparent);
+  --navigationMenu-tab-item-highlighted-backgroundColor: var(--color-layer-4);
+  --navigationMenu-underline-item-highlighted-backgroundColor: transparent;
+  --navigationMenu-tab-item-radius: 0.5rem;
+  --navigationMenu-underline-item-radius: 0px;
+  --navigationMenu-tab-item-padding: 0.5rem 1rem;
+  --navigationMenu-underline-item-padding: 0.5rem;
+
   --navigationMenu-item-checked-textColor: var(--color-text-2);
-  --navigationMenu-item-highlighted-backgroundColor: var(--color-layer-4);
   --navigationMenu-item-highlighted-textColor: var(--color-text-2);
-  --navigationMenu-item-radius: 0.5rem;
-  --navigationMenu-item-padding: 0.5rem 1rem;
 
   /* Rules */
   align-self: stretch;
@@ -220,9 +250,8 @@ const $Root = styled(Root)`
     ${layoutMixins.row}
     align-items: stretch;
 
-    padding: calc((var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2) 0;
+    margin: calc((var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2) 0;
     height: max-content;
-    // min-height: calc(100% - (var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2);
   }
   &[data-orientation='vertical'] {
     ${layoutMixins.column}
@@ -400,8 +429,11 @@ const $ListItem = styled(Item)`
   }
 `;
 
-const $SubMenuTrigger = styled(Trigger)`
-  border-radius: var(--navigationMenu-item-radius);
+const $SubMenuTrigger = styled(Trigger)<{ $dividerStyling: 'tab' | 'underline' }>`
+  border-radius: ${({ $dividerStyling }) =>
+    $dividerStyling === 'tab'
+      ? css`var(--navigationMenu-tab-item-radius)`
+      : css`var(--navigationMenu-underline-item-radius)`};
   outline-offset: -2px;
 
   &[data-state='open'] {
@@ -411,31 +443,60 @@ const $SubMenuTrigger = styled(Trigger)`
   }
 `;
 
-type NavItemStyleProps = { orientation: 'horizontal' | 'vertical' };
+type NavItemStyleProps = {
+  orientation: 'horizontal' | 'vertical';
+  $dividerStyling: 'tab' | 'underline';
+};
 const NavItemTypeTemp = getSimpleStyledOutputType(NavItem, {} as NavItemStyleProps);
 
 const $NavItem = styled(NavItem)<NavItemStyleProps>`
-  ${({ subitems }) =>
+  ${({ subitems, $dividerStyling }) =>
     subitems?.length
       ? css`
           ${popoverMixins.trigger}
-          --trigger-open-backgroundColor: var(--navigationMenu-item-checked-backgroundColor);
+          --trigger-open-backgroundColor: ${$dividerStyling === 'tab'
+            ? css`var(--navigationMenu-tab-item-checked-backgroundColor)`
+            : css`var(--navigationMenu-underline-item-checked-backgroundColor)`};
+          ${$dividerStyling === 'underline' &&
+          css`
+            --trigger-active-filter: none;
+            --trigger-hover-filter: none;
+          `}
         `
       : css`
           &:hover:not(:active) {
-            background-color: var(--navigationMenu-item-highlighted-backgroundColor);
+            background-color: ${$dividerStyling === 'tab'
+              ? css`var(--navigationMenu-tab-item-highlighted-backgroundColor)`
+              : css`var(--navigationMenu-underline-highlighted-backgroundColor)`};
             color: var(--navigationMenu-item-highlighted-textColor);
           }
         `}
 
   ${popoverMixins.item}
-  --item-checked-backgroundColor: var(--navigationMenu-item-checked-backgroundColor);
-  --item-checked-textColor: var(--navigationMenu-item-checked-textColor);
-  --item-highlighted-backgroundColor: var(--navigationMenu-item-highlighted-backgroundColor);
-  --item-highlighted-textColor: var(--navigationMenu-item-highlighted-textColor);
-  // --item-radius: var(--navigationMenu-item-radius);
-  --item-padding: var(--navigationMenu-item-padding);
 
+  ${({ $dividerStyling }) =>
+    $dividerStyling === 'tab'
+      ? css`
+          --item-checked-backgroundColor: var(--navigationMenu-tab-item-checked-backgroundColor);
+          --item-highlighted-backgroundColor: var(
+            --navigationMenu-tab-item-highlighted-backgroundColor
+          );
+          --item-radius: var(--navigationMenu-tab-item-radius);
+          --item-padding: var(--navigationMenu-tab-item-padding);
+        `
+      : css`
+          --item-checked-backgroundColor: var(
+            --navigationMenu-underline-item-checked-backgroundColor
+          );
+          --item-highlighted-backgroundColor: var(
+            --navigationMenu-underline-item-highlighted-backgroundColor
+          );
+          --item-radius: var(--navigationMenu-underline-item-radius);
+          --item-padding: var(--navigationMenu-underline-item-padding);
+        `};
+
+  --item-checked-textColor: var(--navigationMenu-item-checked-textColor);
+  --item-highlighted-textColor: var(--navigationMenu-item-highlighted-textColor);
   ${layoutMixins.scrollSnapItem}
 
   min-height: var(--navigationMenu-item-height);
@@ -486,6 +547,16 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
   ${$List}[data-orientation="menu"] ${$List}[data-orientation="menu"] > ${$ListItem}:first-child > & {
     border-top-left-radius: 0;
   }
+
+  ${({ $dividerStyling }) =>
+    $dividerStyling === 'underline' &&
+    css`
+      &[data-state='checked'], // @radix-ui
+      &[aria-current='page'] // <a>
+      {
+        box-shadow: inset 0 -2px 0 var(--color-accent);
+      }
+    `}
 ` as typeof NavItemTypeTemp;
 
 const $Icon = styled(Icon)`
