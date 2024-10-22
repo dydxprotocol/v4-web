@@ -78,10 +78,10 @@ export const useTransfers = () => {
   const [toChainId, setToChainId] = useState<string | undefined>();
   const [fromAddress, setFromAddress] = useState<
     EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
-  >(undefined);
+  >();
   const [toAddress, setToAddress] = useState<
     EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
-  >(undefined);
+  >();
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 
