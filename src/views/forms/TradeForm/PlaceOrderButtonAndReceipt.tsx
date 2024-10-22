@@ -26,6 +26,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
+import { ToggleButton } from '@/components/ToggleButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -40,6 +41,7 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 import {
   calculateCrossPositionMargin,
   getTradeStateWithDoubleValuesHasDiff,
@@ -95,6 +97,7 @@ export const PlaceOrderButtonAndReceipt = ({
   );
 
   const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
+  const { uiRefresh } = testFlags;
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
@@ -355,15 +358,18 @@ export const PlaceOrderButtonAndReceipt = ({
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
               </Button>
             ),
-            <$HideButton
-              isToggle
-              iconName={IconName.Caret}
-              shape={ButtonShape.Circle}
-              size={ButtonSize.XSmall}
-              onPressedChange={setIsReceiptOpen}
-              isPressed={isReceiptOpen}
-              key="hide"
-            />,
+            uiRefresh && (
+              <$HideButton
+                slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                onPressedChange={setIsReceiptOpen}
+                isPressed={isReceiptOpen}
+                key="hide"
+              >
+                {stringGetter({ key: STRING_KEYS.RECEIPT })}
+              </$HideButton>
+            ),
           ].filter(isTruthy)}
         </$WithSeparators>
       </div>
@@ -394,12 +400,13 @@ const $WithSeparators = styled(WithSeparators)`
   --separatorHeight-padding: 0.5rem;
 `;
 
-const $HideButton = styled(IconButton)`
+const $HideButton = styled(ToggleButton)`
   --button-toggle-off-backgroundColor: var(--color-layer-3);
   --button-toggle-on-backgroundColor: var(--color-layer-3);
   --button-toggle-on-textColor: var(--button-toggle-off-textColor);
   --button-icon-size: 1em;
   margin-right: 0.5em;
+  gap: 0.75ch;
 
   &[data-state='off'] {
     svg {
