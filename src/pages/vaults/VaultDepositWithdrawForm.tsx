@@ -94,7 +94,7 @@ export const VaultDepositWithdrawForm = ({
   const { usdcImage } = useTokenConfigs();
 
   const { amount, confirmationStep, slippageAck, termsAck, operation } =
-    useAppSelector(getVaultForm) ?? {};
+    useAppSelector(getVaultForm);
   const validationResponse = useVaultFormValidationResponse();
 
   const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
@@ -316,16 +316,13 @@ export const VaultDepositWithdrawForm = ({
           body: stringGetter({
             key: STRING_KEYS.MEGAVAULT_WITHDRAWAL_SUCCESSFUL_BODY,
             params: {
-              AMOUNT:
-                amount == null ? (
-                  stringGetter({ key: STRING_KEYS.UNKNOWN })
-                ) : (
-                  <Output
-                    tw="inline-block text-color-text-1"
-                    type={OutputType.Fiat}
-                    value={realAmountReceived}
-                  />
-                ),
+              AMOUNT: (
+                <Output
+                  tw="inline-block text-color-text-1"
+                  type={OutputType.Fiat}
+                  value={realAmountReceived}
+                />
+              ),
             },
           }),
         });
@@ -371,9 +368,9 @@ export const VaultDepositWithdrawForm = ({
 
   const onClickMax = () => {
     if (operation === 'DEPOSIT') {
-      setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
+      setAmountState(`${Math.floor(freeCollateral?.current ?? 0)}`);
     } else {
-      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100 ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100}`);
     }
   };
 
@@ -528,8 +525,8 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorsPreventingSubmit = errors.filter((e) => e.type.name === 'error') ?? [];
-  const hasInputErrors = validationResponse == null || errorsPreventingSubmit.length > 0;
+  const errorsPreventingSubmit = errors.filter((e) => e.type.name === 'error');
+  const hasInputErrors = errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
     .filter((e) => e.long != null)

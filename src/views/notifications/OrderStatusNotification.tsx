@@ -62,6 +62,7 @@ export const OrderStatusNotification = ({
   const { assetId } = orEmptyObj(marketData);
   const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const { equityTiersLearnMore } = useURLConfigs();
+  // force allow the ?. just in case it's not in the map
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
   const indexedOrderStatus = order?.status.rawValue as
