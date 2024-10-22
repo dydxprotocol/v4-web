@@ -15,8 +15,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
+import { Switch } from '@/components/Switch';
 import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { WithLabel } from '@/components/WithLabel';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -28,6 +30,7 @@ export const MarketFilter = ({
   hideNewMarketButton,
   compactLayout = false,
   searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
+  unlaunchedMarketToggle,
 }: {
   selectedFilter: MarketFilters;
   filters: MarketFilters[];
@@ -36,6 +39,10 @@ export const MarketFilter = ({
   hideNewMarketButton?: boolean;
   searchPlaceholderKey?: string;
   compactLayout?: boolean;
+  unlaunchedMarketToggle?: {
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+  };
 }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
@@ -43,20 +50,42 @@ export const MarketFilter = ({
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
   const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
 
+  const displayUnlaunchedMarketToggle = unlaunchedMarketToggle && (
+    <WithLabel
+      label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
+      tw="flex flex-row items-center"
+    >
+      <Switch
+        name="show-launchable"
+        checked={unlaunchedMarketToggle.checked}
+        onCheckedChange={unlaunchedMarketToggle.onCheckedChange}
+        tw="font-mini-book"
+      />
+    </WithLabel>
+  );
+
+  const filterLaunchable = (filter: MarketFilters) => {
+    if (unlaunchedMarketToggle?.checked) return true;
+    return filter !== MarketFilters.LAUNCHABLE;
+  };
+
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters).map((value) => ({
-          label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
-          slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
-            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-          ),
-          value,
-        })) as MenuItem<MarketFilters>[]
+        Object.values(filters)
+          .filter(filterLaunchable)
+          .map((value) => ({
+            label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
+            slotAfter: MARKET_FILTER_OPTIONS[value]?.isNew && (
+              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+            ),
+            value,
+          })) as MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
       overflow={uiRefresh ? 'wrap' : 'scroll'}
+      slotBefore={displayUnlaunchedMarketToggle}
     />
   );
 
