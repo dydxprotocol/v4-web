@@ -48,6 +48,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { isValidKey } from '@/lib/typeUtils';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
@@ -89,7 +90,7 @@ export const TransferForm = ({
     setCurrentFee(fee);
   }, [fee]);
 
-  const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const asset = token ?? selectedAsset;
   const isChainTokenSelected = asset === DydxChainAsset.CHAINTOKEN;
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
@@ -249,6 +250,8 @@ export const TransferForm = ({
     }
   };
 
+  const selectedTokenConfig = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset] : undefined;
+
   const assetOptions = [
     {
       value: DydxChainAsset.USDC,
@@ -285,13 +288,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {/*
-          tokenConfigs string access isn't guaranteed to return a token config.
-          the default abacus state selectedAsset denom is set to ETH USDC denom
-          which isn't a key in tokenConfigs
-           */}
-          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset]?.name}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{selectedTokenConfig?.name}</Tag>
         </span>
       ),
       value: (

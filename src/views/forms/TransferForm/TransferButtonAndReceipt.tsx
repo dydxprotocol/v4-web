@@ -24,9 +24,10 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { isValidKey } from '@/lib/typeUtils';
 
 type ElementProps = {
-  selectedAsset: DydxChainAsset;
+  selectedAsset: string;
   fee?: number;
   isDisabled?: boolean;
   isLoading?: boolean;
@@ -61,18 +62,16 @@ export const TransferButtonAndReceipt = ({
 
   const newBalance = isUSDCSelected ? newEquity : newNativeTokenBalance;
 
+  const selectedTokenConfig = isValidKey(selectedAsset, tokensConfigs)
+    ? tokensConfigs[selectedAsset]
+    : undefined;
+
   const transferDetailItems = [
     {
       key: 'fees',
       label: (
         <span>
-          {/*
-          tokenConfigs string access isn't guaranteed to return a token config.
-          the default abacus state selectedAsset denom is set to ETH USDC denom
-          which isn't a key in tokenConfigs
-           */}
-          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
+          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{selectedTokenConfig?.name}</Tag>
         </span>
       ),
       value: <Output type={OutputType.Asset} value={fee} />,
@@ -81,14 +80,7 @@ export const TransferButtonAndReceipt = ({
       key: 'balance',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.BALANCE })}{' '}
-          {/*
-          tokenConfigs string access isn't guaranteed to return a token config.
-          the default abacus state selectedAsset denom is set to ETH USDC denom
-          which isn't a key in tokenConfigs
-           */}
-          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-          <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
+          {stringGetter({ key: STRING_KEYS.BALANCE })} <Tag>{selectedTokenConfig?.name}</Tag>
         </span>
       ),
       value: (
