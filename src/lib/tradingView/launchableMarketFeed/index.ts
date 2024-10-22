@@ -15,14 +15,13 @@ import type {
   Timezone,
 } from 'public/tradingview/charting_library';
 
-import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
+import { MetadataServiceAsset, MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
-import { type RootStore } from '@/state/_store';
-
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
@@ -51,8 +50,7 @@ const configurationData: DatafeedConfiguration = {
 };
 
 export const getLaunchableMarketDatafeed = (
-  store: RootStore,
-  tickSizeDecimals: number
+  metadataServiceData: Record<string, MetadataServiceAsset>
 ): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
@@ -69,6 +67,10 @@ export const getLaunchableMarketDatafeed = (
 
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
+
+    const assetId = getAssetFromMarketId(symbolName);
+    const metaDataForAsset = metadataServiceData?.[assetId];
+    const tickSizeDecimals = getTickSizeDecimalsFromPrice(metaDataForAsset?.price ?? 0);
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : 100;
 
