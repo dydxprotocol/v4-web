@@ -36,7 +36,7 @@ export const useChartMarketAndResolution = ({
     useAppSelector((s) => getSelectedResolutionForMarket(s, currentMarketId)) ?? DEFAULT_RESOLUTION;
 
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
-  const chartResolution = chart?.resolution?.();
+  const chartResolution = chart?.resolution();
 
   /**
    * @description Hook to handle changing markets - intentionally should avoid triggering on change of resolutions.

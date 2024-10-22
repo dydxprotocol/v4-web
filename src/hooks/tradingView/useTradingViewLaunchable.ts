@@ -65,15 +65,15 @@ export const useTradingViewLaunchable = ({
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
         auto_save_delay: 1,
-        disabled_features: [...(widgetOptions?.disabled_features ?? []), 'chart_scroll'],
+        disabled_features: [...(widgetOptions.disabled_features ?? []), 'chart_scroll'],
       };
 
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvChartWidget.onChartReady(() => {
-        tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => {
+        tvWidgetRef.current?.subscribe('onAutoSaveNeeded', () =>
+          tvWidgetRef.current?.save((chartConfig: object) => {
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
           })
         );

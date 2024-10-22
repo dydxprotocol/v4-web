@@ -43,8 +43,8 @@ export const TimeoutButton = ({
       state={{
         isDisabled:
           secondsLeft > 0 ||
-          otherProps?.state === ButtonState.Disabled ||
-          (otherProps?.state as ButtonStateConfig)?.isDisabled,
+          otherProps.state === ButtonState.Disabled ||
+          (otherProps.state as ButtonStateConfig | undefined)?.isDisabled,
       }}
     >
       {secondsLeft

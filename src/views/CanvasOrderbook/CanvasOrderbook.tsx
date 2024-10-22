@@ -183,7 +183,7 @@ export const CanvasOrderbook = forwardRef(
                 key={idx}
                 title={`${row.price}`}
                 onClick={
-                  row?.price
+                  row.price
                     ? () => {
                         onRowAction(row.price);
                       }

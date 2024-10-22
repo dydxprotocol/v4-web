@@ -36,6 +36,7 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
     (market): PerpetualMarket & Asset =>
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       safeAssign({}, market, allAssets[market?.assetId] ?? ({} as Asset))
   );
 

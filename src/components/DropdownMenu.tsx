@@ -79,7 +79,7 @@ export const DropdownMenu = forwardRefFn(
                 <$Item
                   disabled={!item.onSelect}
                   $highlightColor={item.highlightColor}
-                  onSelect={item?.onSelect}
+                  onSelect={item.onSelect}
                 >
                   {item.icon}
                   {item.label}

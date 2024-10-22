@@ -90,7 +90,7 @@ export const AccountMenu = () => {
   }
 
   const privy = usePrivy();
-  const { google, discord, twitter } = privy?.user ?? {};
+  const { google, discord, twitter } = privy.user ?? {};
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
 
@@ -142,7 +142,7 @@ export const AccountMenu = () => {
                 tw="z-[2] text-[1.75rem]"
               />
               <$Column>
-                {walletInfo && walletInfo?.name !== WalletType.Keplr ? (
+                {walletInfo && walletInfo.name !== WalletType.Keplr ? (
                   <DydxDerivedAddress address={address} />
                 ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>

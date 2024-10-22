@@ -83,7 +83,7 @@ export const FooterDesktop = () => {
           </$FooterButton>
         </WithTooltip>
 
-        {globalThis?.Intercom && (
+        {globalThis.Intercom && (
           <$FooterButton
             slotLeft={<ChatIcon />}
             size={ButtonSize.XSmall}

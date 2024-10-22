@@ -23,7 +23,7 @@ export const AdjustIsolatedMarginDialog = ({
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(positionId), shallowEqual);
   const logoUrl = useAppSelector((s) => getAssetImageUrl(s, subaccountPosition?.assetId));
-  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <Dialog
