@@ -130,7 +130,7 @@ export const VaultPositionsSection = ({ className }: { className?: string }) => 
   return (
     <div className={className}>
       <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
-        {stringGetter({ key: STRING_KEYS.POSITIONS })}{' '}
+        {stringGetter({ key: STRING_KEYS.HOLDINGS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
         </Tag>
