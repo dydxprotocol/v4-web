@@ -63,7 +63,7 @@ export const MarketFilter = ({
   const launchMarketButton = uiRefresh ? (
     <Button
       onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-      size={ButtonSize.XSmall}
+      size={ButtonSize.Small}
       shape={ButtonShape.Pill}
       action={ButtonAction.Primary}
     >
