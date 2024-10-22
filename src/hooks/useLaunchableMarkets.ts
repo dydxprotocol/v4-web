@@ -45,25 +45,27 @@ export const useMetadataService = () => {
       const data: Record<string, MetadataServiceAsset> = {};
 
       Object.keys(info ?? {}).forEach((key) => {
-        if (info?.[key] && prices?.[key]) {
-          const tickSizeDecimals = getTickSizeDecimalsFromPrice(prices[key].price);
+        const infoKey = info?.[key];
+        const pricesKey = prices?.[key];
+        if (infoKey && pricesKey) {
+          const tickSizeDecimals = getTickSizeDecimalsFromPrice(pricesKey.price);
 
           data[key] = {
             id: key,
-            name: info[key].name,
-            logo: info[key].logo,
+            name: infoKey.name,
+            logo: infoKey.logo,
             urls: {
-              website: info[key].urls.website,
-              technicalDoc: info[key].urls.technical_doc,
-              cmc: info[key].urls.cmc,
+              website: infoKey.urls.website,
+              technicalDoc: infoKey.urls.technical_doc,
+              cmc: infoKey.urls.cmc,
             },
-            sectorTags: info[key].sector_tags,
-            exchanges: info[key].exchanges,
-            price: prices[key].price,
-            percentChange24h: prices[key].percent_change_24h,
-            marketCap: prices[key].market_cap,
-            volume24h: prices[key].volume_24h,
-            reportedMarketCap: prices[key].self_reported_market_cap,
+            sectorTags: infoKey.sector_tags,
+            exchanges: infoKey.exchanges,
+            price: pricesKey.price,
+            percentChange24h: pricesKey.percent_change_24h,
+            marketCap: pricesKey.market_cap,
+            volume24h: pricesKey.volume_24h,
+            reportedMarketCap: pricesKey.self_reported_market_cap,
             tickSizeDecimals,
           };
         }
@@ -136,6 +138,6 @@ export const useMetadataServiceCandles = (
 
   return {
     ...candlesQuery,
-    data: candlesQuery.data?.[asset ?? ''].map(mapMetadataServiceCandles),
+    data: candlesQuery.data?.[asset ?? '']?.map(mapMetadataServiceCandles),
   };
 };

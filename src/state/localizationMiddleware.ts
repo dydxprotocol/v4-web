@@ -58,7 +58,7 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
         store.dispatch(setSelectedLocale({ locale: localStorageLocale }));
       } else {
         const browserLanguage = getBrowserLanguage();
-        const browserLanguageBaseTag = browserLanguage.split('-')[0].toLowerCase();
+        const browserLanguageBaseTag = browserLanguage.split('-')[0]!.toLowerCase();
 
         let locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
           SupportedLocales.EN) as SupportedLocales;

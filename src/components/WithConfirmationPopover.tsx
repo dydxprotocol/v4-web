@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  SyntheticEvent,
   type FormEvent,
   type FormEventHandler,
   type ReactElement,
@@ -21,6 +22,7 @@ type ElementProps = {
   onConfirm?: FormEventHandler;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClickTrigger?: (e: SyntheticEvent) => void;
   slotTrigger: ReactElement;
 };
 
@@ -43,6 +45,7 @@ export const WithConfirmationPopover = forwardRef(
       asChild,
       open,
       onOpenChange,
+      onClickTrigger,
       align,
       sideOffset,
       slotTrigger,
@@ -50,7 +53,15 @@ export const WithConfirmationPopover = forwardRef(
     ref?: Ref<HTMLDivElement>
   ) => (
     <Root open={open} onOpenChange={onOpenChange}>
-      <Trigger asChild={asChild} onClick={(e) => asChild && e.preventDefault()}>
+      <Trigger
+        asChild={asChild}
+        onClick={(e) => {
+          onClickTrigger?.(e);
+          if (asChild) {
+            e.preventDefault();
+          }
+        }}
+      >
         <Anchor>{slotTrigger}</Anchor>
       </Trigger>
 

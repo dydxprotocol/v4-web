@@ -5,10 +5,13 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,8 +22,13 @@ import { Button } from '@/components/Button';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
+
+import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { NewMarketAgreement } from '../NewMarketAgreement';
@@ -41,31 +49,47 @@ export const NewMarketPreviewStep = ({
   shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
   const stringGetter = useStringGetter();
-  const [errorMessage, setErrorMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
   const baseAsset = getDisplayableAssetFromTicker(ticker);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
+  const { usdcImage } = useTokenConfigs();
+  const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);
 
-  const alertMessage = useMemo(() => {
-    let alert;
+  const { alertInfo, shouldDisableForm } = useMemo(() => {
     if (errorMessage) {
-      alert = {
-        type: AlertType.Error,
-        message: errorMessage,
+      return {
+        alertInfo: {
+          type: AlertType.Error,
+          message: errorMessage,
+        },
+        shouldDisableForm: false,
       };
     }
 
-    if (alert) {
-      <AlertMessage type={alert.type}>{alert.message} </AlertMessage>;
+    if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
+      return {
+        alertInfo: {
+          type: AlertType.Error,
+          message: stringGetter({
+            key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
+            params: {
+              USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+            },
+          }),
+        },
+        shouldDisableForm: true,
+      };
     }
 
-    return null;
-  }, [errorMessage]);
-
-  const isDisabled = alertMessage !== null;
+    return {
+      alertInfo: undefined,
+      shouldDisableForm: false,
+    };
+  }, [errorMessage, freeCollateral, stringGetter]);
 
   const heading = shouldHideTitleAndDescription ? null : (
     <>
@@ -76,13 +100,7 @@ export const NewMarketPreviewStep = ({
           params: {
             NUM_DAYS: <span tw="text-color-text-1">30</span>,
             PAST_DAYS: 30,
-            APR_PERCENTAGE: (
-              <Output
-                type={OutputType.Percent}
-                tw="inline-block text-color-success"
-                value={0.3456}
-              />
-            ),
+            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           },
         })}
       </span>
@@ -96,8 +114,8 @@ export const NewMarketPreviewStep = ({
           {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
         </span>
         <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <AssetIcon tw="h-2 w-2" symbol="USDC" />
-          <Output useGrouping type={OutputType.Fiat} value={10_000} />
+          <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
+          <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
         </div>
       </div>
 
@@ -121,9 +139,7 @@ export const NewMarketPreviewStep = ({
         {stringGetter({
           key: STRING_KEYS.LIQUIDITY_TIER_IS,
           params: {
-            TIER: (
-              <span tw="text-color-text-1">{stringGetter({ key: STRING_KEYS.LONG_TAIL })}</span>
-            ),
+            TIER: <span tw="text-color-text-1">{stringGetter({ key: STRING_KEYS.ISOLATED })}</span>,
           },
         })}
       </span>
@@ -134,21 +150,39 @@ export const NewMarketPreviewStep = ({
           {
             key: 'imf',
             label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION_SHORT }),
-            value: <Output type={OutputType.Number} value={0.2} fractionDigits={1} />,
+            value: (
+              <Output
+                type={OutputType.Number}
+                value={ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction}
+                fractionDigits={2}
+              />
+            ),
           },
           {
             key: 'mainetnanace-margin',
             label: stringGetter({ key: STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_SHORT }),
-            value: <Output type={OutputType.Number} value={0.1} fractionDigits={1} />,
+            value: (
+              <Output
+                type={OutputType.Number}
+                value={ISOLATED_LIQUIDITY_TIER_INFO.maintenanceMarginFraction}
+                fractionDigits={2}
+              />
+            ),
           },
           {
             key: 'impact-notional',
             label: stringGetter({ key: STRING_KEYS.IMPACT_NOTIONAL }),
-            value: <Output type={OutputType.Fiat} value={2_500} />,
+            value: (
+              <Output type={OutputType.Fiat} value={ISOLATED_LIQUIDITY_TIER_INFO.impactNotional} />
+            ),
           },
         ]}
       />
     </div>
+  );
+
+  const alertMessage = alertInfo && (
+    <AlertMessage type={alertInfo.type}>{alertInfo.message}</AlertMessage>
   );
 
   return (
@@ -204,10 +238,10 @@ export const NewMarketPreviewStep = ({
             <Button
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
-              state={{ isDisabled, isLoading }}
+              state={{ isDisabled: shouldDisableForm, isLoading }}
             >
               {hasAcceptedTerms
-                ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
+                ? stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })
                 : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
             </Button>
           </div>

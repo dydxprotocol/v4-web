@@ -69,7 +69,7 @@ export const ManageFundsDialog = ({
       hasHeaderBorder
       tw="[--dialog-content-paddingTop:1.5rem]"
     >
-      {transferTypeConfig[currentType].component}
+      {transferTypeConfig[currentType]?.component}
     </Dialog>
   );
 };

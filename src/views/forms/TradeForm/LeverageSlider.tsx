@@ -89,7 +89,7 @@ export const LeverageSlider = ({
 
   const onSliderDrag = ([newLeverage]: number[]) => {
     setLeverageInputValue(`${newLeverage}`);
-    debouncedSetAbacusLeverage(newLeverage);
+    debouncedSetAbacusLeverage(newLeverage!);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {

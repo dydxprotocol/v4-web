@@ -24,24 +24,26 @@ import { TableCell } from '@/components/Table/TableCell';
 import { NewTag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 interface MarketsCompactTableProps {
   className?: string;
-  filters?: MarketFilters;
   sorting?: MarketSorting;
 }
 
 export const MarketsCompactTable = ({
   className,
-  filters,
   sorting,
 }: PropsWithChildren<MarketsCompactTableProps>) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { filteredMarkets } = useMarketsData(filters);
+  const { filteredMarkets } = useMarketsData({
+    filter: MarketFilters.ALL,
+    hideUnlaunchedMarkets: true,
+  });
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
     () =>
@@ -53,12 +55,13 @@ export const MarketsCompactTable = ({
           renderCell: ({
             assetId,
             effectiveInitialMarginFraction,
+            imageUrl,
             initialMarginFraction,
             name,
           }) => (
             <AssetTableCell
               stacked
-              configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+              configs={{ imageUrl, effectiveInitialMarginFraction, initialMarginFraction }}
               name={name}
               symbol={assetId}
             />
@@ -130,7 +133,7 @@ export const MarketsCompactTable = ({
                     <Output
                       type={OutputType.CompactNumber}
                       value={openInterest}
-                      slotRight={` ${assetId}`}
+                      slotRight={` ${getDisplayableAssetFromBaseAsset(assetId)}`}
                       tw="text-color-text-0 font-mini-medium"
                     />
                   </$RecentlyListed>
@@ -185,11 +188,7 @@ export const MarketsCompactTable = ({
       className={className}
       slotEmpty={
         <$MarketNotFound>
-          {filters === MarketFilters.NEW ? (
-            <p>{stringGetter({ key: STRING_KEYS.NO_RECENTLY_LISTED_MARKETS })}</p>
-          ) : (
-            <LoadingSpace id="compact-markets-table" />
-          )}
+          <LoadingSpace id="compact-markets-table" />
         </$MarketNotFound>
       }
       initialPageSize={5}

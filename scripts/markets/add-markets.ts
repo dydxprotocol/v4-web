@@ -13,17 +13,18 @@ import {
   IndexerConfig,
   LocalWallet as LocalWalletType,
   Network,
-  ValidatorConfig
+  ValidatorConfig,
 } from '@dydxprotocol/v4-client-js';
 import { readFileSync } from 'fs';
 import Long from 'long';
+
 import {
-  createAndSendMarketMapProposal,
   PerpetualMarketType,
   Proposal,
+  createAndSendMarketMapProposal,
   retry,
   sleep,
-  voteOnProposals
+  voteOnProposals,
 } from './help';
 
 const LocalWalletModule = await import(
@@ -177,15 +178,15 @@ async function addMarkets(
   );
 
   // Add markets to market map first.
-  console.log("Submitting market map proposal...");
+  console.log('Submitting market map proposal...');
   await createAndSendMarketMapProposal(
     filteredProposals.slice(0, numMarkets),
     config.validatorEndpoint,
     config.chainId,
-    binary,
+    binary
   );
   await sleep(sleepMsBtwTxs);
-  console.log("Submitted market map proposal");
+  console.log('Submitted market map proposal');
 
   // Get latest gov proposal ID.
   const allProposalsResp = await client.validatorClient.get.getAllGovProposals();
@@ -215,16 +216,16 @@ async function addMarkets(
       if (numProposalsSent >= numProposalsToSend) {
         break;
       }
-      const proposal = proposalsToSend[j];
+      const proposal = proposalsToSend[j]!;
       const marketId: number = numExistingMarkets + numProposalsSent + 1;
 
       // Send proposal.
       const exchangeConfigString = `{"exchanges":${JSON.stringify(
-        proposal.params.exchangeConfigJson
+        proposal!.params.exchangeConfigJson
       )}}`;
       await retry(() =>
         client.submitGovAddNewMarketProposal(
-          wallets[j],
+          wallets[j]!,
           {
             id: marketId,
             ticker: proposal.params.ticker,
@@ -272,7 +273,7 @@ async function main(): Promise<void> {
   // Get which env and how many markets to add.
   const args = process.argv.slice(2);
   const env = args[0] as Env;
-  const numMarkets = parseInt(args[1], 10);
+  const numMarkets = args[1] != null ? parseInt(args[1], 10) : 0;
   const binary = args[2];
 
   // Validate inputs.

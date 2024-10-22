@@ -44,10 +44,10 @@ const useSkipClientContext = () => {
             if (chainId === getNeutronChainId()) return neutronValidator;
             if (chainId === getOsmosisChainId()) return osmosisValidator;
             if (chainId === selectedDydxChainId)
-              return compositeClient?.network.validatorConfig.restEndpoint ?? validators[0];
+              return compositeClient?.network.validatorConfig.restEndpoint ?? validators[0]!;
             if (chainId === getSolanaChainId()) return solanaRpcUrl;
             const evmRpcUrls = RPCUrlsByChainId[chainId];
-            if (evmRpcUrls) return evmRpcUrls[0];
+            if (evmRpcUrls?.length) return evmRpcUrls[0]!;
             throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
           },
         },

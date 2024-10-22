@@ -25,7 +25,7 @@ export function getBarTime(
   fillTimeMs: number,
   resolution: ResolutionString
 ): number | undefined {
-  const intervalMs = RESOLUTION_TO_INTERVAL_MS[resolution];
+  const intervalMs = RESOLUTION_TO_INTERVAL_MS[resolution]!;
 
   const [startBn, intervalSizeBn, fillTimeBn] = [
     BigNumber(chartStartTimeMs),
@@ -69,7 +69,7 @@ export const getMarkForOrderFills = (
       selectedLocale,
     }
   );
-  const fill = orderFills[0];
+  const fill = orderFills[0]!;
   const fillDetails = getFillDetails()(store.getState(), fill.id);
 
   const textParams = {

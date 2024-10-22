@@ -42,7 +42,7 @@ export const ChooseWallet = ({
                   selectedWallet.connectorType === ConnectorType.Injected
                     ? selectedWallet.name
                     : stringGetter({
-                        key: wallets[selectedWallet.name].stringKey,
+                        key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
                       }),
               },
             })}
@@ -63,7 +63,7 @@ export const ChooseWallet = ({
             <$WalletName>
               {wallet.connectorType === ConnectorType.Injected
                 ? wallet.name
-                : stringGetter({ key: wallets[wallet.name].stringKey })}
+                : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
             </$WalletName>
           </$WalletButton>
         ))}
