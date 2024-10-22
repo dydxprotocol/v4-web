@@ -42,7 +42,7 @@ const USDC_MARKET_HARDCODED = 'USDC-USD';
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  const { usdcImage } = useTokenConfigs();
+  const { usdcImage, usdcLabel } = useTokenConfigs();
 
   const vaultsDataRaw = useLoadedVaultPositions();
   const vaultsData = useMemo(
@@ -84,12 +84,12 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     slotLeft={
                       <AssetIcon
                         logoUrl={logoUrl}
-                        symbol={marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.id}
+                        symbol={marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.id}
                         tw="[--asset-icon-size:2.5em]"
                       />
                     }
                   >
-                    {marketId === USDC_MARKET_HARDCODED ? 'USDC' : asset?.name}
+                    {marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.name}
                     <div tw="row gap-0.25">
                       <$OutputSigned
                         value={
@@ -128,7 +128,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   type={OutputType.Asset}
                   tag={
                     <$Label>
-                      {getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
+                      {marketId === USDC_MARKET_HARDCODED
+                        ? usdcLabel
+                        : getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
                     </$Label>
                   }
                   fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
