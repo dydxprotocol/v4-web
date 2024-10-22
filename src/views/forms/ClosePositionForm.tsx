@@ -12,7 +12,7 @@ import {
   type Nullable,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -354,34 +354,20 @@ export const ClosePositionForm = ({
         </$MobileLayout>
       )}
 
-      <$Footer>
-        {amountInput != null && (
-          <div tw="row justify-self-end px-0 py-0.5">
-            <Button
-              type={ButtonType.Reset}
-              action={ButtonAction.Reset}
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              onClick={onClearInputs}
-            >
-              {stringGetter({ key: STRING_KEYS.CLEAR })}
-            </Button>
-          </div>
-        )}
-
-        <PlaceOrderButtonAndReceipt
-          hasValidationErrors={hasInputErrors}
-          actionStringKey={inputAlert?.actionStringKey}
-          validationErrorString={alertContent}
-          summary={summary ?? undefined}
-          currentStep={currentStep}
-          confirmButtonConfig={{
-            stringKey: STRING_KEYS.CLOSE_ORDER,
-            buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
-            buttonAction: ButtonAction.Destroy,
-          }}
-        />
-      </$Footer>
+      <PlaceOrderButtonAndReceipt
+        hasValidationErrors={hasInputErrors}
+        hasInput={amountInput != null}
+        onClearInputs={onClearInputs}
+        actionStringKey={inputAlert?.actionStringKey}
+        validationErrorString={alertContent}
+        summary={summary ?? undefined}
+        currentStep={currentStep}
+        confirmButtonConfig={{
+          stringKey: STRING_KEYS.CLOSE_ORDER,
+          buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
+          buttonAction: ButtonAction.Destroy,
+        }}
+      />
     </$ClosePositionForm>
   );
 };
@@ -455,13 +441,6 @@ const $ToggleGroup = styled(ToggleGroup)`
   }
 `;
 
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  padding-bottom: var(--dialog-content-paddingBottom);
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
-
-  ${layoutMixins.column}
-`;
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
