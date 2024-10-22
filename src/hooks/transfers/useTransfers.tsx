@@ -142,7 +142,6 @@ export const useTransfers = () => {
     return getDefaultTokenDenomFromAssets(assetsForSelectedChain);
   }, [assetsForSelectedChain]);
 
-  // consider moving to useMemo outside of this query
   const cosmosChainAddresses = useMemo(() => {
     if (!dydxAddress) return {};
     return {
