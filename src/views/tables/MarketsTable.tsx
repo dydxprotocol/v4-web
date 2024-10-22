@@ -252,10 +252,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
-          unlaunchedMarketToggle={{
-            checked: shouldHideUnlaunchedMarkets,
-            onCheckedChange: setShouldHideUnlaunchedMarkets,
-          }}
+          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
+          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
 

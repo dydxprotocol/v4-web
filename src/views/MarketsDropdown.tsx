@@ -212,10 +212,8 @@ const MarketsDropdownContent = ({
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
-          unlaunchedMarketToggle={{
-            checked: shouldHideUnlaunchedMarkets,
-            onCheckedChange: setShouldHideUnlaunchedMarkets,
-          }}
+          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
+          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
       {slotTop}

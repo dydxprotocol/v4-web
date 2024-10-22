@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -22,6 +24,20 @@ import { WithLabel } from '@/components/WithLabel';
 
 import { testFlags } from '@/lib/testFlags';
 
+type MarketFilterProps = {
+  selectedFilter: MarketFilters;
+  filters: MarketFilters[];
+  onChangeFilter: (filter: MarketFilters) => void;
+  onSearchTextChange?: (filter: string) => void;
+  hideNewMarketButton?: boolean;
+  searchPlaceholderKey?: string;
+  compactLayout?: boolean;
+
+  // Need both items to display unlaunchedMarketSwitch
+  shouldHideUnlaunchedMarkets?: boolean;
+  onShouldHideUnlaunchedMarketsChange?: (shouldHide: boolean) => void;
+};
+
 export const MarketFilter = ({
   selectedFilter,
   filters,
@@ -30,42 +46,36 @@ export const MarketFilter = ({
   hideNewMarketButton,
   compactLayout = false,
   searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
-  unlaunchedMarketToggle,
-}: {
-  selectedFilter: MarketFilters;
-  filters: MarketFilters[];
-  onChangeFilter: (filter: MarketFilters) => void;
-  onSearchTextChange?: (filter: string) => void;
-  hideNewMarketButton?: boolean;
-  searchPlaceholderKey?: string;
-  compactLayout?: boolean;
-  unlaunchedMarketToggle?: {
-    checked: boolean;
-    onCheckedChange: (checked: boolean) => void;
-  };
-}) => {
+  shouldHideUnlaunchedMarkets,
+  onShouldHideUnlaunchedMarketsChange,
+}: MarketFilterProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
   const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
 
-  const displayUnlaunchedMarketToggle = unlaunchedMarketToggle && (
-    <WithLabel
-      label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
-      tw="flex flex-row items-center"
-    >
-      <Switch
-        name="show-launchable"
-        checked={unlaunchedMarketToggle.checked}
-        onCheckedChange={unlaunchedMarketToggle.onCheckedChange}
-        tw="font-mini-book"
-      />
-    </WithLabel>
+  const unlaunchedMarketSwitch = useMemo(
+    () =>
+      shouldHideUnlaunchedMarkets != null &&
+      onShouldHideUnlaunchedMarketsChange != null && (
+        <WithLabel
+          label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
+          tw="flex flex-row items-center"
+        >
+          <Switch
+            name="show-launchable"
+            checked={shouldHideUnlaunchedMarkets}
+            onCheckedChange={onShouldHideUnlaunchedMarketsChange}
+            tw="font-mini-book"
+          />
+        </WithLabel>
+      ),
+    [stringGetter, shouldHideUnlaunchedMarkets, onShouldHideUnlaunchedMarketsChange]
   );
 
   const filterLaunchable = (filter: MarketFilters) => {
-    if (unlaunchedMarketToggle?.checked) return true;
+    if (shouldHideUnlaunchedMarkets) return true;
     return filter !== MarketFilters.LAUNCHABLE;
   };
 
@@ -80,12 +90,12 @@ export const MarketFilter = ({
               <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
             ),
             value,
-          })) as MenuItem<MarketFilters>[]
+          })) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
       overflow={uiRefresh ? 'wrap' : 'scroll'}
-      slotBefore={displayUnlaunchedMarketToggle}
+      slotBefore={unlaunchedMarketSwitch}
     />
   );
 
@@ -131,6 +141,7 @@ export const MarketFilter = ({
     </$MarketFilter>
   );
 };
+
 const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: boolean }>`
   display: flex;
   flex-direction: column;
