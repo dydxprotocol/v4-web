@@ -209,6 +209,7 @@ export enum TransferNotificationTypes {
   Deposit = 'deposit',
 }
 
+// TODO: fix typo
 export type TransferNotifcation = {
   id?: string;
   txHash: string;
@@ -233,6 +234,7 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesS6Ended = 'incentives-s6-ended',
   KeplrSupport = 'keplr-support',
   PhantomSupport = 'phantom-support',
+  PermissionlessMarketLaunch = 'permissionless-market-launch',
 }
 
 // Incentives Season

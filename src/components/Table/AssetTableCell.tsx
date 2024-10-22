@@ -1,14 +1,19 @@
 import styled from 'styled-components';
 
-import type { MarketConfigs, Nullable } from '@/constants/abacus';
+import type { Nullable } from '@/constants/abacus';
+import { STRING_KEYS } from '@/constants/localization';
+import { MarketData } from '@/constants/markets';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';
@@ -17,7 +22,10 @@ interface AssetTableCellProps {
   symbol?: string;
   name?: Nullable<string>;
   configs:
-    | Pick<MarketConfigs, 'effectiveInitialMarginFraction' | 'initialMarginFraction'>
+    | Pick<
+        MarketData,
+        'effectiveInitialMarginFraction' | 'imageUrl' | 'initialMarginFraction' | 'isUnlaunched'
+      >
     | null
     | undefined;
   className?: string;
@@ -25,8 +33,11 @@ interface AssetTableCellProps {
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
+  const stringGetter = useStringGetter();
   const { symbol, name, stacked, configs, className } = props;
-  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyRecord(configs);
+
+  const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
+    orEmptyObj(configs);
 
   const maxLeverage =
     configs != null ? (
@@ -39,14 +50,22 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
         fractionDigits={0}
       />
     ) : undefined;
+
   return (
-    <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={symbol} />}>
+    <TableCell
+      className={className}
+      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={stacked} symbol={symbol} />}
+    >
       <$TableCellContent stacked={stacked}>
         <div tw="row gap-0.5">
           <$Asset stacked={stacked}>{name}</$Asset>
-          <Tag>{maxLeverage}</Tag>
+          <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
         </div>
-        {stacked ? <span tw="text-color-text-0 font-mini-medium">{symbol}</span> : undefined}
+        {stacked ? (
+          <span tw="text-color-text-0 font-mini-medium">
+            {symbol && getDisplayableAssetFromBaseAsset(symbol)}
+          </span>
+        ) : undefined}
       </$TableCellContent>
     </TableCell>
   );

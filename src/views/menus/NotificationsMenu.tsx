@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 
 import { groupBy } from 'lodash';
-import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationStatus, type Notification } from '@/constants/notifications';
 
@@ -14,8 +16,14 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
+import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Notification as NotificationCard } from '@/components/Notification';
 import { Toolbar } from '@/components/Toolbar';
+
+import { useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -50,6 +58,8 @@ export const NotificationsMenu = ({
     hasUnreadNotifications,
   } = useNotifications();
 
+  const dispatch = useDispatch();
+
   const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
     () =>
       groupBy(Object.values(notifications).filter(getDisplayData), (notification) =>
@@ -79,8 +89,8 @@ export const NotificationsMenu = ({
             )
             .map((notification) => ({
               notification,
-              key: getKey?.(notification),
-              displayData: getDisplayData?.(notification),
+              key: getKey(notification),
+              displayData: getDisplayData(notification)!,
             }))
             .map(({ notification, key, displayData }) => ({
               value: key,
@@ -119,13 +129,25 @@ export const NotificationsMenu = ({
     [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 
+  const activeDialog = useAppSelector(getActiveDialog);
+  const isPreferencesDialogOpen = activeDialog?.type === DialogTypes.Preferences().type;
+
   return (
     <$ComboboxDialogMenu
       withItemBorders
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
       items={items}
-      title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
+      title={
+        <div tw="flex items-center justify-between">
+          {stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
+          <IconButton
+            iconName={IconName.Gear}
+            onClick={() => dispatch(openDialog(DialogTypes.Preferences()))}
+            buttonStyle={ButtonStyle.WithoutBackground}
+          />
+        </div>
+      }
       slotTrigger={
         <div tw="stack">
           {slotTrigger}
@@ -166,16 +188,23 @@ export const NotificationsMenu = ({
       }
       placement={placement}
       preventClose={isTablet}
+      $noPointerEvents={isPreferencesDialogOpen}
     />
   );
 };
 
-const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)<{ $noPointerEvents?: boolean }>`
   --comboboxDialogMenu-item-padding: 0;
 
   [cmdk-list] > [cmdk-list-sizer] > * {
     box-shadow: none;
   }
+
+  ${({ $noPointerEvents }) =>
+    $noPointerEvents &&
+    css`
+      pointer-events: none !important;
+    `}
 `;
 
 const $UnreadIndicator = styled.div`

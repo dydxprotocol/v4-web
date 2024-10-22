@@ -368,7 +368,6 @@ const $DropdownTabTrigger = styled(Trigger)<{
   $withUnderline?: boolean;
 }>`
   ${tabMixins.tabTriggerStyle}
-  gap: 1ch;
   height: 100%;
   width: 100%;
 

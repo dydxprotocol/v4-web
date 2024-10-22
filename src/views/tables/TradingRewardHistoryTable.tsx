@@ -35,10 +35,12 @@ export enum TradingRewardHistoryTableColumnKey {
 
 const getTradingRewardHistoryTableColumnDef = ({
   key,
+  chainTokenImage,
   chainTokenLabel,
   stringGetter,
 }: {
   key: TradingRewardHistoryTableColumnKey;
+  chainTokenImage: string;
   chainTokenLabel: string;
   stringGetter: StringGetterFunction;
 }): ColumnDef<HistoricalTradingReward> => ({
@@ -85,7 +87,7 @@ const getTradingRewardHistoryTableColumnDef = ({
             type={OutputType.Asset}
             value={amount}
             showSign={ShowSign.Both}
-            slotRight={<AssetIcon symbol={chainTokenLabel} />}
+            slotRight={<AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />}
             tw="gap-[0.5ch] [--output-sign-color:--color-positive]"
           />
         ),
@@ -111,7 +113,7 @@ export const TradingRewardHistoryTable = ({
   const stringGetter = useStringGetter();
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const { isNotTablet } = useBreakpoints();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
   const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
     getTradingRewardsEventsForPeriod,
@@ -125,6 +127,7 @@ export const TradingRewardHistoryTable = ({
   const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
     getTradingRewardHistoryTableColumnDef({
       key,
+      chainTokenImage,
       chainTokenLabel,
       stringGetter,
     })

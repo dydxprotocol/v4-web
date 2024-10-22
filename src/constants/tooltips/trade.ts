@@ -130,6 +130,10 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MARGIN_USAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MARGIN_USAGE_BODY }),
   }),
+  'margin-used': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MARGIN_USED_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MARGIN_USED_BODY }),
+  }),
   'maximum-leverage': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_LEVERAGE_BODY }),
@@ -161,6 +165,18 @@ export const tradeTooltips = {
   'partial-close-take-profit': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_TAKE_PROFIT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_TAKE_PROFIT_BODY }),
+  }),
+  'portfolio-value': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.PORTFOLIO_VALUE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.PORTFOLIO_VALUE_BODY }),
+  }),
+  'position-leverage': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.POSITION_LEVERAGE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.POSITION_LEVERAGE_BODY }),
+  }),
+  'position-margin': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.POSITION_MARGIN_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.POSITION_MARGIN_BODY }),
   }),
   'post-only': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.POST_ONLY_TITLE }),

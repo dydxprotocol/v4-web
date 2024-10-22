@@ -5,6 +5,7 @@ import {
   ButtonShape,
   ButtonSize,
   ButtonState,
+  ButtonStyle,
   ButtonType,
 } from '@/constants/buttons';
 
@@ -50,5 +51,10 @@ ButtonStory.argTypes = {
     options: Object.values(ButtonShape),
     control: { type: 'select' },
     defaultValue: ButtonShape.Rectangle,
+  },
+  buttonStyle: {
+    options: Object.values(ButtonStyle),
+    control: { type: 'select' },
+    defaultValue: ButtonStyle.Default,
   },
 };

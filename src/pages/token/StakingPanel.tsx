@@ -42,7 +42,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
 
   const { complianceState } = useComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { protocolStaking } = useURLConfigs();
 
   const showStakingActions = canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
@@ -73,7 +73,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
       slotHeader={
         <$Header>
           <$Title>
-            <AssetIcon symbol={chainTokenLabel} />
+            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
             {chainTokenLabel}
           </$Title>
           {complianceState === ComplianceStates.FULL_ACCESS && (

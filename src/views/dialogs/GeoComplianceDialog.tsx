@@ -70,7 +70,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
 
   const submit = async () => {
     const action =
-      residence && isBlockedGeo(COUNTRIES_MAP[residence])
+      residence && isBlockedGeo(COUNTRIES_MAP[residence]!)
         ? ComplianceAction.INVALID_SURVEY
         : ComplianceAction.VALID_SURVEY;
 

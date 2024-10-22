@@ -61,7 +61,7 @@ const useLocalNotificationsContext = () => {
 
   const { dydxAddress } = useAccounts();
 
-  const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] || [] : [];
+  const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] ?? [] : [];
 
   const setTransferNotifications = useCallback(
     (notifications: TransferNotifcation[]) => {
@@ -71,7 +71,7 @@ const useLocalNotificationsContext = () => {
 
         updatedNotifications[dydxAddress] = [
           ...notifications,
-          ...(updatedNotifications[dydxAddress] || []).slice(notifications.length),
+          ...(updatedNotifications[dydxAddress] ?? []).slice(notifications.length),
         ];
 
         return updatedNotifications;

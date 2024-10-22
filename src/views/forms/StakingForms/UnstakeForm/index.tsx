@@ -115,7 +115,7 @@ export const UnstakeForm = ({
       getUndelegateFee(amounts)
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
-            const feeAmount = stdFee.amount[0].amount;
+            const feeAmount = stdFee.amount[0]!.amount;
             setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
           }
         })

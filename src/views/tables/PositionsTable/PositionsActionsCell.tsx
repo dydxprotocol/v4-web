@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { AbacusPositionSides, Nullable, SubaccountOrder } from '@/constants/abacus';
-import { ButtonShape } from '@/constants/buttons';
+import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -113,7 +113,7 @@ export const PositionsActionsCell = ({
   };
 
   return (
-    <$ActionsTableCell $uiRefreshEnabled={uiRefresh}>
+    <$ActionsTableCell $uiRefreshEnabled={uiRefresh} tw="mr-[-0.5rem]">
       {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && !uiRefresh && (
         <WithTooltip
           tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
@@ -127,14 +127,17 @@ export const PositionsActionsCell = ({
           />
         </WithTooltip>
       )}
-      <$TriggersButton
-        key="share"
-        onClick={openShareDialog}
-        iconName={IconName.Share}
-        shape={ButtonShape.Square}
-        disabled={isDisabled}
-        $uiRefreshEnabled={uiRefresh}
-      />
+      <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.SHARE })}>
+        <$TriggersButton
+          key="share"
+          onClick={openShareDialog}
+          iconName={IconName.Share}
+          shape={ButtonShape.Square}
+          disabled={isDisabled}
+          buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+          $uiRefreshEnabled={uiRefresh}
+        />
+      </WithTooltip>
       {showClosePositionAction && (
         <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}>
           <$CloseButtonToggle
@@ -149,7 +152,7 @@ export const PositionsActionsCell = ({
             iconName={IconName.Close}
             shape={ButtonShape.Square}
             disabled={isDisabled}
-            $uiRefreshEnabled={uiRefresh}
+            buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
           />
         </WithTooltip>
       )}
@@ -161,12 +164,12 @@ const $ActionsTableCell = styled(ActionsTableCell)<{ $uiRefreshEnabled: boolean 
   ${({ $uiRefreshEnabled }) =>
     $uiRefreshEnabled &&
     css`
-      --toolbar-margin: 1rem;
+      --toolbar-margin: 0.25rem;
     `}
 `;
 
 const $TriggersButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
-  --button-icon-size: 1.5em;
+  --button-icon-size: 1.25em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
 
@@ -174,22 +177,11 @@ const $TriggersButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
     $uiRefreshEnabled &&
     css`
       --button-icon-size: 1em;
-      --button-backgroundColor: transparent;
-      --button-border: none;
-      width: min-content;
     `}
 `;
 
-const $CloseButtonToggle = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
+const $CloseButtonToggle = styled(IconButton)`
   --button-icon-size: 1em;
   --button-hover-textColor: var(--color-red);
   --button-toggle-on-textColor: var(--color-red);
-
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --button-backgroundColor: transparent;
-      --button-border: none;
-      width: min-content;
-    `}
 `;

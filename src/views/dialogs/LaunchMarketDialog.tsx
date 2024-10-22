@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { DialogProps, LaunchMarketDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -14,6 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 
+import { MegaVaultYieldOutput } from '../MegaVaultYieldOutput';
 import { NewMarketForm, NewMarketFormStep } from '../forms/NewMarketForm';
 
 export const LaunchMarketDialog = ({
@@ -40,15 +42,14 @@ export const LaunchMarketDialog = ({
           description: stringGetter({
             key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
             params: {
-              APR_PERCENTAGE: (
-                <Output
-                  type={OutputType.Percent}
-                  tw="inline-block text-color-success"
-                  value={0.3456}
-                />
-              ),
+              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
               DEPOSIT_AMOUNT: (
-                <Output useGrouping type={OutputType.Fiat} tw="inline-block" value={10_000} />
+                <Output
+                  useGrouping
+                  type={OutputType.Fiat}
+                  tw="inline-block"
+                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                />
               ),
               PAST_DAYS: 30,
             },
@@ -62,13 +63,7 @@ export const LaunchMarketDialog = ({
             params: {
               NUM_DAYS: <span tw="text-color-text-1">30</span>,
               PAST_DAYS: 30,
-              APR_PERCENTAGE: (
-                <Output
-                  type={OutputType.Percent}
-                  tw="inline-block text-color-success"
-                  value={0.3456}
-                />
-              ),
+              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
             },
           }),
         };

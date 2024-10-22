@@ -376,7 +376,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       // take out fee from amount before sweeping
       const amount =
         parseInt(ibcMsg.value.token.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
@@ -466,7 +466,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       // take out fee from amount before sweeping
       const amount =
         parseInt(ibcMsg.value.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
@@ -504,14 +504,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       // take out fee from amount before sweeping
       const amount =
-        parseInt(ibcMsgs[0].value.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        parseInt(ibcMsgs[0]!.value.amount, 10) -
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
       }
 
-      ibcMsgs[0].value.amount = amount.toString();
+      ibcMsgs[0]!.value.amount = amount.toString();
 
       dd.info('cctpMultiMsgWithdraw attempting to submit tx', { ibcMsgs, fee, amount });
       const tx = await this.nobleClient.send(ibcMsgs);

@@ -2,6 +2,8 @@ import React from 'react';
 
 import styled from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from './AssetIcon';
@@ -10,6 +12,7 @@ type PortfolioCardProps = {
   assetName: string;
   assetId?: string;
   assetIcon?: React.ReactNode;
+  assetImgUrl?: Nullable<string>;
   actionSlot: React.ReactNode;
 
   detailLabel: string;
@@ -19,6 +22,7 @@ type PortfolioCardProps = {
 export const PortfolioCard = ({
   assetId,
   assetIcon,
+  assetImgUrl,
   assetName,
   actionSlot,
   detailLabel,
@@ -27,7 +31,7 @@ export const PortfolioCard = ({
   return (
     <$PortfolioCard>
       <$MarketRow>
-        {assetIcon ?? <AssetIcon symbol={assetId} />}
+        {assetIcon ?? <AssetIcon logoUrl={assetImgUrl} symbol={assetId} />}
         {assetName}
       </$MarketRow>
       <div tw="spacedRow mt-0.5 px-0.625 py-0">

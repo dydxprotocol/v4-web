@@ -13,6 +13,8 @@ import {
 } from '@radix-ui/react-tabs';
 import styled, { css, keyframes } from 'styled-components';
 
+import { ButtonShape, ButtonStyle } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tabMixins } from '@/styles/tabMixins';
 
@@ -96,7 +98,12 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
           <Toolbar tw="inlineRow">
             {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
-              <$IconButton iconName={IconName.Caret} isToggle $uiRefreshEnabled={uiRefresh} />
+              <$IconButton
+                iconName={IconName.Caret}
+                isToggle
+                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+                shape={uiRefresh ? ButtonShape.Square : ButtonShape.Circle}
+              />
             </CollapsibleTrigger>
           </Toolbar>
         </$Header>
@@ -236,16 +243,9 @@ const $Header = styled.header`
   z-index: 2;
 `;
 
-const $IconButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
+const $IconButton = styled(IconButton)`
   --button-icon-size: 1em;
   ${$CollapsibleRoot}[data-state='closed'] & {
     rotate: -0.5turn;
   }
-
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --button-border: none;
-      --button-backgroundColor: transparent;
-    `};
 `;

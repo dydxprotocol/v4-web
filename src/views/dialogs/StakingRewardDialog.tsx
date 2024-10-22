@@ -41,13 +41,12 @@ export const StakingRewardDialog = ({
   validators,
 }: DialogProps<StakingRewardDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { usdcLabel, usdcDecimals } = useTokenConfigs();
+  const { usdcImage, usdcLabel, usdcDecimals } = useTokenConfigs();
 
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
-
   const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +56,7 @@ export const StakingRewardDialog = ({
     getWithdrawRewardFee(validators)
       .then((stdFee) => {
         if (stdFee.amount.length > 0) {
-          const feeAmount = stdFee.amount[0].amount;
+          const feeAmount = stdFee.amount[0]!.amount;
           setFee(MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals)));
         } else {
           setFee(undefined);
@@ -159,7 +158,7 @@ export const StakingRewardDialog = ({
             />
             {usdcLabel}
           </$Pill>
-          <AssetIcon symbol="USDC" tw="text-[5rem]" />
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="text-[5rem]" />
         </div>
         <h3 tw="z-[1] text-color-text-2 font-extra-bold">
           {stringGetter({ key: STRING_KEYS.YOU_EARNED })}

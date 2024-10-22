@@ -21,8 +21,6 @@ import abacusStateManager from './abacus';
 import { isTruthy } from './isTruthy';
 import { sleep } from './timeUtils';
 
-export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-
 export const STATUS_ERROR_GRACE_PERIOD = 300_000;
 
 type SkipStatusParams = {
@@ -73,7 +71,10 @@ export const fetchSkipStatus = async ({ transactionHash, chainId, baseUrl }: Ski
 };
 
 const getTransferFromStatusResponse = (skipStatusResponse: TxStatusResponseJSON) => {
-  return skipStatusResponse.transfers[0];
+  if (!skipStatusResponse.transfers.length) {
+    throw new Error('Skip status response was empty.');
+  }
+  return skipStatusResponse.transfers[0]!;
 };
 
 const getChainNameFromId = (chainId: string | undefined) => {

@@ -15,6 +15,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
 type ElementProps = {
   showNarrowVariation?: boolean;
 };
@@ -22,16 +24,18 @@ type ElementProps = {
 export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { configs } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
-  const { size: positionSize, notionalTotal } =
-    useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } = configs ?? {};
+  const { id, resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
+  const { configs } = orEmptyObj(useAppSelector(getCurrentMarketData, shallowEqual));
+  const { size: positionSize, notionalTotal } = orEmptyObj(
+    useAppSelector(getCurrentMarketPositionData, shallowEqual)
+  );
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(configs);
+  const { imageUrl } = orEmptyObj(resources);
 
   return (
     <$PositionPreviewContainer>
       <$YourPosition>
-        {!showNarrowVariation && <AssetIcon symbol={id} />}
+        {!showNarrowVariation && <AssetIcon logoUrl={imageUrl} symbol={id} />}
         <span>
           {stringGetter({
             key: STRING_KEYS.YOUR_MARKET_POSITION,
@@ -42,6 +46,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         </span>
       </$YourPosition>
       <PositionTile
+        assetImgUrl={imageUrl}
         currentSize={positionSize?.current}
         notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}

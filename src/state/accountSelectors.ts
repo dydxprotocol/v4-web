@@ -180,7 +180,7 @@ export const getMarketOrders = createAppSelector(
     return (orders ?? []).reduce(
       (marketOrders, order) => {
         marketOrders[order.marketId] ??= [];
-        marketOrders[order.marketId].push(order);
+        marketOrders[order.marketId]!.push(order);
         return marketOrders;
       },
       {} as { [marketId: string]: SubaccountOrder[] }
@@ -273,7 +273,7 @@ export const getMarketSubaccountOpenOrders = createAppSelector(
     return (orders ?? []).reduce(
       (marketOrders, order) => {
         marketOrders[order.marketId] ??= [];
-        marketOrders[order.marketId].push(order);
+        marketOrders[order.marketId]!.push(order);
         return marketOrders;
       },
       {} as { [marketId: string]: SubaccountOrder[] }
@@ -398,7 +398,7 @@ export const getMarketFills = createAppSelector(
     return (fills ?? []).reduce(
       (marketFills, fill) => {
         marketFills[fill.marketId] ??= [];
-        marketFills[fill.marketId].push(fill);
+        marketFills[fill.marketId]!.push(fill);
         return marketFills;
       },
       {} as { [marketId: string]: SubaccountFill[] }
@@ -432,7 +432,7 @@ export const getFillDetails = () =>
 export const getCurrentMarketFills = createAppSelector(
   [getCurrentMarketId, getMarketFills],
   (currentMarketId, marketFills): SubaccountFill[] =>
-    !currentMarketId ? [] : marketFills[currentMarketId]
+    !currentMarketId ? [] : marketFills[currentMarketId] ?? []
 );
 
 const getFillsForOrderId = createAppSelector(
@@ -468,7 +468,7 @@ export const getMarketFundingPayments = createAppSelector(
     return (fundingPayments ?? []).reduce(
       (marketFundingPayments, fundingPayment) => {
         marketFundingPayments[fundingPayment.marketId] ??= [];
-        marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
+        marketFundingPayments[fundingPayment.marketId]!.push(fundingPayment);
         return marketFundingPayments;
       },
       {} as { [marketId: string]: SubaccountFundingPayment[] }
@@ -483,7 +483,7 @@ export const getMarketFundingPayments = createAppSelector(
 export const getCurrentMarketFundingPayments = createAppSelector(
   [getCurrentMarketId, getMarketFundingPayments],
   (currentMarketId, marketFundingPayments): SubaccountFundingPayment[] =>
-    !currentMarketId ? [] : marketFundingPayments[currentMarketId]
+    !currentMarketId ? [] : marketFundingPayments[currentMarketId] ?? []
 );
 
 /**

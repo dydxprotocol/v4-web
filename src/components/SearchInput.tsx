@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
+import { ButtonStyle } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -41,6 +43,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
             setValue('');
             onTextChange?.('');
           }}
+          buttonStyle={ButtonStyle.WithoutBackground}
         />
       )}
     </$Search>
@@ -49,8 +52,8 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
 const $Search = styled.div`
   ${layoutMixins.row}
   width: auto;
-  height: 2rem;
-  background-color: var(--color-layer-3);
+  height: 2.5rem;
+  background-color: var(--color-layer-5);
   color: ${({ theme }) => theme.textTertiary};
   border-radius: 2.5rem;
   border: solid var(--border-width) var(--color-layer-6);
@@ -60,8 +63,6 @@ const $Search = styled.div`
 `;
 const $IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
-  --button-border: none;
-  --button-backgroundColor: transparent;
   color: ${({ theme }) => theme.textSecondary};
   width: 1.5rem;
   height: 1.5rem;

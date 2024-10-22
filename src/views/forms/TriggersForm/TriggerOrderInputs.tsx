@@ -34,6 +34,7 @@ import { getTriggerFormInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 
 type InputChangeType = InputType.Currency | InputType.Percent;
@@ -285,7 +286,8 @@ export const TriggerOrderInputs = ({
           id={`${tooltipId}-price`}
           label={
             <>
-              {stringGetter({ key: stringKeys.price })} <Tag>{symbol}</Tag>
+              {stringGetter({ key: stringKeys.price })}{' '}
+              <Tag>{getDisplayableAssetFromBaseAsset(symbol)}</Tag>
             </>
           }
           type={InputType.Currency}

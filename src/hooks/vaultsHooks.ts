@@ -304,6 +304,39 @@ export const useVaultFormSlippage = () => {
   return mapNullableQueryResult(slippageQueryResult);
 };
 
+export const useVaultCalculationForLaunchingMarket = ({ amount }: { amount: number }) => {
+  const accountInfo = useAppSelector(selectSubaccountStateForVaults);
+  const vaultAccount = useLoadedVaultAccount().data;
+
+  const vaultFormInfo = useMemo(
+    () => new VaultFormData(operationStringToVaultFormAction('DEPOSIT'), amount, true, true, true),
+    [amount]
+  );
+
+  const vaultFormAccountInfo = useMemo(
+    () =>
+      new VaultFormAccountData(
+        accountInfo.marginUsage,
+        accountInfo.freeCollateral,
+        accountInfo.canViewAccount
+      ),
+    [accountInfo.marginUsage, accountInfo.freeCollateral, accountInfo.canViewAccount]
+  );
+
+  const validationResponse = useMemo(
+    () =>
+      VaultDepositWithdrawFormValidator.validateVaultForm(
+        vaultFormInfo,
+        vaultFormAccountInfo,
+        vaultAccount,
+        null
+      ),
+    [vaultAccount, vaultFormInfo, vaultFormAccountInfo]
+  );
+
+  return validationResponse;
+};
+
 export const useVaultFormValidationResponse = () => {
   const { operation, slippageAck, termsAck, confirmationStep } = useAppSelector(
     selectVaultFormStateExceptAmount
@@ -356,7 +389,7 @@ function getErrorToRenderFromErrorMessage(
   if (errorMessage.indexOf('insufficient funds: insufficient funds') > 0) {
     return stringGetter({ key: STRING_KEYS.BROADCAST_ERROR_SDK_5 });
   }
-  return errorMessage.split('\n')[0];
+  return errorMessage.split('\n')[0]!;
 }
 
 export const useVaultFormErrorState = () => {

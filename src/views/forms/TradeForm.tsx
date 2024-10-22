@@ -15,7 +15,7 @@ import {
   type Nullable,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -33,7 +33,6 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
@@ -307,34 +306,21 @@ export const TradeForm = ({
   );
 
   const tradeFooter = (
-    <$Footer>
-      {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-        <div tw="row justify-self-end px-0 py-0.5">
-          <Button
-            type={ButtonType.Reset}
-            action={ButtonAction.Reset}
-            shape={ButtonShape.Pill}
-            size={ButtonSize.XSmall}
-            onClick={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
-          >
-            {stringGetter({ key: STRING_KEYS.CLEAR })}
-          </Button>
-        </div>
-      )}
-      <PlaceOrderButtonAndReceipt
-        hasValidationErrors={hasInputErrors}
-        actionStringKey={inputAlert?.actionStringKey}
-        validationErrorString={shortAlertContent}
-        summary={summary ?? undefined}
-        currentStep={currentStep}
-        showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
-        confirmButtonConfig={{
-          stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
-          buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
-          buttonAction: orderSideAction,
-        }}
-      />
-    </$Footer>
+    <PlaceOrderButtonAndReceipt
+      hasValidationErrors={hasInputErrors}
+      hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
+      onClearInputs={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
+      actionStringKey={inputAlert?.actionStringKey}
+      validationErrorString={shortAlertContent}
+      summary={summary ?? undefined}
+      currentStep={currentStep}
+      showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+      confirmButtonConfig={{
+        stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
+        buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
+        buttonAction: orderSideAction as ButtonAction,
+      }}
+    />
   );
 
   return (
@@ -488,10 +474,4 @@ const $IconButton = styled(IconButton)`
 
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
-`;
-const $Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
-
-  ${layoutMixins.column}
 `;

@@ -44,7 +44,7 @@ import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, type EvmAddress, WalletNetworkType, WalletType } from '@/constants/wallets';
 
-import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDydxClient } from '@/hooks/useDydxClient';
@@ -79,8 +79,8 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
+import { isNativeDenom, WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
-import { NATIVE_TOKEN_ADDRESS } from '@/lib/skip';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
@@ -181,7 +181,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   // Async Data
   const { balance } = useAccountBalance({
-    addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
+    addressOrDenom: sourceToken?.address || WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS,
     chainId,
     isCosmosChain: isKeplrWallet,
   });
@@ -329,7 +329,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       throw new Error('Missing source token address');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
     if (!requestPayload?.value) throw new Error('Missing transaction value');
-    if (sourceToken?.address === NATIVE_TOKEN_ADDRESS) return;
+    if (isNativeDenom(sourceToken?.address)) return;
 
     const allowance = await publicClientWagmi.readContract({
       address: sourceToken.address as EvmAddress,

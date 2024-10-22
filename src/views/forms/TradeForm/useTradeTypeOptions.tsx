@@ -12,18 +12,22 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
-import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedTradeType } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: boolean }) => {
   const { showAll, showAssetIcon } = opts ?? {};
   const stringGetter = useStringGetter();
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
-  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
+  const { id: currentAssetId, resources } = orEmptyObj(
+    useAppSelector(getCurrentMarketAssetData, shallowEqual)
+  );
+  const { imageUrl } = orEmptyObj(resources);
   const { type: tradeType } = currentTradeData ?? {};
 
   const selectedTradeType = getSelectedTradeType(tradeType);
@@ -39,10 +43,12 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
             ? STRING_KEYS.TAKE_PROFIT_LIMIT
             : ((stringKey ?? '') as StringKey),
       }),
-      slotBefore: showAssetIcon ? <AssetIcon symbol={currentAssetId} /> : undefined,
+      slotBefore: showAssetIcon ? (
+        <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
+      ) : undefined,
     }));
     return allItems;
-  }, [currentAssetId, showAssetIcon, stringGetter, typeOptions]);
+  }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions]);
 
   const asSubItems = useMemo((): Array<MenuItem<TradeTypes>> => {
     if (allTradeTypeItems == null || allTradeTypeItems.length === 0) {

@@ -134,7 +134,7 @@ export const getLaunchableMarketDatafeed = (
         if (!cachedBars.length) {
           const candlesResponse = await metadataClient.getCandles({
             asset,
-            timeframe: RESOLUTION_TO_TIMEFRAME_MAP[resolution],
+            timeframe: RESOLUTION_TO_TIMEFRAME_MAP[resolution]!,
           });
 
           const fetchedCandles: MetadataServiceCandlesResponse[string] | undefined =

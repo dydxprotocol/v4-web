@@ -27,30 +27,33 @@ export const WithReceipt = ({
   const receipt = <$SlotReceipt>{slotReceipt}</$SlotReceipt>;
 
   return (
-    <$WithReceipt className={className} hideReceipt={hideReceipt}>
+    <$WithReceipt className={className} showReceipt={!hideReceipt}>
       {side === 'top' && receipt}
       {children}
       {side === 'bottom' && receipt}
     </$WithReceipt>
   );
 };
-const $WithReceipt = styled.div<{ hideReceipt?: boolean }>`
-  --withReceipt-backgroundColor: var(--color-layer-1);
-  display: grid;
-
-  background-color: var(--withReceipt-backgroundColor);
-  border-radius: 0.5em;
-
-  ${({ hideReceipt }) =>
-    hideReceipt &&
-    css`
-      background-color: transparent;
-
-      ${$SlotReceipt} {
-        height: 0;
-        opacity: 0;
-      }
-    `}
-`;
 
 const $SlotReceipt = styled.div``;
+
+const $WithReceipt = styled.div<{ showReceipt?: boolean }>`
+  --withReceipt-backgroundColor: var(--color-layer-1);
+
+  background-color: transparent;
+  border-radius: 0.5em;
+
+  display: grid;
+  grid-template-rows: 0fr;
+
+  ${$SlotReceipt} {
+    overflow: hidden;
+  }
+
+  ${({ showReceipt }) =>
+    showReceipt &&
+    css`
+      grid-template-rows: 1fr;
+      background-color: var(--withReceipt-backgroundColor);
+    `}
+`;

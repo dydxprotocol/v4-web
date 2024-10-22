@@ -1,5 +1,7 @@
 import { darkTheme, FunkitConfig, lightTheme, PurifiedCheckoutHistoryItem } from '@funkit/connect';
 
+import { LogoShortIcon } from '@/icons/logo-short';
+
 export type FunkitDeposit = {
   checkoutId: string;
   timestamp: number;
@@ -15,6 +17,18 @@ export const funkitConfig = {
     web3: true,
   },
   apiKey: import.meta.env.VITE_FUNKIT_API_KEY,
+  uiCustomizations: {
+    inputAmountScreen: {
+      allowTokenAmountInput: false,
+    },
+    confirmationScreen: {
+      showTokenAmount: false,
+      customRecipientConfig: {
+        destinationIcon: LogoShortIcon({ id: 'funkit-dydx-logo' }),
+        destinationText: 'dYdX Account',
+      },
+    },
+  },
 } as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';

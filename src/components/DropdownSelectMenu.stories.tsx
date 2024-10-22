@@ -32,7 +32,7 @@ const exampleItems = [
 export const DropdownSelectMenuStory: Story<
   Pick<Parameters<typeof DropdownSelectMenu>[0], 'items' | 'align' | 'sideOffset' | 'disabled'>
 > = (args) => {
-  const [item, setItem] = useState(exampleItems[0].value);
+  const [item, setItem] = useState(exampleItems[0]!.value);
   return (
     <StoryWrapper>
       <DropdownSelectMenu value={item} onValueChange={(value) => setItem(value)} {...args} />

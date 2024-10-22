@@ -225,7 +225,7 @@ export const useTradingViewDatafeed = (
                 marketId: symbolInfo.ticker!,
                 resolution,
                 fromMs,
-                toMs: earliestCachedBarTime || toMs,
+                toMs: earliestCachedBarTime ?? toMs,
               });
 
               dispatch(

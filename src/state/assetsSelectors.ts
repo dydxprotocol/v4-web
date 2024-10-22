@@ -1,3 +1,5 @@
+import { Nullable } from '@/constants/abacus';
+
 import type { RootState } from './_store';
 import { getCurrentMarketData } from './perpetualsSelectors';
 
@@ -16,3 +18,12 @@ export const getCurrentMarketAssetData = (state: RootState) => {
   const { assetId } = getCurrentMarketData(state) ?? {};
   return assetId ? getAssets(state)?.[assetId] : undefined;
 };
+
+/**
+ * @returns Asset data of specified AssetId
+ */
+export const getAssetData = (state: RootState, assetId: Nullable<string>) =>
+  getAssets(state)?.[assetId ?? ''];
+
+export const getAssetImageUrl = (s: RootState, assetId: Nullable<string>) =>
+  getAssetData(s, assetId)?.resources?.imageUrl;

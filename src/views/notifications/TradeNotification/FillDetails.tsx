@@ -11,6 +11,7 @@ import { Details } from '@/components/Details';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BigNumberish } from '@/lib/numbers';
 
 export const FillDetails = ({
@@ -40,7 +41,13 @@ export const FillDetails = ({
               <OrderSideTag orderSide={orderSide} />
             </span>
           ),
-          value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
+          value: (
+            <Output
+              type={OutputType.Asset}
+              value={filledAmount}
+              tag={getDisplayableAssetFromBaseAsset(assetId)}
+            />
+          ),
         },
         {
           key: 'price',

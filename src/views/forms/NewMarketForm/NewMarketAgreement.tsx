@@ -14,6 +14,8 @@ import { Checkbox } from '@/components/Checkbox';
 import { Link } from '@/components/Link';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const NewMarketAgreement = ({
   onAccept,
   onCancel,
@@ -27,22 +29,24 @@ export const NewMarketAgreement = ({
   return (
     <$Content>
       <p>
-        {stringGetter({
-          key: STRING_KEYS.NEW_MARKET_PROPOSAL_AGREEMENT,
-          params: {
-            DOCUMENTATION_LINK: (
-              <Link
-                href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process"
-                withIcon
-                isAccent
-                isInline
-              >
-                {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
-              </Link>
-            ),
-            TERMS_OF_USE: <TermsOfUseLink isInline isAccent />,
-          },
-        })}
+        {testFlags.pml
+          ? stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_AGREEMENT })
+          : stringGetter({
+              key: STRING_KEYS.NEW_MARKET_PROPOSAL_AGREEMENT,
+              params: {
+                DOCUMENTATION_LINK: (
+                  <Link
+                    href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process"
+                    withIcon
+                    isAccent
+                    isInline
+                  >
+                    {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
+                  </Link>
+                ),
+                TERMS_OF_USE: <TermsOfUseLink isInline isAccent />,
+              },
+            })}
       </p>
 
       <Checkbox
