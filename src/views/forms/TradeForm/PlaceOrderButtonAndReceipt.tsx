@@ -23,7 +23,6 @@ import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
 import { ToggleButton } from '@/components/ToggleButton';

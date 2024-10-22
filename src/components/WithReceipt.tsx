@@ -48,7 +48,6 @@ const $WithReceipt = styled.div<{ showReceipt?: boolean }>`
 
   ${$SlotReceipt} {
     overflow: hidden;
-    height: 100%;
   }
 
   ${({ showReceipt }) =>
