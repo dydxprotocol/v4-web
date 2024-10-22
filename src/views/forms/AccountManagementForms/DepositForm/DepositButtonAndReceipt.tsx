@@ -141,7 +141,7 @@ export const DepositButtonAndReceipt = ({
           <Output
             type={OutputType.Fiat}
             fractionDigits={TOKEN_DECIMALS}
-            value={summary?.toAmountMin}
+            value={summary.toAmountMin}
           />
         ),
         tooltip: 'minimum-deposit-amount',
@@ -158,7 +158,7 @@ export const DepositButtonAndReceipt = ({
               tag={sourceToken?.symbol}
             />
             =
-            <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
+            <Output type={OutputType.Asset} value={summary.exchangeRate} tag={usdcLabel} />
           </span>
         ),
       },
@@ -169,7 +169,7 @@ export const DepositButtonAndReceipt = ({
             {stringGetter({ key: STRING_KEYS.GAS_FEE })}
           </WithTooltip>
         ),
-        value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+        value: <Output type={OutputType.Fiat} value={summary.gasFee} />,
       },
       typeof summary?.bridgeFee === 'number' && {
         key: 'bridge-fees',
@@ -178,7 +178,7 @@ export const DepositButtonAndReceipt = ({
             {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
           </WithTooltip>
         ),
-        value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
+        value: <Output type={OutputType.Fiat} value={summary.bridgeFee} />,
       },
       {
         key: 'equity',

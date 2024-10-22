@@ -260,7 +260,7 @@ export const useTransfers = () => {
     enabled: hasAllParams,
   });
 
-  const { route, txs } = routeQuery?.data ?? {};
+  const { route, txs } = routeQuery.data ?? {};
   return {
     // TODO [onboarding-rewrite]: Think about trimming this list
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties

@@ -171,7 +171,7 @@ const MarketsDropdownContent = ({
 
     if (
       !hasSeenElectionBannerTrumpWin &&
-      featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+      featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
       currentDate < new Date('2024-11-06T23:59:59')
     ) {
       return (

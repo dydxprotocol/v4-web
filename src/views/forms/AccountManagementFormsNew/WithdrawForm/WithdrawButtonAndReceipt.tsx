@@ -138,7 +138,7 @@ export const WithdrawButtonAndReceipt = ({
           newValue={leverage?.postOrder}
           sign={NumberSign.Negative}
           withDiff={Boolean(
-            leverage?.current && leverage?.postOrder && leverage.current !== leverage?.postOrder
+            leverage?.current && leverage.postOrder && leverage.current !== leverage.postOrder
           )}
           tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />

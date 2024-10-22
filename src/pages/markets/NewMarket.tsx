@@ -80,7 +80,7 @@ const NewMarket = () => {
         subtitle: stringGetter({
           key: STRING_KEYS.ADD_MARKET_STEP_3_DESCRIPTION,
           params: {
-            REQUIRED_NUM_TOKENS: MustBigNumber(newMarketProposal?.initialDepositAmount)
+            REQUIRED_NUM_TOKENS: MustBigNumber(newMarketProposal.initialDepositAmount)
               .div(Number(`1e${chainTokenDecimals}`))
               .toFixed(isMainnet ? 0 : chainTokenDecimals),
             NATIVE_TOKEN_DENOM: chainTokenLabel,

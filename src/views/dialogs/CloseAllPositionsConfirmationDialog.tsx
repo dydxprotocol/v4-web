@@ -18,7 +18,7 @@ export const CloseAllPositionsConfirmationDialog = ({
 
   const onSubmit = useCallback(() => {
     closeAllPositions();
-    setIsOpen?.(false);
+    setIsOpen(false);
   }, [closeAllPositions, setIsOpen]);
 
   return (
