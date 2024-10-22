@@ -88,7 +88,6 @@ export const WithdrawForm = () => {
     toToken,
     chainsForNetwork,
     routeLoading,
-    cosmosChainAddresses,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
