@@ -32,9 +32,9 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
-import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -314,7 +314,7 @@ const $NavigationMenu = styled(NavigationMenu)<{ $uiRefreshEnabled: boolean }>`
 ` as typeof navigationMenuType;
 
 const $NavBefore = styled.div<{
-  $uiRefreshEnabled: boolean;
+  $uiRefreshEnabled: boolean;g
 }>`
   ${({ $uiRefreshEnabled }) => css`
     ${$uiRefreshEnabled
