@@ -26,6 +26,7 @@ export const WithdrawDialog = ({ setIsOpen }: DialogProps<WithdrawDialogProps>) 
         testFlags.onboardingRewrite ? (
           <span tw="row gap-[0.5ch]">
             <Icon iconName={IconName.Usdc} size="1.5em" />
+            {/* TODO [onboarding-rewrite]: localize */}
             {stringGetter({ key: STRING_KEYS.WITHDRAW })} USDC
           </span>
         ) : (

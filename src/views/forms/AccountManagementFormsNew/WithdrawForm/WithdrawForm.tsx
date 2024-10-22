@@ -337,24 +337,18 @@ export const WithdrawForm = () => {
     ]
   );
 
-  const onChangeAddress = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setToAddress(e.target.value);
-    },
-    [setToAddress]
-  );
+  const onChangeAddress = (e: ChangeEvent<HTMLInputElement>) => {
+    setToAddress(e.target.value);
+  };
 
-  const onChangeAmount = useCallback(
-    ({ value }: NumberFormatValues) => {
-      setAmount(value);
-      setOnSubmitErrorMessage(undefined);
-    },
-    [setAmount]
-  );
+  const onChangeAmount = ({ value }: NumberFormatValues) => {
+    setAmount(value);
+    setOnSubmitErrorMessage(undefined);
+  };
 
-  const onClickMax = useCallback(() => {
+  const onClickMax = () => {
     setAmount(freeCollateralBN.toString());
-  }, [freeCollateralBN, setAmount]);
+  };
 
   useEffect(() => {
     if (sourceAccount?.walletInfo?.name === WalletType.Privy) {
@@ -403,6 +397,7 @@ export const WithdrawForm = () => {
     return (
       <$Form onSubmit={onSubmit}>
         <div tw="text-color-text-0">
+          {/* TODO [onboarding-rewrite]: localize */}
           Make sure everything looks correct with your withdrawal before confirming
         </div>
         <WithdrawButtonAndReceipt
@@ -444,7 +439,7 @@ export const WithdrawForm = () => {
           </span>
         }
         validationConfig={
-          toAddress && Boolean(exchange) && !isValidDestinationAddress
+          toAddress && !!exchange && !isValidDestinationAddress
             ? {
                 type: AlertType.Error,
                 message: stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION }),
@@ -519,4 +514,11 @@ const $Form = styled.form`
 
 const ArrowContainer = styled.div`
   border: solid var(--border-width) var(--color-layer-6);
+  background-color: var(--color-layer-4);
+  justify-content: center;
+  z-index: 1;
+  margin-bottom: -1.25;
+  margin-top: -1.25;
+  display: flex;
+  width: 1.5;
 `;

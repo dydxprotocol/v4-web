@@ -82,6 +82,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onFocus,
       onInput,
       type = InputType.Number,
+      // TODO: https://linear.app/dydx/issue/OTE-888/simplify-input-component-bg-styles
+      // simplify input component styles. backgroundColorOverride has to override styles in too many places
       $backgroundColorOverride: backgroundColorOverride,
       ...otherProps
     },
