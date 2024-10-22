@@ -1,7 +1,10 @@
+import { useState } from 'react';
+
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
 import { AbacusInputTypes, AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,12 +15,17 @@ import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
+import { WithSeparators } from '@/components/Separator';
+import { ToggleButton } from '@/components/ToggleButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -32,6 +40,7 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 import {
   calculateCrossPositionMargin,
   getTradeStateWithDoubleValuesHasDiff,
@@ -49,21 +58,25 @@ type ConfirmButtonConfig = {
 type ElementProps = {
   actionStringKey?: string;
   summary?: TradeInputSummary;
+  hasInput: boolean;
   hasValidationErrors?: boolean;
   validationErrorString?: string;
   currentStep?: MobilePlaceOrderSteps;
   showDeposit?: boolean;
   confirmButtonConfig: ConfirmButtonConfig;
+  onClearInputs: () => void;
 };
 
 export const PlaceOrderButtonAndReceipt = ({
   actionStringKey,
   summary,
+  hasInput,
   hasValidationErrors,
   validationErrorString,
   currentStep,
   showDeposit,
   confirmButtonConfig,
+  onClearInputs,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
@@ -83,6 +96,9 @@ export const PlaceOrderButtonAndReceipt = ({
   );
 
   const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
+  const { uiRefresh } = testFlags;
+
+  const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -325,16 +341,75 @@ export const PlaceOrderButtonAndReceipt = ({
   );
 
   return (
-    <WithDetailsReceipt detailItems={items}>
-      {!canAccountTrade ? (
-        <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
-        depositButton
-      ) : (
-        <WithTooltip tooltipString={showValidatorErrors ? validationErrorString : undefined}>
-          {submitButton}
-        </WithTooltip>
-      )}
-    </WithDetailsReceipt>
+    <$Footer>
+      <div tw="row gap-0.5 justify-self-end px-0 py-0.5">
+        <$WithSeparators layout="row">
+          {[
+            hasInput && (
+              <Button
+                type={ButtonType.Reset}
+                action={ButtonAction.Reset}
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                onClick={onClearInputs}
+                key="clear"
+              >
+                {stringGetter({ key: STRING_KEYS.CLEAR })}
+              </Button>
+            ),
+            uiRefresh && (
+              <$HideButton
+                slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                onPressedChange={setIsReceiptOpen}
+                isPressed={isReceiptOpen}
+                key="hide"
+              >
+                {stringGetter({ key: STRING_KEYS.RECEIPT })}
+              </$HideButton>
+            ),
+          ].filter(isTruthy)}
+        </$WithSeparators>
+      </div>
+      <WithDetailsReceipt detailItems={items} hideReceipt={!isReceiptOpen}>
+        {!canAccountTrade ? (
+          <OnboardingTriggerButton size={ButtonSize.Base} />
+        ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
+          depositButton
+        ) : (
+          <WithTooltip tooltipString={showValidatorErrors ? validationErrorString : undefined}>
+            {submitButton}
+          </WithTooltip>
+        )}
+      </WithDetailsReceipt>
+    </$Footer>
   );
 };
+
+const $Footer = styled.footer`
+  ${formMixins.footer}
+  padding-bottom: var(--dialog-content-paddingBottom);
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
+
+  ${layoutMixins.column}
+`;
+
+const $WithSeparators = styled(WithSeparators)`
+  --separatorHeight-padding: 0.5rem;
+`;
+
+const $HideButton = styled(ToggleButton)`
+  --button-toggle-off-backgroundColor: var(--color-layer-3);
+  --button-toggle-on-backgroundColor: var(--color-layer-3);
+  --button-toggle-on-textColor: var(--button-toggle-off-textColor);
+  --button-icon-size: 1em;
+  margin-right: 0.5em;
+  gap: 0.75ch;
+
+  &[data-state='off'] {
+    svg {
+      rotate: -0.5turn;
+    }
+  }
+`;
