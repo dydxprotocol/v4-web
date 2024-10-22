@@ -1,5 +1,6 @@
 import React from 'react';
 
+import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -26,6 +27,7 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -45,7 +47,11 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
         myVaultMetadata == null || myVaultMetadata.balanceUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <Output value={myVaultMetadata?.balanceUsdc} type={OutputType.Fiat} />
+          <Output
+            value={myVaultMetadata.balanceUsdc}
+            roundingMode={BigNumber.ROUND_FLOOR}
+            type={OutputType.Fiat}
+          />
         ),
     },
     {
@@ -54,14 +60,14 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
       tooltip: 'vault-all-time-pnl' as const,
       value:
         myVaultMetadata == null ||
-        myVaultMetadata?.allTimeReturnUsdc == null ||
-        myVaultMetadata?.allTimeReturnUsdc === 0 ? (
+        myVaultMetadata.allTimeReturnUsdc == null ||
+        myVaultMetadata.allTimeReturnUsdc === 0 ? (
           <EmptyValue />
         ) : (
-          <$ColoredReturn $sign={getNumberSign(myVaultMetadata?.allTimeReturnUsdc, 0.01)}>
+          <$ColoredReturn $sign={getNumberSign(myVaultMetadata.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
               <Output
-                value={myVaultMetadata?.allTimeReturnUsdc}
+                value={myVaultMetadata.allTimeReturnUsdc}
                 type={OutputType.Fiat}
                 fractionDigits={0}
               />
@@ -124,7 +130,7 @@ export const VaultPositionsSection = ({ className }: { className?: string }) => 
   return (
     <div className={className}>
       <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
-        {stringGetter({ key: STRING_KEYS.POSITIONS })}{' '}
+        {stringGetter({ key: STRING_KEYS.HOLDINGS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
         </Tag>
@@ -138,17 +144,13 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
+  const { totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {
       key: '30d-apr',
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
-      value: (
-        <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
-          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} fractionDigits={0} />
-        </$ColoredReturn>
-      ),
+      value: <MegaVaultYieldOutput />,
     },
     {
       key: 'balance',

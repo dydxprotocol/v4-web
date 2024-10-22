@@ -13,8 +13,10 @@ export type MarketData = {
 
   clobPairId: number;
   effectiveInitialMarginFraction: Nullable<number>;
+  imageUrl: Nullable<string>;
   initialMarginFraction: Nullable<number>;
   isNew?: boolean;
+  isUnlaunched?: boolean;
   line?: Nullable<number[]>;
   name?: Nullable<string>;
   nextFundingRate?: Nullable<number>;
@@ -63,6 +65,7 @@ export enum MarketFilters {
   GAMING = 'gaming',
   MEMES = 'memes',
   RWA = 'real-world-assets',
+  LAUNCHABLE = 'launchable',
 }
 
 // ORDER IS INTENTIONAL
@@ -140,6 +143,10 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
+  [MarketFilters.LAUNCHABLE]: {
+    label: STRING_KEYS.LAUNCHABLE,
+    isNew: true,
+  },
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';
@@ -199,3 +206,5 @@ export const LIQUIDITY_TIERS = {
     impactNotional: 2_500,
   },
 };
+
+export const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];

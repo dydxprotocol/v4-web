@@ -28,8 +28,10 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS, isNumber, MustBigNumber } from '@/lib/numbers';
 import { hasPositionSideChanged } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionTile } from './PositionTile';
 
@@ -69,7 +71,9 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
-  const { id } = currentMarketAssetData ?? {};
+  const { id, resources } = orEmptyObj(currentMarketAssetData);
+  const symbol = getDisplayableAssetFromBaseAsset(id);
+  const { imageUrl } = orEmptyObj(resources);
 
   const {
     adjustedImf,
@@ -83,7 +87,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     size,
     unrealizedPnl,
     unrealizedPnlPercent,
-  } = currentMarketPosition || {};
+  } = currentMarketPosition ?? {};
 
   const netFundingBN = MustBigNumber(netFunding);
 
@@ -162,7 +166,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     }
   }
 
-  const mainFieldsContent: PositionInfoItems[] = [
+  const mainFieldsContent = [
     {
       key: 'leverage',
       type: OutputType.Multiple,
@@ -187,7 +191,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip: 'liquidation-price',
       tooltipParams: {
-        SYMBOL: id ?? '',
+        SYMBOL: symbol,
       },
       fractionDigits: tickSizeDecimals,
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
@@ -224,7 +228,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },
-  ];
+  ] as const satisfies readonly PositionInfoItems[];
 
   const createDetailItem = ({
     key,
@@ -318,6 +322,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       <$MobilePositionInfo>
         <$DetachedSection>
           <PositionTile
+            assetImgUrl={imageUrl}
             currentSize={size?.current}
             notionalTotal={notionalTotal?.current}
             postOrderSize={size?.postOrder}
@@ -362,6 +367,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     <$PositionInfo>
       <div>
         <PositionTile
+          assetImgUrl={imageUrl}
           currentSize={size?.current}
           notionalTotal={notionalTotal?.current}
           postOrderSize={size?.postOrder}

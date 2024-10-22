@@ -3,12 +3,17 @@ import { Fragment, useState, type ReactNode } from 'react';
 import { Command } from 'cmdk';
 import styled, { css } from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { type MenuConfig } from '@/constants/menus';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Tag } from '@/components/Tag';
+
+import { SearchInput } from './SearchInput';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
@@ -18,6 +23,7 @@ type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends 
   inputPlaceholder?: string;
   slotEmpty?: ReactNode;
   withSearch?: boolean;
+  alternateSearchInputComponent?: boolean;
 };
 
 type StyleProps = {
@@ -39,15 +45,19 @@ export const ComboboxMenu = <
   onItemSelected,
 
   title,
-  inputPlaceholder = 'Search…',
-  slotEmpty = 'No items found.',
+  inputPlaceholder,
+  slotEmpty,
   withSearch = true,
+  alternateSearchInputComponent,
 
   className,
   withItemBorders,
   withStickyLayout,
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
+  const stringGetter = useStringGetter();
   const [searchValue, setSearchValue] = useState('');
+
+  const placeholderWithDefault = inputPlaceholder ?? stringGetter({ key: STRING_KEYS.SEARCH });
 
   return (
     <$Command
@@ -64,17 +74,25 @@ export const ComboboxMenu = <
     >
       {withSearch && (
         <$Header $withStickyLayout={withStickyLayout}>
-          <$Input
-            /**
-             * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
-             * https://github.com/pacocoursey/cmdk/issues/127
-             */
-            autoFocus
-            value={searchValue}
-            onValueChange={setSearchValue}
-            placeholder={inputPlaceholder}
-            data-hj-allow
-          />
+          {alternateSearchInputComponent ? (
+            <$SearchInput
+              value={searchValue}
+              onChange={setSearchValue}
+              placeholder={placeholderWithDefault}
+            />
+          ) : (
+            <$Input
+              /**
+               * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
+               * https://github.com/pacocoursey/cmdk/issues/127
+               */
+              autoFocus
+              value={searchValue}
+              onValueChange={setSearchValue}
+              placeholder={placeholderWithDefault}
+              data-hj-allow
+            />
+          )}
         </$Header>
       )}
 
@@ -172,7 +190,12 @@ export const ComboboxMenu = <
           </$Group>
         ))}
         {slotEmpty && searchValue.trim() !== '' && (
-          <Command.Empty tw="h-full p-1 text-color-text-0">{slotEmpty}</Command.Empty>
+          <Command.Empty tw="h-full p-1 text-color-text-0">
+            {slotEmpty ??
+              stringGetter({
+                key: STRING_KEYS.NO_RESULTS,
+              })}
+          </Command.Empty>
         )}
       </$List>
     </$Command>
@@ -214,6 +237,14 @@ const $Command = styled(Command)<{ $withStickyLayout?: boolean }>`
             overflow-y: auto;
           }
         `}
+
+  /*
+  Layout mixins withInnerHorizontalBorders forces all children components to have box shadow
+  This creates a border-like effect that we don't want for this dropdown component
+  */
+  && > * {
+    box-shadow: none;
+  }
 `;
 
 const $Header = styled.header<{ $withStickyLayout?: boolean }>`
@@ -243,7 +274,7 @@ const $Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLa
   color: var(--color-text-0);
 
   > [cmdk-group-heading] {
-    padding: 0.5rem 0.75rem 0.3rem;
+    padding: 0.5rem 1rem 0.3rem;
     font: var(--font-base-medium);
     background-color: var(--comboboxMenu-backgroundColor, inherit);
   }
@@ -341,4 +372,9 @@ const $ItemLabel = styled.div`
   }
 
   min-width: 0;
+`;
+
+const $SearchInput = styled(SearchInput)`
+  margin-top: 0.75em;
+  margin-bottom: 0.5em;
 `;

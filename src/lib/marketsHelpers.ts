@@ -1,11 +1,11 @@
-import { MarketConfigs } from '@/constants/abacus';
+import { MarketData } from '@/constants/markets';
 
 import { BIG_NUMBERS } from './numbers';
 
 export function calculateMarketMaxLeverage({
   effectiveInitialMarginFraction,
   initialMarginFraction,
-}: Pick<MarketConfigs, 'effectiveInitialMarginFraction' | 'initialMarginFraction'>) {
+}: Pick<MarketData, 'effectiveInitialMarginFraction' | 'initialMarginFraction'>) {
   if (effectiveInitialMarginFraction) {
     return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
   }

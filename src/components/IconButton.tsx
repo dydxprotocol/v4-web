@@ -2,7 +2,13 @@ import { forwardRef, type ElementType } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonStyle,
+} from '@/constants/buttons';
 
 import { Button, ButtonStateConfig } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
@@ -17,7 +23,11 @@ type ElementProps = {
   state?: ButtonState | ButtonStateConfig;
 };
 
-export type IconButtonProps = ElementProps & ToggleButtonProps;
+type StyleProps = {
+  buttonStyle?: ButtonStyle;
+};
+
+export type IconButtonProps = ElementProps & ToggleButtonProps & StyleProps;
 
 export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, IconButtonProps>(
   (
@@ -34,6 +44,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
       onClick,
       onPressedChange,
       className,
+      buttonStyle = ButtonStyle.Default,
 
       ...otherProps
     },
@@ -47,6 +58,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onPressedChange={onPressedChange ?? (onClick as any)} // TODO fix types
+        $withoutBackground={buttonStyle === ButtonStyle.WithoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
@@ -59,6 +71,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         shape={shape}
         href={href}
         onClick={onClick}
+        buttonStyle={buttonStyle}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
@@ -77,10 +90,18 @@ const buttonMixin = css`
   }
 `;
 
+const withoutBackgroundMixin = css`
+  --button-icon-size: 1.5em;
+  --button-border: none;
+  --button-backgroundColor: transparent;
+`;
+
 const $IconButton = styled(Button)`
   ${buttonMixin}
 `;
 
-const $IconToggleButton = styled(ToggleButton)`
+const $IconToggleButton = styled(ToggleButton)<{ $withoutBackground?: boolean }>`
   ${buttonMixin}
+
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
 `;

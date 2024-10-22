@@ -108,7 +108,7 @@ type WalletConfig = {
   icon: string;
 };
 
-export const wallets: Record<WalletInfo['name'], WalletConfig> = {
+export const wallets = {
   [WalletType.OtherWallet]: {
     type: WalletType.OtherWallet,
     stringKey: STRING_KEYS.OTHER_WALLET,
@@ -154,7 +154,7 @@ export const wallets: Record<WalletInfo['name'], WalletConfig> = {
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
   },
-};
+} satisfies Record<WalletInfo['name'], WalletConfig>;
 
 /**
  * @description typed data to sign for dYdX Chain onboarding

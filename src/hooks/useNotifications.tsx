@@ -200,12 +200,12 @@ const useNotificationsContext = () => {
               updateStatus(thisNotification, newStatus);
             } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
               // updateKey changed - update existing notification
-              const thisNotification = notifications[key];
+              const thisNotification = notifications[key]!;
 
               thisNotification.updateKey = updateKey;
               updateStatus(thisNotification, NotificationStatus.Updated);
             } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
-              const thisNotification = notifications[key];
+              const thisNotification = notifications[key]!;
               updateStatus(thisNotification, NotificationStatus.Updated);
             }
           } else {
@@ -273,9 +273,10 @@ const useNotificationsContext = () => {
         if (
           notification.status < NotificationStatus.Seen &&
           notification.timestamps[notification.status]! > pushNotificationsLastUpdated &&
-          !globalThis.document.hasFocus()
+          !globalThis.document.hasFocus() &&
+          getDisplayData(notification) != null
         ) {
-          const displayData = getDisplayData(notification);
+          const displayData = getDisplayData(notification)!;
 
           const iconUrl =
             displayData.icon &&

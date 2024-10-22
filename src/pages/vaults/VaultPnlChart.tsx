@@ -68,7 +68,8 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   );
 
   const timeUnitsToRender = useMemo(() => {
-    const dataRange = data.length > 1 ? (data[data.length - 1].date ?? 0) - (data[0].date ?? 0) : 0;
+    const dataRange =
+      data.length > 1 ? (data[data.length - 1]!.date ?? 0) - (data[0]!.date ?? 0) : 0;
     const validRanges = TIME_RANGES.filter((t) => t.time <= dataRange + timeUnits.day * 3);
     return validRanges.map((t) => ({
       value: t.value,
@@ -117,9 +118,13 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     ? relevantDataPoints[relevantDataPoints.length - 1]
     : undefined;
   const pnlDiff = atLeastTwoPoints
-    ? relevantDataPoints[relevantDataPoints.length - 1] - relevantDataPoints[0]
+    ? relevantDataPoints[relevantDataPoints.length - 1]! - relevantDataPoints[0]!
     : undefined;
-  const pnlDiffPercent = atLeastTwoPoints ? (pnlDiff ?? 0) / relevantDataPoints[0] : undefined;
+  // must divide by equity no matter whether we are on pnl or equity
+  const pnlDiffPercent = atLeastTwoPoints
+    ? // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      (pnlDiff ?? 0) / (pointsInView[0]?.equity || 1)
+    : undefined;
 
   const xAccessorFunc = useCallback((datum: VaultPnlDatum) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(
@@ -135,7 +140,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         yAccessor: yAccessorFunc,
         colorAccessor: () =>
           atLeastTwoPoints
-            ? relevantDataPoints[relevantDataPoints.length - 1] - relevantDataPoints[0] >= 0
+            ? relevantDataPoints[relevantDataPoints.length - 1]! - relevantDataPoints[0]! >= 0
               ? 'var(--color-positive)'
               : 'var(--color-negative)'
             : 'var(--color-positive)',
@@ -167,7 +172,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const onVisibleDataChange = useCallback((inRangeData: VaultPnlDatum[]) => {
     setVisibleTimeRange(
       inRangeData.length > 1
-        ? [inRangeData[0].date ?? 0, inRangeData[inRangeData.length - 1].date ?? 0]
+        ? [inRangeData[0]!.date ?? 0, inRangeData[inRangeData.length - 1]!.date ?? 0]
         : undefined
     );
   }, []);

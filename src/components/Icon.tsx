@@ -307,6 +307,7 @@ type ElementProps = {
 
 type StyleProps = {
   className?: string;
+  size?: string;
 };
 
 export const Icon = styled(
@@ -317,7 +318,7 @@ export const Icon = styled(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     size,
     ...props
-  }: ElementProps & StyleProps & { size?: string }) =>
+  }: ElementProps & StyleProps) =>
     Component ? <Component className={className} {...props} /> : null
 )`
   --icon-size: ${({ size }) => size ?? ''};

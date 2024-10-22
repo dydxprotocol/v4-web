@@ -20,7 +20,10 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { FillDetails } from './FillDetails';
 
@@ -45,7 +48,8 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   const stringGetter = useStringGetter();
   const { AVERAGE_PRICE, FILLED_AMOUNT, MARKET, ORDER_TYPE, ORDER_STATUS, SIDE } = data;
   const marketData = useAppSelector((s) => getMarketData(s, MARKET), shallowEqual);
-  const { assetId } = marketData ?? {};
+  const { assetId } = orEmptyObj(marketData);
+  const assetImgUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
   const tradeType = TRADE_TYPES[orderType] ?? undefined;
   const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
@@ -55,7 +59,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
     <Notification
       isToast={isToast}
       notification={notification}
-      slotIcon={<AssetIcon symbol={assetId} />}
+      slotIcon={<AssetIcon logoUrl={assetImgUrl} symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
         <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">

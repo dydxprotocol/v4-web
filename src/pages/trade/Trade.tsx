@@ -35,6 +35,8 @@ import { VerticalPanel } from './VerticalPanel';
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
 
+  const { uiRefresh, pml } = testFlags;
+
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
@@ -45,7 +47,7 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  if (isViewingUnlaunchedMarket && testFlags.pml) {
+  if (isViewingUnlaunchedMarket && pml) {
     return <LaunchableMarket />;
   }
 
@@ -80,8 +82,9 @@ const TradePage = () => {
       </header>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
-        <AccountInfo />
+        {!uiRefresh && <AccountInfo />}
         <TradeBox />
+        {uiRefresh && <AccountInfo />}
       </$GridSection>
 
       <$GridSection gridArea="Vertical">

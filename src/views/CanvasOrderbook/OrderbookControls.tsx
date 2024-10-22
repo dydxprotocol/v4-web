@@ -19,6 +19,7 @@ import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 
 type OrderbookControlsProps = {
   className?: string;
@@ -84,7 +85,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
         {assetId && (
           <ToggleGroup
             items={[
-              { label: assetId, value: DisplayUnit.Asset },
+              { label: getDisplayableAssetFromBaseAsset(assetId), value: DisplayUnit.Asset },
               { label: 'USD', value: DisplayUnit.Fiat },
             ]}
             shape={ButtonShape.Rectangle}

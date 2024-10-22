@@ -51,6 +51,7 @@ import { IncentiveSeasonDistributionNotification } from '@/views/notifications/I
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { PermissionlessMarketsLiveNotification } from '@/views/notifications/PermissionlessMarketsLiveNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -68,6 +69,7 @@ import {
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -261,6 +263,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
       const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+      const { usdcImage } = useTokenConfigs();
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
@@ -281,7 +284,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished =
             (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
-            <$AssetIcon symbol="USDC" />
+            <$AssetIcon logoUrl={usdcImage} symbol="USDC" />
           ) : (
             <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
           );
@@ -331,7 +334,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [isFinished]
           );
         }
-      }, [transferNotifications, stringGetter, selectedDydxChainId]);
+      }, [transferNotifications, stringGetter, selectedDydxChainId, usdcImage]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -341,13 +344,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const { discoveryProgram } = useURLConfigs();
-      const { chainTokenLabel } = useTokenConfigs();
+      const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
       const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
         useIncentivesSeason();
 
       const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
+      const pmlLiveExpirationDate = new Date('2024-11-21T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
@@ -355,7 +359,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             ReleaseUpdateNotificationIds.DiscoveryProgram,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.TITLE',
               }),
@@ -433,6 +437,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
+
+        if (currentDate < pmlLiveExpirationDate && testFlags.pml) {
+          trigger(
+            ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
+            {
+              title: stringGetter({ key: STRING_KEYS.PERMISSIONLESS_LIVE }),
+              body: stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
+              renderCustomBody({ isToast, notification }) {
+                return (
+                  <PermissionlessMarketsLiveNotification
+                    isToast={isToast}
+                    notification={notification}
+                  />
+                );
+              },
+            },
+            []
+          );
+        }
       }, [stringGetter]);
 
       const { dydxAddress } = useAccounts();
@@ -466,7 +491,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             incentivesDistributedSeasonId,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
                 params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
@@ -496,7 +521,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter, dydxAddress, status, dydxRewards]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel, dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -521,14 +546,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
       const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
       const currentDate = new Date();
-      const { chainTokenLabel } = useTokenConfigs();
+      const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
       useEffect(() => {
         if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
           trigger(
             MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
             {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
+              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
               title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
               body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
               toastSensitivity: 'foreground',
@@ -537,7 +562,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel]);
     },
     useNotificationAction: () => {
       return () => {};
