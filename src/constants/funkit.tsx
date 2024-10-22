@@ -8,28 +8,29 @@ export type FunkitDeposit = {
   status?: PurifiedCheckoutHistoryItem['state'];
 };
 
-export const funkitConfig = {
-  appName: 'dYdX',
-  appLogoSrc: '/logos/dydx-x.png',
-  appBackgroundColor: '#0F0F0F',
-  loginConfig: {
-    web2: true,
-    web3: true,
-  },
-  apiKey: import.meta.env.VITE_FUNKIT_API_KEY,
-  uiCustomizations: {
-    inputAmountScreen: {
-      allowTokenAmountInput: false,
+export const funkitConfig = () =>
+  ({
+    appName: 'dYdX',
+    appLogoSrc: '/logos/dydx-x.png',
+    appBackgroundColor: '#0F0F0F',
+    loginConfig: {
+      web2: true,
+      web3: true,
     },
-    confirmationScreen: {
-      showTokenAmount: false,
-      customRecipientConfig: {
-        destinationIcon: LogoShortIcon({ id: 'funkit-dydx-logo' }),
-        destinationText: 'dYdX Account',
+    apiKey: import.meta.env.VITE_FUNKIT_API_KEY,
+    uiCustomizations: {
+      inputAmountScreen: {
+        allowTokenAmountInput: false,
+      },
+      confirmationScreen: {
+        showTokenAmount: false,
+        customRecipientConfig: {
+          destinationIcon: <LogoShortIcon id="funkit-dydx-logo" />,
+          destinationText: 'dYdX Account',
+        },
       },
     },
-  },
-} as FunkitConfig;
+  }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
 const ACCENT_COLOR_WASH = 'rgb(114,122,255)'; // dydx uses brightness

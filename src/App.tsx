@@ -195,7 +195,7 @@ const providers = [
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
   wrapProvider(FunkitProvider, {
-    funkitConfig,
+    funkitConfig: funkitConfig(),
     theme: funkitTheme,
     initialChain: config.chains[0].id,
   }),
