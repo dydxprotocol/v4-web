@@ -1,4 +1,4 @@
-import { isDev } from '@/constants/networks';
+import { isDev, isTestnet } from '@/constants/networks';
 
 class TestFlags {
   public queryParams: { [key: string]: string };
@@ -35,7 +35,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults || isDev;
+    return !!this.queryParams.vaults || isDev || isTestnet;
   }
 
   get referrer() {
@@ -47,7 +47,7 @@ class TestFlags {
   }
 
   get pml() {
-    return !!this.queryParams.pml || isDev;
+    return !!this.queryParams.pml || isDev || isTestnet;
   }
 
   get showLimitClose() {

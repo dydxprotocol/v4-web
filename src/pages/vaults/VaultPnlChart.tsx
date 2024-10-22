@@ -120,7 +120,11 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const pnlDiff = atLeastTwoPoints
     ? relevantDataPoints[relevantDataPoints.length - 1]! - relevantDataPoints[0]!
     : undefined;
-  const pnlDiffPercent = atLeastTwoPoints ? (pnlDiff ?? 0) / relevantDataPoints[0]! : undefined;
+  // must divide by equity no matter whether we are on pnl or equity
+  const pnlDiffPercent = atLeastTwoPoints
+    ? // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      (pnlDiff ?? 0) / (pointsInView[0]?.equity || 1)
+    : undefined;
 
   const xAccessorFunc = useCallback((datum: VaultPnlDatum | undefined) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(

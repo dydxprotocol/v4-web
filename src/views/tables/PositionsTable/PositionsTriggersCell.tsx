@@ -7,7 +7,7 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -100,6 +100,7 @@ export const PositionsTriggersCell = ({
         size={ButtonSize.XSmall}
         onClick={onViewOrders ?? undefined}
         disabled={isDisabled}
+        buttonStyle={ButtonStyle.WithoutBackground}
       >
         <$Label>{stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}</$Label>
       </$ViewOrdersButton>
@@ -110,11 +111,13 @@ export const PositionsTriggersCell = ({
     <WithTooltip
       tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
     >
-      <$EditButton
+      <IconButton
         key="edit-triggers"
         iconName={IconName.Pencil}
         shape={ButtonShape.Square}
         onClick={openTriggersDialog}
+        action={ButtonAction.Secondary}
+        buttonStyle={ButtonStyle.WithoutBackground}
       />
     </WithTooltip>
   );
@@ -228,7 +231,7 @@ const $TableCell = styled(TableCell)`
   gap: 0.75em;
   justify-content: center;
 
-  --output-width: 70px;
+  --output-width: 80px;
 `;
 
 const $Container = styled.div<{ $align: 'right' | 'left' }>`
@@ -270,23 +273,11 @@ const $Output = styled(Output)<{
           `}
 `;
 
-const ButtonStyle = css`
-  --button-backgroundColor: transparent;
-  --button-border: none;
-  --button-width: min-content;
-`;
-
-const $EditButton = styled(IconButton)`
-  ${ButtonStyle}
-  --button-textColor: var(--color-text-0);
-  --button-padding: 0 1em 0 0;
-`;
-
 const $ViewOrdersButton = styled(Button)`
-  ${ButtonStyle}
   --button-height: 100%;
   --button-textColor: var(--color-accent);
-  --button-padding: 0;
+  --button-padding: 0 0.5em;
+  margin: 0 -0.5em;
 
   max-width: 100%;
 `;

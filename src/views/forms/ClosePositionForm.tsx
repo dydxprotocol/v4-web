@@ -269,7 +269,7 @@ export const ClosePositionForm = ({
         id="close-position-amount"
         label={
           <>
-            {stringGetter({ key: STRING_KEYS.AMOUNT })}
+            <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
             {id && <Tag>{id}</Tag>}
           </>
         }
