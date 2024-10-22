@@ -48,7 +48,7 @@ export const popoverMixins = {
     }
 
     &[data-state='open'] {
-      // background-color: var(--trigger-open-backgroundColor);
+      background-color: var(--trigger-open-backgroundColor);
       color: var(--trigger-open-textColor);
     }
   `,
@@ -248,7 +248,6 @@ export const popoverMixins = {
         var(--trigger-selected-color, var(--popover-backgroundColor, inherit))
       );
       color: var(--item-checked-textColor, var(--trigger-textColor, inherit));
-
     }
   `,
 } satisfies Record<string, ReturnType<typeof css>>;

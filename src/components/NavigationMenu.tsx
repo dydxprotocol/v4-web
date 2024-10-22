@@ -184,7 +184,7 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
   );
 
   return (
-    <$Root orientation={orientation} dir={dir} className={className} $dividerStyling={dividerStyle}>
+    <$Root orientation={orientation} dir={dir} className={className}>
       {slotBefore}
 
       {items.map((group) => (
@@ -220,7 +220,7 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
     </$Root>
   );
 };
-const $Root = styled(Root)<{ $dividerStyling: 'tab' | 'underline' }>`
+const $Root = styled(Root)`
   /* Params */
   --navigationMenu-height: auto;
 
@@ -454,14 +454,19 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
     subitems?.length
       ? css`
           ${popoverMixins.trigger}
-          --trigger-open-backgroundColor: ${$dividerStyling === 'tab'
-            ? css`var(--navigationMenu-tab-item-checked-backgroundColor)`
-            : css`var(--navigationMenu-underline-item-checked-backgroundColor)`};
-          ${$dividerStyling === 'underline' &&
-          css`
-            --trigger-active-filter: none;
-            --trigger-hover-filter: none;
-          `}
+          ${$dividerStyling === 'tab'
+            ? css`
+                --trigger-open-backgroundColor: var(
+                  --navigationMenu-tab-item-checked-backgroundColor
+                );
+              `
+            : css`
+                --trigger-open-backgroundColor: var(
+                  --navigationMenu-underline-item-checked-backgroundColor
+                );
+                --trigger-active-filter: none;
+                --trigger-hover-filter: none;
+              `};
         `
       : css`
           &:hover:not(:active) {
