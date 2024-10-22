@@ -13,18 +13,16 @@ import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
-import { store } from '@/state/_store';
 import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateLaunchableMarketsChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
-import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { getLaunchableMarketDatafeed } from '@/lib/tradingView/launchableMarketFeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
-import { useMetadataServiceAssetFromId } from '../useLaunchableMarkets';
+import { useMetadataService } from '../useLaunchableMarkets';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -47,19 +45,18 @@ export const useTradingViewLaunchable = ({
   const savedTvChartConfig = useAppSelector((s) => getTvChartConfig(s, true));
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig }) ?? undefined;
-  const launchableAsset = useMetadataServiceAssetFromId(marketId);
 
-  const tickSizeDecimals = getTickSizeDecimalsFromPrice(launchableAsset?.price ?? 0);
+  const { data: metadataServiceData, isLoading: isDataLoading } = useMetadataService();
 
   useEffect(() => {
-    if (marketId) {
+    if (marketId && !isDataLoading) {
       const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getLaunchableMarketDatafeed(store, tickSizeDecimals),
+        datafeed: getLaunchableMarketDatafeed(metadataServiceData),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
@@ -87,7 +84,7 @@ export const useTradingViewLaunchable = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tickSizeDecimals, tvWidgetRef]);
+  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tvWidgetRef, isDataLoading]);
 
   return { savedResolution };
 };
