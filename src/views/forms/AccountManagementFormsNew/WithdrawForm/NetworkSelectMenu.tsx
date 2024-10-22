@@ -2,6 +2,7 @@ import { Chain } from '@skip-go/client';
 import tw from 'twin.macro';
 
 import { cctpTokensByChainId, isHighFeeChainId, isLowFeeChainId } from '@/constants/cctp';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
 import { TransferType } from '@/constants/transfers';
@@ -44,7 +45,7 @@ export const NetworkSelectMenu = ({
   const chainItems = chains
     .map((chain) => ({
       value: chain.chainID,
-      label: chain.chainName,
+      label: chain.prettyName,
       onSelect: () => {
         onSelectNetwork(chain.chainID);
       },
@@ -52,7 +53,7 @@ export const NetworkSelectMenu = ({
       slotAfter: getFeeDecoratorComponentForChainId(chain.chainID),
     }))
     .filter((chain) => {
-      return !!cctpTokensByChainId[chain.value];
+      return !!cctpTokensByChainId[chain.value] || SUPPORTED_COSMOS_CHAINS.includes(chain.value);
     });
 
   const { lowFeeChains, nonLowFeeChains } = chainItems.reduce(
@@ -88,15 +89,15 @@ export const NetworkSelectMenu = ({
       items: [...exchangeItems, ...lowFeeChains],
     },
     {
-      group: 'other-networks',
-      groupLabel: 'Other networks',
+      group: 'other-chains',
+      groupLabel: 'Other Chains',
       items: nonLowFeeChains,
     },
   ];
   const isPrivyDeposit = sourceAccount.walletInfo?.name === WalletType.Privy;
 
   return (
-    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination" disabled={isPrivyDeposit}>
+    <SearchSelectMenu items={items.filter(isTruthy)} label="Chain" disabled={isPrivyDeposit}>
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (
           <>

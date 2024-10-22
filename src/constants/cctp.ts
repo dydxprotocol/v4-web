@@ -2,6 +2,7 @@ import { Asset } from '@skip-go/client';
 
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
+import { SUPPORTED_COSMOS_CHAINS } from './graz';
 import { TransferType as NewTransferType } from './transfers';
 
 export type CctpTokenInfo = {
@@ -71,14 +72,15 @@ const lowestFeeTokensByChainIdMapWithdrawal = getMapOfLowestFeeTokensByChainId(
 const lowestFeeTokensByDenomDeposit = getMapOfLowestFeeTokensByDenom(TransferType.deposit);
 const lowestFeeTokensByDenomWithdrawal = getMapOfLowestFeeTokensByDenom(TransferType.withdrawal);
 
-// TODO: refactor these functions to include cosmos chains and denoms in lowest fees.
-// This will probably involve a non trivial amount of work so do in separate PR.
+// TODO [onboarding-rewrite]: refactor these functions to include cosmos chains and denoms in lowest fees.
+// We'll do this during the deposit flow rewrite. We may want separate functions for deposits and withdrawals.
 export const isLowFeeChainId = (chainId: string, type: NewTransferType) => {
   const lowFeeChainIdMap =
     type === NewTransferType.Deposit
       ? lowestFeeTokensByChainIdMapDeposit
       : lowestFeeTokensByChainIdMapWithdrawal;
-  return lowFeeChainIdMap[chainId];
+
+  return !!lowFeeChainIdMap[chainId] || SUPPORTED_COSMOS_CHAINS.includes(chainId);
 };
 
 export const isHighFeeChainId = (chainId: string, type: NewTransferType) => {

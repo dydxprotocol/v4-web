@@ -87,7 +87,9 @@ export const WithdrawForm = () => {
     txs,
     toToken,
     chainsForNetwork,
+    skipSupportedChains,
     routeLoading,
+    setToAddressToConnectedWalletAddress,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
@@ -421,22 +423,32 @@ export const WithdrawForm = () => {
         selectedChain={toChainId ?? undefined}
         onSelectNetwork={onSelectNetwork}
         onSelectExchange={onSelectExchange}
-        chains={chainsForNetwork}
+        chains={skipSupportedChains}
       />
       <FormInput
         type={InputType.Text}
         placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
         onChange={onChangeAddress}
+        preventDefault
         value={toAddress ?? ''}
         label={
-          <span>
+          <span tw="row gap-[0.5ch]">
             {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
             {isValidDestinationAddress ? (
-              <Icon
-                iconName={IconName.Check}
-                tw="mx-[1ch] my-0 text-[0.625rem] text-color-success"
-              />
-            ) : null}
+              <Icon iconName={IconName.Check} tw="my-0 text-[0.625rem] text-color-success" />
+            ) : (
+              <>
+                <div>•</div>
+                <button
+                  type="button"
+                  tw="text-color-accent"
+                  onClick={setToAddressToConnectedWalletAddress}
+                >
+                  {/* TODO [onboarding-rewrite]: localize this */}
+                  Use Connected Wallet
+                </button>
+              </>
+            )}
           </span>
         }
         validationConfig={
@@ -462,11 +474,11 @@ export const WithdrawForm = () => {
         onChange={onChangeAmount}
         value={debouncedAmount}
         label={
-          <div tw="flex">
+          <span tw="row gap-[0.5ch]">
             <div>{stringGetter({ key: STRING_KEYS.AMOUNT })}</div>
-            <div tw="ml-0.25 mr-0.25"> • </div>
+            <div>•</div>
             <div>{freeCollateral?.current?.toFixed(2)} USDC Held</div>
-          </div>
+          </span>
         }
         slotRight={
           <FormMaxInputToggleButton

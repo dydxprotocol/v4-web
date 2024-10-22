@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { Chain, SkipClient } from '@skip-go/client';
@@ -18,7 +18,13 @@ import {
   SWAP_VENUES,
   TransferType,
 } from '@/constants/transfers';
-import { DydxAddress, EvmAddress, NobleAddress, SolAddress } from '@/constants/wallets';
+import {
+  DydxAddress,
+  EvmAddress,
+  NobleAddress,
+  SolAddress,
+  WalletNetworkType,
+} from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -50,6 +56,7 @@ export const chainsQueryFn = async (skipClient: SkipClient) => {
     },
     {}
   );
+
   return {
     skipSupportedChains,
     chainsByNetworkMap,
@@ -102,7 +109,7 @@ export const useTransfers = () => {
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
-  const { chainsByNetworkMap = {} } = chainsQuery.data ?? {};
+  const { chainsByNetworkMap = {}, skipSupportedChains = [] } = chainsQuery.data ?? {};
   const { assetsByChain = {} } = assetsQuery.data ?? {};
 
   const walletNetworkType = getNetworkTypeFromWalletNetworkType(sourceAccount.chain);
@@ -149,7 +156,7 @@ export const useTransfers = () => {
     return getDefaultTokenDenomFromAssets(assetsForSelectedChain);
   }, [assetsForSelectedChain]);
 
-  const cosmosChainAddresses = useMemo(() => {
+  const cosmosChainIdToAddressesMap = useMemo(() => {
     if (!dydxAddress) return {};
     return {
       [getOsmosisChainId()]: convertBech32Address({
@@ -259,7 +266,7 @@ export const useTransfers = () => {
         chainIdsToAddresses: {
           [fromToken.chainID]: fromAddress,
           [toToken.chainID]: dydxAddress,
-          ...cosmosChainAddresses,
+          ...cosmosChainIdToAddressesMap,
         },
         bridges: ['CCTP', 'IBC', 'AXELAR'],
         smartSwapOptions: { evmSwaps: true },
@@ -269,6 +276,29 @@ export const useTransfers = () => {
     refetchInterval: ROUTE_QUERY_REFETCH_INTERVAL,
     enabled: hasAllParams,
   });
+
+  /**
+   * This function sets the toAddress in the WithdrawForm to the address of the user's connected wallet.
+   * If the user is attempting to withdraw to a chain that does not exist on their connected wallet,
+   * we will still set the address to their connected wallet.
+   * It will be caught by validation and display to the user, which is a more intuitive response
+   * than the button just not doing anything.
+   */
+  const setToAddressToConnectedWalletAddress = useCallback(() => {
+    if (exchangeName) {
+      // If the user is withdrawing to coinbase, this function should not be used
+      setToAddress('');
+    } else if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+      // If the user is connected via cosmos, set the address to whichever cosmos chain
+      // that they have currently selected. Cosmos has a unique address per chain
+      const calculatedCosmosAddress = toChainId && cosmosChainIdToAddressesMap[toChainId];
+      // This should never happen because a valid chainId should always be selected
+      setToAddress(calculatedCosmosAddress ?? '');
+    } else {
+      // If the user is connected to SVM or EVM, the sourceAccount.address is correct
+      setToAddress(sourceAccount.address);
+    }
+  }, [sourceAccount, exchangeName, setToAddress, toChainId, cosmosChainIdToAddressesMap]);
 
   const { route, txs } = routeQuery.data ?? {};
   const routeLoading = routeQuery.isLoading;
@@ -305,6 +335,8 @@ export const useTransfers = () => {
     debouncedAmount,
     debouncedAmountBN,
     routeLoading,
-    cosmosChainAddresses,
+    cosmosChainIdToAddressesMap,
+    skipSupportedChains,
+    setToAddressToConnectedWalletAddress,
   };
 };
