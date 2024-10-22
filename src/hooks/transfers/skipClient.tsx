@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useMemo } from 'react';
 
 import {
   MsgWithdrawFromSubaccount,
@@ -25,7 +25,7 @@ export const SkipProvider = ({ ...props }) => (
   <SkipContext.Provider value={useSkipClientContext()} {...props} />
 );
 
-export const useSkipClient = () => useContext(SkipContext);
+export const useSkipClient = () => useSkipClientContext();
 
 const useSkipClientContext = () => {
   const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators } =
