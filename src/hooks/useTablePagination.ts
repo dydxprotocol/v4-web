@@ -13,9 +13,11 @@ const PAGE_TOGGLE_PLACEHOLDER = '...';
 export const useTablePagination = ({
   initialPageSize,
   totalRows,
+  shouldResetOnTotalRowsChange,
 }: {
   initialPageSize: PageSize;
   totalRows: number;
+  shouldResetOnTotalRowsChange?: boolean;
 }) => {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(0);
@@ -35,11 +37,17 @@ export const useTablePagination = ({
   };
 
   useEffect(() => {
+    if (shouldResetOnTotalRowsChange) {
+      setCurrentPage(0);
+    }
+  }, [pageSize, totalRows, shouldResetOnTotalRowsChange]);
+
+  useEffect(() => {
     const lastPage = Math.max(1, Math.ceil(totalRows / pageSize)) - 1;
     if (currentPage > lastPage) {
       setCurrentPage(lastPage);
     }
-  }, [pageSize]);
+  }, [currentPage, pageSize, totalRows]);
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
