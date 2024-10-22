@@ -22,8 +22,8 @@ export const popoverMixins = {
     --trigger-open-backgroundColor: var(--color-layer-1);
     --trigger-open-textColor: var(--color-text-2);
 
-    --trigger-active-filter: brightness(var(--active-filter));
-    --trigger-hover-filter: brightness(var(--hover-filter-base));
+    // --trigger-active-filter: brightness(var(--active-filter));
+    // --trigger-hover-filter: brightness(var(--hover-filter-base));
 
     display: flex;
     align-items: center;
@@ -48,7 +48,8 @@ export const popoverMixins = {
     }
 
     &[data-state='open'] {
-      background-color: var(--trigger-open-backgroundColor);
+      // background-color: var(--trigger-open-backgroundColor);
+      box-shadow: inset 0 -2px 0 var(--color-accent);
       color: var(--trigger-open-textColor);
     }
   `,
@@ -225,29 +226,31 @@ export const popoverMixins = {
       cursor: not-allowed;
     }
 
-    &:not([data-disabled]) {
-      /* &:hover, */
-      /* :not(:has(* > [data-highlighted])) > &:hover, */
-      &[data-radix-collection-item]:hover, // @radix-ui/react-navigation-menu
-      /* &:focus-visible, */
-      &[aria-selected="true"], // cmdk
-      &[data-highlighted] // @radix-ui
-      {
-        filter: brightness(var(--hover-filter-base));
-        background-color: var(--item-highlighted-backgroundColor);
-        color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
-        outline: none;
-      }
-    }
+    // &:not([data-disabled]) {
+    //   /* &:hover, */
+    //   /* :not(:has(* > [data-highlighted])) > &:hover, */
+    //   &[data-radix-collection-item]:hover, // @radix-ui/react-navigation-menu
+    //   /* &:focus-visible, */
+    //   &[aria-selected="true"], // cmdk
+    //   &[data-highlighted] // @radix-ui
+    //   {
+    //     filter: brightness(var(--hover-filter-base));
+    //     background-color: var(--item-highlighted-backgroundColor);
+    //     color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
+    //     outline: none;
+    //   }
+    // }
 
     &[data-state='checked'], // @radix-ui
     &[aria-current='page'] // <a>
     {
-      background-color: var(
-        --item-checked-backgroundColor,
-        var(--trigger-selected-color, var(--popover-backgroundColor, inherit))
-      );
+    //   background-color: var(
+    //     --item-checked-backgroundColor,
+    //     var(--trigger-selected-color, var(--popover-backgroundColor, inherit))
+    //   );
       color: var(--item-checked-textColor, var(--trigger-textColor, inherit));
+      box-shadow: inset 0 -2px 0 var(--color-accent);
+
     }
   `,
 } satisfies Record<string, ReturnType<typeof css>>;

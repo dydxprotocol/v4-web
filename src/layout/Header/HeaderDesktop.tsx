@@ -293,7 +293,7 @@ const $NavigationScrollBar = styled.div`
 const $NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
-    --navigationMenu-item-height: var(--trigger-height);
+    --navigationMenu-item-height: var(--stickyArea-topHeight);
   }
 
   ${layoutMixins.scrollArea}

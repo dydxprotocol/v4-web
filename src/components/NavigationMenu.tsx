@@ -220,8 +220,9 @@ const $Root = styled(Root)`
     ${layoutMixins.row}
     align-items: stretch;
 
-    margin: calc((var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2) 0;
+    padding: calc((var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2) 0;
     height: max-content;
+    // min-height: calc(100% - (var(--navigationMenu-height) - var(--navigationMenu-item-height)) / 2);
   }
   &[data-orientation='vertical'] {
     ${layoutMixins.column}
@@ -432,7 +433,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
   --item-checked-textColor: var(--navigationMenu-item-checked-textColor);
   --item-highlighted-backgroundColor: var(--navigationMenu-item-highlighted-backgroundColor);
   --item-highlighted-textColor: var(--navigationMenu-item-highlighted-textColor);
-  --item-radius: var(--navigationMenu-item-radius);
+  // --item-radius: var(--navigationMenu-item-radius);
   --item-padding: var(--navigationMenu-item-padding);
 
   ${layoutMixins.scrollSnapItem}
