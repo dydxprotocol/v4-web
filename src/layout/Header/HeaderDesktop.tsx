@@ -32,6 +32,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
 
@@ -179,7 +180,12 @@ export const HeaderDesktop = () => {
       <VerticalSeparator />
 
       <$NavigationScrollBar>
-        <$NavigationMenu items={navItems} orientation="horizontal" />
+        <$NavigationMenu
+          items={navItems}
+          orientation="horizontal"
+          $uiRefreshEnabled={uiRefreshEnabled}
+          dividerStyle={uiRefreshEnabled ? 'underline' : 'tab'}
+        />
       </$NavigationScrollBar>
 
       <div role="separator" />
@@ -290,16 +296,22 @@ const $NavigationScrollBar = styled.div`
   ${layoutMixins.scrollAreaFade}
 `;
 
-const $NavigationMenu = styled(NavigationMenu)`
+const navigationMenuType = getSimpleStyledOutputType(
+  NavigationMenu,
+  {} as { $uiRefreshEnabled: boolean }
+);
+
+const $NavigationMenu = styled(NavigationMenu)<{ $uiRefreshEnabled: boolean }>`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
-    --navigationMenu-item-height: var(--trigger-height);
+    --navigationMenu-item-height: ${({ $uiRefreshEnabled }) =>
+      $uiRefreshEnabled ? css`var(--stickyArea-topHeight)` : css`var(--trigger-height)`};
   }
 
   ${layoutMixins.scrollArea}
-  padding: 0 0.5rem;
+  padding: 0 1rem;
   scroll-padding: 0 0.5rem;
-` as typeof NavigationMenu;
+` as typeof navigationMenuType;
 
 const $NavBefore = styled.div<{
   $uiRefreshEnabled: boolean;
