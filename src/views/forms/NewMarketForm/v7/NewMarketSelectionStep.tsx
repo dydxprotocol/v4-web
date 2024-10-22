@@ -1,6 +1,7 @@
 import { FormEvent, useMemo } from 'react';
 
 import { LightningBoltIcon } from '@radix-ui/react-icons';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -8,10 +9,12 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { LinkOutIcon } from '@/icons';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -88,6 +91,15 @@ export const NewMarketSelectionStep = ({
                 />
               ),
               PAST_DAYS: 30,
+              MEGAVAULT_LINK: (
+                <Link
+                  tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"
+                  to={AppRoute.Vault}
+                >
+                  {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+                  <LinkOutIcon />
+                </Link>
+              ),
             },
           })}
         </span>

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
+import { MetadataServiceAsset } from '@/constants/assetMetadata';
 import {
   LIQUIDITY_TIERS,
   MARKET_FILTER_OPTIONS,
@@ -102,6 +103,10 @@ const filterFunctions = {
   },
 };
 
+const sortByMarketCap = (a: MetadataServiceAsset, b: MetadataServiceAsset) => {
+  return (b.marketCap ?? 0) - (a.marketCap ?? 0);
+};
+
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
@@ -182,41 +187,43 @@ export const useMarketsData = ({
       });
 
     if (unlaunchedMarkets.data && !hideUnlaunchedMarkets && testFlags.pml) {
-      const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data).map((market) => {
-        const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
+      const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
+        .sort(sortByMarketCap)
+        .map((market) => {
+          const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
 
-        if (listOfMarkets.some((m) => m.assetId === id)) return null;
+          if (listOfMarkets.some((m) => m.assetId === id)) return null;
 
-        return safeAssign(
-          {},
-          {
-            id: `${id}-USD`,
-            assetId: id,
-            displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
-            clobPairId: -1,
-            effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
-            imageUrl: logo,
-            initialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
-            isNew: false,
-            isUnlaunched: true,
-            line: undefined,
-            name,
-            nextFundingRate: undefined,
-            openInterest: undefined,
-            openInterestUSDC: undefined,
-            oraclePrice: price,
-            priceChange24H:
-              price && percentChange24h
-                ? MustBigNumber(price).times(MustBigNumber(percentChange24h).div(100)).toNumber()
-                : undefined,
-            priceChange24HPercent: MustBigNumber(percentChange24h).div(100).toNumber(),
-            tags: sectorTags ?? [],
-            tickSizeDecimals,
-            trades24H: 0,
-            volume24H: 0,
-          }
-        );
-      });
+          return safeAssign(
+            {},
+            {
+              id: `${id}-USD`,
+              assetId: id,
+              displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
+              clobPairId: -1,
+              effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
+              imageUrl: logo,
+              initialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
+              isNew: false,
+              isUnlaunched: true,
+              line: undefined,
+              name,
+              nextFundingRate: undefined,
+              openInterest: undefined,
+              openInterestUSDC: undefined,
+              oraclePrice: price,
+              priceChange24H:
+                price && percentChange24h
+                  ? MustBigNumber(price).times(MustBigNumber(percentChange24h).div(100)).toNumber()
+                  : undefined,
+              priceChange24HPercent: MustBigNumber(percentChange24h).div(100).toNumber(),
+              tags: sectorTags ?? [],
+              tickSizeDecimals,
+              trades24H: 0,
+              volume24H: 0,
+            }
+          );
+        });
 
       return [...listOfMarkets, ...unlaunchedMarketsData.filter(isTruthy)];
     }

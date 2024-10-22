@@ -1,13 +1,17 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
+import { LinkOutIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -60,6 +64,15 @@ export const LaunchMarketSidePanel = ({
           ),
           APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           PAST_DAYS: 30,
+          MEGAVAULT_LINK: (
+            <Link
+              tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"
+              to={AppRoute.Vault}
+            >
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+              <LinkOutIcon />
+            </Link>
+          ),
         },
       }),
     },

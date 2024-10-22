@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import {
@@ -50,6 +50,10 @@ export const useTradingViewLaunchable = ({
   const launchableAsset = useMetadataServiceAssetFromId(marketId);
 
   const tickSizeDecimals = getTickSizeDecimalsFromPrice(launchableAsset?.price ?? 0);
+  const datafeed = useMemo(
+    () => getLaunchableMarketDatafeed(store, tickSizeDecimals),
+    [tickSizeDecimals]
+  );
 
   useEffect(() => {
     if (marketId) {
@@ -59,7 +63,7 @@ export const useTradingViewLaunchable = ({
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getLaunchableMarketDatafeed(store, tickSizeDecimals),
+        datafeed,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
@@ -87,7 +91,7 @@ export const useTradingViewLaunchable = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tickSizeDecimals, tvWidgetRef]);
+  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, datafeed, tvWidgetRef]);
 
   return { savedResolution };
 };
