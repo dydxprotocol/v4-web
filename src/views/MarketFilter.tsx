@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -15,10 +17,26 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
+import { Switch } from '@/components/Switch';
 import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { WithLabel } from '@/components/WithLabel';
 
 import { testFlags } from '@/lib/testFlags';
+
+type MarketFilterProps = {
+  selectedFilter: MarketFilters;
+  filters: MarketFilters[];
+  onChangeFilter: (filter: MarketFilters) => void;
+  onSearchTextChange?: (filter: string) => void;
+  hideNewMarketButton?: boolean;
+  searchPlaceholderKey?: string;
+  compactLayout?: boolean;
+
+  // Need both items to display unlaunchedMarketSwitch
+  shouldHideUnlaunchedMarkets?: boolean;
+  onShouldHideUnlaunchedMarketsChange?: (shouldHide: boolean) => void;
+};
 
 export const MarketFilter = ({
   selectedFilter,
@@ -28,35 +46,56 @@ export const MarketFilter = ({
   hideNewMarketButton,
   compactLayout = false,
   searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
-}: {
-  selectedFilter: MarketFilters;
-  filters: MarketFilters[];
-  onChangeFilter: (filter: MarketFilters) => void;
-  onSearchTextChange?: (filter: string) => void;
-  hideNewMarketButton?: boolean;
-  searchPlaceholderKey?: string;
-  compactLayout?: boolean;
-}) => {
+  shouldHideUnlaunchedMarkets,
+  onShouldHideUnlaunchedMarketsChange,
+}: MarketFilterProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
   const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
 
+  const unlaunchedMarketSwitch = useMemo(
+    () =>
+      shouldHideUnlaunchedMarkets != null &&
+      onShouldHideUnlaunchedMarketsChange != null && (
+        <WithLabel
+          label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
+          tw="flex flex-row items-center"
+        >
+          <Switch
+            name="show-launchable"
+            checked={shouldHideUnlaunchedMarkets}
+            onCheckedChange={onShouldHideUnlaunchedMarketsChange}
+            tw="font-mini-book"
+          />
+        </WithLabel>
+      ),
+    [stringGetter, shouldHideUnlaunchedMarkets, onShouldHideUnlaunchedMarketsChange]
+  );
+
+  const filterLaunchable = (filter: MarketFilters) => {
+    if (shouldHideUnlaunchedMarkets) return true;
+    return filter !== MarketFilters.LAUNCHABLE;
+  };
+
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters).map((value) => ({
-          label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
-          slotAfter: MARKET_FILTER_OPTIONS[value].isNew && (
-            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-          ),
-          value,
-        })) as MenuItem<MarketFilters>[]
+        Object.values(filters)
+          .filter(filterLaunchable)
+          .map((value) => ({
+            label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
+            slotAfter: MARKET_FILTER_OPTIONS[value].isNew && (
+              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+            ),
+            value,
+          })) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
       overflow={uiRefresh ? 'wrap' : 'scroll'}
+      slotBefore={unlaunchedMarketSwitch}
     />
   );
 
@@ -102,6 +141,7 @@ export const MarketFilter = ({
     </$MarketFilter>
   );
 };
+
 const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: boolean }>`
   display: flex;
   flex-direction: column;
