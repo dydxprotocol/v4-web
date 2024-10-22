@@ -5,7 +5,9 @@ import { cctpTokensByChainId, isHighFeeChainId, isLowFeeChainId } from '@/consta
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
 import { TransferType } from '@/constants/transfers';
+import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -18,19 +20,20 @@ import { FeeLevelTag } from '../FeeLevelTag';
 type ElementProps = {
   selectedExchange?: string;
   selectedChain?: string;
-  onSelect: (name: string, type: 'chain' | 'exchange') => void;
+  onSelectNetwork: (chainID: string) => void;
+  onSelectExchange: (exchangeName: 'coinbase') => void;
   chains: Chain[];
 };
-
-const DEFAULT_NETWORKS_LABEL = 'Networks';
 
 export const NetworkSelectMenu = ({
   selectedExchange,
   selectedChain,
-  onSelect,
+  onSelectNetwork,
+  onSelectExchange,
   chains,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const { sourceAccount } = useAccounts();
 
   const getFeeDecoratorComponentForChainId = (chainId: string) => {
     if (isLowFeeChainId(chainId, TransferType.Withdraw)) return <FeeLevelTag feeLevel="low" />;
@@ -43,7 +46,7 @@ export const NetworkSelectMenu = ({
       value: chain.chainID,
       label: chain.chainName,
       onSelect: () => {
-        onSelect(chain.chainID, 'chain');
+        onSelectNetwork(chain.chainID);
       },
       slotBefore: <$Img src={chain.logoURI ?? undefined} alt="" />,
       slotAfter: getFeeDecoratorComponentForChainId(chain.chainID),
@@ -65,12 +68,12 @@ export const NetworkSelectMenu = ({
     }
   );
 
-  // TODO [onboarding-rewrite]: configure exchanges
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.name,
     label: exchange.label,
     onSelect: () => {
-      onSelect(exchange.name, 'exchange');
+      // TODO: remove typecast once we add more exchanges
+      onSelectExchange(exchange.name as 'coinbase');
     },
     slotBefore: <$Img src={exchange.icon} alt="" />,
     slotAfter: <FeeLevelTag feeLevel="low" />,
@@ -78,31 +81,31 @@ export const NetworkSelectMenu = ({
   const selectedChainOption = chains.find((item) => item.chainID === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.name === selectedExchange);
 
-  // If there's only one group, no need to differentiate between Low Fee or not
   const items = [
-    lowFeeChains.length && {
+    {
       group: 'low-fees',
-      groupLabel: nonLowFeeChains.length ? 'Low Fees' : DEFAULT_NETWORKS_LABEL,
+      groupLabel: 'Low Fees',
       items: [...exchangeItems, ...lowFeeChains],
     },
-    nonLowFeeChains.length && {
+    {
       group: 'other-networks',
-      groupLabel: lowFeeChains.length ? 'Other networks' : DEFAULT_NETWORKS_LABEL,
+      groupLabel: 'Other networks',
       items: nonLowFeeChains,
     },
   ];
+  const isPrivyDeposit = sourceAccount.walletInfo?.name === WalletType.Privy;
 
   return (
-    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination">
+    <SearchSelectMenu items={items.filter(isTruthy)} label="Destination" disabled={isPrivyDeposit}>
       <div tw="row gap-0.5 text-color-text-2 font-base-book">
         {selectedChainOption ? (
           <>
             <$Img src={selectedChainOption.logoURI ?? undefined} alt="" />{' '}
-            {selectedChainOption.chainName}
+            {selectedChainOption.prettyName}
           </>
         ) : selectedExchangeOption ? (
           <>
-            <$Img src={selectedExchangeOption.icon} alt="" /> {selectedExchangeOption.name}
+            <$Img src={selectedExchangeOption.icon} alt="" /> {selectedExchangeOption.label}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })

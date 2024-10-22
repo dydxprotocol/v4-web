@@ -40,7 +40,6 @@ import { InputType } from '@/components/Input';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
@@ -63,13 +62,12 @@ export const WithdrawForm = () => {
   const { dydxAddress, sourceAccount, localDydxWallet, localNobleWallet } = useAccounts();
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
-  // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
-  const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
-
   // User input
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
 
   const {
+    exchangeName,
+    setExchangeName,
     setFromTokenDenom,
     defaultTokenDenom,
     setToTokenDenom,
@@ -90,7 +88,6 @@ export const WithdrawForm = () => {
     toToken,
     chainsForNetwork,
     routeLoading,
-    cosmosChainAddresses,
   } = useTransfers();
   const { skipClient } = useSkipClient();
 
@@ -99,13 +96,13 @@ export const WithdrawForm = () => {
     const grazChainPrefix =
       GRAZ_CHAINS.find((chain) => chain.chainId === toChainId)?.bech32Config.bech32PrefixAccAddr ??
       '';
-    const prefix = exchange ? 'noble' : grazChainPrefix;
+    const prefix = exchangeName ? 'noble' : grazChainPrefix;
     return isValidAddress({
       address: toAddress,
       network: toChainId === getSolanaChainId() ? 'solana' : prefix ? 'cosmos' : 'evm',
       prefix,
     });
-  }, [exchange, toAddress, toChainId]);
+  }, [exchangeName, toAddress, toChainId]);
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
 
@@ -119,9 +116,6 @@ export const WithdrawForm = () => {
     setFromChainId(selectedDydxChainId);
     setFromAddress(dydxAddress);
     setFromTokenDenom(usdcDenom);
-    // Cosmos chains connect to the keplr wallet, which has a unique address per chain id
-    const calculatedCosmosAddress = toChainId && cosmosChainAddresses[toChainId];
-    setToAddress(calculatedCosmosAddress ?? sourceAccount.address);
   }, [
     setTransferType,
     setFromChainId,
@@ -133,7 +127,6 @@ export const WithdrawForm = () => {
     setToAddress,
     sourceAccount.address,
     toChainId,
-    cosmosChainAddresses,
   ]);
 
   useEffect(() => {
@@ -211,7 +204,7 @@ export const WithdrawForm = () => {
               toAmount: Number(debouncedAmount),
               triggeredAt: Date.now(),
               isCctp,
-              isExchange: Boolean(exchange),
+              isExchange: Boolean(exchangeName),
               requestId: undefined,
             };
             addOrUpdateTransferNotification({ ...notificationParams, txHash, isDummy: false });
@@ -259,7 +252,7 @@ export const WithdrawForm = () => {
       localDydxWallet?.offlineSigner,
       fromChainId,
       isCctp,
-      exchange,
+      exchangeName,
       addOrUpdateTransferNotification,
     ]
   );
@@ -356,22 +349,15 @@ export const WithdrawForm = () => {
 
   useEffect(() => {
     if (sourceAccount?.walletInfo?.name === WalletType.Privy) {
-      // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
-      // abacusStateManager.setTransferValue({
-      //   field: TransferInputField.exchange,
-      //   value: 'coinbase',
-      // });
+      setExchangeName('coinbase');
     }
   }, [sourceAccount, nobleChainId, setToChainId]);
 
   const onSelectNetwork = useCallback(
-    (chainID: string, type: 'chain' | 'exchange') => {
-      if (chainID) {
-        setAmount('');
-        if (type === 'chain') {
-          setToChainId(chainID);
-        }
-      }
+    (chainID: string) => {
+      setAmount('');
+      setToChainId(chainID);
+      setExchangeName(undefined);
     },
     [setAmount, setToChainId]
   );
@@ -387,10 +373,20 @@ export const WithdrawForm = () => {
     freeCollateralBN,
   });
 
+  const onSelectExchange = useCallback(
+    // TODO: remove typecast once we add more exchanges
+    (_exchangeName: 'coinbase') => {
+      setAmount('');
+      setToChainId(undefined);
+      setExchangeName(_exchangeName);
+    },
+    [setAmount, setToChainId, setExchangeName]
+  );
+
   const isDisabled =
     !!errorMessage ||
     !toToken ||
-    (!toChainId && !exchange) ||
+    (!toChainId && !exchangeName) ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
     isSubmitting ||
@@ -421,9 +417,10 @@ export const WithdrawForm = () => {
   return (
     <$Form>
       <NetworkSelectMenu
-        selectedExchange={exchange ?? undefined}
+        selectedExchange={exchangeName ?? undefined}
         selectedChain={toChainId ?? undefined}
-        onSelect={onSelectNetwork}
+        onSelectNetwork={onSelectNetwork}
+        onSelectExchange={onSelectExchange}
         chains={chainsForNetwork}
       />
       <FormInput
@@ -443,7 +440,7 @@ export const WithdrawForm = () => {
           </span>
         }
         validationConfig={
-          toAddress && !!exchange && !isValidDestinationAddress
+          toAddress && !!exchangeName && !isValidDestinationAddress
             ? {
                 type: AlertType.Error,
                 message: stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION }),

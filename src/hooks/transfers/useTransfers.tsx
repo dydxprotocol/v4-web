@@ -18,7 +18,7 @@ import {
   SWAP_VENUES,
   TransferType,
 } from '@/constants/transfers';
-import { DydxAddress, EvmAddress, SolAddress } from '@/constants/wallets';
+import { DydxAddress, EvmAddress, NobleAddress, SolAddress } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -69,17 +69,19 @@ export const useTransfers = () => {
   const { dydxAddress, sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
+  // coinbase is the only exchange we currently support
+  // TODO: remove typecast once we add more exchanges
+  const [exchangeName, setExchangeName] = useState<'coinbase' | undefined>();
   const [fromTokenDenom, setFromTokenDenom] = useState<string | undefined>();
   const [fromChainId, setFromChainId] = useState<string | undefined>();
   const [toTokenDenom, setToTokenDenom] = useState<string | undefined>();
   const [toChainId, setToChainId] = useState<string | undefined>();
-  // TODO [onboarding-rewrite]: add nobleAddress type when enabling coinbase withdrawals
-  const [fromAddress, setFromAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
-    undefined
-  );
-  const [toAddress, setToAddress] = useState<EvmAddress | SolAddress | DydxAddress | undefined>(
-    undefined
-  );
+  const [fromAddress, setFromAddress] = useState<
+    EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
+  >();
+  const [toAddress, setToAddress] = useState<
+    EvmAddress | SolAddress | DydxAddress | NobleAddress | undefined
+  >();
   const [transferType, setTransferType] = useState<TransferType>(TransferType.Withdraw);
   const [amount, setAmount] = useState<string>('');
 
@@ -135,8 +137,13 @@ export const useTransfers = () => {
   }, [selectedChainId, assetsByChain]);
 
   const defaultChainId = useMemo(() => {
+    // The only exchange we have is coinbase. We only support transfers to coinbase noble.
+    // If there is an exchange name populated, set chain id to noble
+    if (exchangeName) {
+      return getNobleChainId();
+    }
     return getDefaultChainIDFromNetworkType(walletNetworkType) ?? chainsForNetwork[0]?.chainID;
-  }, [walletNetworkType, chainsForNetwork]);
+  }, [exchangeName, walletNetworkType, chainsForNetwork]);
 
   const defaultTokenDenom = useMemo(() => {
     return getDefaultTokenDenomFromAssets(assetsForSelectedChain);
@@ -270,6 +277,8 @@ export const useTransfers = () => {
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties
     // Or, bundle these properties into "depositFormProperties" and "withdrawFormProperties"
     assetsForSelectedChain,
+    exchangeName,
+    setExchangeName,
     chainsForNetwork,
     fromTokenDenom,
     setFromTokenDenom,
