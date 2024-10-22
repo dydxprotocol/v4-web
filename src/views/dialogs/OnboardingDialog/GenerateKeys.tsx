@@ -62,7 +62,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
     setError(undefined);
 
     try {
-      await matchNetwork?.();
+      await matchNetwork();
       return true;
     } catch (err) {
       const { message, walletErrorType, isErrorExpected } = parseWalletError({

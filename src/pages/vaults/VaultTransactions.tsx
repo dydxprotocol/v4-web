@@ -127,7 +127,7 @@ export const VaultTransactionsTable = ({
               transactionHash ? (
                 <Link
                   withIcon
-                  href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
+                  href={`${mintscanTxUrl.replace('{tx_hash}', transactionHash)}`}
                   tw="justify-end"
                 >
                   {truncateAddress(transactionHash, '')}

@@ -11,7 +11,7 @@ export const SelectMarginModeDialog = ({ setIsOpen }: DialogProps<SelectMarginMo
   const stringGetter = useStringGetter();
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.MARGIN_MODE })}>
-      <SelectMarginModeForm onChangeMarginMode={() => setIsOpen?.(false)} />
+      <SelectMarginModeForm onChangeMarginMode={() => setIsOpen(false)} />
     </Dialog>
   );
 };

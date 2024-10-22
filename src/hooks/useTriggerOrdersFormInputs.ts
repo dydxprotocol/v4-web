@@ -135,16 +135,16 @@ export const useTriggerOrdersFormInputs = ({
     }
 
     if (stopLossOrder?.size && takeProfitOrder?.size) {
-      if (stopLossOrder?.size === takeProfitOrder?.size) {
-        setSize(stopLossOrder?.size);
+      if (stopLossOrder.size === takeProfitOrder.size) {
+        setSize(stopLossOrder.size);
       } else {
         setSize(null);
         setDifferingOrderSizes(true);
       }
     } else if (stopLossOrder?.size) {
-      setSize(stopLossOrder?.size);
+      setSize(stopLossOrder.size);
     } else if (takeProfitOrder?.size) {
-      setSize(takeProfitOrder?.size);
+      setSize(takeProfitOrder.size);
     } else {
       // Default to full position size for initial order creation
       setSize(positionSize);

@@ -370,8 +370,8 @@ export const TimeSeriesChart = <Datum extends {}>({
                           colorAccessor={
                             childSeries.threshold ? () => 'transparent' : childSeries.colorAccessor
                           }
-                          onPointerMove={childSeries?.onPointerMove}
-                          onPointerOut={childSeries?.onPointerOut}
+                          onPointerMove={childSeries.onPointerMove}
+                          onPointerOut={childSeries.onPointerOut}
                         />
 
                         {(childSeries.glyphSize ?? childSeries.getGlyphSize) && (

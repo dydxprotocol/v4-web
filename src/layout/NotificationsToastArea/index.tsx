@@ -54,7 +54,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
           displayData && notification.status < NotificationStatus.Unseen
       )
       .slice(-MAX_NUM_TOASTS);
-    return groupBy(notificationMap, (notification) => notification.displayData?.groupKey);
+    return groupBy(notificationMap, (notification) => notification.displayData.groupKey);
   }, [notifications, getKey, getDisplayData]);
 
   if (isMenuOpen) return null;
