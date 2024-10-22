@@ -314,7 +314,7 @@ const $NavigationMenu = styled(NavigationMenu)<{ $uiRefreshEnabled: boolean }>`
 ` as typeof navigationMenuType;
 
 const $NavBefore = styled.div<{
-  $uiRefreshEnabled: boolean;g
+  $uiRefreshEnabled: boolean;
 }>`
   ${({ $uiRefreshEnabled }) => css`
     ${$uiRefreshEnabled
