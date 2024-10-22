@@ -128,7 +128,9 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   type={OutputType.Asset}
                   tag={
                     <$Label>
-                      {getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
+                      {marketId === USDC_MARKET_HARDCODED
+                        ? 'USDC'
+                        : getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
                     </$Label>
                   }
                   fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
