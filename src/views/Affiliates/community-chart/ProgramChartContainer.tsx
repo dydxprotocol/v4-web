@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
+import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { IProgramStats } from '@/constants/affiliates';
 import { AffiliatesProgramMetric } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -21,6 +23,7 @@ export const CommunityChartContainer = () => {
   const [chartMetric, setChartMetric] = useState(AffiliatesProgramMetric.ReferredVolume);
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const { programStats } = useOutletContext<{ programStats: IProgramStats }>();
 
   return (
     <div className="notTablet:px-1">
@@ -49,6 +52,7 @@ export const CommunityChartContainer = () => {
 
       <$ChartContainer className="bg-color-layer-3 p-2">
         <ProgramHistoricalChart
+          {...{ programStats }}
           selectedChartMetric={chartMetric}
           selectedLocale={selectedLocale}
           slotEmpty={
@@ -56,7 +60,7 @@ export const CommunityChartContainer = () => {
               <$EmptyCard>
                 <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
                 {stringGetter({
-                  key: STRING_KEYS.TRADING_REWARD_CHART_EMPTY_STATE,
+                  key: STRING_KEYS.AFFILIATE_CHART_EMPTY_STATE,
                 })}
               </$EmptyCard>
             </div>

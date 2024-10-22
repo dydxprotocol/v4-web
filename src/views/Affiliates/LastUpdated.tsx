@@ -39,7 +39,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
     const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
     if (diffInSeconds < 60) {
-      return 'updated just now';
+      return 'just now';
     }
 
     if (diffInSeconds < 3600) {
@@ -59,7 +59,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
   }
 
   return (
-    <Container>
+    <Container className="mb-1">
       <span className="text-color-text-1">
         {stringGetter({ key: STRING_KEYS.UPDATED })} {timeAgo(currentTime, lastUpdatedDate)}
       </span>
