@@ -224,6 +224,7 @@ const MarketsDropdownContent = ({
           columns={columns}
           initialPageSize={50}
           paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          shouldResetOnTotalRowsChange
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

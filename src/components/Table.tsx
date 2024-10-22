@@ -108,6 +108,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   initialPageSize?: PageSize;
   paginationBehavior?: 'paginate' | 'showAll';
   firstClickSortDirection?: 'ascending' | 'descending';
+  shouldResetOnTotalRowsChange?: boolean;
 };
 
 export type TableStyleProps = {
@@ -148,6 +149,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   withScrollSnapColumns = false,
   withScrollSnapRows = false,
   firstClickSortDirection = 'descending',
+  shouldResetOnTotalRowsChange = false,
   className,
   style,
 }: AllTableProps<TableRowData>) => {
@@ -156,6 +158,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   const { currentPage, pageSize, pages, setCurrentPage, setPageSize } = useTablePagination({
     initialPageSize,
     totalRows: data.length,
+    shouldResetOnTotalRowsChange,
   });
 
   const currentBreakpoints = useBreakpoints();

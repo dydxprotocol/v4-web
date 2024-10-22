@@ -265,6 +265,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         columns={columns}
         initialPageSize={50}
         paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+        shouldResetOnTotalRowsChange
         className={className}
         slotEmpty={
           <$MarketNotFound>
