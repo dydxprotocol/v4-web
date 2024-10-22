@@ -66,7 +66,13 @@ export const TransferButtonAndReceipt = ({
       key: 'fees',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{tokensConfigs[selectedAsset].name}</Tag>
+          {/*
+          tokenConfigs string access isn't guaranteed to return a token config.
+          the default abacus state selectedAsset denom is set to ETH USDC denom
+          which isn't a key in tokenConfigs
+           */}
+          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
         </span>
       ),
       value: <Output type={OutputType.Asset} value={fee} />,
@@ -76,7 +82,13 @@ export const TransferButtonAndReceipt = ({
       label: (
         <span>
           {stringGetter({ key: STRING_KEYS.BALANCE })}{' '}
-          <Tag>{tokensConfigs[selectedAsset].name}</Tag>
+          {/*
+          tokenConfigs string access isn't guaranteed to return a token config.
+          the default abacus state selectedAsset denom is set to ETH USDC denom
+          which isn't a key in tokenConfigs
+           */}
+          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+          <Tag>{tokensConfigs[selectedAsset]?.name}</Tag>
         </span>
       ),
       value: (

@@ -285,7 +285,13 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset].name}</Tag>
+          {/*
+          tokenConfigs string access isn't guaranteed to return a token config.
+          the default abacus state selectedAsset denom is set to ETH USDC denom
+          which isn't a key in tokenConfigs
+           */}
+          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset]?.name}</Tag>
         </span>
       ),
       value: (
