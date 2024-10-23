@@ -172,7 +172,7 @@ export const useWalletConnection = () => {
               // Currently the only usecase for this is piping in EIP specified error codes.
               // There's a nonzero chance of overlap so we should watch out for this
               code: error.code,
-              connectorType: wallet?.connectorType,
+              connectorType: wallet.connectorType,
             }
           );
         }

@@ -60,7 +60,7 @@ const usePortfolioValues = ({
   );
 
   const earliestVisibleDatum = visibleData?.[0];
-  const latestVisibleDatum = visibleData?.[(visibleData?.length ?? 1) - 1];
+  const latestVisibleDatum = visibleData?.[visibleData.length - 1];
 
   const pnl = useMemo(() => {
     let pnlDiff;

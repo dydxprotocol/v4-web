@@ -211,7 +211,7 @@ export const OrderDetailsDialog = ({
 
   const onClearClick = () => {
     dispatch(clearOrder(orderId));
-    setIsOpen?.(false);
+    setIsOpen(false);
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;

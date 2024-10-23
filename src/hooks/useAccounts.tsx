@@ -209,7 +209,7 @@ const useAccountsContext = () => {
         if (!localDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
-          if (sourceAccount?.encryptedSignature && geo && !blockedGeo) {
+          if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
               await setWalletFromSignature(signature);

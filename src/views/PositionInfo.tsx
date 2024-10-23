@@ -131,7 +131,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     !!leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
-    !leverage?.current || (leverage?.postOrder && newLeverageBN.gt(leverageBN));
+    !leverage?.current || (leverage.postOrder && newLeverageBN.gt(leverageBN));
 
   let liquidationArrowSign = NumberSign.Neutral;
   const newLiquidationPriceIsLarger = MustBigNumber(liquidationPrice?.postOrder).gt(

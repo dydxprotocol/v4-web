@@ -8,11 +8,13 @@ import type { DialogProps, PredictionMarketIntroDialogProps } from '@/constants/
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { NewTag } from '@/components/Tag';
 
 import { setHasSeenPredictionMarketIntroDialog } from '@/state/dismissable';
@@ -23,6 +25,7 @@ export const PredictionMarketIntroDialog = ({
   const stringGetter = useStringGetter();
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
   const dispatch = useDispatch();
+  const { predictionMarketLearnMore } = useURLConfigs();
 
   const onDismissPredictionMarketsIntro = useCallback(() => {
     dispatch(setHasSeenPredictionMarketIntroDialog(true));
@@ -94,6 +97,24 @@ export const PredictionMarketIntroDialog = ({
       <Button action={ButtonAction.Primary} onClick={onContinue}>
         {stringGetter({ key: STRING_KEYS.CONTINUE })}
       </Button>
+
+      <p tw="mt-1 text-color-text-0 font-small-book">
+        {stringGetter({
+          key: STRING_KEYS.PREDICTION_MARKET_DISCLAIMER,
+          params: {
+            HERE: (
+              <Link
+                isInline
+                href={predictionMarketLearnMore}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                tw="underline"
+              >
+                {stringGetter({ key: STRING_KEYS.HERE })}
+              </Link>
+            ),
+          },
+        })}
+      </p>
     </Dialog>
   );
 };

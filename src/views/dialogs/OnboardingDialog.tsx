@@ -42,11 +42,11 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
   useEffect(() => {
-    if (!currentOnboardingStep) setIsOpen?.(false);
+    if (!currentOnboardingStep) setIsOpen(false);
   }, [currentOnboardingStep, setIsOpen]);
 
   const setIsOpenFromDialog = (open: boolean) => {
-    setIsOpen?.(open);
+    setIsOpen(open);
   };
 
   const onChooseWallet = (wallet: WalletInfo) => {

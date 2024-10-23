@@ -159,11 +159,11 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       }) => {
         try {
           return await compositeClient?.validatorClient.post.send(
-            subaccountClient?.wallet,
+            subaccountClient.wallet,
             () =>
               new Promise((resolve) => {
                 const msg =
-                  compositeClient?.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
+                  compositeClient.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
                     subaccountClient.address,
                     subaccountClient.subaccountNumber,
                     assetId,
@@ -200,7 +200,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             subaccountClient.wallet,
             () =>
               new Promise((resolve) => {
-                const msg = compositeClient?.sendTokenMessage(
+                const msg = compositeClient.sendTokenMessage(
                   subaccountClient.wallet,
                   amount.toString(),
                   recipient
@@ -209,7 +209,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
                 resolve([msg]);
               }),
             false,
-            compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+            compositeClient.validatorClient.post.defaultDydxGasPrice,
             memo,
             Method.BroadcastTxCommit
           );
@@ -759,13 +759,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet?.address) {
+      if (!subaccountClient?.wallet.address) {
         throw new Error('wallet not initialized');
       }
 
-      const response = await compositeClient?.validatorClient.post.delegate(
+      const response = await compositeClient.validatorClient.post.delegate(
         subaccountClient,
-        subaccountClient.wallet?.address,
+        subaccountClient.wallet.address,
         validator,
         parseUnits(amount.toString(), chainTokenDecimals).toString()
       );
@@ -935,14 +935,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet?.address) {
+      if (!subaccountClient?.wallet.address) {
         throw new Error('wallet not initialized');
       }
-      if (affiliate === subaccountClient?.wallet?.address) {
+      if (affiliate === subaccountClient.wallet.address) {
         throw new Error('affiliate can not be the same as referree');
       }
       try {
-        const response = await compositeClient?.validatorClient.post.registerAffiliate(
+        const response = await compositeClient.validatorClient.post.registerAffiliate(
           subaccountClient,
           affiliate
         );
@@ -1008,7 +1008,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     if (!compositeClient?.validatorClient) {
       throw new Error('client not initialized');
     }
-    const result = await compositeClient?.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
+    const result = await compositeClient.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
     if (result == null) {
       return result;
     }

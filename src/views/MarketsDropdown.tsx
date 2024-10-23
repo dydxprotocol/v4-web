@@ -53,12 +53,17 @@ const MarketsDropdownContent = ({
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const { filteredMarkets, marketFilters } = useMarketsData({ filter, searchFilter });
+  const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-
   const { uiRefresh } = testFlags;
+
+  const { filteredMarkets, marketFilters } = useMarketsData({
+    filter,
+    searchFilter,
+    hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
+  });
 
   const columns = useMemo(
     () =>
@@ -166,7 +171,7 @@ const MarketsDropdownContent = ({
 
     if (
       !hasSeenElectionBannerTrumpWin &&
-      featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+      featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
       currentDate < new Date('2024-11-06T23:59:59')
     ) {
       return (
@@ -207,6 +212,8 @@ const MarketsDropdownContent = ({
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
+          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
+          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
       {slotTop}
@@ -224,6 +231,7 @@ const MarketsDropdownContent = ({
           columns={columns}
           initialPageSize={50}
           paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          shouldResetOnTotalRowsChange
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

@@ -142,6 +142,24 @@ export const useTransfers = () => {
     return getDefaultTokenDenomFromAssets(assetsForSelectedChain);
   }, [assetsForSelectedChain]);
 
+  const cosmosChainAddresses = useMemo(() => {
+    if (!dydxAddress) return {};
+    return {
+      [getOsmosisChainId()]: convertBech32Address({
+        address: dydxAddress,
+        bech32Prefix: OSMO_BECH32_PREFIX,
+      }),
+      [getNeutronChainId()]: convertBech32Address({
+        address: dydxAddress,
+        bech32Prefix: NEUTRON_BECH32_PREFIX,
+      }),
+      [getNobleChainId()]: convertBech32Address({
+        address: dydxAddress,
+        bech32Prefix: NOBLE_BECH32_PREFIX,
+      }),
+    };
+  }, [dydxAddress]);
+
   const hasAllParams =
     !!fromToken?.denom &&
     !!toToken?.denom &&
@@ -204,21 +222,6 @@ export const useTransfers = () => {
         amountIn: parseUnits(amount, fromToken.decimals).toString(),
       };
 
-      // consider moving to useMemo outside of this query
-      const cosmosChainAddresses = {
-        [getOsmosisChainId()]: convertBech32Address({
-          address: dydxAddress,
-          bech32Prefix: OSMO_BECH32_PREFIX,
-        }),
-        [getNeutronChainId()]: convertBech32Address({
-          address: dydxAddress,
-          bech32Prefix: NEUTRON_BECH32_PREFIX,
-        }),
-        [getNobleChainId()]: convertBech32Address({
-          address: dydxAddress,
-          bech32Prefix: NOBLE_BECH32_PREFIX,
-        }),
-      };
       // WITHDRAWALS
       if (transferType === TransferType.Withdraw) {
         return skipClient.msgsDirect({
@@ -260,7 +263,8 @@ export const useTransfers = () => {
     enabled: hasAllParams,
   });
 
-  const { route, txs } = routeQuery?.data ?? {};
+  const { route, txs } = routeQuery.data ?? {};
+  const routeLoading = routeQuery.isLoading;
   return {
     // TODO [onboarding-rewrite]: Think about trimming this list
     // Right now we're exposing everything, but there's a good chance we can only expose a few properties
@@ -291,5 +295,7 @@ export const useTransfers = () => {
     fromToken,
     debouncedAmount,
     debouncedAmountBN,
+    routeLoading,
+    cosmosChainAddresses,
   };
 };

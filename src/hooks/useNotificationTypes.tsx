@@ -253,7 +253,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 }[transferType],
               });
 
-          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
+          const toChainEta = status?.toChain?.chainData.estimatedRouteDuration ?? 0;
           // TODO: remove typeguards once skip implements estimatedrouteduration
           // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
           const estimatedDuration =
@@ -336,7 +336,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         if (
-          featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+          featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
         ) {
           trigger(
@@ -359,7 +359,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (featureFlags?.[StatsigFlags.ffEnableKeplr]) {
+        if (featureFlags[StatsigFlags.ffEnableKeplr]) {
           trigger(
             ReleaseUpdateNotificationIds.KeplrSupport,
             {
@@ -528,7 +528,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dynamicConfigs = useAllStatsigDynamicConfigValues();
-      const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
+      const maticWindDownProposal = dynamicConfigs[StatsigDynamicConfigs.dcMaticProposalNotif];
       const { contractLossMechanismLearnMore } = useURLConfigs();
 
       const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
@@ -829,7 +829,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       const dynamicConfigs = useAllStatsigDynamicConfigValues();
       const feedbackRequestWalletAddresses =
-        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+        dynamicConfigs[StatsigDynamicConfigs.dcHighestVolumeUsers];
 
       useEffect(() => {
         if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
