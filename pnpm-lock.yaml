@@ -58,7 +58,7 @@ dependencies:
     version: 0.12.121
   '@privy-io/react-auth':
     specifier: ^1.73.0
-    version: 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.5.3)
+    version: 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.6.3)
   '@privy-io/wagmi':
     specifier: ^0.2.10
     version: 0.2.10(@privy-io/react-auth@1.73.1)(react-dom@18.2.0)(react@18.2.0)(viem@2.16.2)(wagmi@2.10.9)
@@ -151,7 +151,7 @@ dependencies:
     version: 1.2.1
   '@skip-go/client':
     specifier: 0.10.3
-    version: 0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)
+    version: 0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)
   '@solana/web3.js':
     specifier: ^1.93.0
     version: 1.93.2
@@ -253,7 +253,7 @@ dependencies:
     version: 3.3.0
   mipd:
     specifier: ^0.0.7
-    version: 0.0.7(typescript@5.5.3)
+    version: 0.0.7(typescript@5.6.3)
   prometheus-query:
     specifier: ^3.4.0
     version: 3.4.0
@@ -304,10 +304,10 @@ dependencies:
     version: 1.2.1(@types/react@18.3.3)(react@18.2.0)
   viem:
     specifier: ^2.16.2
-    version: 2.16.2(typescript@5.5.3)
+    version: 2.16.2(typescript@5.6.3)
   wagmi:
     specifier: ^2.10.7
-    version: 2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.5.3)(viem@2.16.2)
+    version: 2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.6.3)(viem@2.16.2)
 
 devDependencies:
   '@babel/core':
@@ -315,13 +315,13 @@ devDependencies:
     version: 7.23.9
   '@commitlint/cli':
     specifier: ^19.0.3
-    version: 19.0.3(@types/node@20.12.13)(typescript@5.5.3)
+    version: 19.0.3(@types/node@20.12.13)(typescript@5.6.3)
   '@commitlint/config-conventional':
     specifier: ^19.0.3
     version: 19.0.3
   '@ladle/react':
     specifier: ^4.0.2
-    version: 4.0.2(@types/node@20.12.13)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3)
+    version: 4.0.2(@types/node@20.12.13)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)
   '@testing-library/webdriverio':
     specifier: ^3.2.1
     version: 3.2.1(webdriverio@8.36.1)
@@ -351,25 +351,25 @@ devDependencies:
     version: 18.2.6
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.21.0
-    version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.5.3)
+    version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.6.3)
   '@typescript-eslint/parser':
     specifier: ^6.21.0
-    version: 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+    version: 6.21.0(eslint@8.57.0)(typescript@5.6.3)
   '@vitejs/plugin-react':
     specifier: ^4.0.1
     version: 4.2.1(vite@4.3.9)
   '@wdio/browserstack-service':
     specifier: ^8.32.4
-    version: 8.33.1(@wdio/cli@8.33.1)(typescript@5.5.3)
+    version: 8.33.1(@wdio/cli@8.33.1)(typescript@5.6.3)
   '@wdio/cli':
     specifier: ^8.32.4
-    version: 8.33.1(typescript@5.5.3)
+    version: 8.33.1(typescript@5.6.3)
   '@wdio/globals':
     specifier: ^8.32.4
-    version: 8.33.1(typescript@5.5.3)
+    version: 8.33.1(typescript@5.6.3)
   '@wdio/local-runner':
     specifier: ^8.32.4
-    version: 8.33.1(typescript@5.5.3)
+    version: 8.33.1(typescript@5.6.3)
   '@wdio/mocha-framework':
     specifier: ^8.32.4
     version: 8.33.1
@@ -420,7 +420,7 @@ devDependencies:
     version: 9.1.0(eslint@8.57.0)
   eslint-config-standard-with-typescript:
     specifier: ^43.0.1
-    version: 43.0.1(@typescript-eslint/eslint-plugin@6.21.0)(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.2.0)(eslint@8.57.0)(typescript@5.5.3)
+    version: 43.0.1(@typescript-eslint/eslint-plugin@6.21.0)(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.2.0)(eslint@8.57.0)(typescript@5.6.3)
   eslint-import-resolver-typescript:
     specifier: ^3.6.1
     version: 3.6.1(@typescript-eslint/parser@6.21.0)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
@@ -480,13 +480,13 @@ devDependencies:
     version: 3.4.6(ts-node@10.9.2)
   ts-node:
     specifier: ^10.9.2
-    version: 10.9.2(@types/node@20.12.13)(typescript@5.5.3)
+    version: 10.9.2(@types/node@20.12.13)(typescript@5.6.3)
   tsx:
     specifier: ^4.7.1
     version: 4.7.1
   typescript:
-    specifier: ^5.1.3
-    version: 5.5.3
+    specifier: ^5.6.3
+    version: 5.6.3
   url-polyfill:
     specifier: ^1.1.12
     version: 1.1.12
@@ -504,7 +504,7 @@ devDependencies:
     version: 0.4.0(vite@4.3.9)
   vite-plugin-svgr:
     specifier: ^3.2.0
-    version: 3.2.0(rollup@2.79.1)(typescript@5.5.3)(vite@4.3.9)
+    version: 3.2.0(rollup@2.79.1)(typescript@5.6.3)(vite@4.3.9)
   vitest:
     specifier: 1.4.0
     version: 1.4.0(@types/node@20.12.13)(jsdom@24.1.0)
@@ -2200,14 +2200,14 @@ packages:
     engines: {node: '>=0.1.90'}
     dev: true
 
-  /@commitlint/cli@19.0.3(@types/node@20.12.13)(typescript@5.5.3):
+  /@commitlint/cli@19.0.3(@types/node@20.12.13)(typescript@5.6.3):
     resolution: {integrity: sha512-mGhh/aYPib4Vy4h+AGRloMY+CqkmtdeKPV9poMcZeImF5e3knQ5VYaSeAM0mEzps1dbKsHvABwaDpafLUuM96g==}
     engines: {node: '>=v18'}
     hasBin: true
     dependencies:
       '@commitlint/format': 19.0.3
       '@commitlint/lint': 19.0.3
-      '@commitlint/load': 19.0.3(@types/node@20.12.13)(typescript@5.5.3)
+      '@commitlint/load': 19.0.3(@types/node@20.12.13)(typescript@5.6.3)
       '@commitlint/read': 19.0.3
       '@commitlint/types': 19.0.3
       execa: 8.0.1
@@ -2276,7 +2276,7 @@ packages:
       '@commitlint/types': 19.0.3
     dev: true
 
-  /@commitlint/load@19.0.3(@types/node@20.12.13)(typescript@5.5.3):
+  /@commitlint/load@19.0.3(@types/node@20.12.13)(typescript@5.6.3):
     resolution: {integrity: sha512-18Tk/ZcDFRKIoKfEcl7kC+bYkEQ055iyKmGsYDoYWpKf6FUvBrP9bIWapuy/MB+kYiltmP9ITiUx6UXtqC9IRw==}
     engines: {node: '>=v18'}
     dependencies:
@@ -2285,8 +2285,8 @@ packages:
       '@commitlint/resolve-extends': 19.0.3
       '@commitlint/types': 19.0.3
       chalk: 5.3.0
-      cosmiconfig: 8.3.6(typescript@5.5.3)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.12.13)(cosmiconfig@8.3.6)(typescript@5.5.3)
+      cosmiconfig: 8.3.6(typescript@5.6.3)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.12.13)(cosmiconfig@8.3.6)(typescript@5.6.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -4310,7 +4310,7 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: true
 
-  /@ladle/react@4.0.2(@types/node@20.12.13)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3):
+  /@ladle/react@4.0.2(@types/node@20.12.13)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3):
     resolution: {integrity: sha512-SnYniR/U7kJX1Zh199jhjxqiFa5e5eA8chuX6uYEZYAUtCCY/hQqGr7/7Grr0j6Q4FYu9iQyyV2K1NJKDdUZIw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
@@ -4343,7 +4343,7 @@ packages:
       koa: 2.14.2
       koa-connect: 2.1.0
       lodash.merge: 4.6.2
-      msw: 2.1.7(typescript@5.5.3)
+      msw: 2.1.7(typescript@5.6.3)
       open: 9.1.0
       prism-react-renderer: 2.3.1(react@18.2.0)
       prop-types: 15.8.1
@@ -4358,7 +4358,7 @@ packages:
       source-map: 0.7.4
       vfile: 6.0.1
       vite: 5.0.12(@types/node@20.12.13)
-      vite-tsconfig-paths: 4.3.1(typescript@5.5.3)(vite@5.0.12)
+      vite-tsconfig-paths: 4.3.1(typescript@5.6.3)(vite@5.0.12)
     transitivePeerDependencies:
       - '@swc/helpers'
       - '@types/node'
@@ -4393,7 +4393,7 @@ packages:
     dependencies:
       '@cosmjs/amino': 0.31.3
       '@cosmjs/proto-signing': 0.31.3
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: false
 
   /@lit-labs/ssr-dom-shim@1.1.2:
@@ -5146,7 +5146,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@privy-io/react-auth@1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.5.3):
+  /@privy-io/react-auth@1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.6.3):
     resolution: {integrity: sha512-sZq1T8R0nsWvd2bL+J5JX77tLM01xBKkVYlrBWU98cFqVm3A2QP1LMeJ53zO6GAjLrBEYT4ToWIiJNoeFk/Bcg==}
     peerDependencies:
       react: ^18
@@ -5181,7 +5181,7 @@ packages:
       libphonenumber-js: 1.10.59
       lokijs: 1.5.12
       md5: 2.3.0
-      mipd: 0.0.7(typescript@5.5.3)
+      mipd: 0.0.7(typescript@5.6.3)
       ofetch: 1.3.4
       pino-pretty: 10.3.1
       qrcode: 1.5.3
@@ -5225,11 +5225,11 @@ packages:
       viem: ^2
       wagmi: ^2
     dependencies:
-      '@privy-io/react-auth': 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.5.3)
+      '@privy-io/react-auth': 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.6.3)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      viem: 2.16.2(typescript@5.5.3)
-      wagmi: 2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.5.3)(viem@2.16.2)
+      viem: 2.16.2(typescript@5.6.3)
+      wagmi: 2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.6.3)(viem@2.16.2)
     dev: false
 
   /@promptbook/utils@0.50.0-10:
@@ -5273,7 +5273,7 @@ packages:
   /@protobufjs/utf8@1.1.0:
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
 
-  /@puppeteer/browsers@1.4.6(typescript@5.5.3):
+  /@puppeteer/browsers@1.4.6(typescript@5.6.3):
     resolution: {integrity: sha512-x4BEjr2SjOPowNeiguzjozQbsc6h437ovD/wu+JpaenxVLm3jkgzHY2xOslMTp50HoTvQreMjiexiGQw1sqZlQ==}
     engines: {node: '>=16.3.0'}
     hasBin: true
@@ -5289,7 +5289,7 @@ packages:
       progress: 2.0.3
       proxy-agent: 6.3.0
       tar-fs: 3.0.4
-      typescript: 5.5.3
+      typescript: 5.6.3
       unbzip2-stream: 1.4.3
       yargs: 17.7.1
     transitivePeerDependencies:
@@ -8450,10 +8450,10 @@ packages:
     dev: true
     optional: true
 
-  /@safe-global/safe-apps-provider@0.18.1(typescript@5.5.3):
+  /@safe-global/safe-apps-provider@0.18.1(typescript@5.6.3):
     resolution: {integrity: sha512-V4a05A3EgJcriqtDoJklDz1BOinWhC6P0hjUSxshA4KOZM7rGPCTto/usXs09zr1vvL28evl/NldSTv97j2bmg==}
     dependencies:
-      '@safe-global/safe-apps-sdk': 8.1.0(typescript@5.5.3)
+      '@safe-global/safe-apps-sdk': 8.1.0(typescript@5.6.3)
       events: 3.3.0
     transitivePeerDependencies:
       - bufferutil
@@ -8463,11 +8463,11 @@ packages:
       - zod
     dev: false
 
-  /@safe-global/safe-apps-sdk@8.1.0(typescript@5.5.3):
+  /@safe-global/safe-apps-sdk@8.1.0(typescript@5.6.3):
     resolution: {integrity: sha512-XJbEPuaVc7b9n23MqlF6c+ToYIS3f7P2Sel8f3cSBQ9WORE4xrSuvhMpK9fDSFqJ7by/brc+rmJR/5HViRr0/w==}
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.9.0
-      viem: 1.20.0(typescript@5.5.3)
+      viem: 1.20.0(typescript@5.6.3)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -8560,7 +8560,7 @@ packages:
       '@sinonjs/commons': 3.0.1
     dev: false
 
-  /@skip-go/client@0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.5.3):
+  /@skip-go/client@0.10.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3):
     resolution: {integrity: sha512-7sA4abXuIB8bHYcM/cdUKqWOsduVq3ORrIehRGgZOJdQsztYEnsrUdqGCtN4PLuPc9VIlXhAXueejiaySAGjig==}
     dependencies:
       '@cosmjs/amino': 0.32.4
@@ -8577,11 +8577,11 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.8
+      chain-registry: 1.69.9
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
-      viem: 2.16.2(typescript@5.5.3)
+      viem: 2.16.2(typescript@5.6.3)
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
@@ -8876,14 +8876,14 @@ packages:
       '@svgr/babel-plugin-transform-svg-component': 7.0.0(@babel/core@7.23.9)
     dev: true
 
-  /@svgr/core@7.0.0(typescript@5.5.3):
+  /@svgr/core@7.0.0(typescript@5.6.3):
     resolution: {integrity: sha512-ztAoxkaKhRVloa3XydohgQQCb0/8x9T63yXovpmHzKMkHO6pkjdsIAWKOS4bE95P/2quVh1NtjSKlMRNzSBffw==}
     engines: {node: '>=14'}
     dependencies:
       '@babel/core': 7.23.9
       '@svgr/babel-preset': 7.0.0(@babel/core@7.23.9)
       camelcase: 6.3.0
-      cosmiconfig: 8.3.6(typescript@5.5.3)
+      cosmiconfig: 8.3.6(typescript@5.6.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -9143,7 +9143,7 @@ packages:
       '@babel/runtime': 7.24.7
       '@testing-library/dom': 8.20.1
       simmerjs: 0.5.6
-      webdriverio: 8.36.1(typescript@5.5.3)
+      webdriverio: 8.36.1(typescript@5.6.3)
     dev: true
 
   /@tootallnate/quickjs-emscripten@0.23.0:
@@ -9585,7 +9585,7 @@ packages:
     dev: true
     optional: true
 
-  /@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.5.3):
+  /@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.6.3):
     resolution: {integrity: sha512-oy9+hTPCUFpngkEZUSzbf9MxI65wbKFoQYsgPdILTfbUldp5ovUuphZVe4i30emU9M/kP+T64Di0mxl7dSw3MA==}
     engines: {node: ^16.0.0 || >=18.0.0}
     peerDependencies:
@@ -9597,10 +9597,10 @@ packages:
         optional: true
     dependencies:
       '@eslint-community/regexpp': 4.10.0
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       '@typescript-eslint/scope-manager': 6.21.0
-      '@typescript-eslint/type-utils': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/type-utils': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.3.4(supports-color@5.5.0)
       eslint: 8.57.0
@@ -9608,13 +9608,13 @@ packages:
       ignore: 5.3.1
       natural-compare: 1.4.0
       semver: 7.6.2
-      ts-api-utils: 1.3.0(typescript@5.5.3)
-      typescript: 5.5.3
+      ts-api-utils: 1.3.0(typescript@5.6.3)
+      typescript: 5.6.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.5.3):
+  /@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.6.3):
     resolution: {integrity: sha512-tbsV1jPne5CkFQCgPBcDOt30ItF7aJoZL997JSF7MhGQqOeT3svWRYxiqlfA5RUdlHN6Fi+EI9bxqbdyAUZjYQ==}
     engines: {node: ^16.0.0 || >=18.0.0}
     peerDependencies:
@@ -9626,11 +9626,11 @@ packages:
     dependencies:
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.5.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.3.4(supports-color@5.5.0)
       eslint: 8.57.0
-      typescript: 5.5.3
+      typescript: 5.6.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9643,7 +9643,7 @@ packages:
       '@typescript-eslint/visitor-keys': 6.21.0
     dev: true
 
-  /@typescript-eslint/type-utils@6.21.0(eslint@8.57.0)(typescript@5.5.3):
+  /@typescript-eslint/type-utils@6.21.0(eslint@8.57.0)(typescript@5.6.3):
     resolution: {integrity: sha512-rZQI7wHfao8qMX3Rd3xqeYSMCL3SoiSQLBATSiVKARdFGCYSRvmViieZjqc58jKgs8Y8i9YvVVhRbHSTA4VBag==}
     engines: {node: ^16.0.0 || >=18.0.0}
     peerDependencies:
@@ -9653,12 +9653,12 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.5.3)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.6.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       debug: 4.3.4(supports-color@5.5.0)
       eslint: 8.57.0
-      ts-api-utils: 1.3.0(typescript@5.5.3)
-      typescript: 5.5.3
+      ts-api-utils: 1.3.0(typescript@5.6.3)
+      typescript: 5.6.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9668,7 +9668,7 @@ packages:
     engines: {node: ^16.0.0 || >=18.0.0}
     dev: true
 
-  /@typescript-eslint/typescript-estree@6.21.0(typescript@5.5.3):
+  /@typescript-eslint/typescript-estree@6.21.0(typescript@5.6.3):
     resolution: {integrity: sha512-6npJTkZcO+y2/kr+z0hc4HwNfrrP4kNYh57ek7yCNlrBjWQ1Y0OS7jiZTkgumrvkX5HkEKXFZkkdFNkaW2wmUQ==}
     engines: {node: ^16.0.0 || >=18.0.0}
     peerDependencies:
@@ -9684,13 +9684,13 @@ packages:
       is-glob: 4.0.3
       minimatch: 9.0.3
       semver: 7.6.2
-      ts-api-utils: 1.3.0(typescript@5.5.3)
-      typescript: 5.5.3
+      ts-api-utils: 1.3.0(typescript@5.6.3)
+      typescript: 5.6.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/utils@6.21.0(eslint@8.57.0)(typescript@5.5.3):
+  /@typescript-eslint/utils@6.21.0(eslint@8.57.0)(typescript@5.6.3):
     resolution: {integrity: sha512-NfWVaC8HP9T8cbKQxHcsJBY5YE1O33+jpMwN45qzWWaPDZgLIbo12toGMWnmhvCpd3sIxkpDw3Wv1B3dYrbDQQ==}
     engines: {node: ^16.0.0 || >=18.0.0}
     peerDependencies:
@@ -9701,7 +9701,7 @@ packages:
       '@types/semver': 7.5.8
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.5.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.6.3)
       eslint: 8.57.0
       semver: 7.6.2
     transitivePeerDependencies:
@@ -10146,7 +10146,7 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wagmi/connectors@5.0.21(@types/react@18.3.3)(@wagmi/core@2.11.6)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.5.3)(viem@2.16.2):
+  /@wagmi/connectors@5.0.21(@types/react@18.3.3)(@wagmi/core@2.11.6)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.6.3)(viem@2.16.2):
     resolution: {integrity: sha512-lbjXEv6HhOa9nXZ5r6NGFJdaadCt2Yj9hSWHjKuiTobrE6dEGQqG16mCQS17yXcvXpI62Q/sW6SL347JrBju/Q==}
     peerDependencies:
       '@wagmi/core': 2.11.6
@@ -10158,14 +10158,14 @@ packages:
     dependencies:
       '@coinbase/wallet-sdk': 4.0.4
       '@metamask/sdk': 0.26.4(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)
-      '@safe-global/safe-apps-provider': 0.18.1(typescript@5.5.3)
-      '@safe-global/safe-apps-sdk': 8.1.0(typescript@5.5.3)
-      '@wagmi/core': 2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)
+      '@safe-global/safe-apps-provider': 0.18.1(typescript@5.6.3)
+      '@safe-global/safe-apps-sdk': 8.1.0(typescript@5.6.3)
+      '@wagmi/core': 2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)
       '@walletconnect/ethereum-provider': 2.13.0(@types/react@18.3.3)(react@18.2.0)
       '@walletconnect/modal': 2.6.2(@types/react@18.3.3)(react@18.2.0)
       cbw-sdk: /@coinbase/wallet-sdk@3.9.3
-      typescript: 5.5.3
-      viem: 2.16.2(typescript@5.5.3)
+      typescript: 5.6.3
+      viem: 2.16.2(typescript@5.6.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -10191,7 +10191,7 @@ packages:
       - zod
     dev: false
 
-  /@wagmi/core@2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2):
+  /@wagmi/core@2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2):
     resolution: {integrity: sha512-Ohk7Bh+Q8kjzxEHImIq98CnPduz8n1a5bdwJi6F7zU3h62crhlVq7fZBYoBhoDgmX0ROVOMr8WW3XU3XhRwUOw==}
     peerDependencies:
       '@tanstack/query-core': '>=5.0.0'
@@ -10204,9 +10204,9 @@ packages:
         optional: true
     dependencies:
       eventemitter3: 5.0.1
-      mipd: 0.0.5(typescript@5.5.3)
-      typescript: 5.5.3
-      viem: 2.16.2(typescript@5.5.3)
+      mipd: 0.0.5(typescript@5.6.3)
+      typescript: 5.6.3
+      viem: 2.16.2(typescript@5.6.3)
       zustand: 4.4.1(@types/react@18.3.3)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
@@ -10788,7 +10788,7 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@wdio/browserstack-service@8.33.1(@wdio/cli@8.33.1)(typescript@5.5.3):
+  /@wdio/browserstack-service@8.33.1(@wdio/cli@8.33.1)(typescript@5.6.3):
     resolution: {integrity: sha512-CcGZSp0xJXo0eHWM/LQBtTmV0Y9NsvJuVsj4tmAf5d/92GNHcF6fW22Udsp7or9g2tJyj6LmJI0lcaCOprliiw==}
     engines: {node: ^16.13 || >=18}
     peerDependencies:
@@ -10797,7 +10797,7 @@ packages:
       '@percy/appium-app': 2.0.4
       '@percy/selenium-webdriver': 2.0.5
       '@types/gitconfiglocal': 2.0.3
-      '@wdio/cli': 8.33.1(typescript@5.5.3)
+      '@wdio/cli': 8.33.1(typescript@5.6.3)
       '@wdio/logger': 8.28.0
       '@wdio/reporter': 8.32.4
       '@wdio/types': 8.32.4
@@ -10809,7 +10809,7 @@ packages:
       gitconfiglocal: 2.1.0
       got: 12.6.1
       uuid: 9.0.1
-      webdriverio: 8.33.1(typescript@5.5.3)
+      webdriverio: 8.33.1(typescript@5.6.3)
       winston-transport: 4.7.0
       yauzl: 3.1.2
     transitivePeerDependencies:
@@ -10821,7 +10821,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@wdio/cli@8.33.1(typescript@5.5.3):
+  /@wdio/cli@8.33.1(typescript@5.6.3):
     resolution: {integrity: sha512-Ngt5R6YAmErkSKnWLWt1JilLIKDPIB0P93bzQhb9bQhmg1arFBcl75uiwe6kf6T355vzcNslMaEJyeuqGChmCg==}
     engines: {node: ^16.13 || >=18}
     hasBin: true
@@ -10829,7 +10829,7 @@ packages:
       '@types/node': 20.12.13
       '@vitest/snapshot': 1.4.0
       '@wdio/config': 8.33.1
-      '@wdio/globals': 8.33.1(typescript@5.5.3)
+      '@wdio/globals': 8.33.1(typescript@5.6.3)
       '@wdio/logger': 8.28.0
       '@wdio/protocols': 8.32.0
       '@wdio/types': 8.32.4
@@ -10848,7 +10848,7 @@ packages:
       lodash.union: 4.6.0
       read-pkg-up: 10.0.0
       recursive-readdir: 2.2.3
-      webdriverio: 8.33.1(typescript@5.5.3)
+      webdriverio: 8.33.1(typescript@5.6.3)
       yargs: 17.7.2
     transitivePeerDependencies:
       - bufferutil
@@ -10890,12 +10890,12 @@ packages:
       - supports-color
     dev: true
 
-  /@wdio/globals@8.33.1(typescript@5.5.3):
+  /@wdio/globals@8.33.1(typescript@5.6.3):
     resolution: {integrity: sha512-1ud9oq7n9MMNywS/FoMRRWqW6uhcoxgnpXoGeLE2Tr+4f937ABOl+sfZgjycXujyvR7yTL8AROOYajp1Yuv1Xg==}
     engines: {node: ^16.13 || >=18}
     optionalDependencies:
-      expect-webdriverio: 4.13.0(typescript@5.5.3)
-      webdriverio: 8.33.1(typescript@5.5.3)
+      expect-webdriverio: 4.13.0(typescript@5.6.3)
+      webdriverio: 8.33.1(typescript@5.6.3)
     transitivePeerDependencies:
       - bufferutil
       - devtools
@@ -10905,14 +10905,14 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@wdio/local-runner@8.33.1(typescript@5.5.3):
+  /@wdio/local-runner@8.33.1(typescript@5.6.3):
     resolution: {integrity: sha512-eQp12wHIkyh5zl9fun1qjv5Qvf4mCHPgLs5sKbfo3OK4LadzmD4/QNvDG8DYq/9cyuhVvnHgbLQ3XAnkoPde3w==}
     engines: {node: ^16.13 || >=18}
     dependencies:
       '@types/node': 20.12.13
       '@wdio/logger': 8.28.0
       '@wdio/repl': 8.24.12
-      '@wdio/runner': 8.33.1(typescript@5.5.3)
+      '@wdio/runner': 8.33.1(typescript@5.6.3)
       '@wdio/types': 8.32.4
       async-exit-hook: 2.0.1
       split2: 4.2.0
@@ -10972,21 +10972,21 @@ packages:
       object-inspect: 1.13.1
     dev: true
 
-  /@wdio/runner@8.33.1(typescript@5.5.3):
+  /@wdio/runner@8.33.1(typescript@5.6.3):
     resolution: {integrity: sha512-i0eRwMCePKkQocWsdkPQpBb1jELyNR5JCwnmOgM3g9fQI6KAf5D4oEUkNDFL/vD4UtgbSRmux7b7j5G01VvuqQ==}
     engines: {node: ^16.13 || >=18}
     dependencies:
       '@types/node': 20.12.13
       '@wdio/config': 8.33.1
-      '@wdio/globals': 8.33.1(typescript@5.5.3)
+      '@wdio/globals': 8.33.1(typescript@5.6.3)
       '@wdio/logger': 8.28.0
       '@wdio/types': 8.32.4
       '@wdio/utils': 8.33.1
       deepmerge-ts: 5.1.0
-      expect-webdriverio: 4.13.0(typescript@5.5.3)
+      expect-webdriverio: 4.13.0(typescript@5.6.3)
       gaze: 1.1.3
       webdriver: 8.33.1
-      webdriverio: 8.33.1(typescript@5.5.3)
+      webdriverio: 8.33.1(typescript@5.6.3)
     transitivePeerDependencies:
       - bufferutil
       - devtools
@@ -11318,7 +11318,7 @@ packages:
       jsonparse: 1.3.1
       through: 2.3.8
 
-  /abitype@0.9.8(typescript@5.5.3):
+  /abitype@0.9.8(typescript@5.6.3):
     resolution: {integrity: sha512-puLifILdm+8sjyss4S+fsUN09obiT1g2YW6CtcQF+QDzxR0euzgEB29MZujC6zMk2a6SVmtttq1fc6+YFA7WYQ==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -11329,10 +11329,10 @@ packages:
       zod:
         optional: true
     dependencies:
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: false
 
-  /abitype@1.0.4(typescript@5.5.3):
+  /abitype@1.0.4(typescript@5.6.3):
     resolution: {integrity: sha512-UivtYZOGJGE8rsrM/N5vdRkUpqEZVmuTumfTuolm7m/6O09wprd958rx8kUBwVAAAhQDveGAgD0GJdBuR8s6tw==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -11343,7 +11343,7 @@ packages:
       zod:
         optional: true
     dependencies:
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: false
 
   /abort-controller@3.0.0:
@@ -12544,8 +12544,8 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.8:
-    resolution: {integrity: sha512-xSBfk2gL0bU7kSXV7XelRJLo8RYk/Yvk3kq2IHScc4PsKauymC92EatiKQVaSjQYNjolXyjRFx77bOm6zaatDQ==}
+  /chain-registry@1.69.9:
+    resolution: {integrity: sha512-Kv0XsEjXTmbjoqthlrh8WJ7k15Z2hlaFXYubnCukdDhtBlTuycVV6qXffwG4Fd3B7XeNW73mhPSkClLimgJzuw==}
     dependencies:
       '@chain-registry/types': 0.50.1
     dev: false
@@ -13013,7 +13013,7 @@ packages:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     requiresBuild: true
 
-  /cosmiconfig-typescript-loader@5.0.0(@types/node@20.12.13)(cosmiconfig@8.3.6)(typescript@5.5.3):
+  /cosmiconfig-typescript-loader@5.0.0(@types/node@20.12.13)(cosmiconfig@8.3.6)(typescript@5.6.3):
     resolution: {integrity: sha512-+8cK7jRAReYkMwMiG+bxhcNKiHJDM6bR9FD/nGBXOWdMLuYawjF5cGrtLilJ+LGd3ZjCXnJjR5DkfWPoIVlqJA==}
     engines: {node: '>=v16'}
     peerDependencies:
@@ -13022,9 +13022,9 @@ packages:
       typescript: '>=4'
     dependencies:
       '@types/node': 20.12.13
-      cosmiconfig: 8.3.6(typescript@5.5.3)
+      cosmiconfig: 8.3.6(typescript@5.6.3)
       jiti: 1.21.0
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: true
 
   /cosmiconfig@5.2.1:
@@ -13047,7 +13047,7 @@ packages:
       path-type: 4.0.0
       yaml: 1.10.2
 
-  /cosmiconfig@8.3.6(typescript@5.5.3):
+  /cosmiconfig@8.3.6(typescript@5.6.3):
     resolution: {integrity: sha512-kcZ6+W5QzcJ3P1Mt+83OUv/oHFqZHIx8DuxG6eZ5RGMERoLqp4BuGjhHLYGK+Kf5XVkQvqBSmAy/nGWN3qDgEA==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -13060,7 +13060,7 @@ packages:
       js-yaml: 4.1.0
       parse-json: 5.2.0
       path-type: 4.0.0
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: true
 
   /cosmjs-types@0.7.2:
@@ -14298,8 +14298,8 @@ packages:
       eslint: ^7.32.0 || ^8.2.0
       eslint-plugin-import: ^2.25.3
     dependencies:
-      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.5.3)
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.6.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       eslint: 8.57.0
       eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.29.1)(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
@@ -14334,7 +14334,7 @@ packages:
       eslint: 8.57.0
     dev: true
 
-  /eslint-config-standard-with-typescript@43.0.1(@typescript-eslint/eslint-plugin@6.21.0)(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.2.0)(eslint@8.57.0)(typescript@5.5.3):
+  /eslint-config-standard-with-typescript@43.0.1(@typescript-eslint/eslint-plugin@6.21.0)(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.2.0)(eslint@8.57.0)(typescript@5.6.3):
     resolution: {integrity: sha512-WfZ986+qzIzX6dcr4yGUyVb/l9N3Z8wPXCc5z/70fljs3UbWhhV+WxrfgsqMToRzuuyX9MqZ974pq2UPhDTOcA==}
     deprecated: Please use eslint-config-love, instead.
     peerDependencies:
@@ -14345,14 +14345,14 @@ packages:
       eslint-plugin-promise: ^6.0.0
       typescript: '*'
     dependencies:
-      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.5.3)
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.6.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       eslint: 8.57.0
       eslint-config-standard: 17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@16.6.2)(eslint-plugin-promise@6.2.0)(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
       eslint-plugin-n: 16.6.2(eslint@8.57.0)
       eslint-plugin-promise: 6.2.0(eslint@8.57.0)
-      typescript: 5.5.3
+      typescript: 5.6.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -14426,7 +14426,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       debug: 3.2.7
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
@@ -14457,7 +14457,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.6.3)
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
       array.prototype.flat: 1.3.2
@@ -15053,7 +15053,7 @@ packages:
       strip-final-newline: 3.0.0
     dev: true
 
-  /expect-webdriverio@4.13.0(typescript@5.5.3):
+  /expect-webdriverio@4.13.0(typescript@5.6.3):
     resolution: {integrity: sha512-y2LF6vECifTOiOk0i0FMPWJGyntiW+eqzQWFZimu9Cae8XMUH5q4F5SzpfGCxsvmOdf3uFjlr+u9IXrQBN5o0Q==}
     engines: {node: '>=16 || >=18 || >=20'}
     dependencies:
@@ -15062,9 +15062,9 @@ packages:
       jest-matcher-utils: 29.7.0
       lodash.isequal: 4.5.0
     optionalDependencies:
-      '@wdio/globals': 8.33.1(typescript@5.5.3)
+      '@wdio/globals': 8.33.1(typescript@5.6.3)
       '@wdio/logger': 8.28.0
-      webdriverio: 8.36.1(typescript@5.5.3)
+      webdriverio: 8.36.1(typescript@5.6.3)
     transitivePeerDependencies:
       - bufferutil
       - devtools
@@ -17767,7 +17767,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.8
+      chain-registry: 1.69.9
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
@@ -19205,7 +19205,7 @@ packages:
     resolution: {integrity: sha512-UZ7eQ+h8ywIRAW1hIEl2AqdwzJucU/Kp59+8kkZeSvafXhZjul247BvIJjEVFVeON6d7lM46XX1HXCduKAS8VA==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  /mipd@0.0.5(typescript@5.5.3):
+  /mipd@0.0.5(typescript@5.6.3):
     resolution: {integrity: sha512-gbKA784D2WKb5H/GtqEv+Ofd1S9Zj+Z/PGDIl1u1QAbswkxD28BQ5bSXQxkeBzPBABg1iDSbiwGG1XqlOxRspA==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -19213,15 +19213,15 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.5.3
-      viem: 1.20.0(typescript@5.5.3)
+      typescript: 5.6.3
+      viem: 1.20.0(typescript@5.6.3)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
       - zod
     dev: false
 
-  /mipd@0.0.7(typescript@5.5.3):
+  /mipd@0.0.7(typescript@5.6.3):
     resolution: {integrity: sha512-aAPZPNDQ3uMTdKbuO2YmAw2TxLHO0moa4YKAyETM/DTj5FloZo+a+8tU+iv4GmW+sOxKLSRwcSFuczk+Cpt6fg==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -19229,7 +19229,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: false
 
   /mitt@2.1.0:
@@ -19335,7 +19335,7 @@ packages:
   /ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  /msw@2.1.7(typescript@5.5.3):
+  /msw@2.1.7(typescript@5.6.3):
     resolution: {integrity: sha512-yTIYqEMqDSrdbVMrfmqP6rTKQsnIbglTvVmAHDWwNegyXPXRcV+RjsaFEqubRS266gwWCDLm9YdOkWSKLdDvJQ==}
     engines: {node: '>=18'}
     hasBin: true
@@ -19363,7 +19363,7 @@ packages:
       path-to-regexp: 6.2.1
       strict-event-emitter: 0.5.1
       type-fest: 4.10.2
-      typescript: 5.5.3
+      typescript: 5.6.3
       yargs: 17.7.2
     dev: true
 
@@ -20383,7 +20383,7 @@ packages:
     dependencies:
       lilconfig: 3.1.2
       postcss: 8.4.39
-      ts-node: 10.9.2(@types/node@20.12.13)(typescript@5.5.3)
+      ts-node: 10.9.2(@types/node@20.12.13)(typescript@5.6.3)
       yaml: 2.4.5
 
   /postcss-nested@6.2.0(postcss@8.4.39):
@@ -20714,7 +20714,7 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  /puppeteer-core@20.9.0(typescript@5.5.3):
+  /puppeteer-core@20.9.0(typescript@5.6.3):
     resolution: {integrity: sha512-H9fYZQzMTRrkboEfPmf7m3CLDN6JvbxXA3qTtS+dFt27tR+CsFHzPsT6pzp6lYL6bJbAPaR0HaPO6uSi+F94Pg==}
     engines: {node: '>=16.3.0'}
     requiresBuild: true
@@ -20724,12 +20724,12 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@puppeteer/browsers': 1.4.6(typescript@5.5.3)
+      '@puppeteer/browsers': 1.4.6(typescript@5.6.3)
       chromium-bidi: 0.4.16(devtools-protocol@0.0.1147663)
       cross-fetch: 4.0.0(encoding@0.1.13)
       debug: 4.3.4(supports-color@5.5.0)
       devtools-protocol: 0.0.1147663
-      typescript: 5.5.3
+      typescript: 5.6.3
       ws: 8.13.0
     transitivePeerDependencies:
       - bufferutil
@@ -23058,13 +23058,13 @@ packages:
     resolution: {integrity: sha512-AqTiAOLcj85xS7vQ8QkAV41hPDIJ71XJB4RCUrzo/1GM2CQwhkJGaf9Hgr7BOugMRpgGUrqRg/DrBDl4H40+8g==}
     dev: true
 
-  /ts-api-utils@1.3.0(typescript@5.5.3):
+  /ts-api-utils@1.3.0(typescript@5.6.3):
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
     dependencies:
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: true
 
   /ts-interface-checker@0.1.13:
@@ -23077,7 +23077,7 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /ts-node@10.9.2(@types/node@20.12.13)(typescript@5.5.3):
+  /ts-node@10.9.2(@types/node@20.12.13)(typescript@5.6.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -23103,11 +23103,11 @@ packages:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.5.3
+      typescript: 5.6.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  /tsconfck@3.0.1(typescript@5.5.3):
+  /tsconfck@3.0.1(typescript@5.6.3):
     resolution: {integrity: sha512-7ppiBlF3UEddCLeI1JRx5m2Ryq+xk4JrZuq4EuYXykipebaq1dV0Fhgr1hb7CkmHt32QSgOZlcqVLEtHBG4/mg==}
     engines: {node: ^18 || >=20}
     hasBin: true
@@ -23117,7 +23117,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.5.3
+      typescript: 5.6.3
     dev: true
 
   /tsconfig-paths@3.15.0:
@@ -23315,8 +23315,8 @@ packages:
     resolution: {integrity: sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==}
     dev: false
 
-  /typescript@5.5.3:
-    resolution: {integrity: sha512-/hreyEujaB0w76zKo6717l3L0o/qEUtRgdvUBvlkhoWeOVMjMuHNHk0BRBzikzuGDqNmPQbg5ifMEqsHLiIUcQ==}
+  /typescript@5.6.3:
+    resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -23829,7 +23829,7 @@ packages:
       vfile-message: 4.0.2
     dev: true
 
-  /viem@1.20.0(typescript@5.5.3):
+  /viem@1.20.0(typescript@5.6.3):
     resolution: {integrity: sha512-yPjV9pJr10xi28C/9LEvs5zdZNEMiru3Kz7nufghVYABJAfeSkoZQXb6b23n7MscS7c55JO5nmUI3xKkd9g6Yg==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -23842,9 +23842,9 @@ packages:
       '@noble/hashes': 1.3.2
       '@scure/bip32': 1.3.2
       '@scure/bip39': 1.2.1
-      abitype: 0.9.8(typescript@5.5.3)
+      abitype: 0.9.8(typescript@5.6.3)
       isows: 1.0.3(ws@8.13.0)
-      typescript: 5.5.3
+      typescript: 5.6.3
       ws: 8.13.0
     transitivePeerDependencies:
       - bufferutil
@@ -23852,7 +23852,7 @@ packages:
       - zod
     dev: false
 
-  /viem@2.16.2(typescript@5.5.3):
+  /viem@2.16.2(typescript@5.6.3):
     resolution: {integrity: sha512-qor3v1cJFR3jcPtcJxPbKfKURAH2agNf2IWZIaSReV6teNLERiu4Sr7kbqpkIeTAEpiDCVQwg336M+mub1m+pg==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -23865,9 +23865,9 @@ packages:
       '@noble/hashes': 1.3.2
       '@scure/bip32': 1.3.2
       '@scure/bip39': 1.2.1
-      abitype: 1.0.4(typescript@5.5.3)
+      abitype: 1.0.4(typescript@5.6.3)
       isows: 1.0.4(ws@8.17.1)
-      typescript: 5.5.3
+      typescript: 5.6.3
       ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
@@ -23918,13 +23918,13 @@ packages:
       vite: 4.3.9(@types/node@20.12.13)
     dev: true
 
-  /vite-plugin-svgr@3.2.0(rollup@2.79.1)(typescript@5.5.3)(vite@4.3.9):
+  /vite-plugin-svgr@3.2.0(rollup@2.79.1)(typescript@5.6.3)(vite@4.3.9):
     resolution: {integrity: sha512-Uvq6niTvhqJU6ga78qLKBFJSDvxWhOnyfQSoKpDPMAGxJPo5S3+9hyjExE5YDj6Lpa4uaLkGc1cBgxXov+LjSw==}
     peerDependencies:
       vite: ^2.6.0 || 3 || 4
     dependencies:
       '@rollup/pluginutils': 5.0.3(rollup@2.79.1)
-      '@svgr/core': 7.0.0(typescript@5.5.3)
+      '@svgr/core': 7.0.0(typescript@5.6.3)
       '@svgr/plugin-jsx': 7.0.0
       vite: 4.3.9(@types/node@20.12.13)
     transitivePeerDependencies:
@@ -23933,7 +23933,7 @@ packages:
       - typescript
     dev: true
 
-  /vite-tsconfig-paths@4.3.1(typescript@5.5.3)(vite@5.0.12):
+  /vite-tsconfig-paths@4.3.1(typescript@5.6.3)(vite@5.0.12):
     resolution: {integrity: sha512-cfgJwcGOsIxXOLU/nELPny2/LUD/lcf1IbfyeKTv2bsupVbTH/xpFtdQlBmIP1GEK2CjjLxYhFfB+QODFAx5aw==}
     peerDependencies:
       vite: '*'
@@ -23943,7 +23943,7 @@ packages:
     dependencies:
       debug: 4.3.4(supports-color@5.5.0)
       globrex: 0.1.2
-      tsconfck: 3.0.1(typescript@5.5.3)
+      tsconfck: 3.0.1(typescript@5.6.3)
       vite: 5.0.12(@types/node@20.12.13)
     transitivePeerDependencies:
       - supports-color
@@ -24104,7 +24104,7 @@ packages:
       - supports-color
     dev: true
 
-  /wagmi@2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.5.3)(viem@2.16.2):
+  /wagmi@2.10.9(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.6.3)(viem@2.16.2):
     resolution: {integrity: sha512-pYGTLmVIAC4q/a90i+vlrkJL86n5Kf/gwhhi65XtQklpsUQWrKDmn4dsY1/yFeAmZ/1yx1mpxYpX3LI97eTuWA==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -24116,12 +24116,12 @@ packages:
         optional: true
     dependencies:
       '@tanstack/react-query': 5.37.1(react@18.2.0)
-      '@wagmi/connectors': 5.0.21(@types/react@18.3.3)(@wagmi/core@2.11.6)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.5.3)(viem@2.16.2)
-      '@wagmi/core': 2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.5.3)(viem@2.16.2)
+      '@wagmi/connectors': 5.0.21(@types/react@18.3.3)(@wagmi/core@2.11.6)(react-dom@18.2.0)(react-native@0.74.3)(react@18.2.0)(rollup@2.79.1)(typescript@5.6.3)(viem@2.16.2)
+      '@wagmi/core': 2.11.6(@types/react@18.3.3)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)
       react: 18.2.0
-      typescript: 5.5.3
+      typescript: 5.6.3
       use-sync-external-store: 1.2.0(react@18.2.0)
-      viem: 2.16.2(typescript@5.5.3)
+      viem: 2.16.2(typescript@5.6.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -24445,7 +24445,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /webdriverio@8.33.1(typescript@5.5.3):
+  /webdriverio@8.33.1(typescript@5.6.3):
     resolution: {integrity: sha512-1DsF8sx1a46AoVYCUpEwJYU74iBAW/U2H5r6p+60ct7dIiFmxmc4uCbOqtf7NLOTgrIzAOaRnT0EsrRICpg5Qw==}
     engines: {node: ^16.13 || >=18}
     peerDependencies:
@@ -24472,7 +24472,7 @@ packages:
       lodash.clonedeep: 4.5.0
       lodash.zip: 4.2.0
       minimatch: 9.0.4
-      puppeteer-core: 20.9.0(typescript@5.5.3)
+      puppeteer-core: 20.9.0(typescript@5.6.3)
       query-selector-shadow-dom: 1.0.1
       resq: 1.11.0
       rgb2hex: 0.2.5
@@ -24486,7 +24486,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /webdriverio@8.36.1(typescript@5.5.3):
+  /webdriverio@8.36.1(typescript@5.6.3):
     resolution: {integrity: sha512-vzE09oFQeMbOYJ/75jZ13sDIljzC3HH7uoUJKAMAEtyrn/bu1F9Sg/4IDEsvQaRD3pz3ae6SkRld33lcQk6HJA==}
     engines: {node: ^16.13 || >=18}
     peerDependencies:
@@ -24513,7 +24513,7 @@ packages:
       lodash.clonedeep: 4.5.0
       lodash.zip: 4.2.0
       minimatch: 9.0.4
-      puppeteer-core: 20.9.0(typescript@5.5.3)
+      puppeteer-core: 20.9.0(typescript@5.6.3)
       query-selector-shadow-dom: 1.0.1
       resq: 1.11.0
       rgb2hex: 0.2.5
