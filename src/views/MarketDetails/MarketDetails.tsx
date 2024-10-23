@@ -21,7 +21,7 @@ type MarketDetailsProps = {
   assetName: Nullable<string>;
   assetIcon: {
     symbol?: Nullable<string>;
-    logoUrl?: string;
+    logoUrl?: Nullable<string>;
   };
   marketDetailItems: DetailsItem[];
   primaryDescription?: string;

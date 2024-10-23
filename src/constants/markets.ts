@@ -34,7 +34,7 @@ export type MarketData = {
 export enum MarketSorting {
   GAINERS = 'gainers',
   LOSERS = 'losers',
-  HIGHEST_CLOB_PAIR_ID = 'highest_clob_pair_id',
+  RECENTLY_LISTED = 'recently-listed',
 }
 
 export enum MarketFilters {
