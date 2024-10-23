@@ -66,6 +66,7 @@ export enum OrdersTableColumnKey {
   Side = 'Side',
   Amount = 'Amount',
   Filled = 'Filled',
+  OrderValue = 'Order-Value',
   Price = 'Price',
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
@@ -198,6 +199,25 @@ const getOrdersTableColumnDef = ({
               type={OutputType.Asset}
               value={totalFilled}
               fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
+            />
+          </TableCell>
+        ),
+      },
+      [OrdersTableColumnKey.OrderValue]: {
+        columnKey: 'orderValue',
+        getCellValue: (row) =>
+          MustBigNumber(row.size)
+            .abs()
+            .multipliedBy(row.triggerPrice ?? row.price)
+            .toNumber(),
+        label: stringGetter({ key: STRING_KEYS.ORDER_VALUE }),
+        renderCell: ({ size, price, triggerPrice }) => (
+          <TableCell>
+            <Output
+              type={OutputType.Fiat}
+              value={MustBigNumber(size)
+                .abs()
+                .multipliedBy(triggerPrice ?? price)}
             />
           </TableCell>
         ),

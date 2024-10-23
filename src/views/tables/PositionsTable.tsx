@@ -187,7 +187,7 @@ const getPositionsTableColumnDef = ({
                 sign={getNumberSign(unrealizedPnl?.current)}
                 type={OutputType.Fiat}
                 value={unrealizedPnl?.current}
-                showSign={ShowSign.None}
+                showSign={ShowSign.Negative}
               />
             </TableCell>
           ) : (
@@ -376,7 +376,12 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ netFunding, fundingRate }) => {
           return uiRefresh ? (
             <TableCell>
-              <Output type={OutputType.Fiat} value={netFunding} />
+              <$OutputSigned
+                sign={getNumberSign(netFunding)}
+                type={OutputType.Fiat}
+                value={netFunding}
+                showSign={ShowSign.Negative}
+              />
             </TableCell>
           ) : (
             <TableCell stacked>
