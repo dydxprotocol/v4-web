@@ -43,6 +43,7 @@ import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSel
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -391,7 +392,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                               tw="text-[1.5em]"
                             />
                           ),
-                          label: currentMarketAssetId,
+                          label: getDisplayableAssetFromBaseAsset(currentMarketAssetId),
                         }
                       : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
                   },
