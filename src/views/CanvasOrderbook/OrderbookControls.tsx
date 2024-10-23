@@ -14,8 +14,8 @@ import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
-import { setDisplayUnit } from '@/state/configs';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { setDisplayUnit } from '@/state/appUiConfigs';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';

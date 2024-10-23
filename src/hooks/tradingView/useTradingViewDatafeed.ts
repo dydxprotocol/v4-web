@@ -30,7 +30,7 @@ import { Themes } from '@/styles/themes';
 import { store } from '@/state/_store';
 import { getMarketFills } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { setCandles } from '@/state/perpetuals';
 import {

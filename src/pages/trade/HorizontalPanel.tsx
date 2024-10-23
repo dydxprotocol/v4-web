@@ -38,8 +38,8 @@ import {
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { getAssetImageUrl } from '@/state/assetsSelectors';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
