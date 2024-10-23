@@ -6,15 +6,30 @@ type ElementProps = {
   label?: React.ReactNode;
   children?: React.ReactNode;
   inputID?: string;
+  preventDefault?: boolean;
 };
 
 type StyleProps = {
   className?: string;
 };
 
-export const WithLabel = ({ label, inputID, children, className }: ElementProps & StyleProps) => (
-  <$Container className={className} tw="grid gap-0.5 [--label-textColor:--color-text-1]">
-    <label htmlFor={inputID} tw="inlineRow text-[color:--label-textColor] font-mini-book">
+export const WithLabel = ({
+  label,
+  inputID,
+  children,
+  className,
+  preventDefault,
+}: ElementProps & StyleProps) => (
+  <$Container className={className} tw="grid [--label-textColor:--color-text-1]">
+    {/* Sometimes we don't want labels to trigger their contents' onClick properties */}
+    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+    <label
+      htmlFor={inputID}
+      tw="inlineRow text-[color:--label-textColor] font-mini-book"
+      onClick={(e) => {
+        if (preventDefault) e.preventDefault();
+      }}
+    >
       {label}
     </label>
     {children}

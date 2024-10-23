@@ -19,6 +19,7 @@ type StyleProps = {
 type ElementProps = {
   label?: React.ReactNode;
   slotRight?: React.ReactNode;
+  preventDefault?: boolean;
   validationConfig?: {
     attached?: boolean;
     type: AlertType;
@@ -30,13 +31,23 @@ export type FormInputProps = ElementProps & StyleProps & InputProps;
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   (
-    { id, label, slotRight, className, validationConfig, backgroundColorOverride, ...otherProps },
+    {
+      id,
+      label,
+      slotRight,
+      className,
+      validationConfig,
+      backgroundColorOverride,
+      preventDefault,
+      ...otherProps
+    },
     ref
   ) => (
     <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
       <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
         {label ? (
           <$WithLabel
+            preventDefault={preventDefault}
             label={label}
             inputID={id}
             disabled={otherProps.disabled}
