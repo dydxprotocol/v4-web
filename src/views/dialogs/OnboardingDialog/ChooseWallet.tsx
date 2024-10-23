@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -11,17 +11,12 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
-import { formMixins } from '@/styles/formMixins';
-import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { Link } from '@/components/Link';
 import { WalletIcon } from '@/components/WalletIcon';
-import { LanguageSelector } from '@/views/menus/LanguageSelector';
-import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 export const ChooseWallet = ({
   onChooseWallet,
