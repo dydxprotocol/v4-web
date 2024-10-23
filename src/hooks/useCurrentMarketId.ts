@@ -6,7 +6,7 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { SubaccountPosition } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_MARKETID, PREDICTION_MARKET } from '@/constants/markets';
+import { DEFAULT_MARKETID, MarketFilters, PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
@@ -24,6 +24,8 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 
+import { useMarketsData } from './useMarketsData';
+
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
@@ -37,6 +39,10 @@ export const useCurrentMarketId = () => {
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
   const hasSeenPredictionMarketIntroDialog = useAppSelector(getHasSeenPredictionMarketIntroDialog);
+  const { filteredMarkets: predictionMarkets } = useMarketsData({
+    filter: MarketFilters.PREDICTION_MARKET,
+    hideUnlaunchedMarkets: true,
+  });
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -62,6 +68,10 @@ export const useCurrentMarketId = () => {
       return market.id === marketId;
     });
   }, [hasLoadedLaunchableMarkets, hasMarketIds, marketId, launchableMarkets.data]);
+
+  const isViewingPredictionMarket = useMemo(() => {
+    return predictionMarkets.some((market) => market.id === marketId);
+  }, [predictionMarkets.length, marketId]);
 
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
@@ -93,7 +103,11 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketId(marketId));
 
         // If changed to a prediction market, display Prediction Market explainer
-        if (Object.values(PREDICTION_MARKET).includes(marketId)) {
+        if (
+          testFlags.pml
+            ? isViewingPredictionMarket
+            : Object.values(PREDICTION_MARKET).includes(marketId)
+        ) {
           onNavigateToPredictionMarket();
         }
 

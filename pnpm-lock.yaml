@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.12.1
     version: 1.12.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.230
-    version: 1.1.230
+    specifier: ^1.1.232
+    version: 1.1.232
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -3320,8 +3320,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.230:
-    resolution: {integrity: sha512-ocZBDYAoYxthVGGvijC3kVTGfyf5j91InOXzZ0Pbakr/3wVtHX3m3KMp0hu/wba+QxIVe9LI7mqokGnpAyTuVA==}
+  /@dydxprotocol/v4-localization@1.1.232:
+    resolution: {integrity: sha512-1ncs2iAwM15jtXoUl4Tp6K1CrNEWmGVz+rBVQalOUYwGpQVD0DL0hbCP8/3HjecdSrxtJkUrIoikccYClRGMbg==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -9522,7 +9522,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.8
+      chain-registry: 1.69.9
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -14166,8 +14166,8 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.8:
-    resolution: {integrity: sha512-xSBfk2gL0bU7kSXV7XelRJLo8RYk/Yvk3kq2IHScc4PsKauymC92EatiKQVaSjQYNjolXyjRFx77bOm6zaatDQ==}
+  /chain-registry@1.69.9:
+    resolution: {integrity: sha512-Kv0XsEjXTmbjoqthlrh8WJ7k15Z2hlaFXYubnCukdDhtBlTuycVV6qXffwG4Fd3B7XeNW73mhPSkClLimgJzuw==}
     dependencies:
       '@chain-registry/types': 0.50.1
     dev: false
@@ -19582,7 +19582,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.8
+      chain-registry: 1.69.9
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
