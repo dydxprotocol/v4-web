@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { useOutletContext } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -76,13 +75,17 @@ const AffiliatesFilter = ({
   );
 };
 
-export const AffiliatesLeaderboard = ({ className }: { className?: string }) => {
+interface IAffiliatesLeaderboardProps {
+  accountStats: IAffiliateStats;
+  className?: string;
+}
+
+export const AffiliatesLeaderboard = ({ accountStats, className }: IAffiliatesLeaderboardProps) => {
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
   const { affiliates, total, setPage } = useAffiliatesLeaderboard();
-  const { accountStats } = useOutletContext<{ accountStats: IAffiliateStats }>();
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1);

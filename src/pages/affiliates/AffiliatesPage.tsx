@@ -18,6 +18,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import LastUpdated from '@/views/Affiliates/LastUpdated';
 import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
@@ -119,6 +120,8 @@ export const AffiliatesPage = () => {
         <$ContentAttached>
           <Outlet context={{ accountStats, programStats }} />
         </$ContentAttached>
+
+        <AffiliatesLeaderboard {...{ accountStats }} />
       </$Page>
     </Suspense>
   );
