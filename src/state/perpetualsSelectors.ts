@@ -211,6 +211,7 @@ export const getMarketIdToAssetMetadataMap = createAppSelector(
     return mapping;
   }
 );
+
 /**
  * @returns Specified market's max leverage
  */
