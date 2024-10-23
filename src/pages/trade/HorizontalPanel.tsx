@@ -136,45 +136,39 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
           currentMarket={showCurrentMarket ? currentMarketId : undefined}
           marketTypeFilter={viewIsolated}
           columnKeys={
-            isTablet
+            uiRefresh
               ? [
-                  PositionsTableColumnKey.Details,
-                  PositionsTableColumnKey.IndexEntry,
+                  PositionsTableColumnKey.Market,
+                  PositionsTableColumnKey.Leverage,
+                  PositionsTableColumnKey.Type,
+                  PositionsTableColumnKey.Size,
+                  PositionsTableColumnKey.Value,
                   PositionsTableColumnKey.PnL,
-                ]
-              : uiRefresh
-                ? [
-                    PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Leverage,
-                    PositionsTableColumnKey.Type,
-                    PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Value,
-                    PositionsTableColumnKey.PnL,
-                    PositionsTableColumnKey.Margin,
-                    PositionsTableColumnKey.AverageOpen,
-                    PositionsTableColumnKey.Oracle,
-                    PositionsTableColumnKey.Liquidation,
-                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    PositionsTableColumnKey.NetFunding,
-                    shouldRenderActions && PositionsTableColumnKey.Actions,
-                  ].filter(isTruthy)
-                : [
-                    PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Margin,
-                    PositionsTableColumnKey.UnrealizedPnl,
-                    !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
-                    PositionsTableColumnKey.NetFunding,
-                    PositionsTableColumnKey.AverageOpenAndClose,
-                    PositionsTableColumnKey.LiquidationAndOraclePrice,
-                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    shouldRenderActions && PositionsTableColumnKey.Actions,
-                  ].filter(isTruthy)
+                  PositionsTableColumnKey.Margin,
+                  PositionsTableColumnKey.AverageOpen,
+                  PositionsTableColumnKey.Oracle,
+                  PositionsTableColumnKey.Liquidation,
+                  PositionsTableColumnKey.NetFunding,
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
+              : [
+                  PositionsTableColumnKey.Market,
+                  PositionsTableColumnKey.Size,
+                  PositionsTableColumnKey.Margin,
+                  PositionsTableColumnKey.UnrealizedPnl,
+                  !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
+                  PositionsTableColumnKey.NetFunding,
+                  PositionsTableColumnKey.AverageOpenAndClose,
+                  PositionsTableColumnKey.LiquidationAndOraclePrice,
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
           }
           columnWidths={
             uiRefresh
               ? {
-                  [PositionsTableColumnKey.Actions]: 100,
+                  [PositionsTableColumnKey.Actions]: 80,
                 }
               : undefined
           }
@@ -229,6 +223,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     OrdersTableColumnKey.Side,
                     OrdersTableColumnKey.Amount,
                     OrdersTableColumnKey.Filled,
+                    OrdersTableColumnKey.OrderValue,
                     OrdersTableColumnKey.Price,
                     OrdersTableColumnKey.Trigger,
                     OrdersTableColumnKey.MarginType,
