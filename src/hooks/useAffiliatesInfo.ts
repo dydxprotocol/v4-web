@@ -122,7 +122,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const affiliateMetadataQuery = useQuery({
-    queryKey: ['affiliateMetadata', dydxAddress],
+    queryKey: ['affiliateMetadata', dydxAddress, compositeClient],
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress),
   });
@@ -130,7 +130,6 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   const programStatsQuery = useQuery({
     queryKey: ['programStats'],
     queryFn: fetchProgramStats,
-    enabled: Boolean(compositeClient),
   });
 
   const affiliateStatsQuery = useQuery({

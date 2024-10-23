@@ -2,18 +2,18 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import {
+  AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
   DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
-  IAffiliateStats,
 } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 interface IShareAffiliateBannerProps {
-  accountStats: IAffiliateStats;
+  totalVolume: string;
 }
-export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProps) => {
+export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps) => {
   const stringGetter = useStringGetter();
 
   return (
@@ -22,7 +22,7 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
         {stringGetter({
           key: STRING_KEYS.SHARE_AFFILIATE_BANNER_TITLE,
           params: {
-            AMMOUNT: '10.000',
+            AMOUNT: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
           },
         })}
       </div>
@@ -50,8 +50,7 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
             {stringGetter({
               key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
               params: {
-                // TODO: make this configurable or get from API
-                AMOUNT_USD: '10K',
+                AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
               },
             })}
           </div>
@@ -59,7 +58,7 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
             {stringGetter({
               key: STRING_KEYS.YOUVE_TRADED,
               params: {
-                AMOUNT_USD: accountStats?.referredVolume ?? 0,
+                AMOUNT_USD: totalVolume,
               },
             })}
           </div>

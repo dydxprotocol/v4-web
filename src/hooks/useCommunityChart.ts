@@ -53,14 +53,16 @@ export const useCommunityChart = (selectedChartMetric: AffiliatesProgramMetric) 
 
       const periodData: IDateStats[] = await response.json();
 
-      setMetricData(
-        periodData
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          .map((m) => ({
-            date: new Date(m.date).getTime(),
-            cumulativeAmount: Number(m[selectedChartMetric]),
-          }))
-      );
+      if (periodData.length) {
+        setMetricData(
+          periodData
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .map((m) => ({
+              date: new Date(m.date).getTime(),
+              cumulativeAmount: Number(m[selectedChartMetric]),
+            }))
+        );
+      }
     } catch (e) {
       log('useCommunityChart/fetchMetricData', e, { endpoint });
     }

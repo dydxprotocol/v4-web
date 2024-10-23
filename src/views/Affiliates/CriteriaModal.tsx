@@ -98,7 +98,7 @@ export const CriteriaModal = ({
             : stringGetter({
                 key: STRING_KEYS.YOUR_TIER,
                 params: {
-                  TIER: currentUserTier.tier,
+                  TIER: currentUserTier?.tier,
                 },
               })
       }
