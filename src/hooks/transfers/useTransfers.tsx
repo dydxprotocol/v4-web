@@ -292,8 +292,11 @@ export const useTransfers = () => {
       // If the user is connected via cosmos, set the address to whichever cosmos chain
       // that they have currently selected. Cosmos has a unique address per chain
       const calculatedCosmosAddress = toChainId && cosmosChainIdToAddressesMap[toChainId];
-      // This should never happen because a valid chainId should always be selected
-      setToAddress(calculatedCosmosAddress ?? '');
+      // If a user selects a non cosmos chain, we'll default to source address
+      // Doesn't really matter what address it is as long as it's a cosmos address.
+      // This will trigger a validation error so users will know to update the address
+      // or to reconnect with a wallet that supports that chain.
+      setToAddress(calculatedCosmosAddress ?? sourceAccount.address);
     } else {
       // If the user is connected to SVM or EVM, the sourceAccount.address is correct
       setToAddress(sourceAccount.address);

@@ -56,9 +56,10 @@ export function isValidAddress(input: MultiChainAddress): boolean {
   if (input.network === 'solana') {
     try {
       // Generating a publickey will demonstrate if an address is valid
-      // eslint-disable-next-line no-new
-      new PublicKey(input.address);
-      return true;
+      // https://solana.com/developers/cookbook/wallets/check-publickey
+      const publicKey = new PublicKey(input.address);
+      // Validate the public key with the `isOnCurve` method
+      return PublicKey.isOnCurve(publicKey.toBytes());
     } catch (_e) {
       return false;
     }
