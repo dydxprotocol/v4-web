@@ -50,6 +50,7 @@ export interface ConfigsState {
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
   displayUnit: DisplayUnit;
+  shouldHideLaunchableMarkets: boolean;
 }
 
 const { uiRefresh } = testFlags;
@@ -67,6 +68,10 @@ const initialState: ConfigsState = {
   feeTiers: undefined,
   equityTiers: undefined,
   network: undefined,
+  shouldHideLaunchableMarkets: getLocalStorage({
+    key: LocalStorageKey.ShouldHideLaunchableMarkets,
+    defaultValue: false,
+  }),
   hasSeenLaunchIncentives: getLocalStorage({
     key: LocalStorageKey.HasSeenLaunchIncentives,
     defaultValue: false,
@@ -132,6 +137,10 @@ export const configsSlice = createSlice({
         })
       );
     },
+    setShouldHideLaunchableMarkets: (state: ConfigsState, action: PayloadAction<boolean>) => {
+      setLocalStorage({ key: LocalStorageKey.ShouldHideLaunchableMarkets, value: action.payload });
+      state.shouldHideLaunchableMarkets = action.payload;
+    },
   },
 });
 
@@ -142,4 +151,5 @@ export const {
   setConfigs,
   markLaunchIncentivesSeen,
   setDisplayUnit,
+  setShouldHideLaunchableMarkets,
 } = configsSlice.actions;

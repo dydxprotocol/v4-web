@@ -43,6 +43,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
@@ -214,7 +215,7 @@ export const TradeSizeInputs = () => {
         <>
           <WithTooltip
             tooltip={inputConfig.tooltipId as TooltipStringKeys}
-            stringParams={{ SYMBOL: id ?? '' }}
+            stringParams={{ SYMBOL: getDisplayableAssetFromBaseAsset(id) }}
             side="right"
           >
             {stringGetter({ key: STRING_KEYS.AMOUNT })}

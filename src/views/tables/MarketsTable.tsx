@@ -43,14 +43,13 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
-  const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
 
   const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
     filter,
     searchFilter,
-    hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
   });
+
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
@@ -252,8 +251,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
-          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
-          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
 
