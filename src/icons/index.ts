@@ -60,6 +60,7 @@ export { default as PriceChartIcon } from './price-chart.svg';
 export { default as PrivacyIcon } from './privacy.svg';
 export { default as ProfileIcon } from './profile.svg';
 export { default as QrIcon } from './qr.svg';
+export { default as QuestionMarkIcon } from './question-mark.svg';
 export { default as RewardStarIcon } from './reward-star.svg';
 export { default as RocketIcon } from './rocket.svg';
 export { default as RoundedArrowIcon } from './rounded-arrow.svg';
