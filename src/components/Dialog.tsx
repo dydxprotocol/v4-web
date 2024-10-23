@@ -494,7 +494,7 @@ const $Title = tw(Title)`flex-1 font-large-medium text-color-text-2 overflow-hid
 
 const $Description = tw(Description)`mt-0.5 text-color-text-0 font-base-book`;
 
-const $Footer = styled.footer<{ $withBorder: boolean; }>`
+const $Footer = styled.footer<{ $withBorder: boolean }>`
   display: grid;
   ${layoutMixins.stickyFooter}
   ${layoutMixins.withStickyFooterBackdrop}
