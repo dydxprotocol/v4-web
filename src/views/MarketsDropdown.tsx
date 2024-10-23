@@ -53,7 +53,6 @@ const MarketsDropdownContent = ({
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
@@ -62,7 +61,6 @@ const MarketsDropdownContent = ({
   const { filteredMarkets, marketFilters } = useMarketsData({
     filter,
     searchFilter,
-    hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
   });
 
   const columns = useMemo(
@@ -212,8 +210,6 @@ const MarketsDropdownContent = ({
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
-          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
-          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
       {slotTop}

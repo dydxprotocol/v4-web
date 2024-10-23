@@ -18,6 +18,8 @@ import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
@@ -31,6 +33,7 @@ const LaunchableMarket = () => {
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
+  const { uiRefresh } = testFlags;
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
@@ -63,8 +66,9 @@ const LaunchableMarket = () => {
       </header>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
-        <AccountInfo />
+        {!uiRefresh && <AccountInfo />}
         <$LaunchMarketSidePanel launchableMarketId={marketId} />
+        {uiRefresh && <AccountInfo />}
       </$GridSection>
 
       <$GridSection gridArea="Inner">

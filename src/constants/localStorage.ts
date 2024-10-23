@@ -30,6 +30,7 @@ export enum LocalStorageKey {
   HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
   DefaultToAllMarketsInPositionsOrdersFills = 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
   SelectedDisplayUnit = 'dydx.SelectedDisplayUnit',
+  ShouldHideLaunchableMarkets = 'dydx.shouldHideLaunchableMarkets',
 
   // Discoverability
   HasSeenElectionBannerTRUMPWIN = 'dydx.HasSeenElectionBannerTRUMPWIN',
