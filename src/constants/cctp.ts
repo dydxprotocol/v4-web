@@ -2,6 +2,7 @@ import { Asset } from '@skip-go/client';
 
 import cctpTokens from '../../public/configs/cctp.json';
 import { TransferType, TransferTypeType } from './abacus';
+import { SUPPORTED_COSMOS_CHAINS } from './graz';
 import { TransferType as NewTransferType } from './transfers';
 
 export type CctpTokenInfo = {
@@ -13,7 +14,15 @@ export type CctpTokenInfo = {
 
 type NullableTransferType = TransferTypeType | undefined | null;
 
-const mainnetChains = cctpTokens.filter((token) => !token.isTestnet);
+const ibcTokens = SUPPORTED_COSMOS_CHAINS.map((chainId) => {
+  return {
+    chainId,
+    tokenAddress: `${chainId}-test-token-address`,
+    name: 'filler name',
+  };
+});
+
+const mainnetChains = cctpTokens.filter((token) => !token.isTestnet).concat(ibcTokens);
 
 // Ethereum is a high fee chain for withdrawals but not deposits for Skip only
 const getLowestFeeChains = (type: NullableTransferType) =>
@@ -68,8 +77,10 @@ const lowestFeeTokensByChainIdMapWithdrawal = getMapOfLowestFeeTokensByChainId(
   TransferType.withdrawal
 );
 
-const lowestFeeTokensByDenomDeposit = getMapOfLowestFeeTokensByDenom(TransferType.deposit);
-const lowestFeeTokensByDenomWithdrawal = getMapOfLowestFeeTokensByDenom(TransferType.withdrawal);
+export const lowestFeeTokensByDenomDeposit = getMapOfLowestFeeTokensByDenom(TransferType.deposit);
+export const lowestFeeTokensByDenomWithdrawal = getMapOfLowestFeeTokensByDenom(
+  TransferType.withdrawal
+);
 
 // TODO: refactor these functions to include cosmos chains and denoms in lowest fees.
 // This will probably involve a non trivial amount of work so do in separate PR.
@@ -83,14 +94,6 @@ export const isLowFeeChainId = (chainId: string, type: NewTransferType) => {
 
 export const isHighFeeChainId = (chainId: string, type: NewTransferType) => {
   return type === NewTransferType.Withdraw && chainId === '1';
-};
-
-export const isLowFeeDenom = (denom: string, type: NewTransferType) => {
-  const lowFeeDenomMap =
-    type === NewTransferType.Deposit
-      ? lowestFeeTokensByDenomDeposit
-      : lowestFeeTokensByDenomWithdrawal;
-  return lowFeeDenomMap[denom.toLowerCase()];
 };
 
 export const cctpTokensByDenomLowerCased = cctpTokens.reduce(
@@ -123,4 +126,8 @@ export const isTokenCctp = (token: Asset | undefined) => {
 const isDenomCctp = (denom: string | undefined) => {
   if (!denom) return false;
   return Boolean(cctpTokensByDenomLowerCased[denom.toLowerCase()]);
+};
+
+export const isLowFeeDenom = (denom: string) => {
+  return lowestFeeTokensByDenomDeposit[denom.toLowerCase()];
 };

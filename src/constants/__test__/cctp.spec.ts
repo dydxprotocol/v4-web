@@ -269,6 +269,34 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         },
       ],
+      'dydx-mainnet-1': [
+        {
+          chainId: 'dydx-mainnet-1',
+          name: 'filler name',
+          tokenAddress: 'dydx-mainnet-1-test-token-address',
+        },
+      ],
+      'neutron-1': [
+        {
+          chainId: 'neutron-1',
+          name: 'filler name',
+          tokenAddress: 'neutron-1-test-token-address',
+        },
+      ],
+      'noble-1': [
+        {
+          chainId: 'noble-1',
+          name: 'filler name',
+          tokenAddress: 'noble-1-test-token-address',
+        },
+      ],
+      'osmosis-1': [
+        {
+          chainId: 'osmosis-1',
+          name: 'filler name',
+          tokenAddress: 'osmosis-1-test-token-address',
+        },
+      ],
     });
   });
   it('deposits skip - should be a map of chain ids to token information including ETH USDC', () => {
@@ -320,6 +348,34 @@ describe('getMapOfLowestFeeTokensByChainId', () => {
           chainId: 'solana',
           name: 'solana',
           tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        },
+      ],
+      'dydx-mainnet-1': [
+        {
+          chainId: 'dydx-mainnet-1',
+          name: 'filler name',
+          tokenAddress: 'dydx-mainnet-1-test-token-address',
+        },
+      ],
+      'neutron-1': [
+        {
+          chainId: 'neutron-1',
+          name: 'filler name',
+          tokenAddress: 'neutron-1-test-token-address',
+        },
+      ],
+      'noble-1': [
+        {
+          chainId: 'noble-1',
+          name: 'filler name',
+          tokenAddress: 'noble-1-test-token-address',
+        },
+      ],
+      'osmosis-1': [
+        {
+          chainId: 'osmosis-1',
+          name: 'filler name',
+          tokenAddress: 'osmosis-1-test-token-address',
         },
       ],
     });
