@@ -44,7 +44,7 @@ export const CancelAllOrdersConfirmationDialog = ({
 
   const onSubmit = useCallback(() => {
     cancelAllOrders(shouldCancelAllOrders ? undefined : marketIdOption);
-    setIsOpen?.(false);
+    setIsOpen(false);
   }, [cancelAllOrders, marketIdOption, setIsOpen, shouldCancelAllOrders]);
 
   return (

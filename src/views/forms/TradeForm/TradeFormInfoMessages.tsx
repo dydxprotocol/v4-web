@@ -24,7 +24,7 @@ export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string>
   });
 
   if (
-    featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+    featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
     marketId === PREDICTION_MARKET.TRUMPWIN &&
     !hasSeenTradeFormMessageTrumpWin
   ) {

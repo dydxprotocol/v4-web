@@ -38,7 +38,7 @@ export const OrderCancelNotification = ({
   const { assetId } = orEmptyObj(marketData);
   const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
-  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
+  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
   const indexedOrderStatus = order.status.rawValue;
   const cancelStatus = localCancel.submissionStatus;
 

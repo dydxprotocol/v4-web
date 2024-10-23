@@ -50,7 +50,7 @@ const SettingsPage = () => {
       label: stringGetter({ key: STRING_KEYS.NETWORK }),
       labelRight: selectedNetworkConfig && (
         <>
-          {selectedNetworkConfig?.slotBefore} <span>{selectedNetworkConfig?.label}</span>
+          {selectedNetworkConfig.slotBefore} <span>{selectedNetworkConfig.label}</span>
         </>
       ),
     },

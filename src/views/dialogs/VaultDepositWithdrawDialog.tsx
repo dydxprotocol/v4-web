@@ -18,7 +18,7 @@ export const VaultDepositWithdrawDialog = ({
   const stringGetter = useStringGetter();
   const { isMobile, isTablet } = useBreakpoints();
 
-  const closeDialog = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const closeDialog = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   useEffect(() => {
     if (!isTablet) {

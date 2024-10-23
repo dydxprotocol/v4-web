@@ -28,6 +28,7 @@ type ElementProps<MenuItemValue extends string> = {
 type StyleProps = {
   className?: string;
   overflow?: 'scroll' | 'wrap';
+  slotBefore?: React.ReactNode;
   truncateLabel?: boolean;
   withSeparators?: boolean;
 };
@@ -47,6 +48,7 @@ export const ToggleGroup = forwardRefFn(
       withSeparators = false,
       size,
       shape = ButtonShape.Pill,
+      slotBefore,
 
       ...buttonProps
     }: ElementProps<MenuItemValue> & StyleProps & BaseButtonProps,
@@ -95,6 +97,7 @@ export const ToggleGroup = forwardRefFn(
         tw="row gap-[0.33em]"
         $withSeparators={withSeparators}
       >
+        {slotBefore}
         {withSeparators ? (
           <$WithSeparators layout="row" withSeparators>
             {toggleItems}

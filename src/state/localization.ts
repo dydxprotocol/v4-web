@@ -50,7 +50,7 @@ export const localizationSlice = createSlice({
           AnalyticsEvents.SwitchedLanguageToEULanguage({
             previousLocale,
             newLocale,
-            browserLanguage: globalThis.navigator?.language,
+            browserLanguage: globalThis.navigator.language,
           })
         );
       }

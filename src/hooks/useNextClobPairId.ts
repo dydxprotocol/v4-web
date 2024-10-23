@@ -122,7 +122,7 @@ export const useNextClobPairId = () => {
       }
 
       if (markets && Object.values(markets).length > 0) {
-        const clobPairIds = Object.values(markets)?.map((perpetualMarket) =>
+        const clobPairIds = Object.values(markets).map((perpetualMarket) =>
           Number((perpetualMarket as PerpetualMarketResponse).clobPairId)
         );
 

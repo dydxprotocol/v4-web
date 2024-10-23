@@ -25,13 +25,13 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: DialogProps<Trad
 
   const onCloseDialog = () => {
     setCurrentStep(MobilePlaceOrderSteps.EditOrder);
-    setIsOpen?.(false);
+    setIsOpen(false);
   };
 
   return (
     <$Dialog
       isOpen={isOpen}
-      setIsOpen={(open: boolean) => (open ? setIsOpen?.(true) : onCloseDialog())}
+      setIsOpen={(open: boolean) => (open ? setIsOpen(true) : onCloseDialog())}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
       currentStep={currentStep}
       slotTrigger={slotTrigger}
