@@ -15,7 +15,6 @@ export interface LinksConfigs {
   foundation?: string;
   governanceLearnMore?: string;
   help?: string;
-  vaultLearnMore?: string;
   initialMarginFractionLearnMore?: string;
   isolatedMarginLearnMore?: string;
   keplrDashboard?: string;
@@ -38,8 +37,8 @@ export interface LinksConfigs {
   mintscanValidatorsLearnMore?: string;
   protocolStaking: string;
   stakingAndClaimingRewardsLearnMore?: string;
-  vaultsLearnMore: string;
   vaultTos?: string;
+  vaultLearnMore?: string;
   vaultOperatorLearnMore?: string;
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
@@ -87,8 +86,6 @@ export const useURLConfigs = (): LinksConfigs => {
     protocolStaking: linksConfigs.protocolStaking,
     stakingAndClaimingRewardsLearnMore:
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
-    // todo add to the link configs objects
-    vaultsLearnMore: linksConfigs.vaultsLearnMore ?? FALLBACK_URL,
     vaultTos: linksConfigs.vaultTos ?? FALLBACK_URL,
     vaultOperatorLearnMore: linksConfigs.vaultOperatorLearnMore ?? FALLBACK_URL,
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
