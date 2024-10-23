@@ -153,7 +153,8 @@ export const TransferForm = ({
   const { screenAddresses } = useDydxClient();
 
   const onTransfer = async () => {
-    if (!isAmountValid || !isAddressValid || !fee) return;
+    const assetDenom = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset].denom : undefined;
+    if (!isAmountValid || !isAddressValid || !fee || !assetDenom) return;
     setIsLoading(true);
     setError(undefined);
 
@@ -178,7 +179,7 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress!,
-          tokensConfigs[asset].denom,
+          assetDenom,
           memo ?? undefined
         );
 
