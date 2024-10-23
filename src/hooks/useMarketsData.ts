@@ -119,6 +119,7 @@ export const useMarketsData = ({
   markets: MarketData[];
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
+  hasMarketIds: boolean;
 } => {
   const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allPerpetualClobIds = orEmptyRecord(
@@ -128,6 +129,7 @@ export const useMarketsData = ({
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
+  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -276,5 +278,5 @@ export const useMarketsData = ({
     [hasPredictionMarkets, markets, showNewFilter]
   );
 
-  return { marketFilters, filteredMarkets, markets };
+  return { marketFilters, filteredMarkets, hasMarketIds, markets };
 };
