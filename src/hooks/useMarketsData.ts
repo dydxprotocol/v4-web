@@ -62,6 +62,9 @@ const filterFunctions = {
     return market.isNew;
   },
   [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
+    return testFlags.pml && market.tags?.includes(MarketFilters.PREDICTION_MARKET);
+  },
+  [MarketFilters.PREDICTION_MARKET_DEPRECATED]: (market: MarketData) => {
     return Object.values(PREDICTION_MARKET).includes(market.id);
   },
   [MarketFilters.RWA]: (market: MarketData) => {
@@ -119,6 +122,7 @@ export const useMarketsData = ({
   markets: MarketData[];
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
+  hasMarketIds: boolean;
 } => {
   const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allPerpetualClobIds = orEmptyRecord(
@@ -128,6 +132,7 @@ export const useMarketsData = ({
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
+  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -271,10 +276,10 @@ export const useMarketsData = ({
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
           markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
         ),
-        hasPredictionMarkets && MarketFilters.PREDICTION_MARKET,
+        hasPredictionMarkets && !testFlags.pml && MarketFilters.PREDICTION_MARKET_DEPRECATED,
       ].filter(isTruthy),
     [hasPredictionMarkets, markets, showNewFilter]
   );
 
-  return { marketFilters, filteredMarkets, markets };
+  return { marketFilters, filteredMarkets, hasMarketIds, markets };
 };

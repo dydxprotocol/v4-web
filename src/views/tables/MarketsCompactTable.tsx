@@ -106,7 +106,7 @@ export const MarketsCompactTable = ({
             </TableCell>
           ),
         },
-        sorting === MarketSorting.HIGHEST_CLOB_PAIR_ID
+        sorting === MarketSorting.RECENTLY_LISTED
           ? {
               columnKey: 'listing',
               allowsSorting: false,
@@ -146,8 +146,8 @@ export const MarketsCompactTable = ({
   );
 
   const sortedMarkets = useMemo(() => {
-    if (sorting === MarketSorting.HIGHEST_CLOB_PAIR_ID) {
-      return filteredMarkets.sort((a, b) => b.clobPairId - a.clobPairId);
+    if (sorting === MarketSorting.RECENTLY_LISTED) {
+      return filteredMarkets.sort((a, b) => (a.line?.length ?? 0) - (b.line?.length ?? 0));
     }
 
     if (sorting === MarketSorting.GAINERS || sorting === MarketSorting.LOSERS) {

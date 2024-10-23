@@ -46,7 +46,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters } = useMarketsData({
+  const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
     filter,
     searchFilter,
     hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
@@ -259,8 +259,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
       <$Table
         withInnerBorders
-        data={filteredMarkets}
-        getRowKey={(row: MarketData) => row.id ?? ''}
+        data={hasMarketIds ? filteredMarkets : []}
+        getRowKey={(row: MarketData) => row.id}
         label="Markets"
         onRowAction={(market: Key) =>
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
@@ -302,7 +302,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               <LoadingSpace id="markets-table" />
             )}
 
-            {hasPotentialMarketsData && (
+            {hasPotentialMarketsData && hasMarketIds && (
               <div>
                 <Button
                   onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
