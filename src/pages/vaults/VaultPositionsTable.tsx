@@ -37,7 +37,7 @@ type VaultTableRow = VaultPosition;
 const VAULT_PAGE_SIZE = 20 as const;
 // abacus adds a special line for unallocated usdc just for vaults, this isn't really done anywhere else so
 // happy to special case it just here
-const USDC_MARKET_HARDCODED = 'USDC-USD';
+const USDC_MARKET_HARDCODED = 'UNALLOCATEDUSDC-USD';
 
 export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -60,7 +60,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
         [
           {
             columnKey: 'market',
-            getCellValue: (row) => row.marketId,
+            getCellValue: (row) =>
+              row.marketId === USDC_MARKET_HARDCODED ? usdcLabel : row.marketId,
             label: stringGetter({ key: STRING_KEYS.MARKET }),
             renderCell: ({ marketId, currentLeverageMultiple }) => {
               const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;

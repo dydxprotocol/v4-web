@@ -90,7 +90,7 @@ export const VaultDepositWithdrawForm = ({
 }: VaultDepositWithdrawFormProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { vaultsLearnMore, vaultTos } = useURLConfigs();
+  const { vaultLearnMore, vaultTos } = useURLConfigs();
   const { usdcImage } = useTokenConfigs();
 
   const { amount, confirmationStep, slippageAck, termsAck, operation } =
@@ -149,7 +149,7 @@ export const VaultDepositWithdrawForm = ({
                     params: {
                       AMOUNT: <$InlineOutput value={slippagePercent} type={OutputType.Percent} />,
                       LINK: (
-                        <Link href={vaultsLearnMore} withIcon isInline>
+                        <Link href={vaultLearnMore} withIcon isInline>
                           {stringGetter({ key: STRING_KEYS.VAULT_FAQS })}
                         </Link>
                       ),
@@ -163,7 +163,7 @@ export const VaultDepositWithdrawForm = ({
         });
         return safeAssign({}, error, errorStrings);
       }),
-    [slippagePercent, stringGetter, validationResponse.errors, vaultsLearnMore]
+    [slippagePercent, stringGetter, validationResponse.errors, vaultLearnMore]
   );
 
   const onSubmitInputForm = () => {
