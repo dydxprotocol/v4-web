@@ -124,8 +124,9 @@ const $WalletName = styled.div`
 `;
 
 const $Link = styled(Link)`
+  --link-color: var(--color-text-0);
+
   justify-content: center;
-  color: var(--color-text-0);
   font: var(--font-base-book);
   &:hover {
     color: var(--color-text-1);
