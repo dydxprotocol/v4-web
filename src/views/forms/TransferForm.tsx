@@ -48,6 +48,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { isValidKey } from '@/lib/typeUtils';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
@@ -89,7 +90,7 @@ export const TransferForm = ({
     setCurrentFee(fee);
   }, [fee]);
 
-  const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const asset = token ?? selectedAsset;
   const isChainTokenSelected = asset === DydxChainAsset.CHAINTOKEN;
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
@@ -152,7 +153,8 @@ export const TransferForm = ({
   const { screenAddresses } = useDydxClient();
 
   const onTransfer = async () => {
-    if (!isAmountValid || !isAddressValid || !fee) return;
+    const assetDenom = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset].denom : undefined;
+    if (!isAmountValid || !isAddressValid || !fee || !assetDenom) return;
     setIsLoading(true);
     setError(undefined);
 
@@ -177,7 +179,7 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress!,
-          tokensConfigs[asset].denom,
+          assetDenom,
           memo ?? undefined
         );
 
@@ -249,6 +251,8 @@ export const TransferForm = ({
     }
   };
 
+  const selectedTokenConfig = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset] : undefined;
+
   const assetOptions = [
     {
       value: DydxChainAsset.USDC,
@@ -285,7 +289,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset].name}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{selectedTokenConfig?.name}</Tag>
         </span>
       ),
       value: (
