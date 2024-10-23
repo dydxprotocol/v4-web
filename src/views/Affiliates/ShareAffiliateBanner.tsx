@@ -22,7 +22,7 @@ export const ShareAffiliateBanner = ({ accountStats }: IShareAffiliateBannerProp
         {stringGetter({
           key: STRING_KEYS.SHARE_AFFILIATE_BANNER_TITLE,
           params: {
-            AMMOUNT: '10.000',
+            AMOUNT: '10.000',
           },
         })}
       </div>
