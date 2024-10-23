@@ -1,4 +1,4 @@
-import { createContext, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import {
   MsgWithdrawFromSubaccount,
@@ -17,17 +17,7 @@ import { RPCUrlsByChainId } from '@/lib/wagmi';
 import { useDydxClient } from '../useDydxClient';
 import { useEndpointsConfig } from '../useEndpointsConfig';
 
-type SkipContextType = ReturnType<typeof useSkipClientContext>;
-const SkipContext = createContext<SkipContextType>({} as SkipContextType);
-SkipContext.displayName = 'skipClient';
-
-export const SkipProvider = ({ ...props }) => (
-  <SkipContext.Provider value={useSkipClientContext()} {...props} />
-);
-
-export const useSkipClient = () => useSkipClientContext();
-
-const useSkipClientContext = () => {
+export const useSkipClient = () => {
   const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators } =
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
