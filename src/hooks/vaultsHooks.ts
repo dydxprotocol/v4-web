@@ -76,9 +76,7 @@ export const useLoadedVaultDetails = () => {
         getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
       ]);
       return wrapNullable(
-        VaultCalculator.calculateVaultSummary(
-          kollections.listOf([dailyResult, hourlyResult].filter(isPresent))
-        )
+        VaultCalculator.calculateVaultSummary([dailyResult, hourlyResult].filter(isPresent))
       );
     },
     ...vaultQueryOptions,
