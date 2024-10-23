@@ -40,10 +40,11 @@ export enum MarketSorting {
 export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
-  PREDICTION_MARKET = 'Prediction Market',
+  PREDICTION_MARKET = 'prediction-market',
 
   // Existing Custom Tags from public/configs/markets.json
   // TODO: Remove when metadataService is default
+  PREDICTION_MARKET_DEPRECATED = 'Prediction Market',
   FX_DEPRECATED = 'FX',
   LAYER_1_DEPRECATED = 'Layer 1',
   LAYER_2_DEPRECATED = 'Layer 2',
@@ -140,6 +141,10 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.ENTERTAINMENT,
   },
   [MarketFilters.PREDICTION_MARKET]: {
+    label: STRING_KEYS.PREDICTION_MARKET,
+    isNew: true,
+  },
+  [MarketFilters.PREDICTION_MARKET_DEPRECATED]: {
     label: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
