@@ -51,6 +51,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
     searchFilter,
     hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
   });
+
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(

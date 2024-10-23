@@ -65,7 +65,7 @@ export const MarketFilter = ({
         >
           <Switch
             name="show-launchable"
-            checked={shouldHideUnlaunchedMarkets}
+            checked={!shouldHideUnlaunchedMarkets}
             onCheckedChange={onShouldHideUnlaunchedMarketsChange}
             tw="font-mini-book"
           />
@@ -75,7 +75,7 @@ export const MarketFilter = ({
   );
 
   const filterLaunchable = (filter: MarketFilters) => {
-    if (shouldHideUnlaunchedMarkets) return true;
+    if (!shouldHideUnlaunchedMarkets) return true;
     return filter !== MarketFilters.LAUNCHABLE;
   };
 

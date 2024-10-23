@@ -191,7 +191,7 @@ export const useMarketsData = ({
         );
       });
 
-    if (unlaunchedMarkets.data && !hideUnlaunchedMarkets && testFlags.pml) {
+    if (!hideUnlaunchedMarkets && testFlags.pml) {
       const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
         .sort(sortByMarketCap)
         .map((market) => {
