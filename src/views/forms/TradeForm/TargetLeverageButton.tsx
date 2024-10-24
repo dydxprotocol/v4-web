@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -14,14 +13,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
+import { getInputTradeTargetLeverage, useTradeFormData } from '@/state/inputsSelectors';
 
 export const TargetLeverageButton = ({ className }: { className?: string }) => {
   const { needsTargetLeverage } = useTradeFormData();
 
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
-
-  const { targetLeverage } = currentTradeData ?? {};
+  const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
 
   const dispatch = useAppDispatch();
   const handleClick = useCallback(() => {

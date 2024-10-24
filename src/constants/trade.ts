@@ -154,6 +154,7 @@ export const CLEARED_SIZE_INPUTS = {
   amountInput: '',
   usdAmountInput: '',
   leverageInput: '',
+  targetLeverageInput: '',
   balancePercentInput: '',
 };
 
