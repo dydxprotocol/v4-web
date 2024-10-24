@@ -53,7 +53,14 @@ const persistConfig = {
   key: 'root',
   version: 3,
   storage,
-  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet', 'appUiConfigs', 'funkitDeposits'],
+  whitelist: [
+    'affiliates',
+    'dismissable',
+    'tradingView',
+    'wallet',
+    'appUiConfigs',
+    'funkitDeposits',
+  ],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 
