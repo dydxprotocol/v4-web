@@ -26,7 +26,7 @@ export const CommunityChartContainer = () => {
   const { programStats } = useOutletContext<{ programStats: IProgramStats }>();
 
   return (
-    <div className="notTablet:px-1">
+    <div className="mb-1 notTablet:px-1">
       <Tabs
         value={chartMetric}
         onValueChange={setChartMetric}

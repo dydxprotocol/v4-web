@@ -60,7 +60,6 @@ import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch } from './state/appTypes';
 import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
-import { AffiliatesLeaderboard } from './views/Affiliates/AffiliatesLeaderboard';
 import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -132,7 +131,6 @@ const Content = () => {
             <Routes>
               <Route path={`${AppRoute.Affiliates}/*`} element={<AffiliatesPage />}>
                 <Route index element={<Navigate to="leaderboard" replace />} />
-                <Route path="leaderboard" element={<AffiliatesLeaderboard />} />
                 <Route path="program-stats" element={<CommunityChartContainer />} />
               </Route>
 
