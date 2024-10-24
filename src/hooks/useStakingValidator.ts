@@ -34,7 +34,7 @@ export const useStakingValidator = () => {
 
   const [selectedValidator, setSelectedValidator] = useState<Validator>();
 
-  const validatorWhitelist = ENVIRONMENT_CONFIG_MAP[selectedNetwork].stakingValidators?.map(
+  const validatorWhitelist = ENVIRONMENT_CONFIG_MAP[selectedNetwork].stakingValidators.map(
     (delegation) => {
       return delegation.toLowerCase();
     }

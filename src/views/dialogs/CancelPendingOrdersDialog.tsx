@@ -28,7 +28,7 @@ export const CancelPendingOrdersDialog = ({
   );
 
   const logoUrl = useAppSelector((s) => getAssetImageUrl(s, pendingPosition?.assetId));
-  const onSuccessfulCancel = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const onSuccessfulCancel = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <Dialog

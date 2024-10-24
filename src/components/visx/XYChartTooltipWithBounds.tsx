@@ -132,14 +132,14 @@ const TooltipInner = <Datum extends object>({
     onTooltipContext?.(tooltipContext);
   }, [tooltipContext]);
 
-  const tooltipContent = tooltipContext?.tooltipOpen
+  const tooltipContent = tooltipContext.tooltipOpen
     ? renderTooltip({ ...tooltipContext, colorScale })
     : null;
 
-  const showTooltip = tooltipContext?.tooltipOpen && tooltipContent != null;
+  const showTooltip = tooltipContext.tooltipOpen && tooltipContent != null;
 
-  let computedTooltipLeft = tooltipContext?.tooltipLeft ?? 0;
-  let computedTooltipTop = tooltipContext?.tooltipTop ?? 0;
+  let computedTooltipLeft = tooltipContext.tooltipLeft ?? 0;
+  let computedTooltipTop = tooltipContext.tooltipTop ?? 0;
   let crosshairLeft = computedTooltipLeft;
   let crosshairTop = computedTooltipTop;
 
@@ -152,19 +152,15 @@ const TooltipInner = <Datum extends object>({
       const xAccessor = entry?.xAccessor;
       const yAccessor = entry?.yAccessor;
       const left =
-        xScale && xAccessor
-          ? Number(xScale(xAccessor(datum))) + xScaleBandwidth / 2 ?? 0
-          : undefined;
+        xScale && xAccessor ? Number(xScale(xAccessor(datum))) + xScaleBandwidth / 2 : undefined;
       const top =
-        yScale && yAccessor
-          ? Number(yScale(yAccessor(datum))) + yScaleBandwidth / 2 ?? 0
-          : undefined;
+        yScale && yAccessor ? Number(yScale(yAccessor(datum))) + yScaleBandwidth / 2 : undefined;
       return { left, top };
     },
     [dataRegistry, xScaleBandwidth, yScaleBandwidth, xScale, yScale]
   );
 
-  const nearestDatum = tooltipContext?.tooltipData?.nearestDatum;
+  const nearestDatum = tooltipContext.tooltipData?.nearestDatum;
   const nearestDatumKey = nearestDatum?.key ?? '';
 
   if (showTooltip && nearestDatum) {
@@ -185,7 +181,7 @@ const TooltipInner = <Datum extends object>({
     const size = Number(glyphStyle?.radius ?? 4);
 
     if (showSeriesGlyphs) {
-      Object.values(tooltipContext?.tooltipData?.datumByKey ?? {}).forEach(
+      Object.values(tooltipContext.tooltipData?.datumByKey ?? {}).forEach(
         ({ key, datum, index }) => {
           const color = colorScale?.(key) ?? theme?.htmlLabel?.color ?? '#222';
           const { left, top } = getDatumLeftTop(key, datum);
@@ -213,7 +209,7 @@ const TooltipInner = <Datum extends object>({
         const color =
           (nearestDatumKey && colorScale?.(nearestDatumKey)) ??
           null ??
-          theme?.gridStyles?.stroke ??
+          theme?.gridStyles.stroke ??
           theme?.htmlLabel?.color ??
           '#222';
         glyphProps.push({
@@ -249,7 +245,7 @@ const TooltipInner = <Datum extends object>({
           y1={margin.top}
           y2={margin.top + innerHeight}
           strokeWidth={1.5}
-          stroke={theme?.gridStyles?.stroke ?? theme?.htmlLabel?.color ?? '#222'}
+          stroke={theme?.gridStyles.stroke ?? theme?.htmlLabel?.color ?? '#222'}
           {...verticalCrosshairStyle}
         />
       )}
@@ -261,7 +257,7 @@ const TooltipInner = <Datum extends object>({
           y1={crosshairTop}
           y2={crosshairTop}
           strokeWidth={1.5}
-          stroke={theme?.gridStyles?.stroke ?? theme?.htmlLabel?.color ?? '#222'}
+          stroke={theme?.gridStyles.stroke ?? theme?.htmlLabel?.color ?? '#222'}
           {...horizontalCrosshairStyle}
         />
       )}
@@ -269,7 +265,7 @@ const TooltipInner = <Datum extends object>({
       {nearestDatum && renderXAxisLabel && (
         <Group left={crosshairLeft} top={margin.top + innerHeight + margin.bottom / 2}>
           <foreignObject style={{ overflow: 'visible' }}>
-            {renderXAxisLabel?.({ ...tooltipContext, colorScale })}
+            {renderXAxisLabel({ ...tooltipContext, colorScale })}
           </foreignObject>
         </Group>
       )}
@@ -281,7 +277,7 @@ const TooltipInner = <Datum extends object>({
           top={crosshairTop}
         >
           <foreignObject style={{ overflow: 'visible' }}>
-            {renderYAxisLabel?.({ ...tooltipContext, colorScale })}
+            {renderYAxisLabel({ ...tooltipContext, colorScale })}
           </foreignObject>
         </Group>
       )}

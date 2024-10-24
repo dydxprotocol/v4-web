@@ -39,7 +39,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
           </h4>
         </$SectionHeader>
-        <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
+        <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
       </$Section>
       <$Section>
         <$SectionHeader>

@@ -195,9 +195,9 @@ export const useChartLines = ({
       return;
     }
 
-    const entryPrice = currentMarketPositionData.entryPrice?.current;
-    const liquidationPrice = currentMarketPositionData.liquidationPrice?.current;
-    const size = currentMarketPositionData.size?.current;
+    const entryPrice = currentMarketPositionData.entryPrice.current;
+    const liquidationPrice = currentMarketPositionData.liquidationPrice.current;
+    const size = currentMarketPositionData.size.current;
 
     maybeDrawPositionLine({
       key: entryLineKey,
@@ -436,9 +436,9 @@ export const useChartLines = ({
       if (isChartReady) {
         runOnChartReady(() => {
           if (orderLinesToggleOn) {
-            orderLineToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
+            orderLineToggle?.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderLineToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
+            orderLineToggle?.classList.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
         });
       }

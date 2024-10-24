@@ -186,7 +186,7 @@ export const WithdrawForm = () => {
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
-      const notificationId = crypto?.randomUUID() ?? Date.now().toString();
+      const notificationId = crypto.randomUUID() ?? Date.now().toString();
 
       try {
         e.preventDefault();
@@ -206,13 +206,13 @@ export const WithdrawForm = () => {
           addresses: [toAddress, dydxAddress],
         });
 
-        if (screenResults?.[dydxAddress]) {
+        if (screenResults[dydxAddress]) {
           setError(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
             })
           );
-        } else if (screenResults?.[toAddress]) {
+        } else if (screenResults[toAddress]) {
           setError(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,

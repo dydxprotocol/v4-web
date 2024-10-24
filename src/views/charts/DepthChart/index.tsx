@@ -247,8 +247,8 @@ export const DepthChart = ({
                     ].reverse()
                   : []
               }
-              xAccessor={(datum: DepthChartDatum) => datum?.price}
-              yAccessor={(datum: DepthChartDatum) => datum?.depth}
+              xAccessor={(datum: DepthChartDatum) => datum.price}
+              yAccessor={(datum: DepthChartDatum) => datum.depth}
               curve={curveStepAfter}
               lineProps={{ strokeWidth: 1.5 }}
               fillOpacity={0.2}
@@ -274,8 +274,8 @@ export const DepthChart = ({
                     ]
                   : []
               }
-              xAccessor={(datum: DepthChartDatum) => datum?.price}
-              yAccessor={(datum: DepthChartDatum) => datum?.depth}
+              xAccessor={(datum: DepthChartDatum) => datum.price}
+              yAccessor={(datum: DepthChartDatum) => datum.depth}
               curve={curveStepAfter}
               lineProps={{ strokeWidth: 1.5 }}
               fillOpacity={0.2}
@@ -305,8 +305,8 @@ export const DepthChart = ({
                 },
               ]}
               strokeWidth={0.25}
-              xAccessor={(datum) => datum?.price}
-              yAccessor={(datum) => datum?.depth}
+              xAccessor={(datum) => datum.price}
+              yAccessor={(datum) => datum.depth}
             />
 
             <Tooltip<DepthChartDatum>

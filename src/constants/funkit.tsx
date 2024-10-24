@@ -8,6 +8,8 @@ export type FunkitDeposit = {
   status?: PurifiedCheckoutHistoryItem['state'];
 };
 
+export const ErrorStatuses = ['CHECKOUT_ERROR', 'EXPIRED', 'CANCELLED'];
+
 export const funkitConfig = () =>
   ({
     appName: 'dYdX',
@@ -25,8 +27,7 @@ export const funkitConfig = () =>
       confirmationScreen: {
         showTokenAmount: false,
         customRecipientConfig: {
-          destinationIcon: <LogoShortIcon id="funkit-dydx-logo" />,
-          destinationText: 'dYdX Account',
+          destinationIcon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
         },
       },
     },
@@ -58,6 +59,7 @@ export const funkitTheme = {
       buttonBackgroundDisabled: OFF_BACKGROUND_DARK,
       inputBackground: OFF_BACKGROUND_DARK,
       offBackground: OFF_BACKGROUND_DARK,
+      buttonIconBackgroundHover: OFF_BACKGROUND_DARK,
     },
   }),
   lightMode: lightTheme({
@@ -68,6 +70,7 @@ export const funkitTheme = {
       buttonBackgroundDisabled: OFF_BACKGROUND_LIGHT,
       offBackground: OFF_BACKGROUND_LIGHT,
       inputBackground: OFF_BACKGROUND_LIGHT,
+      buttonIconBackgroundHover: OFF_BACKGROUND_LIGHT,
     },
   }),
 };

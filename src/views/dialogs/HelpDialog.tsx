@@ -51,7 +51,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
             },
             slotBefore: <Icon iconName={IconName.File} />,
           },
-          globalThis?.Intercom && {
+          globalThis.Intercom && {
             value: 'live-chat',
             label: stringGetter({ key: STRING_KEYS.LIVE_CHAT }),
             description: stringGetter({ key: STRING_KEYS.LIVE_CHAT_DESCRIPTION }),

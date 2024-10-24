@@ -81,7 +81,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     <$Dialog
       isOpen={isTablet}
       setIsOpen={(isOpen: boolean) => {
-        setIsOpen?.(isOpen);
+        setIsOpen(isOpen);
         if (!isOpen)
           abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
       }}

@@ -50,9 +50,9 @@ export const SlippageEditor = ({
 
     if (editorState === EditorState.Selecting) {
       // use setTimeout with a 0ms delay to focus asynchronously.
-      setTimeout(() => toggleGroupRef?.current?.focus(), 0);
+      setTimeout(() => toggleGroupRef.current?.focus(), 0);
     } else if (editorState === EditorState.Editing) {
-      inputRef?.current?.focus();
+      inputRef.current?.focus();
     }
   }, [editorState]);
 

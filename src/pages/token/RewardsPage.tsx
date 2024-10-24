@@ -57,8 +57,8 @@ const RewardsPage = () => {
 
   const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
-  const totalUsdcRewards = (totalRewards?.toArray() ?? [])?.reduce((total: number, reward) => {
-    if (reward?.denom === usdcDenom && reward.amount) {
+  const totalUsdcRewards = (totalRewards?.toArray() ?? []).reduce((total: number, reward) => {
+    if (reward.denom === usdcDenom && reward.amount) {
       return total + parseFloat(reward.amount);
     }
     return total;

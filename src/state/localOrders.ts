@@ -76,7 +76,7 @@ export const localOrdersSlice = createSlice({
           failedOrderClientIds: _.uniq([
             ..._.intersection(
               localCloseAllPositions.submittedOrderClientIds,
-              canceledOrders.map((order) => order.clientId)?.filter(isTruthy)
+              canceledOrders.map((order) => order.clientId).filter(isTruthy)
             ),
             ...localCloseAllPositions.failedOrderClientIds,
           ]),

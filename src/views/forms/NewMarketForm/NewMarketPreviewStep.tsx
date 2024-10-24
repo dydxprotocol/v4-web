@@ -165,7 +165,7 @@ export const NewMarketPreviewStep = ({
               delayBlocks: newMarketProposal.delayBlocks,
             });
 
-            if ((tx as IndexedTx)?.code === 0) {
+            if ((tx as IndexedTx | undefined)?.code === 0) {
               const encodedTx = encodeJson(tx);
               const parsedTx = JSON.parse(encodedTx);
               const hash = parsedTx.hash.toUpperCase();
@@ -297,9 +297,9 @@ export const NewMarketPreviewStep = ({
                   <>
                     {'+ '}
                     <$Icon
-                      $hasError={nativeTokenBalance?.lt(initialDepositAmountBN)}
+                      $hasError={nativeTokenBalance.lt(initialDepositAmountBN)}
                       iconName={
-                        nativeTokenBalance?.gt(initialDepositAmountBN)
+                        nativeTokenBalance.gt(initialDepositAmountBN)
                           ? IconName.CheckCircle
                           : IconName.CautionCircle
                       }

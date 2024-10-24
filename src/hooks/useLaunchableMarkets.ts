@@ -92,7 +92,7 @@ export const useMetadataServiceAssetFromId = (marketId?: string) => {
     }
 
     const assetId = getAssetFromMarketId(marketId);
-    return metadataServiceData.data?.[assetId];
+    return metadataServiceData.data[assetId];
   }, [metadataServiceData.data, marketId]);
 
   return launchableAsset;

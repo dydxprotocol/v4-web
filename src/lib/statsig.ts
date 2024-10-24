@@ -65,7 +65,7 @@ export const getStatsigConfigAsync = async (): Promise<StatsigConfigType> => {
     }));
 
     const dynamicConfigValuesList = Object.values(StatsigDynamicConfigs).map((dcName) => ({
-      [dcName]: client.getDynamicConfig(dcName)?.get('value'),
+      [dcName]: client.getDynamicConfig(dcName).get('value'),
     }));
     const statsigConfig = merge({}, ...gateValuesList, ...dynamicConfigValuesList);
     return statsigConfig;

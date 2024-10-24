@@ -10,7 +10,7 @@ export const setLocalStorage = <Value>({ key, value }: { key: LocalStorageKey; v
 
   const serializedValue = JSON.stringify(value);
 
-  globalThis.localStorage?.setItem(key, serializedValue);
+  globalThis.localStorage.setItem(key, serializedValue);
 };
 
 export const getLocalStorage = <Value>({
@@ -23,7 +23,7 @@ export const getLocalStorage = <Value>({
   validateFn?: (value: Value) => boolean;
 }) => {
   try {
-    const unserializedValue = globalThis.localStorage?.getItem(key);
+    const unserializedValue = globalThis.localStorage.getItem(key);
 
     if (unserializedValue !== null) {
       const value = JSON.parse(unserializedValue) as Value;
@@ -40,5 +40,5 @@ export const getLocalStorage = <Value>({
 };
 
 const removeLocalStorage = ({ key }: { key: LocalStorageKey }) => {
-  globalThis.localStorage?.removeItem(key);
+  globalThis.localStorage.removeItem(key);
 };

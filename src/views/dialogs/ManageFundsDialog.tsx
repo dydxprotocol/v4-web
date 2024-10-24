@@ -28,7 +28,7 @@ export const ManageFundsDialog = ({
   const { type } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
-  const closeDialog = () => setIsOpen?.(false);
+  const closeDialog = () => setIsOpen(false);
 
   const transferTypeConfig = {
     [TransferType.deposit.rawValue]: {

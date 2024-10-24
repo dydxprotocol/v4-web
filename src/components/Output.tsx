@@ -260,6 +260,7 @@ type ElementProps = {
   tag?: React.ReactNode;
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
+  title?: string;
 
   // only for numbers, but they are most common so we hoist
   fractionDigits?: number | null;
@@ -295,6 +296,7 @@ export const Output = ({
   isLoading,
   slotLeft,
   slotRight,
+  title,
   tag,
   className,
   withBaseFont,
@@ -351,7 +353,7 @@ export const Output = ({
         return (
           <$Text
             key={value?.toString()}
-            title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
+            title={`${title ?? value ?? ''}${tag ? ` ${tag}` : ''}`}
             className={className}
           >
             <time
@@ -370,7 +372,7 @@ export const Output = ({
       return (
         <$Text
           key={value?.toString()}
-          title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
+          title={`${title ?? value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
         >
           <RelativeTime timestamp={timestamp} {...relativeTimeOptions} />
@@ -390,7 +392,7 @@ export const Output = ({
       });
 
       return (
-        <$Text key={value} title={`${value ?? ''}${tag ? ` ${tag}` : ''}`} className={className}>
+        <$Text key={value} title={title ?? `${value}${tag ? ` ${tag}` : ''}`} className={className}>
           {dateString}
         </$Text>
       );
@@ -431,14 +433,17 @@ export const Output = ({
       return (
         <$Number
           key={value?.toString()}
-          title={`${value ?? ''}${
-            (
-              { [OutputType.Multiple]: '×', [OutputType.Fiat]: ' USD' } as Record<
-                OutputType,
-                string
-              >
-            )[type] ?? ''
-          }${tag ? ` ${tag}` : ''}`}
+          title={
+            title ??
+            `${value ?? ''}${
+              (
+                { [OutputType.Multiple]: '×', [OutputType.Fiat]: ' USD' } as Record<
+                  OutputType,
+                  string | undefined
+                >
+              )[type] ?? ''
+            }${tag ? ` ${tag}` : ''}`
+          }
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}

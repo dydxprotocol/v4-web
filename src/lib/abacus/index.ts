@@ -40,7 +40,7 @@ import {
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, isDev, type DydxNetwork } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 import {
   CLEARED_CLOSE_POSITION_INPUTS,
@@ -120,7 +120,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.staticTyping = testFlags.enableStaticTyping;
+    appConfigs.staticTyping = testFlags.enableStaticTyping || isDev;
     appConfigs.metadataService = testFlags.pml;
 
     this.stateManager = new AsyncAbacusStateManager(
@@ -435,8 +435,8 @@ class AbacusStateManager {
   getCancelableOrderIds = (marketId: Nullable<string>): string[] =>
     this.stateManager
       .cancelAllOrdersPayload(marketId)
-      ?.payloads?.toArray()
-      ?.map((p) => p.orderId) ?? [];
+      ?.payloads.toArray()
+      .map((p) => p.orderId) ?? [];
 
   adjustIsolatedMarginOfPosition = (
     callback: (

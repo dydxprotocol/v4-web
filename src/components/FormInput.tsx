@@ -13,6 +13,7 @@ import { WithLabel } from '@/components/WithLabel';
 
 type StyleProps = {
   className?: string;
+  backgroundColorOverride?: string;
 };
 
 type ElementProps = {
@@ -28,15 +29,33 @@ type ElementProps = {
 export type FormInputProps = ElementProps & StyleProps & InputProps;
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
-  ({ id, label, slotRight, className, validationConfig, ...otherProps }, ref) => (
+  (
+    { id, label, slotRight, className, validationConfig, backgroundColorOverride, ...otherProps },
+    ref
+  ) => (
     <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
       <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
         {label ? (
-          <$WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
-            <Input ref={ref} id={id} {...otherProps} />
+          <$WithLabel
+            label={label}
+            inputID={id}
+            disabled={otherProps.disabled}
+            $backgroundColorOverride={backgroundColorOverride}
+          >
+            <Input
+              ref={ref}
+              id={id}
+              {...otherProps}
+              $backgroundColorOverride={backgroundColorOverride}
+            />
           </$WithLabel>
         ) : (
-          <Input ref={ref} id={id} {...otherProps} />
+          <Input
+            ref={ref}
+            id={id}
+            {...otherProps}
+            $backgroundColorOverride={backgroundColorOverride}
+          />
         )}
         {slotRight}
       </$InputContainer>
@@ -65,9 +84,11 @@ const $FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     `}
 `;
 
-const $InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean }>`
+const $InputContainer = styled.div<{
+  hasLabel?: boolean;
+  hasSlotRight?: boolean;
+}>`
   ${formMixins.inputContainer}
-
   input {
     ${({ hasLabel }) =>
       !hasLabel &&
@@ -89,8 +110,13 @@ const $InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean 
     `}
 `;
 
-const $WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
+const $WithLabel = styled(WithLabel)<{ disabled?: boolean; $backgroundColorOverride?: string }>`
   ${formMixins.inputLabel}
+  ${({ $backgroundColorOverride }) =>
+    $backgroundColorOverride &&
+    css`
+      background-color: ${$backgroundColorOverride};
+    `}
 
   label {
     ${({ disabled }) => !disabled && 'cursor: text;'}

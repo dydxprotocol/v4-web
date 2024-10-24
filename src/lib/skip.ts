@@ -224,7 +224,7 @@ export const formSkipStatusResponse = (
     routeStatus,
     toChain: toChainTxData?.transactionStatus,
     fromChain: fromChainTxData?.transactionStatus,
-    error: skipStatusResponse?.error?.message,
+    error: skipStatusResponse.error?.message,
   };
 };
 

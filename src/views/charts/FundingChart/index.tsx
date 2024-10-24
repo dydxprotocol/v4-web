@@ -82,8 +82,8 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       series={[
         {
           dataKey: 'funding-rate',
-          xAccessor: (datum) => datum?.time,
-          yAccessor: (datum) => datum?.fundingRate,
+          xAccessor: (datum) => datum.time,
+          yAccessor: (datum) => datum.fundingRate,
           colorAccessor: () => 'var(--color-text-1)',
           getCurve: ({ zoom }) => (zoom > 12 ? curveMonotoneX : curveStepAfter),
         },

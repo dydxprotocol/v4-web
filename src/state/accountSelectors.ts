@@ -68,7 +68,7 @@ export const getSubaccountBuyingPower = (state: RootState) => state.account.suba
  */
 export const getSubaccountEquity = (state: RootState) => state.account.subaccount?.equity;
 
-export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.historicalPnl;
+export const getSubaccountHistoricalPnl = (state: RootState) => state.account.historicalPnl;
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
@@ -137,7 +137,7 @@ export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
     if (
       position?.childSubaccountNumber &&
       position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
-      position.leverage?.current
+      position.leverage.current
     ) {
       return Math.abs(Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS)));
     }
@@ -298,7 +298,7 @@ export const getSubaccountConditionalOrders = () =>
 
       positions?.forEach((position) => {
         const orderSideForConditionalOrder =
-          position?.side?.current === AbacusPositionSide.LONG
+          position.side.current === AbacusPositionSide.LONG
             ? AbacusOrderSide.Sell
             : AbacusOrderSide.Buy;
 
@@ -386,7 +386,7 @@ export const getOrderDetails = () =>
  * @param state
  * @returns list of fills for the currently connected subaccount
  */
-export const getSubaccountFills = (state: RootState) => state.account?.fills;
+export const getSubaccountFills = (state: RootState) => state.account.fills;
 
 /**
  * @param state
@@ -450,13 +450,13 @@ export const getAverageFillPriceForOrder = () =>
  * @param state
  * @returns list of transfers for the currently connected subaccount
  */
-export const getSubaccountTransfers = (state: RootState) => state.account?.transfers;
+export const getSubaccountTransfers = (state: RootState) => state.account.transfers;
 
 /**
  * @param state
  * @returns list of funding payments for the currently connected subaccount
  */
-export const getSubaccountFundingPayments = (state: RootState) => state.account?.fundingPayments;
+export const getSubaccountFundingPayments = (state: RootState) => state.account.fundingPayments;
 
 /**
  * @param state
@@ -550,9 +550,9 @@ export const getCurrentMarketTradeInfoNumbers = createAppSelector(
   [getCurrentMarketOrders, getUnseenFillsCountForMarket, getCurrentMarketFundingPayments],
   (marketOrders, marketUnseenFillsCount, marketFundingPayments) => {
     return {
-      numOpenOrders: marketOrders?.filter((order) => isOpenOrderStatus(order.status)).length,
+      numOpenOrders: marketOrders.filter((order) => isOpenOrderStatus(order.status)).length,
       numUnseenFills: marketUnseenFillsCount,
-      numFundingPayments: marketFundingPayments?.length,
+      numFundingPayments: marketFundingPayments.length,
     };
   }
 );
@@ -585,61 +585,58 @@ export const getHasUnseenOrderUpdates = (state: RootState) => state.account.hasU
 /**
  * @returns Fee tier id of the current user
  */
-export const getUserFeeTier = (state: RootState) => state.account?.wallet?.user?.feeTierId;
+export const getUserFeeTier = (state: RootState) => state.account.wallet?.user?.feeTierId;
 
 /**
  * @returns user stats of the current user
  */
 export const getUserStats = (state: RootState) => ({
-  makerVolume30D: state.account?.wallet?.user?.makerVolume30D,
-  takerVolume30D: state.account?.wallet?.user?.takerVolume30D,
+  makerVolume30D: state.account.wallet?.user?.makerVolume30D,
+  takerVolume30D: state.account.wallet?.user?.takerVolume30D,
 });
 
 /**
  * @returns user wallet balances
  */
-export const getBalances = (state: RootState) => state.account?.balances;
+export const getBalances = (state: RootState) => state.account.balances;
 
 /**
  *  @returns user wallet staking balances
  * */
-export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
+export const getStakingBalances = (state: RootState) => state.account.stakingBalances;
 
 /**
  *  @returns user wallet staking delegations
  * */
-export const getStakingDelegations = (state: RootState) => state.account?.stakingDelegations;
+export const getStakingDelegations = (state: RootState) => state.account.stakingDelegations;
 
 /**
  *  @returns user unbonding delegations
  * */
-export const getUnbondingDelegations = (state: RootState) => state.account?.unbondingDelegations;
+export const getUnbondingDelegations = (state: RootState) => state.account.unbondingDelegations;
 
 /**
  *  @returns user staking rewards
  * */
-export const getStakingRewards = (state: RootState) => state.account?.stakingRewards;
+export const getStakingRewards = (state: RootState) => state.account.stakingRewards;
 
 /**
  * @returns account all time trading rewards
  */
-export const getTotalTradingRewards = (state: RootState) => state.account?.tradingRewards?.total;
+export const getTotalTradingRewards = (state: RootState) => state.account.tradingRewards?.total;
 
 /**
  * @returns account trading rewards aggregated by period
  */
 export const getHistoricalTradingRewards = (state: RootState) =>
-  state.account?.tradingRewards?.filledHistory;
+  state.account.tradingRewards?.filledHistory;
 
 /**
  * @returns account historical trading rewards for the specified perid
  */
 export const getTradingRewardsEventsForPeriod = () =>
   createAppSelector(
-    [
-      (state: RootState) => state.account?.tradingRewards?.rawHistory,
-      (s, period: string) => period,
-    ],
+    [(state: RootState) => state.account.tradingRewards?.rawHistory, (s, period: string) => period],
     (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
   );
 

@@ -105,21 +105,38 @@ const $DetailCard = styled.div`
 `;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const { vaultOperatorLearnMore } = useURLConfigs();
+  const { vaultOperatorLearnMore, vaultLearnMore } = useURLConfigs();
   const operatorName = useEnvConfig('megavaultOperatorName');
   return (
-    <div className={className} tw="text-color-text-0 font-small-medium">
-      {stringGetter({
-        key: STRING_KEYS.VAULT_DESCRIPTION,
-        params: {
-          OPERATOR_NAME: operatorName,
-          OPERATOR_LEARN_MORE: (
-            <Link isInline withIcon href={vaultOperatorLearnMore}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-            </Link>
-          ),
-        },
-      })}
+    <div className={className} tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
+      <p>
+        {stringGetter({
+          key: STRING_KEYS.VAULT_DESCRIPTION,
+        })}{' '}
+        {vaultLearnMore && (
+          <Link isInline withIcon href={vaultLearnMore}>
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE_ABOUT_MEGAVAULT })}
+          </Link>
+        )}
+      </p>
+      <p>
+        {stringGetter({
+          key: STRING_KEYS.VAULT_OPERATOR_DESCRIPTION,
+          params: {
+            OPERATOR_NAME: operatorName,
+          },
+        })}{' '}
+        {vaultOperatorLearnMore && (
+          <Link isInline withIcon href={vaultOperatorLearnMore}>
+            {stringGetter({
+              key: STRING_KEYS.LEARN_MORE_ABOUT_OPERATOR,
+              params: {
+                OPERATOR_NAME: operatorName,
+              },
+            })}
+          </Link>
+        )}
+      </p>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import tw from 'twin.macro';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
+import { ErrorStatuses } from '@/constants/funkit';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
   STRING_KEYS,
@@ -230,12 +231,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
             checkoutId,
             {
               icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
-              title: status === 'COMPLETED' ? 'Instant Deposit' : 'Instant deposit in progress',
+              title:
+                status === 'COMPLETED' || !ErrorStatuses.includes(status ?? '')
+                  ? stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT })
+                  : stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT_IN_PROGRESS }),
               body:
-                status === 'COMPLETED' ? 'Deposit completed' : `Your deposit should arrive shortly`,
+                status === 'COMPLETED'
+                  ? stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })
+                  : ErrorStatuses.includes(status ?? '')
+                    ? stringGetter({ key: STRING_KEYS.DEPOSIT_FAILD })
+                    : stringGetter({ key: STRING_KEYS.DEPOSIT_SHORTLY }),
               toastSensitivity: 'foreground',
               renderCustomBody:
-                status !== 'COMPLETED'
+                status !== 'COMPLETED' && !ErrorStatuses.includes(status ?? '')
                   ? ({ isToast, notification }) => (
                       <FunkitDepositNotification
                         isToast={isToast}
@@ -247,7 +255,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               groupKey: NotificationType.FunkitDeposit,
               renderActionSlot: () => (
                 <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
-                  View instant deposits history →
+                  {stringGetter({ key: STRING_KEYS.VIEW_INSTANT_DEPOSIT_HISTORY })} →
                 </Link>
               ),
             },
@@ -298,7 +306,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 }[transferType],
               });
 
-          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
+          const toChainEta = status?.toChain?.chainData.estimatedRouteDuration ?? 0;
           // TODO: remove typeguards once skip implements estimatedrouteduration
           // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
           const estimatedDuration =
@@ -381,7 +389,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         if (
-          featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+          featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
         ) {
           trigger(
@@ -404,7 +412,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
 
-        if (featureFlags?.[StatsigFlags.ffEnableKeplr]) {
+        if (featureFlags[StatsigFlags.ffEnableKeplr]) {
           trigger(
             ReleaseUpdateNotificationIds.KeplrSupport,
             {
@@ -573,7 +581,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dynamicConfigs = useAllStatsigDynamicConfigValues();
-      const maticWindDownProposal = dynamicConfigs?.[StatsigDynamicConfigs.dcMaticProposalNotif];
+      const maticWindDownProposal = dynamicConfigs[StatsigDynamicConfigs.dcMaticProposalNotif];
       const { contractLossMechanismLearnMore } = useURLConfigs();
 
       const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
@@ -874,7 +882,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       const dynamicConfigs = useAllStatsigDynamicConfigValues();
       const feedbackRequestWalletAddresses =
-        dynamicConfigs?.[StatsigDynamicConfigs.dcHighestVolumeUsers];
+        dynamicConfigs[StatsigDynamicConfigs.dcHighestVolumeUsers];
 
       useEffect(() => {
         if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {

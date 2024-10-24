@@ -100,6 +100,7 @@ import {
 } from '@/icons';
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { LogoShortIcon } from '@/icons/logo-short';
+import UsdcIcon from '@/icons/usdc.svg';
 
 export enum IconName {
   AddressConnector = 'AddressConnector',
@@ -194,6 +195,7 @@ export enum IconName {
   Translate = 'Translate',
   Triangle = 'Triangle',
   TryAgain = 'TryAgain',
+  Usdc = 'Usdc',
   Warning = 'Warning',
   Website = 'Website',
   Whitepaper = 'Whitepaper',
@@ -293,6 +295,7 @@ const icons = {
   [IconName.Translate]: TranslateIcon,
   [IconName.Triangle]: TriangleIcon,
   [IconName.TryAgain]: TryAgainIcon,
+  [IconName.Usdc]: UsdcIcon,
   [IconName.Warning]: WarningIcon,
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,

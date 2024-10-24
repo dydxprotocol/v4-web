@@ -29,7 +29,7 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
 
   const [currentStep, setCurrentStep] = useState<StakeFormSteps>(StakeFormSteps.EditInputs);
 
-  const closeDialog = () => setIsOpen?.(false);
+  const closeDialog = () => setIsOpen(false);
 
   const dialogProps: {
     [key in StakeFormSteps]: {

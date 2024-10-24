@@ -149,7 +149,7 @@ export const CurrentMarketDetails = () => {
   return (
     <MarketDetails
       assetName={name}
-      assetIcon={{ symbol: id }}
+      assetIcon={{ symbol: id, logoUrl: resources?.imageUrl }}
       marketDetailItems={items}
       primaryDescription={stringGetter({ key: `APP.${primaryDescriptionKey}` })}
       secondaryDescription={stringGetter({ key: `APP.${secondaryDescriptionKey}` })}

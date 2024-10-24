@@ -52,7 +52,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   const assetImgUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
   const tradeType = TRADE_TYPES[orderType] ?? undefined;
-  const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
+  const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
   const orderStatus = ORDER_STATUS as KotlinIrEnumValues<typeof AbacusOrderStatus>;
 
   return (
