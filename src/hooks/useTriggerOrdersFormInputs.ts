@@ -45,12 +45,12 @@ export const useTriggerOrdersFormInputs = ({
       [
         {
           field: TriggerOrdersInputField.stopLossOrderId,
-          value: stopLossOrder.id,
+          value: stopLossOrder.id.toString(),
           hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.stopLossOrderSize,
-          value: stopLossOrder.size,
+          value: stopLossOrder.size.toString(),
           hasFormInput: false,
         },
         {
@@ -60,12 +60,12 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.stopLossPrice,
-          value: stopLossOrder.triggerPrice,
+          value: stopLossOrder.triggerPrice?.toString(),
           hasFormInput: true,
         },
         isLimitOrderType(stopLossOrder.type) && {
           field: TriggerOrdersInputField.stopLossLimitPrice,
-          value: stopLossOrder.price,
+          value: stopLossOrder.price.toString(),
           hasFormInput: true,
         },
       ]
@@ -97,7 +97,7 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.takeProfitOrderSize,
-          value: takeProfitOrder.size,
+          value: takeProfitOrder.size.toString(),
           hasFormInput: false,
         },
         {
@@ -107,12 +107,12 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.takeProfitPrice,
-          value: takeProfitOrder.triggerPrice,
+          value: takeProfitOrder.triggerPrice?.toString(),
           hasFormInput: true,
         },
         isLimitOrderType(takeProfitOrder.type) && {
           field: TriggerOrdersInputField.takeProfitLimitPrice,
-          value: takeProfitOrder.price,
+          value: takeProfitOrder.price.toString(),
           hasFormInput: true,
         },
       ]
@@ -153,6 +153,7 @@ export const useTriggerOrdersFormInputs = ({
     return () => {
       abacusStateManager.resetInputState();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

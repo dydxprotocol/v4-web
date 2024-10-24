@@ -62,7 +62,7 @@ export const AdvancedTradeOptions = () => {
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {
       abacusStateManager.setTradeValue({
-        value: true,
+        value: 'true',
         field: TradeInputField.reduceOnly,
       });
     }
@@ -113,7 +113,7 @@ export const AdvancedTradeOptions = () => {
                 })}
                 onChange={({ value }: NumberFormatValues) => {
                   abacusStateManager.setTradeValue({
-                    value: Number(value),
+                    value: Number(value).toString(),
                     field: TradeInputField.goodTilDuration,
                   });
                 }}
@@ -177,7 +177,7 @@ export const AdvancedTradeOptions = () => {
                 disabled={!!reduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
                 onCheckedChange={(checked) =>
                   abacusStateManager.setTradeValue({
-                    value: checked,
+                    value: checked.toString(),
                     field: TradeInputField.reduceOnly,
                   })
                 }
@@ -204,7 +204,7 @@ export const AdvancedTradeOptions = () => {
                 disabled={!!postOnlyTooltip}
                 onCheckedChange={(checked) =>
                   abacusStateManager.setTradeValue({
-                    value: checked,
+                    value: checked.toString(),
                     field: TradeInputField.postOnly,
                   })
                 }

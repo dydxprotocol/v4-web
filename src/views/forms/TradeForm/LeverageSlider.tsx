@@ -68,10 +68,10 @@ export const LeverageSlider = ({
             : undefined,
       },
     }),
-    [maxLeverageBN, leverageBN, orderSide, positionSide]
+    [maxLeverageBN, leverageBN, orderSide]
   );
 
-  const { min, max, midpoint } = sliderConfig[positionSide] || {};
+  const { min, max, midpoint } = sliderConfig[positionSide];
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
   const debouncedSetAbacusLeverage = useMemo(
@@ -79,7 +79,7 @@ export const LeverageSlider = ({
       debounce(
         (newLeverage: number) =>
           abacusStateManager.setTradeValue({
-            value: newLeverage,
+            value: newLeverage.toString(),
             field: TradeInputField.leverage,
           }),
         QUICK_DEBOUNCE_MS
@@ -99,7 +99,7 @@ export const LeverageSlider = ({
     debouncedSetAbacusLeverage.cancel();
 
     abacusStateManager.setTradeValue({
-      value: newLeverage,
+      value: newLeverage?.toString(),
       field: TradeInputField.leverage,
     });
   };
