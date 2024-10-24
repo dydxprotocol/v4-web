@@ -138,6 +138,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           return await compositeClient?.withdrawFromSubaccount(
             subaccountClient,
             amount.toFixed(usdcDecimals),
+            undefined,
             TransactionMemo.withdrawFromSubaccount
           );
         } catch (error) {

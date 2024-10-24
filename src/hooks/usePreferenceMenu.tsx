@@ -15,8 +15,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Switch } from '@/components/Switch';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+import {
+  OtherPreference,
+  setDefaultToAllMarketsInPositionsOrdersFills,
+} from '@/state/appUiConfigs';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 

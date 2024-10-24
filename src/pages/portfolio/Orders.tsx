@@ -11,11 +11,14 @@ import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const Orders = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+
+  const { uiRefresh } = testFlags;
 
   return (
     <AttachedExpandingSection>
@@ -30,6 +33,7 @@ export const Orders = () => {
                 OrdersTableColumnKey.Status,
                 OrdersTableColumnKey.Side,
                 OrdersTableColumnKey.AmountFill,
+                uiRefresh && OrdersTableColumnKey.OrderValue,
                 OrdersTableColumnKey.Price,
                 OrdersTableColumnKey.Trigger,
                 OrdersTableColumnKey.MarginType,

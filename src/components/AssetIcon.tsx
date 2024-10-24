@@ -55,6 +55,7 @@ export const AssetIcon = ({
 
 const $AssetIcon = styled.img`
   --asset-icon-size: 1em;
+  background-color: var(--color-white);
 
   height: var(--asset-icon-size);
   min-height: var(--asset-icon-size);

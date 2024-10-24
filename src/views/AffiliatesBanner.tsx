@@ -23,7 +23,7 @@ import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getGridBackground } from '@/state/configsSelectors';
+import { getGridBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { setDismissedAffiliateBanner } from '@/state/dismissable';
 

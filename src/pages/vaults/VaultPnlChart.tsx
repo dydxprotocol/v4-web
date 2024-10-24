@@ -22,7 +22,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';

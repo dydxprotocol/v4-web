@@ -23,7 +23,7 @@ import {
   AppThemeSystemSetting,
   setAppColorMode,
   setAppThemeSetting,
-} from '@/state/configs';
+} from '@/state/appUiConfigs';
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
 import './ladle.css';
@@ -65,7 +65,7 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <Provider store={store}>
-      <div tw="flex flex-row items-center gap-[8px] ">
+      <div tw="flex flex-row items-center gap-[8px]">
         <h4>Active Theme:</h4>
         <SelectMenu value={theme} onValueChange={setTheme}>
           {[

@@ -21,7 +21,7 @@ import {
   getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import {
   cancelOrderFailed,
   cancelOrderSubmitted,

@@ -49,8 +49,8 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { AppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';

@@ -18,7 +18,7 @@ import { useDydxClient } from '@/hooks/useDydxClient';
 import usePrevious from '@/hooks/usePrevious';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';

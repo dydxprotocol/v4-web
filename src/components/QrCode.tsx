@@ -4,8 +4,8 @@ import QRCodeStyling, { Options } from 'qr-code-styling';
 import styled from 'styled-components';
 
 import { useAppSelector } from '@/state/appTypes';
-import { AppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 type ElementProps = {
   value: string;

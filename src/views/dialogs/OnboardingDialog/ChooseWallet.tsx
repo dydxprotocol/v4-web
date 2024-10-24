@@ -69,11 +69,9 @@ export const ChooseWallet = ({
         ))}
       </$Wallets>
 
-      <$Footer>
-        <Link href={walletLearnMore} withIcon>
-          {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
-        </Link>
-      </$Footer>
+      <$Link href={walletLearnMore} withIcon>
+        {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
+      </$Link>
     </>
   );
 };
@@ -120,17 +118,12 @@ const $WalletName = styled.div`
   ${layoutMixins.textTruncate}
 `;
 
-const $Footer = styled.footer`
-  ${layoutMixins.spacedRow}
+const $Link = styled(Link)`
+  --link-color: var(--color-text-0);
+
   justify-content: center;
-  margin-top: auto;
-
-  a {
-    color: var(--color-text-0);
-    font: var(--font-base-book);
-
-    &:hover {
-      color: var(--color-text-1);
-    }
+  font: var(--font-base-book);
+  &:hover {
+    color: var(--color-text-1);
   }
 `;

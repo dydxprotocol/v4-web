@@ -6,8 +6,8 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { AppTheme, AppThemeSetting } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme, AppThemeSetting } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { updateFunkitDeposit } from '@/state/funkitDeposits';
 

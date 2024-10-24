@@ -4,8 +4,8 @@ import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { AppColorMode, AppTheme } from '@/state/configs';
-import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
+import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { getChartLineColors, getWidgetOverrides } from '@/lib/tradingView/utils';

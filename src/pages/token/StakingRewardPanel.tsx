@@ -21,7 +21,7 @@ import { Panel } from '@/components/Panel';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { BigNumberish } from '@/lib/numbers';

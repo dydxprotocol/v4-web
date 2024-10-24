@@ -24,7 +24,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import {
   getCurrentMarketConfig,
   getCurrentMarketData,
