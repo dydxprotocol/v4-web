@@ -95,7 +95,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
             ))}
           </$TabsList>
 
-          <Toolbar tw="inlineRow">
+          <$Toolbar $uiRefreshEnabled={uiRefresh}>
             {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
               <$IconButton
@@ -105,7 +105,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
                 shape={uiRefresh ? ButtonShape.Square : ButtonShape.Circle}
               />
             </CollapsibleTrigger>
-          </Toolbar>
+          </$Toolbar>
         </$Header>
 
         <CollapsibleContent tw="stack shadow-none">
@@ -222,6 +222,14 @@ const $TabsContent = styled(TabsContent)`
       `} 0.2s var(--ease-out-expo);
     }
   }
+`;
+
+const $Toolbar = styled(Toolbar)<{ $uiRefreshEnabled: boolean }>`
+  ${({ $uiRefreshEnabled }) =>
+    !$uiRefreshEnabled &&
+    css`
+      ${layoutMixins.inlineRow}
+    `}
 `;
 
 const $CollapsibleRoot = styled(CollapsibleRoot)``;
