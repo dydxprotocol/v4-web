@@ -92,17 +92,17 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   >
                     {marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.name}
                     <div tw="row gap-0.25">
-                      <$OutputSigned
-                        value={
-                          (currentLeverageMultiple ?? 0) === 0
-                            ? stringGetter({ key: STRING_KEYS.NONE })
-                            : (currentLeverageMultiple ?? 0) < 0
+                      {!!currentLeverageMultiple && (
+                        <$OutputSigned
+                          value={
+                            (currentLeverageMultiple ?? 0) < 0
                               ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
                               : stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-                        }
-                        sign={getNumberSign(currentLeverageMultiple ?? 0)}
-                        type={OutputType.Text}
-                      />
+                          }
+                          sign={getNumberSign(currentLeverageMultiple ?? 0)}
+                          type={OutputType.Text}
+                        />
+                      )}
                       <Output
                         type={OutputType.Multiple}
                         value={
@@ -202,7 +202,15 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           },
         ] satisfies Array<ColumnDef<VaultTableRow> | false>
       ).filter(isTruthy),
-    [isTablet, marketIdToAssetMetadataMap, marketsData, navigate, stringGetter, usdcImage]
+    [
+      isTablet,
+      marketIdToAssetMetadataMap,
+      marketsData,
+      navigate,
+      stringGetter,
+      usdcImage,
+      usdcLabel,
+    ]
   );
 
   return (
