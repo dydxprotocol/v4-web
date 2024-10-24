@@ -74,7 +74,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
       shape={ButtonShape.Rectangle}
-      size={uiRefresh ? ButtonSize.XSmall : ButtonSize.XSmall}
+      size={ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
@@ -88,7 +88,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
       shape={ButtonShape.Rectangle}
-      size={uiRefresh ? ButtonSize.XSmall : ButtonSize.XSmall}
+      size={ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
