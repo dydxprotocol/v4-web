@@ -72,7 +72,7 @@ export const TradingRewardsChart = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
   const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
   const now = useNow({ intervalMs: timeUnits.minute });
@@ -108,8 +108,8 @@ export const TradingRewardsChart = ({
     return [];
   }, [periodTradingRewards, canViewAccount]);
 
-  const oldestDataPointDate = rewardsData?.[0]?.date;
-  const newestDataPointDate = rewardsData?.[rewardsData.length - 1]?.date;
+  const oldestDataPointDate = rewardsData[0]?.date;
+  const newestDataPointDate = rewardsData[rewardsData.length - 1]?.date;
 
   const msForPeriod = useCallback(
     (period: TradingRewardsPeriod, clampMax: Boolean = true) => {
@@ -169,7 +169,7 @@ export const TradingRewardsChart = ({
           } else {
             // Update period to new selected period
             setIsZooming(false);
-            setSelectedPeriod(periodOptions[predefinedPeriodIx]);
+            setSelectedPeriod(periodOptions[predefinedPeriodIx]!);
           }
         }
       }, NORMAL_DEBOUNCE_MS),
@@ -186,8 +186,8 @@ export const TradingRewardsChart = ({
 
   const onToggleInteract = () => setIsZooming(false);
 
-  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.date, []);
-  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.cumulativeAmount, []);
+  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.date, []);
+  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.cumulativeAmount, []);
 
   const series = useMemo(
     () => [
@@ -273,10 +273,10 @@ export const TradingRewardsChart = ({
         {rewardsData.length > 0 && (
           <$Value>
             {MustBigNumber(
-              tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
+              tooltipContext?.tooltipData?.nearestDatum?.datum.cumulativeAmount ??
                 totalTradingRewards
             ).toFixed(TOKEN_DECIMALS)}
-            <AssetIcon symbol={chainTokenLabel} />
+            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
           </$Value>
         )}
       </TimeSeriesChart>

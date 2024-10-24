@@ -89,9 +89,10 @@ export const VaultTransactionsTable = ({
                   value={timestampMs}
                   type={OutputType.Date}
                   dateOptions={{ format: 'medium' }}
+                  title=""
                 />
                 <div tw="text-[0.75rem] leading-[0.7rem] text-color-text-0">
-                  <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} />
+                  <Output value={timestampMs} type={OutputType.Time} timeOptions={{}} title="" />
                 </div>
               </div>
             ),
@@ -127,7 +128,7 @@ export const VaultTransactionsTable = ({
               transactionHash ? (
                 <Link
                   withIcon
-                  href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
+                  href={`${mintscanTxUrl.replace('{tx_hash}', transactionHash)}`}
                   tw="justify-end"
                 >
                   {truncateAddress(transactionHash, '')}

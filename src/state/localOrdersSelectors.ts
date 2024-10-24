@@ -7,7 +7,7 @@ import { createAppSelector } from './appTypes';
  * @param state
  * @returns latestOrder of the currently connected subaccount throughout this session
  */
-export const getLatestOrder = (state: RootState) => state.localOrders?.latestOrder;
+export const getLatestOrder = (state: RootState) => state.localOrders.latestOrder;
 
 /**
  * @returns the clientId of the latest order

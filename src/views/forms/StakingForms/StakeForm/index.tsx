@@ -55,7 +55,7 @@ export const StakeForm = ({
   const stringGetter = useStringGetter();
   const { delegate, getDelegateFee } = useSubaccount();
   const { nativeTokenBalance: balance, nativeStakingBalance } = useAccountBalance();
-  const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
+  const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator();
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
   const { mintscanValidatorsLearnMore } = useURLConfigs();
 
@@ -103,7 +103,7 @@ export const StakeForm = ({
       getDelegateFee(selectedValidator.operatorAddress, amountBN.toNumber())
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
-            const feeAmount = stdFee.amount[0].amount;
+            const feeAmount = stdFee.amount[0]!.amount;
             setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
           }
         })
@@ -199,7 +199,7 @@ export const StakeForm = ({
           hasInvalidNewValue={newStakedBalanceBN?.isNegative()}
           withDiff={
             newStakedBalanceBN !== undefined &&
-            !MustBigNumber(nativeStakingBalance).eq(newStakedBalanceBN ?? 0)
+            !MustBigNumber(nativeStakingBalance).eq(newStakedBalanceBN)
           }
         />
       ),

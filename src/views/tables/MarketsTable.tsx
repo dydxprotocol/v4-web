@@ -35,6 +35,7 @@ import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -42,9 +43,14 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
+  const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
+    filter,
+    searchFilter,
+    hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
+  });
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
@@ -58,11 +64,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
+                isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
@@ -114,11 +127,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               renderCell: ({
                 assetId,
                 effectiveInitialMarginFraction,
+                imageUrl,
                 initialMarginFraction,
                 name,
+                isUnlaunched,
               }) => (
                 <AssetTableCell
-                  configs={{ effectiveInitialMarginFraction, initialMarginFraction }}
+                  configs={{
+                    effectiveInitialMarginFraction,
+                    imageUrl,
+                    initialMarginFraction,
+                    isUnlaunched,
+                  }}
                   name={name}
                   symbol={assetId}
                 />
@@ -232,13 +252,15 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
+          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
+          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
 
       <$Table
         withInnerBorders
-        data={filteredMarkets}
-        getRowKey={(row: MarketData) => row.id ?? ''}
+        data={hasMarketIds ? filteredMarkets : []}
+        getRowKey={(row: MarketData) => row.id}
         label="Markets"
         onRowAction={(market: Key) =>
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
@@ -248,7 +270,9 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           direction: 'descending',
         }}
         columns={columns}
-        paginationBehavior="showAll"
+        initialPageSize={50}
+        paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+        shouldResetOnTotalRowsChange
         className={className}
         slotEmpty={
           <$MarketNotFound>
@@ -278,7 +302,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               <LoadingSpace id="markets-table" />
             )}
 
-            {hasPotentialMarketsData && (
+            {hasPotentialMarketsData && hasMarketIds && (
               <div>
                 <Button
                   onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}

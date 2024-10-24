@@ -9,7 +9,7 @@ import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
 import { TradingViewBar } from '@/constants/candles';
 import { STRING_KEYS } from '@/constants/localization';
-import { LIQUIDITY_TIERS } from '@/constants/markets';
+import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { timeUnits } from '@/constants/time';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
@@ -37,8 +37,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
-
-const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];
 
 export const LaunchableMarketChart = ({
   className,
@@ -98,9 +96,9 @@ export const LaunchableMarketChart = ({
   const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
 
   const colorString = useMemo(() => {
-    if (!candlesQuery.data) return 'var(--color-text-1)';
-    const first = candlesQuery.data[0];
-    const last = candlesQuery.data[candlesQuery.data.length - 1];
+    if (!candlesQuery.data || candlesQuery.data.length < 1) return 'var(--color-text-1)';
+    const first = candlesQuery.data[0]!;
+    const last = candlesQuery.data[candlesQuery.data.length - 1]!;
     if (first.close > last.close) return 'var(--color-negative)';
     return 'var(--color-positive)';
   }, [candlesQuery.data]);
@@ -128,7 +126,7 @@ export const LaunchableMarketChart = ({
   );
 
   const renderTooltip = (tooltipParam: RenderTooltipParams<TradingViewBar>) => {
-    const datum = tooltipParam?.tooltipData?.nearestDatum?.datum;
+    const datum = tooltipParam.tooltipData?.nearestDatum?.datum;
     if (!datum) return <div />;
 
     return (

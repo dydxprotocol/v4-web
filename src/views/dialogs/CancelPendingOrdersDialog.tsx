@@ -12,6 +12,7 @@ import { Dialog } from '@/components/Dialog';
 
 import { getNonZeroPendingPositions } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 
 import { CancelAllOrdersInMarketForm } from '../forms/CancelAllOrdersInMarketForm';
 
@@ -26,13 +27,14 @@ export const CancelPendingOrdersDialog = ({
     [allPending, marketId]
   );
 
-  const onSuccessfulCancel = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, pendingPosition?.assetId));
+  const onSuccessfulCancel = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      slotIcon={pendingPosition && <AssetIcon symbol={pendingPosition.assetId} />}
+      slotIcon={pendingPosition && <AssetIcon logoUrl={logoUrl} symbol={pendingPosition.assetId} />}
       title={stringGetter({
         key:
           (pendingPosition?.orderCount ?? 0) !== 1

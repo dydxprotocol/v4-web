@@ -1,10 +1,4 @@
-import { Asset } from '@skip-go/client';
-
 import { WalletNetworkType } from '@/constants/wallets';
-
-import { isNativeDenom } from '@/lib/assetUtils';
-
-import { isTokenCctp } from './cctp';
 
 export enum TransferType {
   Deposit = 'DEPOSIT',
@@ -87,27 +81,4 @@ export const getNetworkTypeFromWalletNetworkType = (
     return 'cosmos';
   }
   return 'evm';
-};
-
-export const getDefaultTokenDenomFromAssets = (assets: Asset[]): string => {
-  const cctpToken = assets.find((asset) => {
-    return isTokenCctp(asset);
-  });
-  const nativeChainToken = assets.find((asset) => {
-    return isNativeDenom(asset.denom);
-  });
-  const uusdcToken = assets.find((asset) => {
-    return asset.denom === 'uusdc' || asset.originDenom === 'uusdc';
-  });
-  // If not cctp or native chain token, default to the first item in the list
-  const defaultTokenDenom =
-    cctpToken?.denom ?? nativeChainToken?.denom ?? uusdcToken?.denom ?? assets[0]?.denom;
-  return defaultTokenDenom;
-};
-
-export const getDefaultChainIDFromNetworkType = (networkType: NetworkType): string | undefined => {
-  if (networkType === 'evm') return '1';
-  if (networkType === 'svm') return 'solana';
-  if (networkType === 'cosmos') return 'noble-1';
-  return undefined;
 };

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { IAffiliateStats, IProgramStats } from '@/constants/affiliates';
+import { IProgramStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 import { AffiliateRoute } from '@/constants/routes';
 
@@ -51,6 +51,9 @@ export const AffiliatesPage = () => {
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount.toString(),
+    totalVolume: affiliateMetadata?.totalVolume
+      ? Math.floor(affiliateMetadata.totalVolume).toLocaleString()
+      : '0',
   };
 
   return (
@@ -89,7 +92,7 @@ export const AffiliatesPage = () => {
             <section className="mt-0.5 flex flex-row flex-wrap items-center justify-between gap-y-1">
               {isConnectedWagmi && !userStatus.isAffiliate && !userStatus.isVip ? (
                 <div className="w-full notTablet:w-7/12">
-                  <ShareAffiliateBanner accountStats={accountStats as IAffiliateStats} />
+                  <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
                 </div>
               ) : (
                 <AffiliateStatsCard

@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
@@ -12,10 +13,12 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { PositionSideTag } from '@/components/PositionSideTag';
 import { TagSize } from '@/components/Tag';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { hasPositionSideChanged } from '@/lib/tradeData';
 
 type ElementProps = {
+  assetImgUrl: Nullable<string>;
   currentSize?: number | null;
   notionalTotal?: number | null;
   postOrderSize?: number | null;
@@ -30,6 +33,7 @@ type StyleProps = {
 };
 
 export const PositionTile = ({
+  assetImgUrl,
   currentSize,
   notionalTotal,
   postOrderSize,
@@ -40,6 +44,7 @@ export const PositionTile = ({
   showNarrowVariation,
 }: ElementProps & StyleProps) => {
   const hasSizeDiff = isNumber(postOrderSize) && currentSize !== postOrderSize;
+  const displaySymbol = getDisplayableAssetFromBaseAsset(symbol);
 
   const { currentPositionSide, newPositionSide, positionSideHasChanged } = hasPositionSideChanged({
     currentSize,
@@ -57,7 +62,9 @@ export const PositionTile = ({
       showNarrowVariation={showNarrowVariation}
     >
       <div>
-        {showNarrowVariation && <AssetIcon symbol={symbol} tw="text-[2.25rem]" />}
+        {showNarrowVariation && (
+          <AssetIcon logoUrl={assetImgUrl} symbol={symbol} tw="text-[2.25rem]" />
+        )}
         <div tw="inlineRow">
           <PositionSideTag positionSide={currentPositionSide} size={TagSize.Medium} />
           {hasSizeDiff && newPositionSide && currentPositionSide !== newPositionSide && (
@@ -73,7 +80,7 @@ export const PositionTile = ({
         <$PositionSizes showNarrowVariation={showNarrowVariation}>
           <$Output
             type={OutputType.Number}
-            tag={!hasSizeDiff && symbol}
+            tag={!hasSizeDiff && displaySymbol}
             value={currentSize}
             fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             showSign={ShowSign.None}
@@ -94,7 +101,7 @@ export const PositionTile = ({
                 value={postOrderSize}
                 fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
                 showSign={ShowSign.None}
-                tag={symbol}
+                tag={displaySymbol}
                 withBaseFont
               />
             </div>

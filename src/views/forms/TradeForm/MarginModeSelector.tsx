@@ -50,7 +50,7 @@ export const MarginModeSelector = ({
       <$Text>
         {marginMode &&
           stringGetter({
-            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+            key: MARGIN_MODE_STRINGS[marginMode.rawValue]!,
           })}
       </$Text>
       <Icon iconName={IconName.Triangle} tw="ml-[0.5ch] rotate-[0.75turn] text-[0.4375rem]" />
@@ -74,7 +74,7 @@ export const MarginModeSelector = ({
         <$Text>
           {marginMode &&
             stringGetter({
-              key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+              key: MARGIN_MODE_STRINGS[marginMode.rawValue]!,
             })}
         </$Text>
       </Button>

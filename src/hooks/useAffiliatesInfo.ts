@@ -122,7 +122,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const affiliateMetadataQuery = useQuery({
-    queryKey: ['affiliateMetadata', dydxAddress],
+    queryKey: ['affiliateMetadata', dydxAddress, compositeClient],
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress),
   });
@@ -130,7 +130,6 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   const programStatsQuery = useQuery({
     queryKey: ['programStats'],
     queryFn: fetchProgramStats,
-    enabled: Boolean(compositeClient),
   });
 
   const affiliateStatsQuery = useQuery({
@@ -150,7 +149,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     const maxRevshare = lastTier
       ? lastTier.takerFeeSharePpm / 1_000_000
       : DEFAULT_MAX_AFFILIATE_SHARE;
-    const taker3FeeTier = feeTiers?.[2].taker ?? DEFAULT_TAKER_3_FEE;
+    const taker3FeeTier = feeTiers?.[2]?.taker ?? DEFAULT_TAKER_3_FEE;
 
     const maxEarning = taker3FeeTier * maxRevshare * REF_SHARE_VOLUME_CAP_USD;
     const maxVipEarning = taker3FeeTier * MAX_AFFILIATE_VIP_SHARE * REF_SHARE_VOLUME_CAP_USD;

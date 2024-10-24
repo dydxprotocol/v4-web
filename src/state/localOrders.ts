@@ -76,7 +76,7 @@ export const localOrdersSlice = createSlice({
           failedOrderClientIds: _.uniq([
             ..._.intersection(
               localCloseAllPositions.submittedOrderClientIds,
-              canceledOrders.map((order) => order.clientId)?.filter(isTruthy)
+              canceledOrders.map((order) => order.clientId).filter(isTruthy)
             ),
             ...localCloseAllPositions.failedOrderClientIds,
           ]),
@@ -286,17 +286,21 @@ const updateCancelAllOrderIds = (
   };
 
   const updateKey = (currentKey: string) => ({
-    ...state.localCancelAlls[currentKey],
-    [key]: getNewOrderIds(state.localCancelAlls[currentKey]),
+    ...state.localCancelAlls[currentKey]!,
+    [key]: getNewOrderIds(state.localCancelAlls[currentKey]!),
   });
 
   state.localCancelAlls = {
     ...state.localCancelAlls,
-    ...(state.localCancelAlls[CANCEL_ALL_ORDERS_KEY] && {
-      [CANCEL_ALL_ORDERS_KEY]: updateKey(CANCEL_ALL_ORDERS_KEY),
-    }),
-    ...(state.localCancelAlls[cancelAllKey] && {
-      [cancelAllKey]: updateKey(cancelAllKey),
-    }),
+    ...(state.localCancelAlls[CANCEL_ALL_ORDERS_KEY]
+      ? {
+          [CANCEL_ALL_ORDERS_KEY]: updateKey(CANCEL_ALL_ORDERS_KEY),
+        }
+      : {}),
+    ...(state.localCancelAlls[cancelAllKey]
+      ? {
+          [cancelAllKey]: updateKey(cancelAllKey),
+        }
+      : {}),
   };
 };

@@ -23,7 +23,7 @@ export const UnbondingPanels = () => {
   const stringGetter = useStringGetter();
   const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
   const { unbondingValidators } = useStakingValidator() ?? {};
-  const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
+  const { chainTokenDecimals, chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
   if (!unbondingDelegations?.length) {
     return null;
@@ -98,7 +98,9 @@ export const UnbondingPanels = () => {
               <Output
                 type={OutputType.Asset}
                 value={formatUnits(BigInt(delegation.balance), chainTokenDecimals)}
-                slotRight={<AssetIcon symbol={chainTokenLabel} tw="ml-0.5" />}
+                slotRight={
+                  <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} tw="ml-0.5" />
+                }
                 tw="text-color-text-2 font-large-book"
               />
               <div tw="text-color-text-0">{availableInText}</div>

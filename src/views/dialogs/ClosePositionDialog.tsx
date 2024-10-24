@@ -28,9 +28,11 @@ import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDialogProps>) => {
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id, resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
+  const { imageUrl } = orEmptyObj(resources);
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -48,7 +50,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
   } = {
     [MobilePlaceOrderSteps.EditOrder]: {
       title: <CloseOrderHeader />,
-      slotIcon: <AssetIcon symbol={id} />,
+      slotIcon: <AssetIcon logoUrl={imageUrl} symbol={id} />,
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
@@ -79,7 +81,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
     <$Dialog
       isOpen={isTablet}
       setIsOpen={(isOpen: boolean) => {
-        setIsOpen?.(isOpen);
+        setIsOpen(isOpen);
         if (!isOpen)
           abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
       }}

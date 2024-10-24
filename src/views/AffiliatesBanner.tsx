@@ -111,25 +111,6 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
               {titleString}
             </div>
           </div>
-          {/* <div tw="ml-0.5">
-            {stringGetter({
-              key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
-              params: {
-                AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT.toLocaleString()}`,
-              },
-            })}
-            <br />
-            {stringGetter({
-              key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
-              params: {
-                LINK: (
-                  <Link href={affiliateProgram} isInline isAccent>
-                    {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
-                  </Link>
-                ),
-              },
-            })}
-          </div> */}
           <div tw="ml-0.5">{description}</div>
         </div>
       </div>

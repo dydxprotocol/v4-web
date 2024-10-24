@@ -137,10 +137,11 @@ export const TimeSeriesChart = <Datum extends {}>({
   const chartRef = useRef<HTMLDivElement>(null);
 
   // Chart data
-  const { xAccessor, yAccessor } = series[0];
+  const { xAccessor, yAccessor } = series[0]!;
 
-  const earliestDatum = data?.[0];
-  const latestDatum = data?.[data.length - 1];
+  const atLeastOnePoint = data.length > 0;
+  const earliestDatum = data[0];
+  const latestDatum = data[data.length - 1];
 
   // Chart state
   const getClampedZoomDomain = useCallback(
@@ -148,7 +149,7 @@ export const TimeSeriesChart = <Datum extends {}>({
       return clamp(
         Math.max(1e-320, Math.min(Number.MAX_SAFE_INTEGER, unclamped)),
         minZoomDomain,
-        xAccessor(latestDatum) - xAccessor(earliestDatum)
+        atLeastOnePoint ? xAccessor(latestDatum!) - xAccessor(earliestDatum!) : 0
       );
     },
     [earliestDatum, latestDatum, minZoomDomain, xAccessor]
@@ -211,10 +212,18 @@ export const TimeSeriesChart = <Datum extends {}>({
 
     const zoom = zoomDomain / minZoomDomain;
 
-    const domainBase = [
-      clamp(xAccessor(latestDatum) - zoomDomain, xAccessor(earliestDatum), xAccessor(latestDatum)),
-      xAccessor(latestDatum),
-    ] as [number, number];
+    const domainBase = (
+      atLeastOnePoint
+        ? [
+            clamp(
+              xAccessor(latestDatum!) - zoomDomain,
+              xAccessor(earliestDatum!),
+              xAccessor(latestDatum!)
+            ),
+            xAccessor(latestDatum!),
+          ]
+        : [0, 0]
+    ) as [number, number];
     const domain = [
       domainBase[0] - (domainBase[1] - domainBase[0]) * domainBasePadding[0],
       domainBase[1] + (domainBase[1] - domainBase[0]) * domainBasePadding[1],
@@ -361,8 +370,8 @@ export const TimeSeriesChart = <Datum extends {}>({
                           colorAccessor={
                             childSeries.threshold ? () => 'transparent' : childSeries.colorAccessor
                           }
-                          onPointerMove={childSeries?.onPointerMove}
-                          onPointerOut={childSeries?.onPointerOut}
+                          onPointerMove={childSeries.onPointerMove}
+                          onPointerOut={childSeries.onPointerOut}
                         />
 
                         {(childSeries.glyphSize ?? childSeries.getGlyphSize) && (

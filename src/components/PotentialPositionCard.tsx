@@ -6,7 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { Icon, IconName } from './Icon';
@@ -35,11 +36,13 @@ export const PotentialPositionCard = ({
 
   const stringGetter = useStringGetter();
   const { assetId, freeCollateral, marketId, orderCount } = pendingPosition;
+  const assetImgUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
 
   return (
     <PortfolioCard
       assetName={marketName}
       assetId={assetId}
+      assetImgUrl={assetImgUrl}
       detailLabel={stringGetter({ key: STRING_KEYS.MARGIN })}
       detailValue={<Output type={OutputType.Fiat} value={freeCollateral?.current} />}
       actionSlot={

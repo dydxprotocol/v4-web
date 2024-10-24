@@ -24,12 +24,12 @@ import { forceOpenDialog } from '@/state/dialogs';
 
 export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const stakingApr = useStakingAPR();
 
   const [currentStep, setCurrentStep] = useState<StakeFormSteps>(StakeFormSteps.EditInputs);
 
-  const closeDialog = () => setIsOpen?.(false);
+  const closeDialog = () => setIsOpen(false);
 
   const dialogProps: {
     [key in StakeFormSteps]: {
@@ -41,7 +41,7 @@ export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
     [StakeFormSteps.EditInputs]: {
       title: stringGetter({ key: STRING_KEYS.STAKE }),
       description: stringGetter({ key: STRING_KEYS.STAKE_DESCRIPTION }),
-      slotIcon: <AssetIcon symbol={chainTokenLabel} />,
+      slotIcon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
     },
     [StakeFormSteps.PreviewOrder]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRM_STAKE }),

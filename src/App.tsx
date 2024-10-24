@@ -49,11 +49,13 @@ import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
+import { useReferralAddress } from './hooks/useReferralAddress';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
+import { updateLatestReferrer } from './state/affiliates';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch } from './state/appTypes';
 import { openDialog } from './state/dialogs';
@@ -98,11 +100,21 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
+  const { data: referralAddress, isSuccess: isReferralAddressSuccess } = useReferralAddress(
+    testFlags.referralCode
+  );
+
   useEffect(() => {
     if (testFlags.referralCode) {
       dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    if (referralAddress && isReferralAddressSuccess) {
+      dispatch(updateLatestReferrer(referralAddress));
+    }
+  }, [referralAddress, isReferralAddressSuccess, dispatch]);
 
   return (
     <>

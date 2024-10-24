@@ -72,9 +72,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() ?? [])
+              (updatedState.assetIds()?.toArray() ?? [])
                 .map((assetId: string) => {
-                  const assetData = updatedState?.asset(assetId);
+                  const assetData = updatedState.asset(assetId);
                   if (assetData == null) {
                     return undefined;
                   }
@@ -112,7 +112,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.tradingRewards)) {
         if (updatedState.account?.tradingRewards) {
-          dispatch(setTradingRewards(updatedState.account?.tradingRewards));
+          dispatch(setTradingRewards(updatedState.account.tradingRewards));
         }
       }
 

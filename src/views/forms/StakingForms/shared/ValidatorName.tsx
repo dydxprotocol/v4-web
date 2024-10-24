@@ -20,8 +20,8 @@ export const ValidatorName = ({
         fallbackText={validator?.description?.moniker}
       />
       {validator?.description?.website ? (
-        <Link href={validator?.description?.website}>
-          <$TruncatedText>{validator?.description?.moniker} </$TruncatedText>
+        <Link href={validator.description.website}>
+          <$TruncatedText>{validator.description.moniker} </$TruncatedText>
         </Link>
       ) : (
         <$TruncatedText>{validator?.description?.moniker} </$TruncatedText>

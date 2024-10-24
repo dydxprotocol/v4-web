@@ -27,9 +27,9 @@ export const useOrderbookCandles = ({
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           if (orderbookCandlesToggleOn) {
-            orderbookCandlesToggle?.classList?.add(TOGGLE_ACTIVE_CLASS_NAME);
+            orderbookCandlesToggle?.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
           } else {
-            orderbookCandlesToggle?.classList?.remove(TOGGLE_ACTIVE_CLASS_NAME);
+            orderbookCandlesToggle?.classList.remove(TOGGLE_ACTIVE_CLASS_NAME);
           }
           abacusStateManager.toggleOrderbookCandles(orderbookCandlesToggleOn);
         });

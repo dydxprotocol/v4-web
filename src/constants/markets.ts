@@ -13,8 +13,10 @@ export type MarketData = {
 
   clobPairId: number;
   effectiveInitialMarginFraction: Nullable<number>;
+  imageUrl: Nullable<string>;
   initialMarginFraction: Nullable<number>;
   isNew?: boolean;
+  isUnlaunched?: boolean;
   line?: Nullable<number[]>;
   name?: Nullable<string>;
   nextFundingRate?: Nullable<number>;
@@ -32,16 +34,17 @@ export type MarketData = {
 export enum MarketSorting {
   GAINERS = 'gainers',
   LOSERS = 'losers',
-  HIGHEST_CLOB_PAIR_ID = 'highest_clob_pair_id',
+  RECENTLY_LISTED = 'recently-listed',
 }
 
 export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
-  PREDICTION_MARKET = 'Prediction Market',
+  PREDICTION_MARKET = 'prediction-market',
 
   // Existing Custom Tags from public/configs/markets.json
   // TODO: Remove when metadataService is default
+  PREDICTION_MARKET_DEPRECATED = 'Prediction Market',
   FX_DEPRECATED = 'FX',
   LAYER_1_DEPRECATED = 'Layer 1',
   LAYER_2_DEPRECATED = 'Layer 2',
@@ -63,6 +66,7 @@ export enum MarketFilters {
   GAMING = 'gaming',
   MEMES = 'memes',
   RWA = 'real-world-assets',
+  LAUNCHABLE = 'launchable',
 }
 
 // ORDER IS INTENTIONAL
@@ -140,6 +144,14 @@ export const MARKET_FILTER_OPTIONS: Record<
     label: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
+  [MarketFilters.PREDICTION_MARKET_DEPRECATED]: {
+    label: STRING_KEYS.PREDICTION_MARKET,
+    isNew: true,
+  },
+  [MarketFilters.LAUNCHABLE]: {
+    label: STRING_KEYS.LAUNCHABLE,
+    isNew: true,
+  },
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';
@@ -199,3 +211,5 @@ export const LIQUIDITY_TIERS = {
     impactNotional: 2_500,
   },
 };
+
+export const ISOLATED_LIQUIDITY_TIER_INFO = LIQUIDITY_TIERS[4];

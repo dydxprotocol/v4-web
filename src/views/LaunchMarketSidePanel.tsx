@@ -1,11 +1,17 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
+import { LinkOutIcon } from '@/icons';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -16,6 +22,8 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+
+import { MegaVaultYieldOutput } from './MegaVaultYieldOutput';
 
 export const LaunchMarketSidePanel = ({
   className,
@@ -28,6 +36,7 @@ export const LaunchMarketSidePanel = ({
   const stringGetter = useStringGetter();
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const baseAsset = launchableAsset && getDisplayableAssetFromBaseAsset(launchableAsset.id);
+  const { usdcImage } = useTokenConfigs();
 
   const items = [
     {
@@ -42,13 +51,28 @@ export const LaunchMarketSidePanel = ({
             <Output
               tw="inline-block"
               type={OutputType.Asset}
-              value={10_000}
-              slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline-block" symbol="USDC" />}
+              value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+              slotRight={
+                <AssetIcon
+                  tw="mb-[-0.125rem] ml-0.25 inline-block"
+                  logoUrl={usdcImage}
+                  symbol="USDC"
+                />
+              }
               fractionDigits={0}
             />
           ),
-          APR_PERCENTAGE: <Output tw="inline-block" type={OutputType.Percent} value={0.3456} />,
+          APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           PAST_DAYS: 30,
+          MEGAVAULT_LINK: (
+            <Link
+              tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"
+              to={AppRoute.Vault}
+            >
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+              <LinkOutIcon />
+            </Link>
+          ),
         },
       }),
     },
@@ -94,8 +118,10 @@ export const LaunchMarketSidePanel = ({
               <Output
                 tw="inline text-color-text-1"
                 type={OutputType.Asset}
-                value={10_000}
-                slotRight={<AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" symbol="USDC" />}
+                value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                slotRight={
+                  <AssetIcon tw="mb-[-0.125rem] ml-0.25 inline" logoUrl={usdcImage} symbol="USDC" />
+                }
                 fractionDigits={0}
               />
             ),

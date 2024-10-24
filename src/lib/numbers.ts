@@ -65,7 +65,7 @@ export const getSeparator = ({
 }) =>
   Intl.NumberFormat(browserLanguage)
     .formatToParts(1000.1)
-    .find?.((part) => part.type === separatorType)?.value;
+    .find((part) => part.type === separatorType)?.value;
 
 /**
  * Converts a byte array (representing an arbitrary-size signed integer) into a bigint.
@@ -76,7 +76,7 @@ export function bytesToBigInt(u: Uint8Array): bigint {
     return BigInt(0);
   }
   // eslint-disable-next-line no-bitwise
-  const negated: boolean = (u[0] & 1) === 1;
+  const negated: boolean = (u[0]! & 1) === 1;
   const hex: string = Buffer.from(u.slice(1)).toString('hex');
   const abs: bigint = BigInt(`0x${hex}`);
   return negated ? -abs : abs;

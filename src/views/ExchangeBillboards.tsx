@@ -53,7 +53,10 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           link: `${chainTokenLabel}`,
         },
       ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
-        <div key={key} tw="row flex-1 justify-between rounded-0.625 bg-color-layer-3 px-1.25 py-1">
+        <div
+          key={key}
+          tw="row flex-1 justify-between rounded-0.625 bg-color-layer-3 px-1 pb-0.5 pt-0.75 tablet:pb-0.75 tablet:pt-1"
+        >
           <$BillboardStat>
             <div tw="row gap-0.375">
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}

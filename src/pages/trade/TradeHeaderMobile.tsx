@@ -19,9 +19,13 @@ import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?: string }) => {
-  const { name, id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { name, id, resources } = orEmptyObj(
+    useAppSelector(getCurrentMarketAssetData, shallowEqual)
+  );
+  const { imageUrl } = orEmptyObj(resources);
   const navigate = useNavigate();
 
   const { displayId, priceChange24H, priceChange24HPercent } =
@@ -43,7 +47,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
     </div>
   ) : (
     <div tw="inlineRow gap-[1ch]">
-      <AssetIcon symbol={id} tw="text-[2.5rem]" />
+      <AssetIcon logoUrl={imageUrl} symbol={id} tw="text-[2.5rem]" />
       <$Name>
         <h3>{name}</h3>
         <span>{displayId}</span>

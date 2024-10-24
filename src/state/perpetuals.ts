@@ -67,14 +67,18 @@ export const perpetualsSlice = createSlice({
     ) => {
       const { candles, marketId, resolution } = action.payload;
 
-      const candleState = state.candles[marketId]
-        ? { ...state.candles[marketId], selectedResolution: resolution }
-        : {
-            data: Object.fromEntries(
-              Object.keys(RESOLUTION_MAP).map((resolutionString: string) => [resolutionString, []])
-            ),
-            selectedResolution: resolution,
-          };
+      const candleState: CandleDataByMarket =
+        state.candles[marketId] != null
+          ? { ...state.candles[marketId]!, selectedResolution: resolution }
+          : {
+              data: Object.fromEntries(
+                Object.keys(RESOLUTION_MAP).map((resolutionString: string) => [
+                  resolutionString,
+                  [],
+                ])
+              ),
+              selectedResolution: resolution,
+            };
 
       const existingCandles = (candleState.data[resolution] ??= []);
 
@@ -82,7 +86,8 @@ export const perpetualsSlice = createSlice({
         ...existingCandles,
         ...(existingCandles.length
           ? candles.filter(
-              ({ startedAt }) => startedAt < existingCandles[existingCandles.length - 1].startedAt
+              ({ startedAt }) =>
+                startedAt < (existingCandles[existingCandles.length - 1]?.startedAt ?? 0)
             )
           : candles),
       ];
@@ -134,14 +139,15 @@ export const perpetualsSlice = createSlice({
     ) => {
       const { marketId, resolution } = action.payload;
 
-      const candleState = state.candles[marketId]
-        ? { ...state.candles[marketId], selectedResolution: resolution }
-        : {
-            data: Object.fromEntries(
-              objectKeys(RESOLUTION_MAP).map((resolutionString) => [resolutionString, []])
-            ),
-            selectedResolution: resolution,
-          };
+      const candleState =
+        state.candles[marketId] != null
+          ? { ...state.candles[marketId]!, selectedResolution: resolution }
+          : {
+              data: Object.fromEntries(
+                objectKeys(RESOLUTION_MAP).map((resolutionString) => [resolutionString, []])
+              ),
+              selectedResolution: resolution,
+            };
 
       state.candles[marketId] = candleState;
     },

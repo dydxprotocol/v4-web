@@ -81,9 +81,9 @@ const useDydxClientContext = () => {
     (async () => {
       if (
         networkConfig?.chainId &&
-        networkConfig?.indexerUrl &&
-        networkConfig?.websocketUrl &&
-        networkConfig?.validatorUrl
+        networkConfig.indexerUrl &&
+        networkConfig.websocketUrl &&
+        networkConfig.validatorUrl
       ) {
         try {
           const initializedClient = await CompositeClient.connect(
@@ -393,7 +393,7 @@ const useDydxClientContext = () => {
       const { candles } =
         (await indexerClient.markets.getPerpetualMarketCandles(
           marketId,
-          RESOLUTION_MAP[resolution],
+          RESOLUTION_MAP[resolution]!,
           fromIso,
           toIso,
           limit
@@ -438,10 +438,10 @@ const useDydxClientContext = () => {
       const length = candlesInRange.length;
 
       if (length) {
-        const oldestTime = new Date(candlesInRange[length - 1].startedAt).getTime();
+        const oldestTime = new Date(candlesInRange[length - 1]!.startedAt).getTime();
 
         if (oldestTime > fromMs) {
-          toIso = candlesInRange[length - 1].startedAt;
+          toIso = candlesInRange[length - 1]!.startedAt;
         } else {
           break;
         }
@@ -461,7 +461,7 @@ const useDydxClientContext = () => {
     const results = await Promise.all(promises);
 
     const screenedAddresses = Object.fromEntries(
-      addresses.map((address, index) => [address, results[index]?.restricted])
+      addresses.map((address, index) => [address, !!results[index]?.restricted])
     );
 
     updateSanctionedAddresses(screenedAddresses);

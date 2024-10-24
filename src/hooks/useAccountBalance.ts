@@ -200,7 +200,7 @@ export const useAccountBalance = ({
         const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount;
         const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount;
         return currentBalance >= largestBalance ? current : largest;
-      }, accounts[0]);
+      }, accounts[0]!);
 
       return {
         data: {
@@ -231,7 +231,7 @@ export const useAccountBalance = ({
       ? formatUnits(evmNativeBalance, evmNativeDecimals)
       : undefined
     : evmTokenBalance?.result !== undefined && evmTokenDecimals?.result !== undefined
-      ? formatUnits(evmTokenBalance?.result, evmTokenDecimals?.result)
+      ? formatUnits(evmTokenBalance.result, evmTokenDecimals.result)
       : undefined;
 
   // remove fee from usdc cosmos balance
@@ -239,7 +239,7 @@ export const useAccountBalance = ({
     ? Math.max(parseFloat(cosmosQuery.data) - COSMOS_GAS_RESERVE, 0)
     : undefined;
 
-  const solBalance = solanaQuery?.data?.data.formatted;
+  const solBalance = solanaQuery.data?.data.formatted;
 
   const balance = isCosmosChain ? cosmosBalance : isSolanaChain ? solBalance : evmBalance;
 

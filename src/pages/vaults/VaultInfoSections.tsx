@@ -27,6 +27,7 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagSize, TagType } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -104,21 +105,38 @@ const $DetailCard = styled.div`
 `;
 export const VaultDescription = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const { vaultOperatorLearnMore } = useURLConfigs();
+  const { vaultOperatorLearnMore, vaultLearnMore } = useURLConfigs();
   const operatorName = useEnvConfig('megavaultOperatorName');
   return (
-    <div className={className} tw="text-color-text-0 font-small-medium">
-      {stringGetter({
-        key: STRING_KEYS.VAULT_DESCRIPTION,
-        params: {
-          OPERATOR_NAME: operatorName,
-          OPERATOR_LEARN_MORE: (
-            <Link isInline withIcon href={vaultOperatorLearnMore}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-            </Link>
-          ),
-        },
-      })}
+    <div className={className} tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
+      <p>
+        {stringGetter({
+          key: STRING_KEYS.VAULT_DESCRIPTION,
+        })}{' '}
+        {vaultLearnMore && (
+          <Link isInline withIcon href={vaultLearnMore}>
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE_ABOUT_MEGAVAULT })}
+          </Link>
+        )}
+      </p>
+      <p>
+        {stringGetter({
+          key: STRING_KEYS.VAULT_OPERATOR_DESCRIPTION,
+          params: {
+            OPERATOR_NAME: operatorName,
+          },
+        })}{' '}
+        {vaultOperatorLearnMore && (
+          <Link isInline withIcon href={vaultOperatorLearnMore}>
+            {stringGetter({
+              key: STRING_KEYS.LEARN_MORE_ABOUT_OPERATOR,
+              params: {
+                OPERATOR_NAME: operatorName,
+              },
+            })}
+          </Link>
+        )}
+      </p>
     </div>
   );
 };
@@ -129,7 +147,7 @@ export const VaultPositionsSection = ({ className }: { className?: string }) => 
   return (
     <div className={className}>
       <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
-        {stringGetter({ key: STRING_KEYS.POSITIONS })}{' '}
+        {stringGetter({ key: STRING_KEYS.HOLDINGS })}{' '}
         <Tag size={TagSize.Medium} type={TagType.Number}>
           {numPositions}
         </Tag>
@@ -143,17 +161,13 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const { thirtyDayReturnPercent, totalValue } = orEmptyObj(useLoadedVaultDetails().data);
+  const { totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
   const detailItems = [
     {
       key: '30d-apr',
       label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
-      value: (
-        <$ColoredReturn $sign={getNumberSign(thirtyDayReturnPercent)}>
-          <Output value={thirtyDayReturnPercent} type={OutputType.Percent} fractionDigits={0} />
-        </$ColoredReturn>
-      ),
+      value: <MegaVaultYieldOutput />,
     },
     {
       key: 'balance',

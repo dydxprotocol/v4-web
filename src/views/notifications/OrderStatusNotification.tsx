@@ -31,10 +31,12 @@ import {
   getOrderByClientId,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { getTradeType } from '@/lib/orders';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { FillDetails } from './TradeNotification/FillDetails';
@@ -57,12 +59,15 @@ export const OrderStatusNotification = ({
     localOrder.orderId
   );
 
-  const { assetId } = marketData ?? {};
+  const { assetId } = orEmptyObj(marketData);
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
   const { equityTiersLearnMore } = useURLConfigs();
+  // force allow the ?. just in case it's not in the map
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
-  const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
-    typeof AbacusOrderStatus
-  >;
+  const indexedOrderStatus = order?.status.rawValue as
+    | KotlinIrEnumValues<typeof AbacusOrderStatus>
+    | undefined;
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
@@ -132,7 +137,7 @@ export const OrderStatusNotification = ({
     <Notification
       isToast={isToast}
       notification={notification}
-      slotIcon={<AssetIcon symbol={assetId} />}
+      slotIcon={<AssetIcon logoUrl={logoUrl} symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
         <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">

@@ -12,6 +12,7 @@ import { Dialog } from '@/components/Dialog';
 
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getAssetImageUrl } from '@/state/assetsSelectors';
 
 import { AdjustIsolatedMarginForm } from '../forms/AdjustIsolatedMarginForm';
 
@@ -21,14 +22,16 @@ export const AdjustIsolatedMarginDialog = ({
 }: DialogProps<AdjustIsolatedMarginDialogProps>) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(positionId), shallowEqual);
-
-  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, subaccountPosition?.assetId));
+  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
+      slotIcon={
+        subaccountPosition && <AssetIcon logoUrl={logoUrl} symbol={subaccountPosition.assetId} />
+      }
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
       tw="[--dialog-width:25rem]"
     >

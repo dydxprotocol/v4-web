@@ -74,8 +74,8 @@ export const ProgramHistoricalChart = ({
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
   const { metricData, setSelectedPeriod, selectedPeriod } = useCommunityChart(selectedChartMetric);
 
-  const oldestDataPointDate = metricData?.[0]?.date;
-  const newestDataPointDate = metricData?.[metricData.length - 1]?.date;
+  const oldestDataPointDate = metricData[0]?.date;
+  const newestDataPointDate = metricData[metricData.length - 1]?.date;
 
   const chartTitles = {
     [AffiliatesProgramMetric.AffiliateEarnings]: stringGetter({
@@ -137,8 +137,8 @@ export const ProgramHistoricalChart = ({
 
   const onToggleInteract = () => setIsZooming(false);
 
-  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.date, []);
-  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.cumulativeAmount, []);
+  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.date, []);
+  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.cumulativeAmount, []);
 
   const series = useMemo(
     () => [
@@ -180,7 +180,7 @@ export const ProgramHistoricalChart = ({
 
   return (
     <>
-      {metricData?.length === 0 ? undefined : (
+      {metricData.length === 0 ? undefined : (
         <div tw="spacedRow w-full font-medium-book">
           <span tw="h-min text-color-text-1">{chartTitles[selectedChartMetric]}</span>
 
@@ -212,9 +212,9 @@ export const ProgramHistoricalChart = ({
       >
         {programStats && metricData.length > 0 ? (
           <$Value>
-            {tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount != undefined
+            {tooltipContext?.tooltipData?.nearestDatum?.datum.cumulativeAmount !== undefined
               ? MustBigNumber(
-                  tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount
+                  tooltipContext.tooltipData.nearestDatum.datum.cumulativeAmount
                 ).toFixed(chartDecimals[selectedChartMetric])
               : chartTotales[selectedChartMetric]}
             <AssetIcon symbol={chainTokenLabel} />

@@ -132,7 +132,7 @@ export const TvChart = () => {
 
     // Only reset data if displayUnit has actually changed
     if (prevDisplayUnit !== displayUnit) {
-      const chart = tvWidget.activeChart?.();
+      const chart = tvWidget.activeChart();
       if (chart) {
         chart.resetData();
         resetCache();

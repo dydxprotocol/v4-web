@@ -30,7 +30,7 @@ const exampleItems = [
 ];
 
 export const RadioGroupStory: Story<Pick<Parameters<typeof RadioGroup>[0], 'items'>> = (args) => {
-  const [item, setItem] = useState(exampleItems[0].value);
+  const [item, setItem] = useState(exampleItems[0]!.value);
   return (
     <StoryWrapper>
       <RadioGroup value={item} onValueChange={(value) => setItem(value)} {...args} />

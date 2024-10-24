@@ -1,4 +1,4 @@
-import { isDev } from '@/constants/networks';
+import { isDev, isTestnet } from '@/constants/networks';
 
 class TestFlags {
   public queryParams: { [key: string]: string };
@@ -30,12 +30,12 @@ class TestFlags {
     return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get addressOverride(): string {
+  get addressOverride(): string | undefined {
     return this.queryParams.address;
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults || isDev;
+    return !!this.queryParams.vaults || isDev || isTestnet;
   }
 
   get referrer() {
@@ -47,7 +47,7 @@ class TestFlags {
   }
 
   get pml() {
-    return !!this.queryParams.pml || isDev;
+    return !!this.queryParams.pml || isDev || isTestnet;
   }
 
   get showLimitClose() {
@@ -64,6 +64,10 @@ class TestFlags {
 
   get uiRefresh() {
     return !!this.queryParams.uirefresh || isDev;
+  }
+
+  get onboardingRewrite() {
+    return !!this.queryParams.onboarding_rewrite;
   }
 }
 

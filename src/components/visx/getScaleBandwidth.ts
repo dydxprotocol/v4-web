@@ -2,5 +2,5 @@
 import { AxisScale } from '@visx/axis';
 
 export function getScaleBandwidth<Scale extends AxisScale>(s?: Scale) {
-  return s && 'bandwidth' in s ? s?.bandwidth() ?? 0 : 0;
+  return s && 'bandwidth' in s ? s.bandwidth() : 0;
 }

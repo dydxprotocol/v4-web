@@ -70,13 +70,13 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
 
   const submit = async () => {
     const action =
-      residence && isBlockedGeo(COUNTRIES_MAP[residence])
+      residence && isBlockedGeo(COUNTRIES_MAP[residence]!)
         ? ComplianceAction.INVALID_SURVEY
         : ComplianceAction.VALID_SURVEY;
 
     const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
       if (success) {
-        setIsOpen?.(false);
+        setIsOpen(false);
       } else {
         log('useWithdrawalInfo/getWithdrawalCapacityByDenom', new Error(parsingError?.message));
       }

@@ -51,7 +51,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   // Chart data
   const data = useAppSelector(calculateFundingRateHistory, shallowEqual);
 
-  const latestDatum = data?.[data.length - 1];
+  const latestDatum = data[data.length - 1];
 
   // Chart state
   const [fundingRateView, setFundingRateView] = useState(FundingRateResolution.OneHour);
@@ -82,8 +82,8 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       series={[
         {
           dataKey: 'funding-rate',
-          xAccessor: (datum) => datum?.time,
-          yAccessor: (datum) => datum?.fundingRate,
+          xAccessor: (datum) => datum.time,
+          yAccessor: (datum) => datum.fundingRate,
           colorAccessor: () => 'var(--color-text-1)',
           getCurve: ({ zoom }) => (zoom > 12 ? curveMonotoneX : curveStepAfter),
         },
@@ -97,7 +97,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         return (
           <AxisLabelOutput
             type={OutputType.DateTime}
-            value={tooltipDatum.time}
+            value={tooltipDatum?.time}
             tw="shadow-[0_0_0.5rem_var(--color-layer-2)]"
           />
         );
@@ -108,13 +108,13 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         return (
           <$YAxisLabelOutput
             type={OutputType.SmallPercent}
-            value={getAllFundingRates(tooltipDatum.fundingRate)[fundingRateView]}
+            value={getAllFundingRates(tooltipDatum?.fundingRate)[fundingRateView]}
             accentColor={
               {
                 [FundingDirection.ToLong]: 'var(--color-negative)',
                 [FundingDirection.ToShort]: 'var(--color-positive)',
                 [FundingDirection.None]: 'var(--color-layer-6)',
-              }[tooltipDatum.direction]
+              }[tooltipDatum?.direction ?? FundingDirection.None]
             }
           />
         );
@@ -174,7 +174,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
           type={OutputType.SmallPercent}
           value={latestFundingRate}
           fractionDigits={TINY_PERCENT_DECIMALS}
-          isNegative={latestFundingRate < 0}
+          isNegative={(latestFundingRate ?? 0) < 0}
         />
       </$CurrentFundingRate>
     </TimeSeriesChart>

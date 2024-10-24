@@ -16,6 +16,7 @@ import { timeUnits } from '@/constants/time';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import {
   useForceRefreshVaultAccount,
@@ -90,9 +91,10 @@ export const VaultDepositWithdrawForm = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { vaultsLearnMore, vaultTos } = useURLConfigs();
+  const { usdcImage } = useTokenConfigs();
 
   const { amount, confirmationStep, slippageAck, termsAck, operation } =
-    useAppSelector(getVaultForm) ?? {};
+    useAppSelector(getVaultForm);
   const validationResponse = useVaultFormValidationResponse();
 
   const { balanceUsdc: userBalance, withdrawableUsdc: userAvailableBalance } = orEmptyObj(
@@ -109,7 +111,7 @@ export const VaultDepositWithdrawForm = ({
     vaultBalance: userBalanceUpdated,
     marginUsage: marginUsageUpdated,
     withdrawableVaultBalance: userAvailableUpdated,
-  } = orEmptyObj(validationResponse?.summaryData);
+  } = orEmptyObj(validationResponse.summaryData);
 
   // save initial type to state if it is provided
   useEffect(() => {
@@ -132,7 +134,7 @@ export const VaultDepositWithdrawForm = ({
 
   const errors = useMemo(
     () =>
-      validationResponse?.errors.toArray().map((error) => {
+      validationResponse.errors.toArray().map((error) => {
         const errorStrings: { long?: string | JSX.Element; short?: string } = runFn(() => {
           const longKey = error.resources.text?.stringKey;
           const shortKey = error.resources.title?.stringKey;
@@ -161,7 +163,7 @@ export const VaultDepositWithdrawForm = ({
         });
         return safeAssign({}, error, errorStrings);
       }),
-    [slippagePercent, stringGetter, validationResponse?.errors, vaultsLearnMore]
+    [slippagePercent, stringGetter, validationResponse.errors, vaultsLearnMore]
   );
 
   const onSubmitInputForm = () => {
@@ -258,10 +260,7 @@ export const VaultDepositWithdrawForm = ({
           }),
         });
       } else if (operation === 'WITHDRAW') {
-        if (
-          submissionData?.withdraw?.shares == null ||
-          submissionData?.withdraw?.minAmount == null
-        ) {
+        if (submissionData?.withdraw?.shares == null || submissionData.withdraw.minAmount == null) {
           notify({
             slotTitleLeft: <$SmallIcon iconName={IconName.OrderCanceled} $hasError />,
             title: stringGetter({ key: STRING_KEYS.MEGAVAULT_CANT_SUBMIT }),
@@ -288,14 +287,14 @@ export const VaultDepositWithdrawForm = ({
 
         const startTime = new Date().valueOf();
         const result = await withdrawFromMegavault(
-          submissionData?.withdraw?.shares,
-          submissionData?.withdraw?.minAmount
+          submissionData.withdraw.shares,
+          submissionData.withdraw.minAmount
         );
         const intermediateTime = new Date().valueOf();
         await sleep(INDEXER_LAG_ALLOWANCE);
         const finalTime = new Date().valueOf();
 
-        const events = (result as IndexedTx)?.events;
+        const events = (result as IndexedTx | undefined)?.events;
         const actualAmount = events
           ?.find((e) => e.type === 'withdraw_from_megavault')
           ?.attributes.find((a) => a.key === 'redeemed_quote_quantums')?.value;
@@ -306,7 +305,7 @@ export const VaultDepositWithdrawForm = ({
             amount: realAmountReceived,
             operation,
             userOperationId,
-            amountDiff: Math.abs((preEstimate ?? 0) - (realAmountReceived ?? 0)),
+            amountDiff: Math.abs((preEstimate ?? 0) - realAmountReceived),
             submissionTimeBase: intermediateTime - startTime,
             submissionTimeTotal: finalTime - startTime,
           })
@@ -317,16 +316,13 @@ export const VaultDepositWithdrawForm = ({
           body: stringGetter({
             key: STRING_KEYS.MEGAVAULT_WITHDRAWAL_SUCCESSFUL_BODY,
             params: {
-              AMOUNT:
-                amount == null ? (
-                  stringGetter({ key: STRING_KEYS.UNKNOWN })
-                ) : (
-                  <Output
-                    tw="inline-block text-color-text-1"
-                    type={OutputType.Fiat}
-                    value={realAmountReceived}
-                  />
-                ),
+              AMOUNT: (
+                <Output
+                  tw="inline-block text-color-text-1"
+                  type={OutputType.Fiat}
+                  value={realAmountReceived}
+                />
+              ),
             },
           }),
         });
@@ -372,9 +368,9 @@ export const VaultDepositWithdrawForm = ({
 
   const onClickMax = () => {
     if (operation === 'DEPOSIT') {
-      setAmountState(`${Math.floor(freeCollateral?.current ?? 0) ?? ''}`);
+      setAmountState(`${Math.floor(freeCollateral?.current ?? 0)}`);
     } else {
-      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100 ?? ''}`);
+      setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100}`);
     }
   };
 
@@ -529,12 +525,12 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorsPreventingSubmit = errors?.filter((e) => e.type.name === 'error') ?? [];
-  const hasInputErrors = validationResponse == null || errorsPreventingSubmit.length > 0;
+  const errorsPreventingSubmit = errors.filter((e) => e.type.name === 'error');
+  const hasInputErrors = errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
-    ?.filter((e) => e.long != null)
-    ?.filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
+    .filter((e) => e.long != null)
+    .filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
     .map((alertMessage) => (
       <AlertMessage
         key={alertMessage.code}
@@ -646,7 +642,7 @@ export const VaultDepositWithdrawForm = ({
         <$SourceLabel>{inputFormConfig.formLabel}</$SourceLabel>
         <$TargetLabel>{stringGetter({ key: STRING_KEYS.DESTINATION })}</$TargetLabel>
         <$SourceBox>
-          <AssetIcon symbol="USDC" tw="h-2 w-2" />
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="h-2 w-2" />
           <Output value={amount} type={OutputType.Fiat} />
         </$SourceBox>
         <$Arrow>
@@ -657,7 +653,7 @@ export const VaultDepositWithdrawForm = ({
           {inputFormConfig.transactionTarget.icon === 'cross' ? (
             <div tw="grid h-2 w-2 items-center justify-center rounded-1 bg-color-layer-6">C</div>
           ) : (
-            <img src="/dydx-chain.png" tw="h-2 w-2" />
+            <img src="/dydx-chain.png" alt="dydx-chain" tw="h-2 w-2" />
           )}
           <div>{inputFormConfig.transactionTarget.label}</div>
         </$TargetBox>
@@ -673,7 +669,7 @@ export const VaultDepositWithdrawForm = ({
         items={[...inputFormConfig.inputReceiptItems, ...inputFormConfig.receiptItems]}
       />
 
-      {validationResponse?.summaryData.needSlippageAck && (
+      {validationResponse.summaryData.needSlippageAck && (
         <Checkbox
           checked={slippageAck}
           onCheckedChange={(checked) => dispatch(setVaultFormSlippageAck(checked))}
@@ -691,7 +687,7 @@ export const VaultDepositWithdrawForm = ({
         />
       )}
 
-      {validationResponse?.summaryData.needTermsAck && (
+      {validationResponse.summaryData.needTermsAck && (
         <Checkbox
           checked={termsAck}
           onCheckedChange={(checked) => dispatch(setVaultFormTermsAck(checked))}

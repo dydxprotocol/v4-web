@@ -219,13 +219,13 @@ export const useTradingViewDatafeed = (
 
             // If there are not enough candles in the store, retrieve more from the API
             if (cachedBars.length < countBack) {
-              const earliestCachedBarTime = cachedBars?.[cachedBars.length - 1]?.time;
+              const earliestCachedBarTime = cachedBars[cachedBars.length - 1]?.time;
 
               fetchedCandles = await getCandlesForDatafeed({
                 marketId: symbolInfo.ticker!,
                 resolution,
                 fromMs,
-                toMs: earliestCachedBarTime || toMs,
+                toMs: earliestCachedBarTime ?? toMs,
               });
 
               dispatch(

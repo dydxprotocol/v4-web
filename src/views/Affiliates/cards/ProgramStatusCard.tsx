@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD } from '@/constants/affiliates';
-import { ButtonAction } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -90,7 +90,8 @@ export const ProgramStatusCard = ({
             <Button
               className="w-full"
               action={ButtonAction.Base}
-              onClick={() => window.open(affiliateProgram)}
+              type={ButtonType.Link}
+              href={affiliateProgram}
             >
               {buttonText}
             </Button>
@@ -99,18 +100,16 @@ export const ProgramStatusCard = ({
               <Button
                 className="w-full"
                 action={ButtonAction.Base}
-                onClick={() => {
-                  window.open(`mailto:${supportEmail}`, '_blank');
-                }}
+                type={ButtonType.Link}
+                href={`mailto:${supportEmail}`}
               >
                 {buttonText}
               </Button>
               <Button
                 className="w-full"
                 action={ButtonAction.Base}
-                onClick={() => {
-                  window.open(community, '_blank');
-                }}
+                type={ButtonType.Link}
+                href={community}
               >
                 {stringGetter({ key: STRING_KEYS.JOIN_DISCORD })}
               </Button>

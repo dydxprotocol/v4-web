@@ -50,7 +50,7 @@ const useLocalNotificationsContext = () => {
   // Ensure version matches, otherwise wipe
   useEffect(() => {
     if (
-      allTransferNotifications?.version !==
+      allTransferNotifications.version !==
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.TransferNotifications]
     ) {
       setAllTransferNotifications({
@@ -61,7 +61,7 @@ const useLocalNotificationsContext = () => {
 
   const { dydxAddress } = useAccounts();
 
-  const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] || [] : [];
+  const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] ?? [] : [];
 
   const setTransferNotifications = useCallback(
     (notifications: TransferNotifcation[]) => {
@@ -71,7 +71,7 @@ const useLocalNotificationsContext = () => {
 
         updatedNotifications[dydxAddress] = [
           ...notifications,
-          ...(updatedNotifications[dydxAddress] || []).slice(notifications.length),
+          ...(updatedNotifications[dydxAddress] ?? []).slice(notifications.length),
         ];
 
         return updatedNotifications;
@@ -157,7 +157,7 @@ const useLocalNotificationsContext = () => {
                 !isExchange &&
                 !hasErrors &&
                 (!currentStatus?.latestRouteStatusSummary ||
-                  currentStatus?.latestRouteStatusSummary === 'ongoing')
+                  currentStatus.latestRouteStatusSummary === 'ongoing')
               ) {
                 try {
                   const skipParams = {
@@ -178,7 +178,7 @@ const useLocalNotificationsContext = () => {
                   });
                   if (status) {
                     transferNotification.status = status;
-                    if (status?.latestRouteStatusSummary === 'success') {
+                    if (status.latestRouteStatusSummary === 'success') {
                       track(
                         AnalyticsEvents.TransferNotification({
                           triggeredAt,

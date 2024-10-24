@@ -16,6 +16,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { PageMenu } from '@/components/PageMenu';
 import { PageMenuItemType } from '@/components/PageMenu/PageMenuItem';
+import { DisplaySettings } from '@/views/DisplaySettings';
 import { useNetworks } from '@/views/menus/useNetworks';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -49,7 +50,7 @@ const SettingsPage = () => {
       label: stringGetter({ key: STRING_KEYS.NETWORK }),
       labelRight: selectedNetworkConfig && (
         <>
-          {selectedNetworkConfig?.slotBefore} <span>{selectedNetworkConfig?.label}</span>
+          {selectedNetworkConfig.slotBefore} <span>{selectedNetworkConfig.label}</span>
         </>
       ),
     },
@@ -58,6 +59,12 @@ const SettingsPage = () => {
       type: PageMenuItemType.Navigation,
       href: `${AppRoute.Settings}/${MobileSettingsRoute.Preferences}`,
       label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
+    },
+    {
+      value: 'display-settings-nav-item',
+      type: PageMenuItemType.Navigation,
+      href: `${AppRoute.Settings}/${MobileSettingsRoute.Display}`,
+      label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
     },
   ];
 
@@ -101,6 +108,7 @@ const SettingsPage = () => {
           path={MobileSettingsRoute.Network}
           element={<PageMenu group="network" items={[networkMenuItems]} />}
         />
+        <Route path={MobileSettingsRoute.Display} element={<DisplaySettings tw="px-1.5 py-1" />} />
         <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
     </>

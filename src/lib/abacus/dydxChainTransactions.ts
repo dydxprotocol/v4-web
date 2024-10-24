@@ -213,7 +213,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
 
       // Place order
-      const tx = await this.compositeClient?.placeOrder(
+      const tx = await this.compositeClient.placeOrder(
         subaccountClient,
         marketId,
         type as OrderType,
@@ -234,7 +234,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       // Handle stateful orders
-      if ((tx as IndexedTx)?.code !== 0) {
+      if ((tx as IndexedTx | undefined)?.code !== 0) {
         throw new StatefulOrderError('Stateful order has failed to commit.', tx);
       }
 
@@ -268,7 +268,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       params ?? {};
 
     try {
-      const tx = await this.compositeClient?.cancelRawOrder(
+      const tx = await this.compositeClient.cancelRawOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
         parseInt(clientId, 10),
         orderFlags,
@@ -339,11 +339,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             if (!this.localWallet) {
               throw new Error('Missing compositeClient or localWallet');
             }
-            const msg = compositeClient?.sendTokenMessage(this.localWallet, amount, recipient);
+            const msg = compositeClient.sendTokenMessage(this.localWallet, amount, recipient);
 
             resolve([msg]);
           }),
-        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice
+        this.compositeClient.validatorClient.post.defaultDydxGasPrice
       );
 
       const parsedTx = parseToPrimitives(tx);
@@ -376,7 +376,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       // take out fee from amount before sweeping
       const amount =
         parseInt(ibcMsg.value.token.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
@@ -443,6 +443,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       dd.info('withdrawToNobleIBC tx submitted', { tx, ibcMsg });
 
       return JSON.stringify({
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         txHash: hashFromTx(tx?.hash),
       });
     } catch (error) {
@@ -466,7 +467,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       // take out fee from amount before sweeping
       const amount =
         parseInt(ibcMsg.value.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
@@ -504,14 +505,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       // take out fee from amount before sweeping
       const amount =
-        parseInt(ibcMsgs[0].value.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+        parseInt(ibcMsgs[0]!.value.amount, 10) -
+        Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
       }
 
-      ibcMsgs[0].value.amount = amount.toString();
+      ibcMsgs[0]!.value.amount = amount.toString();
 
       dd.info('cctpMultiMsgWithdraw attempting to submit tx', { ibcMsgs, fee, amount });
       const tx = await this.nobleClient.send(ibcMsgs);
@@ -537,7 +538,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   }): Promise<string> {
     const address = this.localWallet?.address;
     try {
-      if (this.hdkey?.privateKey && this.hdkey?.publicKey) {
+      if (this.hdkey?.privateKey && this.hdkey.publicKey) {
         const { signedMessage, timestamp } = await signComplianceSignature(
           params.message,
           params.action,

@@ -139,7 +139,7 @@ export const getHydratedTradingData = <
   perpetualMarkets: Record<string, PerpetualMarket>;
 }): T & AddedProps => ({
   ...data,
-  asset: assets[perpetualMarkets[data.marketId]?.assetId],
+  asset: assets[perpetualMarkets[data.marketId]?.assetId ?? ''],
   stepSizeDecimals: perpetualMarkets[data.marketId]?.configs?.stepSizeDecimals,
   tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),

@@ -65,7 +65,7 @@ export const AdjustTargetLeverageForm = ({
           field: TradeInputField.targetLeverage,
         });
 
-        onSetTargetLeverage?.(leverage);
+        onSetTargetLeverage(leverage);
       }}
     >
       <$Description>
@@ -81,8 +81,8 @@ export const AdjustTargetLeverageForm = ({
             min={1}
             max={maxLeverage}
             value={MustBigNumber(leverage).abs().toNumber()}
-            onSliderDrag={([value]: number[]) => setLeverage(value.toString())}
-            onValueCommit={([value]: number[]) => setLeverage(value.toString())}
+            onSliderDrag={([value]: number[]) => setLeverage(value!.toString())}
+            onValueCommit={([value]: number[]) => setLeverage(value!.toString())}
           />
         </$WithLabel>
         <$InnerInputContainer>

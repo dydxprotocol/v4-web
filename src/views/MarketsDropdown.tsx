@@ -3,7 +3,8 @@ import { Key, memo, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
+import { Nullable } from '@/constants/abacus';
+import { ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
@@ -52,12 +53,17 @@ const MarketsDropdownContent = ({
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const [shouldHideUnlaunchedMarkets, setShouldHideUnlaunchedMarkets] = useState(false);
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-
   const { uiRefresh } = testFlags;
+
+  const { filteredMarkets, marketFilters } = useMarketsData({
+    filter,
+    searchFilter,
+    hideUnlaunchedMarkets: shouldHideUnlaunchedMarkets,
+  });
 
   const columns = useMemo(
     () =>
@@ -69,23 +75,29 @@ const MarketsDropdownContent = ({
           renderCell: ({
             assetId,
             displayId,
+            imageUrl,
             isNew,
+            isUnlaunched,
             effectiveInitialMarginFraction,
             initialMarginFraction,
           }: MarketData) => (
             <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-              <$AssetIcon $uiRefreshEnabled={uiRefresh} symbol={assetId} />
+              <$AssetIcon $uiRefreshEnabled={uiRefresh} logoUrl={imageUrl} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
-                <Output
-                  type={OutputType.Multiple}
-                  value={calculateMarketMaxLeverage({
-                    effectiveInitialMarginFraction,
-                    initialMarginFraction,
-                  })}
-                  fractionDigits={0}
-                />
+                {isUnlaunched ? (
+                  stringGetter({ key: STRING_KEYS.LAUNCHABLE })
+                ) : (
+                  <Output
+                    type={OutputType.Multiple}
+                    value={calculateMarketMaxLeverage({
+                      effectiveInitialMarginFraction,
+                      initialMarginFraction,
+                    })}
+                    fractionDigits={0}
+                  />
+                )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </$MarketName>
@@ -159,7 +171,7 @@ const MarketsDropdownContent = ({
 
     if (
       !hasSeenElectionBannerTrumpWin &&
-      featureFlags?.[StatsigFlags.ffShowPredictionMarketsUi] &&
+      featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
       currentDate < new Date('2024-11-06T23:59:59')
     ) {
       return (
@@ -173,9 +185,11 @@ const MarketsDropdownContent = ({
           >
             🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
           </Link>
-          <$IconButton
+          <IconButton
+            tw="[--button-icon-size:0.8em]"
             onClick={() => setHasSeenElectionBannerTrupmWin(true)}
             iconName={IconName.Close}
+            buttonStyle={ButtonStyle.WithoutBackground}
           />
         </$MarketDropdownBanner>
       );
@@ -198,6 +212,8 @@ const MarketsDropdownContent = ({
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
+          shouldHideUnlaunchedMarkets={shouldHideUnlaunchedMarkets}
+          onShouldHideUnlaunchedMarketsChange={setShouldHideUnlaunchedMarkets}
         />
       </$Toolbar>
       {slotTop}
@@ -213,8 +229,9 @@ const MarketsDropdownContent = ({
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
-          initialPageSize={15}
-          paginationBehavior="showAll"
+          initialPageSize={50}
+          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          shouldResetOnTotalRowsChange
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
@@ -264,11 +281,11 @@ export const MarketsDropdown = memo(
   ({
     currentMarketId,
     launchableMarketId,
-    symbol = '',
+    logoUrl = '',
   }: {
     currentMarketId?: string;
     launchableMarketId?: string;
-    symbol: string | null;
+    logoUrl: Nullable<string>;
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
@@ -306,7 +323,7 @@ export const MarketsDropdown = memo(
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
-    }, [isOpen]);
+    }, []);
 
     return (
       <$Popover
@@ -343,7 +360,7 @@ export const MarketsDropdown = memo(
                     </>
                   ) : (
                     <>
-                      <$AssetIcon symbol={symbol} $uiRefreshEnabled={uiRefreshEnabled} />
+                      <$AssetIcon logoUrl={logoUrl} $uiRefreshEnabled={uiRefreshEnabled} />
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                     </>
                   )}
@@ -490,11 +507,6 @@ const $AssetIcon = styled(AssetIcon)<{ $uiRefreshEnabled: boolean }>`
       --asset-icon-size: 1.5em;
     `}
   `}
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
 `;
 
 const $FlagGradient = styled.div`

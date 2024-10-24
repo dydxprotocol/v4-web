@@ -332,7 +332,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     network.validatorConfig.chainId,
     'v4-chain/protocol/build/dydxprotocold'
   );
-  console.log("Submitted market map proposal");
+  console.log('Submitted market map proposal');
   await sleep(5000);
   for (const wallet of wallets) {
     retry(() => voteOnProposals([1], client, wallet));
@@ -352,7 +352,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     const proposalIds: number[] = [];
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
-      const proposal = proposalsToSend[j];
+      const proposal = proposalsToSend[j]!;
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -361,7 +361,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       )}}`;
       const tx = await retry(() =>
         client.submitGovAddNewMarketProposal(
-          wallets[j],
+          wallets[j]!,
           // @ts-ignore: marketType is not a valid parameter for addNewMarketProposal
           {
             id: marketId,
@@ -701,6 +701,24 @@ function validateParamsSchema(proposal: Proposal): void {
   }
 }
 
+function validateAtomicResolution(proposal: Proposal): void {
+  if (proposal.params.ticker === 'TRUMPWIN-USD') {
+    if (proposal.params.atomicResolution !== -6) {
+      throw new Error(
+        `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match -6`
+      );
+    } else {
+      return;
+    }
+  }
+  const calculatedAtomicResolution = -6 - Math.floor(Math.log10(proposal.meta.referencePrice));
+  if (proposal.params.atomicResolution !== calculatedAtomicResolution) {
+    throw new Error(
+      `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match the calculated value (${calculatedAtomicResolution}) based on reference price ${proposal.meta.referencePrice}`
+    );
+  }
+}
+
 // getProposalsToValidate finds proposals that are either added or whose params are modified,
 // i.e. ignoring initialDeposit, meta, summary, title, etc.
 function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<string> {
@@ -716,7 +734,7 @@ function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<str
       continue;
     }
 
-    const oldParams = removeIdFromParams(oldProposals[name].params);
+    const oldParams = removeIdFromParams(oldProposals[name]!.params);
     const newParams = removeIdFromParams(newProposal.params);
     if (JSON.stringify(oldParams) !== JSON.stringify(newParams)) {
       marketsToValidate.add(name);
@@ -743,6 +761,12 @@ async function main(): Promise<void> {
     validateParamsSchema(proposal);
   }
 
+  // Validate atomicResolution of all proposals.
+  console.log('Validating atomicResolution of all proposals...\n');
+  for (const proposal of Object.values(newProposals)) {
+    validateAtomicResolution(proposal);
+  }
+
   // Validate parameters of all proposals.
   console.log('\nValidating parameters of all proposals...\n');
   for (const proposal of Object.values(newProposals)) {
@@ -756,7 +780,7 @@ async function main(): Promise<void> {
   if (proposalsToValidate.size === 0) {
     return;
   }
-  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]));
+  await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]!));
 
   console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
 }
