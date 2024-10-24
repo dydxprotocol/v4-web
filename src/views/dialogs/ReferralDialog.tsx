@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { styled } from 'twin.macro';
 
 import { AFFILIATES_FEE_DISCOUNT_USD } from '@/constants/affiliates';
@@ -14,9 +12,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
-
-import { updateLatestReferrer } from '@/state/affiliates';
-import { useAppDispatch } from '@/state/appTypes';
 
 import { truncateAddress } from '@/lib/wallet';
 
@@ -39,18 +34,11 @@ const CONTENT_SECTIONS = [
 
 export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialogProps>) => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
   const { data: referralAddress, isSuccess } = useReferralAddress(refCode);
   const {
     affiliateMetadataQuery: { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess },
   } = useAffiliatesInfo(referralAddress);
-
-  useEffect(() => {
-    if (referralAddress) {
-      dispatch(updateLatestReferrer(referralAddress));
-    }
-  }, [referralAddress, dispatch]);
 
   const isEligible = referralAddress && affiliatesInfo?.isEligible;
 

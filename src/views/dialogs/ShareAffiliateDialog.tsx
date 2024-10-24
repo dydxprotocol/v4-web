@@ -7,7 +7,7 @@ import {
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
   DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
@@ -166,6 +166,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               isLoading: isCopying,
             }}
             tw="flex-1"
+            type={ButtonType.Link}
             href={affiliateProgram}
           >
             {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}

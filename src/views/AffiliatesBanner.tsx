@@ -35,6 +35,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
   const {
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo();
+
   const background = useAppSelector(getGridBackground);
 
   const titleString = stringGetter({
