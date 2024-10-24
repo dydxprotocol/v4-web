@@ -5,8 +5,13 @@ import { ThemeProvider } from 'styled-components';
 import { Themes } from '@/styles/themes';
 
 import { useAppSelector } from '@/state/appTypes';
-import { AppColorMode, AppTheme, AppThemeSetting, AppThemeSystemSetting } from '@/state/configs';
-import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
+import {
+  AppColorMode,
+  AppTheme,
+  AppThemeSetting,
+  AppThemeSystemSetting,
+} from '@/state/appUiConfigs';
+import { getAppColorMode, getAppThemeSetting } from '@/state/appUiConfigsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 

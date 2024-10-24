@@ -14,7 +14,7 @@ import { SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateLaunchableMarketsChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';

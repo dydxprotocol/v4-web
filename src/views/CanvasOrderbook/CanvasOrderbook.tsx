@@ -21,7 +21,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import {
