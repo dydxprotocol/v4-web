@@ -92,7 +92,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                   >
                     {marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.name}
                     <div tw="row gap-0.25">
-                      {(currentLeverageMultiple ?? 0) !== 0 && (
+                      {!!currentLeverageMultiple && (
                         <$OutputSigned
                           value={
                             (currentLeverageMultiple ?? 0) < 0
