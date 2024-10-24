@@ -138,23 +138,21 @@ export const CriteriaModal = ({
                 })}
           </div>
 
-          {userTier === 'vip' && (
-            <div className="flex">
-              <BorderStatCell
-                className="pr-1"
-                border={['right']}
-                title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-                outputType={OutputType.CompactFiat}
-                value={accountStats?.referredVolume}
-              />
-              <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
-                <div className="flex items-center">
-                  {isConnectedWagmi ? stakedDYdX?.toLocaleString() : '-'}
-                  <Tag className="ml-0.25">DYDX</Tag>
-                </div>
-              </StatCell>
-            </div>
-          )}
+          <div className="my-1 flex">
+            <BorderStatCell
+              className="pr-1"
+              border={['right']}
+              title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+              outputType={OutputType.CompactFiat}
+              value={accountStats?.referredVolume}
+            />
+            <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
+              <div className="flex items-center">
+                {isConnectedWagmi ? stakedDYdX?.toLocaleString() : '-'}
+                <Tag className="ml-0.25">DYDX</Tag>
+              </div>
+            </StatCell>
+          </div>
         </div>
 
         <CriteriaTable tiers={tiers} userTier={userTier} />
