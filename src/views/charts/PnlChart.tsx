@@ -209,13 +209,16 @@ export const PnlChart = ({
     if (oldestPnlCreatedAt) {
       const options = getPeriodOptions(oldestPnlCreatedAt);
       setPeriodOptions(options);
-
-      // default to show 7d period if there's enough data
-      if (options.includes(HistoricalPnlPeriod.Period7d)) {
-        setSelectedPeriod(HistoricalPnlPeriod.Period7d);
-      }
     }
   }, [oldestPnlCreatedAt, getPeriodOptions]);
+
+  useEffect(() => {
+    // default to show 7d period if there's enough data
+    if (periodOptions.includes(HistoricalPnlPeriod.Period7d)) {
+      setSelectedPeriod(HistoricalPnlPeriod.Period7d);
+      setIsZooming(false);
+    }
+  }, [periodOptions.includes(HistoricalPnlPeriod.Period7d)]);
 
   const chartStyles = useMemo(
     () => ({
