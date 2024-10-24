@@ -24,20 +24,30 @@ interface AssetTableCellProps {
   configs:
     | Pick<
         MarketData,
-        'effectiveInitialMarginFraction' | 'imageUrl' | 'initialMarginFraction' | 'isUnlaunched'
+        | 'effectiveInitialMarginFraction'
+        | 'imageUrl'
+        | 'initialMarginFraction'
+        | 'isUnlaunched'
+        | 'volume24H'
       >
     | null
     | undefined;
   className?: string;
   stacked?: boolean;
+  showStackedVolume?: boolean;
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
-  const { symbol, name, stacked, configs, className } = props;
-
-  const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
-    orEmptyObj(configs);
+  const { symbol, name, stacked, configs, showStackedVolume, className } = props;
+  const useStackedStyle = stacked ?? showStackedVolume;
+  const {
+    imageUrl,
+    initialMarginFraction,
+    effectiveInitialMarginFraction,
+    isUnlaunched,
+    volume24H,
+  } = orEmptyObj(configs);
 
   const maxLeverage =
     configs != null ? (
@@ -54,17 +64,25 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell
       className={className}
-      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={stacked} symbol={symbol} />}
+      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={useStackedStyle} symbol={symbol} />}
     >
-      <$TableCellContent stacked={stacked}>
+      <$TableCellContent stacked={useStackedStyle}>
         <div tw="row gap-0.5">
           <$Asset stacked={stacked}>{name}</$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
         </div>
-        {stacked ? (
-          <span tw="text-color-text-0 font-mini-medium">
-            {symbol && getDisplayableAssetFromBaseAsset(symbol)}
-          </span>
+        {useStackedStyle ? (
+          showStackedVolume ? (
+            <Output
+              type={OutputType.CompactFiat}
+              value={volume24H ?? undefined}
+              tw="text-color-text-0 font-mini-medium"
+            />
+          ) : (
+            <span tw="text-color-text-0 font-mini-medium">
+              {symbol && getDisplayableAssetFromBaseAsset(symbol)}
+            </span>
+          )
         ) : undefined}
       </$TableCellContent>
     </TableCell>

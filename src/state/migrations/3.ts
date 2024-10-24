@@ -43,6 +43,10 @@ export function migration3(state: PersistedState | undefined): V3State {
 
   return {
     ...state,
-    appUiConfigs,
+    appUiConfigs: {
+      ...appUiConfigs,
+      // rest of values that were not stored in localStorage
+      favoritedMarkets: [],
+    },
   };
 }

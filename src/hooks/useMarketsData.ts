@@ -18,7 +18,7 @@ import {
 } from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
+import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
@@ -43,6 +43,9 @@ const filterFunctions = {
   },
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
+  },
+  [MarketFilters.FAVORITED]: (market: MarketData) => {
+    return market.isFavorite;
   },
   [MarketFilters.FX]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.FX);
@@ -72,7 +75,7 @@ const filterFunctions = {
     return market.tags?.includes(MarketFilters.RWA);
   },
   [MarketFilters.LAUNCHABLE]: (market: MarketData) => {
-    return market.isUnlaunched;
+    return testFlags.pml && market.isUnlaunched;
   },
   // Soon to be deprecated filters
   [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
@@ -133,9 +136,10 @@ export const useMarketsData = ({
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
-  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
   const shouldHideLaunchableMarkets =
     useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
+  const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
+  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -190,6 +194,7 @@ export const useMarketsData = ({
             tickSizeDecimals,
             trades24H,
             volume24H,
+            isFavorite: favoritedMarkets.includes(id),
           }
         );
       });
@@ -229,6 +234,7 @@ export const useMarketsData = ({
               tickSizeDecimals,
               trades24H: 0,
               volume24H: 0,
+              isFavorite: favoritedMarkets.includes(`${id}-USD`),
             }
           );
         });
@@ -245,6 +251,7 @@ export const useMarketsData = ({
     hideUnlaunchedMarkets,
     sevenDaysSparklineData,
     unlaunchedMarkets.data,
+    favoritedMarkets,
   ]);
 
   const filteredMarkets = useMemo(() => {
@@ -261,27 +268,14 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
-  const { hasPredictionMarkets, showNewFilter } = useMemo(() => {
-    return {
-      hasPredictionMarkets: markets.some((market) =>
-        Object.values(PREDICTION_MARKET).includes(market.id)
-      ),
-      showNewFilter: markets.some((market) => market.isNew),
-    };
-  }, [markets]);
-
   const marketFilters = useMemo(
     () =>
       [
-        MarketFilters.ALL,
-        showNewFilter ? MarketFilters.NEW : null,
-        testFlags.pml && MarketFilters.LAUNCHABLE,
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-          markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
+          markets.some((market) => filterFunctions[marketFilter](market))
         ),
-        hasPredictionMarkets && !testFlags.pml && MarketFilters.PREDICTION_MARKET_DEPRECATED,
       ].filter(isTruthy),
-    [hasPredictionMarkets, markets, showNewFilter]
+    [markets]
   );
 
   return { marketFilters, filteredMarkets, hasMarketIds, markets };
