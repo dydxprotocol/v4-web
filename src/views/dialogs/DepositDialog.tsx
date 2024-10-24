@@ -3,7 +3,9 @@ import { useEffect } from 'react';
 import { DepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
+import { WalletType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useFunkitBuyNobleUsdc } from '@/hooks/useFunkitBuyNobleUsdc';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
@@ -31,12 +33,21 @@ export const DepositDialog = ({
   const dispatch = useAppDispatch();
   const ffEnableFunkit = useStatsigGateValue(StatsigFlags.ffEnableFunkit);
 
+  const {
+    sourceAccount: { walletInfo },
+  } = useAccounts();
+
   useEffect(() => {
-    if (depositType === DepositType.FUNKIT && ffEnableFunkit) {
+    if (
+      depositType === DepositType.FUNKIT &&
+      ffEnableFunkit &&
+      walletInfo?.name !== WalletType.Keplr &&
+      walletInfo?.name !== WalletType.Phantom
+    ) {
       dispatch(closeDialog());
       startCheckout();
     }
-  }, [depositType, dispatch, startCheckout, ffEnableFunkit]);
+  }, [depositType, dispatch, startCheckout, ffEnableFunkit, walletInfo?.name]);
 
   return (
     <Dialog

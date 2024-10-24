@@ -233,14 +233,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
               title:
                 status === 'COMPLETED' || !ErrorStatuses.includes(status ?? '')
-                  ? 'Instant Deposit'
-                  : 'Instant deposit in progress',
+                  ? stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT })
+                  : stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT_IN_PROGRESS }),
               body:
                 status === 'COMPLETED'
-                  ? 'Deposit completed'
+                  ? stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })
                   : ErrorStatuses.includes(status ?? '')
-                    ? `Deposit failed`
-                    : `Your deposit should arrive shortly`,
+                    ? stringGetter({ key: STRING_KEYS.DEPOSIT_FAILD })
+                    : stringGetter({ key: STRING_KEYS.DEPOSIT_SHORTLY }),
               toastSensitivity: 'foreground',
               renderCustomBody:
                 status !== 'COMPLETED' && !ErrorStatuses.includes(status ?? '')
@@ -255,7 +255,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               groupKey: NotificationType.FunkitDeposit,
               renderActionSlot: () => (
                 <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
-                  View instant deposits history →
+                  {stringGetter({ key: STRING_KEYS.VIEW_INSTANT_DEPOSIT_HISTORY })} →
                 </Link>
               ),
             },

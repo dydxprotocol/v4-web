@@ -5,7 +5,7 @@ import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
@@ -23,7 +23,8 @@ import { WalletIcon } from '@/components/WalletIcon';
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
 
@@ -32,6 +33,7 @@ import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 
 export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProps>) => {
+  const dispatch = useAppDispatch();
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
   const stringGetter = useStringGetter();
@@ -43,7 +45,11 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen(false);
-  }, [currentOnboardingStep, setIsOpen]);
+    if (currentOnboardingStep === OnboardingSteps.DepositFunds) {
+      setIsOpen(false);
+      dispatch(forceOpenDialog(DialogTypes.Deposit({})));
+    }
+  }, [currentOnboardingStep, setIsOpen, dispatch]);
 
   const setIsOpenFromDialog = (open: boolean) => {
     setIsOpen(open);
