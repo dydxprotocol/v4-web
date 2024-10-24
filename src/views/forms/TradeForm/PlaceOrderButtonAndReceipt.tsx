@@ -38,6 +38,7 @@ import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -183,7 +184,11 @@ export const PlaceOrderButtonAndReceipt = ({
       {
         key: 'liquidation-price',
         label: (
-          <WithTooltip tooltip="liquidation-price" stringParams={{ SYMBOL: id ?? '' }} side="right">
+          <WithTooltip
+            tooltip="liquidation-price"
+            stringParams={{ SYMBOL: getDisplayableAssetFromBaseAsset(id) }}
+            side="right"
+          >
             {stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}
           </WithTooltip>
         ),
