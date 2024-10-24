@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -11,8 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
+import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -49,7 +47,7 @@ export const TradeTableSettings = ({
       align="end"
       sideOffset={4}
       triggerType={TriggerType.TradeTableSettings}
-      slotTrigger={<$IconButton iconName={IconName.Settings} shape={ButtonShape.Square} />}
+      slotTrigger={<Icon iconName={IconName.Settings} size="1.75em" tw="p-0.25" />}
     >
       <$Settings>
         <$Row>
@@ -115,13 +113,6 @@ export const TradeTableSettings = ({
     </Popover>
   );
 };
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-  --button-icon-size: 1.66em;
-  --button-textColor: var(--color-text-0);
-`;
 
 const $Settings = styled.div`
   ${popoverMixins.popover}
