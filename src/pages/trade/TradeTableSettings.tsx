@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -12,14 +11,13 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
-import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketTypeFilter, PanelView } from './types';
@@ -52,7 +50,7 @@ export const TradeTableSettings = ({
       sideOffset={4}
       triggerType={TriggerType.TradeTableSettings}
       slotTrigger={
-        <div tw="flex items-center font-mini-book gap-[0.5ch] px-0.5 h-[1.75rem]">
+        <div tw="flex h-[1.75rem] items-center gap-[0.5ch] px-0.5 font-mini-book">
           {stringGetter({
             key: STRING_KEYS.SHOWING,
             params: {
