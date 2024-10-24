@@ -73,6 +73,8 @@ export const MarginModeSelector = ({
   );
 
   if (uiRefresh) {
+    const showMarginModeUnToggleableTooltip = canAccountTrade && !needsMarginMode;
+
     const selector = (
       <$MarginModeSelector tw="flex flex-1 items-center justify-between">
         {stringGetter({
@@ -85,7 +87,11 @@ export const MarginModeSelector = ({
           items={[
             {
               value: AbacusMarginMode.Cross.rawValue,
-              label: (
+              label: showMarginModeUnToggleableTooltip ? (
+                stringGetter({
+                  key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue]!,
+                })
+              ) : (
                 <WithTooltip
                   side="left"
                   tooltipString={stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
@@ -99,7 +105,11 @@ export const MarginModeSelector = ({
             },
             {
               value: AbacusMarginMode.Isolated.rawValue,
-              label: (
+              label: showMarginModeUnToggleableTooltip ? (
+                stringGetter({
+                  key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue]!,
+                })
+              ) : (
                 <WithTooltip
                   align="end"
                   tooltipString={stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
@@ -118,7 +128,7 @@ export const MarginModeSelector = ({
       </$MarginModeSelector>
     );
 
-    return canAccountTrade && !needsMarginMode ? (
+    return showMarginModeUnToggleableTooltip ? (
       <$WarningTooltip className={className} slotTooltip={warningTooltip}>
         {selector}
       </$WarningTooltip>
