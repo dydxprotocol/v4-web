@@ -9,6 +9,7 @@ import tw from 'twin.macro';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
+import { ErrorStatuses } from '@/constants/funkit';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
   STRING_KEYS,
@@ -230,12 +231,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
             checkoutId,
             {
               icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
-              title: status === 'COMPLETED' ? 'Instant Deposit' : 'Instant deposit in progress',
+              title:
+                status === 'COMPLETED' || !ErrorStatuses.includes(status ?? '')
+                  ? 'Instant Deposit'
+                  : 'Instant deposit in progress',
               body:
-                status === 'COMPLETED' ? 'Deposit completed' : `Your deposit should arrive shortly`,
+                status === 'COMPLETED'
+                  ? 'Deposit completed'
+                  : ErrorStatuses.includes(status ?? '')
+                    ? `Deposit failed`
+                    : `Your deposit should arrive shortly`,
               toastSensitivity: 'foreground',
               renderCustomBody:
-                status !== 'COMPLETED'
+                status !== 'COMPLETED' && !ErrorStatuses.includes(status ?? '')
                   ? ({ isToast, notification }) => (
                       <FunkitDepositNotification
                         isToast={isToast}

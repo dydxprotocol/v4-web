@@ -8,6 +8,8 @@ export type FunkitDeposit = {
   status?: PurifiedCheckoutHistoryItem['state'];
 };
 
+export const ErrorStatuses = ['CHECKOUT_ERROR', 'EXPIRED', 'CANCELLED'];
+
 export const funkitConfig = () =>
   ({
     appName: 'dYdX',
