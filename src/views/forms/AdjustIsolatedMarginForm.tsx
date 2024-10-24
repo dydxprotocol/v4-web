@@ -86,7 +86,7 @@ export const AdjustIsolatedMarginForm = ({
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({
-      value: childSubaccountNumber,
+      value: childSubaccountNumber?.toString(),
       field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
     });
 
@@ -102,7 +102,7 @@ export const AdjustIsolatedMarginForm = ({
 
   const setAmount = ({ floatValue }: { floatValue?: number }) => {
     abacusStateManager.setAdjustIsolatedMarginValue({
-      value: floatValue,
+      value: floatValue?.toString(),
       field: AdjustIsolatedMarginInputField.Amount,
     });
   };

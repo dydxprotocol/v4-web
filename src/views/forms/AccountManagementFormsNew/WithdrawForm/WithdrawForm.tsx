@@ -191,7 +191,7 @@ export const WithdrawForm = () => {
           { chainID: selectedDydxChainId, address: dydxAddress },
           {
             chainID: getNobleChainId(),
-            address: localNobleWallet?.address,
+            address: localNobleWallet.address,
           },
           {
             chainID: toChainId,
@@ -282,13 +282,13 @@ export const WithdrawForm = () => {
           addresses: [toAddress, dydxAddress],
         });
 
-        if (screenResults?.[dydxAddress]) {
+        if (screenResults[dydxAddress]) {
           setOnSubmitErrorMessage(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
             })
           );
-        } else if (screenResults?.[toAddress]) {
+        } else if (screenResults[toAddress]) {
           setOnSubmitErrorMessage(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
@@ -355,7 +355,7 @@ export const WithdrawForm = () => {
   };
 
   useEffect(() => {
-    if (sourceAccount?.walletInfo?.name === WalletType.Privy) {
+    if (sourceAccount.walletInfo?.name === WalletType.Privy) {
       // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
       // abacusStateManager.setTransferValue({
       //   field: TransferInputField.exchange,

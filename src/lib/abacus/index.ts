@@ -334,7 +334,13 @@ class AbacusStateManager {
     this.chainTransactions.setSelectedGasDenom(denom);
   };
 
-  setTradeValue = ({ value, field }: { value: any; field: Nullable<TradeInputFields> }) => {
+  setTradeValue = ({
+    value,
+    field,
+  }: {
+    value: Nullable<string>;
+    field: Nullable<TradeInputFields>;
+  }) => {
     this.stateManager.trade(value, field);
   };
 
@@ -342,17 +348,29 @@ class AbacusStateManager {
     value,
     field,
   }: {
-    value: any;
+    value: Nullable<string>;
     field: AdjustIsolatedMarginInputFields;
   }) => {
     this.stateManager.adjustIsolatedMargin(value, field);
   };
 
-  setTransferValue = ({ value, field }: { value: any; field: TransferInputFields }) => {
+  setTransferValue = ({
+    value,
+    field,
+  }: {
+    value: Nullable<string>;
+    field: TransferInputFields;
+  }) => {
     this.stateManager.transfer(value, field);
   };
 
-  setTriggerOrdersValue = ({ value, field }: { value: any; field: TriggerOrdersInputFields }) => {
+  setTriggerOrdersValue = ({
+    value,
+    field,
+  }: {
+    value: Nullable<string>;
+    field: TriggerOrdersInputFields;
+  }) => {
     this.stateManager.triggerOrders(value, field);
   };
 

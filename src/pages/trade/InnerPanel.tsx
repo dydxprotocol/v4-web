@@ -64,11 +64,11 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
               abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side });
               abacusStateManager.setTradeValue({
                 field: TradeInputField.limitPrice,
-                value: price,
+                value: price.toString(),
               });
               abacusStateManager.setTradeValue({
                 field: TradeInputField.size,
-                value: size,
+                value: size.toString(),
               });
             }}
             stringGetter={stringGetter}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
@@ -134,6 +134,7 @@ export const TransferForm = ({
     return () => {
       abacusStateManager.resetInputState();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { sanctionedAddresses } = useRestrictions();
@@ -221,7 +222,7 @@ export const TransferForm = ({
 
   const onChangeAmount = (value?: number) => {
     abacusStateManager.setTransferValue({
-      value,
+      value: value?.toString(),
       field: isUSDCSelected ? TransferInputField.usdcSize : TransferInputField.size,
     });
   };
@@ -327,11 +328,8 @@ export const TransferForm = ({
     </$FormInputToggleButton>
   );
 
-  const onToggleMaxButton = useCallback(
-    (isPressed: boolean) =>
-      isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined),
-    [balanceBN, onChangeAmount]
-  );
+  const onToggleMaxButton = (isPressed: boolean) =>
+    isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined);
 
   return (
     <$Form
