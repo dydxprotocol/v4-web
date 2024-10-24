@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import tw from 'twin.macro';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
+import { ErrorStatuses } from '@/constants/funkit';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
   STRING_KEYS,
@@ -45,6 +47,7 @@ import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
+import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -57,6 +60,7 @@ import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelector
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getFunkitDeposits } from '@/state/funkitDepositsSelector';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -210,6 +214,55 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         }
       };
+    },
+  },
+  {
+    type: NotificationType.FunkitDeposit,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const funkitDeposits = useAppSelector(getFunkitDeposits, shallowEqual);
+      const { openAccountModal } = useAccountModal();
+
+      useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const deposit of Object.values(funkitDeposits)) {
+          const { checkoutId, status } = deposit;
+          trigger(
+            checkoutId,
+            {
+              icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
+              title:
+                status === 'COMPLETED' || !ErrorStatuses.includes(status ?? '')
+                  ? stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT })
+                  : stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT_IN_PROGRESS }),
+              body:
+                status === 'COMPLETED'
+                  ? stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })
+                  : ErrorStatuses.includes(status ?? '')
+                    ? stringGetter({ key: STRING_KEYS.DEPOSIT_FAILD })
+                    : stringGetter({ key: STRING_KEYS.DEPOSIT_SHORTLY }),
+              toastSensitivity: 'foreground',
+              renderCustomBody:
+                status !== 'COMPLETED' && !ErrorStatuses.includes(status ?? '')
+                  ? ({ isToast, notification }) => (
+                      <FunkitDepositNotification
+                        isToast={isToast}
+                        notification={notification}
+                        deposit={deposit}
+                      />
+                    )
+                  : undefined,
+              groupKey: NotificationType.FunkitDeposit,
+              renderActionSlot: () => (
+                <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
+                  {stringGetter({ key: STRING_KEYS.VIEW_INSTANT_DEPOSIT_HISTORY })} →
+                </Link>
+              ),
+            },
+            []
+          );
+        }
+      }, [funkitDeposits, stringGetter, trigger, openAccountModal]);
     },
   },
   {

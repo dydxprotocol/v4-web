@@ -1,13 +1,21 @@
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
-export const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => {
+export const LogoShortIcon: React.FC<{ id?: string; width?: number; height?: number }> = ({
+  id,
+  width = 135,
+  height = 145,
+}: {
+  id?: string;
+  width?: number;
+  height?: number;
+}) => {
   const theme = useAppThemeAndColorModeContext();
   const fill = theme.logoFill;
 
   return (
     <svg
-      width="135"
-      height="145"
+      width={width}
+      height={height}
       viewBox="0 0 135 145"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
