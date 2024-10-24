@@ -60,8 +60,8 @@ type ElementProps<Datum extends {}> = {
   > &
     Pick<ThresholdProps<Datum>, 'curve'> & {
       colorAccessor: GlyphSeriesProps<Datum>['colorAccessor'];
-      xAccessor: (_: Datum) => number;
-      yAccessor: (_: Datum) => number;
+      xAccessor: (_: Datum | undefined) => number;
+      yAccessor: (_: Datum | undefined) => number;
       getCurve?: (_: { zoom: number; zoomDomain: number }) => ThresholdProps<Datum>['curve']; // LineSeriesProps<Datum>['curve'];
       glyphSize?: GlyphSeriesProps<Datum>['size'];
       getGlyphSize?: (_: { datum: Datum; zoom: number }) => number;

@@ -92,8 +92,8 @@ export const LaunchableMarketChart = ({
     },
   ];
 
-  const xAccessorFunc = useCallback((datum: TradingViewBar) => datum.time, []);
-  const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
+  const xAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.time ?? 0, []);
+  const yAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.close ?? 0, []);
 
   const colorString = useMemo(() => {
     if (!candlesQuery.data || candlesQuery.data.length < 1) return 'var(--color-text-1)';

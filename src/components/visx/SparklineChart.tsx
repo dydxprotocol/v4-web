@@ -7,8 +7,8 @@ import styled from 'styled-components';
 interface SparklineChartProps<Datum extends {}> {
   data: Datum[];
   positive: boolean;
-  xAccessor: (_: Datum) => number;
-  yAccessor: (_: Datum) => number;
+  xAccessor: (_: Datum | undefined) => number;
+  yAccessor: (_: Datum | undefined) => number;
 }
 
 const theme = buildChartTheme({
