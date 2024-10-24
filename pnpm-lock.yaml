@@ -36,7 +36,7 @@ dependencies:
     specifier: 1.12.1
     version: 1.12.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.232
+    specifier: ^1.1.234
     version: 1.1.234
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
