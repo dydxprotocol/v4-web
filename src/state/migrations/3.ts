@@ -8,6 +8,7 @@ export type V3State = PersistedState & {
 };
 
 export type AppUiConfigsKeys = keyof typeof appUiConfigsInitialState;
+export type AppUIConfigsMappableLocalStorageKeys = keyof typeof appUiConfigsLocalStorageKeys;
 
 export const appUiConfigsLocalStorageKeys = {
   appThemeSetting: 'dydx.SelectedTheme',
@@ -16,7 +17,7 @@ export const appUiConfigsLocalStorageKeys = {
   defaultToAllMarketsInPositionsOrdersFills: 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
   displayUnit: 'dydx.SelectedDisplayUnit',
   shouldHideLaunchableMarkets: 'dydx.ShouldHideLaunchableMarkets',
-} satisfies Record<AppUiConfigsKeys, string>;
+};
 
 /**
  * 4th migration, moving over the app ui configs localStorage items

@@ -9,7 +9,11 @@ import {
 } from '@/state/appUiConfigs';
 
 import { V2State } from '../2';
-import { AppUiConfigsKeys, appUiConfigsLocalStorageKeys, migration3 } from '../3';
+import {
+  appUiConfigsLocalStorageKeys,
+  AppUIConfigsMappableLocalStorageKeys,
+  migration3,
+} from '../3';
 
 const V2_STATE: V2State = {
   _persist: { version: 2, rehydrated: true },
@@ -19,6 +23,7 @@ const V2_STATE: V2State = {
   },
 };
 
+// values for testing -- they should be different than default / intial state
 const oppositeUiConfigsLocalStorageValues = {
   appThemeSetting: AppTheme.Light,
   appColorMode: AppColorMode.RedUp,
@@ -26,7 +31,7 @@ const oppositeUiConfigsLocalStorageValues = {
   defaultToAllMarketsInPositionsOrdersFills: false,
   displayUnit: DisplayUnit.Fiat,
   shouldHideLaunchableMarkets: true,
-} satisfies Record<AppUiConfigsKeys, any>;
+} satisfies Record<AppUIConfigsMappableLocalStorageKeys, any>;
 
 describe('migration3', () => {
   afterEach(() => {
@@ -46,7 +51,7 @@ describe('migration3', () => {
   it('should copy localStorage values to app ui configs object', () => {
     Object.entries(oppositeUiConfigsLocalStorageValues).forEach(([key, value]) => {
       localStorage.setItem(
-        appUiConfigsLocalStorageKeys[key as AppUiConfigsKeys],
+        appUiConfigsLocalStorageKeys[key as AppUIConfigsMappableLocalStorageKeys],
         JSON.stringify(value)
       );
     });

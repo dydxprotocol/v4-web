@@ -233,7 +233,7 @@ export const useTradingViewDatafeed = (
               );
             }
 
-            const volumeUnit = store.getState().configs.displayUnit;
+            const volumeUnit = store.getState().appUiConfigs.displayUnit;
 
             const bars = [
               ...cachedBars,
