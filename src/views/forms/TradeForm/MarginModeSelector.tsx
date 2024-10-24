@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -73,7 +74,7 @@ export const MarginModeSelector = ({
 
   if (uiRefresh) {
     const selector = (
-      <div tw="flex flex-1 items-center justify-between font-mini-regular">
+      <$MarginModeSelector tw="flex flex-1 items-center justify-between">
         {stringGetter({
           key: STRING_KEYS.MARGIN_MODE,
         })}
@@ -86,6 +87,7 @@ export const MarginModeSelector = ({
               value: AbacusMarginMode.Cross.rawValue,
               label: (
                 <WithTooltip
+                  side="left"
                   tooltipString={stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
                 >
                   {stringGetter({
@@ -99,6 +101,7 @@ export const MarginModeSelector = ({
               value: AbacusMarginMode.Isolated.rawValue,
               label: (
                 <WithTooltip
+                  align="end"
                   tooltipString={stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
                 >
                   {stringGetter({
@@ -112,7 +115,7 @@ export const MarginModeSelector = ({
           value={marginMode.rawValue}
           onValueChange={setMarginMode}
         />
-      </div>
+      </$MarginModeSelector>
     );
 
     return canAccountTrade && !needsMarginMode ? (
@@ -145,6 +148,13 @@ export const MarginModeSelector = ({
     </$WarningTooltip>
   );
 };
+
+const $MarginModeSelector = styled.div`
+  font: var(--font-mini-book);
+  @media ${breakpoints.tablet} {
+    font: var(--font-small-book);
+  }
+`;
 
 const $WarningTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-gradient-warning);
