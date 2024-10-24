@@ -29,7 +29,7 @@ import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
+import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
@@ -172,7 +172,9 @@ export const HeaderDesktop = () => {
       <VerticalSeparator />
 
       <$NavBefore $uiRefreshEnabled={uiRefreshEnabled}>
-        <LanguageSelector sideOffset={16} />
+        <$LanguageSelector sideOffset={16}>
+          {uiRefreshEnabled ? <Icon iconName={IconName.Translate} size="1.25em" /> : undefined}
+        </$LanguageSelector>
         <VerticalSeparator />
         <NetworkSelectMenu sideOffset={16} />
       </$NavBefore>
@@ -370,4 +372,9 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
 const $LaunchMarketButton = styled(Button)`
   --button-backgroundColor: var(--color-layer-5);
   --button-border: solid var(--border-width) var(--color-border);
+`;
+
+const $LanguageSelector = styled(LanguageSelector)`
+  ${headerMixins.dropdownTrigger}
+  --trigger-padding: 0.33rem 0.5rem;
 `;

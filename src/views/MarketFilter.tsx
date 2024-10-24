@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -22,6 +22,10 @@ import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithLabel } from '@/components/WithLabel';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
+import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
+
 import { testFlags } from '@/lib/testFlags';
 
 type MarketFilterProps = {
@@ -32,10 +36,6 @@ type MarketFilterProps = {
   hideNewMarketButton?: boolean;
   searchPlaceholderKey?: string;
   compactLayout?: boolean;
-
-  // Need both items to display unlaunchedMarketSwitch
-  shouldHideUnlaunchedMarkets?: boolean;
-  onShouldHideUnlaunchedMarketsChange?: (shouldHide: boolean) => void;
 };
 
 export const MarketFilter = ({
@@ -46,36 +46,42 @@ export const MarketFilter = ({
   hideNewMarketButton,
   compactLayout = false,
   searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
-  shouldHideUnlaunchedMarkets,
-  onShouldHideUnlaunchedMarketsChange,
 }: MarketFilterProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
   const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
+  const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
+
+  const onShouldHideLaunchableMarkets = useCallback(
+    (shouldHide: boolean) => {
+      dispatch(setShouldHideLaunchableMarkets(!shouldHide));
+    },
+    [dispatch]
+  );
 
   const unlaunchedMarketSwitch = useMemo(
     () =>
-      shouldHideUnlaunchedMarkets != null &&
-      onShouldHideUnlaunchedMarketsChange != null && (
+      testFlags.pml && (
         <WithLabel
           label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
           tw="flex flex-row items-center"
         >
           <Switch
             name="show-launchable"
-            checked={shouldHideUnlaunchedMarkets}
-            onCheckedChange={onShouldHideUnlaunchedMarketsChange}
+            checked={!shouldHideLaunchableMarkets}
+            onCheckedChange={onShouldHideLaunchableMarkets}
             tw="font-mini-book"
           />
         </WithLabel>
       ),
-    [stringGetter, shouldHideUnlaunchedMarkets, onShouldHideUnlaunchedMarketsChange]
+    [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
   );
 
   const filterLaunchable = (filter: MarketFilters) => {
-    if (shouldHideUnlaunchedMarkets) return true;
+    if (!shouldHideLaunchableMarkets) return true;
     return filter !== MarketFilters.LAUNCHABLE;
   };
 

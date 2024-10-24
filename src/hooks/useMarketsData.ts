@@ -18,6 +18,7 @@ import {
 } from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
@@ -133,6 +134,8 @@ export const useMarketsData = ({
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
+  const shouldHideLaunchableMarkets =
+    useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -191,7 +194,7 @@ export const useMarketsData = ({
         );
       });
 
-    if (unlaunchedMarkets.data && !hideUnlaunchedMarkets && testFlags.pml) {
+    if (!shouldHideLaunchableMarkets && testFlags.pml) {
       const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
         .sort(sortByMarketCap)
         .map((market) => {

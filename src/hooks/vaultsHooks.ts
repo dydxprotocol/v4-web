@@ -6,7 +6,6 @@ import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 
 import {
-  IndexerMegavaultHistoricalPnlResponse,
   Nullable,
   PerpetualMarket,
   VaultAccountCalculator,
@@ -28,6 +27,7 @@ import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
+import { isPresent } from '@/lib/typeUtils';
 
 import { appQueryClient } from '../state/appQueryClient';
 import { useAppSelector } from '../state/appTypes';
@@ -76,12 +76,7 @@ export const useLoadedVaultDetails = () => {
         getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
       ]);
       return wrapNullable(
-        VaultCalculator.calculateVaultSummary(
-          new IndexerMegavaultHistoricalPnlResponse([
-            ...(dailyResult?.megavaultPnl ?? []),
-            ...(hourlyResult?.megavaultPnl ?? []),
-          ])
-        )
+        VaultCalculator.calculateVaultSummary([dailyResult, hourlyResult].filter(isPresent))
       );
     },
     ...vaultQueryOptions,

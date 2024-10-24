@@ -24,12 +24,7 @@ export enum LocalStorageKey {
   LastViewedMarket = 'dydx.LastViewedMarket',
   SelectedLocale = 'dydx.SelectedLocale',
   SelectedNetwork = 'dydx.SelectedNetwork',
-  SelectedTheme = 'dydx.SelectedTheme',
-  SelectedColorMode = 'dydx.SelectedColorMode',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
-  HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
-  DefaultToAllMarketsInPositionsOrdersFills = 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
-  SelectedDisplayUnit = 'dydx.SelectedDisplayUnit',
 
   // Discoverability
   HasSeenElectionBannerTRUMPWIN = 'dydx.HasSeenElectionBannerTRUMPWIN',
