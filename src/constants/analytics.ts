@@ -370,6 +370,10 @@ export const AnalyticsEvents = unionize(
 
     // Affiliate
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
+
+    // Favoriting Markets
+    FavoritedMarket: ofType<{ marketId: string }>(),
+    UnfavoritedMarket: ofType<{ marketId: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
