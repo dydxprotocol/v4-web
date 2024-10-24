@@ -58,7 +58,10 @@ describe('migration3', () => {
 
     const result = migration3(V2_STATE);
 
-    expect(result.appUiConfigs).toMatchObject(oppositeUiConfigsLocalStorageValues);
+    expect(result.appUiConfigs).toMatchObject({
+      ...oppositeUiConfigsLocalStorageValues,
+      favoritedMarkets: [],
+    });
 
     // Check if localStorage items were removed
     Object.values(appUiConfigsLocalStorageKeys).forEach((localStorageKey) => {

@@ -28,25 +28,23 @@ export function migration3(state: PersistedState | undefined): V3State {
 
   const appUiConfigs = Object.entries(appUiConfigsLocalStorageKeys).reduce(
     (acc, [key, localStorageKey]) => {
-      const value = parseStorageItem(localStorage.getItem(localStorageKey));
+      const value = localStorageKey
+        ? parseStorageItem(localStorage.getItem(localStorageKey))
+        : undefined;
       return {
         ...acc,
         [key]: value ?? appUiConfigsInitialState[key as AppUiConfigsKeys],
       };
     },
-    {} as AppUIConfigsState
+    { favoritedMarkets: [] } as Record<AppUiConfigsKeys, any>
   );
 
   Object.values(appUiConfigsLocalStorageKeys).forEach((localStorageKey) => {
-    localStorage.removeItem(localStorageKey);
+    if (localStorageKey) localStorage.removeItem(localStorageKey);
   });
 
   return {
     ...state,
-    appUiConfigs: {
-      ...appUiConfigs,
-      // rest of values that were not stored in localStorage
-      favoritedMarkets: [],
-    },
+    appUiConfigs,
   };
 }
