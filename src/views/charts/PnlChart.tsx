@@ -236,8 +236,8 @@ export const PnlChart = ({
     [chartDotsBackground, isTablet]
   );
 
-  const xAccessorFunc = useCallback((datum: PnlDatum) => datum.createdAt, []);
-  const yAccessorFunc = useCallback((datum: PnlDatum) => datum.equity, []);
+  const xAccessorFunc = useCallback((datum: PnlDatum | undefined) => datum?.createdAt ?? 0, []);
+  const yAccessorFunc = useCallback((datum: PnlDatum | undefined) => datum?.equity ?? 0, []);
 
   const series = useMemo(
     () => [

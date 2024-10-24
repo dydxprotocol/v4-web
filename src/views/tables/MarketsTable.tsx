@@ -165,8 +165,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       x: index + 1,
                       y: parseFloat(datum.toString()),
                     }))}
-                    xAccessor={(datum) => datum.x}
-                    yAccessor={(datum) => datum.y}
+                    xAccessor={(datum) => datum?.x ?? 0}
+                    yAccessor={(datum) => datum?.y ?? 0}
                     positive={MustBigNumber(priceChange24HPercent).gt(0)}
                   />
                 </div>
