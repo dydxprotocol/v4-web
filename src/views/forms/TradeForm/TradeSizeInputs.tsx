@@ -44,8 +44,10 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
+import { TargetLeverageInput } from './TargetLeverageInput';
 import { TradePercentSizeToggle } from './TradePercentSizeToggle';
 
 export const TradeSizeInputs = () => {
@@ -58,6 +60,8 @@ export const TradeSizeInputs = () => {
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
 
+  const { uiRefresh } = testFlags;
+
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const {
@@ -67,7 +71,8 @@ export const TradeSizeInputs = () => {
     balancePercent,
     input: lastEditedInput,
   } = inputTradeSizeData ?? {};
-  const { needsBalancePercent, needsLeverage } = currentTradeInputOptions ?? {};
+  const { needsBalancePercent, needsLeverage, needsTargetLeverage } =
+    currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
   const { amountInput, usdAmountInput, leverageInput, balancePercentInput } = useAppSelector(
@@ -239,6 +244,8 @@ export const TradeSizeInputs = () => {
           }
         />
       )}
+      {uiRefresh && needsTargetLeverage && <TargetLeverageInput />}
+
       {needsBalancePercent && (
         <TradePercentSizeToggle
           balancePercentValue={balancePercentInput}

@@ -94,12 +94,12 @@ export const TradeTableSettings = ({
                 label: stringGetter({ key: STRING_KEYS.ALL }),
               },
               {
-                value: MarketTypeFilter.Isolated,
-                label: stringGetter({ key: STRING_KEYS.ISOLATED }),
-              },
-              {
                 value: MarketTypeFilter.Cross,
                 label: stringGetter({ key: STRING_KEYS.CROSS }),
+              },
+              {
+                value: MarketTypeFilter.Isolated,
+                label: stringGetter({ key: STRING_KEYS.ISOLATED }),
               },
             ]}
             value={marketTypeFilter}

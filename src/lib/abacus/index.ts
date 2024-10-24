@@ -190,13 +190,17 @@ class AbacusStateManager {
 
   clearTradeInputSizeValues = () => {
     const state = this.store?.getState();
-    const { needsLeverage } = (state && getInputTradeOptions(state)) ?? {};
+    const { needsLeverage, needsTargetLeverage } = (state && getInputTradeOptions(state)) ?? {};
     this.setTradeValue({ value: null, field: TradeInputField.size });
     this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
     this.setTradeValue({ value: null, field: TradeInputField.balancePercent });
 
     if (needsLeverage) {
       this.setTradeValue({ value: null, field: TradeInputField.leverage });
+    }
+
+    if (needsTargetLeverage) {
+      this.setTradeValue({ value: null, field: TradeInputField.targetLeverage });
     }
 
     this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
