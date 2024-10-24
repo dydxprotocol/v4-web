@@ -11,7 +11,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { IconName } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -19,6 +19,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
+import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketTypeFilter, PanelView } from './types';
@@ -43,13 +44,30 @@ export const TradeTableSettings = ({
     useAppSelector(getCurrentMarketAssetData)
   );
   const { imageUrl } = orEmptyObj(resources);
+  const symbol = getDisplayableAssetFromBaseAsset(currentMarketAssetId);
 
   return (
     <Popover
       align="end"
       sideOffset={4}
       triggerType={TriggerType.TradeTableSettings}
-      slotTrigger={<$IconButton iconName={IconName.Settings} shape={ButtonShape.Square} />}
+      slotTrigger={
+        <div tw="flex items-center font-mini-book gap-[0.5ch] px-0.5 h-[1.75rem]">
+          {stringGetter({
+            key: STRING_KEYS.SHOWING,
+            params: {
+              ALL_OR_MARKET: (
+                <span tw="text-color-text-2">
+                  {panelView === PanelView.CurrentMarket
+                    ? symbol
+                    : stringGetter({ key: STRING_KEYS.ALL })}
+                </span>
+              ),
+            },
+          })}
+          <Icon iconName={IconName.Settings} size="1.5em" />
+        </div>
+      }
     >
       <$Settings>
         <$Row>
@@ -63,16 +81,12 @@ export const TradeTableSettings = ({
               },
               {
                 value: PanelView.CurrentMarket,
-                ...(currentMarketAssetId
+                ...(symbol
                   ? {
                       slotBefore: (
-                        <AssetIcon
-                          logoUrl={imageUrl}
-                          symbol={currentMarketAssetId}
-                          tw="text-[1.5em]"
-                        />
+                        <AssetIcon logoUrl={imageUrl} symbol={symbol} tw="text-[1.5em]" />
                       ),
-                      label: currentMarketAssetId,
+                      label: symbol,
                     }
                   : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
               },
@@ -85,7 +99,7 @@ export const TradeTableSettings = ({
           />
         </$Row>
         <$Row>
-          {stringGetter({ key: STRING_KEYS.TYPE })}{' '}
+          {stringGetter({ key: STRING_KEYS.TYPE })}
           <ToggleGroup
             withSeparators
             items={[
@@ -115,13 +129,6 @@ export const TradeTableSettings = ({
     </Popover>
   );
 };
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-  --button-icon-size: 1.66em;
-  --button-textColor: var(--color-text-0);
-`;
 
 const $Settings = styled.div`
   ${popoverMixins.popover}
