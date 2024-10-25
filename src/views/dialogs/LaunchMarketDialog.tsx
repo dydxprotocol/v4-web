@@ -16,6 +16,7 @@ import { LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { MegaVaultYieldOutput } from '../MegaVaultYieldOutput';
@@ -28,6 +29,7 @@ export const LaunchMarketDialog = ({
   const { isMobile } = useBreakpoints();
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const { title, description } = useMemo(() => {
     switch (formStep) {
@@ -69,7 +71,14 @@ export const LaunchMarketDialog = ({
         };
       case NewMarketFormStep.PREVIEW:
         return {
-          title: <$Title>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</$Title>,
+          title: isLoading ? (
+            <span tw="flex flex-row items-center gap-[0.5ch]">
+              <$LoadingSpinner />
+              <$Title>{stringGetter({ key: STRING_KEYS.LAUNCHING_MARKET_LOADING })}</$Title>
+            </span>
+          ) : (
+            <$Title>{stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })}</$Title>
+          ),
           description: stringGetter({
             key: STRING_KEYS.DEPOSIT_LOCKUP_DESCRIPTION,
             params: {
@@ -86,7 +95,7 @@ export const LaunchMarketDialog = ({
           description: null,
         };
     }
-  }, [formStep, stringGetter]);
+  }, [formStep, stringGetter, isLoading]);
 
   return (
     <Dialog
@@ -99,10 +108,18 @@ export const LaunchMarketDialog = ({
       <NewMarketForm
         defaultLaunchableMarketId={defaultLaunchableMarketId}
         setFormStep={setFormStep}
+        setIsParentLoading={setIsLoading}
       />
     </Dialog>
   );
 };
+
+const $LoadingSpinner = styled(LoadingSpinner)`
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+`;
 
 const $Title = styled.h2`
   ${layoutMixins.row}

@@ -68,7 +68,6 @@ export const LaunchableMarketChart = ({
       value: (
         <Output
           type={OutputType.CompactFiat}
-          isLoading={!ticker}
           tw="text-color-text-1"
           value={showSelfReportedMarketCap ? reportedMarketCap : marketCap}
         />
@@ -81,7 +80,6 @@ export const LaunchableMarketChart = ({
       value: (
         <Output
           type={OutputType.Multiple}
-          isLoading={!ticker}
           value={
             ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction
               ? BIG_NUMBERS.ONE.div(ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction)
@@ -180,7 +178,6 @@ export const LaunchableMarketChart = ({
                   type={OutputType.Fiat}
                   tw="text-color-text-1"
                   value={price}
-                  isLoading={!ticker}
                   fractionDigits={tickSizeDecimals}
                 />
               ),

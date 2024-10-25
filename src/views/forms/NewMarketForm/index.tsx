@@ -3,7 +3,7 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from
 import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
@@ -31,6 +31,7 @@ import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 import { NewMarketPreviewStep as NewMarketPreviewStep2 } from './v7/NewMarketPreviewStep';
 import { NewMarketSelectionStep as NewMarketSelectionStep2 } from './v7/NewMarketSelectionStep';
+import { NewMarketSuccessStep as NewMarketSuccessStep2 } from './v7/NewMarketSuccessStep';
 
 export enum NewMarketFormStep {
   SELECTION,
@@ -41,10 +42,12 @@ export enum NewMarketFormStep {
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
   setFormStep,
+  setIsParentLoading,
   updateTickerToAdd,
 }: {
   defaultLaunchableMarketId?: string;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
+  setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
 }) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
@@ -90,6 +93,8 @@ export const NewMarketForm = ({
           type={OutputType.Fiat}
           value={freeCollateral?.current}
           newValue={freeCollateralUpdated}
+          sign={NumberSign.Negative}
+          hasInvalidNewValue={(freeCollateralUpdated ?? 0) < 0}
         />
       ),
     };
@@ -117,10 +122,12 @@ export const NewMarketForm = ({
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
         value: (
           <DiffOutput
-            withDiff={!!marginUsage?.current}
+            withDiff={!!marginUsage?.current && marginUsageUpdated != null}
             type={OutputType.Percent}
             value={marginUsage?.current}
             newValue={marginUsageUpdated}
+            sign={NumberSign.Negative}
+            hasInvalidNewValue={(marginUsageUpdated ?? 0) < 0 || (marginUsageUpdated ?? 0) > 1}
           />
         ),
       },
@@ -137,18 +144,29 @@ export const NewMarketForm = ({
    * Permissionless Markets Flow
    */
   if (testFlags.pml) {
-    if (NewMarketFormStep.SUCCESS === step) {
-      return <NewMarketSuccessStep href="" />;
+    if (NewMarketFormStep.SUCCESS === step && tickerToAdd && proposalTxHash) {
+      return (
+        <NewMarketSuccessStep2
+          transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
+          tickerToAdd={tickerToAdd}
+          onLaunchAnotherMarket={() => {
+            setTickerToAdd(undefined);
+            setStep(NewMarketFormStep.SELECTION);
+          }}
+        />
+      );
     }
 
     if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
       return (
         <NewMarketPreviewStep2
-          onSuccess={() => {
+          onSuccess={(txHash: string) => {
+            setProposalTxHash(txHash);
             setStep(NewMarketFormStep.SUCCESS);
           }}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
           receiptItems={receiptItems}
+          setIsParentLoading={setIsParentLoading}
           shouldHideTitleAndDescription={shouldHideTitleAndDescription}
           ticker={tickerToAdd}
         />

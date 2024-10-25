@@ -110,7 +110,10 @@ export const useLaunchableMarkets = () => {
       };
     });
 
-    return assets.filter(({ id }) => {
+    return assets.filter(({ asset, id }) => {
+      // Remove USDT and markets that are already launched
+      if (['USDT'].includes(asset)) return false;
+
       return !marketIds.includes(id);
     });
   }, [marketIds, metadataServiceData.data]);
