@@ -4,6 +4,8 @@ import { useActiveTheme, useFunkitCheckout } from '@funkit/connect';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { EvmAddress } from '@/constants/wallets';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme, AppThemeSetting } from '@/state/appUiConfigs';
@@ -14,6 +16,7 @@ import { updateFunkitDeposit } from '@/state/funkitDeposits';
 import { track } from '@/lib/analytics/analytics';
 
 import { useAccounts } from './useAccounts';
+import { useStringGetter } from './useStringGetter';
 
 const TOKEN_SYMBOL = 'USDC';
 const TOKEN_ICON_SRC = '/currencies/usdc.png';
@@ -23,6 +26,7 @@ const CHECKOUT_EXPIRATION_MS = 3600000; // 1 hour (recommended)
 const DEFAULT_USDC_AMT = 0;
 
 export function useFunkitBuyNobleUsdc() {
+  const stringGetter = useStringGetter();
   const appThemeSetting: AppThemeSetting = useAppSelector(getAppTheme);
   const { lightMode, darkMode, setTheme } = useActiveTheme();
   const dispatch = useAppDispatch();
@@ -45,16 +49,16 @@ export function useFunkitBuyNobleUsdc() {
   const startCheckout = useCallback(async () => {
     setTheme(appThemeSetting === AppTheme.Light ? (lightMode as any) : (darkMode as any));
     await beginCheckout({
-      modalTitle: 'Deposit',
+      modalTitle: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       iconSrc: TOKEN_ICON_SRC,
       targetChain: TOKEN_CONTRACT_CHAIN_ID,
-      targetAsset: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+      targetAsset: TOKEN_CONTRACT_ADDRESS as EvmAddress,
       targetAssetAmount: DEFAULT_USDC_AMT,
       targetAssetTicker: TOKEN_SYMBOL,
       checkoutItemTitle: TOKEN_SYMBOL,
       customRecipient: dydxAddress,
       expirationTimestampMs: CHECKOUT_EXPIRATION_MS,
     });
-  }, [appThemeSetting, beginCheckout, darkMode, dydxAddress, lightMode, setTheme]);
+  }, [appThemeSetting, beginCheckout, darkMode, dydxAddress, lightMode, setTheme, stringGetter]);
   return startCheckout;
 }

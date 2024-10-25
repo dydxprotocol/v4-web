@@ -34,9 +34,9 @@ export const funkitConfig = () =>
   }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
-const ACCENT_COLOR_WASH = 'rgb(114,122,255)'; // dydx uses brightness
+const ACCENT_COLOR_WASH = 'var(--color-accent-faced)'; // dydx uses brightness
 const OFF_BACKGROUND_DARK = 'var(--color-layer-4)';
-const OFF_BACKGROUND_LIGHT = 'var(--color-layer-1)';
+const OFF_BACKGROUND_LIGHT = 'var(--color-layer-4)';
 
 const defaultCustomColors = {
   primaryText: 'var(--color-text-2)',
