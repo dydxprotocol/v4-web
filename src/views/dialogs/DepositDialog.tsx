@@ -16,6 +16,8 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { DepositDialogContent } from './DepositDialog/DepositDialogContent';
 
 enum DepositType {
@@ -32,7 +34,8 @@ export const DepositDialog = ({
   const startCheckout = useFunkitBuyNobleUsdc();
   const dispatch = useAppDispatch();
   const ffEnableFunkit =
-    useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY;
+    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) || testFlags.showInstantDepositToggle) &&
+    import.meta.env.VITE_FUNKIT_API_KEY;
 
   const {
     sourceAccount: { walletInfo },
