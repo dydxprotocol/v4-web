@@ -71,7 +71,8 @@ export const ToggleGroup = forwardRefFn(
         <$ToggleButton
           size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
           shape={shape}
-          disabled={item.disabled ?? disabled}
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          disabled={item.disabled || disabled}
           $withSeparators={withSeparators}
           {...buttonProps}
         >
