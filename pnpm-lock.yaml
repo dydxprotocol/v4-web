@@ -48,8 +48,8 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@funkit/connect':
-    specifier: ^3.4.5
-    version: 3.4.5(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)(wagmi@2.10.9)
+    specifier: ^3.4.8
+    version: 3.4.8(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)(wagmi@2.10.9)
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
@@ -4248,8 +4248,8 @@ packages:
       big.js: 6.2.2
     dev: false
 
-  /@funkit/connect@3.4.5(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)(wagmi@2.10.9):
-    resolution: {integrity: sha512-i7aHxHcv/q/seoSadSzECGC8ySO1izassanhN1+FhN7yI/ntHf+oHlfFfdWdEx8KDJA7E6H1ewq2x3N3t0RYkg==}
+  /@funkit/connect@3.4.8(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.6.3)(viem@2.16.2)(wagmi@2.10.9):
+    resolution: {integrity: sha512-Whg+odqmiItArAQCo03zzP42zDVlxUzN0nGjCwg1SzdvCzrCUDZU1Jm5hIgCILhO2Y7o/KQix9j2+qwbp9m6gQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -9522,7 +9522,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.10
+      chain-registry: 1.69.11
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -14166,8 +14166,8 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.10:
-    resolution: {integrity: sha512-+0eF5PEgBaDsfxpKhhArgcXTsF+XzbvCnJZ+wZ1bnwBKfkHtbgtQpmAlTAtW1Ii7JU9fivA2j2Ij8bSHfwngGg==}
+  /chain-registry@1.69.11:
+    resolution: {integrity: sha512-Xh65YDkGQ6QJOgAURq3Ezixs1yfZ6Q8ZozY8Ybj402jdQSPm9+7srpRSqS/JijP5d29UDqrhCbmESSIdqhtdGw==}
     dependencies:
       '@chain-registry/types': 0.50.1
     dev: false
@@ -19582,7 +19582,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.10
+      chain-registry: 1.69.11
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
