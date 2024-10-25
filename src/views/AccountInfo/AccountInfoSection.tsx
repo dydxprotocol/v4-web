@@ -86,7 +86,7 @@ export const AccountInfoSection = () => {
   const depositButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}

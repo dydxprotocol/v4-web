@@ -1,7 +1,7 @@
 // Custom connectors
 import type { PrivyClientConfig } from '@privy-io/react-auth';
 import { createConfig } from '@privy-io/wagmi';
-import { FallbackTransport, Transport, http, type Chain } from 'viem';
+import { FallbackTransport, http, Transport, type Chain } from 'viem';
 import {
   arbitrum,
   arbitrumGoerli,
