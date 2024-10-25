@@ -115,8 +115,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
   const ffEnableFunkit =
-    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY) ||
-    testFlags.showInstantDepositToggle;
+    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) || testFlags.showInstantDepositToggle) &&
+    import.meta.env.VITE_FUNKIT_API_KEY;
 
   const {
     dydxAddress,
