@@ -243,7 +243,7 @@ export const ClosePositionForm = ({
     </$MidPriceButton>
   );
 
-  const onUseLimitCheckedChange = (checked: Boolean) => {
+  const onUseLimitCheckedChange = (checked: boolean) => {
     abacusStateManager.setClosePositionValue({
       value: checked,
       field: ClosePositionInputField.useLimit,

@@ -62,6 +62,7 @@ import {
 } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
 import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
@@ -74,6 +75,24 @@ import AbacusRest from './rest';
 import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
 import AbacusWebsocket from './websocket';
+
+type AbacusInputValue = string | number | boolean | null | undefined;
+function abacusValueToString(val: AbacusInputValue): Nullable<string> {
+  if (val == null) {
+    return val;
+  }
+  if (typeof val === 'number') {
+    return val.toString();
+  }
+  if (typeof val === 'string') {
+    return val;
+  }
+  if (typeof val === 'boolean') {
+    return val ? 'true' : 'false';
+  }
+  assertNever(val);
+  return val?.toString() ?? '';
+}
 
 class AbacusStateManager {
   private store: RootStore | undefined;
@@ -319,26 +338,44 @@ class AbacusStateManager {
     this.chainTransactions.setSelectedGasDenom(denom);
   };
 
-  setTradeValue = ({ value, field }: { value: any; field: Nullable<TradeInputFields> }) => {
-    this.stateManager.trade(value, field);
+  setTradeValue = ({
+    value,
+    field,
+  }: {
+    value: AbacusInputValue;
+    field: Nullable<TradeInputFields>;
+  }) => {
+    this.stateManager.trade(abacusValueToString(value), field);
   };
 
   setAdjustIsolatedMarginValue = ({
     value,
     field,
   }: {
-    value: any;
+    value: AbacusInputValue;
     field: AdjustIsolatedMarginInputFields;
   }) => {
-    this.stateManager.adjustIsolatedMargin(value, field);
+    this.stateManager.adjustIsolatedMargin(abacusValueToString(value), field);
   };
 
-  setTransferValue = ({ value, field }: { value: any; field: TransferInputFields }) => {
-    this.stateManager.transfer(value, field);
+  setTransferValue = ({
+    value,
+    field,
+  }: {
+    value: AbacusInputValue;
+    field: TransferInputFields;
+  }) => {
+    this.stateManager.transfer(abacusValueToString(value), field);
   };
 
-  setTriggerOrdersValue = ({ value, field }: { value: any; field: TriggerOrdersInputFields }) => {
-    this.stateManager.triggerOrders(value, field);
+  setTriggerOrdersValue = ({
+    value,
+    field,
+  }: {
+    value: AbacusInputValue;
+    field: TriggerOrdersInputFields;
+  }) => {
+    this.stateManager.triggerOrders(abacusValueToString(value), field);
   };
 
   setHistoricalPnlPeriod = (
@@ -364,8 +401,14 @@ class AbacusStateManager {
     }
   };
 
-  setClosePositionValue = ({ value, field }: { value: any; field: ClosePositionInputFields }) => {
-    this.stateManager.closePosition(value, field);
+  setClosePositionValue = ({
+    value,
+    field,
+  }: {
+    value: AbacusInputValue;
+    field: ClosePositionInputFields;
+  }) => {
+    this.stateManager.closePosition(abacusValueToString(value), field);
   };
 
   setLocaleSeparators = ({ group, decimal }: LocaleSeparators) => {
