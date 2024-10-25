@@ -37,7 +37,7 @@ export const ProgramStatusCard = ({
   isVip = false,
 }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgram, community, supportEmail } = useURLConfigs();
+  const { affiliateProgram, vipsChannel, supportEmail } = useURLConfigs();
 
   const title: ReactNode = isVip
     ? stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE_VIP })
@@ -109,7 +109,7 @@ export const ProgramStatusCard = ({
                 className="w-full"
                 action={ButtonAction.Base}
                 type={ButtonType.Link}
-                href={community}
+                href={vipsChannel}
               >
                 {stringGetter({ key: STRING_KEYS.JOIN_DISCORD })}
               </Button>

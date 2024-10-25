@@ -9,6 +9,7 @@ export interface LinksConfigs {
   accountExportLearnMore?: string;
   blogs?: string;
   community?: string;
+  vipsChannel?: string;
   documentation?: string;
   equityTiersLearnMore?: string;
   feedback?: string;
@@ -58,6 +59,7 @@ export const useURLConfigs = (): LinksConfigs => {
     accountExportLearnMore: linksConfigs.accountExportLearnMore ?? FALLBACK_URL,
     blogs: linksConfigs.blogs ?? FALLBACK_URL,
     community: linksConfigs.community ?? FALLBACK_URL,
+    vipsChannel: linksConfigs.vipsChannel ?? FALLBACK_URL,
     documentation: linksConfigs.documentation ?? FALLBACK_URL,
     equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
