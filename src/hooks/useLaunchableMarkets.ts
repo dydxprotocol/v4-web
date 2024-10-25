@@ -19,6 +19,8 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
+const ASSETS_TO_REMOVE = ['USDC', 'USDT'];
+
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
     queries: [
@@ -71,6 +73,10 @@ export const useMetadataService = () => {
         }
       });
 
+      ASSETS_TO_REMOVE.forEach((asset) => {
+        delete data[asset];
+      });
+
       return {
         data,
         isLoading: results.some((result) => result.isLoading),
@@ -110,10 +116,7 @@ export const useLaunchableMarkets = () => {
       };
     });
 
-    return assets.filter(({ asset, id }) => {
-      // Remove USDT and markets that are already launched
-      if (['USDT'].includes(asset)) return false;
-
+    return assets.filter(({ id }) => {
       return !marketIds.includes(id);
     });
   }, [marketIds, metadataServiceData.data]);

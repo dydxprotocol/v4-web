@@ -2,7 +2,6 @@ import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } fro
 
 import { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -32,7 +31,7 @@ import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
-import { getMarketIds } from '@/state/perpetualsSelectors';
+import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
@@ -69,7 +68,7 @@ export const NewMarketPreviewStep = ({
   const { createPermissionlessMarket } = useSubaccount();
   const { usdcImage } = useTokenConfigs();
   const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const marketOraclePrice = useAppSelector((s) => getMarketOraclePrice(s, ticker));
   const [txHash, setTxHash] = useState<string>();
   const [eta, setEta] = useState<number>(0);
   const now = useNow();
@@ -81,13 +80,13 @@ export const NewMarketPreviewStep = ({
    * @description Side effect to set loading to false after ticker is returned from v4_markets channel and added to marketIds
    */
   useEffect(() => {
-    if (marketIds.includes(ticker) && isLoading && txHash) {
+    if (marketOraclePrice && isLoading && txHash) {
       setIsLoading(false);
       setIsParentLoading?.(false);
       setEta(0);
       onSuccess(txHash);
     }
-  }, [marketIds, isLoading, ticker, txHash, onSuccess, setIsParentLoading]);
+  }, [marketOraclePrice, isLoading, ticker, txHash, onSuccess, setIsParentLoading]);
 
   const { alertInfo, shouldDisableForm } = useMemo(() => {
     if (errorMessage) {

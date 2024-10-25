@@ -31,6 +31,10 @@ export const LaunchMarketDialog = ({
   const stringGetter = useStringGetter();
   const [isLoading, setIsLoading] = useState(false);
 
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
   const { title, description } = useMemo(() => {
     switch (formStep) {
       case NewMarketFormStep.SELECTION:
@@ -107,6 +111,7 @@ export const LaunchMarketDialog = ({
     >
       <NewMarketForm
         defaultLaunchableMarketId={defaultLaunchableMarketId}
+        onSuccessAction={onClose}
         setFormStep={setFormStep}
         setIsParentLoading={setIsLoading}
       />
@@ -121,7 +126,7 @@ const $LoadingSpinner = styled(LoadingSpinner)`
   }
 `;
 
-const $Title = styled.h2`
+const $Title = styled.div`
   ${layoutMixins.row}
   justify-content: space-between;
   margin: 0;

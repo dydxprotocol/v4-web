@@ -1,3 +1,4 @@
+import { Link, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonStyle, ButtonType } from '@/constants/buttons';
@@ -14,17 +15,40 @@ import { Icon, IconName } from '@/components/Icon';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSuccessStepProps = {
+  onActionClicked?: () => void;
   onLaunchAnotherMarket: () => void;
   tickerToAdd: string;
   transactionUrl: string;
 };
 
 export const NewMarketSuccessStep = ({
+  onActionClicked,
   onLaunchAnotherMarket,
   tickerToAdd,
   transactionUrl,
 }: NewMarketSuccessStepProps) => {
   const stringGetter = useStringGetter();
+  const match = useMatch(`${AppRoute.Trade}/:marketId`);
+  const { marketId } = match?.params ?? {};
+
+  const cta =
+    marketId === tickerToAdd ? (
+      <Button type={ButtonType.Button} action={ButtonAction.Primary} onClick={onActionClicked}>
+        {stringGetter({
+          key: STRING_KEYS.TRADE_MARKET,
+          params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
+        })}
+      </Button>
+    ) : (
+      <Link to={`${AppRoute.Trade}/${tickerToAdd}`}>
+        <Button type={ButtonType.Button} action={ButtonAction.Primary}>
+          {stringGetter({
+            key: STRING_KEYS.TRADE_MARKET,
+            params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
+          })}
+        </Button>
+      </Link>
+    );
 
   return (
     <$Container>
@@ -52,16 +76,7 @@ export const NewMarketSuccessStep = ({
         <Button type={ButtonType.Link} href={AppRoute.Vault} action={ButtonAction.Secondary}>
           {stringGetter({ key: STRING_KEYS.VIEW_VAULT })}
         </Button>
-        <Button
-          type={ButtonType.Link}
-          href={`${AppRoute.Trade}/${tickerToAdd}`}
-          action={ButtonAction.Primary}
-        >
-          {stringGetter({
-            key: STRING_KEYS.TRADE_MARKET,
-            params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
-          })}
-        </Button>
+        {cta}
       </div>
 
       <div tw="flex flex-col">

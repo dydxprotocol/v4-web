@@ -19,7 +19,7 @@ import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
-import { getMarketIds } from '@/state/perpetualsSelectors';
+import { getMarketIds, getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
@@ -35,6 +35,8 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
+  const currentMarketOraclePrice = useAppSelector((s) => getMarketOraclePrice(s, marketId ?? ''));
+  const hasMarketOraclePrice = currentMarketOraclePrice != null;
   const launchableMarkets = useLaunchableMarkets();
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
@@ -131,10 +133,17 @@ export const useCurrentMarketId = () => {
       abacusStateManager.setMarket(DEFAULT_MARKETID);
       abacusStateManager.setTradeValue({ value: null, field: null });
     } else if (hasMarketIds) {
-      abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+      if (marketId) {
+        if (hasMarketOraclePrice) {
+          abacusStateManager.setMarket(marketId);
+        }
+      } else {
+        abacusStateManager.setMarket(DEFAULT_MARKETID);
+      }
+
       abacusStateManager.setTradeValue({ value: null, field: null });
     }
-  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketIds, marketId]);
+  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketIds, hasMarketOraclePrice, marketId]);
 
   return {
     isViewingUnlaunchedMarket,
