@@ -113,7 +113,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
-  const ffEnableFunkit = useStatsigGateValue(StatsigFlags.ffEnableFunkit);
+  const ffEnableFunkit =
+    useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY;
 
   const {
     dydxAddress,
