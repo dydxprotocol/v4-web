@@ -31,7 +31,8 @@ export const DepositDialog = ({
   const { isMobile } = useBreakpoints();
   const startCheckout = useFunkitBuyNobleUsdc();
   const dispatch = useAppDispatch();
-  const ffEnableFunkit = useStatsigGateValue(StatsigFlags.ffEnableFunkit);
+  const ffEnableFunkit =
+    useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY;
 
   const {
     sourceAccount: { walletInfo },
@@ -39,7 +40,6 @@ export const DepositDialog = ({
 
   useEffect(() => {
     if (
-      import.meta.env.VITE_FUNKIT_API_KEY &&
       depositType === DepositType.FUNKIT &&
       ffEnableFunkit &&
       walletInfo?.name !== WalletType.Keplr &&

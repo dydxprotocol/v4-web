@@ -54,6 +54,7 @@ import { useInitializePage } from './hooks/useInitializePage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
 import { appQueryClient } from './state/appQueryClient';
@@ -194,11 +195,12 @@ const providers = [
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
-  wrapProvider(FunkitProvider, {
-    funkitConfig: funkitConfig(),
-    theme: funkitTheme,
-    initialChain: config.chains[0].id,
-  }),
+  import.meta.env.VITE_FUNKIT_API_KEY &&
+    wrapProvider(FunkitProvider, {
+      funkitConfig: funkitConfig(),
+      theme: funkitTheme,
+      initialChain: config.chains[0].id,
+    }),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
@@ -209,7 +211,7 @@ const providers = [
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
-];
+].filter(isTruthy);
 
 const App = () => {
   return [...providers].reverse().reduce(
