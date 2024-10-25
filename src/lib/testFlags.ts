@@ -69,6 +69,10 @@ class TestFlags {
   get onboardingRewrite() {
     return !!this.queryParams.onboarding_rewrite;
   }
+
+  get showInstantDepositToggle() {
+    return !!this.queryParams.funkit_toggle;
+  }
 }
 
 export const testFlags = new TestFlags();

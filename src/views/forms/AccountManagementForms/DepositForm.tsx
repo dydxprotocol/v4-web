@@ -82,6 +82,7 @@ import { dd } from '@/lib/analytics/datadog';
 import { isNativeDenom, WAGMI_COSMJS_NATIVE_TOKEN_ADDRESS } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -114,7 +115,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { hasAcknowledgedTerms } = useAppSelector(getOnboardingGuards);
   const ffEnableFunkit =
-    useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY;
+    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) && import.meta.env.VITE_FUNKIT_API_KEY) ||
+    testFlags.showInstantDepositToggle;
 
   const {
     dydxAddress,
