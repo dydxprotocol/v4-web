@@ -60,7 +60,7 @@ import {
   setTradeFormInputs,
   setTriggerFormInputs,
 } from '@/state/inputs';
-import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
+import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { LocaleSeparators } from '../numbers';
 import { testFlags } from '../testFlags';
@@ -165,21 +165,9 @@ class AbacusStateManager {
 
   // ------ Input Values ------ //
   clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
-    const state = this.store?.getState();
-
-    const { needsTriggerPrice, needsTrailingPercent, needsLimitPrice } =
-      (state && getInputTradeOptions(state)) ?? {};
-
-    if (needsTrailingPercent) {
-      this.setTradeValue({ value: null, field: TradeInputField.trailingPercent });
-    }
-    if (needsTriggerPrice) {
-      this.setTradeValue({ value: null, field: TradeInputField.triggerPrice });
-    }
-
-    if (needsLimitPrice) {
-      this.setTradeValue({ value: null, field: TradeInputField.limitPrice });
-    }
+    this.setTradeValue({ value: null, field: TradeInputField.trailingPercent });
+    this.setTradeValue({ value: null, field: TradeInputField.triggerPrice });
+    this.setTradeValue({ value: null, field: TradeInputField.limitPrice });
 
     this.store?.dispatch(setTradeFormInputs(CLEARED_TRADE_INPUTS));
 
@@ -189,15 +177,12 @@ class AbacusStateManager {
   };
 
   clearTradeInputSizeValues = () => {
-    const state = this.store?.getState();
-    const { needsLeverage } = (state && getInputTradeOptions(state)) ?? {};
     this.setTradeValue({ value: null, field: TradeInputField.size });
     this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
     this.setTradeValue({ value: null, field: TradeInputField.balancePercent });
 
-    if (needsLeverage) {
-      this.setTradeValue({ value: null, field: TradeInputField.leverage });
-    }
+    this.setTradeValue({ value: null, field: TradeInputField.leverage });
+    this.setTradeValue({ value: null, field: TradeInputField.targetLeverage });
 
     this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
   };

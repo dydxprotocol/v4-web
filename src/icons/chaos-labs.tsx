@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/state/appTypes';
-import { AppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 export const ChaosLabsIcon: React.FC = () => {
   const appTheme = useAppSelector(getAppTheme);

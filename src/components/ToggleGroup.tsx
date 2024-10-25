@@ -23,6 +23,7 @@ type ElementProps<MenuItemValue extends string> = {
   onValueChange: (value: MenuItemValue) => void;
   onInteraction?: () => void;
   ensureSelected?: boolean;
+  disabled?: boolean;
 };
 
 type StyleProps = {
@@ -39,6 +40,7 @@ export const ToggleGroup = forwardRefFn(
       items,
       value,
       ensureSelected = true,
+      disabled = false,
       onValueChange,
       onInteraction,
 
@@ -69,7 +71,8 @@ export const ToggleGroup = forwardRefFn(
         <$ToggleButton
           size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
           shape={shape}
-          disabled={item.disabled}
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          disabled={item.disabled || disabled}
           $withSeparators={withSeparators}
           {...buttonProps}
         >
@@ -96,6 +99,7 @@ export const ToggleGroup = forwardRefFn(
         overflow={overflow}
         tw="row gap-[0.33em]"
         $withSeparators={withSeparators}
+        disabled={disabled}
       >
         {slotBefore}
         {withSeparators ? (
@@ -117,6 +121,7 @@ const $Root = styled(Root)<{
   ${({ $withSeparators }) =>
     $withSeparators &&
     css`
+      --separator-padding: 0.5rem;
       align-self: stretch;
     `}
   ${({ overflow }) =>
@@ -136,10 +141,21 @@ const $Label = styled.div`
 `;
 
 const $WithSeparators = styled(WithSeparators)`
-  --separatorHeight-padding: 0.5rem;
+  --separatorHeight-padding: var(--separator-padding);
 `;
 
 const $ToggleButton = styled(ToggleButton)<{ $withSeparators: boolean }>`
+  &[data-disabled] {
+    > * {
+      cursor: not-allowed;
+    }
+  }
+  &:not([data-disabled]) {
+    > * {
+      cursor: pointer;
+    }
+  }
+
   ${({ $withSeparators }) =>
     $withSeparators &&
     css`
@@ -150,5 +166,6 @@ const $ToggleButton = styled(ToggleButton)<{ $withSeparators: boolean }>`
       --button-padding: 0 0.25rem;
 
       width: min-content;
+      max-width: max-content;
     `}
 `;

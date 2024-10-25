@@ -186,8 +186,14 @@ export const TradingRewardsChart = ({
 
   const onToggleInteract = () => setIsZooming(false);
 
-  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.date, []);
-  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum.cumulativeAmount, []);
+  const xAccessorFunc = useCallback(
+    (datum: TradingRewardsDatum | undefined) => datum?.date ?? 0,
+    []
+  );
+  const yAccessorFunc = useCallback(
+    (datum: TradingRewardsDatum | undefined) => datum?.cumulativeAmount ?? 0,
+    []
+  );
 
   const series = useMemo(
     () => [

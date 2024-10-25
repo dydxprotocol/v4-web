@@ -1,7 +1,7 @@
 import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/styles/base';
 import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
 
-import { AppColorMode, AppTheme } from '@/state/configs';
+import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
 
 import { generateFadedColorVariant } from '@/lib/styles';
 import { testFlags } from '@/lib/testFlags';

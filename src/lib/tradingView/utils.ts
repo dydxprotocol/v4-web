@@ -12,7 +12,7 @@ import type { ChartLineType } from '@/constants/tvchart';
 
 import { Themes } from '@/styles/themes';
 
-import { AppTheme, type AppColorMode } from '@/state/configs';
+import { AppTheme, type AppColorMode } from '@/state/appUiConfigs';
 
 import { getDisplayableTickerFromMarket } from '../assetUtils';
 import { testFlags } from '../testFlags';

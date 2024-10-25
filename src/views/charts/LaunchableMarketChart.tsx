@@ -31,7 +31,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
@@ -92,8 +92,8 @@ export const LaunchableMarketChart = ({
     },
   ];
 
-  const xAccessorFunc = useCallback((datum: TradingViewBar) => datum.time, []);
-  const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
+  const xAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.time ?? 0, []);
+  const yAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.close ?? 0, []);
 
   const colorString = useMemo(() => {
     if (!candlesQuery.data || candlesQuery.data.length < 1) return 'var(--color-text-1)';
