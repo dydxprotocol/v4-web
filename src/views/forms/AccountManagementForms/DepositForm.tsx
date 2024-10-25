@@ -545,7 +545,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           }
 
           setDepositStep(DepositSteps.Confirm);
-          txHash = await signTransactionPhantom(Buffer.from(requestPayload.data, 'base64'));
+          txHash = await signTransactionPhantom(
+            new Uint8Array(Buffer.from(requestPayload.data, 'base64'))
+          );
         } else {
           if (!signerWagmi) {
             throw new Error('Missing signer');

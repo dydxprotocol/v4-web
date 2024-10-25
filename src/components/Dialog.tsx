@@ -49,6 +49,7 @@ type StyleProps = {
   portalContainer?: HTMLElement;
   hasHeaderBorder?: boolean;
   hasHeaderBlur?: boolean;
+  hasFooterBorder?: boolean;
   children?: React.ReactNode;
   className?: string;
   stacked?: boolean;
@@ -90,6 +91,7 @@ export const Dialog = ({
   portalContainer,
   hasHeaderBorder = false,
   hasHeaderBlur = true,
+  hasFooterBorder = false,
   withAnimation = false,
   withOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement),
   children,
@@ -163,7 +165,7 @@ export const Dialog = ({
 
           <$Content>{children}</$Content>
 
-          {slotFooter && <$Footer>{slotFooter}</$Footer>}
+          {slotFooter && <$Footer $withBorder={hasFooterBorder}>{slotFooter}</$Footer>}
         </$Container>
       </DialogPortal>
     </Root>
@@ -492,11 +494,19 @@ const $Title = tw(Title)`flex-1 font-large-medium text-color-text-2 overflow-hid
 
 const $Description = tw(Description)`mt-0.5 text-color-text-0 font-base-book`;
 
-const $Footer = styled.footer`
+const $Footer = styled.footer<{ $withBorder: boolean }>`
   display: grid;
   ${layoutMixins.stickyFooter}
   ${layoutMixins.withStickyFooterBackdrop}
   --stickyFooterBackdrop-outsetX: var(--dialog-paddingX);
+
+  ${({ $withBorder }) =>
+    $withBorder &&
+    css`
+      ${layoutMixins.withOuterBorder};
+      background: var(--dialog-backgroundColor);
+      --dialog-footer-paddingTop: var(--dialog-footer-paddingBottom);
+    `};
 
   padding: var(--dialog-footer-paddingTop) var(--dialog-footer-paddingLeft)
     var(--dialog-footer-paddingBottom) var(--dialog-footer-paddingRight);

@@ -18,8 +18,8 @@ import {
 } from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 import { getAssets } from '@/state/assetsSelectors';
-import { getShouldHideLaunchableMarkets } from '@/state/configsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';

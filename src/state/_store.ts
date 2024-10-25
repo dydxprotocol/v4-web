@@ -8,6 +8,7 @@ import { accountSlice } from './account';
 import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
+import { appUiConfigsSlice } from './appUiConfigs';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
@@ -28,6 +29,7 @@ const reducers = {
   account: accountSlice.reducer,
   affiliates: affiliatesSlice.reducer,
   app: appSlice.reducer,
+  appUiConfigs: appUiConfigsSlice.reducer,
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
@@ -47,9 +49,9 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 2,
+  version: 3,
   storage,
-  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet'],
+  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet', 'appUiConfigs'],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 

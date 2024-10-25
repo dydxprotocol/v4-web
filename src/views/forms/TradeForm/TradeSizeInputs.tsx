@@ -30,9 +30,9 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setDisplayUnit } from '@/state/appUiConfigs';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { setDisplayUnit } from '@/state/configs';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getInputTradeOptions,

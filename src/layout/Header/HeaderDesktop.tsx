@@ -1,3 +1,4 @@
+import { shallowEqual } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -6,6 +7,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -28,12 +30,14 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
+import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
+import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
+import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
@@ -42,6 +46,11 @@ export const HeaderDesktop = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { chainTokenLabel } = useTokenConfigs();
+  const { dydxAccounts } = useAccounts();
+
+  const subAccount = useAppSelector(getSubaccount, shallowEqual);
+  const { freeCollateral: availableBalance } = subAccount ?? {};
+
   const {
     enableVaults: showVaults,
     pml: showLaunchMarkets,
@@ -172,7 +181,9 @@ export const HeaderDesktop = () => {
       <VerticalSeparator />
 
       <$NavBefore $uiRefreshEnabled={uiRefreshEnabled}>
-        <LanguageSelector sideOffset={16} />
+        <$LanguageSelector sideOffset={16}>
+          {uiRefreshEnabled ? <Icon iconName={IconName.Translate} size="1.25em" /> : undefined}
+        </$LanguageSelector>
         <VerticalSeparator />
         <NetworkSelectMenu sideOffset={16} />
       </$NavBefore>
@@ -207,8 +218,13 @@ export const HeaderDesktop = () => {
               tw="mr-[0.5em]"
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
-              action={ButtonAction.Primary}
+              action={
+                MustBigNumber(availableBalance?.current).gt(0)
+                  ? ButtonAction.Secondary
+                  : ButtonAction.Primary
+              }
               onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+              state={{ isDisabled: !dydxAccounts }}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Button>
@@ -370,4 +386,9 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
 const $LaunchMarketButton = styled(Button)`
   --button-backgroundColor: var(--color-layer-5);
   --button-border: solid var(--border-width) var(--color-border);
+`;
+
+const $LanguageSelector = styled(LanguageSelector)`
+  ${headerMixins.dropdownTrigger}
+  --trigger-padding: 0.33rem 0.5rem;
 `;

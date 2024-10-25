@@ -27,7 +27,7 @@ export const signComplianceSignature = async (
 
   const timestampInSeconds = Math.floor(Date.now() / 1000);
   const messageToSign: string = `${message}:${action}"${status || ''}:${timestampInSeconds}`;
-  const messageHash = sha256(Buffer.from(messageToSign));
+  const messageHash = sha256(new Uint8Array(Buffer.from(messageToSign)));
 
   const signed = await Secp256k1.createSignature(messageHash, hdkey.privateKey);
   const signedMessage = signed.toFixedLength();
