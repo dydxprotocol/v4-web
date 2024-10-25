@@ -39,6 +39,7 @@ export const DepositDialog = ({
 
   useEffect(() => {
     if (
+      import.meta.env.VITE_FUNKIT_API_KEY &&
       depositType === DepositType.FUNKIT &&
       ffEnableFunkit &&
       walletInfo?.name !== WalletType.Keplr &&
