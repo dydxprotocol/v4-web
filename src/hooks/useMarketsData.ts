@@ -263,12 +263,11 @@ export const useMarketsData = ({
   }, [markets, searchFilter, filter]);
 
   const marketFilters = useMemo(
-    () =>
-      [
-        ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-          markets.some((market) => filterFunctions[marketFilter](market))
-        ),
-      ].filter(isTruthy),
+    () => [
+      ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
+        markets.some((market) => filterFunctions[marketFilter](market))
+      ),
+    ],
     [markets]
   );
 
