@@ -7,4 +7,4 @@ export const getDismissedAffiliateBanner = (state: RootState) =>
   state.dismissable.dismissedAffiliateBanner;
 
 export const getHasSeenUnlimitedAnnouncement = (state: RootState) =>
-  !state.dismissable.hasSeenUnlimitedAnnouncement;
+  state.dismissable.hasSeenUnlimitedAnnouncement;

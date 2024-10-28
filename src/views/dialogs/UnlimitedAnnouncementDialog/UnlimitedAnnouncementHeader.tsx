@@ -13,7 +13,7 @@ export const UnlimitedAnnouncementHeader = ({
   currentStep: UnlimitedAnnouncementDialogSteps;
 }) => {
   const stringGetter = useStringGetter();
-  
+
   const backgrounds: {
     [key in UnlimitedAnnouncementDialogSteps]: string;
   } = {

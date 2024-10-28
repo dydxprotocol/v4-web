@@ -47,6 +47,7 @@ import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
+import { StatsigFlags } from './constants/statsig';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -65,7 +66,6 @@ import { openDialog } from './state/dialogs';
 import { getActiveDialog } from './state/dialogsSelectors';
 import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
-import { StatsigFlags } from './constants/statsig';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
