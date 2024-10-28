@@ -59,6 +59,7 @@ class TestFlags {
   }
 
   get enableStaticTyping() {
+    if (this.queryParams.statictyping === 'false') return false;
     return !!this.queryParams.statictyping || isDev;
   }
 

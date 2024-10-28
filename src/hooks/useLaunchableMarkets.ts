@@ -49,7 +49,8 @@ export const useMetadataService = () => {
       Object.keys(info ?? {}).forEach((key) => {
         const infoKey = info?.[key];
         const pricesKey = prices?.[key];
-        if (infoKey && pricesKey) {
+
+        if (infoKey && pricesKey && !ASSETS_TO_REMOVE.includes(key)) {
           const tickSizeDecimals = getTickSizeDecimalsFromPrice(pricesKey.price);
 
           data[key] = {
@@ -71,10 +72,6 @@ export const useMetadataService = () => {
             tickSizeDecimals,
           };
         }
-      });
-
-      ASSETS_TO_REMOVE.forEach((asset) => {
-        delete data[asset];
       });
 
       return {

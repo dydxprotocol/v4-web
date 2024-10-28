@@ -39,7 +39,7 @@ import { log } from '@/lib/telemetry';
 
 import { NewMarketAgreement } from '../NewMarketAgreement';
 
-const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.second * 30;
+const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
 
 type NewMarketPreviewStepProps = {
   ticker: string;
@@ -120,35 +120,31 @@ export const NewMarketPreviewStep = ({
     };
   }, [errorMessage, freeCollateral, stringGetter]);
 
-  const heading = useMemo(() => {
-    if (shouldHideTitleAndDescription) return null;
+  const heading = shouldHideTitleAndDescription ? null : (
+    <>
+      <h2>
+        {isLoading ? (
+          <span tw="flex flex-row items-center gap-[0.5ch]">
+            <$LoadingSpinner />
+            {stringGetter({ key: STRING_KEYS.LAUNCHING_MARKET_LOADING })}
+          </span>
+        ) : (
+          stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })
+        )}
+      </h2>
 
-    return (
-      <>
-        <h2>
-          {isLoading ? (
-            <span tw="flex flex-row items-center gap-[0.5ch]">
-              <$LoadingSpinner />
-              {stringGetter({ key: STRING_KEYS.LAUNCHING_MARKET_LOADING })}
-            </span>
-          ) : (
-            stringGetter({ key: STRING_KEYS.CONFIRM_LAUNCH_DETAILS })
-          )}
-        </h2>
-
-        <span tw="text-color-text-0">
-          {stringGetter({
-            key: STRING_KEYS.DEPOSIT_LOCKUP_DESCRIPTION,
-            params: {
-              NUM_DAYS: <span tw="text-color-text-1">30</span>,
-              PAST_DAYS: 30,
-              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
-            },
-          })}
-        </span>
-      </>
-    );
-  }, [stringGetter, isLoading, shouldHideTitleAndDescription]);
+      <span tw="text-color-text-0">
+        {stringGetter({
+          key: STRING_KEYS.DEPOSIT_LOCKUP_DESCRIPTION,
+          params: {
+            NUM_DAYS: <span tw="text-color-text-1">30</span>,
+            PAST_DAYS: 30,
+            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
+          },
+        })}
+      </span>
+    </>
+  );
 
   const launchVisualization = (
     <div tw="mx-auto flex flex-row items-center gap-0.25">
