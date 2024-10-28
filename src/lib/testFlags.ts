@@ -67,7 +67,7 @@ class TestFlags {
   }
 
   get unlimitedAnnouncement() {
-    return !!this.queryParams.unlimitedAnnouncement || isDev;
+    return true;
   }
 
   get onboardingRewrite() {

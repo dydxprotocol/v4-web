@@ -7,6 +7,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
+import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
@@ -57,9 +58,12 @@ import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { getIsAccountConnected } from './state/accountSelectors';
 import { appQueryClient } from './state/appQueryClient';
-import { useAppDispatch } from './state/appTypes';
+import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { openDialog } from './state/dialogs';
+import { getActiveDialog } from './state/dialogsSelectors';
+import { getShouldShowUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -88,6 +92,10 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
 
+  const shouldShowUnlimitedAnnouncement = useAppSelector(getShouldShowUnlimitedAnnouncement);
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
+  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
+
   const { complianceState } = useComplianceState();
   const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
 
@@ -101,12 +109,16 @@ const Content = () => {
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   useEffect(() => {
-    if (testFlags.referralCode) {
-      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
-    } else if (testFlags.unlimitedAnnouncement) {
+    if (isAccountConnected && shouldShowUnlimitedAnnouncement) {
       dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
     }
-  }, [dispatch]);
+  }, [dispatch, shouldShowUnlimitedAnnouncement, isAccountConnected]);
+
+  useEffect(() => {
+    if (testFlags.referralCode && !activeDialog) {
+      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    }
+  }, [dispatch, activeDialog]);
 
   return (
     <>

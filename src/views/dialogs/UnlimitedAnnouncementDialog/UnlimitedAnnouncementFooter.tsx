@@ -44,13 +44,14 @@ export const UnlimitedAnnouncementFooter = ({
 
   switch (currentStep) {
     case UnlimitedAnnouncementDialogSteps.Announcement:
+      // Use row-reverse so that the auto focus on the dialog focusses on the primary action rather than the secondary
       return (
-        <div tw="flex gap-0.75">
-          <Button tw="flex-1" action={ButtonAction.Base} onClick={onTradeNow}>
-            {stringGetter({ key: STRING_KEYS.TRADE_NOW })}
-          </Button>
+        <div tw="flex flex-row-reverse gap-0.75">
           <Button tw="flex-1" action={ButtonAction.Primary} onClick={onIncrementStep(1)}>
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+          </Button>
+          <Button tw="flex-1" action={ButtonAction.Base} onClick={onTradeNow}>
+            {stringGetter({ key: STRING_KEYS.TRADE_NOW })}
           </Button>
         </div>
       );

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { DialogProps, UnlimitedAnnouncementDialogProps } from '@/constants/dialogs';
@@ -13,11 +14,13 @@ import { Dialog } from '@/components/Dialog';
 
 import { UnlimitedAnnouncementFooter } from './UnlimitedAnnouncementFooter';
 import { UnlimitedAnnouncementHeader } from './UnlimitedAnnouncementHeader';
+import { markUnlimitedAnnouncementSeen } from '@/state/dismissable';
 
 export const UnlimitedAnnouncementDialog = ({
   setIsOpen,
 }: DialogProps<UnlimitedAnnouncementDialogProps>) => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
 
   const [currentStep, setCurrentStep] = useState(UnlimitedAnnouncementDialogSteps.Announcement);
 
@@ -65,16 +68,22 @@ export const UnlimitedAnnouncementDialog = ({
     },
   };
 
+  const onCloseDialog = useCallback(() => {
+    setIsOpen(false);
+    dispatch(markUnlimitedAnnouncementSeen());
+  }, [setIsOpen, dispatch]);
+
   return (
     <$Dialog
       isOpen
       setIsOpen={setIsOpen}
+      preventClose
       slotHeader={<UnlimitedAnnouncementHeader currentStep={currentStep} />}
       slotFooter={
         <UnlimitedAnnouncementFooter
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
-          onDone={() => setIsOpen(false)}
+          onDone={onCloseDialog}
         />
       }
       tw="[--dialog-footer-paddingBottom: 1.5rem]"
@@ -108,7 +117,7 @@ export const UnlimitedAnnouncementDialog = ({
           </div>
         </div>
       ) : (
-        <$Row tw="flex flex-col gap-0.25 h-[4.5rem]">
+        <$Row tw="flex h-[4.5rem] flex-col gap-0.25">
           <h2>{dialogStrings[currentStep].title} </h2>
           <p>{dialogStrings[currentStep].description}</p>
         </$Row>

@@ -4,11 +4,13 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface DismissableState {
   hasSeenPredictionMarketIntroDialog: boolean;
   dismissedAffiliateBanner: boolean;
+  hasSeenUnlimitedAnnouncement: boolean;
 }
 
 const initialState: DismissableState = {
   hasSeenPredictionMarketIntroDialog: false,
   dismissedAffiliateBanner: false,
+  hasSeenUnlimitedAnnouncement: false,
 };
 
 export const dismissableSlice = createSlice({
@@ -21,8 +23,14 @@ export const dismissableSlice = createSlice({
     setDismissedAffiliateBanner: (state, action: PayloadAction<boolean>) => {
       state.dismissedAffiliateBanner = action.payload;
     },
+    markUnlimitedAnnouncementSeen: (state) => {
+      state.hasSeenUnlimitedAnnouncement = true;
+    },
   },
 });
 
-export const { setHasSeenPredictionMarketIntroDialog, setDismissedAffiliateBanner } =
-  dismissableSlice.actions;
+export const {
+  setHasSeenPredictionMarketIntroDialog,
+  setDismissedAffiliateBanner,
+  markUnlimitedAnnouncementSeen,
+} = dismissableSlice.actions;
