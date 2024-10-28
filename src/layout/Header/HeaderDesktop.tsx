@@ -222,7 +222,7 @@ export const HeaderDesktop = () => {
                 !availableBalance || MustBigNumber(availableBalance.current).gt(0)
                   ? ButtonAction.Secondary
                   : ButtonAction.Primary
-            }
+              }
               onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
               state={{ isDisabled: !dydxAccounts }}
             >
