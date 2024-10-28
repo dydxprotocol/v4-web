@@ -1,7 +1,15 @@
-import { isDev, isTestnet } from '@/constants/networks';
+import { isDev, isMainnet } from '@/constants/networks';
 
 class TestFlags {
   public queryParams: { [key: string]: string };
+
+  private isValueExplicitlyFalse = (value: string) =>
+    ['false', '0', 'no', 'off'].includes(value.toLowerCase());
+
+  private booleanFlag = (value?: string, defaultTrue?: boolean) => {
+    if (!value) return defaultTrue ?? false;
+    return !this.isValueExplicitlyFalse(value);
+  };
 
   constructor() {
     this.queryParams = {};
@@ -27,7 +35,7 @@ class TestFlags {
   }
 
   get displayInitializingMarkets() {
-    return !!this.queryParams.displayinitializingmarkets;
+    return this.booleanFlag(this.queryParams.displayinitializingmarkets);
   }
 
   get addressOverride(): string | undefined {
@@ -35,7 +43,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return !!this.queryParams.vaults || isDev || isTestnet;
+    return this.booleanFlag(this.queryParams.vaults, !isMainnet);
   }
 
   get referrer() {
@@ -43,15 +51,15 @@ class TestFlags {
   }
 
   get enablePredictionMarketPerp() {
-    return !!this.queryParams.prediction || isDev;
+    return this.booleanFlag(this.queryParams.prediction, isDev);
   }
 
   get pml() {
-    return !!this.queryParams.pml || isDev || isTestnet;
+    return this.booleanFlag(this.queryParams.pml, !isMainnet);
   }
 
   get showLimitClose() {
-    return !!this.queryParams.limitclose;
+    return this.booleanFlag(this.queryParams.limitclose);
   }
 
   get referralCode() {
@@ -59,16 +67,19 @@ class TestFlags {
   }
 
   get enableStaticTyping() {
-    if (this.queryParams.statictyping === 'false') return false;
-    return !!this.queryParams.statictyping || isDev;
+    return this.booleanFlag(this.queryParams.statictyping, isDev);
   }
 
   get uiRefresh() {
-    return !!this.queryParams.uirefresh || isDev;
+    return this.booleanFlag(this.queryParams.uirefresh, isDev);
   }
 
   get onboardingRewrite() {
     return !!this.queryParams.onboarding_rewrite;
+  }
+
+  get showInstantDepositToggle() {
+    return !!this.queryParams.funkit_toggle;
   }
 }
 

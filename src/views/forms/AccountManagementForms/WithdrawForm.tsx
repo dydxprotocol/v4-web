@@ -290,6 +290,10 @@ export const WithdrawForm = () => {
         if (isCctp) {
           // if error update the dummy notification with error
           addOrUpdateTransferNotification({
+            type: TransferNotificationTypes.Withdrawal,
+            toAmount: debouncedAmountBN.toNumber(),
+            triggeredAt: Date.now(),
+            isCctp,
             id: notificationId,
             txHash: DUMMY_TX_HASH,
             status: { error: stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }) },
