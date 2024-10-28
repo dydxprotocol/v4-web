@@ -66,10 +66,6 @@ class TestFlags {
     return !!this.queryParams.uirefresh || isDev;
   }
 
-  get unlimitedAnnouncement() {
-    return true;
-  }
-
   get onboardingRewrite() {
     return !!this.queryParams.onboarding_rewrite;
   }

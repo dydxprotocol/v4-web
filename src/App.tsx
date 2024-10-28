@@ -23,7 +23,7 @@ import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider } from '@/hooks/useStatsig';
+import { StatsigProvider, useStatsigGateValue } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -63,8 +63,9 @@ import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { openDialog } from './state/dialogs';
 import { getActiveDialog } from './state/dialogsSelectors';
-import { getShouldShowUnlimitedAnnouncement } from './state/dismissableSelectors';
+import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
+import { StatsigFlags } from './constants/statsig';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -92,7 +93,8 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
 
-  const shouldShowUnlimitedAnnouncement = useAppSelector(getShouldShowUnlimitedAnnouncement);
+  const ffShowUnlimitedAnnouncement = useStatsigGateValue(StatsigFlags.ffShowUnlimitedAnnouncement);
+  const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
   const isAccountConnected = useAppSelector(getIsAccountConnected);
   const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
 
@@ -109,10 +111,10 @@ const Content = () => {
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   useEffect(() => {
-    if (isAccountConnected && shouldShowUnlimitedAnnouncement) {
+    if (isAccountConnected && ffShowUnlimitedAnnouncement && !hasSeenUnlimitedAnnouncement) {
       dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
     }
-  }, [dispatch, shouldShowUnlimitedAnnouncement, isAccountConnected]);
+  }, [dispatch, ffShowUnlimitedAnnouncement, hasSeenUnlimitedAnnouncement, isAccountConnected]);
 
   useEffect(() => {
     if (testFlags.referralCode && !activeDialog) {

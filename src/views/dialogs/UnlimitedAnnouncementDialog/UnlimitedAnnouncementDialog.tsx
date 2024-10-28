@@ -12,9 +12,10 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 
+import { markUnlimitedAnnouncementSeen } from '@/state/dismissable';
+
 import { UnlimitedAnnouncementFooter } from './UnlimitedAnnouncementFooter';
 import { UnlimitedAnnouncementHeader } from './UnlimitedAnnouncementHeader';
-import { markUnlimitedAnnouncementSeen } from '@/state/dismissable';
 
 export const UnlimitedAnnouncementDialog = ({
   setIsOpen,
@@ -24,7 +25,7 @@ export const UnlimitedAnnouncementDialog = ({
 
   const [currentStep, setCurrentStep] = useState(UnlimitedAnnouncementDialogSteps.Announcement);
 
-  const dialogStrings: {
+  const featureStrings: {
     [key in UnlimitedAnnouncementDialogSteps]: {
       title: string;
       description: string;
@@ -60,10 +61,10 @@ export const UnlimitedAnnouncementDialog = ({
     },
     [UnlimitedAnnouncementDialogSteps.Incentives]: {
       title: stringGetter({
-        key: STRING_KEYS.INCENTIVES_PROGRAM,
+        key: STRING_KEYS.UPDATED_INCENTIVES,
       }),
       description: stringGetter({
-        key: STRING_KEYS.INCENTIVES_PROGRAM_DESCRIPTION,
+        key: STRING_KEYS.UPDATED_INCENTIVES_DESCRIPTION,
       }),
     },
   };
@@ -118,8 +119,8 @@ export const UnlimitedAnnouncementDialog = ({
         </div>
       ) : (
         <$Row tw="flex h-[4.5rem] flex-col gap-0.25">
-          <h2>{dialogStrings[currentStep].title} </h2>
-          <p>{dialogStrings[currentStep].description}</p>
+          <h2>{featureStrings[currentStep].title} </h2>
+          <p>{featureStrings[currentStep].description}</p>
         </$Row>
       )}
     </$Dialog>
