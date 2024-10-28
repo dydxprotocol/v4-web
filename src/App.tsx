@@ -103,6 +103,8 @@ const Content = () => {
   useEffect(() => {
     if (testFlags.referralCode) {
       dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    } else if (testFlags.unlimitedAnnouncement) {
+      dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
     }
   }, [dispatch]);
 

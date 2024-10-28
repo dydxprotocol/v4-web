@@ -53,7 +53,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
         params: {
           AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}`,
         },
-      })}{' '}
+      })}
       <br />
       {stringGetter({
         key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
