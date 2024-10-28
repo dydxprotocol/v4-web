@@ -41,7 +41,8 @@ export enum NewMarketFormStep {
 
 type NewMarketFormProps = {
   defaultLaunchableMarketId?: string;
-  onSuccessAction?: () => void;
+  onResubscribeMarketId?: (marketId: string) => void;
+  onSuccessAction?: (marketId: string) => void;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
   setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
@@ -49,6 +50,7 @@ type NewMarketFormProps = {
 
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
+  onResubscribeMarketId,
   onSuccessAction,
   setFormStep,
   setIsParentLoading,
@@ -154,6 +156,7 @@ export const NewMarketForm = ({
           transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
           tickerToAdd={tickerToAdd}
           onActionClicked={onSuccessAction}
+          onResubscribeMarketId={onResubscribeMarketId}
           onLaunchAnotherMarket={() => {
             setTickerToAdd(undefined);
             setStep(NewMarketFormStep.SELECTION);

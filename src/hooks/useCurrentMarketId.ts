@@ -134,7 +134,9 @@ export const useCurrentMarketId = () => {
       abacusStateManager.setTradeValue({ value: null, field: null });
     } else if (hasMarketIds) {
       if (marketId) {
-        if (hasMarketOraclePrice) {
+        const isMarketReadyForSubscription = hasMarketOraclePrice;
+
+        if (isMarketReadyForSubscription) {
           abacusStateManager.setMarket(marketId);
         }
       } else {

@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Link, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -15,8 +17,9 @@ import { Icon, IconName } from '@/components/Icon';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSuccessStepProps = {
-  onActionClicked?: () => void;
+  onActionClicked?: (marketId: string) => void;
   onLaunchAnotherMarket: () => void;
+  onResubscribeMarketId?: (marketId: string) => void;
   tickerToAdd: string;
   transactionUrl: string;
 };
@@ -24,6 +27,7 @@ type NewMarketSuccessStepProps = {
 export const NewMarketSuccessStep = ({
   onActionClicked,
   onLaunchAnotherMarket,
+  onResubscribeMarketId,
   tickerToAdd,
   transactionUrl,
 }: NewMarketSuccessStepProps) => {
@@ -31,9 +35,21 @@ export const NewMarketSuccessStep = ({
   const match = useMatch(`${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
 
+  useEffect(() => {
+    return () => {
+      if (marketId === tickerToAdd) {
+        onResubscribeMarketId?.(tickerToAdd);
+      }
+    };
+  }, [marketId, onResubscribeMarketId, tickerToAdd]);
+
   const cta =
     marketId === tickerToAdd ? (
-      <Button type={ButtonType.Button} action={ButtonAction.Primary} onClick={onActionClicked}>
+      <Button
+        type={ButtonType.Button}
+        action={ButtonAction.Primary}
+        onClick={() => onActionClicked?.(tickerToAdd)}
+      >
         {stringGetter({
           key: STRING_KEYS.TRADE_MARKET,
           params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
