@@ -66,13 +66,13 @@ const filterFunctions = {
     return testFlags.pml && market.tags?.includes(MarketFilters.PREDICTION_MARKET);
   },
   [MarketFilters.PREDICTION_MARKET_DEPRECATED]: (market: MarketData) => {
-    return Object.values(PREDICTION_MARKET).includes(market.id);
+    return !testFlags.pml && Object.values(PREDICTION_MARKET).includes(market.id);
   },
   [MarketFilters.RWA]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.RWA);
   },
   [MarketFilters.LAUNCHABLE]: (market: MarketData) => {
-    return market.isUnlaunched;
+    return testFlags.pml && market.isUnlaunched;
   },
   // Soon to be deprecated filters
   [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
@@ -124,6 +124,7 @@ export const useMarketsData = ({
   filteredMarkets: MarketData[];
   marketFilters: MarketFilters[];
   hasMarketIds: boolean;
+  hasResults: boolean;
 } => {
   const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allPerpetualClobIds = orEmptyRecord(
@@ -238,12 +239,12 @@ export const useMarketsData = ({
 
     return listOfMarkets;
   }, [
-    allPerpetualClobIds,
     allPerpetualMarkets,
-    allAssets,
+    shouldHideLaunchableMarkets,
     featureFlags,
-    hideUnlaunchedMarkets,
     sevenDaysSparklineData,
+    allPerpetualClobIds,
+    allAssets,
     unlaunchedMarkets.data,
   ]);
 
@@ -261,28 +262,21 @@ export const useMarketsData = ({
     return filtered;
   }, [markets, searchFilter, filter]);
 
-  const { hasPredictionMarkets, showNewFilter } = useMemo(() => {
-    return {
-      hasPredictionMarkets: markets.some((market) =>
-        Object.values(PREDICTION_MARKET).includes(market.id)
-      ),
-      showNewFilter: markets.some((market) => market.isNew),
-    };
-  }, [markets]);
-
   const marketFilters = useMemo(
     () =>
       [
-        MarketFilters.ALL,
-        showNewFilter ? MarketFilters.NEW : null,
-        testFlags.pml && MarketFilters.LAUNCHABLE,
         ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-          markets.some((market) => market.tags?.some((tag) => tag === marketFilter))
+          markets.some((market) => filterFunctions[marketFilter](market))
         ),
-        hasPredictionMarkets && !testFlags.pml && MarketFilters.PREDICTION_MARKET_DEPRECATED,
       ].filter(isTruthy),
-    [hasPredictionMarkets, markets, showNewFilter]
+    [markets]
   );
 
-  return { marketFilters, filteredMarkets, hasMarketIds, markets };
+  return {
+    marketFilters,
+    filteredMarkets,
+    hasMarketIds,
+    markets,
+    hasResults: filteredMarkets.length > 0,
+  };
 };
