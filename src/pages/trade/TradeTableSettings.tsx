@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -11,14 +10,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
+import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketTypeFilter, PanelView } from './types';
@@ -43,13 +42,30 @@ export const TradeTableSettings = ({
     useAppSelector(getCurrentMarketAssetData)
   );
   const { imageUrl } = orEmptyObj(resources);
+  const symbol = getDisplayableAssetFromBaseAsset(currentMarketAssetId);
 
   return (
     <Popover
       align="end"
       sideOffset={4}
       triggerType={TriggerType.TradeTableSettings}
-      slotTrigger={<$IconButton iconName={IconName.Settings} shape={ButtonShape.Square} />}
+      slotTrigger={
+        <div tw="flex h-[1.75rem] items-center gap-[0.5ch] px-0.5 font-mini-book">
+          {stringGetter({
+            key: STRING_KEYS.SHOWING,
+            params: {
+              ALL_OR_MARKET: (
+                <span tw="text-color-text-2">
+                  {panelView === PanelView.CurrentMarket
+                    ? symbol
+                    : stringGetter({ key: STRING_KEYS.ALL })}
+                </span>
+              ),
+            },
+          })}
+          <Icon iconName={IconName.Settings} size="1.5em" />
+        </div>
+      }
     >
       <$Settings>
         <$Row>
@@ -63,16 +79,12 @@ export const TradeTableSettings = ({
               },
               {
                 value: PanelView.CurrentMarket,
-                ...(currentMarketAssetId
+                ...(symbol
                   ? {
                       slotBefore: (
-                        <AssetIcon
-                          logoUrl={imageUrl}
-                          symbol={currentMarketAssetId}
-                          tw="text-[1.5em]"
-                        />
+                        <AssetIcon logoUrl={imageUrl} symbol={symbol} tw="text-[1.5em]" />
                       ),
-                      label: currentMarketAssetId,
+                      label: symbol,
                     }
                   : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
               },
@@ -85,7 +97,7 @@ export const TradeTableSettings = ({
           />
         </$Row>
         <$Row>
-          {stringGetter({ key: STRING_KEYS.TYPE })}{' '}
+          {stringGetter({ key: STRING_KEYS.TYPE })}
           <ToggleGroup
             withSeparators
             items={[
@@ -94,12 +106,12 @@ export const TradeTableSettings = ({
                 label: stringGetter({ key: STRING_KEYS.ALL }),
               },
               {
-                value: MarketTypeFilter.Isolated,
-                label: stringGetter({ key: STRING_KEYS.ISOLATED }),
-              },
-              {
                 value: MarketTypeFilter.Cross,
                 label: stringGetter({ key: STRING_KEYS.CROSS }),
+              },
+              {
+                value: MarketTypeFilter.Isolated,
+                label: stringGetter({ key: STRING_KEYS.ISOLATED }),
               },
             ]}
             value={marketTypeFilter}
@@ -115,13 +127,6 @@ export const TradeTableSettings = ({
     </Popover>
   );
 };
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-backgroundColor: transparent;
-  --button-icon-size: 1.66em;
-  --button-textColor: var(--color-text-0);
-`;
 
 const $Settings = styled.div`
   ${popoverMixins.popover}

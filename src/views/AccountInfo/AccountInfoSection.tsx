@@ -74,7 +74,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
       shape={ButtonShape.Rectangle}
-      size={uiRefresh ? ButtonSize.Small : ButtonSize.XSmall}
+      size={ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
@@ -86,9 +86,9 @@ export const AccountInfoSection = () => {
   const depositButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
       shape={ButtonShape.Rectangle}
-      size={uiRefresh ? ButtonSize.Small : ButtonSize.XSmall}
+      size={ButtonSize.XSmall}
       buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
       action={uiRefresh ? ButtonAction.Primary : undefined}
       $uiRefreshEnabled={uiRefresh}
@@ -149,7 +149,11 @@ export const AccountInfoSection = () => {
       isPositive: MustBigNumber(availableBalance?.postOrder).gt(
         MustBigNumber(availableBalance?.current)
       ),
-      label: stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE }),
+      label: (
+        <WithTooltip tooltip="available-balance" side="right">
+          {stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}
+        </WithTooltip>
+      ),
       type: OutputType.Fiat,
       value:
         MustBigNumber(availableBalance?.current).lt(0) && availableBalance?.postOrder === null
@@ -200,6 +204,29 @@ export const AccountInfoSection = () => {
           )}
           type={OutputType.Fiat}
           value={portfolioValue}
+        />
+      ),
+    },
+    {
+      key: AccountInfoItem.AvailableBalance,
+      label: (
+        <WithTooltip tooltip="available-balance" side="left">
+          {stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}
+        </WithTooltip>
+      ),
+      value: (
+        <AccountInfoDiffOutput
+          hasError={isPostOrderBalanceNegative}
+          hideDiff={isPostOrderBalanceNegative}
+          isPositive={MustBigNumber(availableBalance?.postOrder).gt(
+            MustBigNumber(availableBalance?.current)
+          )}
+          type={OutputType.Fiat}
+          value={
+            MustBigNumber(availableBalance?.current).lt(0) && availableBalance?.postOrder === null
+              ? undefined
+              : availableBalance
+          }
         />
       ),
     },
@@ -265,7 +292,7 @@ const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
   ${({ $uiRefreshEnabled }) =>
     $uiRefreshEnabled
       ? css`
-          font: var(--font-small-book);
+          font: var(--font-mini-book);
           padding: 0 1rem;
 
           > * {

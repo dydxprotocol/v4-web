@@ -224,6 +224,7 @@ const useLocalNotificationsContext = () => {
     },
     refetchInterval: TRANSFER_STATUS_FETCH_INTERVAL,
   });
+
   return {
     // Transfer notifications
     transferNotifications,

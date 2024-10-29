@@ -85,6 +85,7 @@ Set environment variables via `.env`.
 - `VITE_TOKEN_MIGRATION_URI` (optional): The URL of the token migration website.
 - `AMPLITUDE_API_KEY` (optional): Amplitude API key for enabling Amplitude; used with `pnpm run build:inject-amplitude`.
 - `AMPLITUDE_SERVER_URL` (optional): Custom Amplitude server URL
+- `AMPLITUDE_SERVER_ZONE` (optional): Custom Amplitude server zone; if provided, `AMPLITUDE_SERVER_URL` must be provided too.
 - `GOOGLE_TAG_MANAGER_CONTAINER_ID` (optional): Id for a google tag manager container; used with `pnpm run build:inject-google-tag-manager`.
 - `HOTJAR_SITE_ID`, `HOTJAR_VERSION` (optional): used for enabling Hotjar tracking; used with `pnpm run build:inject-hotjar`
 - `BUGSNAG_API_KEY` (optional): API key for enabling Bugsnag; used with `pnpm run build:inject-bugsnag`.
@@ -94,6 +95,7 @@ Set environment variables via `.env`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 - `VITE_PRIVY_APP_ID` (optional): App ID used for enabling Privy authentication. For deployment of DYDX token holders use `clua5njf801bncvpa0woolzq4`.
 - `VITE_PRIVY_APP_CLIENT_ID` (optional): App Client ID used for enabling Privy authentication.
+- `VITE_ROBOTS` (optional): Value of the HTML meta tag "robots"; recommended values: `index, follow` or `noindex`.
 
 ## Part 5: Configure entry points
 

@@ -247,8 +247,8 @@ export const DepthChart = ({
                     ].reverse()
                   : []
               }
-              xAccessor={(datum: DepthChartDatum) => datum.price}
-              yAccessor={(datum: DepthChartDatum) => datum.depth}
+              xAccessor={(datum: DepthChartDatum | undefined) => datum?.price ?? 0}
+              yAccessor={(datum: DepthChartDatum | undefined) => datum?.depth ?? 0}
               curve={curveStepAfter}
               lineProps={{ strokeWidth: 1.5 }}
               fillOpacity={0.2}

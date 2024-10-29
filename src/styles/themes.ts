@@ -70,9 +70,9 @@ const ClassicThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   profileRed: ColorToken.Red2,
 
   inputBackground: ColorToken.GrayBlue3,
-  popoverBackground: generateFadedColorVariant(ColorToken.GrayBlue4, OpacityToken.Opacity90),
+  popoverBackground: ColorToken.GrayBlue4,
   toggleBackground: ColorToken.GrayBlue3,
-  tooltipBackground: generateFadedColorVariant(ColorToken.GrayBlue3, OpacityToken.Opacity66),
+  tooltipBackground: ColorToken.GrayBlue3,
 
   hoverFilterBase: BrightnessFilterToken.Lighten10,
   hoverFilterVariant: BrightnessFilterToken.Lighten10,
@@ -138,9 +138,9 @@ const DarkThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   profileRed: ColorToken.Red2,
 
   inputBackground: ColorToken.DarkGray6,
-  popoverBackground: generateFadedColorVariant(ColorToken.DarkGray8, OpacityToken.Opacity90),
+  popoverBackground: ColorToken.DarkGray8,
   toggleBackground: ColorToken.DarkGray6,
-  tooltipBackground: generateFadedColorVariant(ColorToken.DarkGray6, OpacityToken.Opacity66),
+  tooltipBackground: ColorToken.DarkGray6,
 
   hoverFilterBase: BrightnessFilterToken.Lighten10,
   hoverFilterVariant: BrightnessFilterToken.Lighten10,
@@ -212,9 +212,9 @@ const LightThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   profileRed: ColorToken.Red2,
 
   inputBackground: ColorToken.White,
-  popoverBackground: generateFadedColorVariant(ColorToken.LightGray9, OpacityToken.Opacity90),
+  popoverBackground: ColorToken.LightGray9,
   toggleBackground: ColorToken.LightGray4,
-  tooltipBackground: generateFadedColorVariant(ColorToken.LightGray8, OpacityToken.Opacity66),
+  tooltipBackground: ColorToken.LightGray8,
 
   hoverFilterBase: BrightnessFilterToken.Darken5,
   hoverFilterVariant: BrightnessFilterToken.Lighten10,

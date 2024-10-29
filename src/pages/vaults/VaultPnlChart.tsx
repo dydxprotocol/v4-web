@@ -126,9 +126,10 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       (pnlDiff ?? 0) / (pointsInView[0]?.equity || 1)
     : undefined;
 
-  const xAccessorFunc = useCallback((datum: VaultPnlDatum) => datum.date ?? 0, []);
+  const xAccessorFunc = useCallback((datum: VaultPnlDatum | undefined) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(
-    (datum: VaultPnlDatum) => (selectedChart === 'pnl' ? datum.totalPnl ?? 0 : datum.equity ?? 0),
+    (datum: VaultPnlDatum | undefined) =>
+      selectedChart === 'pnl' ? datum?.totalPnl ?? 0 : datum?.equity ?? 0,
     [selectedChart]
   );
 

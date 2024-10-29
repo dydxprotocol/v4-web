@@ -19,6 +19,8 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
+const ASSETS_TO_REMOVE = ['USDC', 'USDT'];
+
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
     queries: [
@@ -47,7 +49,8 @@ export const useMetadataService = () => {
       Object.keys(info ?? {}).forEach((key) => {
         const infoKey = info?.[key];
         const pricesKey = prices?.[key];
-        if (infoKey && pricesKey) {
+
+        if (infoKey && pricesKey && !ASSETS_TO_REMOVE.includes(key)) {
           const tickSizeDecimals = getTickSizeDecimalsFromPrice(pricesKey.price);
 
           data[key] = {
