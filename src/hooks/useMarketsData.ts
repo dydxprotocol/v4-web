@@ -22,7 +22,7 @@ import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/app
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset, getMarketIdFromAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
@@ -204,16 +204,26 @@ export const useMarketsData = ({
       const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
         .sort(sortByMarketCap)
         .map((market) => {
-          const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
+          const {
+            id: assetId,
+            name,
+            logo,
+            sectorTags,
+            price,
+            percentChange24h,
+            tickSizeDecimals,
+          } = market;
 
-          if (listOfMarkets.some((m) => m.assetId === id)) return null;
+          if (listOfMarkets.some((m) => m.assetId === assetId)) return null;
+
+          const id = getMarketIdFromAsset(assetId);
 
           return safeAssign(
             {},
             {
-              id: `${id}-USD`,
-              assetId: id,
-              displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
+              id,
+              assetId,
+              displayId: getMarketIdFromAsset(getDisplayableAssetFromBaseAsset(assetId)),
               clobPairId: -1,
               effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
               imageUrl: logo,
@@ -235,7 +245,7 @@ export const useMarketsData = ({
               tickSizeDecimals,
               trades24H: 0,
               volume24H: 0,
-              isFavorite: favoritedMarkets.includes(`${id}-USD`),
+              isFavorite: favoritedMarkets.includes(id),
             }
           );
         });
