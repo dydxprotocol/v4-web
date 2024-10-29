@@ -16,7 +16,7 @@ import { NewMarketForm } from '@/views/forms/NewMarketForm';
 const LaunchMarket = () => {
   const stringGetter = useStringGetter();
 
-  useDocumentTitle(stringGetter({ key: STRING_KEYS.ADD_A_MARKET }));
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET }));
   const [tickerToAdd, setTickerToAdd] = useState<string>();
 
   return (

@@ -65,7 +65,7 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
+      <$GridSection gridArea="Side" tw="flex flex-col">
         {!uiRefresh && <AccountInfo />}
         <$LaunchMarketSidePanel launchableMarketId={marketId} />
         {uiRefresh && <AccountInfo />}

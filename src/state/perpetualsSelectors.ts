@@ -149,6 +149,13 @@ export const getCurrentMarketOraclePrice = (state: RootState) =>
   getCurrentMarketData(state)?.oraclePrice;
 
 /**
+ * @param marketId
+ * @returns oraclePrice of specified marketId
+ */
+export const getMarketOraclePrice = (state: RootState, marketId: string) =>
+  getMarketData(state, marketId)?.oraclePrice;
+
+/**
  * @returns Mid market price for the market the user is currently viewing
  */
 export const getCurrentMarketMidMarketPrice = (state: RootState) => {
