@@ -24,7 +24,7 @@ import { Panel } from '@/components/Panel';
 import { TagSize, WarningTag } from '@/components/Tag';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { markLaunchIncentivesSeen } from '@/state/configs';
+import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {

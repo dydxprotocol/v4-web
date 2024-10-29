@@ -19,8 +19,8 @@ import {
   setAppColorMode,
   setAppThemeSetting,
   type AppThemeSetting,
-} from '@/state/configs';
-import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
+} from '@/state/appUiConfigs';
+import { getAppColorMode, getAppThemeSetting } from '@/state/appUiConfigsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 

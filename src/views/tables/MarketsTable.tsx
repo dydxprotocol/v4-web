@@ -57,8 +57,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
       isTablet
         ? ([
             {
-              columnKey: 'market',
-              getCellValue: (row) => row.id,
+              columnKey: 'marketAndVolume',
+              getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
               renderCell: ({
                 assetId,
@@ -67,6 +67,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 initialMarginFraction,
                 name,
                 isUnlaunched,
+                volume24H,
               }) => (
                 <AssetTableCell
                   configs={{
@@ -77,7 +78,13 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                   }}
                   name={name}
                   symbol={assetId}
-                />
+                >
+                  <Output
+                    type={OutputType.CompactFiat}
+                    value={volume24H ?? undefined}
+                    tw="text-color-text-0 font-mini-medium"
+                  />
+                </AssetTableCell>
               ),
             },
             {
@@ -96,6 +103,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     value={oraclePrice}
                     fractionDigits={tickSizeDecimals}
                     withBaseFont
+                    withSubscript
                   />
                   <$InlineRow tw="font-small-book">
                     {!priceChange24H ? (
@@ -165,8 +173,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       x: index + 1,
                       y: parseFloat(datum.toString()),
                     }))}
-                    xAccessor={(datum) => datum.x}
-                    yAccessor={(datum) => datum.y}
+                    xAccessor={(datum) => datum?.x ?? 0}
+                    yAccessor={(datum) => datum?.y ?? 0}
                     positive={MustBigNumber(priceChange24HPercent).gt(0)}
                   />
                 </div>
@@ -263,7 +271,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
         }
         defaultSortDescriptor={{
-          column: 'volume24H',
+          column: isTablet ? 'marketAndVolume' : 'volume24H',
           direction: 'descending',
         }}
         columns={columns}
@@ -345,7 +353,7 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $TabletOutput = tw(Output)`font-medium-book text-color-text-2`;
+const $TabletOutput = tw(Output)`font-base-book text-color-text-2`;
 
 const $InlineRow = tw.div`inlineRow`;
 const $NumberOutput = tw(Output)`font-base-medium text-color-text-2`;

@@ -160,6 +160,7 @@ const $Container = styled.section`
   grid-template-rows: auto 1fr auto;
   gap: 1rem;
   padding: 1rem;
+  flex: 1;
 
   button {
     width: 100%;

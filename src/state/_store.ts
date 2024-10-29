@@ -8,10 +8,12 @@ import { accountSlice } from './account';
 import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
+import { appUiConfigsSlice } from './appUiConfigs';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
+import { funkitDepositsSlice } from './funkitDeposits';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
@@ -28,10 +30,12 @@ const reducers = {
   account: accountSlice.reducer,
   affiliates: affiliatesSlice.reducer,
   app: appSlice.reducer,
+  appUiConfigs: appUiConfigsSlice.reducer,
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
+  funkitDeposits: funkitDepositsSlice.reducer,
   inputs: inputsSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
@@ -47,9 +51,16 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 2,
+  version: 3,
   storage,
-  whitelist: ['affiliates', 'dismissable', 'tradingView', 'wallet'],
+  whitelist: [
+    'affiliates',
+    'dismissable',
+    'tradingView',
+    'wallet',
+    'appUiConfigs',
+    'funkitDeposits',
+  ],
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 

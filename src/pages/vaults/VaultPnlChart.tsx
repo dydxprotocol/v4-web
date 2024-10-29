@@ -22,7 +22,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
@@ -126,9 +126,10 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
       (pnlDiff ?? 0) / (pointsInView[0]?.equity || 1)
     : undefined;
 
-  const xAccessorFunc = useCallback((datum: VaultPnlDatum) => datum.date ?? 0, []);
+  const xAccessorFunc = useCallback((datum: VaultPnlDatum | undefined) => datum?.date ?? 0, []);
   const yAccessorFunc = useCallback(
-    (datum: VaultPnlDatum) => (selectedChart === 'pnl' ? datum.totalPnl ?? 0 : datum.equity ?? 0),
+    (datum: VaultPnlDatum | undefined) =>
+      selectedChart === 'pnl' ? datum?.totalPnl ?? 0 : datum?.equity ?? 0,
     [selectedChart]
   );
 

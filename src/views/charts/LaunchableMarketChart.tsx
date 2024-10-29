@@ -31,7 +31,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
@@ -68,7 +68,6 @@ export const LaunchableMarketChart = ({
       value: (
         <Output
           type={OutputType.CompactFiat}
-          isLoading={!ticker}
           tw="text-color-text-1"
           value={showSelfReportedMarketCap ? reportedMarketCap : marketCap}
         />
@@ -81,7 +80,6 @@ export const LaunchableMarketChart = ({
       value: (
         <Output
           type={OutputType.Multiple}
-          isLoading={!ticker}
           value={
             ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction
               ? BIG_NUMBERS.ONE.div(ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction)
@@ -92,8 +90,8 @@ export const LaunchableMarketChart = ({
     },
   ];
 
-  const xAccessorFunc = useCallback((datum: TradingViewBar) => datum.time, []);
-  const yAccessorFunc = useCallback((datum: TradingViewBar) => datum.close, []);
+  const xAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.time ?? 0, []);
+  const yAccessorFunc = useCallback((datum: TradingViewBar | undefined) => datum?.close ?? 0, []);
 
   const colorString = useMemo(() => {
     if (!candlesQuery.data || candlesQuery.data.length < 1) return 'var(--color-text-1)';
@@ -180,7 +178,6 @@ export const LaunchableMarketChart = ({
                   type={OutputType.Fiat}
                   tw="text-color-text-1"
                   value={price}
-                  isLoading={!ticker}
                   fractionDigits={tickSizeDecimals}
                 />
               ),

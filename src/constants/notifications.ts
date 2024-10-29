@@ -7,6 +7,7 @@ export enum NotificationType {
   // So the notifications don't get retriggered
   // It's pretty scary getting a bunch of unexpected withdrawal notifications
   SkipTransfer = 'SquidTransfer',
+  FunkitDeposit = 'FunkitDeposit',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
@@ -32,6 +33,7 @@ export const NotificationTypeCategory: {
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,

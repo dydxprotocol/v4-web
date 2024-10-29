@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -7,11 +7,11 @@ import { MarketData } from '@/constants/markets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -28,14 +28,15 @@ interface AssetTableCellProps {
       >
     | null
     | undefined;
+  truncateAssetName?: boolean;
+  children?: React.ReactNode;
   className?: string;
-  stacked?: boolean;
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
-  const { symbol, name, stacked, configs, className } = props;
-
+  const { symbol, name, configs, truncateAssetName, children, className } = props;
+  const stacked = !!children;
   const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
     orEmptyObj(configs);
 
@@ -58,14 +59,12 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
     >
       <$TableCellContent stacked={stacked}>
         <div tw="row gap-0.5">
-          <$Asset stacked={stacked}>{name}</$Asset>
+          <$Asset stacked={stacked} truncateAssetName={truncateAssetName}>
+            {name}
+          </$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
         </div>
-        {stacked ? (
-          <span tw="text-color-text-0 font-mini-medium">
-            {symbol && getDisplayableAssetFromBaseAsset(symbol)}
-          </span>
-        ) : undefined}
+        {children}
       </$TableCellContent>
     </TableCell>
   );
@@ -84,7 +83,14 @@ const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
     font-size: ${({ stacked }) => (stacked ? '1.5rem' : '2.25rem')};
   }
 `;
-const $Asset = styled.span<{ stacked?: boolean }>`
+const $Asset = styled.span<{ stacked?: boolean; truncateAssetName?: boolean }>`
   color: var(--color-text-1);
-  font: ${({ stacked }) => (stacked ? 'var(--font-small-medium)' : 'var(--font-medium-medium)')};
+  font: ${({ stacked }) => (stacked ? 'var(--font-base-medium)' : 'var(--font-medium-medium)')};
+
+  ${({ truncateAssetName }) =>
+    truncateAssetName &&
+    css`
+      ${layoutMixins.textTruncate}
+      max-width: 4.5rem;
+    `}
 `;

@@ -4,8 +4,9 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketSorting } from '@/constants/markets';
+import { MarketFilters, MarketSorting } from '@/constants/markets';
 
+import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -26,21 +27,28 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const stringGetter = useStringGetter();
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
+  const { hasResults: hasNewMarkets } = useMarketsData({
+    filter: MarketFilters.NEW,
+    hideUnlaunchedMarkets: true,
+  });
+
   return (
     <section
       className={className}
-      tw="grid grid-cols-3 gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
+      tw="grid auto-cols-fr grid-flow-col gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
     >
       <ExchangeBillboards />
-      <$Section>
-        <$SectionHeader>
-          <h4 tw="flex items-center gap-0.375">
-            {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
-            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-          </h4>
-        </$SectionHeader>
-        <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
-      </$Section>
+      {hasNewMarkets && (
+        <$Section>
+          <$SectionHeader>
+            <h4 tw="flex items-center gap-0.375">
+              {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
+              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
+            </h4>
+          </$SectionHeader>
+          <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
+        </$Section>
+      )}
       <$Section>
         <$SectionHeader>
           <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>

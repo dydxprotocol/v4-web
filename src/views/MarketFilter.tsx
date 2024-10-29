@@ -23,8 +23,8 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithLabel } from '@/components/WithLabel';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setShouldHideLaunchableMarkets } from '@/state/configs';
-import { getShouldHideLaunchableMarkets } from '@/state/configsSelectors';
+import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
+import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 

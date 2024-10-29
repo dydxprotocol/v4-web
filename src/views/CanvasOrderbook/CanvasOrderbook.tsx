@@ -21,7 +21,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getSelectedDisplayUnit } from '@/state/configsSelectors';
+import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import {
@@ -205,7 +205,7 @@ export const CanvasOrderbook = forwardRef(
         <$OrderbookContent $isLoading={!hasOrderbook}>
           {!hideHeader && <OrderbookControls assetId={id} grouping={currentGrouping} />}
           {!hideHeader && (
-            <OrderbookRow tw="h-1.75 text-color-text-0">
+            <$OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
                 {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
               </span>
@@ -217,7 +217,7 @@ export const CanvasOrderbook = forwardRef(
                 {stringGetter({ key: STRING_KEYS.TOTAL })}{' '}
                 <DisplayUnitTag assetId={id} entryPoint="orderbookAssetTag" />
               </span>
-            </OrderbookRow>
+            </$OrderbookRow>
           )}
 
           {(displaySide === 'top' || layout === 'horizontal') && (
@@ -261,6 +261,7 @@ const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
   position: relative;
   ${({ $isLoading }) => $isLoading && 'flex: 1;'}
 `;
+
 const $OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks'; $rows: number }>`
   ${({ $rows }) => css`
     min-height: calc(${$rows} * ${ORDERBOOK_ROW_HEIGHT}px);
@@ -286,6 +287,11 @@ const $HoverRows = styled.div<{ $bottom?: boolean }>`
   width: 100%;
 
   ${({ $bottom }) => $bottom && 'bottom: 0;'}
+`;
+
+const $OrderbookRow = styled(OrderbookRow)`
+  border-top: var(--border);
+  border-bottom: var(--border);
 `;
 
 const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`

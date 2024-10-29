@@ -28,7 +28,7 @@ import {
   getSubaccountId,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getChartDotBackground } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -209,13 +209,16 @@ export const PnlChart = ({
     if (oldestPnlCreatedAt) {
       const options = getPeriodOptions(oldestPnlCreatedAt);
       setPeriodOptions(options);
-
-      // default to show 7d period if there's enough data
-      if (options.includes(HistoricalPnlPeriod.Period7d)) {
-        setSelectedPeriod(HistoricalPnlPeriod.Period7d);
-      }
     }
   }, [oldestPnlCreatedAt, getPeriodOptions]);
+
+  useEffect(() => {
+    // default to show 7d period if there's enough data
+    if (periodOptions.includes(HistoricalPnlPeriod.Period7d)) {
+      setSelectedPeriod(HistoricalPnlPeriod.Period7d);
+      setIsZooming(false);
+    }
+  }, [periodOptions.includes(HistoricalPnlPeriod.Period7d)]);
 
   const chartStyles = useMemo(
     () => ({
@@ -236,8 +239,8 @@ export const PnlChart = ({
     [chartDotsBackground, isTablet]
   );
 
-  const xAccessorFunc = useCallback((datum: PnlDatum) => datum.createdAt, []);
-  const yAccessorFunc = useCallback((datum: PnlDatum) => datum.equity, []);
+  const xAccessorFunc = useCallback((datum: PnlDatum | undefined) => datum?.createdAt ?? 0, []);
+  const yAccessorFunc = useCallback((datum: PnlDatum | undefined) => datum?.equity ?? 0, []);
 
   const series = useMemo(
     () => [
