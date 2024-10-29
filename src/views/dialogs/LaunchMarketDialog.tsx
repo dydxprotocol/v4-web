@@ -19,8 +19,6 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
-import abacusStateManager from '@/lib/abacus';
-
 import { MegaVaultYieldOutput } from '../MegaVaultYieldOutput';
 import { NewMarketForm, NewMarketFormStep } from '../forms/NewMarketForm';
 
@@ -35,10 +33,6 @@ export const LaunchMarketDialog = ({
 
   const onClose = () => {
     setIsOpen(false);
-  };
-
-  const startMarketSubscription = (marketId: string) => {
-    abacusStateManager.setMarket(marketId);
   };
 
   const { title, description } = useMemo(() => {
@@ -118,8 +112,7 @@ export const LaunchMarketDialog = ({
     >
       <NewMarketForm
         defaultLaunchableMarketId={defaultLaunchableMarketId}
-        onSuccessAction={onClose}
-        onResubscribeMarketId={startMarketSubscription}
+        onCloseDialog={onClose}
         setFormStep={setFormStep}
         setIsParentLoading={setIsLoading}
       />

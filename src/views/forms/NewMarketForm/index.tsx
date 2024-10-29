@@ -1,4 +1,11 @@
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { shallowEqual } from 'react-redux';
 
@@ -41,8 +48,7 @@ export enum NewMarketFormStep {
 
 type NewMarketFormProps = {
   defaultLaunchableMarketId?: string;
-  onResubscribeMarketId?: (marketId: string) => void;
-  onSuccessAction?: (marketId: string) => void;
+  onCloseDialog?: () => void;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
   setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
@@ -50,8 +56,7 @@ type NewMarketFormProps = {
 
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
-  onResubscribeMarketId,
-  onSuccessAction,
+  onCloseDialog,
   setFormStep,
   setIsParentLoading,
   updateTickerToAdd,
@@ -146,6 +151,11 @@ export const NewMarketForm = ({
     ].filter(isTruthy);
   }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
 
+  const onSuccess = useCallback((txHash: string) => {
+    setProposalTxHash(txHash);
+    setStep(NewMarketFormStep.SUCCESS);
+  }, []);
+
   /**
    * Permissionless Markets Flow
    */
@@ -155,8 +165,7 @@ export const NewMarketForm = ({
         <NewMarketSuccessStep2
           transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
           tickerToAdd={tickerToAdd}
-          onActionClicked={onSuccessAction}
-          onResubscribeMarketId={onResubscribeMarketId}
+          onCloseDialog={onCloseDialog}
           onLaunchAnotherMarket={() => {
             setTickerToAdd(undefined);
             setStep(NewMarketFormStep.SELECTION);
@@ -168,10 +177,7 @@ export const NewMarketForm = ({
     if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
       return (
         <NewMarketPreviewStep2
-          onSuccess={(txHash: string) => {
-            setProposalTxHash(txHash);
-            setStep(NewMarketFormStep.SUCCESS);
-          }}
+          onSuccess={onSuccess}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
           receiptItems={receiptItems}
           setIsParentLoading={setIsParentLoading}

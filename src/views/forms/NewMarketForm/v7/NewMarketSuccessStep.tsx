@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { Link, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -14,57 +12,57 @@ import { LinkOutIcon } from '@/icons';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 
+import abacusStateManager from '@/lib/abacus';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSuccessStepProps = {
-  onActionClicked?: (marketId: string) => void;
+  onCloseDialog?: () => void;
   onLaunchAnotherMarket: () => void;
-  onResubscribeMarketId?: (marketId: string) => void;
   tickerToAdd: string;
   transactionUrl: string;
 };
 
 export const NewMarketSuccessStep = ({
-  onActionClicked,
+  onCloseDialog,
   onLaunchAnotherMarket,
-  onResubscribeMarketId,
   tickerToAdd,
   transactionUrl,
 }: NewMarketSuccessStepProps) => {
   const stringGetter = useStringGetter();
   const match = useMatch(`${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
+  const isOnMarketTradePage = marketId === tickerToAdd;
 
-  useEffect(() => {
-    return () => {
-      if (marketId === tickerToAdd) {
-        onResubscribeMarketId?.(tickerToAdd);
-      }
-    };
-  }, [marketId, onResubscribeMarketId, tickerToAdd]);
+  const onMaybeNeedsResubscribe = () => {
+    if (isOnMarketTradePage) {
+      abacusStateManager.setMarket(tickerToAdd);
+    }
+  };
 
-  const cta =
-    marketId === tickerToAdd ? (
-      <Button
-        type={ButtonType.Button}
-        action={ButtonAction.Primary}
-        onClick={() => onActionClicked?.(tickerToAdd)}
-      >
+  const cta = isOnMarketTradePage ? (
+    <Button
+      type={ButtonType.Button}
+      action={ButtonAction.Primary}
+      onClick={() => {
+        onMaybeNeedsResubscribe();
+        onCloseDialog?.();
+      }}
+    >
+      {stringGetter({
+        key: STRING_KEYS.TRADE_MARKET,
+        params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
+      })}
+    </Button>
+  ) : (
+    <Link to={`${AppRoute.Trade}/${tickerToAdd}`}>
+      <Button type={ButtonType.Button} action={ButtonAction.Primary}>
         {stringGetter({
           key: STRING_KEYS.TRADE_MARKET,
           params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
         })}
       </Button>
-    ) : (
-      <Link to={`${AppRoute.Trade}/${tickerToAdd}`}>
-        <Button type={ButtonType.Button} action={ButtonAction.Primary}>
-          {stringGetter({
-            key: STRING_KEYS.TRADE_MARKET,
-            params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
-          })}
-        </Button>
-      </Link>
-    );
+    </Link>
+  );
 
   return (
     <$Container>

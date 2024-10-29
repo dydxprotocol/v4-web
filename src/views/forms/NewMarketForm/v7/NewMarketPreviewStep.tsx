@@ -75,18 +75,19 @@ export const NewMarketPreviewStep = ({
 
   // coundownt of 30 seconds from now
   const secondsLeft = isLoading ? Math.max(0, (eta - now) / timeUnits.second) : 0;
+  const fullTimeElapsed = isLoading && secondsLeft === 0;
 
   /**
    * @description Side effect to set loading to false after ticker is returned from v4_markets channel and added to marketIds
    */
   useEffect(() => {
-    if (marketOraclePrice && isLoading && txHash) {
+    if (marketOraclePrice && txHash && fullTimeElapsed) {
       setIsLoading(false);
       setIsParentLoading?.(false);
       setEta(0);
       onSuccess(txHash);
     }
-  }, [marketOraclePrice, isLoading, ticker, txHash, onSuccess, setIsParentLoading]);
+  }, [marketOraclePrice, fullTimeElapsed, ticker, txHash, onSuccess, setIsParentLoading]);
 
   const { alertInfo, shouldDisableForm } = useMemo(() => {
     if (errorMessage) {
