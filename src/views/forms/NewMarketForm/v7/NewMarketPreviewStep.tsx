@@ -73,7 +73,7 @@ export const NewMarketPreviewStep = ({
   const [eta, setEta] = useState<number>(0);
   const now = useNow();
 
-  // coundownt of 30 seconds from now
+  // Countdown timer used to wait for OraclePrice as well as a hard block before allowing user to navigate/re-subscribe
   const secondsLeft = isLoading ? Math.max(0, (eta - now) / timeUnits.second) : 0;
   const fullTimeElapsed = isLoading && secondsLeft === 0;
 
