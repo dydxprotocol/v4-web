@@ -42,10 +42,10 @@ const $Page = styled.div`
 
   @media ${breakpoints.tablet} {
     --stickyArea-topHeight: var(--page-header-height-mobile);
-    padding: 0 1rem 1rem;
+    padding: 0;
 
     > * {
-      max-width: calc(100vw - 2rem);
+      max-width: 100vw;
       width: 100%;
     }
   }
@@ -61,7 +61,7 @@ const $Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin: 0 auto;
+    margin: 0;
   }
 `;
 
@@ -75,6 +75,7 @@ const $FormContainer = styled.div`
   @media ${breakpoints.tablet} {
     width: 100%;
     min-width: unset;
+    border-radius: 0;
   }
 `;
 

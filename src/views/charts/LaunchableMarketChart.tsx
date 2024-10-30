@@ -21,6 +21,7 @@ import {
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LinkOutIcon } from '@/icons';
+import breakpoints from '@/styles/breakpoints';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
@@ -265,7 +266,14 @@ export const LaunchableMarketChart = ({
   );
 };
 
-const $LaunchableMarketChartContainer = tw.div`flex h-fit w-[25rem] flex-col gap-1 rounded-[1rem] border-[length:--border-width] border-color-border p-1.5 [border-style:solid]`;
+const $LaunchableMarketChartContainer = styled.div`
+  ${tw`flex h-fit w-[25rem] flex-col gap-1 rounded-[1rem] border-[length:--border-width] border-color-border p-1.5 [border-style:solid]`}
+
+  @media ${breakpoints.tablet} {
+    ${tw`w-full`}
+    border: none;
+  }
+`;
 
 const $ChartContainerHeader = tw.div`flex flex-row items-center justify-between`;
 
