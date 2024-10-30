@@ -1,5 +1,6 @@
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
 import abacusStateManager from '@/lib/abacus';
@@ -61,10 +62,11 @@ const persistConfig = {
     'appUiConfigs',
     'funkitDeposits',
   ],
+  stateReconciler: autoMergeLevel2,
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -72,11 +74,10 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(appMiddleware as Middleware, localizationMiddleware as Middleware),
-
   devTools: process.env.NODE_ENV !== 'production',
 });
 
-persistStore(store);
+export const persistor = persistStore(store);
 
 // Set store so (Abacus & v4-Client) classes can getState and dispatch
 abacusStateManager.setStore(store);

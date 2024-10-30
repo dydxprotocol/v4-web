@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonStyle } from '@/constants/buttons';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -10,6 +11,8 @@ import { IconButton } from '@/components/IconButton';
 
 import { favoritedMarket, unfavoritedMarket } from '@/state/appUiConfigs';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
+
+import { track } from '@/lib/analytics/analytics';
 
 export const FavoriteButton = ({
   className,
@@ -24,8 +27,10 @@ export const FavoriteButton = ({
   const onToggle = (newIsFavorited: boolean) => {
     if (newIsFavorited) {
       dispatch(favoritedMarket(marketId));
+      track(AnalyticsEvents.FavoritedMarket({ marketId }));
     } else {
       dispatch(unfavoritedMarket(marketId));
+      track(AnalyticsEvents.UnfavoritedMarket({ marketId }));
     }
   };
 
