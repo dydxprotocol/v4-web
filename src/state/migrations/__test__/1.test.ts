@@ -13,34 +13,19 @@ const MOCK_EVM_SIGNATURE = 'fake_signature_woohoo';
 const MOCK_SOLANA_ADDRESS = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
 const MOCK_DYDX_ADDRESS = 'dydx1';
 
-enum CosmosWalletType {
-  KEPLR = 'keplr',
-}
-
-enum WalletType {
-  CoinbaseWallet = 'COINBASE_WALLET',
-  Phantom = 'PHANTOM',
-}
-
-enum ConnectorType {
-  Coinbase = 'coinbase',
-  Cosmos = 'cosmos',
-  PhantomSolana = 'phantomSolana',
-}
-
 const MOCK_EVM_WALLET_INFO = {
-  connectorType: ConnectorType.Coinbase,
-  name: WalletType.CoinbaseWallet,
+  connectorType: 'coinbase',
+  name: 'COINBASE_WALLET',
 };
 
 const MOCK_SOLANA_WALLET_INFO = {
-  connectorType: ConnectorType.PhantomSolana,
-  name: WalletType.Phantom,
+  connectorType: 'phantomSolana',
+  name: 'PHANTOM',
 };
 
 const MOCK_COSMOS_WALLET_INFO = {
-  connectorType: ConnectorType.Cosmos,
-  name: CosmosWalletType.KEPLR,
+  connectorType: 'cosmos',
+  name: 'keplr',
 };
 
 describe('migration1', () => {
