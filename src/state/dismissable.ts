@@ -5,7 +5,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface DismissableState {
   hasSeenPredictionMarketIntroDialog: boolean;
   dismissedAffiliateBanner: boolean;
-  hasSeenUnlimitedAnnouncement?: boolean;
+  hasSeenUnlimitedAnnouncement: boolean;
 }
 
 const initialState: DismissableState = {
