@@ -2,17 +2,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { DisplayUnit } from '@/constants/trade';
 
-import {
-  AppColorMode,
-  AppTheme,
-  initialState as appUiConfigsInitialState,
-} from '@/state/appUiConfigs';
+import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
 
 import { V2State } from '../2';
 import {
   appUiConfigsLocalStorageKeys,
   AppUIConfigsMappableLocalStorageKeys,
   migration3,
+  PersistAppStateV3,
 } from '../3';
 
 const V2_STATE: V2State = {
@@ -20,6 +17,18 @@ const V2_STATE: V2State = {
   dismissable: {
     hasSeenPredictionMarketIntroDialog: false,
     dismissedAffiliateBanner: false,
+  },
+};
+
+const updatedState: PersistAppStateV3 = {
+  _persist: { version: 3, rehydrated: true },
+  appUiConfigs: {
+    appThemeSetting: AppTheme.Classic,
+    appColorMode: AppColorMode.GreenUp,
+    hasSeenLaunchIncentives: false,
+    defaultToAllMarketsInPositionsOrdersFills: true,
+    displayUnit: DisplayUnit.Asset,
+    shouldHideLaunchableMarkets: false,
   },
 };
 
@@ -40,12 +49,12 @@ describe('migration3', () => {
 
   it('should add the app ui configs to default values', () => {
     const result = migration3(V2_STATE);
-    expect(result.appUiConfigs).toMatchObject(appUiConfigsInitialState);
+    expect(result.appUiConfigs).toMatchObject(updatedState.appUiConfigs);
   });
 
   it('should overwrite the app ui configs if values exist', () => {
     const result = migration3(V2_STATE);
-    expect(result.appUiConfigs).toMatchObject(appUiConfigsInitialState);
+    expect(result.appUiConfigs).toMatchObject(updatedState.appUiConfigs);
   });
 
   it('should copy localStorage values to app ui configs object', () => {
@@ -60,7 +69,6 @@ describe('migration3', () => {
 
     expect(result.appUiConfigs).toMatchObject({
       ...oppositeUiConfigsLocalStorageValues,
-      favoritedMarkets: [],
     });
 
     // Check if localStorage items were removed

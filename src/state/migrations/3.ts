@@ -1,13 +1,30 @@
-import { PersistedState } from 'redux-persist';
+import { PersistedState, PersistState } from 'redux-persist';
 
-import { AppUIConfigsState, initialState as appUiConfigsInitialState } from '../appUiConfigs';
+import { DisplayUnit } from '@/constants/trade';
+
+import {
+  AppColorMode,
+  AppThemeSetting,
+  initialState as appUiConfigsInitialState,
+  AppUIConfigsState,
+} from '../appUiConfigs';
 import { parseStorageItem } from './utils';
 
-export type V3State = PersistedState & {
-  appUiConfigs: AppUIConfigsState;
+export type V3AppUiConfigs = {
+  appThemeSetting: AppThemeSetting;
+  appColorMode: AppColorMode;
+  hasSeenLaunchIncentives: boolean;
+  defaultToAllMarketsInPositionsOrdersFills: boolean;
+  displayUnit: DisplayUnit;
+  shouldHideLaunchableMarkets: boolean;
 };
 
-export type AppUiConfigsKeys = keyof typeof appUiConfigsInitialState;
+export type PersistAppStateV3 = {
+  _persist: PersistState;
+  appUiConfigs: V3AppUiConfigs;
+};
+
+export type AppUiConfigsKeys = keyof V3AppUiConfigs;
 export type AppUIConfigsMappableLocalStorageKeys = keyof typeof appUiConfigsLocalStorageKeys;
 
 export const appUiConfigsLocalStorageKeys = {
@@ -23,20 +40,19 @@ export const appUiConfigsLocalStorageKeys = {
  * 4th migration, moving over the app ui configs localStorage items
  *
  */
-export function migration3(state: PersistedState | undefined): V3State {
+export function migration3(state: PersistedState | undefined): PersistAppStateV3 {
   if (!state) throw new Error('state must be defined');
 
   const appUiConfigs = Object.entries(appUiConfigsLocalStorageKeys).reduce(
     (acc, [key, localStorageKey]) => {
-      const value = localStorageKey
-        ? parseStorageItem(localStorage.getItem(localStorageKey))
-        : undefined;
+      const value = parseStorageItem(localStorage.getItem(localStorageKey));
+
       return {
         ...acc,
         [key]: value ?? appUiConfigsInitialState[key as AppUiConfigsKeys],
       };
     },
-    { favoritedMarkets: [] } as Record<AppUiConfigsKeys, any>
+    {} as AppUIConfigsState
   );
 
   Object.values(appUiConfigsLocalStorageKeys).forEach((localStorageKey) => {
