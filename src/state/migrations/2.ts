@@ -1,9 +1,13 @@
 import { PersistedState } from 'redux-persist';
 
-import { DismissableState } from '../dismissable';
 import { parseStorageItem } from './utils';
 
-export type V2State = PersistedState & { dismissable: DismissableState };
+interface V2MigrationDismissableState {
+  hasSeenPredictionMarketIntroDialog: boolean;
+  dismissedAffiliateBanner: boolean;
+}
+
+export type V2State = PersistedState & { dismissable: V2MigrationDismissableState };
 /**
  * Third migration, moving over the hasSeenPredictionMarketsIntro localStorage item
  *

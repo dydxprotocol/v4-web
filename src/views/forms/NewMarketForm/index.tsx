@@ -1,9 +1,17 @@
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { shallowEqual } from 'react-redux';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
-import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { useNextClobPairId } from '@/hooks/useNextClobPairId';
@@ -21,6 +29,7 @@ import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -31,6 +40,7 @@ import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 import { NewMarketPreviewStep as NewMarketPreviewStep2 } from './v7/NewMarketPreviewStep';
 import { NewMarketSelectionStep as NewMarketSelectionStep2 } from './v7/NewMarketSelectionStep';
+import { NewMarketSuccessStep as NewMarketSuccessStep2 } from './v7/NewMarketSuccessStep';
 
 export enum NewMarketFormStep {
   SELECTION,
@@ -38,15 +48,21 @@ export enum NewMarketFormStep {
   SUCCESS,
 }
 
+type NewMarketFormProps = {
+  defaultLaunchableMarketId?: string;
+  onCloseDialog?: () => void;
+  setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
+  setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
+  updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
+};
+
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
+  onCloseDialog,
   setFormStep,
+  setIsParentLoading,
   updateTickerToAdd,
-}: {
-  defaultLaunchableMarketId?: string;
-  setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
-  updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
-}) => {
+}: NewMarketFormProps) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
   const [tickerToAdd, setTickerToAdd] = useState<string | undefined>(defaultLaunchableMarketId);
@@ -59,6 +75,7 @@ export const NewMarketForm = ({
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
+  const currentFreeCollateral = freeCollateral?.current ?? 0;
 
   const summaryData = useVaultCalculationForLaunchingMarket({
     amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
@@ -80,6 +97,28 @@ export const NewMarketForm = ({
 
   const shouldHideTitleAndDescription = setFormStep !== undefined;
 
+  const trackLaunchMarketFormStepChange = useCallback(
+    ({
+      currentStep,
+      updatedStep,
+      ticker,
+    }: {
+      currentStep: NewMarketFormStep;
+      updatedStep: NewMarketFormStep;
+      ticker?: string;
+    }) => {
+      track(
+        AnalyticsEvents.LaunchMarketFormStepChange({
+          currentStep,
+          updatedStep,
+          ticker,
+          userFreeCollateral: currentFreeCollateral,
+        })
+      );
+    },
+    [currentFreeCollateral]
+  );
+
   const freeCollateralDetailItem = useMemo(() => {
     return {
       key: 'cross-free-collateral',
@@ -90,6 +129,8 @@ export const NewMarketForm = ({
           type={OutputType.Fiat}
           value={freeCollateral?.current}
           newValue={freeCollateralUpdated}
+          sign={NumberSign.Negative}
+          hasInvalidNewValue={(freeCollateralUpdated ?? 0) < 0}
         />
       ),
     };
@@ -117,10 +158,12 @@ export const NewMarketForm = ({
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
         value: (
           <DiffOutput
-            withDiff={!!marginUsage?.current}
+            withDiff={!!marginUsage?.current && marginUsageUpdated != null}
             type={OutputType.Percent}
             value={marginUsage?.current}
             newValue={marginUsageUpdated}
+            sign={NumberSign.Negative}
+            hasInvalidNewValue={(marginUsageUpdated ?? 0) < 0 || (marginUsageUpdated ?? 0) > 1}
           />
         ),
       },
@@ -133,22 +176,59 @@ export const NewMarketForm = ({
     ].filter(isTruthy);
   }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
 
+  const onSuccess = useCallback(
+    (txHash: string) => {
+      setProposalTxHash(txHash);
+      setStep(NewMarketFormStep.SUCCESS);
+
+      trackLaunchMarketFormStepChange({
+        currentStep: NewMarketFormStep.PREVIEW,
+        updatedStep: NewMarketFormStep.SUCCESS,
+        ticker: tickerToAdd,
+      });
+    },
+    [tickerToAdd, trackLaunchMarketFormStepChange]
+  );
+
   /**
    * Permissionless Markets Flow
    */
   if (testFlags.pml) {
-    if (NewMarketFormStep.SUCCESS === step) {
-      return <NewMarketSuccessStep href="" />;
+    if (NewMarketFormStep.SUCCESS === step && tickerToAdd && proposalTxHash) {
+      return (
+        <NewMarketSuccessStep2
+          transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
+          tickerToAdd={tickerToAdd}
+          onCloseDialog={onCloseDialog}
+          onLaunchAnotherMarket={() => {
+            setTickerToAdd(undefined);
+            setStep(NewMarketFormStep.SELECTION);
+
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.SUCCESS,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: undefined,
+            });
+          }}
+        />
+      );
     }
 
     if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
       return (
         <NewMarketPreviewStep2
-          onSuccess={() => {
-            setStep(NewMarketFormStep.SUCCESS);
+          onSuccess={onSuccess}
+          onBack={() => {
+            setStep(NewMarketFormStep.SELECTION);
+
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.PREVIEW,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: tickerToAdd,
+            });
           }}
-          onBack={() => setStep(NewMarketFormStep.SELECTION)}
           receiptItems={receiptItems}
+          setIsParentLoading={setIsParentLoading}
           shouldHideTitleAndDescription={shouldHideTitleAndDescription}
           ticker={tickerToAdd}
         />
@@ -159,6 +239,12 @@ export const NewMarketForm = ({
       <NewMarketSelectionStep2
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
+
+          trackLaunchMarketFormStepChange({
+            currentStep: NewMarketFormStep.SELECTION,
+            updatedStep: NewMarketFormStep.PREVIEW,
+            ticker: tickerToAdd,
+          });
         }}
         freeCollateralDetailItem={freeCollateralDetailItem}
         receiptItems={receiptItems}

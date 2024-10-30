@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { TradeLayouts } from '@/constants/layout';
 import { AppRoute } from '@/constants/routes';
 
@@ -18,6 +19,7 @@ import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
 import { HorizontalPanel } from './HorizontalPanel';
@@ -36,6 +38,16 @@ const LaunchableMarket = () => {
   const { uiRefresh } = testFlags;
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
+
+  useEffect(() => {
+    if (marketId) {
+      track(
+        AnalyticsEvents.LaunchMarketViewFromTradePage({
+          marketId,
+        })
+      );
+    }
+  }, [marketId]);
 
   return isTablet ? (
     <$TradeLayoutMobile>
@@ -65,7 +77,7 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
+      <$GridSection gridArea="Side" tw="flex flex-col">
         {!uiRefresh && <AccountInfo />}
         <$LaunchMarketSidePanel launchableMarketId={marketId} />
         {uiRefresh && <AccountInfo />}

@@ -191,6 +191,7 @@ const $TradeLayoutMobile = styled.article`
     justify-content: start;
   }
 `;
+
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;

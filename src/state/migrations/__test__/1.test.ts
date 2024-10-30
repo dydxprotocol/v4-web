@@ -1,7 +1,4 @@
-import { WalletType as CosmosWalletType } from 'graz';
 import { afterEach, describe, expect, it } from 'vitest';
-
-import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { V0State } from '../0';
 import { migration1 } from '../1';
@@ -16,19 +13,19 @@ const MOCK_EVM_SIGNATURE = 'fake_signature_woohoo';
 const MOCK_SOLANA_ADDRESS = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
 const MOCK_DYDX_ADDRESS = 'dydx1';
 
-const MOCK_EVM_WALLET_INFO: WalletInfo = {
-  connectorType: ConnectorType.Coinbase,
-  name: WalletType.CoinbaseWallet,
+const MOCK_EVM_WALLET_INFO = {
+  connectorType: 'coinbase',
+  name: 'COINBASE_WALLET',
 };
 
-const MOCK_SOLANA_WALLET_INFO: WalletInfo = {
-  connectorType: ConnectorType.PhantomSolana,
-  name: WalletType.Phantom,
+const MOCK_SOLANA_WALLET_INFO = {
+  connectorType: 'phantomSolana',
+  name: 'PHANTOM',
 };
 
-const MOCK_COSMOS_WALLET_INFO: WalletInfo = {
-  connectorType: ConnectorType.Cosmos,
-  name: CosmosWalletType.KEPLR,
+const MOCK_COSMOS_WALLET_INFO = {
+  connectorType: 'cosmos',
+  name: 'keplr',
 };
 
 describe('migration1', () => {

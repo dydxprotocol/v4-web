@@ -7,7 +7,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -37,11 +36,10 @@ export const MarketsCompactTable = ({
   sorting,
 }: PropsWithChildren<MarketsCompactTableProps>) => {
   const stringGetter = useStringGetter();
-  const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
   const { filteredMarkets } = useMarketsData({
-    filter: MarketFilters.ALL,
+    filter: sorting === MarketSorting.RECENTLY_LISTED ? MarketFilters.NEW : MarketFilters.ALL,
     hideUnlaunchedMarkets: true,
   });
 
@@ -60,11 +58,15 @@ export const MarketsCompactTable = ({
             name,
           }) => (
             <AssetTableCell
-              stacked
               configs={{ imageUrl, effectiveInitialMarginFraction, initialMarginFraction }}
               name={name}
               symbol={assetId}
-            />
+              truncateAssetName
+            >
+              <span tw="text-color-text-0 font-mini-medium">
+                {getDisplayableAssetFromBaseAsset(assetId)}
+              </span>
+            </AssetTableCell>
           ),
         },
         {
@@ -142,7 +144,7 @@ export const MarketsCompactTable = ({
               ),
             },
       ] satisfies ColumnDef<MarketData>[],
-    [stringGetter, isTablet]
+    [stringGetter, sorting]
   );
 
   const sortedMarkets = useMemo(() => {
@@ -179,7 +181,7 @@ export const MarketsCompactTable = ({
     <$Table
       withInnerBorders
       data={sortedMarkets.slice(0, 3)}
-      getRowKey={(row) => row.id ?? ''}
+      getRowKey={(row) => row.id}
       label="Markets"
       onRowAction={(market: Key) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
