@@ -5,6 +5,7 @@ import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { MetadataServiceCandlesTimeframes } from '@/constants/assetMetadata';
 import { ButtonSize } from '@/constants/buttons';
 import { TradingViewBar } from '@/constants/candles';
@@ -34,6 +35,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -143,6 +145,20 @@ export const LaunchableMarketChart = ({
     );
   };
 
+  const trackTimeframeChange = useCallback(
+    (_timeframe: string) => {
+      if (id) {
+        track(
+          AnalyticsEvents.LaunchMarketPageChangePriceChartTimeframe({
+            asset: id,
+            timeframe: _timeframe,
+          })
+        );
+      }
+    },
+    [id]
+  );
+
   return (
     <$LaunchableMarketChartContainer className={className}>
       <$ChartContainerHeader tw="flex flex-row items-center justify-between">
@@ -190,14 +206,23 @@ export const LaunchableMarketChart = ({
             {
               value: '1d',
               label: `1${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
+              onClick() {
+                trackTimeframeChange('1d');
+              },
             },
             {
               value: '7d',
               label: `7${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
+              onClick() {
+                trackTimeframeChange('7d');
+              },
             },
             {
               value: '30d',
               label: `30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
+              onClick() {
+                trackTimeframeChange('30d');
+              },
             },
           ]}
           value={timeframe}
