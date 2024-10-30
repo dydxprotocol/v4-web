@@ -30,6 +30,8 @@ export { default as FastForwardIcon } from './fast-forward.svg';
 export { default as FeedbackIcon } from './feedback.svg';
 export { default as FileIcon } from './file.svg';
 export { default as FundingChartIcon } from './funding-chart.svg';
+export { default as FunkitInstantIcon } from './funkit-instant.svg';
+export { default as FunkitStandardIcon } from './funkit-standard.svg';
 export { default as GearIcon } from './gear.svg';
 export { default as GiftboxIcon } from './giftbox.svg';
 export { default as GooglePlayIcon } from './google-play.svg';

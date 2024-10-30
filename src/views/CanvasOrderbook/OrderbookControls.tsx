@@ -2,15 +2,16 @@ import { useCallback } from 'react';
 
 import { clamp } from 'lodash';
 import { shallowEqual, useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit } from '@/constants/trade';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
+import { WithSeparators } from '@/components/Separator';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -20,6 +21,7 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { testFlags } from '@/lib/testFlags';
 
 type OrderbookControlsProps = {
   className?: string;
@@ -30,6 +32,8 @@ type OrderbookControlsProps = {
 export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
+
+  const { uiRefresh } = testFlags;
 
   const modifyScale = useCallback(
     (direction: number) => {
@@ -60,21 +64,25 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     <$OrderbookControlsContainer className={className}>
       <div tw="flex justify-between gap-0.5">
         <div tw="flex gap-0.5">
-          <$ButtonGroup>
-            <Button
-              size={ButtonSize.XSmall}
-              shape={ButtonShape.Square}
-              onClick={() => modifyScale(-1)}
-            >
-              <span tw="-mt-0.125">-</span>
-            </Button>
-            <Button
-              size={ButtonSize.XSmall}
-              shape={ButtonShape.Square}
-              onClick={() => modifyScale(1)}
-            >
-              +
-            </Button>
+          <$ButtonGroup $uiRefreshEnabled={uiRefresh}>
+            <$WithSeparators layout="row" withSeparators={uiRefresh}>
+              <Button
+                size={ButtonSize.XSmall}
+                shape={ButtonShape.Square}
+                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+                onClick={() => modifyScale(-1)}
+              >
+                -
+              </Button>
+              <Button
+                size={ButtonSize.XSmall}
+                shape={ButtonShape.Square}
+                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+                onClick={() => modifyScale(1)}
+              >
+                +
+              </Button>
+            </$WithSeparators>
           </$ButtonGroup>
           <Output
             value={grouping?.tickSize}
@@ -84,6 +92,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
         </div>
         {assetId && (
           <ToggleGroup
+            withSeparators
             items={[
               { label: getDisplayableAssetFromBaseAsset(assetId), value: DisplayUnit.Asset },
               { label: 'USD', value: DisplayUnit.Fiat },
@@ -111,10 +120,23 @@ const $OrderbookControlsContainer = styled.div`
     padding-bottom: 0.3rem;
   }
 `;
-const $ButtonGroup = styled.div`
+
+const $WithSeparators = styled(WithSeparators)`
+  --separatorHeight-padding: 0.5rem;
+`;
+
+const $ButtonGroup = styled.div<{ $uiRefreshEnabled: boolean }>`
   display: flex;
   gap: 0.25rem;
   > button {
     --button-font: var(--font-medium-book);
+
+    ${({ $uiRefreshEnabled }) =>
+      $uiRefreshEnabled &&
+      css`
+        --button-textColor: var(--color-text-2);
+        --button-padding: 0 0.5rem;
+        --button-width: min-content;
+      `}
   }
 `;

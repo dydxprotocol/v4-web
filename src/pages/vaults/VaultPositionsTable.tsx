@@ -153,8 +153,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                         x: index + 1,
                         y: elem,
                       }))}
-                      xAccessor={(datum) => datum.x}
-                      yAccessor={(datum) => datum.y}
+                      xAccessor={(datum) => datum?.x ?? 0}
+                      yAccessor={(datum) => datum?.y ?? 0}
                       positive={(thirtyDayPnl.absolute ?? 0) > 0}
                     />
                   )}

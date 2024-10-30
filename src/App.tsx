@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
+import { FunkitProvider } from '@funkit/connect';
+import '@funkit/connect/styles.css';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -43,6 +45,7 @@ import { config, privyConfig } from '@/lib/wagmi';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
+import { funkitConfig, funkitTheme } from './constants/funkit';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -51,6 +54,7 @@ import { useInitializePage } from './hooks/useInitializePage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
 import { appQueryClient } from './state/appQueryClient';
@@ -191,6 +195,12 @@ const providers = [
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
+  import.meta.env.VITE_FUNKIT_API_KEY &&
+    wrapProvider(FunkitProvider, {
+      funkitConfig: funkitConfig(),
+      theme: funkitTheme,
+      initialChain: config.chains[0].id,
+    }),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
@@ -201,7 +211,7 @@ const providers = [
   wrapProvider(PotentialMarketsProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
-];
+].filter(isTruthy);
 
 const App = () => {
   return [...providers].reverse().reduce(
@@ -250,10 +260,10 @@ const $Content = styled.div<{
         --page-currentFooterHeight: var(--page-footer-height-mobile);
       }
     `}
-  
+
     /* Rules */
     ${layoutMixins.contentContainer}
-  
+
     ${layoutMixins.scrollArea}
     --scrollArea-height: 100vh;
 

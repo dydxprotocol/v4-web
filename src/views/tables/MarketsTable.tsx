@@ -80,12 +80,16 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       imageUrl,
                       initialMarginFraction,
                       isUnlaunched,
-                      volume24H,
                     }}
                     name={name}
                     symbol={assetId}
-                    showStackedVolume
-                  />
+                  >
+                    <Output
+                      type={OutputType.CompactFiat}
+                      value={volume24H ?? undefined}
+                      tw="text-color-text-0 font-mini-medium"
+                    />
+                  </AssetTableCell>
                 </div>
               ),
             },
@@ -180,8 +184,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       x: index + 1,
                       y: parseFloat(datum.toString()),
                     }))}
-                    xAccessor={(datum) => datum.x}
-                    yAccessor={(datum) => datum.y}
+                    xAccessor={(datum) => datum?.x ?? 0}
+                    yAccessor={(datum) => datum?.y ?? 0}
                     positive={MustBigNumber(priceChange24HPercent).gt(0)}
                   />
                 </div>
