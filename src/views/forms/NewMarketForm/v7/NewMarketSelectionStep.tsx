@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
@@ -35,6 +36,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSelectionStepProps = {
@@ -133,6 +135,11 @@ export const NewMarketSelectionStep = ({
                   tag: getDisplayableAssetFromBaseAsset(launchableMarket.asset),
                   onSelect: () => {
                     setTickerToAdd(launchableMarket.id);
+                    track(
+                      AnalyticsEvents.LaunchMarketFormSelectedAsset({
+                        asset: launchableMarket.asset,
+                      })
+                    );
                   },
                 })),
               },

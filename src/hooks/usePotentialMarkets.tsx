@@ -5,6 +5,7 @@ import { LIQUIDITY_TIERS } from '@/constants/markets';
 import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 import { useStringGetter } from './useStringGetter';
 
@@ -95,7 +96,7 @@ const usePotentialMarketsContext = () => {
 
   return {
     potentialMarkets,
-    hasPotentialMarketsData: Boolean(potentialMarkets),
+    hasPotentialMarketsData: Boolean(potentialMarkets) && !testFlags.pml,
     liquidityTiers,
   };
 };
