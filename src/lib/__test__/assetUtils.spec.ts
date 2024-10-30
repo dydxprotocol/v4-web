@@ -138,4 +138,8 @@ describe('getMarketIdFromAsset', () => {
   it('should handle empty asset strings', () => {
     expect(getMarketIdFromAsset('')).toEqual('-USD');
   });
+
+  it('should handle different quote asset', () => {
+    expect(getMarketIdFromAsset('ETH', 'BTC')).toEqual('ETH-BTC');
+  });
 });
