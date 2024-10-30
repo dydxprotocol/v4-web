@@ -2,6 +2,7 @@ import { Asset } from '@skip-go/client';
 
 import { Nullable } from '@/constants/abacus';
 import { isTokenCctp } from '@/constants/cctp';
+import { DEFAULT_QUOTE_ASSET } from '@/constants/markets';
 import { NetworkType } from '@/constants/transfers';
 
 /**
@@ -56,6 +57,14 @@ export const getTickerFromMarketmapId = (marketmapId: string): string => {
 
 export const getAssetFromMarketId = (marketId: string): string => {
   return marketId.split('-')[0]!;
+};
+
+/**
+ * @param assetId
+ * @returns the internal ticker of a market
+ */
+export const getMarketIdFromAsset = (assetId: string, quoteAsset: string = DEFAULT_QUOTE_ASSET) => {
+  return `${assetId}-${quoteAsset}`;
 };
 
 const SKIP_NATIVE_DENOM_SUFFIX = 'native';

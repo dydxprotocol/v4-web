@@ -4,6 +4,7 @@ import {
   getDisplayableAssetFromBaseAsset,
   getDisplayableAssetFromTicker,
   getDisplayableTickerFromMarket,
+  getMarketIdFromAsset,
   getTickerFromMarketmapId,
 } from '../assetUtils';
 
@@ -120,5 +121,25 @@ describe('getTickerFromMarketmapId', () => {
 
   it('should handle empty marketmap id', () => {
     expect(getTickerFromMarketmapId('')).toEqual('');
+  });
+});
+
+describe('getMarketIdFromAsset', () => {
+  it('should return the marketId given a asset', () => {
+    expect(getMarketIdFromAsset('ETH')).toEqual('ETH-USD');
+  });
+
+  it('should handle long asset strings', () => {
+    expect(getMarketIdFromAsset(ASSET_WITH_DEX_AND_ADDRESS)).toEqual(
+      `${ASSET_WITH_DEX_AND_ADDRESS}-USD`
+    );
+  });
+
+  it('should handle empty asset strings', () => {
+    expect(getMarketIdFromAsset('')).toEqual('-USD');
+  });
+
+  it('should handle different quote asset', () => {
+    expect(getMarketIdFromAsset('ETH', 'BTC')).toEqual('ETH-BTC');
   });
 });

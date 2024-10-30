@@ -1,18 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { DisplayUnit } from '@/constants/trade';
-
-import {
-  AppColorMode,
-  AppTheme,
-  initialState as appUiConfigsInitialState,
-} from '@/state/appUiConfigs';
-
 import { V2State } from '../2';
 import {
   appUiConfigsLocalStorageKeys,
   AppUIConfigsMappableLocalStorageKeys,
   migration3,
+  PersistAppStateV3,
+  V3AppColorMode,
+  V3AppTheme,
+  V3DisplayUnit,
 } from '../3';
 
 const V2_STATE: V2State = {
@@ -23,13 +19,25 @@ const V2_STATE: V2State = {
   },
 };
 
+const updatedState: PersistAppStateV3 = {
+  _persist: { version: 3, rehydrated: true },
+  appUiConfigs: {
+    appThemeSetting: V3AppTheme.Classic,
+    appColorMode: V3AppColorMode.GreenUp,
+    hasSeenLaunchIncentives: false,
+    defaultToAllMarketsInPositionsOrdersFills: true,
+    displayUnit: V3DisplayUnit.Asset,
+    shouldHideLaunchableMarkets: false,
+  },
+};
+
 // values for testing -- they should be different than default / intial state
 const oppositeUiConfigsLocalStorageValues = {
-  appThemeSetting: AppTheme.Light,
-  appColorMode: AppColorMode.RedUp,
+  appThemeSetting: V3AppTheme.Light,
+  appColorMode: V3AppColorMode.RedUp,
   hasSeenLaunchIncentives: true,
   defaultToAllMarketsInPositionsOrdersFills: false,
-  displayUnit: DisplayUnit.Fiat,
+  displayUnit: V3DisplayUnit.Fiat,
   shouldHideLaunchableMarkets: true,
 } satisfies Record<AppUIConfigsMappableLocalStorageKeys, any>;
 
@@ -40,12 +48,12 @@ describe('migration3', () => {
 
   it('should add the app ui configs to default values', () => {
     const result = migration3(V2_STATE);
-    expect(result.appUiConfigs).toMatchObject(appUiConfigsInitialState);
+    expect(result.appUiConfigs).toMatchObject(updatedState.appUiConfigs);
   });
 
   it('should overwrite the app ui configs if values exist', () => {
     const result = migration3(V2_STATE);
-    expect(result.appUiConfigs).toMatchObject(appUiConfigsInitialState);
+    expect(result.appUiConfigs).toMatchObject(updatedState.appUiConfigs);
   });
 
   it('should copy localStorage values to app ui configs object', () => {
@@ -60,7 +68,6 @@ describe('migration3', () => {
 
     expect(result.appUiConfigs).toMatchObject({
       ...oppositeUiConfigsLocalStorageValues,
-      favoritedMarkets: [],
     });
 
     // Check if localStorage items were removed
