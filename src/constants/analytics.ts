@@ -378,8 +378,10 @@ export const AnalyticsEvents = unionize(
       currentStep: number;
       updatedStep: number;
       ticker?: string;
+      userFreeCollateral?: number;
     }>(),
     LaunchMarketPageChangePriceChartTimeframe: ofType<{ timeframe: string; asset: string }>(),
+    LaunchMarketTransaction: ofType<{ marketId: string }>(),
     LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }

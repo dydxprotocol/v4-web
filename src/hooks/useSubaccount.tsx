@@ -746,6 +746,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw new Error('wallet not initialized');
       }
 
+      track(AnalyticsEvents.LaunchMarketTransaction({ marketId: ticker }));
+
       const response = await compositeClient.createMarketPermissionless(
         subaccountClient,
         ticker,

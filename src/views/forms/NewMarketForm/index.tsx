@@ -75,6 +75,7 @@ export const NewMarketForm = ({
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
+  const currentFreeCollateral = freeCollateral?.current ?? 0;
 
   const summaryData = useVaultCalculationForLaunchingMarket({
     amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
@@ -95,6 +96,28 @@ export const NewMarketForm = ({
   }, [updateTickerToAdd, tickerToAdd]);
 
   const shouldHideTitleAndDescription = setFormStep !== undefined;
+
+  const trackLaunchMarketFormStepChange = useCallback(
+    ({
+      currentStep,
+      updatedStep,
+      ticker,
+    }: {
+      currentStep: NewMarketFormStep;
+      updatedStep: NewMarketFormStep;
+      ticker?: string;
+    }) => {
+      track(
+        AnalyticsEvents.LaunchMarketFormStepChange({
+          currentStep,
+          updatedStep,
+          ticker,
+          userFreeCollateral: currentFreeCollateral,
+        })
+      );
+    },
+    [currentFreeCollateral]
+  );
 
   const freeCollateralDetailItem = useMemo(() => {
     return {
@@ -158,15 +181,13 @@ export const NewMarketForm = ({
       setProposalTxHash(txHash);
       setStep(NewMarketFormStep.SUCCESS);
 
-      track(
-        AnalyticsEvents.LaunchMarketFormStepChange({
-          currentStep: NewMarketFormStep.PREVIEW,
-          updatedStep: NewMarketFormStep.SUCCESS,
-          ticker: tickerToAdd,
-        })
-      );
+      trackLaunchMarketFormStepChange({
+        currentStep: NewMarketFormStep.PREVIEW,
+        updatedStep: NewMarketFormStep.SUCCESS,
+        ticker: tickerToAdd,
+      });
     },
-    [tickerToAdd]
+    [tickerToAdd, trackLaunchMarketFormStepChange]
   );
 
   /**
@@ -183,13 +204,11 @@ export const NewMarketForm = ({
             setTickerToAdd(undefined);
             setStep(NewMarketFormStep.SELECTION);
 
-            track(
-              AnalyticsEvents.LaunchMarketFormStepChange({
-                currentStep: NewMarketFormStep.SUCCESS,
-                updatedStep: NewMarketFormStep.SELECTION,
-                ticker: undefined,
-              })
-            );
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.SUCCESS,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: undefined,
+            });
           }}
         />
       );
@@ -202,13 +221,11 @@ export const NewMarketForm = ({
           onBack={() => {
             setStep(NewMarketFormStep.SELECTION);
 
-            track(
-              AnalyticsEvents.LaunchMarketFormStepChange({
-                currentStep: NewMarketFormStep.PREVIEW,
-                updatedStep: NewMarketFormStep.SELECTION,
-                ticker: tickerToAdd,
-              })
-            );
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.PREVIEW,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: tickerToAdd,
+            });
           }}
           receiptItems={receiptItems}
           setIsParentLoading={setIsParentLoading}
@@ -223,13 +240,11 @@ export const NewMarketForm = ({
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
 
-          track(
-            AnalyticsEvents.LaunchMarketFormStepChange({
-              currentStep: NewMarketFormStep.SELECTION,
-              updatedStep: NewMarketFormStep.PREVIEW,
-              ticker: tickerToAdd,
-            })
-          );
+          trackLaunchMarketFormStepChange({
+            currentStep: NewMarketFormStep.SELECTION,
+            updatedStep: NewMarketFormStep.PREVIEW,
+            ticker: tickerToAdd,
+          });
         }}
         freeCollateralDetailItem={freeCollateralDetailItem}
         receiptItems={receiptItems}
