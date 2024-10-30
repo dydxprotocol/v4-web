@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { ColorToken } from '@/constants/styles/base';
@@ -15,7 +14,7 @@ import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
-import { Button } from '@/components/Button';
+import { Link } from '@/components/Link';
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
@@ -96,7 +95,12 @@ export const AccountOverviewSection = () => {
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
-      label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
+      label: (
+        <Link onClick={() => handleViewVault()} withIcon tw="text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+        </Link>
+      ),
+      labelString: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
       amount: vaultBalance,
       color: ColorToken.Purple1,
     },
@@ -111,12 +115,6 @@ export const AccountOverviewSection = () => {
         <$WithLabel label={stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE })}>
           <Output tw="font-extra-book" type={OutputType.Fiat} value={totalValue} />
         </$WithLabel>
-        {showVaults && (
-          <Button action={ButtonAction.Base} onClick={handleViewVault}>
-            {stringGetter({ key: STRING_KEYS.VIEW_MEGAVAULT })}
-            <MegavaultYieldTag />
-          </Button>
-        )}
       </div>
       <div tw="row w-full gap-1 p-1">
         <div tw="row gap-2">
@@ -157,7 +155,7 @@ export const AccountOverviewSection = () => {
                 return (
                   <WithTooltip
                     key={section.id}
-                    tooltipStringTitle={`${section.label}: ${formattedDollars} (${formattedPercent})`}
+                    tooltipStringTitle={`${section.labelString ?? section.label}: ${formattedDollars} (${formattedPercent})`}
                     slotTrigger={
                       <$LineSegment
                         tw="h-full"
