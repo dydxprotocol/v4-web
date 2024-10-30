@@ -146,12 +146,12 @@ export const LaunchableMarketChart = ({
   };
 
   const trackTimeframeChange = useCallback(
-    (_timeframe: string) => {
+    (selectedTimeframe: string) => {
       if (id) {
         track(
           AnalyticsEvents.LaunchMarketPageChangePriceChartTimeframe({
             asset: id,
-            timeframe: _timeframe,
+            timeframe: selectedTimeframe,
           })
         );
       }
