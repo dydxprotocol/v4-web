@@ -2,12 +2,12 @@ import { PersistedState } from 'redux-persist';
 
 import { parseStorageItem } from './utils';
 
-enum DisplayUnit {
+export enum DisplayUnit {
   Asset = 'asset',
   Fiat = 'fiat',
 }
 
-enum AppTheme {
+export enum AppTheme {
   Classic = 'Classic',
   Dark = 'Dark',
   Light = 'Light',
@@ -19,7 +19,7 @@ enum AppThemeSystemSetting {
 
 type AppThemeSetting = AppTheme | AppThemeSystemSetting;
 
-enum AppColorMode {
+export enum AppColorMode {
   GreenUp = 'GreenUp',
   RedUp = 'RedUp',
 }

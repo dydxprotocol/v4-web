@@ -1,13 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { DisplayUnit } from '@/constants/trade';
-
-import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
-
 import { V2State } from '../2';
 import {
+  AppColorMode,
+  AppTheme,
   appUiConfigsLocalStorageKeys,
   AppUIConfigsMappableLocalStorageKeys,
+  DisplayUnit,
   migration3,
   PersistAppStateV3,
 } from '../3';
