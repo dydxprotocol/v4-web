@@ -2,13 +2,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { V2State } from '../2';
 import {
-  AppColorMode,
-  AppTheme,
   appUiConfigsLocalStorageKeys,
   AppUIConfigsMappableLocalStorageKeys,
-  DisplayUnit,
   migration3,
   PersistAppStateV3,
+  V3AppColorMode,
+  V3AppTheme,
+  V3DisplayUnit,
 } from '../3';
 
 const V2_STATE: V2State = {
@@ -22,22 +22,22 @@ const V2_STATE: V2State = {
 const updatedState: PersistAppStateV3 = {
   _persist: { version: 3, rehydrated: true },
   appUiConfigs: {
-    appThemeSetting: AppTheme.Classic,
-    appColorMode: AppColorMode.GreenUp,
+    appThemeSetting: V3AppTheme.Classic,
+    appColorMode: V3AppColorMode.GreenUp,
     hasSeenLaunchIncentives: false,
     defaultToAllMarketsInPositionsOrdersFills: true,
-    displayUnit: DisplayUnit.Asset,
+    displayUnit: V3DisplayUnit.Asset,
     shouldHideLaunchableMarkets: false,
   },
 };
 
 // values for testing -- they should be different than default / intial state
 const oppositeUiConfigsLocalStorageValues = {
-  appThemeSetting: AppTheme.Light,
-  appColorMode: AppColorMode.RedUp,
+  appThemeSetting: V3AppTheme.Light,
+  appColorMode: V3AppColorMode.RedUp,
   hasSeenLaunchIncentives: true,
   defaultToAllMarketsInPositionsOrdersFills: false,
-  displayUnit: DisplayUnit.Fiat,
+  displayUnit: V3DisplayUnit.Fiat,
   shouldHideLaunchableMarkets: true,
 } satisfies Record<AppUIConfigsMappableLocalStorageKeys, any>;
 

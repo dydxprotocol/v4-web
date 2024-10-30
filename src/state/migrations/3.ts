@@ -2,34 +2,34 @@ import { PersistedState } from 'redux-persist';
 
 import { parseStorageItem } from './utils';
 
-export enum DisplayUnit {
+export enum V3DisplayUnit {
   Asset = 'asset',
   Fiat = 'fiat',
 }
 
-export enum AppTheme {
+export enum V3AppTheme {
   Classic = 'Classic',
   Dark = 'Dark',
   Light = 'Light',
 }
 
-enum AppThemeSystemSetting {
+enum V3AppThemeSystemSetting {
   System = 'System',
 }
 
-type AppThemeSetting = AppTheme | AppThemeSystemSetting;
+type V3AppThemeSetting = V3AppTheme | V3AppThemeSystemSetting;
 
-export enum AppColorMode {
+export enum V3AppColorMode {
   GreenUp = 'GreenUp',
   RedUp = 'RedUp',
 }
 
 export type V3AppUiConfigs = {
-  appThemeSetting: AppThemeSetting;
-  appColorMode: AppColorMode;
+  appThemeSetting: V3AppThemeSetting;
+  appColorMode: V3AppColorMode;
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
-  displayUnit: DisplayUnit;
+  displayUnit: V3DisplayUnit;
   shouldHideLaunchableMarkets: boolean;
 };
 
@@ -41,20 +41,20 @@ export type AppUiConfigsKeys = keyof V3AppUiConfigs;
 export type AppUIConfigsMappableLocalStorageKeys = keyof typeof appUiConfigsLocalStorageKeys;
 
 interface V3AppUIConfigsState {
-  appThemeSetting: AppThemeSetting;
-  appColorMode: AppColorMode;
+  appThemeSetting: V3AppThemeSetting;
+  appColorMode: V3AppColorMode;
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
-  displayUnit: DisplayUnit;
+  displayUnit: V3DisplayUnit;
   shouldHideLaunchableMarkets: boolean;
 }
 
 const v3AppUiConfigsInitialState: V3AppUiConfigs = {
-  appThemeSetting: AppTheme.Classic,
-  appColorMode: AppColorMode.GreenUp,
+  appThemeSetting: V3AppTheme.Classic,
+  appColorMode: V3AppColorMode.GreenUp,
   hasSeenLaunchIncentives: false,
   defaultToAllMarketsInPositionsOrdersFills: true,
-  displayUnit: DisplayUnit.Asset,
+  displayUnit: V3DisplayUnit.Asset,
   shouldHideLaunchableMarkets: false,
 };
 
