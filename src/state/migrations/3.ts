@@ -1,14 +1,28 @@
-import { PersistedState, PersistState } from 'redux-persist';
+import { PersistedState } from 'redux-persist';
 
-import { DisplayUnit } from '@/constants/trade';
-
-import {
-  AppColorMode,
-  AppThemeSetting,
-  initialState as appUiConfigsInitialState,
-  AppUIConfigsState,
-} from '../appUiConfigs';
 import { parseStorageItem } from './utils';
+
+enum DisplayUnit {
+  Asset = 'asset',
+  Fiat = 'fiat',
+}
+
+enum AppTheme {
+  Classic = 'Classic',
+  Dark = 'Dark',
+  Light = 'Light',
+}
+
+enum AppThemeSystemSetting {
+  System = 'System',
+}
+
+type AppThemeSetting = AppTheme | AppThemeSystemSetting;
+
+enum AppColorMode {
+  GreenUp = 'GreenUp',
+  RedUp = 'RedUp',
+}
 
 export type V3AppUiConfigs = {
   appThemeSetting: AppThemeSetting;
@@ -19,13 +33,30 @@ export type V3AppUiConfigs = {
   shouldHideLaunchableMarkets: boolean;
 };
 
-export type PersistAppStateV3 = {
-  _persist: PersistState;
+export type PersistAppStateV3 = PersistedState & {
   appUiConfigs: V3AppUiConfigs;
 };
 
 export type AppUiConfigsKeys = keyof V3AppUiConfigs;
 export type AppUIConfigsMappableLocalStorageKeys = keyof typeof appUiConfigsLocalStorageKeys;
+
+interface V3AppUIConfigsState {
+  appThemeSetting: AppThemeSetting;
+  appColorMode: AppColorMode;
+  hasSeenLaunchIncentives: boolean;
+  defaultToAllMarketsInPositionsOrdersFills: boolean;
+  displayUnit: DisplayUnit;
+  shouldHideLaunchableMarkets: boolean;
+}
+
+const v3AppUiConfigsInitialState: V3AppUiConfigs = {
+  appThemeSetting: AppTheme.Classic,
+  appColorMode: AppColorMode.GreenUp,
+  hasSeenLaunchIncentives: false,
+  defaultToAllMarketsInPositionsOrdersFills: true,
+  displayUnit: DisplayUnit.Asset,
+  shouldHideLaunchableMarkets: false,
+};
 
 export const appUiConfigsLocalStorageKeys = {
   appThemeSetting: 'dydx.SelectedTheme',
@@ -49,10 +80,10 @@ export function migration3(state: PersistedState | undefined): PersistAppStateV3
 
       return {
         ...acc,
-        [key]: value ?? appUiConfigsInitialState[key as AppUiConfigsKeys],
+        [key]: value ?? v3AppUiConfigsInitialState[key as AppUiConfigsKeys],
       };
     },
-    {} as AppUIConfigsState
+    {} as V3AppUIConfigsState
   );
 
   Object.values(appUiConfigsLocalStorageKeys).forEach((localStorageKey) => {
