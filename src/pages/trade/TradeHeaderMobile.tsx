@@ -38,7 +38,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
       <img
         src={launchableAsset.logo}
         alt={launchableAsset.name}
-        tw="h-[2.5rem] w-[2.5rem] border-r-[50%]"
+        tw="h-[2.5rem] w-[2.5rem] rounded-[50%]"
       />
       <$Name>
         <h3>{launchableAsset.name}</h3>
