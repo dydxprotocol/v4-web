@@ -100,13 +100,11 @@ export const appUiConfigsSlice = createSlice({
       const currentFavoritedMarkets = state.favoritedMarkets;
       const newFavoritedMarkets = [...currentFavoritedMarkets, marketId];
       state.favoritedMarkets = newFavoritedMarkets;
-      track(AnalyticsEvents.FavoritedMarket({ marketId }));
     },
     unfavoritedMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
       const currentFavoritedMarkets = state.favoritedMarkets;
       const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
       state.favoritedMarkets = newFavoritedMarkets;
-      track(AnalyticsEvents.UnfavoritedMarket({ marketId }));
     },
   },
 });
