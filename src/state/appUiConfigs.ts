@@ -29,6 +29,7 @@ export enum OtherPreference {
   ReverseLayout = 'ReverseLayout',
 }
 
+// NOTE: This app slice is persisted via redux-persist. Changes to this type may require migrations.
 export interface AppUIConfigsState {
   appThemeSetting: AppThemeSetting;
   appColorMode: AppColorMode;

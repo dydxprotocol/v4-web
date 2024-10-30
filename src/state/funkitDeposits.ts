@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { FunkitDeposit } from '@/constants/funkit';
 
+// NOTE: This app slice is persisted via redux-persist. Changes to this type may require migrations.
 export interface FunkitDepositsState {
   deposits: Record<string, FunkitDeposit>;
 }

@@ -28,7 +28,6 @@ export function migration2(state: PersistedState | undefined): V2State {
     dismissable: {
       hasSeenPredictionMarketIntroDialog: hasSeenPredictionMarketsIntro ?? false,
       dismissedAffiliateBanner: false,
-      hasSeenUnlimitedAnnouncement: false,
     },
   };
 }
