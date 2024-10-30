@@ -9,6 +9,7 @@ import {
 
 import { shallowEqual } from 'react-redux';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
@@ -28,6 +29,7 @@ import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -73,6 +75,7 @@ export const NewMarketForm = ({
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
+  const currentFreeCollateral = freeCollateral?.current ?? 0;
 
   const summaryData = useVaultCalculationForLaunchingMarket({
     amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
@@ -93,6 +96,28 @@ export const NewMarketForm = ({
   }, [updateTickerToAdd, tickerToAdd]);
 
   const shouldHideTitleAndDescription = setFormStep !== undefined;
+
+  const trackLaunchMarketFormStepChange = useCallback(
+    ({
+      currentStep,
+      updatedStep,
+      ticker,
+    }: {
+      currentStep: NewMarketFormStep;
+      updatedStep: NewMarketFormStep;
+      ticker?: string;
+    }) => {
+      track(
+        AnalyticsEvents.LaunchMarketFormStepChange({
+          currentStep,
+          updatedStep,
+          ticker,
+          userFreeCollateral: currentFreeCollateral,
+        })
+      );
+    },
+    [currentFreeCollateral]
+  );
 
   const freeCollateralDetailItem = useMemo(() => {
     return {
@@ -151,10 +176,19 @@ export const NewMarketForm = ({
     ].filter(isTruthy);
   }, [freeCollateralDetailItem, marginUsage, marginUsageUpdated, step, stringGetter]);
 
-  const onSuccess = useCallback((txHash: string) => {
-    setProposalTxHash(txHash);
-    setStep(NewMarketFormStep.SUCCESS);
-  }, []);
+  const onSuccess = useCallback(
+    (txHash: string) => {
+      setProposalTxHash(txHash);
+      setStep(NewMarketFormStep.SUCCESS);
+
+      trackLaunchMarketFormStepChange({
+        currentStep: NewMarketFormStep.PREVIEW,
+        updatedStep: NewMarketFormStep.SUCCESS,
+        ticker: tickerToAdd,
+      });
+    },
+    [tickerToAdd, trackLaunchMarketFormStepChange]
+  );
 
   /**
    * Permissionless Markets Flow
@@ -169,6 +203,12 @@ export const NewMarketForm = ({
           onLaunchAnotherMarket={() => {
             setTickerToAdd(undefined);
             setStep(NewMarketFormStep.SELECTION);
+
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.SUCCESS,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: undefined,
+            });
           }}
         />
       );
@@ -178,7 +218,15 @@ export const NewMarketForm = ({
       return (
         <NewMarketPreviewStep2
           onSuccess={onSuccess}
-          onBack={() => setStep(NewMarketFormStep.SELECTION)}
+          onBack={() => {
+            setStep(NewMarketFormStep.SELECTION);
+
+            trackLaunchMarketFormStepChange({
+              currentStep: NewMarketFormStep.PREVIEW,
+              updatedStep: NewMarketFormStep.SELECTION,
+              ticker: tickerToAdd,
+            });
+          }}
           receiptItems={receiptItems}
           setIsParentLoading={setIsParentLoading}
           shouldHideTitleAndDescription={shouldHideTitleAndDescription}
@@ -191,6 +239,12 @@ export const NewMarketForm = ({
       <NewMarketSelectionStep2
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
+
+          trackLaunchMarketFormStepChange({
+            currentStep: NewMarketFormStep.SELECTION,
+            updatedStep: NewMarketFormStep.PREVIEW,
+            ticker: tickerToAdd,
+          });
         }}
         freeCollateralDetailItem={freeCollateralDetailItem}
         receiptItems={receiptItems}

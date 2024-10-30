@@ -375,6 +375,18 @@ export const AnalyticsEvents = unionize(
     // Favoriting Markets
     FavoritedMarket: ofType<{ marketId: string }>(),
     UnfavoritedMarket: ofType<{ marketId: string }>(),
+
+    // Launching Markets
+    LaunchMarketFormSelectedAsset: ofType<{ asset: string }>(),
+    LaunchMarketFormStepChange: ofType<{
+      currentStep: number;
+      updatedStep: number;
+      ticker?: string;
+      userFreeCollateral?: number;
+    }>(),
+    LaunchMarketPageChangePriceChartTimeframe: ofType<{ timeframe: string; asset: string }>(),
+    LaunchMarketTransaction: ofType<{ marketId: string }>(),
+    LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -390,6 +402,8 @@ export enum TransactionMemo {
 
   placeOrder = `${DEFAULT_TRANSACTION_MEMO} | Place Order`,
   cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
+
+  launchMarket = `${DEFAULT_TRANSACTION_MEMO} | Launch Market`,
 }
 
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
