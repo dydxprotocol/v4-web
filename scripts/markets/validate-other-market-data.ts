@@ -702,7 +702,7 @@ function validateParamsSchema(proposal: Proposal): void {
 }
 
 function validateAtomicResolution(proposal: Proposal): void {
-  if (proposal.params.ticker === 'TRUMPWIN-USD') {
+  if (proposal.params.exchangeConfigJson[0]!.exchangeName === 'polymarket_api') {
     if (proposal.params.atomicResolution !== -6) {
       throw new Error(
         `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match -6`
