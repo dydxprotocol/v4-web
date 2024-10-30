@@ -6,4 +6,10 @@ export enum UnlimitedAnnouncementDialogSteps {
   Incentives = 'Incentives',
 }
 
-export const unlimitedAnnouncementStepOrder = Object.values(UnlimitedAnnouncementDialogSteps);
+export const unlimitedAnnouncementStepOrder = [
+  UnlimitedAnnouncementDialogSteps.Announcement,
+  UnlimitedAnnouncementDialogSteps.MarketListings,
+  UnlimitedAnnouncementDialogSteps.MegaVault,
+  UnlimitedAnnouncementDialogSteps.AffiliatesProgram,
+  UnlimitedAnnouncementDialogSteps.Incentives,
+] as const;

@@ -174,7 +174,7 @@ export const Dialog = ({
             </$Header>
           )}
 
-          <$Content> {children}</$Content>
+          <$Content>{children}</$Content>
 
           {slotFooter && <$Footer $withBorder={hasFooterBorder}>{slotFooter}</$Footer>}
         </$Container>

@@ -20,7 +20,6 @@ const V2_STATE: V2State = {
   dismissable: {
     hasSeenPredictionMarketIntroDialog: false,
     dismissedAffiliateBanner: false,
-    hasSeenUnlimitedAnnouncement: false,
   },
 };
 
