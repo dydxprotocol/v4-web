@@ -42,14 +42,14 @@ interface AssetTableCellProps {
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
   const {
-    children,
-    className,
     symbol,
     name,
     stacked,
     configs,
     showStackedVolume,
     truncateAssetName,
+    children,
+    className,
   } = props;
   const useStackedStyle = stacked ?? showStackedVolume;
   const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
