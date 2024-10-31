@@ -18,6 +18,7 @@ import {
 } from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
@@ -136,12 +137,7 @@ export const useMarketsData = ({
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
-<<<<<<< HEAD
-=======
-  const shouldHideLaunchableMarkets =
-    useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
->>>>>>> main
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
   const markets = useMemo(() => {

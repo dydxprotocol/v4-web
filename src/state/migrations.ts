@@ -5,12 +5,15 @@ import { migration0 } from './migrations/0';
 import { migration1 } from './migrations/1';
 import { migration2 } from './migrations/2';
 import { migration3 } from './migrations/3';
+import { migration4 } from './migrations/4';
 
 export const migrations: MigrationManifest = {
   0: migration0,
   1: migration1,
   2: migration2,
   3: migration3,
+  // @ts-expect-error PersistAppStateV4 is a union of PersistedState and new app state
+  4: migration4,
 } as const;
 
 /*

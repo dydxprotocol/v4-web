@@ -13,11 +13,11 @@ export enum V3AppTheme {
   Light = 'Light',
 }
 
-enum V3AppThemeSystemSetting {
+export enum V3AppThemeSystemSetting {
   System = 'System',
 }
 
-type V3AppThemeSetting = V3AppTheme | V3AppThemeSystemSetting;
+export type V3AppThemeSetting = V3AppTheme | V3AppThemeSystemSetting;
 
 export enum V3AppColorMode {
   GreenUp = 'GreenUp',
