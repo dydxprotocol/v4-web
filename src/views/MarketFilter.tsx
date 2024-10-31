@@ -16,6 +16,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
+import { Icon } from '@/components/Icon';
 import { SearchInput } from '@/components/SearchInput';
 import { Switch } from '@/components/Switch';
 import { NewTag } from '@/components/Tag';
@@ -81,7 +82,6 @@ export const MarketFilter = ({
   );
 
   const filterLaunchable = (filter: MarketFilters) => {
-    if (!shouldHideLaunchableMarkets) return true;
     return filter !== MarketFilters.LAUNCHABLE;
   };
 
@@ -90,13 +90,21 @@ export const MarketFilter = ({
       items={
         Object.values(filters)
           .filter(filterLaunchable)
-          .map((value) => ({
-            label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
-            slotAfter: MARKET_FILTER_OPTIONS[value].isNew && (
-              <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-            ),
-            value,
-          })) satisfies MenuItem<MarketFilters>[]
+          .map((value) => {
+            const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+            return {
+              label: labelIconName ? (
+                <Icon iconName={labelIconName} />
+              ) : (
+                stringGetter({
+                  key: labelStringKey,
+                  fallback: value,
+                })
+              ),
+              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+              value,
+            };
+          }) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}

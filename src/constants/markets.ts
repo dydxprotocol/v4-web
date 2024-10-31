@@ -1,6 +1,8 @@
 import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { IconName } from '@/components/Icon';
+
 export type MarketData = {
   // Unique Market id (e.g. 'ETH-USD' or 'BUFFI,uniswap_v3,0x4c1b1302220d7de5c22b495e78b72f2dd2457d45-USD')
   id: string;
@@ -29,6 +31,7 @@ export type MarketData = {
   trades24H?: Nullable<number>;
   volume24H?: Nullable<number>;
   tags?: Nullable<string[]>;
+  isFavorite: boolean;
 };
 
 export enum MarketSorting {
@@ -39,6 +42,7 @@ export enum MarketSorting {
 
 export enum MarketFilters {
   ALL = 'all',
+  FAVORITE = 'favorite',
   NEW = 'new',
   PREDICTION_MARKET = 'prediction-market',
 
@@ -73,88 +77,93 @@ export enum MarketFilters {
 export const MARKET_FILTER_OPTIONS: Record<
   MarketFilters,
   {
-    label?: string;
+    labelIconName?: IconName;
+    labelStringKey?: string;
     isNew?: boolean;
   }
 > = {
   [MarketFilters.ALL]: {
-    label: STRING_KEYS.ALL,
+    labelStringKey: STRING_KEYS.ALL,
+  },
+  [MarketFilters.FAVORITE]: {
+    labelIconName: IconName.Star,
   },
   [MarketFilters.NEW]: {
-    label: STRING_KEYS.RECENTLY_LISTED,
+    labelStringKey: STRING_KEYS.RECENTLY_LISTED,
+  },
+  [MarketFilters.LAUNCHABLE]: {
+    labelStringKey: STRING_KEYS.LAUNCHABLE,
+    isNew: true,
   },
   [MarketFilters.MEME_DEPRECATED]: {
-    label: STRING_KEYS.MEME,
+    labelStringKey: STRING_KEYS.MEME,
   },
   [MarketFilters.MEMES]: {
-    label: STRING_KEYS.MEME,
+    labelStringKey: STRING_KEYS.MEME,
   },
   [MarketFilters.AI_DEPRECATED]: {
-    label: STRING_KEYS.AI,
+    labelStringKey: STRING_KEYS.AI,
   },
   [MarketFilters.AI]: {
-    label: STRING_KEYS.AI_BIG_DATA,
+    labelStringKey: STRING_KEYS.AI_BIG_DATA,
   },
   [MarketFilters.DEFI_DEPRECATED]: {
-    label: STRING_KEYS.DEFI,
+    labelStringKey: STRING_KEYS.DEFI,
   },
   [MarketFilters.DEFI]: {
-    label: STRING_KEYS.DEFI,
+    labelStringKey: STRING_KEYS.DEFI,
   },
   [MarketFilters.DEPIN]: {
-    label: STRING_KEYS.DEPIN,
+    labelStringKey: STRING_KEYS.DEPIN,
   },
   [MarketFilters.LAYER_1_DEPRECATED]: {
-    label: STRING_KEYS.LAYER_1,
+    labelStringKey: STRING_KEYS.LAYER_1,
   },
   [MarketFilters.LAYER_1]: {
-    label: STRING_KEYS.LAYER_1,
+    labelStringKey: STRING_KEYS.LAYER_1,
   },
   [MarketFilters.LAYER_2_DEPRECATED]: {
-    label: STRING_KEYS.LAYER_2,
+    labelStringKey: STRING_KEYS.LAYER_2,
   },
   [MarketFilters.LAYER_2]: {
-    label: STRING_KEYS.LAYER_2,
+    labelStringKey: STRING_KEYS.LAYER_2,
   },
   [MarketFilters.RWA_DEPRECATED]: {
-    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+    labelStringKey: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
   },
   [MarketFilters.RWA]: {
-    label: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
+    labelStringKey: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
   },
   [MarketFilters.GAMING_DEPRECATED]: {
-    label: STRING_KEYS.GAMING,
+    labelStringKey: STRING_KEYS.GAMING,
   },
   [MarketFilters.GAMING]: {
-    label: STRING_KEYS.GAMING,
+    labelStringKey: STRING_KEYS.GAMING,
   },
   [MarketFilters.FX_DEPRECATED]: {
-    label: STRING_KEYS.FOREX,
+    labelStringKey: STRING_KEYS.FOREX,
   },
   [MarketFilters.FX]: {
-    label: STRING_KEYS.FOREX,
+    labelStringKey: STRING_KEYS.FOREX,
   },
   [MarketFilters.NFT_DEPRECATED]: {
-    label: STRING_KEYS.NFT,
+    labelStringKey: STRING_KEYS.NFT,
   },
   [MarketFilters.ENT_DEPRECATED]: {
-    label: STRING_KEYS.ENTERTAINMENT,
+    labelStringKey: STRING_KEYS.ENTERTAINMENT,
   },
   [MarketFilters.PREDICTION_MARKET]: {
-    label: STRING_KEYS.PREDICTION_MARKET,
+    labelStringKey: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
   [MarketFilters.PREDICTION_MARKET_DEPRECATED]: {
-    label: STRING_KEYS.PREDICTION_MARKET,
-    isNew: true,
-  },
-  [MarketFilters.LAUNCHABLE]: {
-    label: STRING_KEYS.LAUNCHABLE,
+    labelStringKey: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';
+export const DEFAULT_QUOTE_ASSET = 'USD';
 
 export enum FundingDirection {
   ToShort = 'ToShort',

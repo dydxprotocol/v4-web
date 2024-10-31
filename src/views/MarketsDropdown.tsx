@@ -25,7 +25,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
-import { IconName } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
@@ -33,6 +33,7 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { elementIsTextInput } from '@/lib/domUtils';
@@ -42,6 +43,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
+import { FavoriteButton } from './tables/MarketsTable/FavoriteButton';
 
 const MarketsDropdownContent = ({
   closeDropdown,
@@ -71,6 +73,7 @@ const MarketsDropdownContent = ({
           getCellValue: (row: MarketData) => row.displayId,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({
+            id,
             assetId,
             displayId,
             imageUrl,
@@ -79,8 +82,8 @@ const MarketsDropdownContent = ({
             effectiveInitialMarginFraction,
             initialMarginFraction,
           }: MarketData) => (
-            <$MarketName isFavorited={false}>
-              {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
+            <div tw="flex items-center gap-0.25">
+              <FavoriteButton marketId={id} />
               <$AssetIcon $uiRefreshEnabled={uiRefresh} logoUrl={imageUrl} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
@@ -98,7 +101,7 @@ const MarketsDropdownContent = ({
                 )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
-            </$MarketName>
+            </div>
           ),
         },
         {
@@ -223,6 +226,7 @@ const MarketsDropdownContent = ({
           withInnerBorders
           data={filteredMarkets}
           getRowKey={(row: MarketData) => row.id}
+          getIsRowPinned={(row: MarketData) => row.isFavorite}
           onRowAction={onRowAction}
           defaultSortDescriptor={{
             column: 'volume24H',
@@ -326,6 +330,8 @@ export const MarketsDropdown = memo(
       };
     }, []);
 
+    const isFavoritedMarket = useParameterizedSelector(getIsMarketFavorited, currentMarketId ?? '');
+
     return (
       <$Popover
         $uiRefreshEnabled={uiRefreshEnabled}
@@ -360,10 +366,17 @@ export const MarketsDropdown = memo(
                       </div>
                     </>
                   ) : (
-                    <>
-                      <$AssetIcon logoUrl={logoUrl} $uiRefreshEnabled={uiRefreshEnabled} />
+                    <div tw="flex items-center gap-0.25">
+                      <$AssetIconWithStar>
+                        {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
+                        <$AssetIcon
+                          logoUrl={logoUrl}
+                          $uiRefreshEnabled={uiRefreshEnabled}
+                          tw="mr-0.25"
+                        />
+                      </$AssetIconWithStar>
                       <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
-                    </>
+                    </div>
                   )}
                   {leverageTag}
                 </div>
@@ -388,27 +401,6 @@ export const MarketsDropdown = memo(
     );
   }
 );
-
-const $MarketName = styled.div<{ isFavorited: boolean }>`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-
-  svg {
-    color: var(--color-text-0);
-  }
-
-  ${({ isFavorited }) =>
-    isFavorited &&
-    css`
-      svg {
-        color: var(--color-favorite);
-
-        path {
-          fill: var(--color-favorite);
-        }
-      }
-    `}
-`;
 
 const $TriggerContainer = styled.div<{ $isOpen: boolean; $uiRefreshEnabled: boolean }>`
   position: relative;
@@ -585,5 +577,23 @@ const $MarketNotFound = styled.div`
   h2 {
     font: var(--font-medium-book);
     font-weight: 500;
+  }
+`;
+
+const $FavoriteStatus = styled(Icon)`
+  --icon-size: 0.75em;
+  --icon-color: ${({ theme }) => theme.profileYellow};
+  place-self: start;
+
+  color: var(--icon-color);
+  fill: var(--icon-color);
+  z-index: 1;
+`;
+
+const $AssetIconWithStar = styled.div`
+  ${layoutMixins.stack}
+
+  ${$AssetIcon} {
+    margin: 0.2rem;
   }
 `;

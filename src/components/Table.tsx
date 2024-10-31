@@ -109,6 +109,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   paginationBehavior?: 'paginate' | 'showAll';
   firstClickSortDirection?: 'ascending' | 'descending';
   shouldResetOnTotalRowsChange?: boolean;
+  getIsRowPinned?: (rowData: TableRowData) => boolean;
 };
 
 export type TableStyleProps = {
@@ -134,6 +135,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   data = [],
   getRowKey,
   getRowAttributes,
+  getIsRowPinned,
   onRowAction,
   defaultSortDescriptor,
   selectionMode = 'single',
@@ -167,7 +169,6 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   );
 
   const collator = useCollator();
-
   const sortFn = useCallback(
     (
       a: TableRowData | CustomRowConfig,
@@ -181,9 +182,18 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
       if (column == null || column.allowsSorting === false) {
         return 0;
       }
+
       const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
       const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
       const sortDirectionAsNumber = sortDirection === 'descending' ? -1 : 1;
+
+      // Pinned check: show items that are isPinned first
+      const isFirstPinned = isTableRowData(a) && getIsRowPinned?.(a);
+      const isSecondPinned = isTableRowData(b) && getIsRowPinned?.(b);
+
+      if (isFirstPinned !== isSecondPinned) {
+        return isFirstPinned ? -1 : 1;
+      }
 
       if (first == null || second == null) {
         if (first === second) {

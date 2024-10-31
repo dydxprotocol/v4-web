@@ -18,11 +18,11 @@ import {
 } from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
+import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset, getMarketIdFromAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
@@ -43,6 +43,9 @@ const filterFunctions = {
   },
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
+  },
+  [MarketFilters.FAVORITE]: (market: MarketData) => {
+    return market.isFavorite;
   },
   [MarketFilters.FX]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.FX);
@@ -134,9 +137,10 @@ export const useMarketsData = ({
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
   const unlaunchedMarkets = useMetadataService();
-  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
   const shouldHideLaunchableMarkets =
     useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
+  const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
+  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
@@ -191,6 +195,7 @@ export const useMarketsData = ({
             tickSizeDecimals,
             trades24H,
             volume24H,
+            isFavorite: favoritedMarkets.includes(id),
           }
         );
       });
@@ -199,16 +204,26 @@ export const useMarketsData = ({
       const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
         .sort(sortByMarketCap)
         .map((market) => {
-          const { id, name, logo, sectorTags, price, percentChange24h, tickSizeDecimals } = market;
+          const {
+            id: assetId,
+            name,
+            logo,
+            sectorTags,
+            price,
+            percentChange24h,
+            tickSizeDecimals,
+          } = market;
 
-          if (listOfMarkets.some((m) => m.assetId === id)) return null;
+          if (listOfMarkets.some((m) => m.assetId === assetId)) return null;
+
+          const id = getMarketIdFromAsset(assetId);
 
           return safeAssign(
             {},
             {
-              id: `${id}-USD`,
-              assetId: id,
-              displayId: `${getDisplayableAssetFromBaseAsset(id)}-USD`,
+              id,
+              assetId,
+              displayId: getMarketIdFromAsset(getDisplayableAssetFromBaseAsset(assetId)),
               clobPairId: -1,
               effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
               imageUrl: logo,
@@ -230,6 +245,7 @@ export const useMarketsData = ({
               tickSizeDecimals,
               trades24H: 0,
               volume24H: 0,
+              isFavorite: favoritedMarkets.includes(id),
             }
           );
         });
@@ -246,6 +262,7 @@ export const useMarketsData = ({
     allPerpetualClobIds,
     allAssets,
     unlaunchedMarkets.data,
+    favoritedMarkets,
   ]);
 
   const filteredMarkets = useMemo(() => {
