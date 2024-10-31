@@ -96,7 +96,7 @@ export const AccountOverviewSection = () => {
     (showVaults || (vaultBalance ?? 0) > 0.01) && {
       id: 'megavault',
       label: (
-        <Link onClick={() => handleViewVault()} withIcon tw="text-color-text-0">
+        <Link onClick={() => handleViewVault()} tw="text-color-text-0 underline">
           {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
         </Link>
       ),
