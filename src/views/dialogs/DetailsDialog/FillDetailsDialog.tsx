@@ -63,7 +63,14 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
       {
         key: 'price',
         label: stringGetter({ key: STRING_KEYS.PRICE }),
-        value: <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />,
+        value: (
+          <Output
+            withSubscript
+            type={OutputType.Fiat}
+            value={price}
+            fractionDigits={tickSizeDecimals}
+          />
+        ),
       },
       {
         key: 'total',

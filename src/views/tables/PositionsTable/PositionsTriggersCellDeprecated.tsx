@@ -183,6 +183,7 @@ export const PositionsTriggersCellDeprecated = ({
         <>
           {triggerLabel({ liquidationWarningSide })}
           <$Output
+            withSubscript
             type={OutputType.Fiat}
             value={triggerPrice ?? null}
             fractionDigits={tickSizeDecimals}
