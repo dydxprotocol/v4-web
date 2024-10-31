@@ -379,6 +379,7 @@ export const AdjustIsolatedMarginForm = ({
       </div>
       <div>
         <DiffOutput
+          withSubscript
           withDiff={
             !!liquidationPriceUpdated &&
             liquidationPrice !== liquidationPriceUpdated &&

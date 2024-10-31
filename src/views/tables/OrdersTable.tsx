@@ -230,7 +230,12 @@ const getOrdersTableColumnDef = ({
           isMarketOrderType(type) ? (
             stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
           ) : (
-            <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={price}
+              fractionDigits={tickSizeDecimals}
+            />
           ),
       },
       [OrdersTableColumnKey.Trigger]: {
@@ -239,7 +244,12 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
         renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={triggerPrice}
+              fractionDigits={tickSizeDecimals}
+            />
             {trailingPercent && (
               <span>
                 <Output
@@ -353,7 +363,12 @@ const getOrdersTableColumnDef = ({
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
               <span tw="text-color-text-0">@</span>
-              <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+              <Output
+                withSubscript
+                type={OutputType.Fiat}
+                value={price}
+                fractionDigits={tickSizeDecimals}
+              />
             </$InlineRow>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}

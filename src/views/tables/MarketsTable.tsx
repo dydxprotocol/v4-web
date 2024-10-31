@@ -105,11 +105,11 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               }) => (
                 <TableCell stacked tw="max-w-8">
                   <$TabletOutput
+                    withSubscript
                     type={OutputType.Fiat}
                     value={oraclePrice}
                     fractionDigits={tickSizeDecimals}
                     withBaseFont
-                    withSubscript
                   />
                   <$InlineRow tw="font-small-book">
                     {!priceChange24H ? (
@@ -168,6 +168,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
               renderCell: ({ oraclePrice, tickSizeDecimals }) => (
                 <$TabletOutput
+                  withSubscript
                   type={OutputType.Fiat}
                   value={oraclePrice}
                   fractionDigits={tickSizeDecimals}

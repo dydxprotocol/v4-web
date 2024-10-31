@@ -146,6 +146,7 @@ export const PositionsTriggersCell = ({
 
       const output = (
         <$Output
+          withSubscript
           type={OutputType.Fiat}
           value={triggerPrice ?? null}
           fractionDigits={tickSizeDecimals}

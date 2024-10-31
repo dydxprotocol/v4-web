@@ -107,6 +107,7 @@ export const PositionTile = ({
             </div>
           ) : (
             <$Output
+              withSubscript
               type={OutputType.Fiat}
               value={notionalTotal}
               fractionDigits={tickSizeDecimals}

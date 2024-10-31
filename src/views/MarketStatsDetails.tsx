@@ -240,7 +240,14 @@ const DetailsItem = ({
 
   switch (stat) {
     case MarketStats.OraclePrice: {
-      return <$Output type={OutputType.Fiat} value={value} fractionDigits={tickSizeDecimals} />;
+      return (
+        <$Output
+          withSubscript
+          type={OutputType.Fiat}
+          value={value}
+          fractionDigits={tickSizeDecimals}
+        />
+      );
     }
     case MarketStats.OpenInterest: {
       return (
@@ -271,7 +278,12 @@ const DetailsItem = ({
       return (
         <$RowSpan color={!isLoading ? color : undefined}>
           {!isLoading && <TriangleIndicator value={valueBN} />}
-          <$Output type={OutputType.Fiat} value={valueBN.abs()} fractionDigits={tickSizeDecimals} />
+          <$Output
+            withSubscript
+            type={OutputType.Fiat}
+            value={valueBN.abs()}
+            fractionDigits={tickSizeDecimals}
+          />
           {!isLoading && (
             <$Output
               type={OutputType.Percent}
