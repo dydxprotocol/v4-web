@@ -85,9 +85,9 @@ export const FundingChartTooltipContent = ({
                   value={
                     {
                       [FundingRateResolution.OneHour]: tooltipDatum?.fundingRate ?? 0,
-                      [FundingRateResolution.EightHour]: tooltipDatum?.fundingRate ?? 0 * 8,
+                      [FundingRateResolution.EightHour]: (tooltipDatum?.fundingRate ?? 0) * 8,
                       [FundingRateResolution.Annualized]:
-                        tooltipDatum?.fundingRate ?? 0 * (24 * 365),
+                        (tooltipDatum?.fundingRate ?? 0) * (24 * 365),
                     }[fundingRateView]
                   }
                   showSign={ShowSign.Both}
