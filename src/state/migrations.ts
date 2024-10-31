@@ -7,6 +7,12 @@ import { migration2 } from './migrations/2';
 import { migration3 } from './migrations/3';
 import { migration4 } from './migrations/4';
 
+/**
+ * @description Migrate function should be used when the expected param for your migration is a previous state with reducer data
+ * @param state PersistedState to be migrated
+ * @param migration function to alter state and return new state
+ * @returns updated with the type of PersistedState & {...}
+ */
 function migrate<V, V2>(state: PersistedState, migration: (persistedState: V) => V2): V2 {
   const persistedState = state as V;
   const migratedState = migration(persistedState);
