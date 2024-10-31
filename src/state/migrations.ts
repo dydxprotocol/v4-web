@@ -7,13 +7,10 @@ import { migration2 } from './migrations/2';
 import { migration3 } from './migrations/3';
 import { migration4 } from './migrations/4';
 
-function migrate<V, V2>(
-  state: PersistedState,
-  migration: (persistedState: V) => V2
-): PersistedState {
+function migrate<V, V2>(state: PersistedState, migration: (persistedState: V) => V2): V2 {
   const persistedState = state as V;
-  const migratedState = migration(persistedState) as PersistedState;
-  return migratedState as PersistedState;
+  const migratedState = migration(persistedState);
+  return migratedState;
 }
 
 export const migrations: MigrationManifest = {
