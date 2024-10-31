@@ -7,13 +7,21 @@ import { migration2 } from './migrations/2';
 import { migration3 } from './migrations/3';
 import { migration4 } from './migrations/4';
 
+function migrate<V, V2>(
+  state: PersistedState,
+  migration: (persistedState: V) => V2
+): PersistedState {
+  const persistedState = state as V;
+  const migratedState = migration(persistedState) as PersistedState;
+  return migratedState as PersistedState;
+}
+
 export const migrations: MigrationManifest = {
   0: migration0,
   1: migration1,
   2: migration2,
   3: migration3,
-  // @ts-expect-error PersistAppStateV4 is a union of PersistedState and new app state
-  4: migration4,
+  4: (state: PersistedState) => migrate(state, migration4),
 } as const;
 
 /*
