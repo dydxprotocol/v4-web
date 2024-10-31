@@ -373,8 +373,8 @@ export const AnalyticsEvents = unionize(
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
 
     // Favoriting Markets
-    FavoritedMarket: ofType<{ marketId: string }>(),
-    UnfavoritedMarket: ofType<{ marketId: string }>(),
+    FavoriteMarket: ofType<{ marketId: string }>(),
+    UnfavoriteMarket: ofType<{ marketId: string }>(),
 
     // Launching Markets
     LaunchMarketFormSelectedAsset: ofType<{ asset: string }>(),

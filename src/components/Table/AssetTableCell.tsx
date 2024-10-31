@@ -36,22 +36,11 @@ interface AssetTableCellProps {
   children?: React.ReactNode;
   className?: string;
   stacked?: boolean;
-  showStackedVolume?: boolean;
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
-  const {
-    symbol,
-    name,
-    stacked,
-    configs,
-    showStackedVolume,
-    truncateAssetName,
-    children,
-    className,
-  } = props;
-  const useStackedStyle = stacked ?? showStackedVolume;
+  const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
   const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
     orEmptyObj(configs);
 
@@ -70,9 +59,9 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell
       className={className}
-      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={useStackedStyle} symbol={symbol} />}
+      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={stacked} symbol={symbol} />}
     >
-      <$TableCellContent stacked={useStackedStyle}>
+      <$TableCellContent stacked={stacked}>
         <div tw="row gap-0.5">
           <$Asset stacked={stacked} truncateAssetName={truncateAssetName}>
             {name}

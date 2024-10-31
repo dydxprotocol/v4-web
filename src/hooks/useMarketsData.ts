@@ -44,7 +44,7 @@ const filterFunctions = {
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
   },
-  [MarketFilters.FAVORITED]: (market: MarketData) => {
+  [MarketFilters.FAVORITE]: (market: MarketData) => {
     return market.isFavorite;
   },
   [MarketFilters.FX]: (market: MarketData) => {

@@ -9,7 +9,7 @@ import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
-import { favoritedMarket, unfavoritedMarket } from '@/state/appUiConfigs';
+import { favoriteMarket, unfavoriteMarket } from '@/state/appUiConfigs';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
 
 import { track } from '@/lib/analytics/analytics';
@@ -26,11 +26,11 @@ export const FavoriteButton = ({
 
   const onToggle = (newIsFavorited: boolean) => {
     if (newIsFavorited) {
-      dispatch(favoritedMarket(marketId));
-      track(AnalyticsEvents.FavoritedMarket({ marketId }));
+      dispatch(favoriteMarket(marketId));
+      track(AnalyticsEvents.FavoriteMarket({ marketId }));
     } else {
-      dispatch(unfavoritedMarket(marketId));
-      track(AnalyticsEvents.UnfavoritedMarket({ marketId }));
+      dispatch(unfavoriteMarket(marketId));
+      track(AnalyticsEvents.UnfavoriteMarket({ marketId }));
     }
   };
 

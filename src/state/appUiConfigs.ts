@@ -96,12 +96,12 @@ export const appUiConfigsSlice = createSlice({
         })
       );
     },
-    favoritedMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
+    favoriteMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
       const currentFavoritedMarkets = state.favoritedMarkets;
       const newFavoritedMarkets = [...currentFavoritedMarkets, marketId];
       state.favoritedMarkets = newFavoritedMarkets;
     },
-    unfavoritedMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
+    unfavoriteMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
       const currentFavoritedMarkets = state.favoritedMarkets;
       const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
       state.favoritedMarkets = newFavoritedMarkets;
@@ -116,6 +116,6 @@ export const {
   markLaunchIncentivesSeen,
   setShouldHideLaunchableMarkets,
   setDisplayUnit,
-  favoritedMarket,
-  unfavoritedMarket,
+  favoriteMarket,
+  unfavoriteMarket,
 } = appUiConfigsSlice.actions;

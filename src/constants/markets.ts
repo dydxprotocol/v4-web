@@ -42,7 +42,7 @@ export enum MarketSorting {
 
 export enum MarketFilters {
   ALL = 'all',
-  FAVORITED = 'favorited',
+  FAVORITE = 'favorite',
   NEW = 'new',
   PREDICTION_MARKET = 'prediction-market',
 
@@ -85,7 +85,7 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.ALL]: {
     labelStringKey: STRING_KEYS.ALL,
   },
-  [MarketFilters.FAVORITED]: {
+  [MarketFilters.FAVORITE]: {
     labelIconName: IconName.Star,
   },
   [MarketFilters.NEW]: {
