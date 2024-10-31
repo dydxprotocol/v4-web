@@ -145,7 +145,12 @@ export const FundingPaymentsTable = ({
             getCellValue: (row) => row.price,
             label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
             renderCell: ({ price, tickSizeDecimals }) => (
-              <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+              <Output
+                withSubscript
+                type={OutputType.Fiat}
+                value={price}
+                fractionDigits={tickSizeDecimals}
+              />
             ),
           },
         ] satisfies Array<false | ColumnDef<FundingPaymentTableRow>>

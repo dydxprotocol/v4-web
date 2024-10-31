@@ -52,6 +52,7 @@ type PositionInfoItems = {
   showSign?: ShowSign;
   useDiffOutput?: boolean;
   withBaseFont?: boolean;
+  withSubscript?: boolean;
 
   // Values
   value: Nullable<number> | string;
@@ -98,6 +99,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       label: STRING_KEYS.AVERAGE_OPEN,
       fractionDigits: tickSizeDecimals,
       value: entryPrice?.current,
+      withSubscript: true,
     },
     {
       key: 'average-close',
@@ -245,6 +247,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     newValue,
     percentValue,
     withBaseFont,
+    withSubscript,
   }: PositionInfoItems) => ({
     key,
     label: stringGetter({ key: label }),
@@ -261,6 +264,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         sign={sign}
         showSign={showSign}
         withBaseFont={withBaseFont}
+        withSubscript={withSubscript}
         withDiff={isNumber(newValue) && value !== newValue}
       />
     ) : (
@@ -284,6 +288,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           )
         }
         withBaseFont={withBaseFont}
+        withSubscript={withSubscript}
       />
     ),
   });

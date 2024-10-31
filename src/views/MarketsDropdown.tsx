@@ -106,7 +106,12 @@ const MarketsDropdownContent = ({
           getCellValue: (row: MarketData) => row.oraclePrice,
           label: stringGetter({ key: STRING_KEYS.PRICE }),
           renderCell: ({ oraclePrice, tickSizeDecimals }: MarketData) => (
-            <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+            <$Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
           ),
         },
         {

@@ -136,6 +136,7 @@ export const LaunchableMarketChart = ({
         <span>
           {stringGetter({ key: STRING_KEYS.PRICE })}:{' '}
           <Output
+            withSubscript
             tw="inline"
             value={datum.close}
             type={OutputType.Fiat}
@@ -192,6 +193,7 @@ export const LaunchableMarketChart = ({
               tooltip: 'reference-price',
               value: (
                 <Output
+                  withSubscript
                   type={OutputType.Fiat}
                   tw="text-color-text-1"
                   value={price}
