@@ -1,5 +1,3 @@
-import { useCallback, useMemo } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -18,14 +16,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { SearchInput } from '@/components/SearchInput';
-import { Switch } from '@/components/Switch';
 import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { WithLabel } from '@/components/WithLabel';
-
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -50,66 +42,32 @@ export const MarketFilter = ({
 }: MarketFilterProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh, pml: showLaunchMarkets } = testFlags;
   const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
-  const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
-
-  const onShouldHideLaunchableMarkets = useCallback(
-    (shouldHide: boolean) => {
-      dispatch(setShouldHideLaunchableMarkets(!shouldHide));
-    },
-    [dispatch]
-  );
-
-  const unlaunchedMarketSwitch = useMemo(
-    () =>
-      testFlags.pml && (
-        <WithLabel
-          label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
-          tw="flex flex-row items-center"
-        >
-          <Switch
-            name="show-launchable"
-            checked={!shouldHideLaunchableMarkets}
-            onCheckedChange={onShouldHideLaunchableMarkets}
-            tw="font-mini-book"
-          />
-        </WithLabel>
-      ),
-    [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
-  );
-
-  const filterLaunchable = (filter: MarketFilters) => {
-    return filter !== MarketFilters.LAUNCHABLE;
-  };
 
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters)
-          .filter(filterLaunchable)
-          .map((value) => {
-            const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
-            return {
-              label: labelIconName ? (
-                <Icon iconName={labelIconName} />
-              ) : (
-                stringGetter({
-                  key: labelStringKey,
-                  fallback: value,
-                })
-              ),
-              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
-              value,
-            };
-          }) satisfies MenuItem<MarketFilters>[]
+        Object.values(filters).map((value) => {
+          const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+          return {
+            label: labelIconName ? (
+              <Icon iconName={labelIconName} />
+            ) : (
+              stringGetter({
+                key: labelStringKey,
+                fallback: value,
+              })
+            ),
+            slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+            value,
+          };
+        }) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
       overflow={uiRefresh ? 'wrap' : 'scroll'}
-      slotBefore={unlaunchedMarketSwitch}
     />
   );
 

@@ -35,7 +35,6 @@ export interface AppUIConfigsState {
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
   displayUnit: DisplayUnit;
-  shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
 }
 
@@ -47,7 +46,6 @@ export const initialState: AppUIConfigsState = {
   hasSeenLaunchIncentives: false,
   defaultToAllMarketsInPositionsOrdersFills: true,
   displayUnit: DisplayUnit.Asset,
-  shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
 };
 
@@ -69,12 +67,6 @@ export const appUiConfigsSlice = createSlice({
     },
     markLaunchIncentivesSeen: (state: AppUIConfigsState) => {
       state.hasSeenLaunchIncentives = true;
-    },
-    setShouldHideLaunchableMarkets: (
-      state: AppUIConfigsState,
-      { payload }: PayloadAction<boolean>
-    ) => {
-      state.shouldHideLaunchableMarkets = payload;
     },
     setDisplayUnit: (
       state: AppUIConfigsState,
@@ -114,7 +106,6 @@ export const {
   setAppThemeSetting,
   setAppColorMode,
   markLaunchIncentivesSeen,
-  setShouldHideLaunchableMarkets,
   setDisplayUnit,
   favoriteMarket,
   unfavoriteMarket,
