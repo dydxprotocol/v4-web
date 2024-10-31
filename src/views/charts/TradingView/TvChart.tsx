@@ -107,12 +107,12 @@ export const TvChart = () => {
   const { chartLines } = useChartLines({
     tvWidget,
     orderLineToggle,
-    isChartReady,
+    isChartReady: isChartReady && !!isWidgetReady,
     orderLinesToggleOn,
   });
   useOrderbookCandles({
     orderbookCandlesToggle,
-    isChartReady,
+    isChartReady: isChartReady && !!isWidgetReady,
     orderbookCandlesToggleOn,
     tvWidget,
   });
@@ -120,7 +120,7 @@ export const TvChart = () => {
     buySellMarksToggle,
     buySellMarksToggleOn,
     tvWidget,
-    isChartReady,
+    isChartReady: isChartReady && !!isWidgetReady,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
