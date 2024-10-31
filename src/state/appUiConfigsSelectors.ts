@@ -48,9 +48,6 @@ export const getDefaultToAllMarketsInPositionsOrdersFills = (state: RootState) =
 
 export const getSelectedDisplayUnit = (state: RootState) => state.appUiConfigs.displayUnit;
 
-export const getShouldHideLaunchableMarkets = (state: RootState) =>
-  state.appUiConfigs.shouldHideLaunchableMarkets;
-
 export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favoritedMarkets;
 
 export const getIsMarketFavorited = () =>
