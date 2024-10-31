@@ -24,19 +24,23 @@ interface AssetTableCellProps {
   configs:
     | Pick<
         MarketData,
-        'effectiveInitialMarginFraction' | 'imageUrl' | 'initialMarginFraction' | 'isUnlaunched'
+        | 'effectiveInitialMarginFraction'
+        | 'imageUrl'
+        | 'initialMarginFraction'
+        | 'isUnlaunched'
+        | 'volume24H'
       >
     | null
     | undefined;
   truncateAssetName?: boolean;
   children?: React.ReactNode;
   className?: string;
+  stacked?: boolean;
 }
 
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
-  const { symbol, name, configs, truncateAssetName, children, className } = props;
-  const stacked = !!children;
+  const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
   const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
     orEmptyObj(configs);
 

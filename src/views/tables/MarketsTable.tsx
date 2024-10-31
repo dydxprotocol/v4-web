@@ -37,6 +37,8 @@ import { getMarketFilter } from '@/state/perpetualsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
+import { FavoriteButton } from './MarketsTable/FavoriteButton';
+
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
@@ -61,6 +63,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
               renderCell: ({
+                id,
                 assetId,
                 effectiveInitialMarginFraction,
                 imageUrl,
@@ -69,22 +72,25 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 isUnlaunched,
                 volume24H,
               }) => (
-                <AssetTableCell
-                  configs={{
-                    effectiveInitialMarginFraction,
-                    imageUrl,
-                    initialMarginFraction,
-                    isUnlaunched,
-                  }}
-                  name={name}
-                  symbol={assetId}
-                >
-                  <Output
-                    type={OutputType.CompactFiat}
-                    value={volume24H ?? undefined}
-                    tw="text-color-text-0 font-mini-medium"
-                  />
-                </AssetTableCell>
+                <div tw="flex items-center gap-0.25">
+                  <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
+                  <AssetTableCell
+                    configs={{
+                      effectiveInitialMarginFraction,
+                      imageUrl,
+                      initialMarginFraction,
+                      isUnlaunched,
+                    }}
+                    name={name}
+                    symbol={assetId}
+                  >
+                    <Output
+                      type={OutputType.CompactFiat}
+                      value={volume24H ?? undefined}
+                      tw="text-color-text-0 font-mini-medium"
+                    />
+                  </AssetTableCell>
+                </div>
               ),
             },
             {
@@ -97,7 +103,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 priceChange24HPercent,
                 tickSizeDecimals,
               }) => (
-                <TableCell stacked>
+                <TableCell stacked tw="max-w-8">
                   <$TabletOutput
                     withSubscript
                     type={OutputType.Fiat}
@@ -131,7 +137,9 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.id,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
+
               renderCell: ({
+                id,
                 assetId,
                 effectiveInitialMarginFraction,
                 imageUrl,
@@ -139,16 +147,19 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 name,
                 isUnlaunched,
               }) => (
-                <AssetTableCell
-                  configs={{
-                    effectiveInitialMarginFraction,
-                    imageUrl,
-                    initialMarginFraction,
-                    isUnlaunched,
-                  }}
-                  name={name}
-                  symbol={assetId}
-                />
+                <div tw="flex items-center gap-0.25">
+                  <FavoriteButton marketId={id} />
+                  <AssetTableCell
+                    configs={{
+                      effectiveInitialMarginFraction,
+                      imageUrl,
+                      initialMarginFraction,
+                      isUnlaunched,
+                    }}
+                    name={name}
+                    symbol={assetId}
+                  />
+                </div>
               ),
             },
             {
@@ -267,6 +278,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         withInnerBorders
         data={hasMarketIds ? filteredMarkets : []}
         getRowKey={(row: MarketData) => row.id}
+        getIsRowPinned={(row: MarketData) => row.isFavorite}
         label="Markets"
         onRowAction={(market: Key) =>
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
@@ -350,6 +362,10 @@ const $Table = styled(Table)`
   @media ${breakpoints.tablet} {
     table {
       max-width: 100vw;
+    }
+
+    thead {
+      display: none;
     }
   }
 ` as typeof Table;

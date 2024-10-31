@@ -14,6 +14,7 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
+import { Icon } from '@/components/Icon';
 import { SearchInput } from '@/components/SearchInput';
 import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -48,13 +49,21 @@ export const MarketFilter = ({
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters).map((value) => ({
-          label: stringGetter({ key: MARKET_FILTER_OPTIONS[value].label, fallback: value }),
-          slotAfter: MARKET_FILTER_OPTIONS[value].isNew && (
-            <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
-          ),
-          value,
-        })) satisfies MenuItem<MarketFilters>[]
+        Object.values(filters).map((value) => {
+          const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+          return {
+            label: labelIconName ? (
+              <Icon iconName={labelIconName} />
+            ) : (
+              stringGetter({
+                key: labelStringKey,
+                fallback: value,
+              })
+            ),
+            slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+            value,
+          };
+        }) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}

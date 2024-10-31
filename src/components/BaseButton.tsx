@@ -10,6 +10,12 @@ type ElementProps = {
   children?: React.ReactNode;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | React.MouseEventHandler<HTMLAnchorElement>;
+  onMouseDown?:
+    | React.MouseEventHandler<HTMLButtonElement>
+    | React.MouseEventHandler<HTMLAnchorElement>;
+  onPointerDown?:
+    | React.PointerEventHandler<HTMLButtonElement>
+    | React.PointerEventHandler<HTMLAnchorElement>;
 };
 
 type StyleProps = {
@@ -31,6 +37,8 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
       href,
 
       onClick,
+      onMouseDown,
+      onPointerDown,
 
       children,
       className,
@@ -53,6 +61,8 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
         className={className}
         // Events
         onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}
+        onMouseDown={onMouseDown as React.MouseEventHandler<HTMLAnchorElement>}
+        onPointerDown={onPointerDown as React.PointerEventHandler<HTMLAnchorElement>}
         // Other
         {...otherProps}
       >
@@ -71,6 +81,8 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
         className={className}
         // Events
         onClick={onClick as React.MouseEventHandler<HTMLButtonElement>}
+        onMouseDown={onMouseDown as React.MouseEventHandler<HTMLButtonElement>}
+        onPointerDown={onPointerDown as React.PointerEventHandler<HTMLButtonElement>}
         // Other
         {...otherProps}
       >
