@@ -11828,7 +11828,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.14
+      chain-registry: 1.69.11
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -18080,10 +18080,10 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.14:
+  /chain-registry@1.69.11:
     resolution:
       {
-        integrity: sha512-SaEei/T4usCrvbIN7UKoFhlo3OATyKIQv7Cjp5WO0j2hkYYqVQvj+eqFKMBmBJrQCNRjcU3DJPMs46k43qIICQ==,
+        integrity: sha512-Xh65YDkGQ6QJOgAURq3Ezixs1yfZ6Q8ZozY8Ybj402jdQSPm9+7srpRSqS/JijP5d29UDqrhCbmESSIdqhtdGw==,
       }
     dependencies:
       '@chain-registry/types': 0.50.1
@@ -25671,7 +25671,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.14
+      chain-registry: 1.69.11
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
