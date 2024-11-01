@@ -77,6 +77,12 @@ export const NewMarketForm = ({
   const { freeCollateral, marginUsage } = subAccount;
   const currentFreeCollateral = freeCollateral?.current ?? 0;
 
+  useEffect(() => {
+    if (defaultLaunchableMarketId) {
+      setTickerToAdd(defaultLaunchableMarketId);
+    }
+  }, [defaultLaunchableMarketId]);
+
   const summaryData = useVaultCalculationForLaunchingMarket({
     amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
   }).summaryData;
@@ -237,6 +243,7 @@ export const NewMarketForm = ({
 
     return (
       <NewMarketSelectionStep2
+        hasDefault={!!defaultLaunchableMarketId}
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
 

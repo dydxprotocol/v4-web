@@ -3,6 +3,7 @@ import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } fro
 import { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -150,32 +151,28 @@ export const NewMarketPreviewStep = ({
 
   const launchVisualization = (
     <div tw="mx-auto flex flex-row items-center gap-0.25">
-      <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">
-          {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
-        </span>
-        <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
+      <$AssetContainer>
+        <$LabelText>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}</$LabelText>
+        <$AssetIconContainer>
           <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
           <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
-        </div>
-      </div>
+        </$AssetIconContainer>
+      </$AssetContainer>
 
       <Icon iconName={IconName.FastForward} size="1rem" tw="mt-[1.45rem] text-color-text-0" />
 
-      <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">
-          {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
-        </span>
-        <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <img src={launchableAsset?.logo} tw="h-2 w-2 rounded-[50%]" alt={baseAsset} />
+      <$AssetContainer>
+        <$LabelText>{stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}</$LabelText>
+        <$AssetIconContainer>
+          <AssetIcon tw="h-2 w-2" logoUrl={launchableAsset?.logo} symbol={baseAsset} />
           <Output useGrouping type={OutputType.Text} value={baseAsset} />
-        </div>
-      </div>
+        </$AssetIconContainer>
+      </$AssetContainer>
     </div>
   );
 
   const liquidityTier = (
-    <div tw="relative flex flex-col gap-0.75 rounded-[0.625rem] bg-color-layer-2 p-1">
+    <$LiquidityTier tw="relative flex flex-col gap-0.75 rounded-[0.625rem] p-1">
       <span tw="text-base text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LIQUIDITY_TIER_IS,
@@ -184,7 +181,7 @@ export const NewMarketPreviewStep = ({
           },
         })}
       </span>
-      <$Details
+      <$LiquidityTierDetails
         layout="rowColumns"
         tw="text-small"
         items={[
@@ -219,7 +216,7 @@ export const NewMarketPreviewStep = ({
           },
         ]}
       />
-    </div>
+    </$LiquidityTier>
   );
 
   const alertMessage = alertInfo && (
@@ -272,10 +269,7 @@ export const NewMarketPreviewStep = ({
 
       {alertMessage}
 
-      <Details
-        items={receiptItems}
-        tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
-      />
+      <$Details items={receiptItems} tw="rounded-[0.625rem] px-1 py-0.5 text-small" />
 
       <Checkbox
         checked={hasAcceptedTerms}
@@ -348,7 +342,15 @@ const $Form = styled.form`
   }
 `;
 
+const $LiquidityTier = styled.div`
+  background-color: var(--innerElement-backgroundColor, var(--color-layer-2));
+`;
+
 const $Details = styled(Details)`
+  background-color: var(--innerElement-backgroundColor, var(--color-layer-2));
+`;
+
+const $LiquidityTierDetails = styled(Details)`
   & > div {
     position: relative;
 
@@ -368,4 +370,20 @@ const $Details = styled(Details)`
       margin: auto 0;
     }
   }
+`;
+
+const $AssetContainer = tw.div`flex flex-col items-center justify-center gap-0.5`;
+
+const $LabelText = tw.span`text-small text-color-text-0`;
+
+const $AssetIconContainer = styled.div`
+  width: var(--launchMarketPreview-width, 9.375rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.625rem;
+  background-color: var(--color-layer-4);
+  padding: 1rem 0;
 `;

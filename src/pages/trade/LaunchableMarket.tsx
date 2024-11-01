@@ -79,7 +79,7 @@ const LaunchableMarket = () => {
 
       <$GridSection gridArea="Side" tw="flex flex-col">
         {!uiRefresh && <AccountInfo />}
-        <$LaunchMarketSidePanel launchableMarketId={marketId} />
+        <$LaunchMarketSidePanel launchableMarketId={marketId} uiRefresh={uiRefresh} />
         {uiRefresh && <AccountInfo />}
       </$GridSection>
 
@@ -189,6 +189,9 @@ const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
 
-const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
-  border-top: var(--border-width) solid var(--color-border);
+const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)<{ uiRefresh?: boolean }>`
+  ${({ uiRefresh }) =>
+    uiRefresh
+      ? 'border-bottom: var(--border-width) solid var(--color-border);'
+      : 'border-top: var(--border-width) solid var(--color-border);'}
 `;

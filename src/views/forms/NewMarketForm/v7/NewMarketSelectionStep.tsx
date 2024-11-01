@@ -40,6 +40,7 @@ import { track } from '@/lib/analytics/analytics';
 import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSelectionStepProps = {
+  hasDefault?: boolean;
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
@@ -49,6 +50,7 @@ type NewMarketSelectionStepProps = {
 };
 
 export const NewMarketSelectionStep = ({
+  hasDefault,
   tickerToAdd,
   setTickerToAdd,
   onConfirmMarket,
@@ -124,7 +126,8 @@ export const NewMarketSelectionStep = ({
         <LoadingSpace id="launch-markets" />
       ) : (
         <>
-          <SearchSelectMenu
+          <$SearchSelectMenu
+            disabled={hasDefault}
             items={[
               {
                 group: 'markets',
@@ -153,13 +156,9 @@ export const NewMarketSelectionStep = ({
             ) : (
               `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
             )}
-          </SearchSelectMenu>
+          </$SearchSelectMenu>
 
-          <WithDetailsReceipt
-            side="bottom"
-            detailItems={[freeCollateralDetailItem]}
-            tw="[--withReceipt-backgroundColor:--color-layer-2]"
-          >
+          <WithDetailsReceipt side="bottom" detailItems={[freeCollateralDetailItem]}>
             <FormInput
               disabled
               type={InputType.Currency}
@@ -172,7 +171,6 @@ export const NewMarketSelectionStep = ({
           {alertMessage}
 
           <WithReceipt
-            tw="[--withReceipt-backgroundColor:--color-layer-2]"
             slotReceipt={<Details items={receiptItems} tw="px-0.75 pb-0.25 pt-0.375 text-small" />}
           >
             {isDisconnected ? (
@@ -192,6 +190,7 @@ export const NewMarketSelectionStep = ({
     </$Form>
   );
 };
+
 const $Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
@@ -203,5 +202,11 @@ const $Form = styled.form`
     margin: 0;
     font: var(--font-large-medium);
     color: var(--color-text-2);
+  }
+`;
+
+const $SearchSelectMenu = styled(SearchSelectMenu)`
+  button:disabled {
+    cursor: default;
   }
 `;
