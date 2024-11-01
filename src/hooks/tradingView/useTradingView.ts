@@ -147,9 +147,7 @@ export const useTradingView = ({
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
-      const initialPriceScale = BigNumber(10)
-        .exponentiatedBy(tickSizeDecimals ?? 2)
-        .toNumber();
+      const initialPriceScale = BigNumber(10).exponentiatedBy(tickSizeDecimals).toNumber();
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
