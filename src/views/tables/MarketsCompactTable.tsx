@@ -62,11 +62,7 @@ export const MarketsCompactTable = ({
               name={name}
               symbol={assetId}
               truncateAssetName
-            >
-              <span tw="text-color-text-0 font-mini-medium">
-                {getDisplayableAssetFromBaseAsset(assetId)}
-              </span>
-            </AssetTableCell>
+            />
           ),
         },
         {

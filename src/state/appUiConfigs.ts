@@ -36,7 +36,7 @@ export interface AppUIConfigsState {
   hasSeenLaunchIncentives: boolean;
   defaultToAllMarketsInPositionsOrdersFills: boolean;
   displayUnit: DisplayUnit;
-  shouldHideLaunchableMarkets: boolean;
+  favoritedMarkets: string[];
 }
 
 const { uiRefresh } = testFlags;
@@ -47,7 +47,7 @@ export const initialState: AppUIConfigsState = {
   hasSeenLaunchIncentives: false,
   defaultToAllMarketsInPositionsOrdersFills: true,
   displayUnit: DisplayUnit.Asset,
-  shouldHideLaunchableMarkets: false,
+  favoritedMarkets: [],
 };
 
 export const appUiConfigsSlice = createSlice({
@@ -69,12 +69,6 @@ export const appUiConfigsSlice = createSlice({
     markLaunchIncentivesSeen: (state: AppUIConfigsState) => {
       state.hasSeenLaunchIncentives = true;
     },
-    setShouldHideLaunchableMarkets: (
-      state: AppUIConfigsState,
-      { payload }: PayloadAction<boolean>
-    ) => {
-      state.shouldHideLaunchableMarkets = payload;
-    },
     setDisplayUnit: (
       state: AppUIConfigsState,
       {
@@ -95,6 +89,16 @@ export const appUiConfigsSlice = createSlice({
         })
       );
     },
+    favoriteMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
+      const currentFavoritedMarkets = state.favoritedMarkets;
+      const newFavoritedMarkets = [...currentFavoritedMarkets, marketId];
+      state.favoritedMarkets = newFavoritedMarkets;
+    },
+    unfavoriteMarket: (state: AppUIConfigsState, { payload: marketId }: PayloadAction<string>) => {
+      const currentFavoritedMarkets = state.favoritedMarkets;
+      const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
+      state.favoritedMarkets = newFavoritedMarkets;
+    },
   },
 });
 
@@ -103,6 +107,7 @@ export const {
   setAppThemeSetting,
   setAppColorMode,
   markLaunchIncentivesSeen,
-  setShouldHideLaunchableMarkets,
   setDisplayUnit,
+  favoriteMarket,
+  unfavoriteMarket,
 } = appUiConfigsSlice.actions;

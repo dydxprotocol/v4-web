@@ -166,8 +166,14 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ entryPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
             <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
+            <Output
+              withSubscript
               type={OutputType.Fiat}
               value={entryPrice.current}
               fractionDigits={tickSizeDecimals}
@@ -316,6 +322,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ entryPrice, tickSizeDecimals }) => (
           <TableCell>
             <Output
+              withSubscript
               type={OutputType.Fiat}
               value={entryPrice.current}
               fractionDigits={tickSizeDecimals}
@@ -331,12 +338,18 @@ const getPositionsTableColumnDef = ({
           <TableCell stacked={!uiRefresh}>
             {!uiRefresh && (
               <Output
+                withSubscript
                 type={OutputType.Fiat}
                 value={liquidationPrice.current}
                 fractionDigits={tickSizeDecimals}
               />
             )}
-            <Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
           </TableCell>
         ),
       },
@@ -347,12 +360,14 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked={!uiRefresh}>
             <Output
+              withSubscript
               type={OutputType.Fiat}
               value={liquidationPrice.current}
               fractionDigits={tickSizeDecimals}
             />
             {!uiRefresh && (
               <Output
+                withSubscript
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
@@ -407,11 +422,17 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
+              withSubscript
               type={OutputType.Fiat}
               value={liquidationPrice.current}
               fractionDigits={tickSizeDecimals}
             />
-            <Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
           </TableCell>
         ),
       },
@@ -461,11 +482,17 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
+              withSubscript
               type={OutputType.Fiat}
               value={entryPrice.current}
               fractionDigits={tickSizeDecimals}
             />
-            <Output type={OutputType.Fiat} value={exitPrice} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={exitPrice}
+              fractionDigits={tickSizeDecimals}
+            />
           </TableCell>
         ),
       },

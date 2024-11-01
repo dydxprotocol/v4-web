@@ -16,6 +16,7 @@ import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -23,8 +24,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
@@ -36,8 +39,6 @@ import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-
-import { NewMarketAgreement } from '../NewMarketAgreement';
 
 const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
 
@@ -61,8 +62,8 @@ export const NewMarketPreviewStep = ({
   const stringGetter = useStringGetter();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const { launchMarketTos } = useURLConfigs();
   const [isLoading, setIsLoading] = useState(false);
-  const [showAgreement, setShowAgreement] = useState(false);
   const baseAsset = getDisplayableAssetFromTicker(ticker);
   const launchableAsset = useMetadataServiceAssetFromId(ticker);
   const { createPermissionlessMarket } = useSubaccount();
@@ -230,95 +231,98 @@ export const NewMarketPreviewStep = ({
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!hasAcceptedTerms) {
-          setShowAgreement(true);
-        } else {
-          setIsLoading(true);
-          setIsParentLoading?.(true);
-          setErrorMessage(undefined);
+        setIsLoading(true);
+        setIsParentLoading?.(true);
+        setErrorMessage(undefined);
 
+        try {
+          const tx = await createPermissionlessMarket(ticker);
+
+          // Add try/catch for encode/parse so that it doesn't mess with loading states below
           try {
-            const tx = await createPermissionlessMarket(ticker);
+            if ((tx as IndexedTx | undefined)?.code === 0) {
+              const encodedTx = encodeJson(tx);
+              const parsedTx = JSON.parse(encodedTx);
+              const hash = parsedTx.hash.toUpperCase();
 
-            // Add try/catch for encode/parse so that it doesn't mess with loading states below
-            try {
-              if ((tx as IndexedTx | undefined)?.code === 0) {
-                const encodedTx = encodeJson(tx);
-                const parsedTx = JSON.parse(encodedTx);
-                const hash = parsedTx.hash.toUpperCase();
-
-                if (!hash) {
-                  throw new Error('Invalid transaction hash');
-                }
-
-                setTxHash(hash);
+              if (!hash) {
+                throw new Error('Invalid transaction hash');
               }
-            } catch (error) {
-              setErrorMessage(error.message);
-            }
 
-            setEta(Date.now() + ESTIMATED_LAUNCH_TIMEOUT);
+              setTxHash(hash);
+            }
           } catch (error) {
-            log('NewMarketPreviewForm/createPermissionlessMarket', error);
             setErrorMessage(error.message);
-            setIsLoading(false);
-            setIsParentLoading?.(false);
           }
+
+          setEta(Date.now() + ESTIMATED_LAUNCH_TIMEOUT);
+        } catch (error) {
+          log('NewMarketPreviewForm/createPermissionlessMarket', error);
+          setErrorMessage(error.message);
+          setIsLoading(false);
+          setIsParentLoading?.(false);
         }
       }}
     >
-      {showAgreement ? (
-        <NewMarketAgreement
-          onAccept={() => {
-            setHasAcceptedTerms(true);
-            setShowAgreement(false);
-          }}
-          onCancel={() => setShowAgreement(false)}
-        />
-      ) : (
-        <>
-          {heading}
+      {heading}
 
-          {launchVisualization}
+      {launchVisualization}
 
-          {liquidityTier}
+      {liquidityTier}
 
-          {alertMessage}
+      {alertMessage}
 
-          <Details
-            items={receiptItems}
-            tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
-          />
+      <Details
+        items={receiptItems}
+        tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
+      />
 
-          <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
-            <Button onClick={onBack} state={{ isDisabled: isLoading }}>
-              {stringGetter({ key: STRING_KEYS.BACK })}
-            </Button>
-            <Button
-              type={ButtonType.Submit}
-              action={ButtonAction.Primary}
-              state={{ isDisabled: shouldDisableForm, isLoading }}
-            >
-              {hasAcceptedTerms
-                ? stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })
-                : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
-            </Button>
-          </div>
-
-          <span tw="text-center text-color-text-1 font-small-book">
-            {secondsLeft > 0 &&
-              stringGetter({
-                key:
-                  Math.ceil(secondsLeft) === 1
-                    ? STRING_KEYS.WAIT_SECONDS_SINGULAR
-                    : STRING_KEYS.WAIT_SECONDS,
-                params: {
-                  SECONDS: String(Math.ceil(secondsLeft)),
-                },
-              })}
+      <Checkbox
+        checked={hasAcceptedTerms}
+        onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
+        id="launch-market-ack"
+        label={
+          <span>
+            {stringGetter({
+              key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
+              params: {
+                CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
+                LINK: (
+                  <Link tw="inline-flex" href={launchMarketTos} withIcon>
+                    {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
+                  </Link>
+                ),
+              },
+            })}
           </span>
-        </>
-      )}
+        }
+      />
+
+      <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
+        <Button onClick={onBack} state={{ isDisabled: isLoading }}>
+          {stringGetter({ key: STRING_KEYS.BACK })}
+        </Button>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
+        >
+          {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
+        </Button>
+      </div>
+
+      <span tw="text-center text-color-text-1 font-small-book">
+        {secondsLeft > 0 &&
+          stringGetter({
+            key:
+              Math.ceil(secondsLeft) === 1
+                ? STRING_KEYS.WAIT_SECONDS_SINGULAR
+                : STRING_KEYS.WAIT_SECONDS,
+            params: {
+              SECONDS: String(Math.ceil(secondsLeft)),
+            },
+          })}
+      </span>
     </$Form>
   );
 };

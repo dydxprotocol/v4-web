@@ -89,7 +89,12 @@ export const LaunchableMarketStatsDetails = ({
     <$MarketDetailsItems>
       {showMidMarketPrice && (
         <$MidMarketPrice>
-          <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+          <Output
+            withSubscript
+            type={OutputType.Fiat}
+            value={price}
+            fractionDigits={tickSizeDecimals}
+          />
           <VerticalSeparator />
         </$MidMarketPrice>
       )}

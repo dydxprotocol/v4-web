@@ -57,6 +57,7 @@ export const FillDetails = ({
               <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
             ) : (
               <Output
+                withSubscript
                 type={OutputType.Fiat}
                 value={averagePrice}
                 fractionDigits={tickSizeDecimals}

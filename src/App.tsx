@@ -9,6 +9,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
 import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { config as grazConfig } from '@/constants/graz';
@@ -59,6 +60,7 @@ import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { persistor } from './state/_store';
 import { getIsAccountConnected } from './state/accountSelectors';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
@@ -232,7 +234,13 @@ const providers = [
 const App = () => {
   return [...providers].reverse().reduce(
     (children, Provider) => {
-      return <Provider>{children}</Provider>;
+      return (
+        <Provider>
+          <PersistGate loading={<LoadingSpace id="main" />} persistor={persistor}>
+            {children}
+          </PersistGate>
+        </Provider>
+      );
     },
     <Content />
   );

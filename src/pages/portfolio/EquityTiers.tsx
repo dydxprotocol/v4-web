@@ -37,7 +37,7 @@ export const EquityTiers = () => {
             {stringGetter({
               key: STRING_KEYS.EQUITY_TIERS_DESCRIPTION_LONG,
             })}
-          </span>
+          </span>{' '}
           {equityTiersLearnMore && (
             <Link href={equityTiersLearnMore}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →

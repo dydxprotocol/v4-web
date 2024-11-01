@@ -134,7 +134,12 @@ const getFillsTableColumnDef = ({
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
               </$Side>
               <span tw="text-color-text-0">@</span>
-              <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+              <Output
+                withSubscript
+                type={OutputType.Fiat}
+                value={price}
+                fractionDigits={tickSizeDecimals}
+              />
             </$InlineRow>
             <$InlineRow>
               <span tw="text-color-text-1">
@@ -243,7 +248,12 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.price,
         label: stringGetter({ key: STRING_KEYS.PRICE }),
         renderCell: ({ price, tickSizeDecimals }) => (
-          <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+          <Output
+            withSubscript
+            type={OutputType.Fiat}
+            value={price}
+            fractionDigits={tickSizeDecimals}
+          />
         ),
       },
       [FillsTableColumnKey.AmountTag]: {
@@ -290,7 +300,12 @@ const getFillsTableColumnDef = ({
         renderCell: ({ size, stepSizeDecimals, price, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
-            <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={price}
+              fractionDigits={tickSizeDecimals}
+            />
           </TableCell>
         ),
       },

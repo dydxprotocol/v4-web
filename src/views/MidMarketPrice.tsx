@@ -51,6 +51,7 @@ export const MidMarketPrice = () => {
 
   return midMarketPrice !== undefined ? (
     <$Output
+      withSubscript
       type={OutputType.Fiat}
       value={midMarketPrice}
       color={midMarketColor}

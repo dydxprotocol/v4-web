@@ -1,4 +1,5 @@
 import type { RootState } from './_store';
+import { createAppSelector } from './appTypes';
 import { AppTheme, AppThemeSetting, AppThemeSystemSetting } from './appUiConfigs';
 
 export const getAppThemeSetting = (state: RootState): AppThemeSetting =>
@@ -47,5 +48,10 @@ export const getDefaultToAllMarketsInPositionsOrdersFills = (state: RootState) =
 
 export const getSelectedDisplayUnit = (state: RootState) => state.appUiConfigs.displayUnit;
 
-export const getShouldHideLaunchableMarkets = (state: RootState) =>
-  state.appUiConfigs.shouldHideLaunchableMarkets;
+export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favoritedMarkets;
+
+export const getIsMarketFavorited = () =>
+  createAppSelector(
+    [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],
+    (favoritedMarkets, marketId) => favoritedMarkets.includes(marketId)
+  );
