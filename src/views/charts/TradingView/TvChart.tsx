@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -19,7 +19,6 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { BaseTvChart } from './BaseTvChart';
 
 export const TvChart = () => {
-  const [isChartReady, setIsChartReady] = useState(false);
   const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
   const tvWidgetRef = useRef<TvWidget | null>(null);
@@ -53,7 +52,6 @@ export const TvChart = () => {
     buySellMarksToggleRef,
     buySellMarksToggleOn,
     setBuySellMarksToggleOn,
-    setIsChartReady,
   });
   useChartMarketAndResolution({
     currentMarketId,
@@ -64,12 +62,10 @@ export const TvChart = () => {
   const { chartLines } = useChartLines({
     tvWidget,
     orderLineToggle,
-    isChartReady,
     orderLinesToggleOn,
   });
   useOrderbookCandles({
     orderbookCandlesToggle,
-    isChartReady,
     orderbookCandlesToggleOn,
     tvWidget,
   });
@@ -77,9 +73,14 @@ export const TvChart = () => {
     buySellMarksToggle,
     buySellMarksToggleOn,
     tvWidget,
-    isChartReady,
   });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
+
+  const [isChartReady, setIsChartReady] = useState(false);
+  useEffect(() => {
+    setIsChartReady(false);
+    tvWidget?.onChartReady(() => setIsChartReady(true));
+  }, [tvWidget]);
 
   return <BaseTvChart isChartReady={isChartReady} />;
 };

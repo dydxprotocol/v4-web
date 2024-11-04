@@ -29,11 +29,9 @@ import { useMetadataService } from '../useLaunchableMarkets';
  */
 export const useTradingViewLaunchable = ({
   tvWidgetRef,
-  setIsChartReady,
   marketId,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
-  setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
   marketId: string;
 }) => {
   const dispatch = useDispatch();
@@ -74,17 +72,14 @@ export const useTradingViewLaunchable = ({
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
           })
         );
-
-        setIsChartReady(true);
       });
     }
 
     return () => {
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
-      setIsChartReady(false);
     };
-  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tvWidgetRef, isDataLoading]);
+  }, [dispatch, !!marketId, selectedLocale, tvWidgetRef, isDataLoading]);
 
   return { savedResolution };
 };

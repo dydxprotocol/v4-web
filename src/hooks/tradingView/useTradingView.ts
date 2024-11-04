@@ -50,7 +50,6 @@ export const useTradingView = ({
   buySellMarksToggleRef,
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
-  setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<TvWidget | null>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
@@ -62,7 +61,6 @@ export const useTradingView = ({
   buySellMarksToggleRef: React.MutableRefObject<HTMLElement | null>;
   buySellMarksToggleOn: boolean;
   setBuySellMarksToggleOn: Dispatch<SetStateAction<boolean>>;
-  setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
@@ -172,9 +170,9 @@ export const useTradingView = ({
 
       tvChartWidget.onChartReady(() => {
         // Initialize additional right-click-menu options
-        tvWidgetRef.current?.onContextMenu(tradingViewLimitOrder);
+        tvChartWidget.onContextMenu(tradingViewLimitOrder);
 
-        tvWidgetRef.current?.headerReady().then(() => {
+        tvChartWidget.headerReady().then(() => {
           if (tvWidgetRef.current) {
             // Order Lines
             initializeToggle({
@@ -226,13 +224,11 @@ export const useTradingView = ({
           }
         });
 
-        tvWidgetRef.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef.current?.save((chartConfig: object) => {
+        tvChartWidget.subscribe('onAutoSaveNeeded', () =>
+          tvChartWidget.save((chartConfig: object) => {
             dispatch(updateChartConfig(chartConfig));
           })
         );
-
-        setIsChartReady(true);
       });
     }
 
@@ -245,7 +241,6 @@ export const useTradingView = ({
       buySellMarksToggleRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
-      setIsChartReady(false);
     };
   }, [
     selectedLocale,
@@ -259,7 +254,6 @@ export const useTradingView = ({
     setOrderLinesToggleOn,
     setOrderbookCandlesToggleOn,
     orderbookCandlesToggleOn,
-    tvWidgetRef,
   ]);
 
   return { savedResolution };

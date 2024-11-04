@@ -56,12 +56,10 @@ const CHART_LINE_FONT = 'bold 10px Satoshi';
 export const useChartLines = ({
   tvWidget,
   orderLineToggle,
-  isChartReady,
   orderLinesToggleOn,
 }: {
   tvWidget: TvWidget | null;
   orderLineToggle: HTMLElement | null;
-  isChartReady: boolean;
   orderLinesToggleOn: boolean;
 }) => {
   const [initialWidget, setInitialWidget] = useState<TvWidget | null>(null);
@@ -420,58 +418,62 @@ export const useChartLines = ({
   }, []);
 
   const drawChartLines = useCallback(() => {
-    if (orderLinesToggleOn) {
+    if (orderLinesToggleOn && isAccountConnected) {
       updateOrderLines();
       updatePositionLines();
     } else {
       clearChartLines();
     }
-  }, [updatePositionLines, updateOrderLines, clearChartLines, orderLinesToggleOn]);
+  }, [
+    updatePositionLines,
+    updateOrderLines,
+    clearChartLines,
+    orderLinesToggleOn,
+    isAccountConnected,
+  ]);
 
   // Effects
 
   useEffect(
     // Update display button on toggle
     () => {
-      if (isChartReady) {
-        runOnChartReady(() => {
-          if (orderLinesToggleOn) {
-            orderLineToggle?.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
-          } else {
-            orderLineToggle?.classList.remove(TOGGLE_ACTIVE_CLASS_NAME);
-          }
-        });
-      }
+      runOnChartReady(() => {
+        if (orderLinesToggleOn) {
+          orderLineToggle?.classList.add(TOGGLE_ACTIVE_CLASS_NAME);
+        } else {
+          orderLineToggle?.classList.remove(TOGGLE_ACTIVE_CLASS_NAME);
+        }
+      });
     },
-    [orderLinesToggleOn, orderLineToggle, runOnChartReady, isChartReady]
+    [orderLinesToggleOn, orderLineToggle, runOnChartReady]
   );
 
   useEffect(
     () => {
-      if (isChartReady && tvWidget) {
-        // Manual call to draw chart lines on initial render of chart
-        if (!initialWidget) {
-          runOnChartReady(drawChartLines);
-          setInitialWidget(tvWidget);
-          setLastMarket(currentMarketId);
-        } else if (currentMarketId && lastMarket !== currentMarketId) {
-          // Subscribe to update chart lines whenever market (symbol) has changed
-          tvWidget
-            .activeChart()
-            .onSymbolChanged()
-            .subscribe(
-              null,
-              () => {
-                runOnChartReady(drawChartLines);
-              },
-              true
-            );
-          setLastMarket(currentMarketId);
-        } else {
-          // Update chart lines if market has not changed. If the market has changed, we want the chart lines to be handled by the subscribe so
-          // that it is guaranteed to run after the tick size of the market has been updated.
-          runOnChartReady(drawChartLines);
-        }
+      if (!tvWidget) return;
+
+      // Manual call to draw chart lines on initial render of chart
+      if (!initialWidget) {
+        runOnChartReady(drawChartLines);
+        setInitialWidget(tvWidget);
+        setLastMarket(currentMarketId);
+      } else if (currentMarketId && lastMarket !== currentMarketId) {
+        // Subscribe to update chart lines whenever market (symbol) has changed
+        tvWidget
+          .activeChart()
+          .onSymbolChanged()
+          .subscribe(
+            null,
+            () => {
+              runOnChartReady(drawChartLines);
+            },
+            true
+          );
+        setLastMarket(currentMarketId);
+      } else {
+        // Update chart lines if market has not changed. If the market has changed, we want the chart lines to be handled by the subscribe so
+        // that it is guaranteed to run after the tick size of the market has been updated.
+        runOnChartReady(drawChartLines);
       }
     },
     // We intentionally do not want the hook to re-run when lastMarket is updated since it is set in the subscribe condition; only the
@@ -480,27 +482,11 @@ export const useChartLines = ({
     [
       initialWidget,
       tvWidget,
-      isChartReady,
       currentMarketId,
       // lastMarket,
       drawChartLines,
       runOnChartReady,
     ]
-  );
-
-  useEffect(
-    () => {
-      if (initialWidget && !isChartReady) {
-        // Clear lines when chart switches to not ready after initialization (i.e. when orderbookCandles is toggled)
-        clearChartLines();
-      } else if (!isAccountConnected) {
-        // Clear lines when disconnecting account
-        clearChartLines();
-      }
-    },
-    // We intentionally avoid rerunning this hook on update of initialWidget
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isChartReady, clearChartLines, isAccountConnected]
   );
 
   useEffect(() => {
