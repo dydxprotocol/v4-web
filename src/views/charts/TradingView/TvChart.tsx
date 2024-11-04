@@ -23,7 +23,6 @@ export const TvChart = () => {
 
   const tvWidgetRef = useRef<TvWidget | null>(null);
   const tvWidget = tvWidgetRef.current;
-  const isWidgetReady = tvWidget?._ready;
 
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
@@ -56,7 +55,6 @@ export const TvChart = () => {
   useChartMarketAndResolution({
     currentMarketId,
     tvWidget,
-    isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
   const { chartLines } = useChartLines({
@@ -74,7 +72,7 @@ export const TvChart = () => {
     buySellMarksToggleOn,
     tvWidget,
   });
-  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
+  useTradingViewTheme({ tvWidget, chartLines });
 
   const [isChartReady, setIsChartReady] = useState(false);
   useEffect(() => {

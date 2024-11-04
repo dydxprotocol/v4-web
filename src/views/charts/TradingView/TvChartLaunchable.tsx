@@ -11,7 +11,7 @@ import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { BaseTvChart } from './BaseTvChart';
 
 export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
-  const [isWidgetReady, setIsWidgetReady] = useState(false);
+  const [isChartReady, setIsChartReady] = useState(false);
 
   const tvWidgetRef = useRef<TvWidget | null>(null);
   const tvWidget = tvWidgetRef.current;
@@ -25,19 +25,17 @@ export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
     currentMarketId: marketId,
     isViewingUnlaunchedMarket: true,
     tvWidget,
-    isWidgetReady,
     savedResolution: savedResolution as ResolutionString,
   });
 
   useTradingViewTheme({
     tvWidget,
-    isWidgetReady,
   });
 
   useEffect(() => {
-    setIsWidgetReady(false);
-    tvWidget?.onChartReady(() => setIsWidgetReady(true));
+    setIsChartReady(false);
+    tvWidget?.onChartReady(() => setIsChartReady(true));
   }, [tvWidget]);
 
-  return <BaseTvChart isChartReady={isWidgetReady} />;
+  return <BaseTvChart isChartReady={isChartReady} />;
 };
