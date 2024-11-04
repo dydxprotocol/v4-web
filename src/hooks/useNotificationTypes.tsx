@@ -37,18 +37,17 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { KeplrIcon, PhantomIcon } from '@/icons';
-
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+// eslint-disable-next-line import/no-cycle
+import { Notification } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNotification';
-import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
@@ -77,7 +76,6 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
-import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -351,43 +349,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
-      const { discoveryProgram } = useURLConfigs();
-      const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
-      const { incentivesDistributedSeasonId, rewardDistributionSeasonNumber } =
-        useIncentivesSeason();
-
       const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
       const pmlLiveExpirationDate = new Date('2024-11-21T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
-        if (discoveryProgram) {
-          trigger(
-            ReleaseUpdateNotificationIds.DiscoveryProgram,
-            {
-              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.TITLE',
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.DISCOVERY_PROGRAM.BODY',
-                params: {
-                  HERE_LINK: (
-                    <Link href={discoveryProgram} isAccent isInline>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.DiscoveryProgram,
-            },
-            []
-          );
-        }
-
         if (
           featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
           currentDate <= tradeUSElectionExpirationDate
@@ -407,40 +375,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               },
               toastSensitivity: 'foreground',
               groupKey: MarketLaunchNotificationIds.TrumpWin,
-            },
-            []
-          );
-        }
-
-        if (featureFlags[StatsigFlags.ffEnableKeplr]) {
-          trigger(
-            ReleaseUpdateNotificationIds.KeplrSupport,
-            {
-              icon: <KeplrIcon />,
-              title: stringGetter({ key: STRING_KEYS.KEPLR_SUPPORT_TITLE }),
-              body: stringGetter({
-                key: STRING_KEYS.KEPLR_SUPPORT_BODY,
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
-            },
-            []
-          );
-        }
-
-        const phantomNotificationExpirationDate = new Date('2024-10-07T15:00:29.517926238Z');
-
-        if (currentDate < phantomNotificationExpirationDate) {
-          trigger(
-            ReleaseUpdateNotificationIds.PhantomSupport,
-            {
-              icon: <PhantomIcon />,
-              title: stringGetter({ key: STRING_KEYS.PHANTOM_SUPPORT_TITLE }),
-              body: stringGetter({
-                key: STRING_KEYS.PHANTOM_SUPPORT_BODY,
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.KeplrSupport,
             },
             []
           );
@@ -467,69 +401,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [stringGetter]);
-
-      const { dydxAddress } = useAccounts();
-      const { data, status } = useQueryChaosLabsIncentives({
-        dydxAddress,
-        season: rewardDistributionSeasonNumber,
-      });
-
-      const { dydxRewards } = data ?? {};
-
-      useEffect(() => {
-        trigger(
-          INCENTIVES_SEASON_NOTIFICATION_ID,
-          {
-            icon: <Icon iconName={IconName.RewardStar} />,
-            title: stringGetter({
-              key: STRING_KEYS.INCENTIVES_SEASON_ENDED_TITLE,
-              params: { SEASON_NUMBER: 6 }, // last season, will just hardcode
-            }),
-            body: stringGetter({ key: STRING_KEYS.INCENTIVES_SEASON_ENDED_BODY }),
-            toastSensitivity: 'foreground',
-            groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
-          },
-          []
-        );
-      }, [stringGetter]);
-
-      useEffect(() => {
-        const rewards = dydxRewards ?? 0;
-        if (dydxAddress && status === 'success' && rewards > 0) {
-          trigger(
-            incentivesDistributedSeasonId,
-            {
-              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
-              title: stringGetter({
-                key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-                params: { SEASON_NUMBER: rewardDistributionSeasonNumber },
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.BODY',
-                params: {
-                  SEASON_NUMBER: rewardDistributionSeasonNumber,
-                  DYDX_AMOUNT: rewards,
-                },
-              }),
-              renderCustomBody({ isToast, notification }) {
-                return (
-                  <IncentiveSeasonDistributionNotification
-                    isToast={isToast}
-                    notification={notification}
-                    data={{
-                      points: rewards,
-                      chainTokenLabel,
-                    }}
-                  />
-                );
-              },
-              toastSensitivity: 'foreground',
-              groupKey: incentivesDistributedSeasonId,
-            },
-            []
-          );
-        }
-      }, [stringGetter, chainTokenImage, chainTokenLabel, dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -717,7 +588,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const displayData: NotificationDisplayData = {
             icon: <$WarningIcon iconName={IconName.Warning} />,
             title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
-            body: complianceMessage,
+            renderCustomBody: ({ isToast, notification }) => (
+              <Notification
+                isToast={isToast}
+                notification={notification}
+                slotDescription={complianceMessage}
+              />
+            ),
             toastSensitivity: 'foreground',
             groupKey: NotificationType.ComplianceAlert,
             withClose: false,
