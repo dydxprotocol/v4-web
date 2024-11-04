@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -74,11 +74,5 @@ export const TvChart = () => {
   });
   useTradingViewTheme({ tvWidget, chartLines });
 
-  const [isChartReady, setIsChartReady] = useState(false);
-  useEffect(() => {
-    setIsChartReady(false);
-    tvWidget?.onChartReady(() => setIsChartReady(true));
-  }, [tvWidget]);
-
-  return <BaseTvChart isChartReady={isChartReady} />;
+  return <BaseTvChart tvWidget={tvWidget} />;
 };
