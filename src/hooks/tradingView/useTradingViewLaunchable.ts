@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import {
@@ -28,10 +28,12 @@ import { useMetadataService } from '../useLaunchableMarkets';
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingViewLaunchable = ({
-  tvWidgetRef,
+  tvWidget,
+  setTvWidget,
   marketId,
 }: {
-  tvWidgetRef: React.MutableRefObject<TvWidget | null>;
+  tvWidget?: TvWidget;
+  setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   marketId: string;
 }) => {
   const dispatch = useDispatch();
@@ -47,7 +49,7 @@ export const useTradingViewLaunchable = ({
   const { data: metadataServiceData, isLoading: isDataLoading } = useMetadataService();
 
   useEffect(() => {
-    if (marketId && !isDataLoading) {
+    if (marketId && !isDataLoading && !tvWidget) {
       const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
@@ -64,11 +66,11 @@ export const useTradingViewLaunchable = ({
       };
 
       const tvChartWidget = new Widget(options);
-      tvWidgetRef.current = tvChartWidget;
+      setTvWidget(tvChartWidget);
 
       tvChartWidget.onChartReady(() => {
-        tvWidgetRef.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef.current?.save((chartConfig: object) => {
+        tvChartWidget.subscribe('onAutoSaveNeeded', () =>
+          tvChartWidget.save((chartConfig: object) => {
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
           })
         );
@@ -76,10 +78,10 @@ export const useTradingViewLaunchable = ({
     }
 
     return () => {
-      tvWidgetRef.current?.remove();
-      tvWidgetRef.current = null;
+      tvWidget?.remove();
+      setTvWidget(undefined);
     };
-  }, [dispatch, !!marketId, selectedLocale, tvWidgetRef, isDataLoading]);
+  }, [dispatch, !!marketId, selectedLocale, isDataLoading, tvWidget, setTvWidget]);
 
   return { savedResolution };
 };

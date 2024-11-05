@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useSt
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
+  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   TradingTerminalWidgetOptions,
@@ -40,7 +41,8 @@ import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingView = ({
-  tvWidgetRef,
+  tvWidget,
+  setTvWidget,
   orderLineToggleRef,
   orderLinesToggleOn,
   setOrderLinesToggleOn,
@@ -51,7 +53,8 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
 }: {
-  tvWidgetRef: React.MutableRefObject<TvWidget | null>;
+  tvWidget?: TvWidget;
+  setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
   setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
@@ -100,20 +103,20 @@ export const useTradingView = ({
   const initializeToggle = useCallback(
     ({
       toggleRef,
-      tvWidget,
+      widget,
       isOn,
       setToggleOn,
       label,
       tooltip,
     }: {
       toggleRef: React.MutableRefObject<HTMLElement | null>;
-      tvWidget: TvWidget;
+      widget: IChartingLibraryWidget;
       isOn: boolean;
       setToggleOn: Dispatch<SetStateAction<boolean>>;
       label: string;
       tooltip: string;
     }) => {
-      toggleRef.current = tvWidget.createButton();
+      toggleRef.current = widget.createButton();
       toggleRef.current.innerHTML = `<span>${label}</span> <div class="toggle"></div>`;
       toggleRef.current.setAttribute('title', tooltip);
       if (isOn) {
@@ -141,7 +144,7 @@ export const useTradingView = ({
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && tickSizeDecimals !== undefined) {
+    if (marketId && tickSizeDecimals !== undefined && !tvWidget) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
@@ -166,62 +169,60 @@ export const useTradingView = ({
       };
 
       const tvChartWidget = new Widget(options);
-      tvWidgetRef.current = tvChartWidget;
+      setTvWidget(tvChartWidget);
 
       tvChartWidget.onChartReady(() => {
         // Initialize additional right-click-menu options
         tvChartWidget.onContextMenu(tradingViewLimitOrder);
 
         tvChartWidget.headerReady().then(() => {
-          if (tvWidgetRef.current) {
-            // Order Lines
-            initializeToggle({
-              toggleRef: orderLineToggleRef,
-              tvWidget: tvWidgetRef.current,
-              isOn: orderLinesToggleOn,
-              setToggleOn: setOrderLinesToggleOn,
-              label: stringGetter({
-                key: STRING_KEYS.ORDER_LINES,
-              }),
-              tooltip: stringGetter({
-                key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-              }),
+          // Order Lines
+          initializeToggle({
+            toggleRef: orderLineToggleRef,
+            widget: tvChartWidget,
+            isOn: orderLinesToggleOn,
+            setToggleOn: setOrderLinesToggleOn,
+            label: stringGetter({
+              key: STRING_KEYS.ORDER_LINES,
+            }),
+            tooltip: stringGetter({
+              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+            }),
+          });
+
+          if (ffEnableOrderbookCandles) {
+            // Orderbook Candles (OHLC)
+            const getOhlcTooltipString = tooltipStrings.ohlc;
+            const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
+              stringGetter,
+              stringParams: {},
+              urlConfigs,
+              featureFlags,
             });
 
-            if (ffEnableOrderbookCandles) {
-              // Orderbook Candles (OHLC)
-              const getOhlcTooltipString = tooltipStrings.ohlc;
-              const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
-                stringGetter,
-                stringParams: {},
-                urlConfigs,
-                featureFlags,
-              });
-
-              initializeToggle({
-                toggleRef: orderbookCandlesToggleRef,
-                tvWidget: tvWidgetRef.current,
-                isOn: orderbookCandlesToggleOn,
-                setToggleOn: setOrderbookCandlesToggleOn,
-                label: `${ohlcTitle}*`,
-                tooltip: ohlcBody as string,
-              });
-            }
-
-            // Buy/Sell Marks
             initializeToggle({
-              toggleRef: buySellMarksToggleRef,
-              tvWidget: tvWidgetRef.current,
-              isOn: buySellMarksToggleOn,
-              setToggleOn: setBuySellMarksToggleOn,
-              label: stringGetter({
-                key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-              }),
-              tooltip: stringGetter({
-                key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-              }),
+              toggleRef: orderbookCandlesToggleRef,
+              widget: tvChartWidget,
+              isOn: orderbookCandlesToggleOn,
+              setToggleOn: setOrderbookCandlesToggleOn,
+              label: `${ohlcTitle}*`,
+              tooltip: ohlcBody as string,
             });
           }
+
+          // Buy/Sell Marks
+          initializeToggle({
+            toggleRef: buySellMarksToggleRef,
+            widget: tvChartWidget,
+            isOn: buySellMarksToggleOn,
+            setToggleOn: setBuySellMarksToggleOn,
+            label: stringGetter({
+              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+            }),
+            tooltip: stringGetter({
+              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+            }),
+          });
         });
 
         tvChartWidget.subscribe('onAutoSaveNeeded', () =>
@@ -239,8 +240,7 @@ export const useTradingView = ({
       orderbookCandlesToggleRef.current = null;
       buySellMarksToggleRef.current?.remove();
       buySellMarksToggleRef.current = null;
-      tvWidgetRef.current?.remove();
-      tvWidgetRef.current = null;
+      tvWidget?.remove();
     };
   }, [
     selectedLocale,
@@ -254,6 +254,8 @@ export const useTradingView = ({
     setOrderLinesToggleOn,
     setOrderbookCandlesToggleOn,
     orderbookCandlesToggleOn,
+    tvWidget,
+    setTvWidget,
   ]);
 
   return { savedResolution };

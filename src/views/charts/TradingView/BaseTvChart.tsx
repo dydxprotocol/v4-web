@@ -13,7 +13,9 @@ export const BaseTvChart = ({ tvWidget }: { tvWidget?: TvWidget | null }) => {
 
   useEffect(() => {
     setIsChartReady(false);
-    tvWidget?.onChartReady(() => setIsChartReady(true));
+    tvWidget?.onChartReady(() => {
+      setIsChartReady(true);
+    });
   }, [tvWidget]);
 
   return (

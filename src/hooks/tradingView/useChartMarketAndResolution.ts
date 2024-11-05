@@ -25,7 +25,7 @@ export const useChartMarketAndResolution = ({
 }: {
   currentMarketId: string;
   isViewingUnlaunchedMarket?: boolean;
-  tvWidget: TvWidget | null;
+  tvWidget?: TvWidget;
   savedResolution?: ResolutionString;
 }) => {
   const dispatch = useAppDispatch();

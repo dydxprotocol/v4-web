@@ -58,7 +58,7 @@ export const useChartLines = ({
   orderLineToggle,
   orderLinesToggleOn,
 }: {
-  tvWidget: TvWidget | null;
+  tvWidget?: TvWidget;
   orderLineToggle: HTMLElement | null;
   orderLinesToggleOn: boolean;
 }) => {
