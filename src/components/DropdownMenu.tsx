@@ -25,6 +25,7 @@ export type DropdownMenuItem<T> = {
   onSelect?: (e: Event) => void;
   separator?: boolean;
   highlightColor?: 'accent' | 'create' | 'destroy';
+  dataTestId?: string;
 };
 
 type StyleProps = {
@@ -80,6 +81,7 @@ export const DropdownMenu = forwardRefFn(
                   disabled={!item.onSelect}
                   $highlightColor={item.highlightColor}
                   onSelect={item.onSelect}
+                  data-testid={item.dataTestId}
                 >
                   {item.icon}
                   {item.label}

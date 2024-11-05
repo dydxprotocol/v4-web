@@ -59,6 +59,7 @@ export const ChooseWallet = ({
             onClick={() => onChooseWallet(wallet)}
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
             size={ButtonSize.Small}
+            data-testid={`wallet-button-${wallet.name.toLowerCase()}`}
           >
             <$WalletName>
               {wallet.connectorType === ConnectorType.Injected

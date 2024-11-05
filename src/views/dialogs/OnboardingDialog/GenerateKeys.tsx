@@ -278,6 +278,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
                 isLoading: isDeriving,
                 isDisabled: status !== EvmDerivedAccountStatus.NotDerived,
               }}
+              data-testid="send-request-button"
             >
               {isDeriving
                 ? stringGetter({

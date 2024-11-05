@@ -29,7 +29,11 @@ export const DisconnectDialog = ({ setIsOpen }: DialogProps<DisconnectWalletDial
         <p>{stringGetter({ key: STRING_KEYS.DISCONNECT_CONFIRMATION })}</p>
         <div tw="row gap-0.5 [justify-content:end]">
           <Close asChild>
-            <Button action={ButtonAction.Destroy} onClick={disconnect}>
+            <Button
+              action={ButtonAction.Destroy}
+              onClick={disconnect}
+              data-testid="disconnect-button"
+            >
               {stringGetter({ key: STRING_KEYS.DISCONNECT })}
             </Button>
           </Close>

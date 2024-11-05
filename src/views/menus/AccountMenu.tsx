@@ -109,7 +109,13 @@ export const AccountMenu = () => {
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
+    walletIcon = (
+      <Icon
+        iconName={IconName.Warning}
+        tw="text-[1.25rem] text-color-warning"
+        data-testid="warning-wallet-connected"
+      />
+    );
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
     walletInfo?.name === WalletType.Privy
@@ -124,11 +130,11 @@ export const AccountMenu = () => {
       walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
     }
   } else if (walletInfo) {
-    walletIcon = <WalletIcon wallet={walletInfo} />;
+    walletIcon = <WalletIcon wallet={walletInfo} data-testid="wallet-connected" />;
   }
 
   return onboardingState === OnboardingState.Disconnected ? (
-    <OnboardingTriggerButton size={ButtonSize.XSmall} />
+    <OnboardingTriggerButton size={ButtonSize.XSmall} data-testid="connect-wallet-button" />
   ) : (
     <$DropdownMenu
       modal={false}
@@ -147,7 +153,9 @@ export const AccountMenu = () => {
                 ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
                 )}
-                <$Address>{truncateAddress(dydxAddress)}</$Address>
+                <$Address data-testid="connected-account-address">
+                  {truncateAddress(dydxAddress)}
+                </$Address>
               </$Column>
               <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
               <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
@@ -173,21 +181,27 @@ export const AccountMenu = () => {
                   </div>
                   <$Column>
                     <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                    <$Address>{displayAddress}</$Address>
+                    <$Address data-testid="connected-account-address">
+                      {truncateAddress(dydxAddress)}
+                    </$Address>
                   </$Column>
                 </$AddressRow>
               )}
             <$Balances>
               <div>
                 <div>
-                  <$label>
+                  <$label data-testid="chain-token-balance-label">
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: chainTokenLabel },
                     })}
                     <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
                   </$label>
-                  <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                  <$BalanceOutput
+                    type={OutputType.Asset}
+                    value={nativeTokenBalance}
+                    data-testid="native-token-balance-output"
+                  />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.CHAINTOKEN}
@@ -200,7 +214,7 @@ export const AccountMenu = () => {
               {isDev && (
                 <div>
                   <div>
-                    <$label>
+                    <$label data-testid="wallet-balance-label">
                       {stringGetter({
                         key: STRING_KEYS.WALLET_BALANCE,
                         params: { ASSET: usdcLabel },
@@ -211,13 +225,14 @@ export const AccountMenu = () => {
                       type={OutputType.Asset}
                       value={usdcBalance}
                       fractionDigits={SMALL_USD_DECIMALS}
+                      data-testid="wallet-balance-output"
                     />
                   </div>
                 </div>
               )}
               <div>
                 <div>
-                  <$label>
+                  <$label data-testid="usdc-balance-label">
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: usdcLabel },
@@ -228,6 +243,7 @@ export const AccountMenu = () => {
                     type={OutputType.Asset}
                     value={freeCollateral?.current ?? 0}
                     fractionDigits={USD_DECIMALS}
+                    data-testid="usdc-balance-output"
                   />
                 </div>
                 <AssetActions
@@ -295,6 +311,7 @@ export const AccountMenu = () => {
           icon: <Icon iconName={IconName.Gear} />,
           label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
           onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
+          dataTestId: 'dropdown-preferences',
         },
         {
           value: 'DisplaySettings',
@@ -306,6 +323,7 @@ export const AccountMenu = () => {
             ),
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
+          dataTestId: 'dropdown-display-settings',
         },
         ...(isDev
           ? [
@@ -385,6 +403,7 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
           highlightColor: 'destroy' as const,
           onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
+          dataTestId: 'dropdown-disconnect',
         },
       ].filter(isTruthy)}
       slotBottomContent={<MobileDownloadLinks withBadges />}
@@ -392,7 +411,7 @@ export const AccountMenu = () => {
       sideOffset={16}
     >
       {walletIcon}
-      {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
+      {!isTablet && <$Address data-testid="connected-account-address">{displayAddress}</$Address>}
     </$DropdownMenu>
   );
 };
@@ -492,6 +511,13 @@ const AssetActions = memo(
                 shape={ButtonShape.Square}
                 iconName={iconName}
                 onClick={() => dispatch(openDialog(dialog))}
+                data-testid={
+                  iconName === IconName.Deposit
+                    ? 'account-menu-deposit-button'
+                    : iconName === IconName.Withdraw
+                      ? 'account-menu-withdraw-button'
+                      : undefined
+                }
               />
             </WithTooltip>
           </Item>
@@ -499,6 +525,7 @@ const AssetActions = memo(
     </div>
   )
 );
+
 const $Column = styled.div`
   ${layoutMixins.column}
 `;

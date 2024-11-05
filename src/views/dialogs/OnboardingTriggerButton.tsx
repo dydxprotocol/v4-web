@@ -54,6 +54,9 @@ export const OnboardingTriggerButton = ({
         isDisabled: disableConnectButton,
       }}
       onClick={openOnboardingDialog}
+      data-testid={
+        onboardingState === OnboardingState.Disconnected ? 'connect-wallet-button' : undefined
+      }
     >
       {
         {

@@ -289,7 +289,10 @@ type StyleProps = {
   withBaseFont?: boolean;
 };
 
-export type OutputProps = ElementProps & StyleProps;
+export type OutputProps = ElementProps &
+  StyleProps & {
+    'data-testid'?: string;
+  };
 
 export const Output = ({
   value,
@@ -301,6 +304,7 @@ export const Output = ({
   className,
   withBaseFont,
   type,
+  'data-testid': dataTestId,
 
   useGrouping = true,
   fractionDigits,
@@ -332,6 +336,7 @@ export const Output = ({
           key={value?.toString()}
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
+          data-testid={dataTestId}
         >
           {slotLeft}
           {value?.toString() ?? null}
@@ -355,6 +360,7 @@ export const Output = ({
             key={value?.toString()}
             title={`${title ?? value ?? ''}${tag ? ` ${tag}` : ''}`}
             className={className}
+            data-testid={dataTestId}
           >
             <time
               dateTime={new Date(timestamp).toISOString()}
@@ -374,6 +380,7 @@ export const Output = ({
           key={value?.toString()}
           title={`${title ?? value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
+          data-testid={dataTestId}
         >
           <RelativeTime timestamp={timestamp} {...relativeTimeOptions} />
 
@@ -392,7 +399,12 @@ export const Output = ({
       });
 
       return (
-        <$Text key={value} title={title ?? `${value}${tag ? ` ${tag}` : ''}`} className={className}>
+        <$Text
+          key={value}
+          title={title ?? `${value}${tag ? ` ${tag}` : ''}`}
+          className={className}
+          data-testid={dataTestId}
+        >
           {dateString}
         </$Text>
       );
@@ -447,6 +459,7 @@ export const Output = ({
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
+          data-testid={dataTestId}
         >
           {slotLeft}
           {sign && <span tw="text-[color:--output-sign-color]">{sign}</span>}
