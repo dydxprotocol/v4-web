@@ -79,7 +79,6 @@ export const useTradingViewLaunchable = ({
 
     return () => {
       tvWidget?.remove();
-      setTvWidget(undefined);
     };
   }, [dispatch, !!marketId, selectedLocale, isDataLoading, tvWidget, setTvWidget]);
 
