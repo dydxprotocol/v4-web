@@ -15,7 +15,7 @@ export const useOrderbookCandles = ({
 }: {
   orderbookCandlesToggle: HTMLElement | null;
   orderbookCandlesToggleOn: boolean;
-  tvWidget: TvWidget | null;
+  tvWidget?: TvWidget;
 }) => {
   useEffect(
     // Update orderbookCandles button on toggle

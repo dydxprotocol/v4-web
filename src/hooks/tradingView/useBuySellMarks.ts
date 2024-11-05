@@ -19,7 +19,7 @@ export function useBuySellMarks({
 }: {
   buySellMarksToggle: HTMLElement | null;
   buySellMarksToggleOn: boolean;
-  tvWidget: TvWidget | null;
+  tvWidget?: TvWidget;
 }) {
   const marketId = useAppSelector(getCurrentMarketId);
   const fills = useAppSelector(getMarketFills);

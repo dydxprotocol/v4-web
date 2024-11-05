@@ -28,7 +28,7 @@ export const useTradingViewTheme = ({
   tvWidget,
 }: {
   chartLines?: Record<string, ChartLine>;
-  tvWidget: TvWidget | null;
+  tvWidget?: TvWidget;
 }) => {
   const appTheme: AppTheme = useAppSelector(getAppTheme);
   const appColorMode: AppColorMode = useAppSelector(getAppColorMode);

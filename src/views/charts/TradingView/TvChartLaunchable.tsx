@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -11,12 +11,12 @@ import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { BaseTvChart } from './BaseTvChart';
 
 export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
-  const tvWidgetRef = useRef<TvWidget | null>(null);
-  const tvWidget = tvWidgetRef.current;
+  const [tvWidget, setTvWidget] = useState<TvWidget>();
 
   const { savedResolution } = useTradingViewLaunchable({
     marketId,
-    tvWidgetRef,
+    tvWidget,
+    setTvWidget,
   });
 
   useChartMarketAndResolution({

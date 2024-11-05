@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
@@ -21,8 +21,7 @@ import { BaseTvChart } from './BaseTvChart';
 export const TvChart = () => {
   const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
-  const tvWidgetRef = useRef<TvWidget | null>(null);
-  const tvWidget = tvWidgetRef.current;
+  const [tvWidget, setTvWidget] = useState<TvWidget>();
 
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
@@ -41,7 +40,8 @@ export const TvChart = () => {
     buySellMarksToggleOn,
   } = useTradingViewToggles();
   const { savedResolution } = useTradingView({
-    tvWidgetRef,
+    tvWidget,
+    setTvWidget,
     orderLineToggleRef,
     orderLinesToggleOn,
     setOrderLinesToggleOn,
