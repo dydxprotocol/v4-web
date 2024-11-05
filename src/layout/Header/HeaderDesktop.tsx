@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -40,13 +40,8 @@ export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { chainTokenLabel } = useTokenConfigs();
-  const {
-    enableVaults: showVaults,
-    pml: showLaunchMarkets,
-    uiRefresh: uiRefreshEnabled,
-  } = testFlags;
+  const { enableVaults: showVaults, uiRefresh: uiRefreshEnabled } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -193,16 +188,6 @@ export const HeaderDesktop = () => {
       <$NavAfter>
         {uiRefreshEnabled && (
           <>
-            {showLaunchMarkets && (
-              <$LaunchMarketButton
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                action={ButtonAction.Navigation}
-                onClick={() => navigate(AppRoute.LaunchMarket)}
-              >
-                {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
-              </$LaunchMarketButton>
-            )}
             <Button
               tw="mr-[0.5em]"
               shape={ButtonShape.Pill}
@@ -365,9 +350,4 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
   --button-border: none;
   --button-icon-size: 1rem;
   --button-padding: 0 0.5em;
-`;
-
-const $LaunchMarketButton = styled(Button)`
-  --button-backgroundColor: var(--color-layer-5);
-  --button-border: solid var(--border-width) var(--color-border);
 `;
