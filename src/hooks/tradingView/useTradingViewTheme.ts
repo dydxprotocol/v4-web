@@ -26,17 +26,17 @@ const isIFrame = (element: HTMLElement | null): element is HTMLIFrameElement =>
 export const useTradingViewTheme = ({
   chartLines,
   tvWidget,
-  isWidgetReady,
 }: {
   chartLines?: Record<string, ChartLine>;
   tvWidget: TvWidget | null;
-  isWidgetReady?: boolean;
 }) => {
   const appTheme: AppTheme = useAppSelector(getAppTheme);
   const appColorMode: AppColorMode = useAppSelector(getAppColorMode);
 
   useEffect(() => {
-    if (tvWidget && isWidgetReady) {
+    if (!tvWidget) return;
+
+    tvWidget.onChartReady(() => {
       tvWidget.changeTheme(THEME_NAMES[appTheme]).then(() => {
         const tvChartId = tvWidget._id;
 
@@ -102,6 +102,6 @@ export const useTradingViewTheme = ({
           });
         }
       });
-    }
-  }, [appTheme, appColorMode, isWidgetReady]);
+    });
+  }, [appTheme, appColorMode, tvWidget]);
 };

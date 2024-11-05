@@ -10,19 +10,17 @@ import abacusStateManager from '@/lib/abacus';
  */
 export const useOrderbookCandles = ({
   orderbookCandlesToggle,
-  isChartReady,
   orderbookCandlesToggleOn,
   tvWidget,
 }: {
   orderbookCandlesToggle: HTMLElement | null;
-  isChartReady: boolean;
   orderbookCandlesToggleOn: boolean;
   tvWidget: TvWidget | null;
 }) => {
   useEffect(
     // Update orderbookCandles button on toggle
     () => {
-      if (!isChartReady || !tvWidget) return;
+      if (!tvWidget) return;
 
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
@@ -35,7 +33,7 @@ export const useOrderbookCandles = ({
         });
       });
     },
-    [orderbookCandlesToggleOn, orderbookCandlesToggle, tvWidget, isChartReady]
+    [orderbookCandlesToggleOn, orderbookCandlesToggle, tvWidget]
   );
 
   return { orderbookCandlesToggleOn };

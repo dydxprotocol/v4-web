@@ -1,10 +1,21 @@
+import { useEffect, useState } from 'react';
+
 import styled, { css } from 'styled-components';
+
+import { TvWidget } from '@/constants/tvchart';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-export const BaseTvChart = ({ isChartReady }: { isChartReady?: boolean }) => {
+export const BaseTvChart = ({ tvWidget }: { tvWidget?: TvWidget | null }) => {
+  const [isChartReady, setIsChartReady] = useState(false);
+
+  useEffect(() => {
+    setIsChartReady(false);
+    tvWidget?.onChartReady(() => setIsChartReady(true));
+  }, [tvWidget]);
+
   return (
     <$PriceChart isChartReady={isChartReady}>
       {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
