@@ -229,7 +229,7 @@ export const CanvasOrderbook = forwardRef(
           )}
           {layout === 'vertical' ? (
             <>
-              <div ref={orderbookRef} tw="flex flex-1 flex-col justify-evenly overflow-y-auto">
+              <div ref={orderbookRef} tw="flex flex-1 flex-col justify-center overflow-y-auto">
                 {asksOrderbook}
                 <OrderbookMiddleRow
                   tickSizeDecimals={tickSizeDecimals}
