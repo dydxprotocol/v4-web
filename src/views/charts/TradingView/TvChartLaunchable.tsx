@@ -15,6 +15,7 @@ export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
 
   const { savedResolution } = useTradingViewLaunchable({
     marketId,
+    tvWidget,
     setTvWidget,
   });
 

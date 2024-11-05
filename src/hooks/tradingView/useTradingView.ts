@@ -3,7 +3,6 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useSt
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
-  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   TradingTerminalWidgetOptions,
@@ -110,7 +109,7 @@ export const useTradingView = ({
       tooltip,
     }: {
       toggleRef: React.MutableRefObject<HTMLElement | null>;
-      widget: IChartingLibraryWidget;
+      widget: TvWidget;
       isOn: boolean;
       setToggleOn: Dispatch<SetStateAction<boolean>>;
       label: string;
