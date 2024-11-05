@@ -118,15 +118,15 @@ export const MobileTopPanel = ({
   );
 };
 const $Tabs = styled(Tabs)`
-  --scrollArea-height: 20rem;
+  --scrollArea-height: 38rem;
   --stickyArea0-background: var(--color-layer-2);
-  --tabContent-height: calc(20rem - 2rem - var(--tabs-currentHeight));
+  --tabContent-height: calc(var(--scrollArea-height) - 2rem - var(--tabs-currentHeight));
 
   min-height: 100%;
 
   gap: var(--border-width);
 
-  > header {
+  > div > header {
     padding: 1rem 1.25rem;
 
     > [role='tablist'] {
