@@ -52,22 +52,19 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
         sideOffset={8}
       >
         <$DownloadLinksInPopover>
-          {googlePlayStoreUrl && (
-            <$AppLink
-              type={ButtonType.Link}
-              href={googlePlayStoreUrl ?? undefined}
-              shape={ButtonShape.Rectangle}
-              iconName={IconName.GooglePlay}
-            />
-          )}
-          {appleAppStoreUrl && (
-            <$AppLink
-              type={ButtonType.Link}
-              href={appleAppStoreUrl ?? undefined}
-              shape={ButtonShape.Rectangle}
-              iconName={IconName.Apple}
-            />
-          )}
+          <div>{stringGetter({ key: STRING_KEYS.GET_DYDX_ON_PHONE })}</div>
+          <div tw="row gap-0.5">
+            {googlePlayStoreUrl && (
+              <Link href={googlePlayStoreUrl}>
+                <img tw="w-10" src="/play-store.png" alt="google-play" />
+              </Link>
+            )}
+            {appleAppStoreUrl && (
+              <Link href={appleAppStoreUrl}>
+                <img tw="w-10" src="/app-store.png" alt="app-store" />
+              </Link>
+            )}
+          </div>
         </$DownloadLinksInPopover>
       </Popover>
       <VerticalSeparator />
@@ -136,6 +133,7 @@ const $IconButton = styled(IconButton)`
 const $DownloadLinksInPopover = styled.div`
   ${popoverMixins.popover}
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-  --popover-padding: 0.5rem;
+  --popover-padding: 0.625rem;
 `;
