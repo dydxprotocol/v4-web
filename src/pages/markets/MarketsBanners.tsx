@@ -1,3 +1,4 @@
+import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -6,14 +7,20 @@ import { PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
+import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Output, OutputType } from '@/components/Output';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -22,6 +29,8 @@ export const MarketsBanners = () => {
   const featureFlags = useAllStatsigGateValues();
   const now = Date.now();
   const trumpwinExpiration = new Date('2020-11-05T00:00:00Z').getTime();
+  const { data: launchableMarkets } = useLaunchableMarkets();
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
 
   return (
     <>
@@ -36,6 +45,25 @@ export const MarketsBanners = () => {
             <span tw="text-color-text-0 font-base-book notTablet:text-nowrap">
               {stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING })}
             </span>
+
+            <$Details
+              withSeparators
+              layout="rowColumns"
+              items={[
+                {
+                  key: 'live',
+                  label: stringGetter({ key: STRING_KEYS.MARKETS }),
+                  value: <Output type={OutputType.CompactNumber} value={marketIds.length} />,
+                },
+                {
+                  key: 'launchable',
+                  label: stringGetter({ key: STRING_KEYS.LAUNCHABLE }),
+                  value: (
+                    <Output type={OutputType.CompactNumber} value={launchableMarkets.length} />
+                  ),
+                },
+              ]}
+            />
           </div>
 
           <$StarsOverlay />
@@ -102,6 +130,7 @@ const $FlagOverlay = styled.div`
 `;
 
 const $PmlBanner = styled($MarketsPageBanner)`
+  height: 8rem;
   img,
   span,
   button {
@@ -126,4 +155,14 @@ const $StarsOverlay = styled.div`
   background: var(--color-layer-0) url('/stars-background.png');
   mix-blend-mode: difference;
   z-index: 0;
+`;
+
+const $Details = styled(Details)`
+  color: var(--color-text-2);
+  z-index: 1;
+  margin-top: 0.5rem;
+
+  > :first-child {
+    padding-left: 0;
+  }
 `;
