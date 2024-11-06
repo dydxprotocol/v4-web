@@ -6,7 +6,7 @@ import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
-import { ComplianceStatus } from '@/constants/abacus';
+import { AbacusOrderType, ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
@@ -31,6 +31,7 @@ import {
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -52,6 +53,7 @@ import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLa
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { PermissionlessMarketsLiveNotification } from '@/views/notifications/PermissionlessMarketsLiveNotification';
+import { PredictionMarketEndNotification } from '@/views/notifications/PredictionMarketEndNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -788,6 +790,60 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
+    },
+  },
+  {
+    type: NotificationType.PredictionMarketConcluded,
+    useTrigger: ({ trigger }) => {
+      const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
+      const stringGetter = useStringGetter();
+
+      // TRUMPWIN-USD
+      const trumpWinFills = allFills.filter((fill) => fill.marketId === PREDICTION_MARKET.TRUMPWIN);
+      const trumpWinDeleveraged = trumpWinFills.filter(
+        (fill) => fill.type === AbacusOrderType.Deleveraged
+      );
+      const trumpWinOffset = trumpWinFills.filter(
+        (fill) => fill.type === AbacusOrderType.Offsetting
+      );
+
+      useEffect(() => {
+        if (trumpWinDeleveraged.length > 0 || trumpWinOffset.length > 0) {
+          const latestTrumpFill = [...trumpWinDeleveraged, ...trumpWinOffset].sort(
+            (a, b) => b.createdAtMilliseconds - a.createdAtMilliseconds
+          )[0];
+
+          const hadCorrectOutcome = latestTrumpFill?.type === AbacusOrderType.Offsetting;
+
+          trigger(
+            PREDICTION_MARKET.TRUMPWIN,
+            {
+              icon: null,
+              title: stringGetter({
+                key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED,
+                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED_DESC,
+                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
+              }),
+              toastSensitivity: 'background',
+              groupKey: PREDICTION_MARKET.TRUMPWIN,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <PredictionMarketEndNotification
+                  isToast={isToast}
+                  marketId={PREDICTION_MARKET.TRUMPWIN}
+                  hadCorrectOutcome={hadCorrectOutcome}
+                  notification={notification}
+                />
+              ),
+            },
+            [],
+            true
+          );
+        }
+      }, [trumpWinDeleveraged, trumpWinOffset]);
     },
   },
   {
