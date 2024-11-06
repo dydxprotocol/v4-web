@@ -256,6 +256,4 @@ export const useTradingView = ({
     tvWidget,
     setTvWidget,
   ]);
-
-  return { savedResolution };
 };

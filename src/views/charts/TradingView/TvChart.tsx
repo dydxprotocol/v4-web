@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
 
-import type { ResolutionString } from 'public/tradingview/charting_library';
-
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import type { TvWidget } from '@/constants/tvchart';
 
@@ -39,7 +37,8 @@ export const TvChart = () => {
     setBuySellMarksToggleOn,
     buySellMarksToggleOn,
   } = useTradingViewToggles();
-  const { savedResolution } = useTradingView({
+
+  useTradingView({
     tvWidget,
     setTvWidget,
     orderLineToggleRef,
@@ -55,7 +54,6 @@ export const TvChart = () => {
   useChartMarketAndResolution({
     currentMarketId,
     tvWidget,
-    savedResolution: savedResolution as ResolutionString | undefined,
   });
   const { chartLines } = useChartLines({
     tvWidget,
