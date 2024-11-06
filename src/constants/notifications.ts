@@ -16,6 +16,7 @@ export enum NotificationType {
   MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
+  PredictionMarketConcluded = 'PredictionMarketConcluded',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
 }
 
@@ -42,6 +43,7 @@ export const NotificationTypeCategory: {
   [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
 };
 

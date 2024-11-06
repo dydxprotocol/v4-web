@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.12.2
     version: 1.12.2
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.239
-    version: 1.1.239
+    specifier: ^1.1.240
+    version: 1.1.240
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -2637,8 +2637,8 @@ packages:
       - fp-ts
     dev: false
 
-  /@chain-registry/types@0.50.5:
-    resolution: {integrity: sha512-txLf3nTGrWq0jqyd7WTNluX+w3hJlSTZtE5j87ErQ9WCDoNojRRywHm8k1Br1yVBtAKly3IWY9MM1Ts60p0FIw==}
+  /@chain-registry/types@0.50.6:
+    resolution: {integrity: sha512-SJsf50OqOqvclEVHRBm7RNKEeQoZ6RANVl0J1ztEPWnRyW24pt4iyEn1IYWb+V7wE4pn0NduhKdJ5jwh6nuJUQ==}
     dev: false
 
   /@coinbase/wallet-sdk@3.9.3:
@@ -3320,8 +3320,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.239:
-    resolution: {integrity: sha512-yVTJyAr5lO/wMi0PyNECS8/tZDIJ5M9/iZtnxB8NC0GVwd3+6oSzPLGuqUJumySzC96LeUIHG5tWTDe3xXrjlg==}
+  /@dydxprotocol/v4-localization@1.1.240:
+    resolution: {integrity: sha512-6szWjG/6CUYqruRly3QG3K86x5eNCohpvdKwva/16k+LEcuOWfCOcZrsddgVx03xmKxR1h4ca58OyP/B0LjMYw==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -9522,7 +9522,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.23
+      chain-registry: 1.69.24
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -12939,6 +12939,7 @@ packages:
 
   /acorn-import-assertions@1.9.0(acorn@8.11.3):
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
+    deprecated: package has been renamed to acorn-import-attributes
     peerDependencies:
       acorn: ^8
     dependencies:
@@ -14166,10 +14167,10 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.23:
-    resolution: {integrity: sha512-am76pGWqaF2q163z5bQ7p0Z2sp8PX93dtKmArpUwYfXuWLvqwPa/uKMJ/UkZvcFcr2kBrslnxL+wpFb/EXzDDw==}
+  /chain-registry@1.69.24:
+    resolution: {integrity: sha512-eT6taV/wkJASFUuzBnb8Rc6NQabMnSPzEF3hKGwD0zj2G9FqdifywfygwpkVUgdMhjMIYhbiP8rSDGAOUvf59A==}
     dependencies:
-      '@chain-registry/types': 0.50.5
+      '@chain-registry/types': 0.50.6
     dev: false
 
   /chalk@2.4.2:
@@ -19582,7 +19583,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.23
+      chain-registry: 1.69.24
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
