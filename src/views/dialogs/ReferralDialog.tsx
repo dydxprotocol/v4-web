@@ -36,14 +36,19 @@ const CONTENT_SECTIONS = [
 export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialogProps>) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { data: referralAddress, isFetched: isReferralAddressFetched } =
-    useReferralAddress(refCode);
+  const {
+    data: referralAddress,
+    isPending: isReferralAddressPending,
+    isFetched: isReferralAddressFetched,
+  } = useReferralAddress(refCode);
   const {
     affiliateMetadataQuery: { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess },
   } = useAffiliatesInfo(referralAddress);
 
   const isNotEligible = isAffiliatesInfoSuccess && !affiliatesInfo.isEligible;
   const invalidReferralCode = isReferralAddressFetched && !referralAddress;
+
+  if (isReferralAddressPending) return null;
 
   return (
     <Dialog
@@ -53,13 +58,19 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
       title={
         <span tw="flex flex-row items-center gap-1">
           {stringGetter({
-            key: !isNotEligible ? STRING_KEYS.YOUR_FRIEND : STRING_KEYS.WELCOME_DYDX,
+            key:
+              !isNotEligible && !invalidReferralCode
+                ? STRING_KEYS.YOUR_FRIEND
+                : STRING_KEYS.WELCOME_DYDX,
           })}
           <span tw="text-color-text-0 font-medium-book">{truncateAddress(referralAddress)}</span>
         </span>
       }
       description={stringGetter({
-        key: !isNotEligible ? STRING_KEYS.INVITED_YOU : STRING_KEYS.THE_PRO_TRADING_PLATFORM,
+        key:
+          !isNotEligible && !invalidReferralCode
+            ? STRING_KEYS.INVITED_YOU
+            : STRING_KEYS.THE_PRO_TRADING_PLATFORM,
       })}
       slotHeaderAbove={
         <$HeaderAbove tw="flex flex-row items-center gap-1">
@@ -67,14 +78,14 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
             <img src="/hedgies-placeholder.png" alt="hedgie" tw="h-5" />
           ) : (
             <div tw="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[100%] bg-color-layer-1">
-              <div tw="flex h-2.5 w-2.5 items-center justify-center rounded-[100%] bg-color-layer-7 text-color-layer-1 font-large-book">
+              <div tw="flex h-2.5 w-2.5 items-center justify-center rounded-[100%] bg-color-text-0 text-color-layer-1 font-large-book">
                 !
               </div>
             </div>
           )}
           <div tw="row">
             <$Triangle />
-            <div tw="inline-block rounded-0.5 bg-color-layer-6 px-1 py-0.5 font-bold text-color-text-2">
+            <div tw="inline-block rounded-0.5 bg-color-layer-6 px-1 py-0.5 text-color-text-2">
               {!invalidReferralCode ? (
                 <span>
                   {stringGetter({
@@ -102,22 +113,26 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
       }
     >
       <div tw="flex flex-col gap-2">
-        {CONTENT_SECTIONS.map(({ header, description }, index) => (
-          <div key={header} tw="flex flex-row items-center gap-1">
-            <div tw="flex h-3 w-3 flex-shrink-0 items-center justify-center rounded-[100%] bg-color-layer-5">
-              <span tw="font-medium text-color-text-1">{index + 1}</span>
+        <div tw="flex flex-col gap-1.5">
+          {CONTENT_SECTIONS.map(({ header, description }, index) => (
+            <div key={header} tw="flex flex-row items-center gap-1">
+              <div tw="flex h-3 w-3 flex-shrink-0 items-center justify-center rounded-[100%] bg-color-layer-5">
+                <span tw="font-medium text-color-text-1">{index + 1}</span>
+              </div>
+              <div tw="flex flex-col">
+                <div tw="font-medium-book">{stringGetter({ key: header })}</div>
+                <div tw="text-color-text-0 font-base-book">
+                  {stringGetter({ key: description })}
+                </div>
+              </div>
             </div>
-            <div tw="flex flex-col">
-              <div tw="font-medium-book">{stringGetter({ key: header })}</div>
-              <div tw="text-color-text-0 font-base-book">{stringGetter({ key: description })}</div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
         <div tw="flex flex-col items-center gap-0.5">
           {!dydxAddress ? (
             <OnboardingTriggerButton
               tw="w-full"
-              size={ButtonSize.Small}
+              size={ButtonSize.Medium}
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -125,7 +140,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
           ) : (
             <Button
               action={ButtonAction.Primary}
-              size={ButtonSize.Small}
+              size={ButtonSize.Medium}
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -138,7 +153,7 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
             {stringGetter({
               key: STRING_KEYS.ALL_REWARDS_DYDX_COMMUNITY,
               params: {
-                // TODO: Add link to DYDX community
+                // TODO(affiliates): Add link to DYDX community
                 DYDX_COMMUNITY_LINK: (
                   <Link isInline>{stringGetter({ key: STRING_KEYS.DYDX_COMMUNITY })}</Link>
                 ),
