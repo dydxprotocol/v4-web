@@ -10,8 +10,9 @@ import {
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setTvChartResolution } from '@/state/perpetuals';
-import { getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
+import { getTvChartConfig } from '@/state/tradingViewSelectors';
+
+import { getSavedResolution } from '@/lib/tradingView/utils';
 
 /**
  * @description Hook to handle changing markets and setting chart resolution
@@ -21,18 +22,21 @@ export const useChartMarketAndResolution = ({
   currentMarketId,
   isViewingUnlaunchedMarket,
   tvWidget,
-  savedResolution,
 }: {
   currentMarketId: string;
   isViewingUnlaunchedMarket?: boolean;
   tvWidget?: TvWidget;
-  savedResolution?: ResolutionString;
 }) => {
   const dispatch = useAppDispatch();
-  const selectedResolution = (useAppSelector((s) =>
-    getSelectedResolutionForMarket(s, currentMarketId)
-  ) ?? DEFAULT_RESOLUTION) as ResolutionString;
-  const initialResolutionRef = useRef<ResolutionString>(savedResolution ?? selectedResolution);
+  const savedTvChartConfig = useAppSelector((s) => getTvChartConfig(s, isViewingUnlaunchedMarket));
+  const savedResolution = (getSavedResolution({ savedConfig: savedTvChartConfig }) ??
+    DEFAULT_RESOLUTION) as ResolutionString;
+
+  // Use ref to use up-to-date resolution value in the next useEffect without running effect when the value changes
+  const savedResolutionRef = useRef<ResolutionString>(savedResolution);
+  useEffect(() => {
+    savedResolutionRef.current = savedResolution;
+  }, [savedResolution]);
 
   /**
    * @description Hook to handle changing markets and subscribe to changing resolutions
@@ -41,9 +45,9 @@ export const useChartMarketAndResolution = ({
     if (!tvWidget) return;
 
     tvWidget.onChartReady(() => {
-      const initialResolution = initialResolutionRef.current;
+      const resolution = savedResolutionRef.current;
       if (currentMarketId !== tvWidget.activeChart().symbol()) {
-        tvWidget.setSymbol(currentMarketId, initialResolution, () => {});
+        tvWidget.setSymbol(currentMarketId, resolution, () => {});
       }
 
       tvWidget
@@ -51,15 +55,10 @@ export const useChartMarketAndResolution = ({
         .onIntervalChanged()
         .subscribe(null, (newResolution) => {
           setVisibleRangeForResolution(tvWidget, newResolution, isViewingUnlaunchedMarket);
-          if (!isViewingUnlaunchedMarket) {
-            dispatch(
-              setTvChartResolution({ marketId: currentMarketId, resolution: newResolution })
-            );
-          }
         });
 
       // Set visible range on initial render
-      setVisibleRangeForResolution(tvWidget, initialResolution, isViewingUnlaunchedMarket);
+      setVisibleRangeForResolution(tvWidget, resolution, isViewingUnlaunchedMarket);
     });
   }, [currentMarketId, tvWidget, isViewingUnlaunchedMarket, dispatch]);
 };
