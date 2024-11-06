@@ -138,16 +138,21 @@ export const Fees = () => {
                 label: stringGetter({ key: STRING_KEYS.VOLUME_30D }),
                 allowsSorting: false,
                 renderCell: ({ symbol, volume: vol, makerShare, totalShare }) => (
-                  <>
-                    <span>{`${
-                      symbol in EQUALITY_SYMBOL_MAP
-                        ? EQUALITY_SYMBOL_MAP[symbol as keyof typeof EQUALITY_SYMBOL_MAP]
-                        : symbol
-                    } `}</span>
-                    <$HighlightOutput type={OutputType.CompactFiat} value={vol} />
-                    {isTablet &&
-                      AdditionalConditions({ totalShare, makerShare, isAdditional: true })}
-                  </>
+                  <div tw="flex flex-col">
+                    <div tw="flex flex-row justify-end gap-0.25">
+                      <span>{`${
+                        symbol in EQUALITY_SYMBOL_MAP
+                          ? EQUALITY_SYMBOL_MAP[symbol as keyof typeof EQUALITY_SYMBOL_MAP]
+                          : symbol
+                      } `}</span>
+                      <$HighlightOutput type={OutputType.CompactFiat} value={vol} />
+                    </div>
+                    {isTablet && (
+                      <div tw="flex justify-end">
+                        {AdditionalConditions({ totalShare, makerShare, isAdditional: true })}
+                      </div>
+                    )}
+                  </div>
                 ),
               },
               isNotTablet && {
@@ -199,20 +204,28 @@ const $AdditionalConditions = styled.div`
   > :nth-child(2) {
     font: var(--font-small-book);
   }
+
+  @media ${breakpoints.mobile} {
+    max-width: 6rem;
+  }
 `;
 
 const $AdditionalConditionsText = styled.span`
   display: flex;
   gap: 0.5ch;
   justify-content: end;
+  align-items: flex-end;
 
   @media ${breakpoints.mobile} {
     display: inline;
-    max-width: 8rem;
     min-width: 0;
 
     output {
       display: inline;
+    }
+
+    :after {
+      content: ' ';
     }
   }
 `;
