@@ -8,10 +8,10 @@ import {
 import { CriteriaDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -39,7 +39,7 @@ export const CriteriaDialog = ({
   stakedAmount,
   userTier,
 }: DialogProps<CriteriaDialogProps>) => {
-  const { isConnectedWagmi } = useWalletConnection();
+  const { dydxAddress } = useAccounts();
   const { affiliateProgram } = useURLConfigs();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -84,7 +84,7 @@ export const CriteriaDialog = ({
       {...{ setIsOpen }}
       placement={DialogPlacement.Default}
       title={
-        !isConnectedWagmi
+        !dydxAddress
           ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
           : userTier === 'vip'
             ? stringGetter({
@@ -140,21 +140,23 @@ export const CriteriaDialog = ({
                 })}
           </div>
 
-          <div className="my-1 flex">
-            <BorderStatCell
-              className="pr-1"
-              border={['right']}
-              title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-              outputType={OutputType.CompactFiat}
-              value={accountStats?.referredVolume}
-            />
-            <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
-              <div className="flex items-center">
-                {isConnectedWagmi ? stakedDYdX.toLocaleString() : '-'}
-                <Tag className="ml-0.25">{chainTokenLabel}</Tag>
-              </div>
-            </StatCell>
-          </div>
+          {dydxAddress && (
+            <div className="my-1 flex">
+              <BorderStatCell
+                className="pr-1"
+                border={['right']}
+                title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+                outputType={OutputType.CompactFiat}
+                value={accountStats?.referredVolume}
+              />
+              <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
+                <div className="flex items-center">
+                  {stakedDYdX.toLocaleString()}
+                  <Tag className="ml-0.25">{chainTokenLabel}</Tag>
+                </div>
+              </StatCell>
+            </div>
+          )}
         </div>
 
         <CriteriaTable tiers={tiers} userTier={userTier} />
@@ -286,7 +288,7 @@ const CriteriaTable = ({
 
   return (
     <$Table
-      affiliateTierIdx={userTier === 'vip' ? 4 : userTier ?? 0}
+      affiliateTierIdx={userTier === 'vip' ? 4 : userTier}
       withInnerBorders
       withOuterBorder
       getRowKey={(row) => row.tier}
@@ -317,7 +319,7 @@ const $Dialog = styled(Dialog)`
 
 const $TableCell = tw(TableCell)`py-0.5`;
 
-const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx: number }>`
+const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx?: number }>`
   th {
     background-color: var(--color-layer-3);
   }
@@ -331,8 +333,11 @@ const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx
   }
 
   ${({ affiliateTierIdx }) => `
-  tr:nth-child(${affiliateTierIdx + 1}) {
+  ${
+    affiliateTierIdx !== undefined &&
+    `tr:nth-child(${affiliateTierIdx + 1}) {
     background-color: var(--color-layer-5);
+}`
   }
 `}
 

@@ -100,7 +100,7 @@ export type WithdrawalGatedDialogProps = {
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: string;
-  userTier: number | 'vip';
+  userTier?: number | 'vip';
 };
 
 export const DialogTypes = unionize(

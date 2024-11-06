@@ -202,7 +202,7 @@ export const AffiliateStatsCard = ({
     dispatch(
       openDialog(
         DialogTypes.Criteria({
-          userTier: isVip ? 'vip' : currentAffiliateTier ?? 0,
+          userTier: isVip ? 'vip' : currentAffiliateTier,
           accountStats,
           stakedAmount: stakedDydx,
         })
