@@ -6,8 +6,10 @@ import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -50,6 +52,7 @@ export const HeaderDesktop = () => {
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
+  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const { enableVaults: showVaults, uiRefresh: uiRefreshEnabled } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
@@ -96,6 +99,11 @@ export const HeaderDesktop = () => {
             </>
           ),
           href: AppRoute.Vault,
+        },
+        affiliatesEnabled && {
+          value: 'AFFILIATES',
+          label: stringGetter({ key: STRING_KEYS.AFFILIATES }),
+          href: AppRoute.Affiliates,
         },
         {
           value: chainTokenLabel,

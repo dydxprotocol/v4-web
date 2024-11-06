@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
 
+import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
@@ -117,5 +118,6 @@ export const DialogManager = () => {
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
+    Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
 };

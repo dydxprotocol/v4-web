@@ -16,6 +16,7 @@ interface EndpointsConfig {
   faucet?: string;
   stakingAPR?: string;
   solanaRpcUrl: string;
+  affiliates?: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -32,5 +33,6 @@ export const useEndpointsConfig = () => {
     faucet: endpointsConfig.faucet,
     stakingAPR: endpointsConfig.stakingAPR,
     solanaRpcUrl: endpointsConfig.solanaRpcUrl,
+    affiliatesBaseUrl: endpointsConfig.affiliates,
   };
 };
