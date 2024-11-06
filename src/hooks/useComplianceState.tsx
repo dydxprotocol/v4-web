@@ -14,7 +14,6 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 import {
   getComplianceStatus,
   getComplianceUpdatedAt,
-  getGeo,
   getOnboardingState,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -22,7 +21,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 
-import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
 
@@ -31,10 +29,12 @@ export const useComplianceState = () => {
   const { help } = useURLConfigs();
   const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
-  const geo = useAppSelector(getGeo);
+  // const geo = useAppSelector(getGeo);
+  const geo = 'US';
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
-  const { checkForGeo } = useEnvFeatures();
+  // const { checkForGeo } = useEnvFeatures();
+  const checkForGeo = true;
 
   const complianceState = useMemo(() => {
     if (

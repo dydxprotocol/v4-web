@@ -116,7 +116,7 @@ const Content = () => {
         isShowingFooter={isShowingFooter}
         showRestrictionWarning={showRestrictionWarning}
       >
-        {isNotTablet && <HeaderDesktop />}
+        {isShowingHeader && <HeaderDesktop />}
         {showRestrictionWarning && <RestrictionWarning />}
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
@@ -273,7 +273,7 @@ const $Content = styled.div<{
     ${layoutMixins.contentContainer}
 
     ${layoutMixins.scrollArea}
-    --scrollArea-height: 100vh;
+    --scrollArea-height: 100%;
 
   @supports (-webkit-touch-callout: none) {
     height: -webkit-fill-available;
@@ -287,9 +287,9 @@ const $Content = styled.div<{
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
-  ${({ showRestrictionWarning }) => css`
+  ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:
-      'Header' var(--page-currentHeaderHeight)
+      ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
       ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
       'Main' minmax(min-content, 1fr)
       'Footer' var(--page-currentFooterHeight)
