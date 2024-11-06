@@ -196,14 +196,6 @@ export const getPerpetualBarsForPriceChart = (orderbookCandlesToggleOn: boolean)
   );
 
 /**
- *
- * @param marketId
- * @returns TvChart resolution for specified marketId
- */
-export const getSelectedResolutionForMarket = (state: RootState, marketId: string) =>
-  state.perpetuals.candles[marketId]?.selectedResolution;
-
-/**
  * @returns Current market's next funding rate
  */
 export const getCurrentMarketNextFundingRate = createAppSelector(

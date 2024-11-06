@@ -81,6 +81,4 @@ export const useTradingViewLaunchable = ({
       tvWidget?.remove();
     };
   }, [dispatch, !!marketId, selectedLocale, isDataLoading, tvWidget, setTvWidget]);
-
-  return { savedResolution };
 };
