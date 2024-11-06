@@ -81,6 +81,7 @@ export default {
       regular: 'var(--fontWeight-regular)',
       book: 'var(--fontWeight-book)',
       medium: 'var(--fontWeight-medium)',
+      semibold: 'var(--fontWeight-semibold)',
       bold: 'var(--fontWeight-bold)',
     },
     spacing: {
