@@ -799,6 +799,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
 
       // TRUMPWIN-USD
+      const trumpWinResultDate = new Date('2024-11-04T23:59:59.000Z');
       const trumpWinFills = allFills.filter((fill) => fill.marketId === PREDICTION_MARKET.TRUMPWIN);
       const trumpWinDeleveraged = trumpWinFills.filter(
         (fill) => fill.type === AbacusOrderType.Deleveraged
@@ -813,35 +814,39 @@ export const notificationTypes: NotificationTypeConfig[] = [
             (a, b) => b.createdAtMilliseconds - a.createdAtMilliseconds
           )[0];
 
-          const hadCorrectOutcome = latestTrumpFill?.type === AbacusOrderType.Offsetting;
+          if (!latestTrumpFill) return;
 
-          trigger(
-            PREDICTION_MARKET.TRUMPWIN,
-            {
-              icon: null,
-              title: stringGetter({
-                key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED,
-                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED_DESC,
-                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
-              }),
-              toastSensitivity: 'background',
-              groupKey: PREDICTION_MARKET.TRUMPWIN,
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              renderCustomBody: ({ isToast, notification }) => (
-                <PredictionMarketEndNotification
-                  isToast={isToast}
-                  marketId={PREDICTION_MARKET.TRUMPWIN}
-                  hadCorrectOutcome={hadCorrectOutcome}
-                  notification={notification}
-                />
-              ),
-            },
-            [],
-            true
-          );
+          const hadCorrectOutcome = latestTrumpFill.type === AbacusOrderType.Offsetting;
+
+          if (latestTrumpFill.createdAtMilliseconds > trumpWinResultDate.getTime()) {
+            trigger(
+              PREDICTION_MARKET.TRUMPWIN,
+              {
+                icon: null,
+                title: stringGetter({
+                  key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED,
+                  params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
+                }),
+                body: stringGetter({
+                  key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED_DESC,
+                  params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
+                }),
+                toastSensitivity: 'background',
+                groupKey: PREDICTION_MARKET.TRUMPWIN,
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                renderCustomBody: ({ isToast, notification }) => (
+                  <PredictionMarketEndNotification
+                    isToast={isToast}
+                    marketId={PREDICTION_MARKET.TRUMPWIN}
+                    hadCorrectOutcome={hadCorrectOutcome}
+                    notification={notification}
+                  />
+                ),
+              },
+              [],
+              true
+            );
+          }
         }
       }, [trumpWinDeleveraged, trumpWinOffset]);
     },
