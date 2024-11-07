@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { FunkitProvider } from '@funkit/connect';
@@ -46,11 +46,13 @@ import { config, privyConfig } from '@/lib/wagmi';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { funkitConfig, funkitTheme } from './constants/funkit';
+import { LocalStorageKey } from './constants/localStorage';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
@@ -61,6 +63,9 @@ import LaunchMarket from './pages/LaunchMarket';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { appQueryClient } from './state/appQueryClient';
+import { useAppDispatch, useAppSelector } from './state/appTypes';
+import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
+import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import breakpoints from './styles/breakpoints';
 import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
@@ -101,6 +106,7 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+  useUiRefreshMigrations();
 
   return (
     <>
@@ -177,6 +183,24 @@ const Content = () => {
     </>
   );
 };
+
+function useUiRefreshMigrations() {
+  const themeSetting = useAppSelector(getAppThemeSetting);
+  const dispatch = useAppDispatch();
+  const { uiRefresh } = testFlags;
+  const [seenUiRefresh, setSeenUiRefresh] = useLocalStorage({
+    key: LocalStorageKey.HasSeenUiRefresh,
+    defaultValue: false,
+  });
+  useEffect(() => {
+    if (uiRefresh && !seenUiRefresh) {
+      setSeenUiRefresh(true);
+      if (themeSetting === AppTheme.Classic) {
+        dispatch(setAppThemeSetting(AppTheme.Dark));
+      }
+    }
+  }, [themeSetting, seenUiRefresh, uiRefresh, dispatch, setSeenUiRefresh]);
+}
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   // eslint-disable-next-line react/display-name
