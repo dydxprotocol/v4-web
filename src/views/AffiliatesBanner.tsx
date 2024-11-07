@@ -35,6 +35,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
   const {
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo();
+
   const background = useAppSelector(getGridBackground);
 
   const titleString = stringGetter({
@@ -70,7 +71,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
 
   if (isTablet) {
     return (
-      <$Background backgroundImagePath={background} tw="mt-1 bg-color-layer-1 p-1">
+      <$Background backgroundImagePath={background} tw="bg-color-layer-1 p-1">
         <div tw="column items-start gap-1">
           <div tw="font-bold text-color-text-2">{titleString}</div>
           <div tw="">{description}</div>
@@ -91,7 +92,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
   return (
     <$Background
       backgroundImagePath={background}
-      tw="row mb-1 justify-between gap-0.5 bg-color-layer-1 pl-1 pr-2"
+      tw="row justify-between gap-0.5 bg-color-layer-1 pl-1 pr-2"
     >
       {withClose && (
         <$CloseButton
@@ -102,7 +103,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
         />
       )}
       <div tw="row">
-        <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-8" />
+        <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8" />
         <div tw="column items-start gap-0.5">
           <div tw="row">
             <$Triangle />

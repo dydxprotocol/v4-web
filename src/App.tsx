@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { FunkitProvider } from '@funkit/connect';
@@ -45,7 +45,6 @@ import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
-import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
@@ -53,16 +52,17 @@ import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
+import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { appQueryClient } from './state/appQueryClient';
-import { useAppDispatch } from './state/appTypes';
-import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
+import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -81,8 +81,8 @@ const Content = () => {
   useAnalytics();
   useCommandMenu();
   usePrefetchedQueries();
+  useReferralCode();
 
-  const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -102,12 +102,6 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  useEffect(() => {
-    if (testFlags.referralCode) {
-      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
-    }
-  }, [dispatch]);
-
   return (
     <>
       <GlobalStyle />
@@ -121,6 +115,11 @@ const Content = () => {
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
+              <Route path={`${AppRoute.Affiliates}/*`} element={<AffiliatesPage />}>
+                <Route index element={<Navigate to="leaderboard" replace />} />
+                <Route path="program-stats" element={<CommunityChartContainer />} />
+              </Route>
+
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />

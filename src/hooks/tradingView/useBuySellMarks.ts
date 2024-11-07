@@ -16,12 +16,10 @@ export function useBuySellMarks({
   buySellMarksToggle,
   buySellMarksToggleOn,
   tvWidget,
-  isChartReady,
 }: {
   buySellMarksToggle: HTMLElement | null;
   buySellMarksToggleOn: boolean;
-  tvWidget: TvWidget | null;
-  isChartReady: boolean;
+  tvWidget?: TvWidget;
 }) {
   const marketId = useAppSelector(getCurrentMarketId);
   const fills = useAppSelector(getMarketFills);
@@ -33,7 +31,7 @@ export function useBuySellMarks({
   useEffect(
     // Update marks on toggle and on new fills and on display preference changes
     () => {
-      if (!isChartReady || !tvWidget) return;
+      if (!tvWidget) return;
 
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
@@ -56,7 +54,6 @@ export function useBuySellMarks({
       isAccountConnected,
       buySellMarksToggle,
       tvWidget,
-      isChartReady,
       currentMarketFills,
       theme,
     ]

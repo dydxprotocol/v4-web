@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { LightningBoltIcon } from '@radix-ui/react-icons';
-import { Link } from 'react-router-dom';
+import { Link as NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { DialogProps, LaunchMarketDialogProps } from '@/constants/dialogs';
@@ -11,11 +11,13 @@ import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
@@ -30,6 +32,7 @@ export const LaunchMarketDialog = ({
   const [formStep, setFormStep] = useState<NewMarketFormStep>();
   const stringGetter = useStringGetter();
   const [isLoading, setIsLoading] = useState(false);
+  const { launchMarketLearnMore } = useURLConfigs();
 
   const onClose = () => {
     setIsOpen(false);
@@ -48,30 +51,37 @@ export const LaunchMarketDialog = ({
               </span>
             </$Title>
           ),
-          description: stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
-            params: {
-              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
-              DEPOSIT_AMOUNT: (
-                <Output
-                  useGrouping
-                  type={OutputType.Fiat}
-                  tw="inline-block"
-                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
-                />
-              ),
-              PAST_DAYS: 30,
-              MEGAVAULT_LINK: (
-                <Link
-                  tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-2)] hover:underline"
-                  to={AppRoute.Vault}
-                >
-                  {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
-                  <LinkOutIcon />
-                </Link>
-              ),
-            },
-          }),
+          description: (
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.MARKET_LAUNCH_DETAILS_4,
+                params: {
+                  APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
+                  DEPOSIT_AMOUNT: (
+                    <Output
+                      useGrouping
+                      type={OutputType.Fiat}
+                      tw="inline-block"
+                      value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                    />
+                  ),
+                  NUM_DAYS: 30,
+                  MEGAVAULT_LINK: (
+                    <NavLink
+                      tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-2)] hover:underline"
+                      to={AppRoute.Vault}
+                    >
+                      {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+                      <LinkOutIcon />
+                    </NavLink>
+                  ),
+                },
+              })}
+              <Link tw="inline-flex" href={launchMarketLearnMore} withIcon>
+                {stringGetter({ key: STRING_KEYS.LEARN_MORE_MARKET_LAUNCH })}
+              </Link>
+            </span>
+          ),
         };
       case NewMarketFormStep.PREVIEW:
         return {

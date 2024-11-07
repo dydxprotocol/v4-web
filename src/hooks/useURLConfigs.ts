@@ -9,6 +9,7 @@ export interface LinksConfigs {
   accountExportLearnMore?: string;
   blogs?: string;
   community?: string;
+  vipsChannel?: string;
   documentation?: string;
   equityTiersLearnMore?: string;
   feedback?: string;
@@ -46,7 +47,9 @@ export interface LinksConfigs {
   deployerTermsAndConditions?: string;
   dydxLearnMore?: string;
   affiliateProgram?: string;
+  affiliateProgramSupportEmail?: string;
   launchMarketTos?: string;
+  launchMarketLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -57,6 +60,7 @@ export const useURLConfigs = (): LinksConfigs => {
     accountExportLearnMore: linksConfigs.accountExportLearnMore ?? FALLBACK_URL,
     blogs: linksConfigs.blogs ?? FALLBACK_URL,
     community: linksConfigs.community ?? FALLBACK_URL,
+    vipsChannel: linksConfigs.vipsChannel ?? FALLBACK_URL,
     documentation: linksConfigs.documentation ?? FALLBACK_URL,
     equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
@@ -95,6 +99,8 @@ export const useURLConfigs = (): LinksConfigs => {
     deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
     dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
     affiliateProgram: linksConfigs.affiliateProgram,
+    affiliateProgramSupportEmail: linksConfigs.affiliateProgramSupportEmail,
     launchMarketTos: linksConfigs.launchMarketTos ?? FALLBACK_URL,
+    launchMarketLearnMore: linksConfigs.launchMarketLearnMore ?? FALLBACK_URL,
   };
 };

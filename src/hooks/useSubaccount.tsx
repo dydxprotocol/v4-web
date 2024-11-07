@@ -984,6 +984,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       return;
     }
     if (
+      compositeClient &&
       latestReferrer &&
       dydxAddress &&
       usdcCoinBalance &&
@@ -995,6 +996,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       registerAffiliateMutate(latestReferrer);
     }
   }, [
+    compositeClient,
     latestReferrer,
     dydxAddress,
     registerAffiliateMutate,

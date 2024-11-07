@@ -122,6 +122,12 @@ export const Tabs = <TabItemsValue extends string>({
     </>
   );
 
+  const header = (
+    <$Header $side={side} ref={headerRef}>
+      {triggers}
+    </$Header>
+  );
+
   return (
     <$Root
       className={className}
@@ -135,17 +141,13 @@ export const Tabs = <TabItemsValue extends string>({
       $withInnerBorder={withBorders || withUnderline}
       $uiRefreshEnabled={uiRefresh}
     >
-      {showFadeStart || showFadeEnd ? (
-        <$HorizontalScrollContainer showFadeStart={showFadeStart} showFadeEnd={showFadeEnd}>
-          <$Header $side={side} ref={headerRef}>
-            {triggers}
-          </$Header>
-        </$HorizontalScrollContainer>
-      ) : (
-        <$Header $side={side} ref={headerRef}>
-          {triggers}
-        </$Header>
-      )}
+      <$HorizontalScrollContainer
+        $side={side}
+        showFadeStart={showFadeStart}
+        showFadeEnd={showFadeEnd}
+      >
+        {header}
+      </$HorizontalScrollContainer>
 
       {sharedContent ?? (
         <div tw="stack shadow-none">
@@ -232,9 +234,21 @@ const $Root = styled(Root)<{
 const $HorizontalScrollContainer = styled.div<{
   showFadeStart: boolean;
   showFadeEnd: boolean;
+  $side: 'top' | 'bottom';
 }>`
   ${layoutMixins.horizontalFadeScrollArea}
   --scrollArea-fade-zIndex: calc(var(--stickyHeader-zIndex) + 1);
+
+  ${({ $side }) =>
+    ({
+      top: css`
+        ${layoutMixins.stickyHeader}
+      `,
+      bottom: css`
+        ${layoutMixins.stickyFooter}
+        grid-row: 2;
+      `,
+    })[$side]}
 
   ${({ showFadeStart }) =>
     !showFadeStart &&
@@ -256,18 +270,6 @@ const $HorizontalScrollContainer = styled.div<{
 const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
   ${layoutMixins.contentSectionDetachedScrollable}
   flex: 1;
-
-  ${({ $side }) =>
-    ({
-      top: css`
-        ${layoutMixins.stickyHeader}
-      `,
-      bottom: css`
-        ${layoutMixins.stickyFooter}
-        grid-row: 2;
-      `,
-    })[$side]}
-
   ${layoutMixins.row}
   justify-content: space-between;
   z-index: var(--stickyHeader-zIndex);
@@ -413,7 +415,7 @@ export const MobileTabs = styled(Tabs)`
   padding-bottom: 1rem;
   gap: var(--border-width);
 
-  > header {
+  > div > header {
     padding: 0 1rem;
 
     button {

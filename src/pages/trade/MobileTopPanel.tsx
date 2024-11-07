@@ -22,6 +22,7 @@ import { LiveTrades } from '@/views/tables/LiveTrades';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 
 enum Tab {
@@ -106,6 +107,7 @@ export const MobileTopPanel = ({
   return (
     <$Tabs
       value={value}
+      $shortMode={value === Tab.Account}
       onValueChange={setValue}
       items={items.map((item) => ({
         ...item,
@@ -117,16 +119,20 @@ export const MobileTopPanel = ({
     />
   );
 };
-const $Tabs = styled(Tabs)`
-  --scrollArea-height: 20rem;
+
+type TabsStyleProps = { $shortMode?: boolean };
+const TabsTypeTemp = getSimpleStyledOutputType(Tabs, {} as TabsStyleProps);
+
+const $Tabs = styled(Tabs)<TabsStyleProps>`
+  --scrollArea-height: ${({ $shortMode }) => ($shortMode ? '19rem' : '38rem')};
   --stickyArea0-background: var(--color-layer-2);
-  --tabContent-height: calc(20rem - 2rem - var(--tabs-currentHeight));
+  --tabContent-height: calc(var(--scrollArea-height) - 2rem - var(--tabs-currentHeight));
 
   min-height: 100%;
 
   gap: var(--border-width);
 
-  > header {
+  > div > header {
     padding: 1rem 1.25rem;
 
     > [role='tablist'] {
@@ -135,7 +141,7 @@ const $Tabs = styled(Tabs)`
       gap: 0.5rem;
     }
   }
-` as typeof Tabs;
+` as typeof TabsTypeTemp;
 
 const $TabButton = styled(ToggleButton)`
   padding: 0 0.5rem;

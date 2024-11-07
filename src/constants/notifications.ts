@@ -16,6 +16,7 @@ export enum NotificationType {
   MarketUpdate = 'MarketUpdate',
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
+  PredictionMarketConcluded = 'PredictionMarketConcluded',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
 }
 
@@ -42,6 +43,7 @@ export const NotificationTypeCategory: {
   [NotificationType.MarketUpdate]: NotificationCategoryPreferences.MustSee,
   [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
 };
 
@@ -147,7 +149,7 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
   title: string; // Title for Toast, Notification, and Push Notification
-  body?: string | React.ReactNode; // Description body for Toast, Notification, and Push Notification
+  body?: string; // Description body for Toast, Notification, and Push Notification
 
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;
