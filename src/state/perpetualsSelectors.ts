@@ -226,3 +226,8 @@ export const getMarketMaxLeverage = () =>
       return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
     }
   );
+
+// Returns list of markets that user has launched to handle loading/navigation state
+export const getLaunchedMarketIds = (state: RootState) => {
+  return state.perpetuals.launchMarketIds;
+};

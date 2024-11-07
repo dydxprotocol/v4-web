@@ -179,6 +179,7 @@ export const NewMarketSelectionStep = ({
           {alertMessage}
 
           <WithReceipt
+            tw="min-h-0"
             slotReceipt={<Details items={receiptItems} tw="px-0.75 pb-0.25 pt-0.375 text-small" />}
           >
             {isDisconnected ? (

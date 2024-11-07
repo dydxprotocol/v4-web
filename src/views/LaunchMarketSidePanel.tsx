@@ -18,7 +18,6 @@ export const LaunchMarketSidePanel = ({
 
 const $Container = styled.section`
   display: grid;
-  grid-template-rows: auto 1fr auto;
   gap: 1rem;
   padding: 1rem;
   flex: 1;

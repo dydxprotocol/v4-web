@@ -7,6 +7,7 @@ import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ESTIMATED_LAUNCH_TIMEOUT, LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
@@ -34,14 +35,13 @@ import { Output, OutputType } from '@/components/Output';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setLaunchMarketIds } from '@/state/perpetuals';
 import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-
-const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
 
 type NewMarketPreviewStepProps = {
   ticker: string;
@@ -74,6 +74,7 @@ export const NewMarketPreviewStep = ({
   const [txHash, setTxHash] = useState<string>();
   const [eta, setEta] = useState<number>(0);
   const now = useNow();
+  const dispatch = useAppDispatch();
 
   // Countdown timer used to wait for OraclePrice as well as a hard block before allowing user to navigate/re-subscribe
   const secondsLeft = isLoading ? Math.max(0, (eta - now) / timeUnits.second) : 0;
@@ -232,6 +233,10 @@ export const NewMarketPreviewStep = ({
         setIsParentLoading?.(true);
         setErrorMessage(undefined);
 
+        dispatch(
+          setLaunchMarketIds({ launchedMarketId: ticker, launchStatus: LaunchMarketStatus.PENDING })
+        );
+
         try {
           const tx = await createPermissionlessMarket(ticker);
 
@@ -254,6 +259,13 @@ export const NewMarketPreviewStep = ({
 
           setEta(Date.now() + ESTIMATED_LAUNCH_TIMEOUT);
         } catch (error) {
+          dispatch(
+            setLaunchMarketIds({
+              launchedMarketId: ticker,
+              launchStatus: LaunchMarketStatus.FAILURE,
+            })
+          );
+
           log('NewMarketPreviewForm/createPermissionlessMarket', error);
           setErrorMessage(error.message);
           setIsLoading(false);
@@ -276,6 +288,7 @@ export const NewMarketPreviewStep = ({
           checked={hasAcceptedTerms}
           onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
           id="launch-market-ack"
+          disabled={isLoading}
           label={
             <span>
               {stringGetter({
@@ -306,7 +319,7 @@ export const NewMarketPreviewStep = ({
           </Button>
         </div>
 
-        <span tw="text-center text-color-text-1 font-small-book">
+        <span tw="mb-1 text-center text-color-text-1 font-small-book">
           {secondsLeft > 0 &&
             stringGetter({
               key:

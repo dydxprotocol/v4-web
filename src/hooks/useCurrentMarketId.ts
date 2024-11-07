@@ -1,13 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { SubaccountPosition } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters, PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
+import { timeUnits } from '@/constants/time';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -18,8 +20,12 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
-import { setCurrentMarketId } from '@/state/perpetuals';
-import { getMarketIds, getMarketOraclePrice } from '@/state/perpetualsSelectors';
+import { setCurrentMarketId, setLaunchMarketIds } from '@/state/perpetuals';
+import {
+  getLaunchedMarketIds,
+  getMarketIds,
+  getMarketOraclePrice,
+} from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
@@ -41,6 +47,8 @@ export const useCurrentMarketId = () => {
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
   const hasSeenPredictionMarketIntroDialog = useAppSelector(getHasSeenPredictionMarketIntroDialog);
+  const launchedMarketIds = useAppSelector(getLaunchedMarketIds, shallowEqual);
+
   const { filteredMarkets: predictionMarkets } = useMarketsData({
     filter: MarketFilters.PREDICTION_MARKET,
     hideUnlaunchedMarkets: true,
@@ -63,13 +71,44 @@ export const useCurrentMarketId = () => {
     return marketId ?? lastViewedMarket;
   }, [hasMarketIds, marketId]);
 
+  const launchedMarketTimeout = useRef<NodeJS.Timeout | null>(null);
+
   const isViewingUnlaunchedMarket = useMemo(() => {
     if (!hasMarketIds || !hasLoadedLaunchableMarkets || !testFlags.pml) return false;
+
+    // Continue displaying unlaunched market view if marketId is in launchedMarketIds state
+    if (marketId && launchedMarketIds.includes(marketId)) {
+      launchedMarketTimeout.current = setTimeout(() => {
+        dispatch(
+          setLaunchMarketIds({
+            launchedMarketId: marketId,
+            launchStatus: LaunchMarketStatus.SUCCESS,
+          })
+        );
+      }, timeUnits.second * 30);
+
+      return true;
+    }
 
     return launchableMarkets.data.some((market) => {
       return market.id === marketId;
     });
-  }, [hasLoadedLaunchableMarkets, hasMarketIds, marketId, launchableMarkets.data]);
+  }, [
+    dispatch,
+    hasLoadedLaunchableMarkets,
+    hasMarketIds,
+    launchedMarketIds,
+    launchableMarkets.data,
+    marketId,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (launchedMarketTimeout.current) {
+        clearTimeout(launchedMarketTimeout.current);
+      }
+    };
+  }, []);
 
   const isViewingPredictionMarket = useMemo(() => {
     return predictionMarkets.some((market) => market.id === marketId);
