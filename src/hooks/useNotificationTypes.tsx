@@ -799,7 +799,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
 
       // TRUMPWIN-USD
-      const trumpWinResultDate = new Date('2024-11-04T23:59:59.000Z');
+      const trumpWinResultDate = new Date('2024-11-06T23:59:59.000Z');
       const trumpWinFills = allFills.filter((fill) => fill.marketId === PREDICTION_MARKET.TRUMPWIN);
       const trumpWinDeleveraged = trumpWinFills.filter(
         (fill) => fill.type === AbacusOrderType.Deleveraged
