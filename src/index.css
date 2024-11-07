@@ -10,6 +10,11 @@
   --border: var(--default-border-width) solid var(--color-border);
 }
 
+body,
+#root {
+  display: contents;
+}
+
 #root:empty {
   display: block;
   position: fixed;
@@ -92,22 +97,6 @@ b {
   font-weight: 700;
 }
 
-body {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  .smartbanner {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  #root {
-    flex: 1;
-    overflow: hidden;
-  }
-}
 /* Fixes the smart banner being unclickable. We want this to rise above all app banners */
 .smartbanner--ios,
 .smartbanner--android {

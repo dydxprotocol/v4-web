@@ -273,7 +273,7 @@ const $Content = styled.div<{
     ${layoutMixins.contentContainer}
 
     ${layoutMixins.scrollArea}
-    --scrollArea-height: 100%;
+    --scrollArea-height: 100vh;
 
   @supports (-webkit-touch-callout: none) {
     height: -webkit-fill-available;
