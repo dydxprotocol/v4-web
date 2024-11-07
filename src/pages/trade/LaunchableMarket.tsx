@@ -77,11 +77,15 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$GridSection gridArea="Side" tw="flex flex-col">
+      <$SidePanel gridArea="Side" uiRefresh={uiRefresh}>
         {!uiRefresh && <AccountInfo />}
-        <$LaunchMarketSidePanel launchableMarketId={marketId} uiRefresh={uiRefresh} />
+        <$LaunchMarketSidePanel
+          tw="overflow-auto"
+          launchableMarketId={marketId}
+          uiRefresh={uiRefresh}
+        />
         {uiRefresh && <AccountInfo />}
-      </$GridSection>
+      </$SidePanel>
 
       <$GridSection gridArea="Inner">
         <InnerPanel launchableMarketId={marketId} />
@@ -187,6 +191,21 @@ const $TradeLayoutMobile = styled.article`
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+`;
+
+const $SidePanel = styled($GridSection)<{ uiRefresh?: boolean }>`
+  ${({ uiRefresh }) =>
+    uiRefresh
+      ? css`
+          grid-template-rows: 1fr auto;
+        `
+      : css`
+          grid-template-rows: auto 1fr;
+        `}
+
+  form {
+    min-height: 0;
+  }
 `;
 
 const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)<{ uiRefresh?: boolean }>`

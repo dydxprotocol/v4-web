@@ -124,7 +124,7 @@ export const NewMarketPreviewStep = ({
   }, [errorMessage, freeCollateral, stringGetter]);
 
   const heading = shouldHideTitleAndDescription ? null : (
-    <>
+    <div tw="flex flex-col gap-1">
       <h2>
         {isLoading ? (
           <span tw="flex flex-row items-center gap-[0.5ch]">
@@ -146,7 +146,7 @@ export const NewMarketPreviewStep = ({
           },
         })}
       </span>
-    </>
+    </div>
   );
 
   const launchVisualization = (
@@ -271,52 +271,54 @@ export const NewMarketPreviewStep = ({
 
       <$Details items={receiptItems} tw="rounded-[0.625rem] px-1 py-0.5 text-small" />
 
-      <Checkbox
-        checked={hasAcceptedTerms}
-        onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
-        id="launch-market-ack"
-        label={
-          <span>
-            {stringGetter({
-              key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
+      <div tw="flex flex-col gap-1">
+        <Checkbox
+          checked={hasAcceptedTerms}
+          onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
+          id="launch-market-ack"
+          label={
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
+                params: {
+                  CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
+                  LINK: (
+                    <Link tw="inline-flex" href={launchMarketTos} withIcon>
+                      {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
+                    </Link>
+                  ),
+                },
+              })}
+            </span>
+          }
+        />
+
+        <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
+          <Button onClick={onBack} state={{ isDisabled: isLoading }}>
+            {stringGetter({ key: STRING_KEYS.BACK })}
+          </Button>
+          <Button
+            type={ButtonType.Submit}
+            action={ButtonAction.Primary}
+            state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
+          </Button>
+        </div>
+
+        <span tw="text-center text-color-text-1 font-small-book">
+          {secondsLeft > 0 &&
+            stringGetter({
+              key:
+                Math.ceil(secondsLeft) === 1
+                  ? STRING_KEYS.WAIT_SECONDS_SINGULAR
+                  : STRING_KEYS.WAIT_SECONDS,
               params: {
-                CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
-                LINK: (
-                  <Link tw="inline-flex" href={launchMarketTos} withIcon>
-                    {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
-                  </Link>
-                ),
+                SECONDS: String(Math.ceil(secondsLeft)),
               },
             })}
-          </span>
-        }
-      />
-
-      <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
-        <Button onClick={onBack} state={{ isDisabled: isLoading }}>
-          {stringGetter({ key: STRING_KEYS.BACK })}
-        </Button>
-        <Button
-          type={ButtonType.Submit}
-          action={ButtonAction.Primary}
-          state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
-        >
-          {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
-        </Button>
+        </span>
       </div>
-
-      <span tw="text-center text-color-text-1 font-small-book">
-        {secondsLeft > 0 &&
-          stringGetter({
-            key:
-              Math.ceil(secondsLeft) === 1
-                ? STRING_KEYS.WAIT_SECONDS_SINGULAR
-                : STRING_KEYS.WAIT_SECONDS,
-            params: {
-              SECONDS: String(Math.ceil(secondsLeft)),
-            },
-          })}
-      </span>
     </$Form>
   );
 };
