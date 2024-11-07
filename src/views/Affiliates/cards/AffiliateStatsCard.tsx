@@ -41,7 +41,15 @@ const MobileView = ({
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
         >
-          <Link isInline href="#" onClick={toggleCriteria}>
+          <Link
+            isInline
+            href="#"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleCriteria();
+            }}
+          >
             <p tw="text-base text-color-accent">
               {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })}
             </p>
