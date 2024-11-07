@@ -21,7 +21,7 @@ import { TelegramInviteBanner } from '@/views/TelegramInviteBanner';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getDismissedAffiliateBanner } from '@/state/dismissableSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -33,6 +33,7 @@ import { AccountOverviewSection } from './AccountOverviewSection';
 export const Overview = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const { isTablet } = useBreakpoints();
   const { dydxAddress } = useAccounts();
@@ -41,7 +42,7 @@ export const Overview = () => {
   const feedbackRequestWalletAddresses = dynamicConfigs[StatsigDynamicConfigs.dcHighestVolumeUsers];
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
-  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates) || true;
   const dismissedAffiliateBanner = useAppSelector(getDismissedAffiliateBanner);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
@@ -59,7 +60,7 @@ export const Overview = () => {
     <div>
       {affiliatesEnabled && !dismissedAffiliateBanner && !isTablet && (
         <DetachedSection>
-          <AffiliatesBanner withClose />
+          <AffiliatesBanner withClose showLink />
         </DetachedSection>
       )}
 
@@ -79,7 +80,7 @@ export const Overview = () => {
 
       {affiliatesEnabled && isTablet && (
         <DetachedSection>
-          <AffiliatesBanner />
+          <AffiliatesBanner showLink />
         </DetachedSection>
       )}
 

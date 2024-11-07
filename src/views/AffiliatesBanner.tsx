@@ -12,7 +12,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -27,11 +26,16 @@ import { getGridBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { setDismissedAffiliateBanner } from '@/state/dismissable';
 
-export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean }) => {
+export const AffiliatesBanner = ({
+  withClose = false,
+  showLink = false,
+}: {
+  withClose?: boolean;
+  showLink?: boolean;
+}) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { affiliateProgram } = useURLConfigs();
   const {
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo();
@@ -48,25 +52,30 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
   });
 
   const description = (
-    <>
-      {stringGetter({
-        key: STRING_KEYS.REFER_FOR_DISCOUNTS_FIRST_ORDER,
-        params: {
-          AMOUNT_USD: `$${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}`,
-        },
-      })}{' '}
-      <br />
-      {stringGetter({
-        key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
-        params: {
-          LINK: (
-            <Link href={affiliateProgram} isInline isAccent>
-              {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
-            </Link>
-          ),
-        },
-      })}
-    </>
+    <div tw="flex flex-col">
+      <div>
+        {stringGetter({
+          key: STRING_KEYS.REFER_FOR_DISCOUNTS,
+          params: {
+            AMOUNT_USD: `${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}`,
+          },
+        })}
+      </div>
+      {showLink && (
+        <div>
+          {stringGetter({
+            key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
+            params: {
+              LINK: (
+                <Link isNewPage={false} href="/affiliates" isInline isAccent>
+                  {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
+                </Link>
+              ),
+            },
+          })}
+        </div>
+      )}
+    </div>
   );
 
   if (isTablet) {
@@ -111,7 +120,7 @@ export const AffiliatesBanner = ({ withClose = false }: { withClose?: boolean })
               {titleString}
             </div>
           </div>
-          <div tw="ml-0.5">{description}</div>
+          <div tw="ml-0.5 text-small text-color-text-0">{description}</div>
         </div>
       </div>
       <div>
