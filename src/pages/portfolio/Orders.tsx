@@ -28,18 +28,31 @@ export const Orders = () => {
         columnKeys={
           isTablet
             ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
-            : [
-                OrdersTableColumnKey.Market,
-                OrdersTableColumnKey.Status,
-                OrdersTableColumnKey.Side,
-                OrdersTableColumnKey.AmountFill,
-                uiRefresh && OrdersTableColumnKey.OrderValue,
-                OrdersTableColumnKey.Price,
-                OrdersTableColumnKey.Trigger,
-                OrdersTableColumnKey.MarginType,
-                OrdersTableColumnKey.GoodTil,
-                !isAccountViewOnly && OrdersTableColumnKey.Actions,
-              ].filter(isTruthy)
+            : uiRefresh
+              ? [
+                  OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.Amount,
+                  OrdersTableColumnKey.Filled,
+                  OrdersTableColumnKey.OrderValue,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.GoodTil,
+                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                ].filter(isTruthy)
+              : [
+                  OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.AmountFill,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.GoodTil,
+                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                ].filter(isTruthy)
         }
         withOuterBorder={isNotTablet}
       />
