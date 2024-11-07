@@ -50,10 +50,6 @@ class TestFlags {
     return this.queryParams.utm_source;
   }
 
-  get enablePredictionMarketPerp() {
-    return this.booleanFlag(this.queryParams.prediction, isDev);
-  }
-
   get pml() {
     return this.booleanFlag(this.queryParams.pml, !isMainnet);
   }
@@ -71,7 +67,7 @@ class TestFlags {
   }
 
   get uiRefresh() {
-    return this.booleanFlag(this.queryParams.uirefresh, isDev);
+    return this.booleanFlag(this.queryParams.uirefresh, !isMainnet);
   }
 
   get onboardingRewrite() {
