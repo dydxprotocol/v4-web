@@ -116,7 +116,7 @@ const Content = () => {
         isShowingFooter={isShowingFooter}
         showRestrictionWarning={showRestrictionWarning}
       >
-        {isNotTablet && <HeaderDesktop />}
+        {isShowingHeader && <HeaderDesktop />}
         {showRestrictionWarning && <RestrictionWarning />}
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
@@ -310,9 +310,9 @@ const $Content = styled.div<{
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
-  ${({ showRestrictionWarning }) => css`
+  ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:
-      'Header' var(--page-currentHeaderHeight)
+      ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
       ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
       'Main' minmax(min-content, 1fr)
       'Footer' var(--page-currentFooterHeight)
