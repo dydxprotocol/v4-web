@@ -106,9 +106,10 @@ export const TargetLeverageInput = () => {
           type={InputType.Leverage}
           value={leverage}
           max={maxLeverage}
-          onChange={({ floatValue }: NumberFormatValues) =>
-            setLeverage(floatValue?.toString() ?? '')
-          }
+          onChange={({ floatValue }: NumberFormatValues) => {
+            setLeverage(floatValue?.toString() ?? '');
+            debouncedSetAbacusLeverage(floatValue?.toString() ?? '');
+          }}
         />
       </$InnerInputContainer>
     </$InputContainer>
