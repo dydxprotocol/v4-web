@@ -105,7 +105,7 @@ body {
 
   #root {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
   }
 }
 /* Fixes the smart banner being unclickable. We want this to rise above all app banners */
