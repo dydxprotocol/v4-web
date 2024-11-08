@@ -5,11 +5,9 @@ import { useMatch, useNavigate } from 'react-router-dom';
 
 import { SubaccountPosition } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
-import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters, PREDICTION_MARKET } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
-import { timeUnits } from '@/constants/time';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -20,7 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
-import { setCurrentMarketId, setLaunchMarketIds } from '@/state/perpetuals';
+import { setCurrentMarketId } from '@/state/perpetuals';
 import {
   getLaunchedMarketIds,
   getMarketIds,
@@ -78,15 +76,6 @@ export const useCurrentMarketId = () => {
 
     // Continue displaying unlaunched market view if marketId is in launchedMarketIds state
     if (marketId && launchedMarketIds.includes(marketId)) {
-      launchedMarketTimeout.current = setTimeout(() => {
-        dispatch(
-          setLaunchMarketIds({
-            launchedMarketId: marketId,
-            launchStatus: LaunchMarketStatus.SUCCESS,
-          })
-        );
-      }, timeUnits.second * 30);
-
       return true;
     }
 
@@ -94,7 +83,6 @@ export const useCurrentMarketId = () => {
       return market.id === marketId;
     });
   }, [
-    dispatch,
     hasLoadedLaunchableMarkets,
     hasMarketIds,
     launchedMarketIds,
