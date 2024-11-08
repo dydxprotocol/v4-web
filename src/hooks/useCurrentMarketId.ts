@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
@@ -69,8 +69,6 @@ export const useCurrentMarketId = () => {
     return marketId ?? lastViewedMarket;
   }, [hasMarketIds, marketId]);
 
-  const launchedMarketTimeout = useRef<NodeJS.Timeout | null>(null);
-
   const isViewingUnlaunchedMarket = useMemo(() => {
     if (!hasMarketIds || !hasLoadedLaunchableMarkets || !testFlags.pml) return false;
 
@@ -89,14 +87,6 @@ export const useCurrentMarketId = () => {
     launchableMarkets.data,
     marketId,
   ]);
-
-  useEffect(() => {
-    return () => {
-      if (launchedMarketTimeout.current) {
-        clearTimeout(launchedMarketTimeout.current);
-      }
-    };
-  }, []);
 
   const isViewingPredictionMarket = useMemo(() => {
     return predictionMarkets.some((market) => market.id === marketId);
