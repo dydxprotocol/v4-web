@@ -13,6 +13,7 @@ import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -39,7 +40,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLaunchMarketIds } from '@/state/perpetuals';
 import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import { getDisplayableAssetFromTicker, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -75,6 +76,7 @@ export const NewMarketPreviewStep = ({
   const [eta, setEta] = useState<number>(0);
   const now = useNow();
   const dispatch = useAppDispatch();
+  const notify = useCustomNotification();
 
   // Countdown timer used to wait for OraclePrice as well as a hard block before allowing user to navigate/re-subscribe
   const secondsLeft = isLoading ? Math.max(0, (eta - now) / timeUnits.second) : 0;
@@ -233,6 +235,21 @@ export const NewMarketPreviewStep = ({
         setIsParentLoading?.(true);
         setErrorMessage(undefined);
 
+        notify(
+          {
+            slotTitleLeft: <$LoadingSpinner />,
+            title: stringGetter({ key: STRING_KEYS.LAUNCHING_MARKET_LOADING }),
+            body: stringGetter({
+              key: STRING_KEYS.AVAILABLE_TO_TRADE_POST_LAUNCH,
+              params: { MARKET: getDisplayableTickerFromMarket(ticker) },
+            }),
+          },
+          {
+            id: `launch-${ticker}`,
+            toastDuration: Infinity,
+          }
+        );
+
         dispatch(
           setLaunchMarketIds({ launchedMarketId: ticker, launchStatus: LaunchMarketStatus.PENDING })
         );
@@ -240,24 +257,42 @@ export const NewMarketPreviewStep = ({
         try {
           const tx = await createPermissionlessMarket(ticker);
 
-          // Add try/catch for encode/parse so that it doesn't mess with loading states below
-          try {
-            if ((tx as IndexedTx | undefined)?.code === 0) {
-              const encodedTx = encodeJson(tx);
-              const parsedTx = JSON.parse(encodedTx);
-              const hash = parsedTx.hash.toUpperCase();
+          if ((tx as IndexedTx | undefined)?.code === 0) {
+            const encodedTx = encodeJson(tx);
+            const parsedTx = JSON.parse(encodedTx);
+            const hash = parsedTx.hash.toUpperCase();
 
-              if (!hash) {
-                throw new Error('Invalid transaction hash');
-              }
-
-              setTxHash(hash);
+            if (!hash) {
+              throw new Error('Invalid transaction hash');
             }
-          } catch (error) {
-            setErrorMessage(error.message);
+
+            setTxHash(hash);
           }
 
           setEta(Date.now() + ESTIMATED_LAUNCH_TIMEOUT);
+
+          setTimeout(() => {
+            dispatch(
+              setLaunchMarketIds({
+                launchedMarketId: ticker,
+                launchStatus: LaunchMarketStatus.SUCCESS,
+              })
+            );
+
+            notify(
+              {
+                slotTitleLeft: <$CheckCircleIcon iconName={IconName.CheckCircle} />,
+                title: stringGetter({ key: STRING_KEYS.MARKET_LAUNCHED }),
+                body: stringGetter({
+                  key: STRING_KEYS.MARKET_NOW_LIVE_TRADE,
+                  params: { MARKET: getDisplayableTickerFromMarket(ticker) },
+                }),
+              },
+              {
+                id: `launch-${ticker}`,
+              }
+            );
+          }, ESTIMATED_LAUNCH_TIMEOUT);
         } catch (error) {
           dispatch(
             setLaunchMarketIds({
@@ -281,7 +316,21 @@ export const NewMarketPreviewStep = ({
 
       {alertMessage}
 
-      <$Details items={receiptItems} tw="rounded-[0.625rem] px-1 py-0.5 text-small" />
+      {secondsLeft > 0 ? (
+        <AlertMessage type={AlertType.Info}>
+          {stringGetter({
+            key:
+              Math.ceil(secondsLeft) === 1
+                ? STRING_KEYS.WAIT_SECONDS_SINGULAR
+                : STRING_KEYS.WAIT_SECONDS,
+            params: {
+              SECONDS: String(Math.ceil(secondsLeft)),
+            },
+          })}
+        </AlertMessage>
+      ) : (
+        <$Details items={receiptItems} tw="rounded-[0.625rem] px-1 py-0.5 text-small" />
+      )}
 
       <div tw="flex flex-col gap-1">
         <Checkbox
@@ -318,19 +367,6 @@ export const NewMarketPreviewStep = ({
             {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
           </Button>
         </div>
-
-        <span tw="mb-1 text-center text-color-text-1 font-small-book">
-          {secondsLeft > 0 &&
-            stringGetter({
-              key:
-                Math.ceil(secondsLeft) === 1
-                  ? STRING_KEYS.WAIT_SECONDS_SINGULAR
-                  : STRING_KEYS.WAIT_SECONDS,
-              params: {
-                SECONDS: String(Math.ceil(secondsLeft)),
-              },
-            })}
-        </span>
       </div>
     </$Form>
   );
@@ -401,4 +437,11 @@ const $AssetIconContainer = styled.div`
   border-radius: 0.625rem;
   background-color: var(--color-layer-4);
   padding: 1rem 0;
+`;
+
+const $CheckCircleIcon = styled(Icon)`
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 `;

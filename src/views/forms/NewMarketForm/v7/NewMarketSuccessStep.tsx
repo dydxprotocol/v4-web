@@ -1,10 +1,7 @@
-import { useEffect } from 'react';
-
 import { Link, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonStyle, ButtonType } from '@/constants/buttons';
-import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -14,9 +11,6 @@ import { LinkOutIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
-
-import { useAppDispatch } from '@/state/appTypes';
-import { setLaunchMarketIds } from '@/state/perpetuals';
 
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
@@ -35,16 +29,6 @@ export const NewMarketSuccessStep = ({
   const match = useMatch(`${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
   const isOnMarketTradePage = marketId === tickerToAdd;
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(
-      setLaunchMarketIds({
-        launchedMarketId: tickerToAdd,
-        launchStatus: LaunchMarketStatus.SUCCESS,
-      })
-    );
-  }, [dispatch]);
 
   const cta = isOnMarketTradePage ? null : (
     <Link to={`${AppRoute.Trade}/${tickerToAdd}`}>
