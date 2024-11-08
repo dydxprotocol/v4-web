@@ -25,6 +25,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getDismissedAffiliateBanner } from '@/state/dismissableSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
@@ -54,6 +55,7 @@ export const Overview = () => {
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
   );
+  const { uiRefresh } = testFlags;
 
   return (
     <div>
@@ -94,17 +96,33 @@ export const Overview = () => {
                   PositionsTableColumnKey.IndexEntry,
                   PositionsTableColumnKey.PnL,
                 ]
-              : [
-                  PositionsTableColumnKey.Market,
-                  PositionsTableColumnKey.Size,
-                  PositionsTableColumnKey.Margin,
-                  PositionsTableColumnKey.UnrealizedPnl,
-                  PositionsTableColumnKey.RealizedPnl,
-                  PositionsTableColumnKey.AverageOpenAndClose,
-                  PositionsTableColumnKey.LiquidationAndOraclePrice,
-                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions && PositionsTableColumnKey.Actions,
-                ].filter(isTruthy)
+              : uiRefresh
+                ? [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Leverage,
+                    PositionsTableColumnKey.Type,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Value,
+                    PositionsTableColumnKey.PnL,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.AverageOpen,
+                    PositionsTableColumnKey.Oracle,
+                    PositionsTableColumnKey.Liquidation,
+                    PositionsTableColumnKey.NetFunding,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
+                : [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.UnrealizedPnl,
+                    PositionsTableColumnKey.RealizedPnl,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}
           navigateToOrders={() =>

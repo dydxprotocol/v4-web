@@ -22,6 +22,7 @@ import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCal
 
 import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
 import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions';
@@ -48,6 +49,7 @@ export const Positions = () => {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
+  const { uiRefresh } = testFlags;
 
   return (
     <>
@@ -64,18 +66,34 @@ export const Positions = () => {
                   PositionsTableColumnKey.IndexEntry,
                   PositionsTableColumnKey.PnL,
                 ]
-              : [
-                  PositionsTableColumnKey.Market,
-                  PositionsTableColumnKey.Size,
-                  PositionsTableColumnKey.Margin,
-                  PositionsTableColumnKey.UnrealizedPnl,
-                  PositionsTableColumnKey.RealizedPnl,
-                  PositionsTableColumnKey.NetFunding,
-                  PositionsTableColumnKey.AverageOpenAndClose,
-                  PositionsTableColumnKey.LiquidationAndOraclePrice,
-                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions && PositionsTableColumnKey.Actions,
-                ].filter(isTruthy)
+              : uiRefresh
+                ? [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Leverage,
+                    PositionsTableColumnKey.Type,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Value,
+                    PositionsTableColumnKey.PnL,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.AverageOpen,
+                    PositionsTableColumnKey.Oracle,
+                    PositionsTableColumnKey.Liquidation,
+                    PositionsTableColumnKey.NetFunding,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
+                : [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.UnrealizedPnl,
+                    PositionsTableColumnKey.RealizedPnl,
+                    PositionsTableColumnKey.NetFunding,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
           }
           currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
           withOuterBorder={isNotTablet}

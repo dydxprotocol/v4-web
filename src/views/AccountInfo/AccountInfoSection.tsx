@@ -239,7 +239,7 @@ export const AccountInfoSection = () => {
       ),
       value: (
         <>
-          <WithTooltip tooltip="cross-margin-usage" side="left">
+          <WithTooltip tooltip="margin-used" side="left">
             <MarginUsageRing value={getUsageValue(marginUsage)} />
           </WithTooltip>
           <AccountInfoDiffOutput

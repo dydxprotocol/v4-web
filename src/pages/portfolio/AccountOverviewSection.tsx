@@ -84,13 +84,15 @@ export const AccountOverviewSection = () => {
     {
       id: 'free-collateral',
       label: stringGetter({ key: STRING_KEYS.FREE_COLLATERAL }),
-      amount: freeCollateral?.current,
+      amount: mapIfPresent(freeCollateral?.current, (fc) => Math.max(fc, 0.0)),
       color: ColorToken.GrayPurple2,
     },
     {
       id: 'open-positions',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-      amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) => e - f),
+      amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) =>
+        Math.max(e - Math.max(f, 0), 0)
+      ),
       color: ColorToken.Yellow1,
     },
     (showVaults || (vaultBalance ?? 0) > 0.01) && {

@@ -1,4 +1,4 @@
-import { isDev, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 
 class TestFlags {
   public queryParams: { [key: string]: string };
@@ -63,7 +63,7 @@ class TestFlags {
   }
 
   get enableStaticTyping() {
-    return this.booleanFlag(this.queryParams.statictyping, isDev);
+    return this.booleanFlag(this.queryParams.statictyping, !isMainnet);
   }
 
   get uiRefresh() {
