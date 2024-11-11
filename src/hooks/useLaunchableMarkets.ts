@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { shallowEqual } from 'react-redux';
 
 import {
   MetadataServiceAsset,
@@ -10,9 +9,6 @@ import {
   MetadataServicePricesResponse,
 } from '@/constants/assetMetadata';
 import { timeUnits } from '@/constants/time';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import metadataClient from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
@@ -24,19 +20,8 @@ import { useDydxClient } from './useDydxClient';
 const ASSETS_TO_REMOVE = ['USDC', 'USDT'];
 
 export const useMetadataService = () => {
-  const { requestAllPerpetualMarkets } = useDydxClient();
-
   const metadataQuery = useQueries({
     queries: [
-      {
-        queryKey: ['requestAllPerpetualMarkets'],
-        queryFn: () => requestAllPerpetualMarkets(),
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchInterval: timeUnits.minute,
-        staleTime: timeUnits.minute,
-      },
       {
         queryKey: ['marketMapInfo'],
         queryFn: async (): Promise<MetadataServiceInfoResponse> => {
@@ -55,10 +40,8 @@ export const useMetadataService = () => {
       },
     ],
     combine: (results) => {
-      const allPerpetualMarkets = results[0].data;
-      console.log(allPerpetualMarkets);
-      const info = results[1].data;
-      const prices = results[2].data;
+      const info = results[0].data;
+      const prices = results[1].data;
       const data: Record<string, MetadataServiceAsset> = {};
 
       Object.keys(info ?? {}).forEach((key) => {
@@ -117,7 +100,18 @@ export const useMetadataServiceAssetFromId = (marketId?: string) => {
 };
 
 export const useLaunchableMarkets = () => {
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const { requestAllPerpetualMarkets } = useDydxClient();
+
+  const perpetualMarketsFetch = useQuery({
+    queryKey: ['requestAllPerpetualMarkets'],
+    queryFn: requestAllPerpetualMarkets,
+    refetchInterval: timeUnits.minute,
+    staleTime: timeUnits.minute,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
   const metadataServiceData = useMetadataService();
 
   const filteredPotentialMarkets: { id: string; asset: string }[] = useMemo(() => {
@@ -129,9 +123,9 @@ export const useLaunchableMarkets = () => {
     });
 
     return assets.filter(({ id }) => {
-      return !marketIds.includes(id);
+      return !perpetualMarketsFetch.data?.[id];
     });
-  }, [marketIds, metadataServiceData.data]);
+  }, [perpetualMarketsFetch.data, metadataServiceData.data]);
 
   return {
     ...metadataServiceData,
