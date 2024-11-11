@@ -94,6 +94,13 @@ export const NewMarketPreviewStep = ({
     }
   }, [marketOraclePrice, fullTimeElapsed, ticker, txHash, onSuccess, setIsParentLoading]);
 
+  /**
+   * @description Side effect to clear error message when ticker changes
+   */
+  useEffect(() => {
+    setErrorMessage(undefined);
+  }, [ticker]);
+
   const { alertInfo, shouldDisableForm } = useMemo(() => {
     if (errorMessage) {
       return {
