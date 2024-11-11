@@ -19,11 +19,24 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { mapMetadataServiceCandles } from '@/lib/tradingView/utils';
 
+import { useDydxClient } from './useDydxClient';
+
 const ASSETS_TO_REMOVE = ['USDC', 'USDT'];
 
 export const useMetadataService = () => {
+  const { requestAllPerpetualMarkets } = useDydxClient();
+
   const metadataQuery = useQueries({
     queries: [
+      {
+        queryKey: ['requestAllPerpetualMarkets'],
+        queryFn: () => requestAllPerpetualMarkets(),
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchInterval: timeUnits.minute,
+        staleTime: timeUnits.minute,
+      },
       {
         queryKey: ['marketMapInfo'],
         queryFn: async (): Promise<MetadataServiceInfoResponse> => {
@@ -42,8 +55,10 @@ export const useMetadataService = () => {
       },
     ],
     combine: (results) => {
-      const info = results[0].data;
-      const prices = results[1].data;
+      const allPerpetualMarkets = results[0].data;
+      console.log(allPerpetualMarkets);
+      const info = results[1].data;
+      const prices = results[2].data;
       const data: Record<string, MetadataServiceAsset> = {};
 
       Object.keys(info ?? {}).forEach((key) => {
