@@ -20,7 +20,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
@@ -35,7 +34,6 @@ const LaunchableMarket = () => {
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
-  const { uiRefresh } = testFlags;
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
@@ -77,14 +75,9 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$SidePanel gridArea="Side" uiRefresh={uiRefresh}>
-        {!uiRefresh && <AccountInfo />}
-        <$LaunchMarketSidePanel
-          tw="overflow-auto"
-          launchableMarketId={marketId}
-          uiRefresh={uiRefresh}
-        />
-        {uiRefresh && <AccountInfo />}
+      <$SidePanel gridArea="Side">
+        <AccountInfo />
+        <$LaunchMarketSidePanel launchableMarketId={marketId} />
       </$SidePanel>
 
       <$GridSection gridArea="Inner">
@@ -193,24 +186,15 @@ const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
 
-const $SidePanel = styled($GridSection)<{ uiRefresh?: boolean }>`
-  ${({ uiRefresh }) =>
-    uiRefresh
-      ? css`
-          grid-template-rows: 1fr auto;
-        `
-      : css`
-          grid-template-rows: auto 1fr;
-        `}
+const $SidePanel = styled($GridSection)`
+  grid-template-rows: auto 1fr;
 
   form {
     min-height: 0;
   }
 `;
 
-const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)<{ uiRefresh?: boolean }>`
-  ${({ uiRefresh }) =>
-    uiRefresh
-      ? 'border-bottom: var(--border-width) solid var(--color-border);'
-      : 'border-top: var(--border-width) solid var(--color-border);'}
+const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
+  overflow: auto;
+  border-top: var(--border-width) solid var(--color-border);
 `;
