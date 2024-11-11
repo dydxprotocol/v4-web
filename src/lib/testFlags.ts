@@ -1,4 +1,4 @@
-import { isDev, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 
 class TestFlags {
   public queryParams: { [key: string]: string };
@@ -50,10 +50,6 @@ class TestFlags {
     return this.queryParams.utm_source;
   }
 
-  get enablePredictionMarketPerp() {
-    return this.booleanFlag(this.queryParams.prediction, isDev);
-  }
-
   get pml() {
     return this.booleanFlag(this.queryParams.pml, !isMainnet);
   }
@@ -67,11 +63,11 @@ class TestFlags {
   }
 
   get enableStaticTyping() {
-    return this.booleanFlag(this.queryParams.statictyping, isDev);
+    return this.booleanFlag(this.queryParams.statictyping, !isMainnet);
   }
 
   get uiRefresh() {
-    return this.booleanFlag(this.queryParams.uirefresh, isDev);
+    return this.booleanFlag(this.queryParams.uirefresh, !isMainnet);
   }
 
   get onboardingRewrite() {

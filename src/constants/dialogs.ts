@@ -44,7 +44,6 @@ export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
-export type LaunchMarketDialogProps = { defaultLaunchableMarketId?: string };
 export type ManageFundsDialogProps = { selectedTransferType?: string };
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
@@ -126,7 +125,6 @@ export const DialogTypes = unionize(
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
-    LaunchMarket: ofType<LaunchMarketDialogProps>(),
     ManageFunds: ofType<ManageFundsDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),

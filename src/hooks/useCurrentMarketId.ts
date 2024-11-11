@@ -19,7 +19,11 @@ import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
-import { getMarketIds, getMarketOraclePrice } from '@/state/perpetualsSelectors';
+import {
+  getLaunchedMarketIds,
+  getMarketIds,
+  getMarketOraclePrice,
+} from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
@@ -41,6 +45,8 @@ export const useCurrentMarketId = () => {
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
   const hasSeenPredictionMarketIntroDialog = useAppSelector(getHasSeenPredictionMarketIntroDialog);
+  const launchedMarketIds = useAppSelector(getLaunchedMarketIds, shallowEqual);
+
   const { filteredMarkets: predictionMarkets } = useMarketsData({
     filter: MarketFilters.PREDICTION_MARKET,
     hideUnlaunchedMarkets: true,
@@ -66,10 +72,21 @@ export const useCurrentMarketId = () => {
   const isViewingUnlaunchedMarket = useMemo(() => {
     if (!hasMarketIds || !hasLoadedLaunchableMarkets || !testFlags.pml) return false;
 
+    // Continue displaying unlaunched market view if marketId is in launchedMarketIds state
+    if (marketId && launchedMarketIds.includes(marketId)) {
+      return true;
+    }
+
     return launchableMarkets.data.some((market) => {
       return market.id === marketId;
     });
-  }, [hasLoadedLaunchableMarkets, hasMarketIds, marketId, launchableMarkets.data]);
+  }, [
+    hasLoadedLaunchableMarkets,
+    hasMarketIds,
+    launchedMarketIds,
+    launchableMarkets.data,
+    marketId,
+  ]);
 
   const isViewingPredictionMarket = useMemo(() => {
     return predictionMarkets.some((market) => market.id === marketId);

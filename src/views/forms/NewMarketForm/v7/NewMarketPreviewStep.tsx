@@ -3,14 +3,17 @@ import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } fro
 import { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ESTIMATED_LAUNCH_TIMEOUT, LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -33,14 +36,13 @@ import { Output, OutputType } from '@/components/Output';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setLaunchMarketIds } from '@/state/perpetuals';
 import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import { getDisplayableAssetFromTicker, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-
-const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
 
 type NewMarketPreviewStepProps = {
   ticker: string;
@@ -73,6 +75,8 @@ export const NewMarketPreviewStep = ({
   const [txHash, setTxHash] = useState<string>();
   const [eta, setEta] = useState<number>(0);
   const now = useNow();
+  const dispatch = useAppDispatch();
+  const notify = useCustomNotification();
 
   // Countdown timer used to wait for OraclePrice as well as a hard block before allowing user to navigate/re-subscribe
   const secondsLeft = isLoading ? Math.max(0, (eta - now) / timeUnits.second) : 0;
@@ -89,6 +93,13 @@ export const NewMarketPreviewStep = ({
       onSuccess(txHash);
     }
   }, [marketOraclePrice, fullTimeElapsed, ticker, txHash, onSuccess, setIsParentLoading]);
+
+  /**
+   * @description Side effect to clear error message when ticker changes
+   */
+  useEffect(() => {
+    setErrorMessage(undefined);
+  }, [ticker]);
 
   const { alertInfo, shouldDisableForm } = useMemo(() => {
     if (errorMessage) {
@@ -123,7 +134,7 @@ export const NewMarketPreviewStep = ({
   }, [errorMessage, freeCollateral, stringGetter]);
 
   const heading = shouldHideTitleAndDescription ? null : (
-    <>
+    <div tw="flex flex-col gap-1">
       <h2>
         {isLoading ? (
           <span tw="flex flex-row items-center gap-[0.5ch]">
@@ -145,37 +156,33 @@ export const NewMarketPreviewStep = ({
           },
         })}
       </span>
-    </>
+    </div>
   );
 
   const launchVisualization = (
     <div tw="mx-auto flex flex-row items-center gap-0.25">
-      <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">
-          {stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}
-        </span>
-        <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
+      <$AssetContainer>
+        <$LabelText>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}</$LabelText>
+        <$AssetIconContainer>
           <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
           <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
-        </div>
-      </div>
+        </$AssetIconContainer>
+      </$AssetContainer>
 
       <Icon iconName={IconName.FastForward} size="1rem" tw="mt-[1.45rem] text-color-text-0" />
 
-      <div tw="flex flex-col items-center justify-center gap-0.5">
-        <span tw="text-small text-color-text-0">
-          {stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}
-        </span>
-        <div tw="flex w-[9.375rem] flex-col items-center justify-center gap-0.5 rounded-[0.625rem] bg-color-layer-4 py-1">
-          <img src={launchableAsset?.logo} tw="h-2 w-2 rounded-[50%]" alt={baseAsset} />
+      <$AssetContainer>
+        <$LabelText>{stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}</$LabelText>
+        <$AssetIconContainer>
+          <AssetIcon tw="h-2 w-2" logoUrl={launchableAsset?.logo} symbol={baseAsset} />
           <Output useGrouping type={OutputType.Text} value={baseAsset} />
-        </div>
-      </div>
+        </$AssetIconContainer>
+      </$AssetContainer>
     </div>
   );
 
   const liquidityTier = (
-    <div tw="relative flex flex-col gap-0.75 rounded-[0.625rem] bg-color-layer-2 p-1">
+    <$LiquidityTier tw="relative flex flex-col gap-0.75 rounded-[0.625rem] p-1">
       <span tw="text-base text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.LIQUIDITY_TIER_IS,
@@ -184,7 +191,7 @@ export const NewMarketPreviewStep = ({
           },
         })}
       </span>
-      <$Details
+      <$LiquidityTierDetails
         layout="rowColumns"
         tw="text-small"
         items={[
@@ -219,7 +226,7 @@ export const NewMarketPreviewStep = ({
           },
         ]}
       />
-    </div>
+    </$LiquidityTier>
   );
 
   const alertMessage = alertInfo && (
@@ -235,28 +242,72 @@ export const NewMarketPreviewStep = ({
         setIsParentLoading?.(true);
         setErrorMessage(undefined);
 
+        notify(
+          {
+            slotTitleLeft: <$LoadingSpinner />,
+            title: stringGetter({ key: STRING_KEYS.LAUNCHING_MARKET_LOADING }),
+            body: stringGetter({
+              key: STRING_KEYS.AVAILABLE_TO_TRADE_POST_LAUNCH,
+              params: { MARKET: getDisplayableTickerFromMarket(ticker) },
+            }),
+          },
+          {
+            id: `launch-${ticker}`,
+            toastDuration: Infinity,
+          }
+        );
+
+        dispatch(
+          setLaunchMarketIds({ launchedMarketId: ticker, launchStatus: LaunchMarketStatus.PENDING })
+        );
+
         try {
           const tx = await createPermissionlessMarket(ticker);
 
-          // Add try/catch for encode/parse so that it doesn't mess with loading states below
-          try {
-            if ((tx as IndexedTx | undefined)?.code === 0) {
-              const encodedTx = encodeJson(tx);
-              const parsedTx = JSON.parse(encodedTx);
-              const hash = parsedTx.hash.toUpperCase();
+          if ((tx as IndexedTx | undefined)?.code === 0) {
+            const encodedTx = encodeJson(tx);
+            const parsedTx = JSON.parse(encodedTx);
+            const hash = parsedTx.hash.toUpperCase();
 
-              if (!hash) {
-                throw new Error('Invalid transaction hash');
-              }
-
-              setTxHash(hash);
+            if (!hash) {
+              throw new Error('Invalid transaction hash');
             }
-          } catch (error) {
-            setErrorMessage(error.message);
+
+            setTxHash(hash);
           }
 
           setEta(Date.now() + ESTIMATED_LAUNCH_TIMEOUT);
+
+          setTimeout(() => {
+            dispatch(
+              setLaunchMarketIds({
+                launchedMarketId: ticker,
+                launchStatus: LaunchMarketStatus.SUCCESS,
+              })
+            );
+
+            notify(
+              {
+                slotTitleLeft: <$CheckCircleIcon iconName={IconName.CheckCircle} />,
+                title: stringGetter({ key: STRING_KEYS.MARKET_LAUNCHED }),
+                body: stringGetter({
+                  key: STRING_KEYS.MARKET_NOW_LIVE_TRADE,
+                  params: { MARKET: getDisplayableTickerFromMarket(ticker) },
+                }),
+              },
+              {
+                id: `launch-${ticker}`,
+              }
+            );
+          }, ESTIMATED_LAUNCH_TIMEOUT);
         } catch (error) {
+          dispatch(
+            setLaunchMarketIds({
+              launchedMarketId: ticker,
+              launchStatus: LaunchMarketStatus.FAILURE,
+            })
+          );
+
           log('NewMarketPreviewForm/createPermissionlessMarket', error);
           setErrorMessage(error.message);
           setIsLoading(false);
@@ -272,48 +323,9 @@ export const NewMarketPreviewStep = ({
 
       {alertMessage}
 
-      <Details
-        items={receiptItems}
-        tw="rounded-[0.625rem] bg-color-layer-2 px-1 py-0.5 text-small"
-      />
-
-      <Checkbox
-        checked={hasAcceptedTerms}
-        onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
-        id="launch-market-ack"
-        label={
-          <span>
-            {stringGetter({
-              key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
-              params: {
-                CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
-                LINK: (
-                  <Link tw="inline-flex" href={launchMarketTos} withIcon>
-                    {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
-                  </Link>
-                ),
-              },
-            })}
-          </span>
-        }
-      />
-
-      <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
-        <Button onClick={onBack} state={{ isDisabled: isLoading }}>
-          {stringGetter({ key: STRING_KEYS.BACK })}
-        </Button>
-        <Button
-          type={ButtonType.Submit}
-          action={ButtonAction.Primary}
-          state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
-        >
-          {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
-        </Button>
-      </div>
-
-      <span tw="text-center text-color-text-1 font-small-book">
-        {secondsLeft > 0 &&
-          stringGetter({
+      {secondsLeft > 0 ? (
+        <AlertMessage type={AlertType.Info}>
+          {stringGetter({
             key:
               Math.ceil(secondsLeft) === 1
                 ? STRING_KEYS.WAIT_SECONDS_SINGULAR
@@ -322,7 +334,47 @@ export const NewMarketPreviewStep = ({
               SECONDS: String(Math.ceil(secondsLeft)),
             },
           })}
-      </span>
+        </AlertMessage>
+      ) : (
+        <$Details items={receiptItems} tw="rounded-[0.625rem] px-1 py-0.5 text-small" />
+      )}
+
+      <div tw="flex flex-col gap-1">
+        <Checkbox
+          checked={hasAcceptedTerms}
+          onCheckedChange={(checked) => setHasAcceptedTerms(checked)}
+          id="launch-market-ack"
+          disabled={isLoading}
+          label={
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
+                params: {
+                  CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
+                  LINK: (
+                    <Link tw="inline-flex" href={launchMarketTos} withIcon>
+                      {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
+                    </Link>
+                  ),
+                },
+              })}
+            </span>
+          }
+        />
+
+        <div tw="grid w-full grid-cols-[1fr_2fr] gap-1">
+          <Button onClick={onBack} state={{ isDisabled: isLoading }}>
+            {stringGetter({ key: STRING_KEYS.BACK })}
+          </Button>
+          <Button
+            type={ButtonType.Submit}
+            action={ButtonAction.Primary}
+            state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
+          </Button>
+        </div>
+      </div>
     </$Form>
   );
 };
@@ -348,7 +400,15 @@ const $Form = styled.form`
   }
 `;
 
+const $LiquidityTier = styled.div`
+  background-color: var(--innerElement-backgroundColor, var(--color-layer-2));
+`;
+
 const $Details = styled(Details)`
+  background-color: var(--innerElement-backgroundColor, var(--color-layer-2));
+`;
+
+const $LiquidityTierDetails = styled(Details)`
   & > div {
     position: relative;
 
@@ -367,5 +427,28 @@ const $Details = styled(Details)`
       background-color: var(--color-border);
       margin: auto 0;
     }
+  }
+`;
+
+const $AssetContainer = tw.div`flex flex-col items-center justify-center gap-0.5`;
+
+const $LabelText = tw.span`text-small text-color-text-0`;
+
+const $AssetIconContainer = styled.div`
+  width: var(--launchMarketPreview-width, 9.375rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.625rem;
+  background-color: var(--color-layer-4);
+  padding: 1rem 0;
+`;
+
+const $CheckCircleIcon = styled(Icon)`
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 `;
