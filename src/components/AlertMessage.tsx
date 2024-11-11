@@ -74,6 +74,7 @@ const AlertContainer = styled.div<StyleProps>`
 
   overflow: auto;
   position: relative;
+  min-height: 2rem;
   max-height: 12.5rem;
   gap: 0.25em;
 

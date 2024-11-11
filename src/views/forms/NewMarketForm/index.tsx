@@ -50,7 +50,6 @@ export enum NewMarketFormStep {
 
 type NewMarketFormProps = {
   defaultLaunchableMarketId?: string;
-  onCloseDialog?: () => void;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
   setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
@@ -58,7 +57,6 @@ type NewMarketFormProps = {
 
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
-  onCloseDialog,
   setFormStep,
   setIsParentLoading,
   updateTickerToAdd,
@@ -76,6 +74,12 @@ export const NewMarketForm = ({
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
   const currentFreeCollateral = freeCollateral?.current ?? 0;
+
+  useEffect(() => {
+    if (defaultLaunchableMarketId) {
+      setTickerToAdd(defaultLaunchableMarketId);
+    }
+  }, [defaultLaunchableMarketId]);
 
   const summaryData = useVaultCalculationForLaunchingMarket({
     amount: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
@@ -199,7 +203,6 @@ export const NewMarketForm = ({
         <NewMarketSuccessStep2
           transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
           tickerToAdd={tickerToAdd}
-          onCloseDialog={onCloseDialog}
           onLaunchAnotherMarket={() => {
             setTickerToAdd(undefined);
             setStep(NewMarketFormStep.SELECTION);
@@ -237,6 +240,7 @@ export const NewMarketForm = ({
 
     return (
       <NewMarketSelectionStep2
+        hasDefault={!!defaultLaunchableMarketId}
         onConfirmMarket={() => {
           setStep(NewMarketFormStep.PREVIEW);
 

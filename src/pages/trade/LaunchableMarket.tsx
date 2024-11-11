@@ -20,7 +20,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
@@ -35,7 +34,6 @@ const LaunchableMarket = () => {
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
-  const { uiRefresh } = testFlags;
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
@@ -77,11 +75,10 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$GridSection gridArea="Side" tw="flex flex-col">
-        {!uiRefresh && <AccountInfo />}
+      <$SidePanel gridArea="Side">
+        <AccountInfo />
         <$LaunchMarketSidePanel launchableMarketId={marketId} />
-        {uiRefresh && <AccountInfo />}
-      </$GridSection>
+      </$SidePanel>
 
       <$GridSection gridArea="Inner">
         <InnerPanel launchableMarketId={marketId} />
@@ -189,6 +186,15 @@ const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
 
+const $SidePanel = styled($GridSection)`
+  grid-template-rows: auto 1fr;
+
+  form {
+    min-height: 0;
+  }
+`;
+
 const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
+  overflow: auto;
   border-top: var(--border-width) solid var(--color-border);
 `;

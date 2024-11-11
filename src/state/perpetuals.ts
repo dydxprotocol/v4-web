@@ -9,6 +9,7 @@ import type {
   PerpetualMarket,
 } from '@/constants/abacus';
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
@@ -35,6 +36,7 @@ export interface PerpetualsState {
   >;
   historicalFundings: Record<string, MarketHistoricalFunding[]>;
   marketFilter: MarketFilters;
+  launchMarketIds: string[];
 }
 
 const initialState: PerpetualsState = {
@@ -46,6 +48,7 @@ const initialState: PerpetualsState = {
   orderbooksMap: undefined,
   historicalFundings: {},
   marketFilter: MarketFilters.ALL,
+  launchMarketIds: [],
 };
 
 const MAX_NUM_LIVE_TRADES = 100;
@@ -144,6 +147,17 @@ export const perpetualsSlice = createSlice({
         currentMarketId:
           getLocalStorage({ key: LocalStorageKey.LastViewedMarket }) ?? DEFAULT_MARKETID,
       }) satisfies PerpetualsState,
+    setLaunchMarketIds: (
+      state: PerpetualsState,
+      action: PayloadAction<{ launchedMarketId: string; launchStatus: LaunchMarketStatus }>
+    ) => {
+      const { launchedMarketId, launchStatus } = action.payload;
+      if (launchStatus === LaunchMarketStatus.PENDING) {
+        state.launchMarketIds = [...state.launchMarketIds, launchedMarketId];
+      } else {
+        state.launchMarketIds = state.launchMarketIds.filter((id) => id !== launchedMarketId);
+      }
+    },
   },
 });
 
@@ -156,4 +170,5 @@ export const {
   setHistoricalFundings,
   resetPerpetualsState,
   setMarketFilter,
+  setLaunchMarketIds,
 } = perpetualsSlice.actions;

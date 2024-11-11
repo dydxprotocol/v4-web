@@ -47,7 +47,7 @@ export const TargetLeverageInput = () => {
   const debouncedSetAbacusLeverage = useMemo(
     () =>
       debounce(
-        (newLeverage: number) =>
+        (newLeverage: number | string) =>
           abacusStateManager.setTradeValue({
             value: newLeverage,
             field: TradeInputField.targetLeverage,
@@ -106,9 +106,10 @@ export const TargetLeverageInput = () => {
           type={InputType.Leverage}
           value={leverage}
           max={maxLeverage}
-          onChange={({ floatValue }: NumberFormatValues) =>
-            setLeverage(floatValue?.toString() ?? '')
-          }
+          onChange={({ floatValue }: NumberFormatValues) => {
+            setLeverage(floatValue?.toString() ?? '');
+            debouncedSetAbacusLeverage(floatValue ?? '');
+          }}
         />
       </$InnerInputContainer>
     </$InputContainer>
