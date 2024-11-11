@@ -75,10 +75,10 @@ const LaunchableMarket = () => {
         <MarketSelectorAndStats launchableMarketId={marketId} />
       </header>
 
-      <$GridSection gridArea="Side" tw="flex flex-col">
+      <$SidePanel gridArea="Side">
         <AccountInfo />
         <$LaunchMarketSidePanel launchableMarketId={marketId} />
-      </$GridSection>
+      </$SidePanel>
 
       <$GridSection gridArea="Inner">
         <InnerPanel launchableMarketId={marketId} />
@@ -186,6 +186,15 @@ const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
 
+const $SidePanel = styled($GridSection)`
+  grid-template-rows: auto 1fr;
+
+  form {
+    min-height: 0;
+  }
+`;
+
 const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
+  overflow: auto;
   border-top: var(--border-width) solid var(--color-border);
 `;
