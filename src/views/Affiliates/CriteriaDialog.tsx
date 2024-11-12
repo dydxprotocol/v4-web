@@ -233,7 +233,7 @@ const CriteriaTable = ({
                 <div tw="flex items-center text-color-text-1">
                   <Output type={OutputType.CompactFiat} value={requirements.referredVol} />+
                 </div>
-                <p tw="text-break text-small text-color-text-0">
+                <p tw="text-small text-color-text-0">
                   {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
                 </p>
               </div>
