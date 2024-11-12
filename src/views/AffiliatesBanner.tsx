@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { css } from 'styled-components';
 import { styled } from 'twin.macro';
 
@@ -8,6 +9,7 @@ import {
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -19,7 +21,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Link } from '@/components/Link';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getGridBackground } from '@/state/appUiConfigsSelectors';
@@ -67,7 +68,10 @@ export const AffiliatesBanner = ({
             key: STRING_KEYS.WANT_TO_VIEW_EARNINGS,
             params: {
               LINK: (
-                <Link isNewPage={false} href="/affiliates" isInline isAccent>
+                <Link
+                  to={AppRoute.Affiliates}
+                  tw="inline-flex text-color-accent visited:text-color-accent hover:underline"
+                >
                   {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →
                 </Link>
               ),
