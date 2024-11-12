@@ -117,11 +117,11 @@ const DesktopView = ({
   const linkRef = useRef<HTMLAnchorElement>(null); // Reference to the button element
 
   return (
-    <div className="flex flex-col gap-y-1 p-1">
-      <div className="flex gap-x-8">
+    <div tw="flex flex-col gap-y-1 p-1">
+      <div tw="flex gap-x-8">
         <StatCell
           valueSize="large"
-          className="relative inline-block"
+          tw="relative inline-block"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
@@ -136,7 +136,7 @@ const DesktopView = ({
               toggleCriteria();
             }}
           >
-            <p className="text-base text-color-accent">
+            <p tw="text-base text-color-accent">
               {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })}
             </p>
           </Link>
@@ -154,31 +154,31 @@ const DesktopView = ({
           value={accountStats?.rank}
         />
       </div>
-      <div className="flex">
+      <div tw="flex">
         <BorderStatCell
           border={['right']}
-          className="pr-1"
+          tw="pr-1"
           title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
           outputType={OutputType.CompactFiat}
           value={accountStats?.referredVolume}
         />
         <BorderStatCell
           border={['right']}
-          className="px-1"
+          tw="px-1"
           title={stringGetter({ key: STRING_KEYS.FEES_REFERRED })}
           outputType={OutputType.CompactFiat}
           value={accountStats?.referredFees}
         />
         <BorderStatCell
           border={['right']}
-          className="px-1"
+          tw="px-1"
           title={stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
           outputType={OutputType.Number}
           value={accountStats?.totalReferredUsers}
         />
 
         <StatCell
-          className="px-1"
+          tw="px-1"
           title={stringGetter({ key: STRING_KEYS.TRADES_REFERRED })}
           outputType={OutputType.Number}
           value={accountStats?.totalReferredTrades}
@@ -210,7 +210,7 @@ export const AffiliateStatsCard = ({
     dispatch(
       openDialog(
         DialogTypes.Criteria({
-          userTier: isVip ? 'vip' : currentAffiliateTier ?? 0,
+          userTier: isVip ? 'vip' : currentAffiliateTier,
           accountStats,
           stakedAmount: stakedDydx,
         })

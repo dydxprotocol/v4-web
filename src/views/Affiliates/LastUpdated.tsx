@@ -53,7 +53,7 @@ const LastUpdated = ({ lastUpdatedDate }: IProps) => {
   }
 
   return (
-    <span className="self-end text-mini text-color-text-1">
+    <span tw="self-end text-mini text-color-text-1">
       {stringGetter({ key: STRING_KEYS.UPDATED })} {timeAgo(currentTime, lastUpdatedDate)}
     </span>
   );

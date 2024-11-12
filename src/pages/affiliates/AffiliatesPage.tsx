@@ -62,8 +62,8 @@ export const AffiliatesPage = () => {
 
   return (
     <Suspense fallback={<LoadingSpace id="affiliates" />}>
-      <$Page className="flex flex-col gap-1">
-        <$Section className="flex flex-col gap-1 px-1 pt-1">
+      <$Page tw="flex flex-col gap-1">
+        <$Section tw="flex flex-col gap-1 px-1 pt-1">
           {isNotTablet && lastUpdated && <LastUpdated lastUpdatedDate={new Date(lastUpdated)} />}
           <AffiliatesBanner />
 
@@ -93,9 +93,9 @@ export const AffiliatesPage = () => {
           </AttachedExpandingSection>
 
           {currentTab === AffiliateRoute.Leaderboard && (
-            <section className="flex flex-row flex-wrap items-center justify-between gap-y-1">
+            <section tw="flex flex-row flex-wrap items-center justify-between gap-y-1">
               {dydxAddress && !userStatus.isAffiliate && !userStatus.isVip ? (
-                <div className="w-full notTablet:w-7/12">
+                <div tw="w-full notTablet:w-7/12">
                   <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
                 </div>
               ) : (
@@ -103,13 +103,13 @@ export const AffiliatesPage = () => {
                   currentAffiliateTier={userStatus.currentAffiliateTier}
                   isVip={userStatus.isVip}
                   stakedDydx={userStatus.stakedDydx}
-                  className="h-fit w-full notTablet:h-full notTablet:w-7/12"
+                  tw="h-fit w-full notTablet:h-full notTablet:w-7/12"
                   accountStats={accountStats}
                 />
               )}
 
               <ProgramStatusCard
-                className="h-fit w-full notTablet:h-full notTablet:w-4/12"
+                tw="h-fit w-full notTablet:h-full notTablet:w-4/12"
                 isVip={!!userStatus.isVip}
               />
             </section>
@@ -117,7 +117,7 @@ export const AffiliatesPage = () => {
 
           {currentTab === AffiliateRoute.ProgramStats && (
             <ProgramStatsCard
-              className="h-fit notTablet:h-full"
+              tw="h-fit notTablet:h-full"
               programStats={programStats as IProgramStats}
             />
           )}

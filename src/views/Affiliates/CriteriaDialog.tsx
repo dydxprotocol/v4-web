@@ -8,10 +8,10 @@ import {
 import { CriteriaDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -39,7 +39,7 @@ export const CriteriaDialog = ({
   stakedAmount,
   userTier,
 }: DialogProps<CriteriaDialogProps>) => {
-  const { isConnectedWagmi } = useWalletConnection();
+  const { dydxAddress } = useAccounts();
   const { affiliateProgram } = useURLConfigs();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -84,16 +84,14 @@ export const CriteriaDialog = ({
       {...{ setIsOpen }}
       placement={DialogPlacement.Default}
       title={
-        !isConnectedWagmi
+        !dydxAddress
           ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
           : userTier === 'vip'
             ? stringGetter({
                 key: STRING_KEYS.YOURE_A_VIP,
                 params: {
                   VIP: (
-                    <span className="text-color-success">
-                      {stringGetter({ key: STRING_KEYS.VIP })}
-                    </span>
+                    <span tw="text-color-success">{stringGetter({ key: STRING_KEYS.VIP })}</span>
                   ),
                 },
               })
@@ -106,9 +104,9 @@ export const CriteriaDialog = ({
       }
       hasHeaderBlur={false}
     >
-      <$Container className="flex flex-col gap-y-1">
-        <div className="flex flex-col gap-y-1 px-1 notTablet:p-0">
-          <div className="text-color-text-0">
+      <$Container tw="flex flex-col gap-y-1">
+        <div tw="flex flex-col gap-y-1 px-1 notTablet:p-0">
+          <div tw="text-color-text-0">
             {userTier === 'vip'
               ? stringGetter({
                   key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
@@ -120,18 +118,18 @@ export const CriteriaDialog = ({
                   key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
                   params: {
                     VIP_VALUE: (
-                      <span className="text-color-text-1">
+                      <span tw="text-color-text-1">
                         ${DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
                       </span>
                     ),
                     REGULAR_VALUE: (
-                      <span className="text-color-text-1">
+                      <span tw="text-color-text-1">
                         ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
                       </span>
                     ),
                     APPLY_HERE: (
                       <Link isInline href={affiliateProgram}>
-                        <span className="text-color-accent">
+                        <span tw="text-color-accent">
                           {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                         </span>
                       </Link>
@@ -140,21 +138,23 @@ export const CriteriaDialog = ({
                 })}
           </div>
 
-          <div className="my-1 flex">
-            <BorderStatCell
-              className="pr-1"
-              border={['right']}
-              title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-              outputType={OutputType.CompactFiat}
-              value={accountStats?.referredVolume}
-            />
-            <StatCell className="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
-              <div className="flex items-center">
-                {isConnectedWagmi ? stakedDYdX.toLocaleString() : '-'}
-                <Tag className="ml-0.25">{chainTokenLabel}</Tag>
-              </div>
-            </StatCell>
-          </div>
+          {dydxAddress && (
+            <div tw="my-1 flex">
+              <BorderStatCell
+                tw="pr-1"
+                border={['right']}
+                title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
+                outputType={OutputType.CompactFiat}
+                value={accountStats?.referredVolume}
+              />
+              <StatCell tw="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
+                <div tw="flex items-center">
+                  {stakedDYdX.toLocaleString()}
+                  <Tag tw="ml-0.25">{chainTokenLabel}</Tag>
+                </div>
+              </StatCell>
+            </div>
+          )}
         </div>
 
         <CriteriaTable tiers={tiers} userTier={userTier} />
@@ -172,6 +172,7 @@ const CriteriaTable = ({
 }) => {
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const columns: ColumnDef<ITierDefinition>[] = [
     {
@@ -180,9 +181,9 @@ const CriteriaTable = ({
       label: stringGetter({ key: STRING_KEYS.TIER }),
       renderCell: ({ tier }) => (
         <$TableCell stacked>
-          <div className="flex items-center">
+          <div tw="flex items-center">
             {tier.toString().toLowerCase() === 'vip' ? (
-              <span className="text-color-success">{tier.toString().toUpperCase()}</span>
+              <span tw="text-color-success">{tier.toString().toUpperCase()}</span>
             ) : (
               tier.toString().toUpperCase()
             )}
@@ -198,14 +199,14 @@ const CriteriaTable = ({
       renderCell: ({ tier, requirements }) =>
         tier === 'vip' && userTier !== 'vip' ? (
           <$TableCell>
-            <Tag className="bg-color-layer-5 p-0.5 text-small text-color-text-1">
-              <div className="flex flex-col gap-x-0.25 notTablet:flex-row">
+            <Tag tw="bg-color-layer-5 p-0.5 text-small text-color-text-1">
+              <div tw="flex flex-col gap-x-0.25 notTablet:flex-row">
                 {stringGetter({
                   key: STRING_KEYS.BY_APPLICATION_ONLY,
                 })}
-                <div className="flex flex-row">
+                <div tw="flex flex-row">
                   <Link href={affiliateProgram}>
-                    <span className="capitalize text-color-accent">
+                    <span tw="capitalize text-color-accent">
                       {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
                     </span>
                   </Link>
@@ -215,7 +216,7 @@ const CriteriaTable = ({
             </Tag>
           </$TableCell>
         ) : tier === 'vip' && userTier === 'vip' ? (
-          <$TableCell className="text-color-text-2">
+          <$TableCell tw="text-color-text-2">
             {stringGetter({
               key: STRING_KEYS.YOURE_A_VIP,
               params: {
@@ -227,28 +228,28 @@ const CriteriaTable = ({
           <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
         ) : (
           <$TableCell stacked>
-            <div className="flex flex-col gap-y-0.5 notTablet:flex-row notTablet:items-center notTablet:gap-x-1">
-              <div className="flex flex-row gap-x-0.5 notTablet:flex-col">
-                <div className="flex items-center text-color-text-1">
+            <div tw="flex flex-col gap-y-0.5 notTablet:flex-row notTablet:items-center notTablet:gap-x-1">
+              <div tw="flex flex-row gap-x-0.5 notTablet:flex-col">
+                <div tw="flex items-center text-color-text-1">
                   <Output type={OutputType.CompactFiat} value={requirements.referredVol} />+
                 </div>
-                <p className="text-sm text-break text-color-text-0">
+                <p tw="text-small text-color-text-0">
                   {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
                 </p>
               </div>
-              <div className="text-color-text-0">
+              <div tw="text-color-text-0">
                 {stringGetter({ key: STRING_KEYS.OR }).toUpperCase()}
               </div>
               <div>
-                <div className="flex flex-row gap-x-0.5 notTablet:flex-col">
-                  <div className="flex items-center text-color-text-1">
+                <div tw="flex flex-row gap-x-0.5 notTablet:flex-col">
+                  <div tw="flex items-center text-color-text-1">
                     <Output type={OutputType.CompactFiat} value={requirements.staked} />+
                   </div>
-                  <div className="flex items-center">
-                    <p className="text-sm text-color-text-0">
+                  <div tw="flex items-center">
+                    <p tw="text-small text-color-text-0">
                       {stringGetter({ key: STRING_KEYS.STAKED })}
                     </p>
-                    <Tag className="ml-0.25 w-fit">DYDX</Tag>
+                    <Tag tw="ml-0.25 w-fit">{chainTokenLabel}</Tag>
                   </div>
                 </div>
               </div>
@@ -256,7 +257,6 @@ const CriteriaTable = ({
           </$TableCell>
         ),
     },
-
     {
       columnKey: 'affiliate-earn-rate',
       allowsSorting: true,
@@ -268,15 +268,15 @@ const CriteriaTable = ({
         </WithTooltip>
       ),
       renderCell: ({ tier, affiliateEarnRate }) => (
-        <$TableCell className="align-center w-full justify-between">
+        <$TableCell tw="w-full items-center justify-between">
           {tier === 'vip' ? (
-            <span className="text-color-success">{affiliateEarnRate}</span>
+            <span tw="text-color-success">{affiliateEarnRate}</span>
           ) : (
             affiliateEarnRate
           )}
           {userTier?.toString().toLowerCase() === tier.toString().toLowerCase() && (
-            <Tag className="bg-color-accent">
-              <span className="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>
+            <Tag tw="bg-color-accent">
+              <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>
             </Tag>
           )}
         </$TableCell>
@@ -286,7 +286,7 @@ const CriteriaTable = ({
 
   return (
     <$Table
-      affiliateTierIdx={userTier === 'vip' ? 4 : userTier ?? 0}
+      affiliateTierIdx={userTier === 'vip' ? 4 : userTier}
       withInnerBorders
       withOuterBorder
       getRowKey={(row) => row.tier}
@@ -317,7 +317,7 @@ const $Dialog = styled(Dialog)`
 
 const $TableCell = tw(TableCell)`py-0.5`;
 
-const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx: number }>`
+const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx?: number }>`
   th {
     background-color: var(--color-layer-3);
   }
@@ -331,8 +331,11 @@ const $Table = styled(Table)<AllTableProps<ITierDefinition> & { affiliateTierIdx
   }
 
   ${({ affiliateTierIdx }) => `
-  tr:nth-child(${affiliateTierIdx + 1}) {
+  ${
+    affiliateTierIdx !== undefined &&
+    `tr:nth-child(${affiliateTierIdx + 1}) {
     background-color: var(--color-layer-5);
+}`
   }
 `}
 

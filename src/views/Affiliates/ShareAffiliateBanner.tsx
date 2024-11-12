@@ -18,7 +18,7 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
 
   return (
     <$Container tw="column gap-1">
-      <div className="text-medium text-color-text-1">
+      <div tw="text-medium text-color-text-1">
         {stringGetter({
           key: STRING_KEYS.SHARE_AFFILIATE_BANNER_TITLE,
           params: {
@@ -32,12 +32,12 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
           params: {
             AMOUNT_DISCOUNT: 550,
             VIP_AMOUNT_USD: (
-              <span className="text-color-text-1">
+              <span tw="text-color-text-1">
                 {DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
               </span>
             ),
             AMOUNT_PER_MONTH: (
-              <span className="text-color-text-1">
+              <span tw="text-color-text-1">
                 {DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
               </span>
             ),

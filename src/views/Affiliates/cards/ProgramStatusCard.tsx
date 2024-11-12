@@ -24,7 +24,7 @@ const ConnectWallet = () => {
   const stringGetter = useStringGetter();
 
   return (
-    <div className="flex flex-col items-center justify-center gap-y-1 px-4 py-2 text-center">
+    <div tw="flex flex-col items-center justify-center gap-y-1 px-4 py-2 text-center">
       <p>{stringGetter({ key: STRING_KEYS.AFFILIATE_CONNECT_WALLET })}</p>
       <OnboardingTriggerButton />
     </div>
@@ -41,21 +41,21 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
     : stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE });
 
   const body: ReactNode = isVip ? (
-    <p className="text-color-text-0">
+    <p tw="text-color-text-0">
       {stringGetter({
         key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
         params: {
-          VIP: <span className="text-color-text-2">{stringGetter({ key: STRING_KEYS.VIP })}</span>,
+          VIP: <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.VIP })}</span>,
         },
       })}
     </p>
   ) : (
-    <p className="text-color-text-0">
+    <p tw="text-color-text-0">
       {stringGetter({
         key: STRING_KEYS.PROGRAM_CARD_BODY,
         params: {
           VIP_VALUE: (
-            <span className="text-color-text-2">
+            <span tw="text-color-text-2">
               {DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
             </span>
           ),
@@ -73,19 +73,19 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
       {!dydxAddress && <ConnectWallet />}
 
       {dydxAddress && (
-        <div className="flex flex-col gap-y-1 p-1">
-          <$Header className="align-center flex">
+        <div tw="flex flex-col gap-y-1 p-1">
+          <$Header tw="flex items-center">
             <$Icon
               iconName={isVip ? IconName.CheckCircle : IconName.Rocket}
               className={isVip ? 'text-color-success' : 'text-color-text-1'}
             />
-            <h4 className="ml-0.5 text-color-text-2">{title}</h4>
+            <h4 tw="ml-0.5 text-color-text-2">{title}</h4>
           </$Header>
           <div>{body}</div>
 
           {!isVip ? (
             <Button
-              className="w-full"
+              tw="w-full"
               action={ButtonAction.Base}
               type={ButtonType.Link}
               href={affiliateProgram}
@@ -93,9 +93,9 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
               {buttonText}
             </Button>
           ) : (
-            <div className="flex gap-1">
+            <div tw="flex gap-1">
               <Button
-                className="w-full"
+                tw="w-full"
                 action={ButtonAction.Base}
                 type={ButtonType.Link}
                 href={`mailto:${affiliateProgramSupportEmail}`}
@@ -103,7 +103,7 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
                 {buttonText}
               </Button>
               <Button
-                className="w-full"
+                tw="w-full"
                 action={ButtonAction.Base}
                 type={ButtonType.Link}
                 href={vipsChannel}
