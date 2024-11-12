@@ -26,7 +26,7 @@ export const CommunityChartContainer = () => {
   const { programStats } = useOutletContext<{ programStats: IProgramStats }>();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-1">
       <Tabs
         value={chartMetric}
         onValueChange={setChartMetric}
@@ -49,7 +49,7 @@ export const CommunityChartContainer = () => {
           },
         ]}
       />
-      <$ChartContainer className="bg-color-layer-3 p-2">
+      <$ChartContainer className="bg-color-layer-3 p-1">
         <ProgramHistoricalChart
           {...{ programStats }}
           selectedChartMetric={chartMetric}

@@ -61,7 +61,7 @@ export const Overview = () => {
     <div>
       {affiliatesEnabled && !dismissedAffiliateBanner && !isTablet && (
         <DetachedSection>
-          <AffiliatesBanner withClose />
+          <AffiliatesBanner withClose showLink />
         </DetachedSection>
       )}
 
@@ -81,7 +81,7 @@ export const Overview = () => {
 
       {affiliatesEnabled && isTablet && (
         <DetachedSection>
-          <AffiliatesBanner />
+          <AffiliatesBanner showLink />
         </DetachedSection>
       )}
 
