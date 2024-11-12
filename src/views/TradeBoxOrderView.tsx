@@ -79,7 +79,7 @@ const $OrderTypeTabs = styled(Tabs)`
   --tabs-height: 2.125rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
 
-  > header {
+  > * > header {
     justify-content: space-around;
   }
 ` as typeof Tabs;
