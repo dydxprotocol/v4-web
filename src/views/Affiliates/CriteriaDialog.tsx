@@ -172,6 +172,7 @@ const CriteriaTable = ({
 }) => {
   const stringGetter = useStringGetter();
   const { affiliateProgram } = useURLConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const columns: ColumnDef<ITierDefinition>[] = [
     {
@@ -248,7 +249,7 @@ const CriteriaTable = ({
                     <p tw="text-sm text-color-text-0">
                       {stringGetter({ key: STRING_KEYS.STAKED })}
                     </p>
-                    <Tag tw="ml-0.25 w-fit">DYDX</Tag>
+                    <Tag tw="ml-0.25 w-fit">{chainTokenLabel}</Tag>
                   </div>
                 </div>
               </div>
@@ -256,7 +257,6 @@ const CriteriaTable = ({
           </$TableCell>
         ),
     },
-
     {
       columnKey: 'affiliate-earn-rate',
       allowsSorting: true,
