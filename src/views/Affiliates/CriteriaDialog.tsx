@@ -268,7 +268,7 @@ const CriteriaTable = ({
         </WithTooltip>
       ),
       renderCell: ({ tier, affiliateEarnRate }) => (
-        <$TableCell tw="align-center w-full justify-between">
+        <$TableCell tw="w-full items-center justify-between">
           {tier === 'vip' ? (
             <span tw="text-color-success">{affiliateEarnRate}</span>
           ) : (

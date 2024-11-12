@@ -74,7 +74,7 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
 
       {dydxAddress && (
         <div tw="flex flex-col gap-y-1 p-1">
-          <$Header tw="align-center flex">
+          <$Header tw="flex items-center">
             <$Icon
               iconName={isVip ? IconName.CheckCircle : IconName.Rocket}
               className={isVip ? 'text-color-success' : 'text-color-text-1'}
