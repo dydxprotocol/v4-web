@@ -223,7 +223,7 @@ export async function createAndSendMarketMapProposal(
           Quote: modifiedTicker.split('/')[1]!,
         },
         decimals: Math.abs(priceExponent).toString(),
-        enabled: false,
+        enabled: true,
         min_provider_count: minExchanges.toString(),
         metadata_JSON: '',
       },
@@ -238,7 +238,7 @@ export async function createAndSendMarketMapProposal(
       {
         '@type': '/slinky.marketmap.v1.MsgUpsertMarkets',
         authority: 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky',
-        markets: markets,
+        markets,
       },
     ],
     deposit: '5000000000000000000adv4tnt',
@@ -266,7 +266,7 @@ export async function createAndSendMarketMapProposal(
       'tx',
       'gov',
       'submit-proposal',
-      'marketMapProposal.json',
+      proposalFile,
       '--from',
       'alice',
       '--fees',
@@ -289,7 +289,7 @@ export function execCLI(command: string, args?: string[], input?: string): Promi
     let output = '';
 
     process.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
+      // console.log(`stdout: ${data}`);
       output += data.toString();
     });
 
@@ -311,4 +311,114 @@ export function execCLI(command: string, args?: string[], input?: string): Promi
     }
     process.stdin.end();
   });
+}
+
+export async function createAndSendOracleMarketsProposal(
+  numExistingMarkets: number,
+  proposals: Proposal[],
+  validatorEndpoint: string,
+  chainId: string,
+  binary: string
+): Promise<Map<number, string>> {
+  const marketsProposed = new Map<number, string>(); // marketId -> ticker
+  const proposalMessages = proposals
+    .map((proposal: Proposal, index: number) => {
+      const marketId = index + numExistingMarkets + 1;
+      marketsProposed.set(marketId, proposal.params.ticker);
+
+      const oracleParams = {
+        id: marketId,
+        pair: proposal.params.ticker,
+        exponent: proposal.params.priceExponent,
+        min_price_change_ppm: proposal.params.minPriceChange,
+        min_exchanges: proposal.params.minExchanges,
+        exchange_config_json: '{}',
+      };
+      const perpetualParams = {
+        id: marketId,
+        ticker: proposal.params.ticker,
+        market_id: marketId,
+        atomic_resolution: proposal.params.atomicResolution,
+        default_funding_ppm: 0,
+        liquidity_tier: proposal.params.liquidityTier,
+        market_type: proposal.params.marketType,
+      };
+      const clobParams = {
+        id: marketId,
+        perpetual_clob_metadata: {
+          perpetual_id: marketId,
+        },
+        step_base_quantums: proposal.params.stepBaseQuantums,
+        subticks_per_tick: proposal.params.subticksPerTick,
+        quantum_conversion_exponent: proposal.params.quantumConversionExponent,
+        status: 'STATUS_ACTIVE',
+      };
+
+      return [
+        {
+          '@type': '/dydxprotocol.prices.MsgCreateOracleMarket',
+          authority: 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky',
+          params: oracleParams,
+        },
+        {
+          '@type': '/dydxprotocol.perpetuals.MsgCreatePerpetual',
+          authority: 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky',
+          params: perpetualParams,
+        },
+        {
+          '@type': '/dydxprotocol.clob.MsgCreateClobPair',
+          authority: 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky',
+          clob_pair: clobParams,
+        },
+      ];
+    })
+    .flat();
+
+  const proposal = {
+    title: 'Add markets to x/prices',
+    summary: 'Add markets to market map',
+    messages: proposalMessages,
+    deposit: '5000000000000000000adv4tnt',
+    expedited: true,
+  };
+
+  const proposalFile = 'oracleMarketProposal.json';
+  fs.writeFileSync(proposalFile, JSON.stringify(proposal, null, 2), 'utf-8');
+
+  try {
+    await execCLI(binary, ['keys', 'show', 'alice']);
+  } catch (error) {
+    await execCLI(
+      binary,
+      ['keys', 'add', 'alice', '--recover'],
+      'merge panther lobster crazy road hollow amused security before critic about cliff exhibit cause coyote talent happy where lion river tobacco option coconut small'
+    );
+  }
+
+  await retry(() =>
+    execCLI(
+      binary,
+      [
+        '--node',
+        validatorEndpoint,
+        'tx',
+        'gov',
+        'submit-proposal',
+        proposalFile,
+        '--from',
+        'alice',
+        '--fees',
+        '20000000000000000000adv4tnt',
+        '--chain-id',
+        chainId,
+        '--gas',
+        'auto',
+      ],
+      'y'
+    )
+  );
+
+  fs.unlinkSync(proposalFile);
+
+  return marketsProposed;
 }
