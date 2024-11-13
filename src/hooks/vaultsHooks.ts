@@ -25,6 +25,7 @@ import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSel
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
+import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
 import { isPresent } from '@/lib/typeUtils';
@@ -81,7 +82,7 @@ export const useLoadedVaultDetails = () => {
       return wrapNullable(
         VaultCalculator.calculateVaultSummary(
           [dailyResult, hourlyResult].filter(isPresent),
-          megavaultHistoryStartDateMs != null && megavaultHistoryStartDateMs.length > 0
+          isTruthy(megavaultHistoryStartDateMs)
             ? MustBigNumber(megavaultHistoryStartDateMs).toNumber()
             : 0
         )

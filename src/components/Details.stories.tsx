@@ -26,7 +26,7 @@ DetailsStory.args = {
     {
       key: 'item-2',
       label: 'Really really really long item name 2',
-      tooltip: 'liquidation-price',
+      tooltip: 'liquidation-price-short',
       value: 'Value 2',
     },
     {
