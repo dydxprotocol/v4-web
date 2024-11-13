@@ -69,7 +69,7 @@ export const AffiliatesBanner = ({
             params: {
               LINK: (
                 <Link
-                  to={AppRoute.Affiliates}
+                  to={AppRoute.Referrals}
                   tw="inline-flex text-color-accent visited:text-color-accent hover:underline"
                 >
                   {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })} →

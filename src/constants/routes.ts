@@ -10,7 +10,7 @@ export enum AppRoute {
   Settings = '/settings',
   Terms = '/terms',
   Privacy = '/privacy',
-  Affiliates = '/affiliates',
+  Referrals = '/referrals',
   LaunchMarket = '/launch-market',
 }
 
