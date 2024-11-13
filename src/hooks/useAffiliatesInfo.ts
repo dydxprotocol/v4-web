@@ -11,6 +11,7 @@ import {
 import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
 
+import { safeFetch } from '@/lib/safeFetch';
 import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
@@ -36,13 +37,13 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
     try {
       const [metaDataResponse, totalVolumeResponse, affiliateInfo] = await Promise.all([
-        fetch(`${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+        safeFetch(`${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         }),
-        fetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+        safeFetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     const endpoint = `${affiliatesBaseUrl}/v1/community/program-stats`;
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await safeFetch(endpoint, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -85,7 +86,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     const endpoint = `${affiliatesBaseUrl}/v1/leaderboard/account/${dydxAddress}`;
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await safeFetch(endpoint, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -105,7 +106,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     const endpoint = `${affiliatesBaseUrl}/v1/last-updated`;
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await safeFetch(endpoint, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -137,6 +138,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     queryKey: ['accountStats', dydxAddress],
     queryFn: fetchAccountStats,
     enabled: Boolean(dydxAddress && affiliatesBaseUrl),
+    retry: 0,
   });
 
   const lastUpdatedQuery = useQuery({
