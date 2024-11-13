@@ -50,7 +50,7 @@ export const CommunityChartContainer = () => {
           },
         ]}
       />
-      <$ChartContainer tw="bg-color-layer-3 p-2 notTablet:rounded-0.5">
+      <$ChartContainer tw="bg-color-layer-3 p-2 notTablet:rounded-0.625">
         <ProgramHistoricalChart
           {...{ programStats }}
           selectedChartMetric={chartMetric}
@@ -74,6 +74,7 @@ export const CommunityChartContainer = () => {
 
 const $Tabs = styled(Tabs)`
   --color-border: transparent;
+  margin-bottom: 0.5rem;
 ` as typeof Tabs;
 
 const $ChartContainer = styled.div`

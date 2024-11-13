@@ -19,12 +19,14 @@ import { Output, OutputType } from '@/components/Output';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const MarketsBanners = () => {
   const stringGetter = useStringGetter();
   const { data: launchableMarkets } = useLaunchableMarkets();
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
 
-  return (
+  return testFlags.pml ? (
     <$PmlBanner to={AppRoute.LaunchMarket}>
       <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-5" />
 
@@ -58,7 +60,7 @@ export const MarketsBanners = () => {
 
       <IconButton iconName={IconName.Arrow} />
     </$PmlBanner>
-  );
+  ) : null;
 };
 
 const $MarketsPageBanner = styled(Link)`
