@@ -1,5 +1,3 @@
-import { isMainnet } from '@/constants/networks';
-
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -43,7 +41,7 @@ class TestFlags {
   }
 
   get enableVaults() {
-    return this.booleanFlag(this.queryParams.vaults, !isMainnet);
+    return true;
   }
 
   get referrer() {
@@ -51,7 +49,7 @@ class TestFlags {
   }
 
   get pml() {
-    return this.booleanFlag(this.queryParams.pml, !isMainnet);
+    return true;
   }
 
   get showLimitClose() {
@@ -63,11 +61,11 @@ class TestFlags {
   }
 
   get enableStaticTyping() {
-    return this.booleanFlag(this.queryParams.statictyping, !isMainnet);
+    return true;
   }
 
   get uiRefresh() {
-    return this.booleanFlag(this.queryParams.uirefresh, !isMainnet);
+    return true;
   }
 
   get onboardingRewrite() {
