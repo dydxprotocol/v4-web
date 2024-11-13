@@ -77,7 +77,11 @@ export const store = configureStore({
   devTools:
     process.env.NODE_ENV !== 'production'
       ? {
-          stateSanitizer: (state: any) => ({ ...state, tradingView: '<LONG BLOB>' }),
+          stateSanitizer: (state: any) => ({
+            ...state,
+            tradingView: '<LONG BLOB>',
+            localization: { ...state.localization, localeData: '<LONG BLOB>' },
+          }),
         }
       : false,
 });
