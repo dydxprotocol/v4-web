@@ -73,6 +73,7 @@ type AccentColors = {
 
 type StatusColors = {
   success: string;
+  successBackground: string;
   warning: string;
   error: string;
   successFaded: string;
