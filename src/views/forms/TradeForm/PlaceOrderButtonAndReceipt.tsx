@@ -3,7 +3,12 @@ import { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusInputTypes, AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
+import {
+  AbacusInputTypes,
+  AbacusMarginMode,
+  AbacusPositionSide,
+  type TradeInputSummary,
+} from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -92,7 +97,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const { id } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
-  const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf } = orEmptyObj(
+  const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf, side } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
 
@@ -185,7 +190,11 @@ export const PlaceOrderButtonAndReceipt = ({
         key: 'liquidation-price',
         label: (
           <WithTooltip
-            tooltip="liquidation-price"
+            tooltip={
+              side?.postOrder === AbacusPositionSide.SHORT
+                ? 'liquidation-price-short'
+                : 'liquidation-price-long'
+            }
             stringParams={{ SYMBOL: getDisplayableAssetFromBaseAsset(id) }}
             side="right"
           >

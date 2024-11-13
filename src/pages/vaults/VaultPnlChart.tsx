@@ -11,7 +11,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useVaultPnlHistory } from '@/hooks/vaultsHooks';
@@ -51,20 +50,11 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const [visibleTimeRange, setVisibleTimeRange] = useState<[number, number] | undefined>(undefined);
   const [hoveredTime, setHoveredTime] = useState<number | undefined>(undefined);
 
-  const megavaultMinimumDateTimeMs = useEnvConfig('megavaultHistoryStartDateMs');
   const data = useMemo(
-    () =>
-      vaultPnl
-        .map((v, index) => safeAssign({}, v, { index }))
-        .filter(
-          (f) =>
-            megavaultMinimumDateTimeMs == null ||
-            f.date == null ||
-            MustBigNumber(megavaultMinimumDateTimeMs).toNumber() <= f.date
-        ),
+    () => vaultPnl.map((v, index) => safeAssign({}, v, { index })),
     // need to churn reference so chart updates axes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vaultPnl, selectedChart, megavaultMinimumDateTimeMs]
+    [vaultPnl, selectedChart]
   );
 
   const timeUnitsToRender = useMemo(() => {
@@ -181,7 +171,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const zoomDomain =
     selectedTimeRange != null
       ? TIME_RANGES.find((t) => t.value === selectedTimeRange)?.time
-      : undefined;
+      : 7 * timeUnits.day;
 
   return (
     <div className={className}>
