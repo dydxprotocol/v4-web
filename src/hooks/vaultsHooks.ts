@@ -34,6 +34,7 @@ import { useAppSelector } from '../state/appTypes';
 import { useAccounts } from './useAccounts';
 import { useDebounce } from './useDebounce';
 import { useDydxClient } from './useDydxClient';
+import { useEnvConfig } from './useEnvConfig';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 
@@ -68,6 +69,8 @@ const toProcessedHistoricalPnlResponse = (res: any) =>
 
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
+  const megavaultHistoryStartDateMs = useEnvConfig('megavaultHistoryStartDateMs');
+
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
     queryFn: async () => {
@@ -76,7 +79,12 @@ export const useLoadedVaultDetails = () => {
         getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
       ]);
       return wrapNullable(
-        VaultCalculator.calculateVaultSummary([dailyResult, hourlyResult].filter(isPresent))
+        VaultCalculator.calculateVaultSummary(
+          [dailyResult, hourlyResult].filter(isPresent),
+          megavaultHistoryStartDateMs != null && megavaultHistoryStartDateMs.length > 0
+            ? MustBigNumber(megavaultHistoryStartDateMs).toNumber()
+            : 0
+        )
       );
     },
     ...vaultQueryOptions,
