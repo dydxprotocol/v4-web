@@ -27,7 +27,8 @@ export const CommunityChartContainer = () => {
 
   return (
     <div tw="flex flex-col">
-      <Tabs
+      <$Tabs
+        dividerStyle="underline"
         value={chartMetric}
         onValueChange={setChartMetric}
         items={[
@@ -49,7 +50,7 @@ export const CommunityChartContainer = () => {
           },
         ]}
       />
-      <$ChartContainer tw="bg-color-layer-3 p-2">
+      <$ChartContainer tw="bg-color-layer-3 p-2 notTablet:rounded-0.5">
         <ProgramHistoricalChart
           {...{ programStats }}
           selectedChartMetric={chartMetric}
@@ -70,6 +71,10 @@ export const CommunityChartContainer = () => {
     </div>
   );
 };
+
+const $Tabs = styled(Tabs)`
+  --color-border: transparent;
+` as typeof Tabs;
 
 const $ChartContainer = styled.div`
   ${layoutMixins.contentSectionDetached}
