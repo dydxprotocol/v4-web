@@ -26,6 +26,7 @@ export enum LocalStorageKey {
   SelectedNetwork = 'dydx.SelectedNetwork',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
 
+  HasSeenUiRefresh = 'dydx.HasSeenUiRefresh',
   // Discoverability
   HasSeenElectionBannerTRUMPWIN = 'dydx.HasSeenElectionBannerTRUMPWIN',
   HasSeenTradeFormMessageTRUMPWIN = 'dydx.HasSeenTradeFormMessageTRUMPWIN',

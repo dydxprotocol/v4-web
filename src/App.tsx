@@ -7,7 +7,6 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
@@ -24,7 +23,7 @@ import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider, useStatsigGateValue } from '@/hooks/useStatsig';
+import { StatsigProvider } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -48,26 +47,31 @@ import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
-import { StatsigFlags } from './constants/statsig';
+import { LocalStorageKey } from './constants/localStorage';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
+import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
+import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { getIsAccountConnected } from './state/accountSelectors';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
+import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
+import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
-import { getActiveDialog } from './state/dialogsSelectors';
 import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
+import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -86,19 +90,16 @@ const Content = () => {
   useAnalytics();
   useCommandMenu();
   usePrefetchedQueries();
+  useReferralCode();
+  useUnlimitedLaunchDialog();
+  useUiRefreshMigrations();
 
-  const dispatch = useAppDispatch();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-
-  const ffShowUnlimitedAnnouncement = useStatsigGateValue(StatsigFlags.ffShowUnlimitedAnnouncement);
-  const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
-  const isAccountConnected = useAppSelector(getIsAccountConnected);
-  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
 
   const { complianceState } = useComplianceState();
   const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
@@ -112,18 +113,6 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  useEffect(() => {
-    if (isAccountConnected && ffShowUnlimitedAnnouncement && !hasSeenUnlimitedAnnouncement) {
-      dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
-    }
-  }, [dispatch, ffShowUnlimitedAnnouncement, hasSeenUnlimitedAnnouncement, isAccountConnected]);
-
-  useEffect(() => {
-    if (testFlags.referralCode && !activeDialog) {
-      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
-    }
-  }, [dispatch, activeDialog]);
-
   return (
     <>
       <GlobalStyle />
@@ -132,11 +121,16 @@ const Content = () => {
         isShowingFooter={isShowingFooter}
         showRestrictionWarning={showRestrictionWarning}
       >
-        {isNotTablet && <HeaderDesktop />}
+        {isShowingHeader && <HeaderDesktop />}
         {showRestrictionWarning && <RestrictionWarning />}
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
+              <Route path={`${AppRoute.Affiliates}/*`} element={<AffiliatesPage />}>
+                <Route index element={<Navigate to="leaderboard" replace />} />
+                <Route path="program-stats" element={<CommunityChartContainer />} />
+              </Route>
+
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />
@@ -195,12 +189,43 @@ const Content = () => {
   );
 };
 
+function useUiRefreshMigrations() {
+  const themeSetting = useAppSelector(getAppThemeSetting);
+  const dispatch = useAppDispatch();
+  const { uiRefresh } = testFlags;
+  const [seenUiRefresh, setSeenUiRefresh] = useLocalStorage({
+    key: LocalStorageKey.HasSeenUiRefresh,
+    defaultValue: false,
+  });
+  useEffect(() => {
+    if (uiRefresh && !seenUiRefresh) {
+      setSeenUiRefresh(true);
+      if (themeSetting === AppTheme.Classic) {
+        dispatch(setAppThemeSetting(AppTheme.Dark));
+      }
+    }
+  }, [themeSetting, seenUiRefresh, uiRefresh, dispatch, setSeenUiRefresh]);
+}
+
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   // eslint-disable-next-line react/display-name
   return ({ children }: { children: React.ReactNode }) => (
     <Component {...props}>{children}</Component>
   );
 };
+
+function useUnlimitedLaunchDialog() {
+  const showUnlimitedAnnouncement = testFlags.pml && testFlags.enableVaults;
+  const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (isAccountConnected && showUnlimitedAnnouncement && !hasSeenUnlimitedAnnouncement) {
+      dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
+    }
+  }, [dispatch, showUnlimitedAnnouncement, hasSeenUnlimitedAnnouncement, isAccountConnected]);
+}
 
 const providers = [
   wrapProvider(PrivyProvider, {
@@ -303,9 +328,9 @@ const $Content = styled.div<{
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
-  ${({ showRestrictionWarning }) => css`
+  ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:
-      'Header' var(--page-currentHeaderHeight)
+      ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
       ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
       'Main' minmax(min-content, 1fr)
       'Footer' var(--page-currentFooterHeight)

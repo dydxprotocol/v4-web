@@ -15,6 +15,7 @@ type ElementProps = {
   href?: string;
   onClick?: (e: React.MouseEvent) => void;
   withIcon?: boolean;
+  isNewPage?: boolean;
 };
 
 type StyleProps = {
@@ -33,6 +34,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       withIcon = false,
       isInline = false,
       isAccent = false,
+      isNewPage = true,
       className,
       ...props
     }: ElementProps & StyleProps,
@@ -54,7 +56,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
         onClick?.(e);
       }}
       rel="noopener noreferrer"
-      target="_blank"
+      target={isNewPage ? '_blank' : undefined}
       {...props}
     >
       {children}

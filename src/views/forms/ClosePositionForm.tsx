@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   AbacusOrderType,
@@ -38,9 +38,11 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Collapsible } from '@/components/Collapsible';
 import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { Tag } from '@/components/Tag';
+import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
@@ -332,6 +334,7 @@ export const ClosePositionForm = ({
     </$InputsColumn>
   );
 
+  const [showOrderbook, setShowOrderbook] = useState(false);
   return (
     <$ClosePositionForm onSubmit={onSubmit} className={className}>
       {!isTablet ? (
@@ -342,13 +345,22 @@ export const ClosePositionForm = ({
           {alertMessage}
         </div>
       ) : (
-        <$MobileLayout>
-          <$OrderbookContainer>
-            <CanvasOrderbook hideHeader tw="min-h-full" />
-          </$OrderbookContainer>
+        <$MobileLayout $showOrderbook={showOrderbook}>
+          {showOrderbook && (
+            <$OrderbookContainer>
+              <CanvasOrderbook hideHeader tw="min-h-full" rowsPerSide={15} />
+            </$OrderbookContainer>
+          )}
 
           <$Right>
             <PositionPreview showNarrowVariation />
+            <$OrderbookButton
+              slotRight={<Icon iconName={IconName.Caret} />}
+              onPressedChange={setShowOrderbook}
+              isPressed={showOrderbook}
+            >
+              {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
+            </$OrderbookButton>
             {inputs}
           </$Right>
         </$MobileLayout>
@@ -401,7 +413,8 @@ const $ClosePositionForm = styled.form`
     }
   }
 `;
-const $MobileLayout = styled.div`
+
+const $MobileLayout = styled.div<{ $showOrderbook: boolean }>`
   height: 0;
   // Apply dialog's top/left/right padding to inner scroll areas
   min-height: calc(100% + var(--dialog-content-paddingTop) + var(--dialog-content-paddingBottom));
@@ -409,13 +422,43 @@ const $MobileLayout = styled.div`
     calc(-1 * var(--form-rowGap)) calc(-1 * var(--dialog-content-paddingRight));
 
   display: grid;
-  grid-template-columns: 3fr 4fr;
+  grid-template-columns: ${({ $showOrderbook }) => ($showOrderbook ? '3fr 4fr' : '1fr')};
+  ${({ $showOrderbook }) =>
+    !$showOrderbook
+      ? css`
+          padding-left: var(--dialog-content-paddingLeft);
+        `
+      : ''}
   gap: var(--form-input-gap);
+`;
+
+const $OrderbookButton = styled(ToggleButton)`
+  --button-toggle-off-textColor: var(--color-text-1);
+  --button-toggle-off-backgroundColor: transparent;
+
+  > svg {
+    color: var(--color-text-0);
+    height: 0.875em;
+    width: 0.875em;
+
+    transition: 0.2s;
+  }
+
+  &[data-state='on'] {
+    svg {
+      rotate: 0.25turn;
+    }
+  }
+
+  &[data-state='off'] {
+    svg {
+      rotate: -0.25turn;
+    }
+  }
 `;
 
 const $OrderbookContainer = styled.div`
   display: flex;
-  min-height: 100%;
   padding-top: var(--dialog-content-paddingTop);
   padding-bottom: var(--form-rowGap);
 `;

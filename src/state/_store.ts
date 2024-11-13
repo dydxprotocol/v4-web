@@ -74,7 +74,16 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(appMiddleware as Middleware, localizationMiddleware as Middleware),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools:
+    process.env.NODE_ENV !== 'production'
+      ? {
+          stateSanitizer: (state: any) => ({
+            ...state,
+            tradingView: '<LONG BLOB>',
+            localization: { ...state.localization, localeData: '<LONG BLOB>' },
+          }),
+        }
+      : false,
 });
 
 export const persistor = persistStore(store);

@@ -8,6 +8,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -29,6 +30,7 @@ const TOKEN_MIGRATION_LEARN_MORE_LINK =
 export const MigratePanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const ethereumChainId = useEnvConfig('ethereumChainId');
 
@@ -104,7 +106,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
                   label: (
                     <$InlineRow>
                       {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}
-                      <Tag>DYDX</Tag>
+                      <Tag>{chainTokenLabel}</Tag>
                     </$InlineRow>
                   ),
                   value: <Output type={OutputType.Asset} value={tokenBalance} />,

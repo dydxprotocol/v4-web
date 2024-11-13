@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useDydxClient } from './useDydxClient';
 
-export const useReferralAddress = (refCode: string) => {
+export const useReferralAddress = (refCode?: string) => {
   const { compositeClient } = useDydxClient();
 
   const queryFn = async () => {
@@ -25,6 +25,7 @@ export const useReferralAddress = (refCode: string) => {
     queryKey: ['referralAddress', refCode],
     queryFn,
     enabled: Boolean(compositeClient && refCode),
+    refetchOnWindowFocus: false,
   });
 
   return query;

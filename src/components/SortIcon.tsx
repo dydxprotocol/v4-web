@@ -43,6 +43,7 @@ const $SortIcon = styled.div<{ hidden: boolean }>`
     hidden
       ? css`
           opacity: 0;
+          width: 0;
         `
       : css`
           opacity: 1;

@@ -6,6 +6,7 @@ import tw from 'twin.macro';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -32,12 +33,13 @@ export const MarketsStats = (props: MarketsStatsProps) => {
     hideUnlaunchedMarkets: true,
   });
 
+  const { isTablet } = useBreakpoints();
   return (
     <section
       className={className}
       tw="grid auto-cols-fr grid-flow-col gap-1 tablet:column desktopSmall:pl-1 desktopSmall:pr-1"
     >
-      <ExchangeBillboards />
+      {!isTablet && <ExchangeBillboards />}
       {hasNewMarkets && (
         <$Section>
           <$SectionHeader>

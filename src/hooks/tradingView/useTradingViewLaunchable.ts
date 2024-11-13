@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import {
@@ -28,12 +28,12 @@ import { useMetadataService } from '../useLaunchableMarkets';
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingViewLaunchable = ({
-  tvWidgetRef,
-  setIsChartReady,
+  tvWidget,
+  setTvWidget,
   marketId,
 }: {
-  tvWidgetRef: React.MutableRefObject<TvWidget | null>;
-  setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
+  tvWidget?: TvWidget;
+  setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   marketId: string;
 }) => {
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ export const useTradingViewLaunchable = ({
   const { data: metadataServiceData, isLoading: isDataLoading } = useMetadataService();
 
   useEffect(() => {
-    if (marketId && !isDataLoading) {
+    if (marketId && !isDataLoading && !tvWidget) {
       const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
 
@@ -66,25 +66,19 @@ export const useTradingViewLaunchable = ({
       };
 
       const tvChartWidget = new Widget(options);
-      tvWidgetRef.current = tvChartWidget;
+      setTvWidget(tvChartWidget);
 
       tvChartWidget.onChartReady(() => {
-        tvWidgetRef.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef.current?.save((chartConfig: object) => {
+        tvChartWidget.subscribe('onAutoSaveNeeded', () =>
+          tvChartWidget.save((chartConfig: object) => {
             dispatch(updateLaunchableMarketsChartConfig(chartConfig));
           })
         );
-
-        setIsChartReady(true);
       });
     }
 
     return () => {
-      tvWidgetRef.current?.remove();
-      tvWidgetRef.current = null;
-      setIsChartReady(false);
+      tvWidget?.remove();
     };
-  }, [dispatch, !!marketId, selectedLocale, setIsChartReady, tvWidgetRef, isDataLoading]);
-
-  return { savedResolution };
+  }, [dispatch, !!marketId, selectedLocale, isDataLoading, tvWidget, setTvWidget]);
 };

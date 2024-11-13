@@ -5,6 +5,7 @@ import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 import { BigNumberish } from '@/lib/numbers';
 
 import { AbacusPositionSides, Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
+import { IAffiliateStats } from './affiliates';
 import { NewMarketProposal } from './potentialMarkets';
 import { DydxChainAsset } from './wallets';
 
@@ -43,7 +44,6 @@ export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
-export type LaunchMarketDialogProps = { defaultLaunchableMarketId?: string };
 export type ManageFundsDialogProps = { selectedTransferType?: string };
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
@@ -97,6 +97,11 @@ export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
   estimatedUnblockTime?: string | null;
 };
+export type CriteriaDialogProps = {
+  accountStats?: IAffiliateStats;
+  stakedAmount?: string;
+  userTier?: number | 'vip';
+};
 
 export const DialogTypes = unionize(
   {
@@ -109,6 +114,7 @@ export const DialogTypes = unionize(
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
+    Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
@@ -120,7 +126,6 @@ export const DialogTypes = unionize(
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
-    LaunchMarket: ofType<LaunchMarketDialogProps>(),
     ManageFunds: ofType<ManageFundsDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),

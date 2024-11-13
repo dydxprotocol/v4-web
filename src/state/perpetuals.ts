@@ -9,11 +9,11 @@ import type {
   PerpetualMarket,
 } from '@/constants/abacus';
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { objectKeys } from '@/lib/objectHelpers';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 interface CandleDataByMarket {
@@ -36,6 +36,7 @@ export interface PerpetualsState {
   >;
   historicalFundings: Record<string, MarketHistoricalFunding[]>;
   marketFilter: MarketFilters;
+  launchMarketIds: string[];
 }
 
 const initialState: PerpetualsState = {
@@ -47,6 +48,7 @@ const initialState: PerpetualsState = {
   orderbooksMap: undefined,
   historicalFundings: {},
   marketFilter: MarketFilters.ALL,
+  launchMarketIds: [],
 };
 
 const MAX_NUM_LIVE_TRADES = 100;
@@ -133,24 +135,6 @@ export const perpetualsSlice = createSlice({
         },
       };
     },
-    setTvChartResolution: (
-      state: PerpetualsState,
-      action: PayloadAction<{ marketId: string; resolution: string }>
-    ) => {
-      const { marketId, resolution } = action.payload;
-
-      const candleState =
-        state.candles[marketId] != null
-          ? { ...state.candles[marketId]!, selectedResolution: resolution }
-          : {
-              data: Object.fromEntries(
-                objectKeys(RESOLUTION_MAP).map((resolutionString) => [resolutionString, []])
-              ),
-              selectedResolution: resolution,
-            };
-
-      state.candles[marketId] = candleState;
-    },
     setHistoricalFundings: (
       state: PerpetualsState,
       action: PayloadAction<{ historicalFundings: MarketHistoricalFunding[]; marketId: string }>
@@ -163,6 +147,17 @@ export const perpetualsSlice = createSlice({
         currentMarketId:
           getLocalStorage({ key: LocalStorageKey.LastViewedMarket }) ?? DEFAULT_MARKETID,
       }) satisfies PerpetualsState,
+    setLaunchMarketIds: (
+      state: PerpetualsState,
+      action: PayloadAction<{ launchedMarketId: string; launchStatus: LaunchMarketStatus }>
+    ) => {
+      const { launchedMarketId, launchStatus } = action.payload;
+      if (launchStatus === LaunchMarketStatus.PENDING) {
+        state.launchMarketIds = [...state.launchMarketIds, launchedMarketId];
+      } else {
+        state.launchMarketIds = state.launchMarketIds.filter((id) => id !== launchedMarketId);
+      }
+    },
   },
 });
 
@@ -172,8 +167,8 @@ export const {
   setLiveTrades,
   setMarkets,
   setOrderbook,
-  setTvChartResolution,
   setHistoricalFundings,
   resetPerpetualsState,
   setMarketFilter,
+  setLaunchMarketIds,
 } = perpetualsSlice.actions;

@@ -195,6 +195,14 @@ const getPositionsTableColumnDef = ({
                 value={unrealizedPnl.current}
                 showSign={ShowSign.Negative}
               />
+              <$OutputSigned
+                sign={getNumberSign(unrealizedPnl.current)}
+                type={OutputType.Percent}
+                value={unrealizedPnlPercent.current}
+                showSign={ShowSign.Negative}
+                fractionDigits={0}
+                withParentheses
+              />
             </TableCell>
           ) : (
             <TableCell stacked>

@@ -98,6 +98,7 @@ b {
 }
 
 /* Fixes the smart banner being unclickable. We want this to rise above all app banners */
-.smartbanner--ios {
+.smartbanner--ios,
+.smartbanner--android {
   z-index: 999;
 }

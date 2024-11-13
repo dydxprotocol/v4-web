@@ -196,14 +196,6 @@ export const getPerpetualBarsForPriceChart = (orderbookCandlesToggleOn: boolean)
   );
 
 /**
- *
- * @param marketId
- * @returns TvChart resolution for specified marketId
- */
-export const getSelectedResolutionForMarket = (state: RootState, marketId: string) =>
-  state.perpetuals.candles[marketId]?.selectedResolution;
-
-/**
  * @returns Current market's next funding rate
  */
 export const getCurrentMarketNextFundingRate = createAppSelector(
@@ -234,3 +226,8 @@ export const getMarketMaxLeverage = () =>
       return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
     }
   );
+
+// Returns list of markets that user has launched to handle loading/navigation state
+export const getLaunchedMarketIds = (state: RootState) => {
+  return state.perpetuals.launchMarketIds;
+};

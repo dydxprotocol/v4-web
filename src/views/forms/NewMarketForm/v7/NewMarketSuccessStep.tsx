@@ -12,18 +12,15 @@ import { LinkOutIcon } from '@/icons';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSuccessStepProps = {
-  onCloseDialog?: () => void;
   onLaunchAnotherMarket: () => void;
   tickerToAdd: string;
   transactionUrl: string;
 };
 
 export const NewMarketSuccessStep = ({
-  onCloseDialog,
   onLaunchAnotherMarket,
   tickerToAdd,
   transactionUrl,
@@ -33,27 +30,7 @@ export const NewMarketSuccessStep = ({
   const { marketId } = match?.params ?? {};
   const isOnMarketTradePage = marketId === tickerToAdd;
 
-  const onMaybeNeedsResubscribe = () => {
-    if (isOnMarketTradePage) {
-      abacusStateManager.setMarket(tickerToAdd);
-    }
-  };
-
-  const cta = isOnMarketTradePage ? (
-    <Button
-      type={ButtonType.Button}
-      action={ButtonAction.Primary}
-      onClick={() => {
-        onMaybeNeedsResubscribe();
-        onCloseDialog?.();
-      }}
-    >
-      {stringGetter({
-        key: STRING_KEYS.TRADE_MARKET,
-        params: { MARKET: getDisplayableTickerFromMarket(tickerToAdd) },
-      })}
-    </Button>
-  ) : (
+  const cta = isOnMarketTradePage ? null : (
     <Link to={`${AppRoute.Trade}/${tickerToAdd}`}>
       <Button type={ButtonType.Button} action={ButtonAction.Primary}>
         {stringGetter({
@@ -103,14 +80,17 @@ export const NewMarketSuccessStep = ({
           {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
           <LinkOutIcon />
         </Button>
-        <Button
-          type={ButtonType.Button}
-          buttonStyle={ButtonStyle.WithoutBackground}
-          tw="h-fit text-color-text-0"
-          onClick={onLaunchAnotherMarket}
-        >
-          {stringGetter({ key: STRING_KEYS.LAUNCH_ANOTHER_MARKET })}
-        </Button>
+
+        {!isOnMarketTradePage && (
+          <Button
+            type={ButtonType.Button}
+            buttonStyle={ButtonStyle.WithoutBackground}
+            tw="h-fit text-color-text-0"
+            onClick={onLaunchAnotherMarket}
+          >
+            {stringGetter({ key: STRING_KEYS.LAUNCH_ANOTHER_MARKET })}
+          </Button>
+        )}
       </div>
     </$Container>
   );

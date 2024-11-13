@@ -22,6 +22,7 @@
   --fontWeight-regular: 400;
   --fontWeight-book: 450;
   --fontWeight-medium: 500;
+  --fontWeight-semibold: 600;
   --fontWeight-bold: 700;
 
   --font-tiny-regular: var(--fontWeight-regular) var(--fontSize-tiny) var(--fontFamily-base);

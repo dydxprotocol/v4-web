@@ -98,6 +98,7 @@ export const useComplianceState = () => {
         },
       });
     }
+
     return message;
   }, [complianceStatus, complianceUpdatedAt, geo, help, selectedLocale, stringGetter]);
 

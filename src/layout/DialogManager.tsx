@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { DialogTypes } from '@/constants/dialogs';
 
+import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
@@ -22,7 +23,6 @@ import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
-import { LaunchMarketDialog } from '@/views/dialogs/LaunchMarketDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
@@ -91,7 +91,6 @@ export const DialogManager = () => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
-    LaunchMarket: (args) => <LaunchMarketDialog {...args} {...modalProps} />,
     ManageFunds: (args) => <ManageFundsDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
@@ -119,5 +118,6 @@ export const DialogManager = () => {
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
+    Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
 };

@@ -1,7 +1,7 @@
 import { FormEvent, useMemo } from 'react';
 
 import { LightningBoltIcon } from '@radix-ui/react-icons';
-import { Link } from 'react-router-dom';
+import { Link as NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -14,6 +14,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LinkOutIcon } from '@/icons';
 import { formMixins } from '@/styles/formMixins';
@@ -24,6 +25,7 @@ import { Button } from '@/components/Button';
 import { Details, type DetailsItem } from '@/components/Details';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -40,6 +42,7 @@ import { track } from '@/lib/analytics/analytics';
 import { getDisplayableAssetFromBaseAsset, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSelectionStepProps = {
+  hasDefault?: boolean;
   tickerToAdd?: string;
   setTickerToAdd: (ticker: string) => void;
   onConfirmMarket: () => void;
@@ -49,6 +52,7 @@ type NewMarketSelectionStepProps = {
 };
 
 export const NewMarketSelectionStep = ({
+  hasDefault,
   tickerToAdd,
   setTickerToAdd,
   onConfirmMarket,
@@ -60,6 +64,7 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const launchableMarkets = useLaunchableMarkets();
   const stringGetter = useStringGetter();
+  const { launchMarketLearnMore } = useURLConfigs();
 
   const alertMessage = useMemo(() => {
     let alert: { type: AlertType; message: string } | undefined;
@@ -81,7 +86,7 @@ export const NewMarketSelectionStep = ({
         </h2>
         <span tw="text-base text-color-text-0">
           {stringGetter({
-            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_3,
+            key: STRING_KEYS.MARKET_LAUNCH_DETAILS_4,
             params: {
               APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
               DEPOSIT_AMOUNT: (
@@ -92,22 +97,27 @@ export const NewMarketSelectionStep = ({
                   value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 />
               ),
-              PAST_DAYS: 30,
+              NUM_DAYS: 30,
               MEGAVAULT_LINK: (
-                <Link
+                <NavLink
                   tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"
                   to={AppRoute.Vault}
                 >
                   {stringGetter({ key: STRING_KEYS.MEGAVAULT })}
                   <LinkOutIcon />
-                </Link>
+                </NavLink>
               ),
             },
-          })}
+          })}{' '}
+          <Link href={launchMarketLearnMore} tw="inline">
+            {stringGetter({
+              key: STRING_KEYS.LEARN_MORE_ARROW,
+            })}
+          </Link>
         </span>
       </>
     );
-  }, [shouldHideTitleAndDescription, stringGetter]);
+  }, [launchMarketLearnMore, shouldHideTitleAndDescription, stringGetter]);
 
   const shortenedTicker = tickerToAdd ? getDisplayableTickerFromMarket(tickerToAdd) : tickerToAdd;
 
@@ -124,7 +134,8 @@ export const NewMarketSelectionStep = ({
         <LoadingSpace id="launch-markets" />
       ) : (
         <>
-          <SearchSelectMenu
+          <$SearchSelectMenu
+            disabled={hasDefault}
             items={[
               {
                 group: 'markets',
@@ -153,13 +164,9 @@ export const NewMarketSelectionStep = ({
             ) : (
               `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
             )}
-          </SearchSelectMenu>
+          </$SearchSelectMenu>
 
-          <WithDetailsReceipt
-            side="bottom"
-            detailItems={[freeCollateralDetailItem]}
-            tw="[--withReceipt-backgroundColor:--color-layer-2]"
-          >
+          <WithDetailsReceipt side="bottom" detailItems={[freeCollateralDetailItem]}>
             <FormInput
               disabled
               type={InputType.Currency}
@@ -172,7 +179,7 @@ export const NewMarketSelectionStep = ({
           {alertMessage}
 
           <WithReceipt
-            tw="[--withReceipt-backgroundColor:--color-layer-2]"
+            tw="min-h-0"
             slotReceipt={<Details items={receiptItems} tw="px-0.75 pb-0.25 pt-0.375 text-small" />}
           >
             {isDisconnected ? (
@@ -192,6 +199,7 @@ export const NewMarketSelectionStep = ({
     </$Form>
   );
 };
+
 const $Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
@@ -203,5 +211,11 @@ const $Form = styled.form`
     margin: 0;
     font: var(--font-large-medium);
     color: var(--color-text-2);
+  }
+`;
+
+const $SearchSelectMenu = styled(SearchSelectMenu)`
+  button:disabled {
+    cursor: default;
   }
 `;
