@@ -37,6 +37,7 @@ export const GlobalStyle = createGlobalStyle`
     --color-success: ${({ theme }) => theme.success};
     --color-warning: ${({ theme }) => theme.warning};
     --color-error: ${({ theme }) => theme.error};
+    --color-success-background: ${({ theme }) => theme.successBackground};
     --color-gradient-success: ${({ theme }) => theme.successFaded};
     --color-gradient-warning: ${({ theme }) => theme.warningFaded};
     --color-gradient-error: ${({ theme }) => theme.errorFaded};
