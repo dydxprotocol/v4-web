@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -50,7 +51,7 @@ export const CommunityChartContainer = () => {
           },
         ]}
       />
-      <$ChartContainer tw="bg-color-layer-3 p-2 notTablet:rounded-0.625">
+      <$ChartContainer tw="bg-color-layer-3 p-2">
         <ProgramHistoricalChart
           {...{ programStats }}
           selectedChartMetric={chartMetric}
@@ -79,6 +80,11 @@ const $Tabs = styled(Tabs)`
 
 const $ChartContainer = styled.div`
   ${layoutMixins.contentSectionDetached}
+  border-radius: 0.625rem;
+
+  @media ${breakpoints.desktopSmall} {
+    border-radius: 0;
+  }
 `;
 
 const $EmptyCard = styled.div`
