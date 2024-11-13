@@ -44,6 +44,7 @@ const ClassicThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   success: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red2,
+  successBackground: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
   successFaded: generateFadedColorVariant(
     uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
     OpacityToken.Opacity16
@@ -116,6 +117,7 @@ const DarkThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green1,
+  successBackground: ColorToken.Green4,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red0,
   successFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
@@ -184,6 +186,7 @@ const LightThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   favorite: ColorToken.Yellow0,
 
   success: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
+  successBackground: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red1,
   successFaded: generateFadedColorVariant(

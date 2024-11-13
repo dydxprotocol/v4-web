@@ -134,7 +134,7 @@ const buttonActionVariants = {
   [ButtonAction.Create]: {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-button);
-      --button-backgroundColor: var(--color-green);
+      --button-backgroundColor: var(--color-success-background);
       --button-border: solid var(--border-width) var(--color-border-white);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
