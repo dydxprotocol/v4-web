@@ -20,12 +20,10 @@ import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
-import { OutputType, formatNumberOutput } from '@/components/Output';
+import { Output, OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
@@ -62,15 +60,10 @@ export const ProgramHistoricalChart = ({
   className,
 }: ElementProps & StyleProps & { selectedChartMetric: AffiliatesProgramMetric }) => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
-
   const historyStartDate = useEnvConfig('rewardsHistoryStartDateMs');
-
   const now = useNow({ intervalMs: timeUnits.minute });
-
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<TradingRewardsDatum>>();
   const [isZooming, setIsZooming] = useState(false);
-
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
   const { metricData, setSelectedPeriod, selectedPeriod } = useCommunityChart(selectedChartMetric);
 
@@ -86,7 +79,7 @@ export const ProgramHistoricalChart = ({
     [AffiliatesProgramMetric.ReferredVolume]: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
   };
 
-  const chartTotales = {
+  const chartTotals = {
     [AffiliatesProgramMetric.AffiliateEarnings]: programStats
       ? MustBigNumber(programStats.totalEarnings).toFixed(TOKEN_DECIMALS)
       : 0,
@@ -215,12 +208,23 @@ export const ProgramHistoricalChart = ({
       >
         {programStats && metricData.length > 0 ? (
           <$Value>
-            {tooltipContext?.tooltipData?.nearestDatum?.datum.cumulativeAmount !== undefined
-              ? MustBigNumber(
-                  tooltipContext.tooltipData.nearestDatum.datum.cumulativeAmount
-                ).toFixed(chartDecimals[selectedChartMetric])
-              : chartTotales[selectedChartMetric]}
-            <AssetIcon symbol={chainTokenLabel} />
+            <Output
+              useGrouping
+              type={
+                {
+                  [AffiliatesProgramMetric.AffiliateEarnings]: OutputType.Fiat,
+                  [AffiliatesProgramMetric.ReferredVolume]: OutputType.Fiat,
+                  [AffiliatesProgramMetric.ReferredTrades]: OutputType.Number,
+                  [AffiliatesProgramMetric.ReferredUsers]: OutputType.Number,
+                }[selectedChartMetric]
+              }
+              value={
+                tooltipContext?.tooltipData?.nearestDatum?.datum.cumulativeAmount !== undefined
+                  ? MustBigNumber(tooltipContext.tooltipData.nearestDatum.datum.cumulativeAmount)
+                  : chartTotals[selectedChartMetric]
+              }
+              fractionDigits={chartDecimals[selectedChartMetric]}
+            />
           </$Value>
         ) : (
           <$Value>-</$Value>

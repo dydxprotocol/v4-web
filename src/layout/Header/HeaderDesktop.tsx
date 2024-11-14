@@ -101,9 +101,9 @@ export const HeaderDesktop = () => {
           href: AppRoute.Vault,
         },
         affiliatesEnabled && {
-          value: 'AFFILIATES',
-          label: stringGetter({ key: STRING_KEYS.AFFILIATES }),
-          href: AppRoute.Affiliates,
+          value: 'REFERRALS',
+          label: stringGetter({ key: STRING_KEYS.REFERRALS }),
+          href: AppRoute.Referrals,
         },
         {
           value: chainTokenLabel,

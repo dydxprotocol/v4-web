@@ -13,6 +13,7 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 interface IProgramCardProps {
@@ -55,9 +56,12 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
         key: STRING_KEYS.PROGRAM_CARD_BODY,
         params: {
           VIP_VALUE: (
-            <span tw="text-color-text-2">
-              {DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
-            </span>
+            <Output
+              tw="inline text-color-text-2"
+              type={OutputType.Fiat}
+              value={DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD}
+              fractionDigits={0}
+            />
           ),
         },
       })}
