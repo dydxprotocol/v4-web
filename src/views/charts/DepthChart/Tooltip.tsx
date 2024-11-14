@@ -177,6 +177,7 @@ export const DepthChartTooltipContent = ({
                         <Output
                           type={OutputType.Fiat}
                           value={nearestDatum?.datum.price}
+                          fractionDigits={tickSizeDecimals}
                           useGrouping={false}
                         />
                       </>
