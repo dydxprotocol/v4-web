@@ -212,7 +212,7 @@ export const HeaderDesktop = () => {
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={
-                MustBigNumber(availableBalance?.current).gt(0)
+                !availableBalance || MustBigNumber(availableBalance.current).gt(0)
                   ? ButtonAction.Secondary
                   : ButtonAction.Primary
               }

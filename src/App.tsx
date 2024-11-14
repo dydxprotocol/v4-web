@@ -45,6 +45,7 @@ import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { ComplianceStates } from './constants/compliance';
+import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
 import { LocalStorageKey } from './constants/localStorage';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -62,10 +63,13 @@ import { testFlags } from './lib/testFlags';
 import LaunchMarket from './pages/LaunchMarket';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
+import { getIsAccountConnected } from './state/accountSelectors';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
+import { openDialog } from './state/dialogs';
+import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
 import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
@@ -87,6 +91,8 @@ const Content = () => {
   useCommandMenu();
   usePrefetchedQueries();
   useReferralCode();
+  useUnlimitedLaunchDialog();
+  useUiRefreshMigrations();
 
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
@@ -106,7 +112,6 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
-  useUiRefreshMigrations();
 
   return (
     <>
@@ -208,6 +213,19 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
     <Component {...props}>{children}</Component>
   );
 };
+
+function useUnlimitedLaunchDialog() {
+  const showUnlimitedAnnouncement = testFlags.pml && testFlags.enableVaults;
+  const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (isAccountConnected && showUnlimitedAnnouncement && !hasSeenUnlimitedAnnouncement) {
+      dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
+    }
+  }, [dispatch, showUnlimitedAnnouncement, hasSeenUnlimitedAnnouncement, isAccountConnected]);
+}
 
 const providers = [
   wrapProvider(PrivyProvider, {

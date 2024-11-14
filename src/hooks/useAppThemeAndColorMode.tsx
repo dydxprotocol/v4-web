@@ -19,10 +19,8 @@ export const AppThemeAndColorModeProvider = ({ ...props }) => {
   return <ThemeProvider theme={useAppThemeAndColorModeContext()} {...props} />;
 };
 
-export const useAppThemeAndColorModeContext = () => {
+export const useCurrentAppThemeSetting = () => {
   const themeSetting: AppThemeSetting = useAppSelector(getAppThemeSetting);
-  const colorMode: AppColorMode = useAppSelector(getAppColorMode);
-
   const darkModePref = globalThis.matchMedia('(prefers-color-scheme: dark)');
 
   const [systemPreference, setSystemPreference] = useState(
@@ -54,6 +52,11 @@ export const useAppThemeAndColorModeContext = () => {
         return systemPreference;
     }
   };
+  return getThemeFromSetting();
+};
 
-  return Themes[getThemeFromSetting()][colorMode];
+export const useAppThemeAndColorModeContext = () => {
+  const colorMode: AppColorMode = useAppSelector(getAppColorMode);
+  const theme = useCurrentAppThemeSetting();
+  return Themes[theme][colorMode];
 };

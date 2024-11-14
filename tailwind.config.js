@@ -150,6 +150,7 @@ export default {
         '.font-medium-regular': { font: 'var(--font-medium-regular)' },
         '.font-medium-book': { font: 'var(--font-medium-book)' },
         '.font-medium-medium': { font: 'var(--font-medium-medium)' },
+        '.font-medium-bold': { font: 'var(--font-medium-bold)' },
 
         '.font-large-regular': { font: 'var(--font-large-regular)' },
         '.font-large-book': { font: 'var(--font-large-book)' },

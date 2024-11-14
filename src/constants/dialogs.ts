@@ -89,6 +89,7 @@ export type TriggersDialogProps = {
   navigateToMarketOrders: (market: string) => void;
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };
+export type UnlimitedAnnouncementDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
@@ -147,6 +148,7 @@ export const DialogTypes = unionize(
     Trade: ofType<TradeDialogProps>(),
     Transfer: ofType<TransferDialogProps>(),
     Triggers: ofType<TriggersDialogProps>(),
+    UnlimitedAnnouncement: ofType<UnlimitedAnnouncementDialogProps>(),
     Unstake: ofType<UnstakeDialogProps>(),
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw: ofType<WithdrawDialogProps>(),

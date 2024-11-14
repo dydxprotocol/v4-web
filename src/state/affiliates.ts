@@ -1,6 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
+// NOTE: This app slice is persisted via redux-persist. Changes to this type may require migrations.
 export interface AffiliatesState {
   latestReferrer: string | undefined;
 }

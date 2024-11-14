@@ -107,7 +107,7 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-accent);
-      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-border: solid var(--border-width) var(--color-accent);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
     [ButtonStyle.WithoutBackground]: css`

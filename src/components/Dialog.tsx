@@ -39,6 +39,7 @@ type ElementProps = {
   preventClose?: boolean;
   slotTrigger?: React.ReactNode;
   slotHeaderAbove?: React.ReactNode;
+  slotHeader?: React.ReactNode;
   slotHeaderInner?: React.ReactNode;
   slotFooter?: React.ReactNode;
   withClose?: boolean;
@@ -83,6 +84,7 @@ export const Dialog = ({
   preventClose,
   slotTrigger,
   slotHeaderAbove,
+  slotHeader,
   slotHeaderInner,
   slotFooter,
   stacked,
@@ -137,6 +139,15 @@ export const Dialog = ({
 
               {slotHeaderInner}
             </$StackedHeaderTopRow>
+          ) : slotHeader ? (
+            <div>
+              {!preventClose && withClose && (
+                <$Close ref={closeButtonRef} $absolute>
+                  <Icon iconName={IconName.Close} />
+                </$Close>
+              )}
+              {slotHeader}
+            </div>
           ) : (
             <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
               <div tw="row gap-[--dialog-title-gap]">
