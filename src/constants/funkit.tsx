@@ -30,11 +30,14 @@ export const funkitConfig = () =>
           destinationIcon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
         },
       },
+      paymentMethods: {
+        isCardEnabled: false,
+      },
     },
   }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
-const ACCENT_COLOR_WASH = 'var(--color-accent-faded)'; // dydx uses brightness
+const ACCENT_COLOR_WASH = 'rgb(114,122,255)'; // dydx uses brightness
 const OFF_BACKGROUND_DARK = 'var(--color-layer-4)';
 const OFF_BACKGROUND_LIGHT = 'var(--color-layer-4)';
 
