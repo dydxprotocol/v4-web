@@ -34,7 +34,7 @@ export const funkitConfig = () =>
   }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
-const ACCENT_COLOR_WASH = 'var(--color-accent-faced)'; // dydx uses brightness
+const ACCENT_COLOR_WASH = 'var(--color-accent-faded)'; // dydx uses brightness
 const OFF_BACKGROUND_DARK = 'var(--color-layer-4)';
 const OFF_BACKGROUND_LIGHT = 'var(--color-layer-4)';
 
