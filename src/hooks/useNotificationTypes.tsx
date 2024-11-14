@@ -97,8 +97,6 @@ const parseStringParamsForNotification = ({
   return value as string;
 };
 
-const NOTIFICATIONS_INIT_TIME = Date.now();
-
 export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.AbacusGenerated,
@@ -114,11 +112,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
         for (const abacusNotif of abacusNotifications) {
           const [abacusNotificationType = '', id = ''] = abacusNotif.id.split(':');
           const parsedData = abacusNotif.data ? JSON.parse(abacusNotif.data) : {};
-
-          // skip notifications that were generated before the app was initialized
-          if (abacusNotif.updateTimeInMilliseconds < NOTIFICATIONS_INIT_TIME) {
-            return;
-          }
 
           const params = Object.fromEntries(
             Object.entries(parsedData).map(([key, value]) => {

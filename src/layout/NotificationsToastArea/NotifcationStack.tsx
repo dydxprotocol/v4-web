@@ -32,6 +32,8 @@ type StyleProps = {
   className?: string;
 };
 
+const NOTIFICATIONS_INIT_TIME = Date.now();
+
 export const NotificationStack = ({ notifications, className }: ElementProps & StyleProps) => {
   const [shouldStackNotifications, setshouldStackNotifications] = useState(true);
 
@@ -60,7 +62,10 @@ export const NotificationStack = ({ notifications, className }: ElementProps & S
         <StyledToast
           key={key}
           isStacked={idx > 0 && shouldStackNotifications}
-          isOpen={notification.status < NotificationStatus.Unseen}
+          isOpen={
+            notification.status < NotificationStatus.Unseen &&
+            (notification.timestamps[NotificationStatus.Unseen] ?? 0) > NOTIFICATIONS_INIT_TIME
+          }
           layer={idx}
           notification={notification}
           slotIcon={displayData?.icon}
