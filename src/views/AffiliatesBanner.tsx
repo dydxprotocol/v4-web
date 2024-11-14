@@ -102,6 +102,10 @@ export const AffiliatesBanner = ({
     );
   }
 
+  const onDismissAffiliateBanner = () => {
+    dispatch(setDismissedAffiliateBanner(true));
+  };
+
   return (
     <$Background
       backgroundImagePath={background}
@@ -112,7 +116,7 @@ export const AffiliatesBanner = ({
           iconName={IconName.Close}
           shape={ButtonShape.Circle}
           size={ButtonSize.XSmall}
-          onClick={() => dispatch(setDismissedAffiliateBanner(true))}
+          onClick={onDismissAffiliateBanner}
         />
       )}
       <div tw="row">
