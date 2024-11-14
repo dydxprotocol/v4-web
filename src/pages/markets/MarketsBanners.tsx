@@ -74,6 +74,7 @@ export const MarketsBanners = () => {
       )}
 
       <$StarsOverlay />
+
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
