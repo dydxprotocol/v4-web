@@ -60,7 +60,7 @@ export const UnlimitedAnnouncementHeader = ({
 };
 
 const $Title = styled.div`
-  height: 200px;
+  height: 12.5rem;
   background-color: var(--color-layer-1);
   overflow: hidden;
 
@@ -82,7 +82,7 @@ const $Unlimited = styled.div`
 `;
 
 const $PlaceholderTitle = styled.div`
-  height: 360px;
+  height: 22.5rem;
   background-color: var(--color-layer-1);
   border-bottom: var(--border);
 `;
