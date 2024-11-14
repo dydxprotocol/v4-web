@@ -124,14 +124,14 @@ export const AffiliatesBanner = ({
               {titleString}
             </div>
           </div>
-          <div tw="ml-0.5 text-small text-color-text-0">{description}</div>
+          <div tw="ml-0.5 text-color-text-0 font-base-book">{description}</div>
         </div>
       </div>
       <div>
         <Button
           action={ButtonAction.Primary}
           slotLeft={<Icon iconName={IconName.Giftbox} />}
-          size={ButtonSize.Medium}
+          size={ButtonSize.Small}
           onClick={() => {
             dispatch(openDialog(DialogTypes.ShareAffiliate()));
           }}
