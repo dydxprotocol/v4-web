@@ -41,6 +41,7 @@ type PickDialogProps = Pick<
   | 'slotTrigger'
   | 'slotFooter'
   | 'preventClose'
+  | 'withOverlay'
 >;
 
 export const ComboboxDialogMenu = <
@@ -54,6 +55,7 @@ export const ComboboxDialogMenu = <
   slotTrigger,
   slotHeaderInner,
   slotFooter,
+  withOverlay,
 
   items,
   onItemSelected,
@@ -80,6 +82,7 @@ export const ComboboxDialogMenu = <
     slotHeaderInner={slotHeaderInner}
     slotTrigger={slotTrigger}
     slotFooter={slotFooter}
+    withOverlay={withOverlay}
     placement={placement}
     preventClose={preventClose}
     className={className}
