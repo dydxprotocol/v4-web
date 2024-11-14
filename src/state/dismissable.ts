@@ -6,12 +6,14 @@ export interface DismissableState {
   hasSeenPredictionMarketIntroDialog: boolean;
   dismissedAffiliateBanner: boolean;
   hasSeenUnlimitedAnnouncement: boolean;
+  hasDismissedPmlBanner: boolean;
 }
 
 const initialState: DismissableState = {
   hasSeenPredictionMarketIntroDialog: false,
   dismissedAffiliateBanner: false,
   hasSeenUnlimitedAnnouncement: false,
+  hasDismissedPmlBanner: false,
 };
 
 export const dismissableSlice = createSlice({
@@ -27,6 +29,9 @@ export const dismissableSlice = createSlice({
     markUnlimitedAnnouncementSeen: (state) => {
       state.hasSeenUnlimitedAnnouncement = true;
     },
+    setHasDismissedPmlBanner: (state, action: PayloadAction<boolean>) => {
+      state.hasDismissedPmlBanner = action.payload;
+    },
   },
 });
 
@@ -34,4 +39,5 @@ export const {
   setHasSeenPredictionMarketIntroDialog,
   setDismissedAffiliateBanner,
   markUnlimitedAnnouncementSeen,
+  setHasDismissedPmlBanner,
 } = dismissableSlice.actions;

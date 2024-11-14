@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -27,7 +28,8 @@ export const CommunityChartContainer = () => {
 
   return (
     <div tw="flex flex-col">
-      <Tabs
+      <$Tabs
+        dividerStyle="underline"
         value={chartMetric}
         onValueChange={setChartMetric}
         items={[
@@ -71,8 +73,18 @@ export const CommunityChartContainer = () => {
   );
 };
 
+const $Tabs = styled(Tabs)`
+  --color-border: transparent;
+  margin-bottom: 0.5rem;
+` as typeof Tabs;
+
 const $ChartContainer = styled.div`
   ${layoutMixins.contentSectionDetached}
+  border-radius: 0.625rem;
+
+  @media ${breakpoints.desktopSmall} {
+    border-radius: 0;
+  }
 `;
 
 const $EmptyCard = styled.div`

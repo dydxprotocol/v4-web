@@ -1,67 +1,29 @@
 import { useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
-import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Switch } from '@/components/Switch';
 import { MarketsStats } from '@/views/MarketsStats';
 import { MarketsTable } from '@/views/tables/MarketsTable';
-
-import { testFlags } from '@/lib/testFlags';
 
 import { MarketsBanners } from './MarketsBanners';
 
 const Markets = () => {
   const stringGetter = useStringGetter();
-  const navigate = useNavigate();
   const [showHighlights, setShowHighlights] = useState(true);
-  const { hasPotentialMarketsData } = usePotentialMarkets();
-
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
-
-  const renderSlotRightActions = () => {
-    if (testFlags.pml) {
-      return (
-        <Button action={ButtonAction.Primary} onClick={() => navigate(AppRoute.LaunchMarket)}>
-          {stringGetter({ key: STRING_KEYS.LAUNCH_A_MARKET })}
-        </Button>
-      );
-    }
-
-    if (hasPotentialMarketsData) {
-      return (
-        <Button
-          action={ButtonAction.Primary}
-          onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-        >
-          {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-        </Button>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <$Page>
       <$HeaderSection>
-        <$ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.MARKETS })}
-          slotRight={renderSlotRightActions()}
-        />
         <MarketsBanners />
         <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
@@ -80,35 +42,17 @@ const Markets = () => {
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
 `;
-const $ContentSectionHeader = styled(ContentSectionHeader)`
-  margin-top: 1rem;
-  padding-top: 0;
-  margin-bottom: 0;
-
-  h3 {
-    font: var(--font-extra-medium);
-  }
-
-  @media ${breakpoints.tablet} {
-    margin-top: 0;
-    padding: 1.25rem 1.5rem 0;
-
-    h3 {
-      font: var(--font-extra-medium);
-    }
-  }
-`;
 
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
-  margin-bottom: 1.5rem;
+  margin: 1.5rem 0;
 
   @media ${breakpoints.tablet} {
     ${layoutMixins.flexColumn}
     gap: 1rem;
 
-    margin-bottom: 1rem;
+    margin: 1rem 0;
   }
 `;
 

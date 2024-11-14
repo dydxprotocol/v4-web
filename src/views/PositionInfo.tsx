@@ -1,7 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { type Nullable } from '@/constants/abacus';
+import { AbacusPositionSide, type Nullable } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
@@ -88,6 +88,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     size,
     unrealizedPnl,
     unrealizedPnlPercent,
+    side,
   } = currentMarketPosition ?? {};
 
   const netFundingBN = MustBigNumber(netFunding);
@@ -191,7 +192,10 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       key: 'liquidation-price',
       type: OutputType.Fiat,
       label: STRING_KEYS.LIQUIDATION_PRICE,
-      tooltip: 'liquidation-price',
+      tooltip:
+        side?.postOrder === AbacusPositionSide.SHORT
+          ? 'liquidation-price-short'
+          : 'liquidation-price-long',
       tooltipParams: {
         SYMBOL: symbol,
       },

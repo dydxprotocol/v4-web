@@ -94,9 +94,19 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_SLIPPAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_SLIPPAGE_BODY }),
   }),
-  'liquidation-price': ({ stringGetter, stringParams }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_BODY, params: stringParams }),
+  'liquidation-price-long': ({ stringGetter, stringParams }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_LONG_TITLE }),
+    body: stringGetter({
+      key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_LONG_BODY,
+      params: stringParams,
+    }),
+  }),
+  'liquidation-price-short': ({ stringGetter, stringParams }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_SHORT_TITLE }),
+    body: stringGetter({
+      key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_SHORT_BODY,
+      params: stringParams,
+    }),
   }),
   'liquidation-price-general': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_GENERAL_TITLE }),

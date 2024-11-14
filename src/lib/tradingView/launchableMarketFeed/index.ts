@@ -69,7 +69,7 @@ export const getLaunchableMarketDatafeed = (
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
 
     const assetId = getAssetFromMarketId(symbolName);
-    const metaDataForAsset = metadataServiceData?.[assetId];
+    const metaDataForAsset = metadataServiceData[assetId];
     const tickSizeDecimals = getTickSizeDecimalsFromPrice(metaDataForAsset?.price ?? 0);
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : 100;

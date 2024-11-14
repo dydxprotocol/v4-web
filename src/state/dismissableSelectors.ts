@@ -8,3 +8,6 @@ export const getDismissedAffiliateBanner = (state: RootState) =>
 
 export const getHasSeenUnlimitedAnnouncement = (state: RootState) =>
   state.dismissable.hasSeenUnlimitedAnnouncement;
+
+export const getHasDismissedPmlBanner = (state: RootState) =>
+  state.dismissable.hasDismissedPmlBanner;

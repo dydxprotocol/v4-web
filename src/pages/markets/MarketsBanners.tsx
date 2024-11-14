@@ -1,14 +1,11 @@
 import { shallowEqual } from 'react-redux';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { PREDICTION_MARKET } from '@/constants/markets';
-import { AppRoute } from '@/constants/routes';
-import { StatsigFlags } from '@/constants/statsig';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
-import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -19,71 +16,76 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setHasDismissedPmlBanner } from '@/state/dismissable';
+import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
 export const MarketsBanners = () => {
   const stringGetter = useStringGetter();
-  const featureFlags = useAllStatsigGateValues();
-  const now = Date.now();
-  const trumpwinExpiration = new Date('2020-11-05T00:00:00Z').getTime();
   const { data: launchableMarkets } = useLaunchableMarkets();
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const { isMobile } = useBreakpoints();
+  const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
+  const dispatch = useAppDispatch();
 
-  return (
-    <>
-      {testFlags.pml && (
-        <$PmlBanner to={AppRoute.LaunchMarket}>
-          <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="mt-1 h-5" />
+  const onDismissPmlBanner = () => {
+    dispatch(setHasDismissedPmlBanner(true));
+  };
 
-          <div tw="mr-auto flex flex-col">
-            <span tw="font-medium-medium">
-              {stringGetter({ key: STRING_KEYS.PERMISSIONLESS_LIVE })}
-            </span>
-            <span tw="text-color-text-0 font-base-book notTablet:text-nowrap">
-              {stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING })}
-            </span>
+  const shouldDisplayPmlBanner = testFlags.pml && !hasDismissedPmlBanner;
 
-            <$Details
-              withSeparators
-              layout="rowColumns"
-              items={[
-                {
-                  key: 'live',
-                  label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                  value: <Output type={OutputType.CompactNumber} value={marketIds.length} />,
-                },
-                {
-                  key: 'launchable',
-                  label: stringGetter({ key: STRING_KEYS.LAUNCHABLE }),
-                  value: (
-                    <Output type={OutputType.CompactNumber} value={launchableMarkets.length} />
-                  ),
-                },
-              ]}
-            />
-          </div>
+  return shouldDisplayPmlBanner ? (
+    <$PmlBanner>
+      <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8" />
 
-          <$StarsOverlay />
+      <div tw="mr-auto flex flex-col">
+        <span tw="font-medium-medium">
+          {stringGetter({ key: STRING_KEYS.INSTANT_MARKET_LISTINGS_ARE_LIVE })}
+        </span>
+        <span tw="text-color-text-0 font-base-book notTablet:text-nowrap">
+          {stringGetter({ key: STRING_KEYS.LIST_ANY_MARKET })}
+        </span>
+      </div>
 
-          <IconButton iconName={IconName.Arrow} />
-        </$PmlBanner>
+      {!isMobile && (
+        <$Details
+          withSeparators
+          layout="rowColumns"
+          items={[
+            {
+              key: 'live',
+              label: (
+                <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.MARKETS })}</span>
+              ),
+              value: <Output type={OutputType.CompactNumber} value={marketIds.length} />,
+            },
+            {
+              key: 'launchable',
+              label: (
+                <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.LAUNCHABLE })}</span>
+              ),
+              value: <Output type={OutputType.CompactNumber} value={launchableMarkets.length} />,
+            },
+          ]}
+        />
       )}
 
-      {featureFlags[StatsigFlags.ffShowPredictionMarketsUi] && now < trumpwinExpiration && (
-        <$MarketsPageBanner to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}>
-          <span>🇺🇸 {stringGetter({ key: STRING_KEYS.LEVERAGE_TRADE_US_ELECTION })}</span>
-          <$FlagOverlay />
-          <IconButton iconName={IconName.Arrow} />
-        </$MarketsPageBanner>
-      )}
-    </>
-  );
+      <$StarsOverlay />
+
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissPmlBanner}
+      />
+    </$PmlBanner>
+  ) : null;
 };
 
-const $MarketsPageBanner = styled(Link)`
+const $MarketsPageBanner = styled.div`
   ${layoutMixins.row}
   height: 5rem;
   border-radius: 10px;
@@ -95,10 +97,6 @@ const $MarketsPageBanner = styled(Link)`
   position: relative;
   overflow: hidden;
 
-  span {
-    font: var(--font-medium-medium);
-  }
-
   @media ${breakpoints.desktopSmall} {
     margin-left: 1rem;
     margin-right: 1rem;
@@ -109,23 +107,6 @@ const $MarketsPageBanner = styled(Link)`
     button {
       z-index: 1;
     }
-  }
-`;
-
-// Note: 573px; is the width of the flag image
-const $FlagOverlay = styled.div`
-  width: 573px;
-  height: 100%;
-  background-image: ${({ theme }) => `
-    linear-gradient(90deg, ${theme.layer1} 0%, ${theme.tooltipBackground} 53%, ${theme.layer1} 99%),
-    url('/AmericanFlag.png')
-  `};
-  background-repeat: no-repeat;
-
-  @media ${breakpoints.mobile} {
-    position: absolute;
-    width: 100%;
-    z-index: 0;
   }
 `;
 
@@ -161,6 +142,7 @@ const $Details = styled(Details)`
   color: var(--color-text-2);
   z-index: 1;
   margin-top: 0.5rem;
+  margin-right: auto;
 
   > :first-child {
     padding-left: 0;

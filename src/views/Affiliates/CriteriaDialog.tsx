@@ -111,7 +111,7 @@ export const CriteriaDialog = ({
               ? stringGetter({
                   key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
                   params: {
-                    VIP: stringGetter({ key: STRING_KEYS.VIP }),
+                    VIP: stringGetter({ key: STRING_KEYS.VIP_AFFILIATE }),
                   },
                 })
               : stringGetter({
