@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.12.2
     version: 1.12.2
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.243
-    version: 1.1.243
+    specifier: ^1.1.244
+    version: 1.1.244
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -3320,8 +3320,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.243:
-    resolution: {integrity: sha512-6ukIz9BFHlW9cXOeyLqUCqrhv35G/cCjiyfnXKlIvz5mUTVNrIIOzt83OOUbIZi+g69L8O7VMI4txBmeAlLCvg==}
+  /@dydxprotocol/v4-localization@1.1.244:
+    resolution: {integrity: sha512-khAw+ZjOXxb1E3yCLMU9dzovxJM9CK5703YkRfMlNLrA1PxWoeCroFSa4dzUk6LqiflJNd4C53jA2lRKASWLQw==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:

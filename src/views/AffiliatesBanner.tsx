@@ -6,7 +6,7 @@ import {
   AFFILIATES_FEE_DISCOUNT_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -102,6 +102,10 @@ export const AffiliatesBanner = ({
     );
   }
 
+  const onDismissAffiliateBanner = () => {
+    dispatch(setDismissedAffiliateBanner(true));
+  };
+
   return (
     <$Background
       backgroundImagePath={background}
@@ -112,9 +116,10 @@ export const AffiliatesBanner = ({
           iconName={IconName.Close}
           shape={ButtonShape.Circle}
           size={ButtonSize.XSmall}
-          onClick={() => dispatch(setDismissedAffiliateBanner(true))}
+          onClick={onDismissAffiliateBanner}
         />
       )}
+
       <div tw="row">
         <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8" />
         <div tw="column items-start gap-0.5">
@@ -124,21 +129,23 @@ export const AffiliatesBanner = ({
               {titleString}
             </div>
           </div>
-          <div tw="ml-0.5 text-small text-color-text-0">{description}</div>
+          <div tw="ml-0.5 text-color-text-0 font-base-book">{description}</div>
         </div>
       </div>
-      <div>
-        <Button
-          action={ButtonAction.Primary}
-          slotLeft={<Icon iconName={IconName.Giftbox} />}
-          size={ButtonSize.Medium}
-          onClick={() => {
-            dispatch(openDialog(DialogTypes.ShareAffiliate()));
-          }}
-        >
-          {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
-        </Button>
-      </div>
+
+      <Button
+        buttonStyle={ButtonStyle.WithoutBackground}
+        tw="flex flex-row items-center gap-0.5 hover:underline"
+        onClick={() => {
+          dispatch(openDialog(DialogTypes.ShareAffiliate()));
+        }}
+      >
+        <span>{stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}</span>
+
+        <$ArrowIcon>
+          <Icon iconName={IconName.Arrow} />
+        </$ArrowIcon>
+      </Button>
     </$Background>
   );
 };
@@ -176,4 +183,16 @@ const $CloseButton = styled(IconButton)`
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
+`;
+
+const $ArrowIcon = styled.div`
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-layer-3);
+  color: var(--color-text-1);
+  border-radius: 50%;
+  font-size: 0.8438rem;
 `;

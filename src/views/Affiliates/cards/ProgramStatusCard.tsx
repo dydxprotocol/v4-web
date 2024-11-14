@@ -46,7 +46,9 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
       {stringGetter({
         key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
         params: {
-          VIP: <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.VIP })}</span>,
+          VIP: (
+            <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.VIP_AFFILIATE })}</span>
+          ),
         },
       })}
     </p>

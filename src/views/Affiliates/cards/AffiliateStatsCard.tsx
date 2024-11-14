@@ -39,7 +39,7 @@ const MobileView = ({
           tw="relative"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
-          value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
+          value={isVip ? stringGetter({ key: STRING_KEYS.VIP_AFFILIATE }) : currentAffiliateTier}
         >
           <Link
             isInline
@@ -124,7 +124,7 @@ const DesktopView = ({
           tw="relative inline-block"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
-          value={isVip ? stringGetter({ key: STRING_KEYS.VIP }) : currentAffiliateTier}
+          value={isVip ? stringGetter({ key: STRING_KEYS.VIP_AFFILIATE }) : currentAffiliateTier}
         >
           <Link
             isInline
