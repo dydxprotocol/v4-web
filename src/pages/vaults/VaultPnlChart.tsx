@@ -41,6 +41,8 @@ const TIME_RANGES = [
   { value: '90d', labelNumDays: '90', time: 90 * timeUnits.day },
 ] as const;
 
+const finalBackupZoomDomain = 30 * timeUnits.day;
+
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -64,24 +66,36 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     return validRanges.map((t) => ({
       value: t.value,
       label: `${t.labelNumDays}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`,
+      time: t.time,
     }));
   }, [data, stringGetter]);
 
-  const [selectedTimeRange, setSelectedTimeRange] = useState<
-    (typeof TIME_RANGES)[number]['value'] | undefined
-  >(timeUnitsToRender[timeUnitsToRender.length - 1]?.value);
+  // changes to this value trigger chart re-zoom
+  const [defaultZoomDomain, setDefaultZoomDomain] = useState<number>(finalBackupZoomDomain);
+
+  // just reflects the reality of the chart
+  const [currentZoomDomain, setCurrentZoomDomain] = useState<number>(defaultZoomDomain);
+
+  const effectiveCurrentTimeRange = timeUnitsToRender.find(
+    (t) => Math.abs(t.time - currentZoomDomain) <= timeUnits.day
+  );
 
   const handleZoom = useCallback(({ zoomDomain }: { zoomDomain: number | undefined }) => {
-    const matching = TIME_RANGES.find(
-      (t) => Math.abs(t.time - (zoomDomain ?? 0)) <= timeUnits.day
-    )?.value;
-    setSelectedTimeRange(matching);
+    setCurrentZoomDomain(zoomDomain ?? finalBackupZoomDomain);
   }, []);
-  const handleTimeRangeSelect = useCallback((timeRange: typeof selectedTimeRange | '') => {
-    if (timeRange !== '') {
-      setSelectedTimeRange(timeRange);
-    }
-  }, []);
+
+  const handleTimeRangeSelect = useCallback(
+    (timeRange: (typeof timeUnitsToRender)[number]['value'] | '') => {
+      if (timeRange !== '') {
+        const range = timeUnitsToRender.find((t) => t.value === timeRange)?.time;
+        if (range != null) {
+          setDefaultZoomDomain(range);
+        }
+      }
+    },
+    [timeUnitsToRender]
+  );
+
   const pointsInView = useMemo(
     () =>
       data
@@ -168,11 +182,6 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     );
   }, []);
 
-  const zoomDomain =
-    selectedTimeRange != null
-      ? TIME_RANGES.find((t) => t.value === selectedTimeRange)?.time
-      : 7 * timeUnits.day;
-
   return (
     <div className={className}>
       <div tw="row justify-between pl-1 pr-1">
@@ -188,7 +197,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
         <ToggleGroup
           size={ButtonSize.Small}
           items={timeUnitsToRender}
-          value={selectedTimeRange ?? ''}
+          value={effectiveCurrentTimeRange?.value ?? ''}
           onValueChange={handleTimeRangeSelect}
         />
       </div>
@@ -248,7 +257,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
           renderTooltip={renderTooltip}
           onTooltipContext={onTooltipContext}
           onZoom={handleZoom}
-          defaultZoomDomain={zoomDomain}
+          defaultZoomDomain={defaultZoomDomain}
           domainBasePadding={[0.01, 0]}
           minZoomDomain={timeUnits.day * 2.5}
           slotEmpty={undefined}
