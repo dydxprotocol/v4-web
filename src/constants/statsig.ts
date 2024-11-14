@@ -15,7 +15,6 @@ export enum StatsigFlags {
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
   ffEnableFunkit = 'ff_enable_funkit',
   ffEnableOhlc = 'ff_enable_ohlc',
-  ffShowUnlimitedAnnouncement = 'ff_show_unlimited_announcement',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

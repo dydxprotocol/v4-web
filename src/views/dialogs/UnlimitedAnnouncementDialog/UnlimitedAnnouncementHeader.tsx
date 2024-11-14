@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { UnlimitedAnnouncementDialogSteps } from '@/constants/unlimitedAnnouncement';
 
+import { useCurrentAppThemeSetting } from '@/hooks/useAppThemeAndColorMode';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LogoIcon } from '@/icons/logo';
+
+import { AppTheme } from '@/state/appUiConfigs';
 
 export const UnlimitedAnnouncementHeader = ({
   currentStep,
@@ -13,22 +16,26 @@ export const UnlimitedAnnouncementHeader = ({
   currentStep: UnlimitedAnnouncementDialogSteps;
 }) => {
   const stringGetter = useStringGetter();
+  const theme = useCurrentAppThemeSetting();
+
+  const themeName =
+    theme === AppTheme.Classic ? 'original' : theme === AppTheme.Dark ? 'dark' : 'light';
 
   const backgrounds: {
     [key in UnlimitedAnnouncementDialogSteps]: string;
   } = {
-    [UnlimitedAnnouncementDialogSteps.Announcement]: `/unlimited-announcement.svg`,
-    [UnlimitedAnnouncementDialogSteps.MarketListings]: `/unlimited-listings.svg`,
-    [UnlimitedAnnouncementDialogSteps.MegaVault]: `/unlimited-megavault.svg`,
-    [UnlimitedAnnouncementDialogSteps.AffiliatesProgram]: `/unlimited-affiliates.svg`,
-    [UnlimitedAnnouncementDialogSteps.Incentives]: `/unlimited-incentives.svg`,
+    [UnlimitedAnnouncementDialogSteps.Announcement]: 'announcement',
+    [UnlimitedAnnouncementDialogSteps.MarketListings]: 'launch',
+    [UnlimitedAnnouncementDialogSteps.MegaVault]: 'vault',
+    [UnlimitedAnnouncementDialogSteps.AffiliatesProgram]: 'affiliates',
+    [UnlimitedAnnouncementDialogSteps.Incentives]: 'rewards',
   };
 
   switch (currentStep) {
     case UnlimitedAnnouncementDialogSteps.Announcement:
       return (
         <$Title>
-          <img src={backgrounds[currentStep]} tw="absolute top-0.75 h-auto w-full" alt="" />
+          <img src="/unlimited/announcement.svg" tw="absolute top-0.75 h-auto w-full" alt="" />
           <div tw="relative flex h-full flex-col items-center justify-center gap-0.5">
             <h3>{stringGetter({ key: STRING_KEYS.INTRODUCING })}</h3>
             <span tw="flex items-center gap-0.75">
@@ -42,7 +49,11 @@ export const UnlimitedAnnouncementHeader = ({
     default:
       return (
         <$PlaceholderTitle>
-          <img src={backgrounds[currentStep]} tw="absolute h-auto w-full" alt="" />
+          <img
+            src={`/unlimited/${backgrounds[currentStep]}-${themeName}.png`}
+            tw="absolute h-auto w-full"
+            alt=""
+          />
         </$PlaceholderTitle>
       );
   }
