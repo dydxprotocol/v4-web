@@ -1,12 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { debounce } from 'lodash';
 import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { QUICK_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
@@ -39,39 +37,31 @@ export const TargetLeverageInput = () => {
 
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
 
+  useEffect(() => {
+    setLeverage(targetLeverage?.toString() ?? '');
+  }, [targetLeverage]);
+
   const maxLeverage = useMemo(() => {
     return calculateMarketMaxLeverage({ initialMarginFraction, effectiveInitialMarginFraction });
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
-  // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
-  const debouncedSetAbacusLeverage = useMemo(
-    () =>
-      debounce(
-        (newLeverage: number | string) =>
-          abacusStateManager.setTradeValue({
-            value: newLeverage,
-            field: TradeInputField.targetLeverage,
-          }),
-        QUICK_DEBOUNCE_MS
-      ),
-    []
-  );
-
   const onSliderDrag = ([newLeverage]: number[]) => {
     setLeverage(newLeverage!.toString());
-    debouncedSetAbacusLeverage(newLeverage!);
   };
 
-  const onValueCommit = ([newLeverage]: number[]) => {
-    setLeverage(newLeverage!.toString());
-
-    // Ensure Abacus is updated with the latest, committed value
-    debouncedSetAbacusLeverage.cancel();
+  const commitLeverage = (newLeverage: number | undefined) => {
+    if (newLeverage != null) {
+      setLeverage(newLeverage.toString());
+    }
 
     abacusStateManager.setTradeValue({
       value: newLeverage,
       field: TradeInputField.targetLeverage,
     });
+  };
+
+  const onValueCommit = ([newLeverage]: number[]) => {
+    commitLeverage(newLeverage);
   };
 
   return (
@@ -107,8 +97,7 @@ export const TargetLeverageInput = () => {
           value={leverage}
           max={maxLeverage}
           onChange={({ floatValue }: NumberFormatValues) => {
-            setLeverage(floatValue?.toString() ?? '');
-            debouncedSetAbacusLeverage(floatValue ?? '');
+            commitLeverage(floatValue);
           }}
         />
       </$InnerInputContainer>

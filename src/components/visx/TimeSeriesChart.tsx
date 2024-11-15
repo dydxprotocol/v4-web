@@ -169,13 +169,27 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   const [zoomDomainAnimateTo, setZoomDomainAnimateTo] = useState<number | undefined>();
 
+  // handle someone changing defaultZoomDomain
   useEffect(() => {
     if (defaultZoomDomain) {
       const clampedZoomDomain = getClampedZoomDomain(defaultZoomDomain);
       setZoomDomain(clampedZoomDomain);
       setZoomDomainAnimateTo(clampedZoomDomain);
     }
-  }, [defaultZoomDomain, getClampedZoomDomain]);
+  }, [defaultZoomDomain]);
+
+  // Handle data changing somehow
+  useEffect(() => {
+    // hack: if we are zoomed all the way in, it's probably because there was no data before, let's use default
+    const zoomDomainToUse =
+      zoomDomain === minZoomDomain ? defaultZoomDomain : zoomDomain ?? defaultZoomDomain ?? null;
+
+    if (zoomDomainToUse) {
+      const clampedZoomDomain = getClampedZoomDomain(zoomDomainToUse);
+      setZoomDomain(clampedZoomDomain);
+      setZoomDomainAnimateTo(clampedZoomDomain);
+    }
+  }, [getClampedZoomDomain]);
 
   useEffect(() => {
     onZoom?.({ zoomDomain });

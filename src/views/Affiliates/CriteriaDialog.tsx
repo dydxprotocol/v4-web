@@ -259,8 +259,7 @@ const CriteriaTable = ({
     },
     {
       columnKey: 'affiliate-earn-rate',
-      allowsSorting: true,
-      getCellValue: (row: ITierDefinition) => row.affiliateEarnRate,
+      allowsSorting: false,
       label: (
         <WithTooltip tooltip="affiliate-commissions" side="right">
           {/* {stringGetter({ key: STRING_KEYS.AFFILIATE_COMISSIONS })} */}

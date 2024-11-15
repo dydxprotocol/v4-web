@@ -89,6 +89,8 @@ export const useLoadedVaultDetails = () => {
       );
     },
     ...vaultQueryOptions,
+    staleTime: timeUnits.minute / 10,
+    refetchInterval: timeUnits.minute / 10,
   });
   return mapNullableQueryResult(vaultDetailsResult);
 };

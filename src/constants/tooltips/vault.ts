@@ -16,4 +16,7 @@ export const vaultTooltips = {
   'vault-all-time-pnl': ({ stringGetter }) => ({
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.YOUR_ALL_TIME_PNL_BODY }),
   }),
+  'vault-apr': ({ stringGetter }) => ({
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.VAULT_APR_BODY }),
+  }),
 } satisfies TooltipStrings;
