@@ -80,9 +80,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
     (t) => Math.abs(t.time - currentZoomDomain) <= timeUnits.day
   );
 
-  console.log('Def', defaultZoomDomain / timeUnits.day, 'cur', currentZoomDomain / timeUnits.day);
   const handleZoom = useCallback(({ zoomDomain }: { zoomDomain: number | undefined }) => {
-    console.log('Zoom', (zoomDomain ?? 0) / timeUnits.day);
     setCurrentZoomDomain(zoomDomain ?? finalBackupZoomDomain);
   }, []);
 
