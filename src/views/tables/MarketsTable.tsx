@@ -72,7 +72,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 isUnlaunched,
                 volume24H,
               }) => (
-                <div tw="flex items-center gap-0.25 overflow-hidden mobile:max-w-[50vw]">
+                <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
                   <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
                   <AssetTableCell
                     tw="overflow-auto"
