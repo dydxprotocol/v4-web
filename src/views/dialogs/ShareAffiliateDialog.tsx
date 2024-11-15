@@ -79,7 +79,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
       description={stringGetter({
-        key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
+        key: STRING_KEYS.EARN_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
         params: {
           AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
           VIP_AMOUNT_USD:

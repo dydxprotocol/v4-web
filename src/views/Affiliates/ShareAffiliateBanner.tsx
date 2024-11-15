@@ -28,7 +28,7 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
       </div>
       <div tw="text-color-text-0">
         {stringGetter({
-          key: STRING_KEYS.EARCH_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
+          key: STRING_KEYS.EARN_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
           params: {
             AMOUNT_DISCOUNT: 550,
             VIP_AMOUNT_USD: (
