@@ -69,7 +69,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
               <Output
                 value={myVaultMetadata.allTimeReturnUsdc}
                 type={OutputType.Fiat}
-                fractionDigits={0}
+                fractionDigits={Math.abs(myVaultMetadata.allTimeReturnUsdc) < 1 ? 2 : 0}
               />
             </div>
           </$ColoredReturn>
@@ -166,7 +166,8 @@ export const VaultHeader = ({ className }: { className?: string }) => {
   const detailItems = [
     {
       key: '30d-apr',
-      label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_APR }),
+      label: stringGetter({ key: STRING_KEYS.EST_APR_PLAIN }),
+      tooltip: 'vault-apr' as const,
       value: <MegaVaultYieldOutput />,
     },
     {
@@ -196,7 +197,9 @@ export const VaultHeader = ({ className }: { className?: string }) => {
           <React.Fragment key={item.key}>
             <$VerticalSeparator />
             <div key={item.key} tw="flexColumn gap-0.375 px-0.5 py-0.25 font-base-book">
-              <div tw="text-color-text-0">{item.label}</div>
+              <WithTooltip tooltip={item.tooltip} side="bottom">
+                <div tw="text-color-text-0">{item.label}</div>
+              </WithTooltip>
               <$DetailValue>{item.value}</$DetailValue>
             </div>
           </React.Fragment>
