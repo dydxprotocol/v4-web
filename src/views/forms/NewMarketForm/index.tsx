@@ -51,14 +51,12 @@ export enum NewMarketFormStep {
 type NewMarketFormProps = {
   defaultLaunchableMarketId?: string;
   setFormStep?: Dispatch<SetStateAction<NewMarketFormStep | undefined>>;
-  setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   updateTickerToAdd?: Dispatch<SetStateAction<string | undefined>>;
 };
 
 export const NewMarketForm = ({
   defaultLaunchableMarketId,
   setFormStep,
-  setIsParentLoading,
   updateTickerToAdd,
 }: NewMarketFormProps) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
@@ -231,7 +229,6 @@ export const NewMarketForm = ({
             });
           }}
           receiptItems={receiptItems}
-          setIsParentLoading={setIsParentLoading}
           shouldHideTitleAndDescription={shouldHideTitleAndDescription}
           ticker={tickerToAdd}
         />

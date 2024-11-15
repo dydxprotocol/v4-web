@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
@@ -49,7 +49,6 @@ type NewMarketPreviewStepProps = {
   onBack: () => void;
   onSuccess: (txHash: string) => void;
   receiptItems: DetailsItem[];
-  setIsParentLoading?: Dispatch<SetStateAction<boolean>>;
   shouldHideTitleAndDescription?: boolean;
 };
 
@@ -58,7 +57,6 @@ export const NewMarketPreviewStep = ({
   onBack,
   onSuccess,
   receiptItems,
-  setIsParentLoading,
   shouldHideTitleAndDescription,
 }: NewMarketPreviewStepProps) => {
   const stringGetter = useStringGetter();
@@ -88,11 +86,10 @@ export const NewMarketPreviewStep = ({
   useEffect(() => {
     if (marketOraclePrice && txHash && fullTimeElapsed) {
       setIsLoading(false);
-      setIsParentLoading?.(false);
       setEta(0);
       onSuccess(txHash);
     }
-  }, [marketOraclePrice, fullTimeElapsed, ticker, txHash, onSuccess, setIsParentLoading]);
+  }, [marketOraclePrice, fullTimeElapsed, ticker, txHash, onSuccess]);
 
   /**
    * @description Side effect to clear error message when ticker changes
@@ -102,36 +99,38 @@ export const NewMarketPreviewStep = ({
   }, [ticker]);
 
   const { alertInfo, shouldDisableForm } = useMemo(() => {
-    if (errorMessage) {
-      return {
-        alertInfo: {
-          type: AlertType.Error,
-          message: errorMessage,
-        },
-        shouldDisableForm: false,
-      };
-    }
+    if (!isLoading) {
+      if (errorMessage) {
+        return {
+          alertInfo: {
+            type: AlertType.Error,
+            message: errorMessage,
+          },
+          shouldDisableForm: false,
+        };
+      }
 
-    if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
-      return {
-        alertInfo: {
-          type: AlertType.Error,
-          message: stringGetter({
-            key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
-            params: {
-              USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
-            },
-          }),
-        },
-        shouldDisableForm: true,
-      };
+      if (MustBigNumber(freeCollateral).lt(DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH)) {
+        return {
+          alertInfo: {
+            type: AlertType.Error,
+            message: stringGetter({
+              key: STRING_KEYS.LAUNCHING_MARKET_REQUIRES_USDC,
+              params: {
+                USDC_AMOUNT: DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH,
+              },
+            }),
+          },
+          shouldDisableForm: true,
+        };
+      }
     }
 
     return {
       alertInfo: undefined,
       shouldDisableForm: false,
     };
-  }, [errorMessage, freeCollateral, stringGetter]);
+  }, [errorMessage, freeCollateral, isLoading, stringGetter]);
 
   const heading = shouldHideTitleAndDescription ? null : (
     <div tw="flex flex-col gap-1">
@@ -239,7 +238,6 @@ export const NewMarketPreviewStep = ({
         e.preventDefault();
 
         setIsLoading(true);
-        setIsParentLoading?.(true);
         setErrorMessage(undefined);
 
         notify(
@@ -311,7 +309,6 @@ export const NewMarketPreviewStep = ({
           log('NewMarketPreviewForm/createPermissionlessMarket', error);
           setErrorMessage(error.message);
           setIsLoading(false);
-          setIsParentLoading?.(false);
         }
       }}
     >
