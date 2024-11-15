@@ -1,8 +1,6 @@
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -34,12 +32,6 @@ export const PermissionlessMarketsLiveNotification = ({
         <div tw="relative flex flex-row">
           <div tw="flex flex-col">
             <span>{stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING })}</span>
-            <Link
-              tw="mt-0.75 text-color-accent visited:text-color-accent hover:underline"
-              to={AppRoute.LaunchMarket}
-            >
-              {stringGetter({ key: STRING_KEYS.READY_FOR_LAUNCH })} →
-            </Link>
           </div>
           <$SpaceshipImg src="/hedgie-spaceship.png" alt="hedgie-spaceship" />
         </div>

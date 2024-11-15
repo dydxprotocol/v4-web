@@ -201,16 +201,6 @@ export const NewMarketForm = ({
         <NewMarketSuccessStep2
           transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
           tickerToAdd={tickerToAdd}
-          onLaunchAnotherMarket={() => {
-            setTickerToAdd(undefined);
-            setStep(NewMarketFormStep.SELECTION);
-
-            trackLaunchMarketFormStepChange({
-              currentStep: NewMarketFormStep.SUCCESS,
-              updatedStep: NewMarketFormStep.SELECTION,
-              ticker: undefined,
-            });
-          }}
         />
       );
     }

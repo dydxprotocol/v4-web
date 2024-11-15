@@ -137,14 +137,7 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Markets}>
-                {testFlags.pml ? (
-                  <Route
-                    path={MarketsRoute.New}
-                    element={<Navigate to={AppRoute.LaunchMarket} replace />}
-                  />
-                ) : (
-                  <Route path={MarketsRoute.New} element={<NewMarket />} />
-                )}
+                {testFlags.pml ? null : <Route path={MarketsRoute.New} element={<NewMarket />} />}
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 

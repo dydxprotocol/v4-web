@@ -15,13 +15,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 
 type NewMarketSuccessStepProps = {
-  onLaunchAnotherMarket: () => void;
   tickerToAdd: string;
   transactionUrl: string;
 };
 
 export const NewMarketSuccessStep = ({
-  onLaunchAnotherMarket,
   tickerToAdd,
   transactionUrl,
 }: NewMarketSuccessStepProps) => {
@@ -80,17 +78,6 @@ export const NewMarketSuccessStep = ({
           {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
           <LinkOutIcon />
         </Button>
-
-        {!isOnMarketTradePage && (
-          <Button
-            type={ButtonType.Button}
-            buttonStyle={ButtonStyle.WithoutBackground}
-            tw="h-fit text-color-text-0"
-            onClick={onLaunchAnotherMarket}
-          >
-            {stringGetter({ key: STRING_KEYS.LAUNCH_ANOTHER_MARKET })}
-          </Button>
-        )}
       </div>
     </$Container>
   );
