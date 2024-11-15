@@ -35,11 +35,19 @@ export const getFractionDigits = (unit?: BigNumberish | null) =>
   // n?.toString().match(/[.](\d*)/)?.[1].length ?? 0
   unit ? Math.max(Math.ceil(-Math.log10(Math.abs(+unit))), 0) : 0;
 
+export const getTickSizeFromPrice = (price: BigNumberish) => {
+  const priceNum = MustBigNumber(price).toNumber();
+  const p = Math.floor(Math.log10(priceNum));
+  const subticksPerTickLog10 = Math.log10(10 ** (9 - 3));
+  const quantumConversionExponent = -9;
+  const exponent = p + quantumConversionExponent + subticksPerTickLog10;
+  return exponent < 0 ? 1 / 10 ** Math.abs(exponent) : 10 ** exponent;
+};
+
 export const getTickSizeDecimalsFromPrice = (price?: BigNumberish | null) => {
   if (!price) return TOKEN_DECIMALS;
-  const priceNum = MustBigNumber(price).toNumber();
-  const p = Math.floor(Math.log(priceNum));
-  return Math.abs(p - 3);
+  const tickSize = getTickSizeFromPrice(price);
+  return getFractionDigits(tickSize);
 };
 
 export const isNumber = (value: any): value is number =>

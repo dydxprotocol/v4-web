@@ -72,9 +72,10 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 isUnlaunched,
                 volume24H,
               }) => (
-                <div tw="flex items-center gap-0.25">
+                <div tw="flex max-w-[50vw] items-center gap-0.25 overflow-hidden">
                   <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
                   <AssetTableCell
+                    tw="overflow-auto"
                     configs={{
                       effectiveInitialMarginFraction,
                       imageUrl,
