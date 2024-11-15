@@ -6,4 +6,4 @@ export enum LaunchMarketStatus {
   SUCCESS,
 }
 
-export const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.second * 30;
+export const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
