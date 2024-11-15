@@ -1,7 +1,12 @@
 import BigNumber from 'bignumber.js';
 import { describe, expect, it } from 'vitest';
 
-import { getFractionDigits, isNumber, roundToNearestFactor } from '../numbers';
+import {
+  getFractionDigits,
+  getTickSizeFromPrice,
+  isNumber,
+  roundToNearestFactor,
+} from '../numbers';
 
 describe('roundToNearestFactor', () => {
   it('should return NaN if given a tick of 0', () => {
@@ -122,5 +127,11 @@ describe('isNumber', () => {
   });
   it('handles number', () => {
     expect(isNumber(3.421)).toEqual(true);
+  });
+});
+
+describe('getTickSizeFromPrice', () => {
+  it('tickSize', () => {
+    expect(getTickSizeFromPrice(0.22)).toEqual(0.0001);
   });
 });

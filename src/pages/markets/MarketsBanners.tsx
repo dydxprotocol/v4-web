@@ -39,7 +39,7 @@ export const MarketsBanners = () => {
 
   return shouldDisplayPmlBanner ? (
     <$PmlBanner>
-      <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8" />
+      <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8 mobile:hidden" />
 
       <div tw="mr-auto flex flex-col">
         <span tw="font-medium-medium">
