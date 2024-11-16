@@ -46,9 +46,14 @@ import {
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketId,
+  getCurrentMarketOraclePrice,
+} from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -91,6 +96,9 @@ export const TradeForm = ({
   const currentInput = useAppSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+
+  const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
+  const currentMarketId = useAppSelector(getCurrentMarketId);
 
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
 
@@ -322,6 +330,15 @@ export const TradeForm = ({
       }}
     />
   );
+
+  // prevent real trading if null/zero oracle price or we are out of sync with abacus somehow
+  if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
+    return (
+      <div tw="flex h-full w-full items-center p-1 text-center">
+        {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
+      </div>
+    );
+  }
 
   return (
     <$TradeForm onSubmit={onSubmit} className={className}>

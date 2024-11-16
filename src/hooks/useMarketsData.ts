@@ -145,6 +145,8 @@ export const useMarketsData = ({
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
+      // temporarily filter out markets with empty/0 oracle price
+      .filter((m) => isTruthy(m.oraclePrice))
       // temporary filterout TRUMPWIN until the backend is working
       .filter(
         (m) => m.assetId !== 'TRUMPWIN' || featureFlags[StatsigFlags.ffShowPredictionMarketsUi]
