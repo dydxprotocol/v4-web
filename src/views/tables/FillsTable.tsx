@@ -1,4 +1,4 @@
-import { Key, useEffect, useMemo } from 'react';
+import { forwardRef, Key, useEffect, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -348,85 +348,87 @@ type StyleProps = {
   withInnerBorders?: boolean;
 };
 
-export const FillsTable = ({
-  columnKeys,
-  columnWidths,
-  currentMarket,
-  initialPageSize,
-  withGradientCardRows,
-  withOuterBorder,
-  withInnerBorders = true,
-}: ElementProps & StyleProps) => {
-  const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
-  const { isMobile } = useBreakpoints();
+export const FillsTable = forwardRef(
+  ({
+    columnKeys,
+    columnWidths,
+    currentMarket,
+    initialPageSize,
+    withGradientCardRows,
+    withOuterBorder,
+    withInnerBorders = true,
+  }: ElementProps & StyleProps) => {
+    const stringGetter = useStringGetter();
+    const dispatch = useAppDispatch();
+    const { isMobile } = useBreakpoints();
 
-  const marketFills = useAppSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
-  const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
-  const fills = currentMarket ? marketFills : allFills;
+    const marketFills = useAppSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+    const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
+    const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
+    const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+    const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
-  useEffect(() => {
-    // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
-    dispatch(viewedFills(currentMarket));
-    return () => {
+    useEffect(() => {
+      // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
       dispatch(viewedFills(currentMarket));
-    };
-  }, [currentMarket, dispatch]);
+      return () => {
+        dispatch(viewedFills(currentMarket));
+      };
+    }, [currentMarket, dispatch]);
 
-  const symbol = mapIfPresent(currentMarket, (market) =>
-    mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
-  );
+    const symbol = mapIfPresent(currentMarket, (market) =>
+      mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
+    );
 
-  const fillsData = useMemo(
-    () =>
-      fills.map(
-        (fill: SubaccountFill): FillTableRow =>
-          getHydratedTradingData({
-            data: fill,
-            assets: allAssets,
-            perpetualMarkets: allPerpetualMarkets,
+    const fillsData = useMemo(
+      () =>
+        fills.map(
+          (fill: SubaccountFill): FillTableRow =>
+            getHydratedTradingData({
+              data: fill,
+              assets: allAssets,
+              perpetualMarkets: allPerpetualMarkets,
+            })
+        ),
+      [fills, allPerpetualMarkets, allAssets]
+    );
+
+    return (
+      <$Table
+        key={currentMarket ?? 'all-fills'}
+        label="Fills"
+        data={
+          isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
+        }
+        getRowKey={(row: FillTableRow) => row.id}
+        onRowAction={(key: Key) =>
+          dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
+        }
+        columns={columnKeys.map((key: FillsTableColumnKey) =>
+          getFillsTableColumnDef({
+            key,
+            stringGetter,
+            symbol,
+            width: columnWidths?.[key],
           })
-      ),
-    [fills, allPerpetualMarkets, allAssets]
-  );
-
-  return (
-    <$Table
-      key={currentMarket ?? 'all-fills'}
-      label="Fills"
-      data={
-        isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
-      }
-      getRowKey={(row: FillTableRow) => row.id}
-      onRowAction={(key: Key) =>
-        dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
-      }
-      columns={columnKeys.map((key: FillsTableColumnKey) =>
-        getFillsTableColumnDef({
-          key,
-          stringGetter,
-          symbol,
-          width: columnWidths?.[key],
-        })
-      )}
-      slotEmpty={
-        <>
-          <Icon iconName={IconName.History} tw="text-[3em]" />
-          <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
-        </>
-      }
-      initialPageSize={initialPageSize}
-      withOuterBorder={withOuterBorder}
-      withInnerBorders={withInnerBorders}
-      withScrollSnapColumns
-      withScrollSnapRows
-      withFocusStickyRows
-    />
-  );
-};
+        )}
+        slotEmpty={
+          <>
+            <Icon iconName={IconName.History} tw="text-[3em]" />
+            <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
+          </>
+        }
+        initialPageSize={initialPageSize}
+        withOuterBorder={withOuterBorder}
+        withInnerBorders={withInnerBorders}
+        withScrollSnapColumns
+        withScrollSnapRows
+        withFocusStickyRows
+      />
+    );
+  }
+);
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;

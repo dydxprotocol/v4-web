@@ -1,4 +1,4 @@
-import { Key, useMemo } from 'react';
+import { forwardRef, Key, useMemo } from 'react';
 
 import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
@@ -42,7 +42,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { getNumberSign, MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
@@ -616,125 +616,127 @@ type StyleProps = {
   withOuterBorder?: boolean;
 };
 
-export const PositionsTable = ({
-  columnKeys,
-  columnWidths,
-  currentRoute,
-  currentMarket,
-  marketTypeFilter,
-  showClosePositionAction,
-  initialPageSize,
-  onNavigate,
-  navigateToOrders,
-  withGradientCardRows,
-  withOuterBorder,
-}: ElementProps & StyleProps) => {
-  const stringGetter = useStringGetter();
-  const navigate = useNavigate();
-  const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
-  const { uiRefresh } = testFlags;
-  const { isTablet } = useBreakpoints();
+export const PositionsTable = forwardRef(
+  ({
+    columnKeys,
+    columnWidths,
+    currentRoute,
+    currentMarket,
+    marketTypeFilter,
+    showClosePositionAction,
+    initialPageSize,
+    onNavigate,
+    navigateToOrders,
+    withGradientCardRows,
+    withOuterBorder,
+  }: ElementProps & StyleProps) => {
+    const stringGetter = useStringGetter();
+    const navigate = useNavigate();
+    const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
+    const { uiRefresh } = testFlags;
+    const { isTablet } = useBreakpoints();
 
-  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const assets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+    const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+    const assets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
-  const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
-  const positions = useMemo(() => {
-    return openPositions.filter((position) => {
-      const matchesMarket = currentMarket == null || position.id === currentMarket;
-      const subaccountNumber = position.childSubaccountNumber;
-      const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
-      const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
-      return matchesMarket && matchesType;
-    });
-  }, [currentMarket, marketTypeFilter, openPositions]);
+    const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+    const positions = useMemo(() => {
+      return openPositions.filter((position) => {
+        const matchesMarket = currentMarket == null || position.id === currentMarket;
+        const subaccountNumber = position.childSubaccountNumber;
+        const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
+        const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+        return matchesMarket && matchesType;
+      });
+    }, [currentMarket, marketTypeFilter, openPositions]);
 
-  const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
-    useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
-      equalityFn: (oldVal, newVal) => {
-        return (
-          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
-          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
-        );
-      },
-    });
+    const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
+    const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
+      useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
+        equalityFn: (oldVal, newVal) => {
+          return (
+            shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
+            shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
+          );
+        },
+      });
 
-  const positionsData = useMemo(
-    () =>
-      positions.map((position: SubaccountPosition): PositionTableRow => {
-        return safeAssign(
-          {},
-          {
-            tickSizeDecimals:
-              perpetualMarkets[position.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
-            asset: assets[position.assetId],
-            oraclePrice: perpetualMarkets[position.id]?.oraclePrice,
-            fundingRate: perpetualMarkets[position.id]?.perpetual?.nextFundingRate,
-            stopLossOrders: allStopLossOrders.filter(
-              (order: SubaccountOrder) => order.marketId === position.id
-            ),
-            takeProfitOrders: allTakeProfitOrders.filter(
-              (order: SubaccountOrder) => order.marketId === position.id
-            ),
-            stepSizeDecimals:
-              perpetualMarkets[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
-          },
-          position
-        );
-      }),
-    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
-  );
+    const positionsData = useMemo(
+      () =>
+        positions.map((position: SubaccountPosition): PositionTableRow => {
+          return safeAssign(
+            {},
+            {
+              tickSizeDecimals:
+                perpetualMarkets[position.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
+              asset: assets[position.assetId],
+              oraclePrice: perpetualMarkets[position.id]?.oraclePrice,
+              fundingRate: perpetualMarkets[position.id]?.perpetual?.nextFundingRate,
+              stopLossOrders: allStopLossOrders.filter(
+                (order: SubaccountOrder) => order.marketId === position.id
+              ),
+              takeProfitOrders: allTakeProfitOrders.filter(
+                (order: SubaccountOrder) => order.marketId === position.id
+              ),
+              stepSizeDecimals:
+                perpetualMarkets[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
+            },
+            position
+          );
+        }),
+      [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+    );
 
-  return (
-    <$Table
-      key={currentMarket ?? 'positions'}
-      label={stringGetter({ key: STRING_KEYS.POSITIONS })}
-      data={positionsData}
-      columns={columnKeys.map((key: PositionsTableColumnKey) =>
-        getPositionsTableColumnDef({
-          key,
-          stringGetter,
-          width: columnWidths?.[key],
-          isAccountViewOnly,
-          showClosePositionAction,
-          navigateToOrders,
-          isSinglePosition: positionsData.length === 1,
-          uiRefresh,
-          isTablet,
-        })
-      )}
-      getRowKey={(row: PositionTableRow) => row.id}
-      onRowAction={
-        currentMarket
-          ? undefined
-          : (market: Key) => {
-              navigate(`${AppRoute.Trade}/${market}`, {
-                state: { from: currentRoute },
-              });
-              onNavigate?.();
-            }
-      }
-      getRowAttributes={(row: PositionTableRow) => ({
-        'data-side': row.side.current,
-      })}
-      slotEmpty={
-        <>
-          <Icon iconName={IconName.Positions} tw="text-[3em]" />
-          <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
-        </>
-      }
-      initialPageSize={initialPageSize}
-      withGradientCardRows={withGradientCardRows}
-      withOuterBorder={withOuterBorder}
-      withInnerBorders
-      withScrollSnapColumns
-      withScrollSnapRows
-      withFocusStickyRows
-    />
-  );
-};
+    return (
+      <$Table
+        key={currentMarket ?? 'positions'}
+        label={stringGetter({ key: STRING_KEYS.POSITIONS })}
+        data={positionsData}
+        columns={columnKeys.map((key: PositionsTableColumnKey) =>
+          getPositionsTableColumnDef({
+            key,
+            stringGetter,
+            width: columnWidths?.[key],
+            isAccountViewOnly,
+            showClosePositionAction,
+            navigateToOrders,
+            isSinglePosition: positionsData.length === 1,
+            uiRefresh,
+            isTablet,
+          })
+        )}
+        getRowKey={(row: PositionTableRow) => row.id}
+        onRowAction={
+          currentMarket
+            ? undefined
+            : (market: Key) => {
+                navigate(`${AppRoute.Trade}/${market}`, {
+                  state: { from: currentRoute },
+                });
+                onNavigate?.();
+              }
+        }
+        getRowAttributes={(row: PositionTableRow) => ({
+          'data-side': row.side.current,
+        })}
+        slotEmpty={
+          <>
+            <Icon iconName={IconName.Positions} tw="text-[3em]" />
+            <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
+          </>
+        }
+        initialPageSize={initialPageSize}
+        withGradientCardRows={withGradientCardRows}
+        withOuterBorder={withOuterBorder}
+        withInnerBorders
+        withScrollSnapColumns
+        withScrollSnapRows
+        withFocusStickyRows
+      />
+    );
+  }
+);
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
