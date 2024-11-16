@@ -64,7 +64,9 @@ export const NotificationStack = ({ notifications, className }: ElementProps & S
           isStacked={idx > 0 && shouldStackNotifications}
           isOpen={
             notification.status < NotificationStatus.Unseen &&
-            (notification.timestamps[NotificationStatus.Unseen] ?? 0) > NOTIFICATIONS_INIT_TIME
+            (notification.timestamps[NotificationStatus.Updated] ??
+              notification.timestamps[NotificationStatus.Triggered] ??
+              0) > NOTIFICATIONS_INIT_TIME
           }
           layer={idx}
           notification={notification}
