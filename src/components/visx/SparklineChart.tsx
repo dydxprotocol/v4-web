@@ -19,6 +19,14 @@ const theme = buildChartTheme({
   gridColorDark: 'transparent',
 });
 
+// don't render the chart with 0 width and height for one frame while getting size
+function oneIfZero(arg: number) {
+  if (arg === 0) {
+    return 1;
+  }
+  return arg;
+}
+
 export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datum>) => {
   const { data, positive, xAccessor, yAccessor } = props;
 
@@ -27,8 +35,8 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
       {/* eslint-disable-next-line react/no-unused-prop-types */}
       {({ height, width }: { width: number; height: number }) => (
         <XYChart
-          width={width}
-          height={height}
+          width={oneIfZero(width)}
+          height={oneIfZero(height)}
           margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           xScale={{
             type: 'linear',
