@@ -115,24 +115,26 @@ export const VaultDescription = ({ className }: { className?: string }) => {
           </Link>
         )}
       </p>
-      <p>
-        {stringGetter({
-          key: STRING_KEYS.VAULT_OPERATOR_DESCRIPTION,
-          params: {
-            OPERATOR_NAME: operatorName,
-          },
-        })}{' '}
-        {vaultOperatorLearnMore && (
-          <Link isInline withIcon href={vaultOperatorLearnMore}>
-            {stringGetter({
-              key: STRING_KEYS.LEARN_MORE_ABOUT_OPERATOR,
-              params: {
-                OPERATOR_NAME: operatorName,
-              },
-            })}
-          </Link>
-        )}
-      </p>
+      {operatorName.length > 0 && (
+        <p>
+          {stringGetter({
+            key: STRING_KEYS.VAULT_OPERATOR_DESCRIPTION,
+            params: {
+              OPERATOR_NAME: operatorName,
+            },
+          })}{' '}
+          {vaultOperatorLearnMore && (
+            <Link isInline withIcon href={vaultOperatorLearnMore}>
+              {stringGetter({
+                key: STRING_KEYS.LEARN_MORE_ABOUT_OPERATOR,
+                params: {
+                  OPERATOR_NAME: operatorName,
+                },
+              })}
+            </Link>
+          )}
+        </p>
+      )}
     </div>
   );
 };
