@@ -5,6 +5,8 @@ import { MarketFilters } from '@/constants/markets';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { setMarketFilter } from '@/state/perpetuals';
 
+import { getMarketFilter } from './perpetualsSelectors';
+
 export default (store: any) => (next: any) => async (action: PayloadAction<any>) => {
   next(action);
 
@@ -13,7 +15,11 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
   switch (type) {
     case setShouldHideLaunchableMarkets.type: {
       if (payload) {
-        store.dispatch(setMarketFilter(MarketFilters.ALL));
+        const isViewingLaunchable = getMarketFilter(store.getState()) === MarketFilters.LAUNCHABLE;
+
+        if (isViewingLaunchable) {
+          store.dispatch(setMarketFilter(MarketFilters.ALL));
+        }
       }
       break;
     }
