@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -26,6 +26,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
+import { setMarketFilter } from '@/state/perpetuals';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -62,6 +63,12 @@ export const MarketFilter = ({
     },
     [dispatch]
   );
+
+  useEffect(() => {
+    if (shouldHideLaunchableMarkets && selectedFilter === MarketFilters.LAUNCHABLE) {
+      dispatch(setMarketFilter(MarketFilters.ALL));
+    }
+  }, [dispatch, selectedFilter, shouldHideLaunchableMarkets]);
 
   const unlaunchedMarketSwitch = useMemo(
     () =>

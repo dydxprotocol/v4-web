@@ -10,7 +10,6 @@ import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { appUiConfigsSlice } from './appUiConfigs';
-import appUiConfigsMiddleware from './appUiConfigsMiddleware';
 import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
@@ -74,11 +73,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(
-      appMiddleware as Middleware,
-      localizationMiddleware as Middleware,
-      appUiConfigsMiddleware as Middleware
-    ),
+    }).concat(appMiddleware as Middleware, localizationMiddleware as Middleware),
   devTools:
     process.env.NODE_ENV !== 'production'
       ? {
