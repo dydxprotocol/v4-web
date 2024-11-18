@@ -64,7 +64,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const fetchAccountStats = async () => {
-    if (!dydxAddress) return undefined;
+    if (!dydxAddress || !compositeClient) return undefined;
 
     const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/snapshot?addressFilter=${encodeURIComponent(dydxAddress)}`;
 
@@ -111,7 +111,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const affiliateMaxEarningQuery = useQuery({
-    queryKey: ['affiliateMaxEarning', compositeClient, feeTiers],
+    queryKey: ['affiliateMaxEarning', feeTiers],
     queryFn: fetchAffiliateMaxEarning,
     enabled: Boolean(compositeClient && feeTiers && affiliatesBaseUrl),
   });

@@ -145,7 +145,7 @@ export const CriteriaDialog = ({
                 border={['right']}
                 title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
                 outputType={OutputType.CompactFiat}
-                value={accountStats?.referredVolume}
+                value={accountStats?.affiliateReferredTotalVolume}
               />
               <StatCell tw="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
                 <div tw="flex items-center">

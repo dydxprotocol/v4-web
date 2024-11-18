@@ -14,6 +14,8 @@ export const useAffiliatesLeaderboard = () => {
   const { compositeClient } = useDydxClient();
 
   const fetchAffiliateStats = async () => {
+    if (!compositeClient) return undefined;
+
     const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/snapshot?sortByAffiliateEarning=true&limit=${PAGE_SIZE}`;
 
     try {
