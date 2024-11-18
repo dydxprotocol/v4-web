@@ -1,10 +1,8 @@
 import { Suspense } from 'react';
 
-import { Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { AffiliateRoute } from '@/constants/routes';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
@@ -13,9 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AttachedExpandingSection } from '@/components/ContentSection';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-import { NavigationMenu } from '@/components/NavigationMenu';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import LastUpdated from '@/views/Affiliates/LastUpdated';
 import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
@@ -24,14 +20,11 @@ import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
 export const AffiliatesPage = () => {
-  const navigate = useNavigate();
-
   const { dydxAddress } = useAccounts();
-  const { programStatsQuery, affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
+  const { affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
     useAffiliatesInfo(dydxAddress);
   const { data: lastUpdated } = lastUpdatedQuery;
   const { data: accountStats } = affiliateStatsQuery;
-  const { data: programStats } = programStatsQuery;
   const { data: affiliateMetadata, isPending: isAffiliateMetadataPending } = affiliateMetadataQuery;
 
   const { isNotTablet } = useBreakpoints();
@@ -59,25 +52,9 @@ export const AffiliatesPage = () => {
         <$Section tw="flex flex-col gap-1 px-1 pt-1">
           {isNotTablet && lastUpdated && <LastUpdated lastUpdatedDate={new Date(lastUpdated)} />}
           <AffiliatesBanner />
-
-          <AttachedExpandingSection>
-            <$NavigationMenu
-              orientation="horizontal"
-              items={[
-                {
-                  group: 'navigation',
-                  items: [
-                    {
-                      value: AffiliateRoute.Leaderboard,
-                      href: AffiliateRoute.Leaderboard,
-                      label: <h3>{stringGetter({ key: STRING_KEYS.YOUR_STATS })}</h3>,
-                      onClick: () => navigate(AffiliateRoute.Leaderboard),
-                    },
-                  ],
-                },
-              ]}
-            />
-          </AttachedExpandingSection>
+          <h3 tw="px-0.5 text-color-text-2 font-large-medium">
+            {stringGetter({ key: STRING_KEYS.YOUR_STATS })}
+          </h3>
 
           <section tw="flex flex-row flex-wrap items-center justify-between gap-y-1">
             {dydxAddress && !userStatus.isAffiliate && !userStatus.isVip ? (
@@ -101,8 +78,6 @@ export const AffiliatesPage = () => {
           </section>
         </$Section>
 
-        <Outlet context={{ accountStats, programStats }} />
-
         <AffiliatesLeaderboard {...{ accountStats }} />
       </$Page>
     </Suspense>
@@ -116,13 +91,4 @@ const $Page = styled.div`
 const $Section = styled.section`
   ${layoutMixins.contentSectionDetached}
   ${layoutMixins.flexColumn}
-`;
-
-const $NavigationMenu = styled(NavigationMenu)`
-  --navigationMenu-item-checked-backgroundColor: var(--color-layer-1);
-  --navigationMenu-item-checked-textColor: var(--color-text-2);
-
-  h3 {
-    font-size: 1.25em;
-  }
 `;

@@ -17,10 +17,6 @@ export enum MarketsRoute {
   New = 'new',
 }
 
-export enum AffiliateRoute {
-  Leaderboard = 'leaderboard',
-}
-
 export enum PortfolioRoute {
   EquityTiers = 'equity-tiers',
   Fees = 'fees',

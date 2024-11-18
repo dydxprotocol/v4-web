@@ -12,7 +12,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { config as grazConfig } from '@/constants/graz';
-import { AffiliateRoute, AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
+import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -124,9 +124,7 @@ const Content = () => {
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
-              <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />}>
-                <Route index element={<Navigate to={AffiliateRoute.Leaderboard} replace />} />
-              </Route>
+              <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
 
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
