@@ -47,7 +47,6 @@ export const MarketsBanners = ({
   const onClickPmlBanner = () => {
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
-    console.log(marketsTableRef?.current);
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
