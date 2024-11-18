@@ -81,30 +81,24 @@ export const MarketFilter = ({
     [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
   );
 
-  const filterLaunchable = (filter: MarketFilters) => {
-    return filter !== MarketFilters.LAUNCHABLE;
-  };
-
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters)
-          .filter(filterLaunchable)
-          .map((value) => {
-            const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
-            return {
-              label: labelIconName ? (
-                <Icon iconName={labelIconName} />
-              ) : (
-                stringGetter({
-                  key: labelStringKey,
-                  fallback: value,
-                })
-              ),
-              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
-              value,
-            };
-          }) satisfies MenuItem<MarketFilters>[]
+        Object.values(filters).map((value) => {
+          const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+          return {
+            label: labelIconName ? (
+              <Icon iconName={labelIconName} />
+            ) : (
+              stringGetter({
+                key: labelStringKey,
+                fallback: value,
+              })
+            ),
+            slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+            value,
+          };
+        }) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}
