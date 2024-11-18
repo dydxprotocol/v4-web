@@ -30,6 +30,8 @@ import { setMarketFilter } from '@/state/perpetuals';
 
 import { testFlags } from '@/lib/testFlags';
 
+export const MARKETS_FILTER_ID = 'markets-filter';
+
 type MarketFilterProps = {
   selectedFilter: MarketFilters;
   filters: MarketFilters[];
@@ -131,7 +133,11 @@ export const MarketFilter = ({
   );
 
   return (
-    <$MarketFilter $compactLayout={compactLayout} $uiRefreshEnabled={uiRefresh}>
+    <$MarketFilter
+      id={MARKETS_FILTER_ID}
+      $compactLayout={compactLayout}
+      $uiRefreshEnabled={uiRefresh}
+    >
       <div tw="flex items-center gap-0.5">
         <$SearchInput
           placeholder={stringGetter({ key: searchPlaceholderKey })}
