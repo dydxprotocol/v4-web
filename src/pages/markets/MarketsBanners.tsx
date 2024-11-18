@@ -1,3 +1,5 @@
+import { RefObject } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -16,7 +18,6 @@ import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
-import { MARKETS_FILTER_ID } from '@/views/MarketFilter';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
@@ -27,7 +28,11 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
-export const MarketsBanners = () => {
+export const MarketsBanners = ({
+  marketsTableRef,
+}: {
+  marketsTableRef?: RefObject<HTMLDivElement>;
+}) => {
   const stringGetter = useStringGetter();
   const { data: launchableMarkets } = useLaunchableMarkets();
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
@@ -42,8 +47,8 @@ export const MarketsBanners = () => {
   const onClickPmlBanner = () => {
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
-    const marketsTable = document.getElementById(MARKETS_FILTER_ID);
-    marketsTable?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log(marketsTableRef?.current);
+    marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const shouldDisplayPmlBanner = testFlags.pml && !hasDismissedPmlBanner;

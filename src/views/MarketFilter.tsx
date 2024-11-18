@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { ForwardedRef, forwardRef, useCallback, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -30,8 +30,6 @@ import { setMarketFilter } from '@/state/perpetuals';
 
 import { testFlags } from '@/lib/testFlags';
 
-export const MARKETS_FILTER_ID = 'markets-filter';
-
 type MarketFilterProps = {
   selectedFilter: MarketFilters;
   filters: MarketFilters[];
@@ -42,124 +40,125 @@ type MarketFilterProps = {
   compactLayout?: boolean;
 };
 
-export const MarketFilter = ({
-  selectedFilter,
-  filters,
-  onChangeFilter,
-  onSearchTextChange,
-  hideNewMarketButton,
-  compactLayout = false,
-  searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
-}: MarketFilterProps) => {
-  const stringGetter = useStringGetter();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { hasPotentialMarketsData } = usePotentialMarkets();
-  const { uiRefresh, pml: showLaunchMarkets } = testFlags;
-  const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
-  const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
+export const MarketFilter = forwardRef(
+  (
+    {
+      selectedFilter,
+      filters,
+      onChangeFilter,
+      onSearchTextChange,
+      hideNewMarketButton,
+      compactLayout = false,
+      searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
+    }: MarketFilterProps,
+    ref: ForwardedRef<HTMLDivElement>
+  ) => {
+    const stringGetter = useStringGetter();
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { hasPotentialMarketsData } = usePotentialMarkets();
+    const { uiRefresh, pml: showLaunchMarkets } = testFlags;
+    const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
+    const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
 
-  const onShouldHideLaunchableMarkets = useCallback(
-    (shouldHide: boolean) => {
-      dispatch(setShouldHideLaunchableMarkets(!shouldHide));
+    const onShouldHideLaunchableMarkets = useCallback(
+      (shouldHide: boolean) => {
+        dispatch(setShouldHideLaunchableMarkets(!shouldHide));
 
-      if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
-        dispatch(setMarketFilter(MarketFilters.ALL));
-      }
-    },
-    [dispatch, selectedFilter]
-  );
+        if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
+          dispatch(setMarketFilter(MarketFilters.ALL));
+        }
+      },
+      [dispatch, selectedFilter]
+    );
 
-  const unlaunchedMarketSwitch = useMemo(
-    () =>
-      testFlags.pml && (
-        <WithLabel
-          label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
-          tw="flex flex-row items-center"
-        >
-          <Switch
-            name="show-launchable"
-            checked={!shouldHideLaunchableMarkets}
-            onCheckedChange={onShouldHideLaunchableMarkets}
-            tw="font-mini-book"
+    const unlaunchedMarketSwitch = useMemo(
+      () =>
+        testFlags.pml && (
+          <WithLabel
+            label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
+            tw="flex flex-row items-center"
+          >
+            <Switch
+              name="show-launchable"
+              checked={!shouldHideLaunchableMarkets}
+              onCheckedChange={onShouldHideLaunchableMarkets}
+              tw="font-mini-book"
+            />
+          </WithLabel>
+        ),
+      [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
+    );
+
+    const filterToggles = (
+      <$ToggleGroup
+        items={
+          Object.values(filters).map((value) => {
+            const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+            return {
+              label: labelIconName ? (
+                <Icon iconName={labelIconName} />
+              ) : (
+                stringGetter({
+                  key: labelStringKey,
+                  fallback: value,
+                })
+              ),
+              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+              value,
+            };
+          }) satisfies MenuItem<MarketFilters>[]
+        }
+        value={selectedFilter}
+        onValueChange={onChangeFilter}
+        overflow={uiRefresh ? 'wrap' : 'scroll'}
+        slotBefore={unlaunchedMarketSwitch}
+      />
+    );
+
+    const launchMarketButton = uiRefresh ? (
+      <Button
+        onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+        size={ButtonSize.Small}
+        shape={ButtonShape.Pill}
+        action={ButtonAction.Primary}
+      >
+        {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
+      </Button>
+    ) : (
+      <Button
+        onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+        size={ButtonSize.Small}
+      >
+        {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+      </Button>
+    );
+
+    return (
+      <$MarketFilter ref={ref} $compactLayout={compactLayout} $uiRefreshEnabled={uiRefresh}>
+        <div tw="flex items-center gap-0.5">
+          <$SearchInput
+            placeholder={stringGetter({ key: searchPlaceholderKey })}
+            onTextChange={onSearchTextChange}
           />
-        </WithLabel>
-      ),
-    [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
-  );
-
-  const filterToggles = (
-    <$ToggleGroup
-      items={
-        Object.values(filters).map((value) => {
-          const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
-          return {
-            label: labelIconName ? (
-              <Icon iconName={labelIconName} />
-            ) : (
-              stringGetter({
-                key: labelStringKey,
-                fallback: value,
-              })
-            ),
-            slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
-            value,
-          };
-        }) satisfies MenuItem<MarketFilters>[]
-      }
-      value={selectedFilter}
-      onValueChange={onChangeFilter}
-      overflow={uiRefresh ? 'wrap' : 'scroll'}
-      slotBefore={unlaunchedMarketSwitch}
-    />
-  );
-
-  const launchMarketButton = uiRefresh ? (
-    <Button
-      onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-      size={ButtonSize.Small}
-      shape={ButtonShape.Pill}
-      action={ButtonAction.Primary}
-    >
-      {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
-    </Button>
-  ) : (
-    <Button
-      onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-      size={ButtonSize.Small}
-    >
-      {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-    </Button>
-  );
-
-  return (
-    <$MarketFilter
-      id={MARKETS_FILTER_ID}
-      $compactLayout={compactLayout}
-      $uiRefreshEnabled={uiRefresh}
-    >
-      <div tw="flex items-center gap-0.5">
-        <$SearchInput
-          placeholder={stringGetter({ key: searchPlaceholderKey })}
-          onTextChange={onSearchTextChange}
-        />
-        {uiRefresh && showProposeButton && showLaunchMarkets && launchMarketButton}
-      </div>
-
-      {uiRefresh ? (
-        filterToggles
-      ) : (
-        <div tw="row overflow-x-scroll">
-          <$ToggleGroupContainer $compactLayout={compactLayout}>
-            {filterToggles}
-          </$ToggleGroupContainer>
-
-          {showProposeButton && launchMarketButton}
+          {uiRefresh && showProposeButton && showLaunchMarkets && launchMarketButton}
         </div>
-      )}
-    </$MarketFilter>
-  );
-};
+
+        {uiRefresh ? (
+          filterToggles
+        ) : (
+          <div tw="row overflow-x-scroll">
+            <$ToggleGroupContainer $compactLayout={compactLayout}>
+              {filterToggles}
+            </$ToggleGroupContainer>
+
+            {showProposeButton && launchMarketButton}
+          </div>
+        )}
+      </$MarketFilter>
+    );
+  }
+);
 
 const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: boolean }>`
   display: flex;
