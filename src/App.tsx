@@ -60,7 +60,6 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
-import LaunchMarket from './pages/LaunchMarket';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { getIsAccountConnected } from './state/accountSelectors';
@@ -71,7 +70,6 @@ import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
 import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
-import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -126,10 +124,7 @@ const Content = () => {
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
-              <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />}>
-                <Route index element={<Navigate to="leaderboard" replace />} />
-                <Route path="program-stats" element={<CommunityChartContainer />} />
-              </Route>
+              <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
 
               <Route path={AppRoute.Trade}>
                 <Route path=":market" element={<TradePage />} />
@@ -137,7 +132,7 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Markets}>
-                {testFlags.pml ? null : <Route path={MarketsRoute.New} element={<NewMarket />} />}
+                {!testFlags.pml && <Route path={MarketsRoute.New} element={<NewMarket />} />}
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
@@ -158,8 +153,6 @@ const Content = () => {
               <Route path={AppRoute.Vault}>
                 <Route path={AppRoute.Vault} element={<VaultPage />} />
               </Route>
-
-              {testFlags.pml && <Route path={AppRoute.LaunchMarket} element={<LaunchMarket />} />}
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route

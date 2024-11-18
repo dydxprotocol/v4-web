@@ -20,16 +20,16 @@ import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
 const CONTENT_SECTIONS = [
   {
-    header: STRING_KEYS.EARN_USDC,
-    description: STRING_KEYS.EARN_USDC_DISCRIPTION,
+    header: STRING_KEYS.LIGHTNING_FAST,
+    description: STRING_KEYS.LIGHTNING_FAST_DISCRIPTION,
   },
   {
     header: STRING_KEYS.TRADE_ANYTHING,
     description: STRING_KEYS.TRADE_ANYTHING_DISCRIPTION,
   },
   {
-    header: STRING_KEYS.LIGHTNING_FAST,
-    description: STRING_KEYS.LIGHTNING_FAST_DISCRIPTION,
+    header: STRING_KEYS.EARN_USDC,
+    description: STRING_KEYS.EARN_USDC_DISCRIPTION,
   },
 ];
 
@@ -56,14 +56,14 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
       setIsOpen={setIsOpen}
       withClose={false}
       title={
-        <span tw="flex flex-row items-center gap-1">
+        <span tw="flex flex-row items-center gap-[0.5ch]">
           {stringGetter({
             key:
               !isNotEligible && !invalidReferralCode
                 ? STRING_KEYS.YOUR_FRIEND
                 : STRING_KEYS.WELCOME_DYDX,
           })}
-          <span tw="text-color-text-0 font-medium-book">{truncateAddress(referralAddress)}</span>
+          <span tw="text-color-text-1">{refCode ?? truncateAddress(referralAddress)}</span>
         </span>
       }
       description={stringGetter({
