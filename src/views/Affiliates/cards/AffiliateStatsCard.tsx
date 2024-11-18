@@ -33,10 +33,10 @@ const MobileView = ({
 
   return (
     <div tw="flex flex-wrap items-center justify-between">
-      <MobileStatsHeader tw="flex w-full justify-between gap-1 divide-y p-1">
+      <MobileStatsHeader tw="flex w-full gap-1 divide-y p-1">
         <StatCell
           valueSize="large"
-          tw="relative"
+          tw="relative flex-1"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_TIER })}
           outputType={OutputType.Text}
           value={isVip ? stringGetter({ key: STRING_KEYS.VIP_AFFILIATE }) : currentAffiliateTier}
@@ -59,14 +59,8 @@ const MobileView = ({
           valueSize="large"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.totalEarnings}
-        />
-
-        <StatCell
-          valueSize="large"
-          title={stringGetter({ key: STRING_KEYS.ALL_TIME_RANK })}
-          outputType={OutputType.Number}
-          value={accountStats?.rank}
+          value={accountStats?.affiliateEarnings}
+          tw="flex-1"
         />
       </MobileStatsHeader>
       <div tw="flex w-full flex-wrap justify-between">
@@ -75,27 +69,27 @@ const MobileView = ({
           tw="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.referredVolume}
+          value={accountStats?.affiliateReferredTotalVolume}
         />
         <BorderStatCell
           border={['bottom']}
           tw="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.FEES_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.referredFees}
+          value={accountStats?.affiliateTotalReferredFees}
         />
         <BorderStatCell
           border={['right']}
           tw="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
           outputType={OutputType.Number}
-          value={accountStats?.totalReferredUsers}
+          value={accountStats?.affiliateReferredUsers}
         />
         <StatCell
           tw="w-6/12 p-1"
           title={stringGetter({ key: STRING_KEYS.TRADES_REFERRED })}
           outputType={OutputType.Number}
-          value={accountStats?.totalReferredTrades}
+          value={accountStats?.affiliateReferredTrades}
         />
       </div>
     </div>
@@ -145,13 +139,7 @@ const DesktopView = ({
           valueSize="large"
           title={stringGetter({ key: STRING_KEYS.AFFILIATE_EARNINGS })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.totalEarnings}
-        />
-        <StatCell
-          valueSize="large"
-          title={stringGetter({ key: STRING_KEYS.ALL_TIME_RANK })}
-          outputType={OutputType.Number}
-          value={accountStats?.rank}
+          value={accountStats?.affiliateEarnings}
         />
       </div>
       <div tw="flex">
@@ -160,28 +148,27 @@ const DesktopView = ({
           tw="pr-1"
           title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.referredVolume}
+          value={accountStats?.affiliateReferredTotalVolume}
         />
         <BorderStatCell
           border={['right']}
           tw="px-1"
           title={stringGetter({ key: STRING_KEYS.FEES_REFERRED })}
           outputType={OutputType.CompactFiat}
-          value={accountStats?.referredFees}
+          value={accountStats?.affiliateTotalReferredFees}
         />
         <BorderStatCell
           border={['right']}
           tw="px-1"
           title={stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
           outputType={OutputType.Number}
-          value={accountStats?.totalReferredUsers}
+          value={accountStats?.affiliateReferredUsers}
         />
-
         <StatCell
           tw="px-1"
           title={stringGetter({ key: STRING_KEYS.TRADES_REFERRED })}
           outputType={OutputType.Number}
-          value={accountStats?.totalReferredTrades}
+          value={accountStats?.affiliateReferredTrades}
         />
       </div>
     </div>

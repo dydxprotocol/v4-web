@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 
-import { IAffiliateStats } from '@/constants/affiliates';
+import { IAffiliateLeaderboardStats, IAffiliateStats } from '@/constants/affiliates';
 
 import { log } from '@/lib/telemetry';
 
-import { useEndpointsConfig } from './useEndpointsConfig';
+import { useDydxClient } from './useDydxClient';
+
+const PAGE_SIZE = 100;
 
 export const useAffiliatesLeaderboard = () => {
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [affiliatesPages, setAffiliatesPages] = useState<Record<number, IAffiliateStats[]>>({});
-  const { affiliatesBaseUrl } = useEndpointsConfig();
+  const { compositeClient } = useDydxClient();
 
   const fetchAffiliateStats = async () => {
-    const endpoint = `${affiliatesBaseUrl}/v1/leaderboard/search`;
+    if (!compositeClient) return undefined;
+
+    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/snapshot?sortByAffiliateEarning=true&limit=${PAGE_SIZE}`;
 
     try {
       const response = await fetch(endpoint, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ pagination: { page, pageSize: 10 } }),
       });
 
       const data = await response.json();
-      return data;
+      return data?.affiliateList;
     } catch (error) {
       log('useAffiliateLeaderboard', error, { endpoint });
       throw error;
@@ -35,25 +35,21 @@ export const useAffiliatesLeaderboard = () => {
   };
 
   const affiliatesLeaderboardQuery = useQuery({
-    queryKey: ['affiliatesLeaderboard', page],
+    queryKey: ['affiliatesLeaderboard'],
     queryFn: fetchAffiliateStats,
-    enabled: Boolean(page && affiliatesBaseUrl),
+    enabled: Boolean(compositeClient),
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    if (affiliatesLeaderboardQuery.data?.results) {
-      setAffiliatesPages((prev) => ({
-        ...prev,
-        [affiliatesLeaderboardQuery.data.page]: affiliatesLeaderboardQuery.data.results,
-      }));
-      setTotal(affiliatesLeaderboardQuery.data.total);
-    }
-  }, [affiliatesLeaderboardQuery.data]);
+  const affiliates: IAffiliateLeaderboardStats[] | undefined = useMemo(
+    () =>
+      affiliatesLeaderboardQuery.data?.map((stat: IAffiliateStats, i: number) => ({
+        ...stat,
+        rank: i + 1,
+      })),
+    [affiliatesLeaderboardQuery.data]
+  );
 
-  // merge all the affiliatesPages into a single array
-  const affiliates = Object.values(affiliatesPages).flat();
-
-  return { affiliates, total, page, setPage };
+  return { affiliates };
 };

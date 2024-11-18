@@ -63,27 +63,10 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     }
   };
 
-  const fetchProgramStats = async () => {
-    const endpoint = `${affiliatesBaseUrl}/v1/community/program-stats`;
-
-    try {
-      const res = await safeFetch(endpoint, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      });
-
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      log('useAffiliatesInfo/fetchProgramStats', error, { endpoint });
-      throw error;
-    }
-  };
-
   const fetchAccountStats = async () => {
-    const endpoint = `${affiliatesBaseUrl}/v1/leaderboard/account/${dydxAddress}`;
+    if (!dydxAddress || !compositeClient) return undefined;
+
+    const endpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/snapshot?addressFilter=${encodeURIComponent(dydxAddress)}`;
 
     try {
       const res = await safeFetch(endpoint, {
@@ -94,57 +77,24 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
       });
 
       const data = await res.json();
-
-      return data;
+      const affiliateStats = data?.affiliateList?.[0];
+      return affiliateStats;
     } catch (error) {
       log('useAffiliatesInfo/fetchAccountStats', error, { endpoint });
       throw error;
     }
   };
 
-  const fetchLastUpdated = async () => {
-    const endpoint = `${affiliatesBaseUrl}/v1/last-updated`;
-
-    try {
-      const res = await safeFetch(endpoint, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      });
-
-      const data = await res.json();
-
-      return data;
-    } catch (error) {
-      log('useAffiliatesInfo/fetchLastUpdated', error, { endpoint });
-      throw error;
-    }
-  };
-
   const affiliateMetadataQuery = useQuery({
-    queryKey: ['affiliateMetadata', dydxAddress, compositeClient],
+    queryKey: ['affiliateMetadata', dydxAddress],
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress && affiliatesBaseUrl),
-  });
-
-  const programStatsQuery = useQuery({
-    queryKey: ['programStats'],
-    queryFn: fetchProgramStats,
-    enabled: Boolean(affiliatesBaseUrl),
   });
 
   const affiliateStatsQuery = useQuery({
     queryKey: ['accountStats', dydxAddress],
     queryFn: fetchAccountStats,
-    enabled: Boolean(dydxAddress && affiliatesBaseUrl),
-    retry: 0,
-  });
-
-  const lastUpdatedQuery = useQuery({
-    queryKey: ['lastUpdated'],
-    queryFn: fetchLastUpdated,
-    enabled: Boolean(affiliatesBaseUrl),
+    enabled: Boolean(compositeClient && dydxAddress),
   });
 
   const fetchAffiliateMaxEarning = async () => {
@@ -161,16 +111,14 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   };
 
   const affiliateMaxEarningQuery = useQuery({
-    queryKey: ['affiliateMaxEarning', compositeClient, feeTiers],
+    queryKey: ['affiliateMaxEarning', feeTiers],
     queryFn: fetchAffiliateMaxEarning,
     enabled: Boolean(compositeClient && feeTiers && affiliatesBaseUrl),
   });
 
   return {
     affiliateMetadataQuery,
-    programStatsQuery,
     affiliateStatsQuery,
-    lastUpdatedQuery,
     affiliateMaxEarningQuery,
   };
 };

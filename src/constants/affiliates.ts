@@ -10,14 +10,21 @@ export const MAX_AFFILIATE_VIP_SHARE = 0.5;
 export const DEFAULT_MAX_AFFILIATE_SHARE = 0.15;
 
 export interface IAffiliateStats {
+  affiliateAddress: string;
+  affiliateReferralCode: string;
+  affiliateEarnings: number;
+  affiliateReferredTrades: number;
+  affiliateTotalReferredFees: number;
+  affiliateReferredUsers: number;
+  affiliateReferredNetProtocolEarnings: number;
+  affiliateReferredTotalVolume: number;
+  affiliateReferredMakerFees: number;
+  affiliateReferredTakerFees: number;
+  affiliateReferredMakerRebates: number;
+}
+
+export interface IAffiliateLeaderboardStats extends IAffiliateStats {
   rank: number;
-  code: string;
-  account: string;
-  referredFees: number;
-  referredVolume: number;
-  totalEarnings: number;
-  totalReferredUsers: number;
-  totalReferredTrades?: number;
 }
 
 export interface IDateStats {
