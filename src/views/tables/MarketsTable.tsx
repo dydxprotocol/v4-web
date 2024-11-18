@@ -1,4 +1,4 @@
-import { Key, useMemo, useState } from 'react';
+import { ForwardedRef, forwardRef, Key, useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -39,304 +39,308 @@ import { testFlags } from '@/lib/testFlags';
 
 import { FavoriteButton } from './MarketsTable/FavoriteButton';
 
-export const MarketsTable = ({ className }: { className?: string }) => {
-  const stringGetter = useStringGetter();
-  const { isTablet } = useBreakpoints();
-  const dispatch = useAppDispatch();
-  const filter: MarketFilters = useAppSelector(getMarketFilter);
-  const [searchFilter, setSearchFilter] = useState<string>();
-  const navigate = useNavigate();
+export const MarketsTable = forwardRef(
+  ({ className }: { className?: string }, ref: ForwardedRef<HTMLDivElement>) => {
+    const stringGetter = useStringGetter();
+    const { isTablet } = useBreakpoints();
+    const dispatch = useAppDispatch();
+    const filter: MarketFilters = useAppSelector(getMarketFilter);
+    const [searchFilter, setSearchFilter] = useState<string>();
+    const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
-    filter,
-    searchFilter,
-  });
+    const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
+      filter,
+      searchFilter,
+    });
 
-  const { hasPotentialMarketsData } = usePotentialMarkets();
+    const { hasPotentialMarketsData } = usePotentialMarkets();
 
-  const columns = useMemo<ColumnDef<MarketData>[]>(
-    () =>
-      isTablet
-        ? ([
-            {
-              columnKey: 'marketAndVolume',
-              getCellValue: (row) => row.volume24H,
-              label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({
-                id,
-                assetId,
-                effectiveInitialMarginFraction,
-                imageUrl,
-                initialMarginFraction,
-                name,
-                isUnlaunched,
-                volume24H,
-              }) => (
-                <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
-                  <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
-                  <AssetTableCell
-                    tw="overflow-auto"
-                    configs={{
-                      effectiveInitialMarginFraction,
-                      imageUrl,
-                      initialMarginFraction,
-                      isUnlaunched,
-                    }}
-                    name={name}
-                    symbol={assetId}
-                  >
-                    <Output
-                      type={OutputType.CompactFiat}
-                      value={volume24H ?? undefined}
-                      tw="text-color-text-0 font-mini-medium"
+    const columns = useMemo<ColumnDef<MarketData>[]>(
+      () =>
+        isTablet
+          ? ([
+              {
+                columnKey: 'marketAndVolume',
+                getCellValue: (row) => row.volume24H,
+                label: stringGetter({ key: STRING_KEYS.MARKET }),
+                renderCell: ({
+                  id,
+                  assetId,
+                  effectiveInitialMarginFraction,
+                  imageUrl,
+                  initialMarginFraction,
+                  name,
+                  isUnlaunched,
+                  volume24H,
+                }) => (
+                  <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
+                    <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
+                    <AssetTableCell
+                      tw="overflow-auto"
+                      configs={{
+                        effectiveInitialMarginFraction,
+                        imageUrl,
+                        initialMarginFraction,
+                        isUnlaunched,
+                      }}
+                      name={name}
+                      symbol={assetId}
+                    >
+                      <Output
+                        type={OutputType.CompactFiat}
+                        value={volume24H ?? undefined}
+                        tw="text-color-text-0 font-mini-medium"
+                      />
+                    </AssetTableCell>
+                  </div>
+                ),
+              },
+              {
+                columnKey: 'price',
+                getCellValue: (row) => row.oraclePrice,
+                label: stringGetter({ key: STRING_KEYS.PRICE }),
+                renderCell: ({
+                  oraclePrice,
+                  priceChange24H,
+                  priceChange24HPercent,
+                  tickSizeDecimals,
+                }) => (
+                  <TableCell stacked tw="max-w-8">
+                    <$TabletOutput
+                      withSubscript
+                      type={OutputType.Fiat}
+                      value={oraclePrice}
+                      fractionDigits={tickSizeDecimals}
+                      withBaseFont
                     />
-                  </AssetTableCell>
-                </div>
-              ),
-            },
-            {
-              columnKey: 'price',
-              getCellValue: (row) => row.oraclePrice,
-              label: stringGetter({ key: STRING_KEYS.PRICE }),
-              renderCell: ({
-                oraclePrice,
-                priceChange24H,
-                priceChange24HPercent,
-                tickSizeDecimals,
-              }) => (
-                <TableCell stacked tw="max-w-8">
+                    <$InlineRow tw="font-small-book">
+                      {!priceChange24H ? (
+                        <Output type={OutputType.Fiat} value={null} />
+                      ) : (
+                        <>
+                          {priceChange24H > 0 && (
+                            <TriangleIndicator value={MustBigNumber(priceChange24H)} />
+                          )}
+                          <$Output
+                            type={OutputType.Percent}
+                            value={MustBigNumber(priceChange24HPercent).abs()}
+                            isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
+                            isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                          />
+                        </>
+                      )}
+                    </$InlineRow>
+                  </TableCell>
+                ),
+              },
+            ] satisfies ColumnDef<MarketData>[])
+          : ([
+              {
+                columnKey: 'market',
+                getCellValue: (row) => row.id,
+                label: stringGetter({ key: STRING_KEYS.MARKET }),
+
+                renderCell: ({
+                  id,
+                  assetId,
+                  effectiveInitialMarginFraction,
+                  imageUrl,
+                  initialMarginFraction,
+                  name,
+                  isUnlaunched,
+                }) => (
+                  <div tw="flex items-center gap-0.25">
+                    <FavoriteButton marketId={id} />
+                    <AssetTableCell
+                      configs={{
+                        effectiveInitialMarginFraction,
+                        imageUrl,
+                        initialMarginFraction,
+                        isUnlaunched,
+                      }}
+                      name={name}
+                      symbol={assetId}
+                    />
+                  </div>
+                ),
+              },
+              {
+                columnKey: 'oraclePrice',
+                getCellValue: (row) => row.oraclePrice,
+                label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
+                renderCell: ({ oraclePrice, tickSizeDecimals }) => (
                   <$TabletOutput
                     withSubscript
                     type={OutputType.Fiat}
                     value={oraclePrice}
                     fractionDigits={tickSizeDecimals}
-                    withBaseFont
                   />
-                  <$InlineRow tw="font-small-book">
-                    {!priceChange24H ? (
-                      <Output type={OutputType.Fiat} value={null} />
-                    ) : (
-                      <>
-                        {priceChange24H > 0 && (
-                          <TriangleIndicator value={MustBigNumber(priceChange24H)} />
-                        )}
+                ),
+              },
+              {
+                columnKey: 'priceChange24HChart',
+                label: stringGetter({ key: STRING_KEYS.LAST_24H }),
+                renderCell: ({ line, priceChange24HPercent }) => (
+                  <div tw="h-2 w-3">
+                    <SparklineChart
+                      data={(line ?? []).map((datum, index) => ({
+                        x: index + 1,
+                        y: parseFloat(datum.toString()),
+                      }))}
+                      xAccessor={(datum) => datum?.x ?? 0}
+                      yAccessor={(datum) => datum?.y ?? 0}
+                      positive={MustBigNumber(priceChange24HPercent).gt(0)}
+                    />
+                  </div>
+                ),
+                allowsSorting: false,
+              },
+              {
+                columnKey: 'priceChange24HPercent',
+                getCellValue: (row) => row.priceChange24HPercent,
+                label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
+                renderCell: ({ priceChange24HPercent }) => (
+                  <TableCell stacked>
+                    <$InlineRow>
+                      {!priceChange24HPercent ? (
+                        <Output type={OutputType.Text} value={null} />
+                      ) : (
                         <$Output
                           type={OutputType.Percent}
                           value={MustBigNumber(priceChange24HPercent).abs()}
                           isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
                           isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                         />
-                      </>
-                    )}
-                  </$InlineRow>
-                </TableCell>
-              ),
-            },
-          ] satisfies ColumnDef<MarketData>[])
-        : ([
-            {
-              columnKey: 'market',
-              getCellValue: (row) => row.id,
-              label: stringGetter({ key: STRING_KEYS.MARKET }),
-
-              renderCell: ({
-                id,
-                assetId,
-                effectiveInitialMarginFraction,
-                imageUrl,
-                initialMarginFraction,
-                name,
-                isUnlaunched,
-              }) => (
-                <div tw="flex items-center gap-0.25">
-                  <FavoriteButton marketId={id} />
-                  <AssetTableCell
-                    configs={{
-                      effectiveInitialMarginFraction,
-                      imageUrl,
-                      initialMarginFraction,
-                      isUnlaunched,
-                    }}
-                    name={name}
-                    symbol={assetId}
+                      )}
+                    </$InlineRow>
+                  </TableCell>
+                ),
+              },
+              {
+                columnKey: 'volume24H',
+                getCellValue: (row) => row.volume24H,
+                label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
+                renderCell: (row) => (
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
+                ),
+              },
+              {
+                columnKey: 'trades24H',
+                getCellValue: (row) => row.trades24H,
+                label: stringGetter({ key: STRING_KEYS.TRADES }),
+                renderCell: (row) => (
+                  <$NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
+                ),
+              },
+              {
+                columnKey: 'openInterest',
+                getCellValue: (row) => row.openInterestUSDC,
+                label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+                renderCell: (row) => (
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
+                ),
+              },
+              {
+                columnKey: 'nextFundingRate',
+                getCellValue: (row) => row.nextFundingRate,
+                label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
+                renderCell: (row) => (
+                  <$Output
+                    type={OutputType.Percent}
+                    fractionDigits={FUNDING_DECIMALS}
+                    value={row.nextFundingRate}
+                    isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
+                    isNegative={MustBigNumber(row.nextFundingRate).isNegative()}
                   />
-                </div>
-              ),
-            },
-            {
-              columnKey: 'oraclePrice',
-              getCellValue: (row) => row.oraclePrice,
-              label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
-              renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                <$TabletOutput
-                  withSubscript
-                  type={OutputType.Fiat}
-                  value={oraclePrice}
-                  fractionDigits={tickSizeDecimals}
-                />
-              ),
-            },
-            {
-              columnKey: 'priceChange24HChart',
-              label: stringGetter({ key: STRING_KEYS.LAST_24H }),
-              renderCell: ({ line, priceChange24HPercent }) => (
-                <div tw="h-2 w-3">
-                  <SparklineChart
-                    data={(line ?? []).map((datum, index) => ({
-                      x: index + 1,
-                      y: parseFloat(datum.toString()),
-                    }))}
-                    xAccessor={(datum) => datum?.x ?? 0}
-                    yAccessor={(datum) => datum?.y ?? 0}
-                    positive={MustBigNumber(priceChange24HPercent).gt(0)}
-                  />
-                </div>
-              ),
-              allowsSorting: false,
-            },
-            {
-              columnKey: 'priceChange24HPercent',
-              getCellValue: (row) => row.priceChange24HPercent,
-              label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
-              renderCell: ({ priceChange24HPercent }) => (
-                <TableCell stacked>
-                  <$InlineRow>
-                    {!priceChange24HPercent ? (
-                      <Output type={OutputType.Text} value={null} />
-                    ) : (
-                      <$Output
-                        type={OutputType.Percent}
-                        value={MustBigNumber(priceChange24HPercent).abs()}
-                        isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
-                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
-                      />
-                    )}
-                  </$InlineRow>
-                </TableCell>
-              ),
-            },
-            {
-              columnKey: 'volume24H',
-              getCellValue: (row) => row.volume24H,
-              label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
-              renderCell: (row) => (
-                <$NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
-              ),
-            },
-            {
-              columnKey: 'trades24H',
-              getCellValue: (row) => row.trades24H,
-              label: stringGetter({ key: STRING_KEYS.TRADES }),
-              renderCell: (row) => (
-                <$NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
-              ),
-            },
-            {
-              columnKey: 'openInterest',
-              getCellValue: (row) => row.openInterestUSDC,
-              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-              renderCell: (row) => (
-                <$NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
-              ),
-            },
-            {
-              columnKey: 'nextFundingRate',
-              getCellValue: (row) => row.nextFundingRate,
-              label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
-              renderCell: (row) => (
-                <$Output
-                  type={OutputType.Percent}
-                  fractionDigits={FUNDING_DECIMALS}
-                  value={row.nextFundingRate}
-                  isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
-                  isNegative={MustBigNumber(row.nextFundingRate).isNegative()}
-                />
-              ),
-            },
-          ] satisfies ColumnDef<MarketData>[]),
-    [stringGetter, isTablet]
-  );
+                ),
+              },
+            ] satisfies ColumnDef<MarketData>[]),
+      [stringGetter, isTablet]
+    );
 
-  const setFilter = (newFilter: MarketFilters) => {
-    dispatch(setMarketFilter(newFilter));
-  };
+    const setFilter = (newFilter: MarketFilters) => {
+      dispatch(setMarketFilter(newFilter));
+    };
 
-  return (
-    <>
-      <$Toolbar>
-        <MarketFilter
-          hideNewMarketButton
-          compactLayout
-          searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
-          selectedFilter={filter}
-          filters={marketFilters}
-          onChangeFilter={setFilter}
-          onSearchTextChange={setSearchFilter}
+    return (
+      <>
+        <$Toolbar>
+          <MarketFilter
+            ref={ref}
+            hideNewMarketButton
+            compactLayout
+            searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
+            selectedFilter={filter}
+            filters={marketFilters}
+            onChangeFilter={setFilter}
+            onSearchTextChange={setSearchFilter}
+          />
+        </$Toolbar>
+
+        <$Table
+          withInnerBorders
+          data={hasMarketIds ? filteredMarkets : []}
+          getRowKey={(row: MarketData) => row.id}
+          getIsRowPinned={(row: MarketData) => row.isFavorite}
+          label="Markets"
+          onRowAction={(market: Key) =>
+            navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
+          }
+          defaultSortDescriptor={{
+            column: isTablet ? 'marketAndVolume' : 'volume24H',
+            direction: 'descending',
+          }}
+          columns={columns}
+          initialPageSize={50}
+          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          shouldResetOnTotalRowsChange
+          className={className}
+          slotEmpty={
+            <$MarketNotFound>
+              {filter === MarketFilters.NEW && !searchFilter ? (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                    })}
+                  </h2>
+                  {hasPotentialMarketsData && (
+                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
+                  )}
+                </>
+              ) : searchFilter ? (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: searchFilter },
+                    })}
+                  </h2>
+                  <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+                </>
+              ) : (
+                <LoadingSpace id="markets-table" />
+              )}
+
+              {hasPotentialMarketsData && hasMarketIds && (
+                <div>
+                  <Button
+                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+                    size={ButtonSize.Small}
+                  >
+                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+                  </Button>
+                </div>
+              )}
+            </$MarketNotFound>
+          }
         />
-      </$Toolbar>
+      </>
+    );
+  }
+);
 
-      <$Table
-        withInnerBorders
-        data={hasMarketIds ? filteredMarkets : []}
-        getRowKey={(row: MarketData) => row.id}
-        getIsRowPinned={(row: MarketData) => row.isFavorite}
-        label="Markets"
-        onRowAction={(market: Key) =>
-          navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
-        }
-        defaultSortDescriptor={{
-          column: isTablet ? 'marketAndVolume' : 'volume24H',
-          direction: 'descending',
-        }}
-        columns={columns}
-        initialPageSize={50}
-        paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
-        shouldResetOnTotalRowsChange
-        className={className}
-        slotEmpty={
-          <$MarketNotFound>
-            {filter === MarketFilters.NEW && !searchFilter ? (
-              <>
-                <h2>
-                  {stringGetter({
-                    key: STRING_KEYS.QUERY_NOT_FOUND,
-                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
-                  })}
-                </h2>
-                {hasPotentialMarketsData && (
-                  <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
-                )}
-              </>
-            ) : searchFilter ? (
-              <>
-                <h2>
-                  {stringGetter({
-                    key: STRING_KEYS.QUERY_NOT_FOUND,
-                    params: { QUERY: searchFilter },
-                  })}
-                </h2>
-                <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
-              </>
-            ) : (
-              <LoadingSpace id="markets-table" />
-            )}
-
-            {hasPotentialMarketsData && hasMarketIds && (
-              <div>
-                <Button
-                  onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-                  size={ButtonSize.Small}
-                >
-                  {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-                </Button>
-              </div>
-            )}
-          </$MarketNotFound>
-        }
-      />
-    </>
-  );
-};
 const $Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;

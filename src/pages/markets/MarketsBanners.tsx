@@ -1,8 +1,11 @@
+import { RefObject } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { MarketFilters } from '@/constants/markets';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
@@ -17,13 +20,19 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { setHasDismissedPmlBanner } from '@/state/dismissable';
 import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
+import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
-export const MarketsBanners = () => {
+export const MarketsBanners = ({
+  marketsTableRef,
+}: {
+  marketsTableRef?: RefObject<HTMLDivElement>;
+}) => {
   const stringGetter = useStringGetter();
   const { data: launchableMarkets } = useLaunchableMarkets();
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
@@ -35,10 +44,16 @@ export const MarketsBanners = () => {
     dispatch(setHasDismissedPmlBanner(true));
   };
 
+  const onClickPmlBanner = () => {
+    dispatch(setShouldHideLaunchableMarkets(false));
+    dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
+    marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const shouldDisplayPmlBanner = testFlags.pml && !hasDismissedPmlBanner;
 
   return shouldDisplayPmlBanner ? (
-    <$PmlBanner>
+    <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
       <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8 mobile:hidden" />
 
       <div tw="mr-auto flex flex-col">

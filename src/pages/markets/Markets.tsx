@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -21,10 +21,12 @@ const Markets = () => {
   const [showHighlights, setShowHighlights] = useState(true);
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
+  const marketsTableRef = useRef<HTMLDivElement>(null);
+
   return (
     <$Page>
       <$HeaderSection>
-        <MarketsBanners />
+        <MarketsBanners marketsTableRef={marketsTableRef} />
         <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
 
@@ -34,7 +36,7 @@ const Markets = () => {
         <$MarketsStats showHighlights={showHighlights} />
       </$HeaderSection>
 
-      <$MarketsTable />
+      <$MarketsTable ref={marketsTableRef} />
     </$Page>
   );
 };
