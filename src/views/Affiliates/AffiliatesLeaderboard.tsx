@@ -3,9 +3,9 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { IAffiliateStats } from '@/constants/affiliates';
-import { ButtonAction } from '@/constants/buttons';
+import { IAffiliateLeaderboardStats, IAffiliateStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useAffiliatesLeaderboard } from '@/hooks/useAffiliatesLeaderboard';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -15,7 +15,6 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, Table, type ColumnDef } from '@/components/Table';
@@ -75,7 +74,7 @@ const AffiliatesFilter = ({
 };
 
 interface IAffiliatesLeaderboardProps {
-  accountStats: IAffiliateStats;
+  accountStats?: IAffiliateStats;
 }
 
 export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardProps) => {
@@ -83,25 +82,22 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
   const stringGetter = useStringGetter();
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
-  const { affiliates, total, setPage } = useAffiliatesLeaderboard();
+  const { affiliates } = useAffiliatesLeaderboard();
 
-  const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
-  };
-
-  const columns: ColumnDef<IAffiliateStats>[] = isTablet
+  const columns: ColumnDef<IAffiliateLeaderboardStats>[] = isTablet
     ? [
         {
           columnKey: 'rank',
           label: stringGetter({ key: STRING_KEYS.RANK }),
-          renderCell: ({ rank, account }) => {
+          renderCell: ({ rank, affiliateAddress }) => {
             return (
               <TableCell>
                 {rank}
 
-                {accountStats?.account && account === accountStats.account && (
-                  <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-                )}
+                {accountStats?.affiliateAddress &&
+                  affiliateAddress === accountStats.affiliateAddress && (
+                    <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+                  )}
               </TableCell>
             );
           },
@@ -112,19 +108,21 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
           allowsSorting: false,
 
-          renderCell: ({ code }) => <$AccountOutput type={OutputType.Text} value={code} />,
+          renderCell: ({ affiliateReferralCode }) => (
+            <$AccountOutput type={OutputType.Text} value={affiliateReferralCode} />
+          ),
         },
         {
           columnKey: 'total-earnings',
           label: stringGetter({ key: STRING_KEYS.TOTAL }),
           allowsSorting: false,
 
-          renderCell: ({ totalEarnings, totalReferredUsers }) => (
+          renderCell: ({ affiliateEarnings, affiliateReferredUsers }) => (
             <TableCell>
               <div tw="w-full">
                 <$EarningsOutput
                   type={OutputType.CompactFiat}
-                  value={totalEarnings}
+                  value={affiliateEarnings}
                   slotRight={
                     <span tw="ml-0.25 text-color-text-2">
                       {stringGetter({ key: STRING_KEYS.EARNINGS }).toLocaleLowerCase()}
@@ -133,7 +131,7 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
                 />
               </div>
               <div tw="w-full text-color-text-0">
-                {totalReferredUsers.toLocaleString()}{' '}
+                {affiliateReferredUsers.toLocaleString()}{' '}
                 {stringGetter({ key: STRING_KEYS.USERS_REFERRED })}
               </div>
             </TableCell>
@@ -145,12 +143,13 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           columnKey: 'rank',
           label: stringGetter({ key: STRING_KEYS.RANK }),
           allowsSorting: false,
-          renderCell: ({ rank, account }) => (
+          renderCell: ({ rank, affiliateAddress }) => (
             <TableCell tw="text-color-text-1 font-base-medium">
               {rank}
-              {accountStats?.account && account === accountStats.account && (
-                <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-              )}
+              {accountStats?.affiliateAddress &&
+                affiliateAddress === accountStats.affiliateAddress && (
+                  <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+                )}
             </TableCell>
           ),
         },
@@ -159,15 +158,17 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
           allowsSorting: false,
 
-          renderCell: ({ code }) => <$AccountOutput type={OutputType.Text} value={code} />,
+          renderCell: ({ affiliateReferralCode }) => (
+            <$AccountOutput type={OutputType.Text} value={affiliateReferralCode} />
+          ),
         },
         {
           columnKey: 'total-earnings',
           label: stringGetter({ key: STRING_KEYS.TOTAL_EARNINGS }),
           allowsSorting: false,
 
-          renderCell: ({ totalEarnings }) => (
-            <$EarningsOutput type={OutputType.CompactFiat} value={totalEarnings} />
+          renderCell: ({ affiliateEarnings }) => (
+            <$EarningsOutput type={OutputType.CompactFiat} value={affiliateEarnings} />
           ),
         },
         {
@@ -175,8 +176,8 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
           allowsSorting: false,
 
-          renderCell: ({ referredVolume }) => (
-            <$NumberOutput type={OutputType.CompactFiat} value={referredVolume} />
+          renderCell: ({ affiliateReferredTotalVolume }) => (
+            <$NumberOutput type={OutputType.CompactFiat} value={affiliateReferredTotalVolume} />
           ),
         } as ColumnDef<IAffiliateStats>,
 
@@ -184,8 +185,8 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           columnKey: 'ref-fees',
           label: stringGetter({ key: STRING_KEYS.FEES_REFERRED }),
           allowsSorting: false,
-          renderCell: ({ referredFees }) => (
-            <$NumberOutput type={OutputType.CompactFiat} value={referredFees} />
+          renderCell: ({ affiliateTotalReferredFees }) => (
+            <$NumberOutput type={OutputType.CompactFiat} value={affiliateTotalReferredFees} />
           ),
         } as ColumnDef<IAffiliateStats>,
 
@@ -193,8 +194,8 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           columnKey: 'total-referred-users',
           label: stringGetter({ key: STRING_KEYS.USERS_REFERRED }),
           allowsSorting: false,
-          renderCell: ({ totalReferredUsers }) => (
-            <$NumberOutput type={OutputType.Number} value={totalReferredUsers} />
+          renderCell: ({ affiliateReferredUsers }) => (
+            <$NumberOutput type={OutputType.Number} value={affiliateReferredUsers} />
           ),
         },
       ];
@@ -219,18 +220,13 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
 
         <$Table
           withInnerBorders
-          data={affiliates}
-          getRowKey={(row: IAffiliateStats) => row.rank}
+          data={affiliates ?? EMPTY_ARR}
+          getRowKey={(row: IAffiliateLeaderboardStats) => row.rank}
           label={stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD })}
           columns={columns}
           paginationBehavior="showAll"
         />
       </div>
-      {affiliates.length < total && (
-        <Button action={ButtonAction.Secondary} tw="notTablet:mx-auto" onClick={handleLoadMore}>
-          {stringGetter({ key: STRING_KEYS.LOAD_MORE })}
-        </Button>
-      )}
     </div>
   );
 };
