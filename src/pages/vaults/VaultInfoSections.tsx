@@ -66,11 +66,7 @@ export const YourVaultDetailsCards = ({ className }: { className?: string }) => 
         ) : (
           <$ColoredReturn $sign={getNumberSign(myVaultMetadata.allTimeReturnUsdc, 0.01)}>
             <div tw="row gap-0.5">
-              <Output
-                value={myVaultMetadata.allTimeReturnUsdc}
-                type={OutputType.Fiat}
-                fractionDigits={Math.abs(myVaultMetadata.allTimeReturnUsdc) < 1 ? 2 : 0}
-              />
+              <Output value={myVaultMetadata.allTimeReturnUsdc} type={OutputType.Fiat} />
             </div>
           </$ColoredReturn>
         ),
