@@ -11,7 +11,6 @@ export enum AppRoute {
   Terms = '/terms',
   Privacy = '/privacy',
   Referrals = '/referrals',
-  LaunchMarket = '/launch-market',
 }
 
 export enum MarketsRoute {
@@ -20,7 +19,6 @@ export enum MarketsRoute {
 
 export enum AffiliateRoute {
   Leaderboard = 'leaderboard',
-  ProgramStats = 'program-stats',
 }
 
 export enum PortfolioRoute {

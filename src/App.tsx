@@ -12,7 +12,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { config as grazConfig } from '@/constants/graz';
-import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
+import { AffiliateRoute, AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -60,7 +60,6 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
-import LaunchMarket from './pages/LaunchMarket';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { getIsAccountConnected } from './state/accountSelectors';
@@ -71,7 +70,6 @@ import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
 import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
-import { CommunityChartContainer } from './views/Affiliates/community-chart/ProgramChartContainer';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -127,8 +125,7 @@ const Content = () => {
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
               <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />}>
-                <Route index element={<Navigate to="leaderboard" replace />} />
-                <Route path="program-stats" element={<CommunityChartContainer />} />
+                <Route index element={<Navigate to={AffiliateRoute.Leaderboard} replace />} />
               </Route>
 
               <Route path={AppRoute.Trade}>
@@ -137,7 +134,7 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Markets}>
-                {testFlags.pml ? null : <Route path={MarketsRoute.New} element={<NewMarket />} />}
+                {!testFlags.pml && <Route path={MarketsRoute.New} element={<NewMarket />} />}
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
@@ -158,8 +155,6 @@ const Content = () => {
               <Route path={AppRoute.Vault}>
                 <Route path={AppRoute.Vault} element={<VaultPage />} />
               </Route>
-
-              {testFlags.pml && <Route path={AppRoute.LaunchMarket} element={<LaunchMarket />} />}
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route

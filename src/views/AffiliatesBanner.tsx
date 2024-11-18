@@ -140,7 +140,9 @@ export const AffiliatesBanner = ({
           dispatch(openDialog(DialogTypes.ShareAffiliate()));
         }}
       >
-        <span>{stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}</span>
+        <span tw="font-bold text-color-text-2">
+          {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+        </span>
 
         <$ArrowIcon>
           <Icon iconName={IconName.Arrow} />

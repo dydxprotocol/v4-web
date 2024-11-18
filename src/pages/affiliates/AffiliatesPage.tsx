@@ -1,9 +1,8 @@
 import { Suspense } from 'react';
 
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { IProgramStats } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 import { AffiliateRoute } from '@/constants/routes';
 
@@ -21,13 +20,11 @@ import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard'
 import LastUpdated from '@/views/Affiliates/LastUpdated';
 import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
-import { ProgramStatsCard } from '@/views/Affiliates/cards/ProgramStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
 export const AffiliatesPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { dydxAddress } = useAccounts();
   const { programStatsQuery, affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
@@ -39,10 +36,6 @@ export const AffiliatesPage = () => {
 
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
-
-  const currentTab = location.pathname.includes(AffiliateRoute.ProgramStats)
-    ? AffiliateRoute.ProgramStats
-    : AffiliateRoute.Leaderboard;
 
   const totalVolume = affiliateMetadata?.totalVolume
     ? Math.floor(affiliateMetadata.totalVolume)
@@ -80,47 +73,32 @@ export const AffiliatesPage = () => {
                       label: <h3>{stringGetter({ key: STRING_KEYS.YOUR_STATS })}</h3>,
                       onClick: () => navigate(AffiliateRoute.Leaderboard),
                     },
-                    {
-                      value: AffiliateRoute.ProgramStats,
-                      href: AffiliateRoute.ProgramStats,
-                      label: <h3>{stringGetter({ key: STRING_KEYS.PROGRAM_STATS })}</h3>,
-                      onClick: () => navigate(AffiliateRoute.ProgramStats),
-                    },
                   ],
                 },
               ]}
             />
           </AttachedExpandingSection>
 
-          {currentTab === AffiliateRoute.Leaderboard && (
-            <section tw="flex flex-row flex-wrap items-center justify-between gap-y-1">
-              {dydxAddress && !userStatus.isAffiliate && !userStatus.isVip ? (
-                <div tw="w-full notTablet:w-7/12">
-                  <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
-                </div>
-              ) : (
-                <AffiliateStatsCard
-                  currentAffiliateTier={userStatus.currentAffiliateTier}
-                  isVip={userStatus.isVip}
-                  stakedDydx={userStatus.stakedDydx}
-                  tw="h-fit w-full notTablet:h-full notTablet:w-7/12"
-                  accountStats={accountStats}
-                />
-              )}
-
-              <ProgramStatusCard
-                tw="h-fit w-full notTablet:h-full notTablet:w-4/12"
-                isVip={!!userStatus.isVip}
+          <section tw="flex flex-row flex-wrap items-center justify-between gap-y-1">
+            {dydxAddress && !userStatus.isAffiliate && !userStatus.isVip ? (
+              <div tw="w-full notTablet:w-7/12">
+                <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
+              </div>
+            ) : (
+              <AffiliateStatsCard
+                currentAffiliateTier={userStatus.currentAffiliateTier}
+                isVip={userStatus.isVip}
+                stakedDydx={userStatus.stakedDydx}
+                tw="h-fit w-full notTablet:h-full notTablet:w-7/12"
+                accountStats={accountStats}
               />
-            </section>
-          )}
+            )}
 
-          {currentTab === AffiliateRoute.ProgramStats && (
-            <ProgramStatsCard
-              tw="h-fit notTablet:h-full"
-              programStats={programStats as IProgramStats}
+            <ProgramStatusCard
+              tw="h-fit w-full notTablet:h-full notTablet:w-4/12"
+              isVip={!!userStatus.isVip}
             />
-          )}
+          </section>
         </$Section>
 
         <Outlet context={{ accountStats, programStats }} />
