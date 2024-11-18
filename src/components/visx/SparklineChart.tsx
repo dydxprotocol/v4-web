@@ -19,65 +19,59 @@ const theme = buildChartTheme({
   gridColorDark: 'transparent',
 });
 
-// don't render the chart with 0 width and height for one frame while getting size
-function oneIfZero(arg: number) {
-  if (arg === 0) {
-    return 1;
-  }
-  return arg;
-}
-
 export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datum>) => {
   const { data, positive, xAccessor, yAccessor } = props;
 
   return (
     <$ParentSize>
       {/* eslint-disable-next-line react/no-unused-prop-types */}
-      {({ height, width }: { width: number; height: number }) => (
-        <XYChart
-          width={oneIfZero(width)}
-          height={oneIfZero(height)}
-          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-          xScale={{
-            type: 'linear',
-            clamp: false,
-            nice: false,
-            zero: false,
-          }}
-          yScale={{
-            type: 'linear',
-            clamp: true,
-            nice: true,
-            zero: false,
-          }}
-          theme={theme}
-        >
-          <Axis orientation="bottom" hideAxisLine numTicks={0} hideTicks hideZero />
-          <Axis orientation="left" hideAxisLine numTicks={0} hideTicks hideZero />
-          <LinearGradient
-            id="sparkline-gradient-positive"
-            from="var(--color-positive)"
-            to="var(--color-positive)"
-            toOpacity={0.4}
-          />
-          <LinearGradient
-            id="sparkline-gradient-negative"
-            from="var(--color-negative)"
-            to="var(--color-negative)"
-            toOpacity={0.4}
-          />
-          <LineSeries
-            dataKey="Sparkline"
-            data={data}
-            xAccessor={xAccessor}
-            yAccessor={yAccessor}
-            curve={curveNatural}
-            stroke={
-              positive ? 'url(#sparkline-gradient-positive)' : 'url(#sparkline-gradient-negative)'
-            }
-          />
-        </XYChart>
-      )}
+      {({ height, width }: { width: number; height: number }) =>
+        height > 0 && width > 0 ? (
+          <XYChart
+            width={width}
+            height={height}
+            margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+            xScale={{
+              type: 'linear',
+              clamp: false,
+              nice: false,
+              zero: false,
+            }}
+            yScale={{
+              type: 'linear',
+              clamp: true,
+              nice: true,
+              zero: false,
+            }}
+            theme={theme}
+          >
+            <Axis orientation="bottom" hideAxisLine numTicks={0} hideTicks hideZero />
+            <Axis orientation="left" hideAxisLine numTicks={0} hideTicks hideZero />
+            <LinearGradient
+              id="sparkline-gradient-positive"
+              from="var(--color-positive)"
+              to="var(--color-positive)"
+              toOpacity={0.4}
+            />
+            <LinearGradient
+              id="sparkline-gradient-negative"
+              from="var(--color-negative)"
+              to="var(--color-negative)"
+              toOpacity={0.4}
+            />
+            <LineSeries
+              dataKey="Sparkline"
+              data={data}
+              xAccessor={xAccessor}
+              yAccessor={yAccessor}
+              curve={curveNatural}
+              stroke={
+                positive ? 'url(#sparkline-gradient-positive)' : 'url(#sparkline-gradient-negative)'
+              }
+            />
+          </XYChart>
+        ) : null
+      }
     </$ParentSize>
   );
 };
