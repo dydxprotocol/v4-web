@@ -26,6 +26,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
+import { setMarketFilter } from '@/state/perpetuals';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -59,8 +60,12 @@ export const MarketFilter = ({
   const onShouldHideLaunchableMarkets = useCallback(
     (shouldHide: boolean) => {
       dispatch(setShouldHideLaunchableMarkets(!shouldHide));
+
+      if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
+        dispatch(setMarketFilter(MarketFilters.ALL));
+      }
     },
-    [dispatch]
+    [dispatch, selectedFilter]
   );
 
   const unlaunchedMarketSwitch = useMemo(
@@ -81,30 +86,24 @@ export const MarketFilter = ({
     [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
   );
 
-  const filterLaunchable = (filter: MarketFilters) => {
-    return filter !== MarketFilters.LAUNCHABLE;
-  };
-
   const filterToggles = (
     <$ToggleGroup
       items={
-        Object.values(filters)
-          .filter(filterLaunchable)
-          .map((value) => {
-            const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
-            return {
-              label: labelIconName ? (
-                <Icon iconName={labelIconName} />
-              ) : (
-                stringGetter({
-                  key: labelStringKey,
-                  fallback: value,
-                })
-              ),
-              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
-              value,
-            };
-          }) satisfies MenuItem<MarketFilters>[]
+        Object.values(filters).map((value) => {
+          const { labelIconName, labelStringKey, isNew } = MARKET_FILTER_OPTIONS[value];
+          return {
+            label: labelIconName ? (
+              <Icon iconName={labelIconName} />
+            ) : (
+              stringGetter({
+                key: labelStringKey,
+                fallback: value,
+              })
+            ),
+            slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+            value,
+          };
+        }) satisfies MenuItem<MarketFilters>[]
       }
       value={selectedFilter}
       onValueChange={onChangeFilter}

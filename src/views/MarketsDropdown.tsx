@@ -33,8 +33,10 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
-import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
+import { setMarketFilter } from '@/state/perpetuals';
+import { getMarketFilter, getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
@@ -52,13 +54,18 @@ const MarketsDropdownContent = ({
   closeDropdown: () => void;
   onRowAction?: (market: Key) => void;
 }) => {
-  const [filter, setFilter] = useState(MarketFilters.ALL);
+  const dispatch = useAppDispatch();
+  const filter: MarketFilters = useAppSelector(getMarketFilter);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { uiRefresh } = testFlags;
+
+  const setFilter = (newFilter: MarketFilters) => {
+    dispatch(setMarketFilter(newFilter));
+  };
 
   const { filteredMarkets, marketFilters } = useMarketsData({
     filter,
