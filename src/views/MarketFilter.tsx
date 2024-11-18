@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -60,15 +60,13 @@ export const MarketFilter = ({
   const onShouldHideLaunchableMarkets = useCallback(
     (shouldHide: boolean) => {
       dispatch(setShouldHideLaunchableMarkets(!shouldHide));
-    },
-    [dispatch]
-  );
 
-  useEffect(() => {
-    if (shouldHideLaunchableMarkets && selectedFilter === MarketFilters.LAUNCHABLE) {
-      dispatch(setMarketFilter(MarketFilters.ALL));
-    }
-  }, [dispatch, selectedFilter, shouldHideLaunchableMarkets]);
+      if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
+        dispatch(setMarketFilter(MarketFilters.ALL));
+      }
+    },
+    [dispatch, selectedFilter]
+  );
 
   const unlaunchedMarketSwitch = useMemo(
     () =>
