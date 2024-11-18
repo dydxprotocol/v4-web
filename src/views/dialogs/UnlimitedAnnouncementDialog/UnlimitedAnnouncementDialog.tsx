@@ -37,7 +37,7 @@ export const UnlimitedAnnouncementDialog = ({
     },
     [UnlimitedAnnouncementDialogSteps.MarketListings]: {
       title: stringGetter({
-        key: STRING_KEYS.PERMISIONLESS_MARKET_LISTINGS,
+        key: STRING_KEYS.INSTANT_MARKET_LISTINGS,
       }),
       description: stringGetter({
         key: STRING_KEYS.PERMISIONLESS_MARKET_LISTINGS_DESCRIPTION,
@@ -48,20 +48,20 @@ export const UnlimitedAnnouncementDialog = ({
         key: STRING_KEYS.MEGAVAULT,
       }),
       description: stringGetter({
-        key: STRING_KEYS.MEGAVAULT_DESCRIPTION,
+        key: STRING_KEYS.MEGAVAULT_EXTENDED_DESCRIPTION,
       }),
     },
     [UnlimitedAnnouncementDialogSteps.AffiliatesProgram]: {
       title: stringGetter({
-        key: STRING_KEYS.AFFILIATES_PROGRAM,
+        key: STRING_KEYS.AFFILIATE_PROGRAM,
       }),
       description: stringGetter({
-        key: STRING_KEYS.AFFILIATES_PROGRAM_DESCRIPTION,
+        key: STRING_KEYS.AFFILIATES_PROGRAM_EXTENDED_DESCRIPTION,
       }),
     },
     [UnlimitedAnnouncementDialogSteps.Incentives]: {
       title: stringGetter({
-        key: STRING_KEYS.UPDATED_INCENTIVES,
+        key: STRING_KEYS.NEW_TRADING_REWARDS,
       }),
       description: stringGetter({
         key: STRING_KEYS.UPDATED_INCENTIVES_DESCRIPTION,
@@ -94,16 +94,16 @@ export const UnlimitedAnnouncementDialog = ({
           <div tw="flex flex-col gap-1">
             {[
               {
-                title: STRING_KEYS.MARKET_LISTINGS,
+                title: STRING_KEYS.INSTANT_MARKET_LISTINGS,
                 description: STRING_KEYS.MARKET_LISTINGS_DESCRIPTION,
               },
               { title: STRING_KEYS.MEGAVAULT, description: STRING_KEYS.MEGAVAULT_DESCRIPTION },
               {
-                title: STRING_KEYS.AFFILIATES_PROGRAM,
+                title: STRING_KEYS.AFFILIATE_PROGRAM,
                 description: STRING_KEYS.AFFILIATES_PROGRAM_DESCRIPTION,
               },
               {
-                title: STRING_KEYS.INCENTIVES_PROGRAM,
+                title: STRING_KEYS.TRADING_REWARDS,
                 description: STRING_KEYS.INCENTIVES_PROGRAM_DESCRIPTION,
               },
             ].map(({ title, description }, idx) => (
