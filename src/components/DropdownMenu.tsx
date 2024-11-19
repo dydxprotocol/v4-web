@@ -32,6 +32,7 @@ type StyleProps = {
   side?: 'top' | 'bottom';
   sideOffset?: number;
   className?: string;
+  withOverlay?: boolean;
 };
 
 type ElementProps<T> = {
@@ -59,13 +60,14 @@ export const DropdownMenu = forwardRefFn(
       side = 'bottom',
       sideOffset = 8,
       triggerOptions,
+      withOverlay = true,
       ...rest
     }: DropdownMenuProps<T>,
     ref: Ref<HTMLButtonElement>
   ) => {
     return (
       <Root {...rest}>
-        <$Trigger ref={ref} className={className} {...triggerOptions}>
+        <$Trigger ref={ref} className={className} {...triggerOptions} $withOverlay={withOverlay}>
           {children}
           <$DropdownIcon aria-hidden="true">
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
@@ -122,9 +124,9 @@ const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }
   }
 `;
 
-const $Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)<{ $withOverlay: boolean }>`
   ${popoverMixins.trigger}
-  ${popoverMixins.backdropOverlay}
+  ${({ $withOverlay }) => $withOverlay && popoverMixins.backdropOverlay}
 `;
 
 const $DropdownIcon = styled.span`

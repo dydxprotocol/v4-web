@@ -88,3 +88,9 @@ export const WarningTag = styled(Tag)`
   color: var(--color-warning);
   border: solid 1px var(--color-warning);
 `;
+
+export const SuccessTag = styled(Tag)`
+  background-color: var(--color-layer-3);
+  color: var(--color-success);
+  border: solid 1px var(--color-success);
+`;
