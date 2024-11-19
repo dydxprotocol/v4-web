@@ -29,7 +29,7 @@ import { BorderStatCell, StatCell } from './StatBox';
 
 interface ITierDefinition {
   tier: number | 'vip';
-  requirements: { referredVol: number; staked: number };
+  requirements: { referredVol?: number; staked?: number };
   affiliateEarnRate: string;
 }
 
@@ -56,7 +56,7 @@ const TIERS: ITierDefinition[] = [
   },
   {
     tier: 'vip',
-    requirements: {} as { referredVol: number; staked: number },
+    requirements: { staked: undefined, referredVol: undefined },
     affiliateEarnRate: '50.0%',
   },
 ];
