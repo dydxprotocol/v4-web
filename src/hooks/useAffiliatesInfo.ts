@@ -37,13 +37,13 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
     try {
       const [metaDataResponse, totalVolumeResponse, affiliateInfo] = await Promise.all([
-        safeFetch(`${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+        fetch(`${metadataEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         }),
-        safeFetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
+        fetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

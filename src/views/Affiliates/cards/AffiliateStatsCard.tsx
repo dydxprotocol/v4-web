@@ -180,7 +180,7 @@ interface IAffiliateStatsProps {
   accountStats?: IAffiliateStats;
   isVip: boolean;
   currentAffiliateTier?: number;
-  stakedDydx?: string;
+  stakedDydx?: bigint;
 }
 
 export const AffiliateStatsCard = ({
