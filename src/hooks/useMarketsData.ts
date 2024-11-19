@@ -253,8 +253,8 @@ export const useMarketsData = ({
               priceChange24HPercent: MustBigNumber(percentChange24h).div(100).toNumber(),
               tags: sectorTags ?? [],
               tickSizeDecimals,
-              trades24H: 0,
-              volume24H: 0,
+              trades24H: undefined,
+              volume24H: undefined,
               isFavorite: favoritedMarkets.includes(id),
             }
           );
