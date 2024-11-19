@@ -9,7 +9,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -44,7 +43,6 @@ import { isOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useCustomNotification } from '../useCustomNotification';
-import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 
 const CHART_LINE_FONT = 'bold 10px Satoshi';
@@ -81,8 +79,6 @@ export const useChartLines = ({
     getCurrentMarketOrders,
     shallowEqual
   );
-
-  const canModifyOrdersFromChart = useStatsigGateValue(StatsigFlags.ffOrderModificationFromChart);
 
   const runOnChartReady = useCallback(
     (callback: () => void) => {
@@ -384,7 +380,7 @@ export const useChartLines = ({
             setLineColorsAndFont({ chartLine });
             chartLinesRef.current[key] = chartLine;
           }
-          if (canModifyOrdersFromChart && canModifyOrderTypeFromChart(order)) {
+          if (canModifyOrderTypeFromChart(order)) {
             orderLine?.onMove(() => onMoveOrderLine(order, orderLine));
           }
 
@@ -404,7 +400,6 @@ export const useChartLines = ({
     currentMarketOrders,
     stringGetter,
     tvWidget,
-    canModifyOrdersFromChart,
     setLineColorsAndFont,
     onMoveOrderLine,
     dispatch,

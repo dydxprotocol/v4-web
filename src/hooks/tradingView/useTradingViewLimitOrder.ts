@@ -26,8 +26,6 @@ export function useTradingViewLimitOrder(
   const stringGetter = useStringGetter();
   const isUserConnected = useAppSelector(getIsAccountConnected);
 
-  const canDraftLimitOrders = true; // useStatsigGateValue(StatsigFlags.ffLimitOrdersFromChart);
-
   // Every time we call tvChartWidget.onContextMenu, a new callback is _added_ and there is no way to remove previously
   // added menu options. So, instead of creating a new callback and calling .onContextMenu every time these state variable
   // change, only pass in one stable callback on chart load that refers to updated state values through a ref
@@ -43,7 +41,7 @@ export function useTradingViewLimitOrder(
 
   return useCallback(
     (_: number, price: number) => {
-      if (!canDraftLimitOrders || !userConnectedRef.current || price < 0 || !marketIdRef.current) {
+      if (!userConnectedRef.current || price < 0 || !marketIdRef.current) {
         return [];
       }
 
@@ -83,6 +81,6 @@ export function useTradingViewLimitOrder(
         },
       ];
     },
-    [canDraftLimitOrders, dispatch, stringGetter]
+    [dispatch, stringGetter]
   );
 }
