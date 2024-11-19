@@ -236,7 +236,6 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesS6Ended = 'incentives-s6-ended',
   KeplrSupport = 'keplr-support',
   PhantomSupport = 'phantom-support',
-  PermissionlessMarketLaunch = 'permissionless-market-launch',
 }
 
 // Incentives Season
