@@ -7,7 +7,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
-const FEE_ESTIMATION_MULTIPLIER = 0.0002; // 2bps
+const FEE_ESTIMATION_MULTIPLIER = 0.0002 * 0.4; // 40% of 2bps because of vault and affiliate revshare
 
 export const usePerpetualMarketsStats = () => {
   const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
