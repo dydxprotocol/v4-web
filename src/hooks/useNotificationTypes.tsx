@@ -27,7 +27,6 @@ import {
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
@@ -52,7 +51,6 @@ import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNo
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
-import { PermissionlessMarketsLiveNotification } from '@/views/notifications/PermissionlessMarketsLiveNotification';
 import { PredictionMarketEndNotification } from '@/views/notifications/PredictionMarketEndNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
@@ -71,7 +69,6 @@ import {
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { testFlags } from '@/lib/testFlags';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -354,7 +351,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
       const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
-      const pmlLiveExpirationDate = new Date('2024-11-21T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
@@ -377,27 +373,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               },
               toastSensitivity: 'foreground',
               groupKey: MarketLaunchNotificationIds.TrumpWin,
-            },
-            []
-          );
-        }
-
-        if (currentDate < pmlLiveExpirationDate && testFlags.pml) {
-          trigger(
-            ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
-            {
-              title: stringGetter({ key: STRING_KEYS.PERMISSIONLESS_LIVE }),
-              body: stringGetter({ key: STRING_KEYS.INSTANTLY_LAUNCH_BY_DEPOSITING }),
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.PermissionlessMarketLaunch,
-              renderCustomBody({ isToast, notification }) {
-                return (
-                  <PermissionlessMarketsLiveNotification
-                    isToast={isToast}
-                    notification={notification}
-                  />
-                );
-              },
             },
             []
           );
