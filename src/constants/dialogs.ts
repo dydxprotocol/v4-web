@@ -99,7 +99,7 @@ export type WithdrawalGatedDialogProps = {
 };
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
-  stakedAmount?: string;
+  stakedAmount?: bigint;
   userTier?: number | 'vip';
 };
 

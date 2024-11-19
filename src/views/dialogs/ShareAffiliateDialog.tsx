@@ -71,7 +71,8 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     },
   });
 
-  const affiliatesUrl = `${window.location.host}?ref=${data?.metadata?.referralCode}`;
+  const affiliatesUrl =
+    data?.metadata?.referralCode && `${window.location.host}?ref=${data.metadata.referralCode}`;
 
   return (
     <Dialog
@@ -119,7 +120,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                     })}
               </div>
               <div>
-                {data?.isEligible
+                {data?.isEligible && affiliatesUrl
                   ? affiliatesUrl
                   : stringGetter({
                       key: STRING_KEYS.YOUVE_TRADED,
@@ -131,7 +132,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                     })}
               </div>
             </div>
-            {data?.isEligible && (
+            {data?.isEligible && affiliatesUrl && (
               <CopyButton
                 action={ButtonAction.Primary}
                 size={ButtonSize.Small}
@@ -141,53 +142,55 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               </CopyButton>
             )}
           </div>
-          <div
-            ref={(domNode) => {
-              if (domNode) {
-                ref(domNode);
-                refShare(domNode);
-              }
-            }}
-            tw="relative"
-          >
-            <img src="/affiliates-share.png" alt="share affiliates" tw="w-full rounded-1" />
-            <$QrCode
-              size={68}
-              options={{
-                margin: 0,
-                backgroundOptions: {
-                  color: ColorToken.White,
-                },
-                dotsOptions: {
-                  type: 'dots',
-                  color: ColorToken.DarkGray13,
-                },
-                cornersSquareOptions: {
-                  type: 'extra-rounded',
-                  color: ColorToken.DarkGray13,
-                },
-                imageOptions: {
-                  margin: 0,
-                },
+          {affiliatesUrl && (
+            <div
+              ref={(domNode) => {
+                if (domNode) {
+                  ref(domNode);
+                  refShare(domNode);
+                }
               }}
-              value={affiliatesUrl}
-            />
-          </div>
-
-          <div tw="flex gap-1">
-            <Button
-              action={data?.isEligible ? ButtonAction.Base : ButtonAction.Primary}
-              slotLeft={<Icon iconName={IconName.Rocket} />}
-              state={{
-                isLoading: isCopying,
-              }}
-              tw="flex-1"
-              type={ButtonType.Link}
-              href={affiliateProgram}
+              tw="relative"
             >
-              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-            </Button>
-            {data?.isEligible && (
+              <img src="/affiliates-share.png" alt="share affiliates" tw="w-full rounded-1" />
+              <$QrCode
+                size={68}
+                options={{
+                  margin: 0,
+                  backgroundOptions: {
+                    color: ColorToken.White,
+                  },
+                  dotsOptions: {
+                    type: 'dots',
+                    color: ColorToken.DarkGray13,
+                  },
+                  cornersSquareOptions: {
+                    type: 'extra-rounded',
+                    color: ColorToken.DarkGray13,
+                  },
+                  imageOptions: {
+                    margin: 0,
+                  },
+                }}
+                value={affiliatesUrl}
+              />
+            </div>
+          )}
+
+          {data?.isEligible && (
+            <div tw="flex gap-1">
+              <Button
+                action={ButtonAction.Base}
+                slotLeft={<Icon iconName={IconName.Rocket} />}
+                state={{
+                  isLoading: isCopying,
+                }}
+                tw="flex-1"
+                type={ButtonType.Link}
+                href={affiliateProgram}
+              >
+                {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+              </Button>
               <Button
                 action={ButtonAction.Base}
                 slotLeft={<Icon iconName={IconName.SocialX} />}
@@ -201,8 +204,8 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               >
                 {stringGetter({ key: STRING_KEYS.SHARE })}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </Dialog>

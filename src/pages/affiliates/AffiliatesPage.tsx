@@ -19,6 +19,8 @@ import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard'
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 
+import { bytesToBigInt } from '@/lib/numbers';
+
 export const AffiliatesPage = () => {
   const { dydxAddress } = useAccounts();
   const { affiliateStatsQuery, lastUpdatedQuery, affiliateMetadataQuery } =
@@ -38,7 +40,9 @@ export const AffiliatesPage = () => {
     isAffiliate: Boolean(affiliateMetadata?.metadata?.isAffiliate) || totalVolume > 10_000,
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
-    stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount.toString(),
+    stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
+      ? bytesToBigInt(affiliateMetadata.affiliateInfo.stakedAmount)
+      : undefined,
     totalVolume: totalVolume.toLocaleString(),
   };
 

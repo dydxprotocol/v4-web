@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
+import { formatUnits } from 'viem';
 
 import {
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
@@ -32,56 +33,54 @@ interface ITierDefinition {
   affiliateEarnRate: string;
 }
 
+const TIERS: ITierDefinition[] = [
+  {
+    tier: 0,
+    requirements: { staked: 0, referredVol: 0 },
+    affiliateEarnRate: '5.0%',
+  },
+  {
+    tier: 1,
+    requirements: { staked: 200, referredVol: 1000000 },
+    affiliateEarnRate: '10.0%',
+  },
+  {
+    tier: 2,
+    requirements: { staked: 1000, referredVol: 5000000 },
+    affiliateEarnRate: '12.5%',
+  },
+  {
+    tier: 3,
+    requirements: { staked: 5000, referredVol: 25000000 },
+    affiliateEarnRate: '15.0%',
+  },
+  {
+    tier: 'vip',
+    requirements: {} as { referredVol: number; staked: number },
+    affiliateEarnRate: '50.0%',
+  },
+];
+
 export const CriteriaDialog = ({
   setIsOpen,
   accountStats,
-  // toggleCriteria,
   stakedAmount,
   userTier,
 }: DialogProps<CriteriaDialogProps>) => {
   const { dydxAddress } = useAccounts();
   const { affiliateProgram } = useURLConfigs();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   const stringGetter = useStringGetter();
-  const stakedDYdX = stakedAmount ?? '0';
 
-  const tiers: ITierDefinition[] = [
-    {
-      tier: 0,
-      requirements: { staked: 0, referredVol: 0 },
-      affiliateEarnRate: '5.0%',
-    },
-    {
-      tier: 1,
-      requirements: { staked: 200, referredVol: 1000000 },
-      affiliateEarnRate: '10.0%',
-    },
-    {
-      tier: 2,
-      requirements: { staked: 1000, referredVol: 5000000 },
-      affiliateEarnRate: '12.5%',
-    },
-    {
-      tier: 3,
-      requirements: { staked: 5000, referredVol: 25000000 },
-      affiliateEarnRate: '15.0%',
-    },
-    {
-      tier: 'vip',
-      requirements: {} as { referredVol: number; staked: number },
-      affiliateEarnRate: '50.0%',
-    },
-  ];
+  const currentUserTierIdx = TIERS.findIndex((tier) => tier.tier === userTier);
 
-  const currentUserTierIdx = tiers.findIndex((tier) => tier.tier === userTier);
-
-  const currentUserTier = tiers[currentUserTierIdx];
+  const currentUserTier = TIERS[currentUserTierIdx];
 
   return (
     <$Dialog
       isOpen
-      {...{ setIsOpen }}
+      setIsOpen={setIsOpen}
       placement={DialogPlacement.Default}
       title={
         !dydxAddress
@@ -149,7 +148,15 @@ export const CriteriaDialog = ({
               />
               <StatCell tw="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
                 <div tw="flex items-center">
-                  {stakedDYdX.toLocaleString()}
+                  <Output
+                    type={OutputType.Asset}
+                    value={
+                      stakedAmount
+                        ? formatUnits(stakedAmount, chainTokenDecimals).toString()
+                        : undefined
+                    }
+                    fractionDigits={2}
+                  />
                   <Tag tw="ml-0.25">{chainTokenLabel}</Tag>
                 </div>
               </StatCell>
@@ -157,7 +164,7 @@ export const CriteriaDialog = ({
           )}
         </div>
 
-        <CriteriaTable tiers={tiers} userTier={userTier} />
+        <CriteriaTable tiers={TIERS} userTier={userTier} />
       </$Container>
     </$Dialog>
   );
