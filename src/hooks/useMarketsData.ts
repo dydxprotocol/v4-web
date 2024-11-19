@@ -142,6 +142,12 @@ export const useMarketsData = ({
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
+  const allPerpetualMarketIdsSet = new Set(
+    Object.values(allPerpetualMarkets)
+      .filter(isTruthy)
+      .map((m) => m.assetId)
+  );
+
   const markets = useMemo(() => {
     const listOfMarkets = Object.values(allPerpetualMarkets)
       .filter(isTruthy)
@@ -218,7 +224,7 @@ export const useMarketsData = ({
             tickSizeDecimals,
           } = market;
 
-          if (listOfMarkets.some((m) => m.assetId === assetId)) return null;
+          if (allPerpetualMarketIdsSet.has(assetId)) return null;
 
           const id = getMarketIdFromAsset(assetId);
 
