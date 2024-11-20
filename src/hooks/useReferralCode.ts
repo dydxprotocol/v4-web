@@ -20,7 +20,6 @@ export function useReferralCode() {
   );
 
   const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
-  console.log("referredBy", referredBy, isReferredByPending)
 
   const latestReferrer = useAppSelector(getLatestReferrer);
 
@@ -32,19 +31,12 @@ export function useReferralCode() {
 
   useEffect(() => {
     // wait for relevant data to load
-    if (!isReferralAddressSuccess || isReferredByPending) {
-      console.log("returning here 1");
-      return;
-    };
+    if (!isReferralAddressSuccess || isReferredByPending) return;
 
     // current user already has a referrer registered
-    if (referredBy?.affiliateAddress) {
-      console.log("returning here 2");
-      return;
-    };
+    if (referredBy?.affiliateAddress) return;
 
     if (referralAddress) {
-      console.log("latest referrer", referralAddress)
       dispatch(updateLatestReferrer(referralAddress));
     }
   }, [
@@ -56,6 +48,10 @@ export function useReferralCode() {
   ]);
 
   // If the current user already has a referrer registered, remove the pending referrer address
+  // This handles the case of:
+  // 1. User opens referral link without a wallet connected, affiliate address is saved
+  // 2. User connects their wallet, and their account already has an affiliate registered
+  // 3. Remove saved affiliate address
   useEffect(() => {
     if (referredBy?.affiliateAddress && latestReferrer) {
       dispatch(removeLatestReferrer());

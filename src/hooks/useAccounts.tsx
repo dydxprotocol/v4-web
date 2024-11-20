@@ -330,7 +330,6 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
-    dydxAddressLoading: sourceAccount.encryptedSignature && !dydxAddress,
 
     nobleAddress,
 
