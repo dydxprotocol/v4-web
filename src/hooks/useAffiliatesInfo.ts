@@ -78,7 +78,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
 
       const data = await res.json();
       const affiliateStats = data?.affiliateList?.[0];
-      return affiliateStats;
+      return affiliateStats ?? null;
     } catch (error) {
       log('useAffiliatesInfo/fetchAccountStats', error, { endpoint });
       throw error;
