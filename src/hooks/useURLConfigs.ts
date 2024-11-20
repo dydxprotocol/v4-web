@@ -47,6 +47,7 @@ export interface LinksConfigs {
   deployerTermsAndConditions?: string;
   dydxLearnMore?: string;
   affiliateProgram?: string;
+  affiliateProgramFaq?: string;
   affiliateProgramSupportEmail?: string;
   launchMarketTos?: string;
   launchMarketLearnMore?: string;
@@ -99,6 +100,7 @@ export const useURLConfigs = (): LinksConfigs => {
     deployerTermsAndConditions: linksConfigs.deployerTermsAndConditions,
     dydxLearnMore: linksConfigs.dydxLearnMore ?? FALLBACK_URL,
     affiliateProgram: linksConfigs.affiliateProgram,
+    affiliateProgramFaq: linksConfigs.affiliateProgramFaq,
     affiliateProgramSupportEmail: linksConfigs.affiliateProgramSupportEmail,
     launchMarketTos: linksConfigs.launchMarketTos ?? FALLBACK_URL,
     launchMarketLearnMore: linksConfigs.launchMarketLearnMore ?? FALLBACK_URL,
