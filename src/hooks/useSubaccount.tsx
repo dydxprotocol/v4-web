@@ -1093,6 +1093,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // affiliates
     registerAffiliate,
+    referredBy: referredBy?.affiliateAddress,
 
     // vaults
     getVaultAccountInfo,
