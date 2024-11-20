@@ -42,7 +42,7 @@ export const Overview = () => {
   const feedbackRequestWalletAddresses = dynamicConfigs[StatsigDynamicConfigs.dcHighestVolumeUsers];
   const shouldShowTelegramInvite =
     dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress);
-  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates) || true;
+  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const dismissedAffiliateBanner = useAppSelector(getDismissedAffiliateBanner);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
