@@ -5,7 +5,6 @@ import {
   AFFILIATES_FEE_DISCOUNT_USD,
   AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
-  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
@@ -39,7 +38,7 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgram } = useURLConfigs();
+  const { affiliateProgramFaq, affiliateProgram } = useURLConfigs();
   const { dydxAddress } = useAccounts();
   const {
     affiliateMetadataQuery: { data },
@@ -47,7 +46,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   } = useAffiliatesInfo(dydxAddress);
 
   const maxEarning = maxEarningData?.maxEarning;
-  const maxVipEarning = maxEarningData?.maxVipEarning;
 
   const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -74,27 +72,28 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   const affiliatesUrl =
     data?.metadata?.referralCode && `${window.location.host}?ref=${data.metadata.referralCode}`;
 
+  const dialogDescription = (
+    <span>
+      {stringGetter({
+        key: STRING_KEYS.EARN_FOR_EACH_TRADER,
+        params: {
+          AMOUNT_USD:
+            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
+        },
+      })}
+      .{' '}
+      <Link href={affiliateProgramFaq} isInline>
+        {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+      </Link>
+    </span>
+  );
+
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
-      description={stringGetter({
-        key: STRING_KEYS.EARN_FOR_EACH_TRADER_REFER_FOR_DISCOUNTS,
-        params: {
-          AMOUNT_DISCOUNT: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
-          VIP_AMOUNT_USD:
-            maxVipEarning?.toLocaleString() ??
-            DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString(),
-          AMOUNT_PER_MONTH:
-            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
-          LEARN_MORE_LINK: (
-            <Link href={affiliateProgram} isInline>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-            </Link>
-          ),
-        },
-      })}
+      description={dialogDescription}
     >
       {!dydxAddress && (
         <OnboardingTriggerButton
@@ -142,7 +141,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               </CopyButton>
             )}
           </div>
-          {affiliatesUrl && (
+          {data?.isEligible && affiliatesUrl && (
             <div
               ref={(domNode) => {
                 if (domNode) {
