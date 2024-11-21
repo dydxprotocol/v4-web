@@ -318,6 +318,10 @@ export const TimeSeriesChart = <Datum extends {}>({
                 const numTicksY =
                   (height - (margin?.top ?? 0) - (margin?.bottom ?? 0)) / tickSpacingY;
 
+                if (width === 0 || height === 0) {
+                  return null;
+                }
+
                 return (
                   <XYChart margin={margin} width={width} height={height}>
                     <Grid

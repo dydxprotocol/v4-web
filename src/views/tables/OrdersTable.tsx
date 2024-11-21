@@ -1,4 +1,4 @@
-import { Key, ReactNode, useEffect, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -406,96 +406,98 @@ type StyleProps = {
   withOuterBorder?: boolean;
 };
 
-export const OrdersTable = ({
-  columnKeys = [],
-  columnWidths,
-  currentMarket,
-  marketTypeFilter,
-  initialPageSize,
-  withOuterBorder,
-}: ElementProps & StyleProps) => {
-  const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
-  const { isTablet } = useBreakpoints();
+export const OrdersTable = forwardRef(
+  ({
+    columnKeys = [],
+    columnWidths,
+    currentMarket,
+    marketTypeFilter,
+    initialPageSize,
+    withOuterBorder,
+  }: ElementProps & StyleProps) => {
+    const stringGetter = useStringGetter();
+    const dispatch = useAppDispatch();
+    const { isTablet } = useBreakpoints();
 
-  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
-  const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+    const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+    const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
 
-  const orders = useMemo(
-    () =>
-      (currentMarket ? marketOrders : allOrders).filter((order) => {
-        const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
-        return marketTypeMatchesFilter(orderType, marketTypeFilter);
-      }),
-    [allOrders, currentMarket, marketOrders, marketTypeFilter]
-  );
+    const orders = useMemo(
+      () =>
+        (currentMarket ? marketOrders : allOrders).filter((order) => {
+          const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
+          return marketTypeMatchesFilter(orderType, marketTypeFilter);
+        }),
+      [allOrders, currentMarket, marketOrders, marketTypeFilter]
+    );
 
-  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
+    const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+    const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
-  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
+    const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
-  useEffect(() => {
-    if (hasUnseenOrderUpdates) dispatch(viewedOrders());
-  }, [hasUnseenOrderUpdates]);
+    useEffect(() => {
+      if (hasUnseenOrderUpdates) dispatch(viewedOrders());
+    }, [hasUnseenOrderUpdates]);
 
-  const symbol = mapIfPresent(currentMarket, (market) =>
-    mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
-  );
+    const symbol = mapIfPresent(currentMarket, (market) =>
+      mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
+    );
 
-  const ordersData = useMemo(
-    () =>
-      orders.map(
-        (order: SubaccountOrder): OrderTableRow =>
-          getHydratedTradingData({
-            data: order,
-            assets: allAssets,
-            perpetualMarkets: allPerpetualMarkets,
+    const ordersData = useMemo(
+      () =>
+        orders.map(
+          (order: SubaccountOrder): OrderTableRow =>
+            getHydratedTradingData({
+              data: order,
+              assets: allAssets,
+              perpetualMarkets: allPerpetualMarkets,
+            })
+        ),
+      [orders, allPerpetualMarkets, allAssets]
+    );
+
+    return (
+      <$Table
+        key={currentMarket ?? 'all-orders'}
+        label="Orders"
+        data={ordersData}
+        getRowKey={(row: OrderTableRow) => row.id}
+        getRowAttributes={(row: OrderTableRow) => ({
+          'data-clearable': isOrderStatusClearable(row.status),
+        })}
+        onRowAction={(key: Key) =>
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
+        }
+        columns={columnKeys.map((key: OrdersTableColumnKey) =>
+          getOrdersTableColumnDef({
+            key,
+            currentMarket,
+            dispatch,
+            isTablet,
+            stringGetter,
+            symbol,
+            isAccountViewOnly,
+            width: columnWidths?.[key],
           })
-      ),
-    [orders, allPerpetualMarkets, allAssets]
-  );
-
-  return (
-    <$Table
-      key={currentMarket ?? 'all-orders'}
-      label="Orders"
-      data={ordersData}
-      getRowKey={(row: OrderTableRow) => row.id}
-      getRowAttributes={(row: OrderTableRow) => ({
-        'data-clearable': isOrderStatusClearable(row.status),
-      })}
-      onRowAction={(key: Key) =>
-        dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
-      }
-      columns={columnKeys.map((key: OrdersTableColumnKey) =>
-        getOrdersTableColumnDef({
-          key,
-          currentMarket,
-          dispatch,
-          isTablet,
-          stringGetter,
-          symbol,
-          isAccountViewOnly,
-          width: columnWidths?.[key],
-        })
-      )}
-      slotEmpty={
-        <>
-          <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-          <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
-        </>
-      }
-      initialPageSize={initialPageSize}
-      withOuterBorder={withOuterBorder}
-      withInnerBorders
-      withScrollSnapColumns
-      withScrollSnapRows
-      withFocusStickyRows
-    />
-  );
-};
+        )}
+        slotEmpty={
+          <>
+            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+            <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
+          </>
+        }
+        initialPageSize={initialPageSize}
+        withOuterBorder={withOuterBorder}
+        withInnerBorders
+        withScrollSnapColumns
+        withScrollSnapRows
+        withFocusStickyRows
+      />
+    );
+  }
+);
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
