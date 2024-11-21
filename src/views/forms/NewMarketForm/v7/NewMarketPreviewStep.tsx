@@ -14,7 +14,7 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useCustomNotification } from '@/hooks/useCustomNotification';
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';

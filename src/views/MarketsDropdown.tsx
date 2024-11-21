@@ -11,9 +11,9 @@ import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/m
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
@@ -148,6 +148,22 @@ const MarketsDropdownContent = ({
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
           renderCell: (row: MarketData) => (
             <$Output type={OutputType.CompactFiat} value={row.volume24H} />
+          ),
+        },
+        {
+          columnKey: 'spotVolume24H',
+          getCellValue: (row: MarketData) => row.spotVolume24H,
+          label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.spotVolume24H} />
+          ),
+        },
+        {
+          columnKey: 'marketCap',
+          getCellValue: (row: MarketData) => row.marketCap,
+          label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.marketCap} />
           ),
         },
         !uiRefresh && {

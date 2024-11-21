@@ -2,7 +2,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DetailsItem } from '@/components/Details';

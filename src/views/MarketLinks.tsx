@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';

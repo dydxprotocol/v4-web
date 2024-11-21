@@ -30,6 +30,8 @@ export type MarketData = {
   tickSizeDecimals?: Nullable<number>;
   trades24H?: Nullable<number>;
   volume24H?: Nullable<number>;
+  spotVolume24H?: Nullable<number>;
+  marketCap?: Nullable<number>;
   tags?: Nullable<string[]>;
   isFavorite: boolean;
 };

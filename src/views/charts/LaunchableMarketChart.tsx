@@ -17,7 +17,7 @@ import { TooltipStringKeys } from '@/constants/tooltips';
 import {
   useMetadataServiceAssetFromId,
   useMetadataServiceCandles,
-} from '@/hooks/useLaunchableMarkets';
+} from '@/hooks/useMetadataService';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LinkOutIcon } from '@/icons';

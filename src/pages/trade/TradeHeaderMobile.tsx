@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

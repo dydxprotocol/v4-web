@@ -44,7 +44,7 @@
 
   /* Market Selector constants */
   --marketsDropdown-openWidth-deprecated: 45rem;
-  --marketsDropdown-openWidth: 40rem;
+  --marketsDropdown-openWidth: 50rem;
 
   /* Form constants */
   --form-input-gap: 0.625rem;
