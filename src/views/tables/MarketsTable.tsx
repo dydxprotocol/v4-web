@@ -225,6 +225,22 @@ export const MarketsTable = forwardRef(
                 ),
               },
               {
+                columnKey: 'spotVolume24H',
+                getCellValue: (row) => row.spotVolume24H,
+                label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
+                renderCell: (row) => (
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.spotVolume24H} />
+                ),
+              },
+              {
+                columnKey: 'market-cap',
+                getCellValue: (row) => row.marketCap,
+                label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+                renderCell: (row) => (
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.marketCap} />
+                ),
+              },
+              {
                 columnKey: 'trades24H',
                 getCellValue: (row) => row.trades24H,
                 label: stringGetter({ key: STRING_KEYS.TRADES }),

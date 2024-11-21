@@ -19,6 +19,16 @@ import { useDydxClient } from './useDydxClient';
 
 const ASSETS_TO_REMOVE = ['USDC', 'USDT'];
 
+export const useMarketMapPriceData = () => {
+  return useQuery({
+    queryKey: ['marketMapPrice'],
+    queryFn: async (): Promise<MetadataServicePricesResponse> => {
+      return metadataClient.getAssetPrices();
+    },
+    refetchInterval: timeUnits.minute * 5,
+  });
+};
+
 export const useMetadataService = () => {
   const metadataQuery = useQueries({
     queries: [

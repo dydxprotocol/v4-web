@@ -150,6 +150,22 @@ const MarketsDropdownContent = ({
             <$Output type={OutputType.CompactFiat} value={row.volume24H} />
           ),
         },
+        {
+          columnKey: 'spotVolume24H',
+          getCellValue: (row: MarketData) => row.spotVolume24H,
+          label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.spotVolume24H} />
+          ),
+        },
+        {
+          columnKey: 'marketCap',
+          getCellValue: (row: MarketData) => row.marketCap,
+          label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.marketCap} />
+          ),
+        },
         !uiRefresh && {
           columnKey: 'openInterest',
           getCellValue: (row: MarketData) => row.openInterestUSDC,

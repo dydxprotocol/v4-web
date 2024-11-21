@@ -30,7 +30,7 @@ import { matchesSearchFilter } from '@/lib/search';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
-import { useMetadataService } from './useLaunchableMarkets';
+import { useMarketMapPriceData, useMetadataService } from './useLaunchableMarkets';
 import { useAllStatsigGateValues } from './useStatsig';
 
 const filterFunctions = {
@@ -141,6 +141,7 @@ export const useMarketsData = ({
     useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
+  const metadataPriceInfo = useMarketMapPriceData();
 
   const allPerpetualMarketIdsSet = new Set(
     Object.values(allPerpetualMarkets)
@@ -165,6 +166,12 @@ export const useMarketsData = ({
           sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
         );
         const clobPairId = allPerpetualClobIds[marketData.id] ?? 0;
+        const {
+          volume_24h: spotVolume24H,
+          market_cap: marketCap,
+          self_reported_market_cap: reportedMarketCap,
+        } = orEmptyObj(metadataPriceInfo.data?.[marketData.assetId]);
+
         const {
           assetId,
           displayId,
@@ -205,6 +212,8 @@ export const useMarketsData = ({
             tickSizeDecimals,
             trades24H,
             volume24H,
+            spotVolume24H,
+            marketCap: marketCap ?? reportedMarketCap,
             isFavorite: favoritedMarkets.includes(id),
           }
         );
@@ -222,6 +231,9 @@ export const useMarketsData = ({
             price,
             percentChange24h,
             tickSizeDecimals,
+            volume24h: spotVolume24H,
+            marketCap,
+            reportedMarketCap,
           } = market;
 
           if (allPerpetualMarketIdsSet.has(assetId)) return null;
@@ -255,6 +267,8 @@ export const useMarketsData = ({
               tickSizeDecimals,
               trades24H: undefined,
               volume24H: undefined,
+              spotVolume24H,
+              marketCap: marketCap ?? reportedMarketCap,
               isFavorite: favoritedMarkets.includes(id),
             }
           );
@@ -273,6 +287,7 @@ export const useMarketsData = ({
     allAssets,
     unlaunchedMarkets.data,
     favoritedMarkets,
+    metadataPriceInfo.data,
   ]);
 
   const filteredMarkets = useMemo(() => {
