@@ -26,11 +26,9 @@ export const useReferredBy = () => {
     }
   };
 
-  const { data, isFetched } = useQuery({
+  return useQuery({
     queryKey: ['referredBy', dydxAddress],
     queryFn,
     enabled: Boolean(compositeClient && dydxAddress),
   });
-
-  return { data, isFetched };
 };

@@ -8,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useReferralAddress } from '@/hooks/useReferralAddress';
+import { useReferredBy } from '@/hooks/useReferredBy';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -44,11 +45,13 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   const {
     affiliateMetadataQuery: { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess },
   } = useAffiliatesInfo(referralAddress);
+  const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
 
   const isNotEligible = isAffiliatesInfoSuccess && !affiliatesInfo.isEligible;
   const invalidReferralCode = isReferralAddressFetched && !referralAddress;
 
-  if (isReferralAddressPending) return null;
+  if (isReferralAddressPending || isReferredByPending || !!referredBy?.affiliateAddress)
+    return null;
 
   return (
     <Dialog
@@ -63,7 +66,9 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
                 ? STRING_KEYS.YOUR_FRIEND
                 : STRING_KEYS.WELCOME_DYDX,
           })}
-          <span tw="text-color-text-1">{refCode ?? truncateAddress(referralAddress)}</span>
+          {!isNotEligible && !invalidReferralCode && (
+            <span tw="text-color-text-1">{refCode ?? truncateAddress(referralAddress)}</span>
+          )}
         </span>
       }
       description={stringGetter({
