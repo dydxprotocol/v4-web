@@ -22,7 +22,7 @@ import { getTvChartConfig } from '@/state/tradingViewSelectors';
 import { getLaunchableMarketDatafeed } from '@/lib/tradingView/launchableMarketFeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
-import { useMetadataService } from '../useLaunchableMarkets';
+import { useMetadataService } from '../useMetadataService';
 
 /**
  * @description Hook to initialize TradingView Chart
