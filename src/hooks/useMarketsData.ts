@@ -30,7 +30,7 @@ import { matchesSearchFilter } from '@/lib/search';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
-import { useMarketMapPriceData, useMetadataService } from './useLaunchableMarkets';
+import { useMetadataService } from './useMetadataService';
 import { useAllStatsigGateValues } from './useStatsig';
 
 const filterFunctions = {
@@ -136,12 +136,11 @@ export const useMarketsData = ({
   const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
   const featureFlags = useAllStatsigGateValues();
-  const unlaunchedMarkets = useMetadataService();
+  const metadataServiceInfo = useMetadataService();
   const shouldHideLaunchableMarkets =
     useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
-  const metadataPriceInfo = useMarketMapPriceData();
 
   const allPerpetualMarketIdsSet = new Set(
     Object.values(allPerpetualMarkets)
@@ -167,10 +166,10 @@ export const useMarketsData = ({
         );
         const clobPairId = allPerpetualClobIds[marketData.id] ?? 0;
         const {
-          volume_24h: spotVolume24H,
-          market_cap: marketCap,
-          self_reported_market_cap: reportedMarketCap,
-        } = orEmptyObj(metadataPriceInfo.data?.[marketData.assetId]);
+          volume24h: spotVolume24H,
+          marketCap,
+          reportedMarketCap,
+        } = orEmptyObj(metadataServiceInfo.data[marketData.assetId]);
 
         const {
           assetId,
@@ -220,7 +219,7 @@ export const useMarketsData = ({
       });
 
     if (!shouldHideLaunchableMarkets && testFlags.pml) {
-      const unlaunchedMarketsData = Object.values(unlaunchedMarkets.data)
+      const unlaunchedMarketsData = Object.values(metadataServiceInfo.data)
         .sort(sortByMarketCap)
         .map((market) => {
           const {
@@ -285,9 +284,8 @@ export const useMarketsData = ({
     sevenDaysSparklineData,
     allPerpetualClobIds,
     allAssets,
-    unlaunchedMarkets.data,
+    metadataServiceInfo.data,
     favoritedMarkets,
-    metadataPriceInfo.data,
   ]);
 
   const filteredMarkets = useMemo(() => {
