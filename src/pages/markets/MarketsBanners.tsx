@@ -26,8 +26,6 @@ import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const MarketsBanners = ({
   marketsTableRef,
 }: {
@@ -50,7 +48,7 @@ export const MarketsBanners = ({
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const shouldDisplayPmlBanner = testFlags.pml && !hasDismissedPmlBanner;
+  const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
 
   return shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>

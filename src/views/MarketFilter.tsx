@@ -1,21 +1,16 @@
 import { ForwardedRef, forwardRef, useCallback, useMemo } from 'react';
 
-import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MARKET_FILTER_OPTIONS, MarketFilters } from '@/constants/markets';
 import { MenuItem } from '@/constants/menus';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { SearchInput } from '@/components/SearchInput';
 import { Switch } from '@/components/Switch';
@@ -35,7 +30,6 @@ type MarketFilterProps = {
   filters: MarketFilters[];
   onChangeFilter: (filter: MarketFilters) => void;
   onSearchTextChange?: (filter: string) => void;
-  hideNewMarketButton?: boolean;
   searchPlaceholderKey?: string;
   compactLayout?: boolean;
 };
@@ -47,18 +41,14 @@ export const MarketFilter = forwardRef(
       filters,
       onChangeFilter,
       onSearchTextChange,
-      hideNewMarketButton,
       compactLayout = false,
       searchPlaceholderKey = STRING_KEYS.MARKET_SEARCH_PLACEHOLDER,
     }: MarketFilterProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const stringGetter = useStringGetter();
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { hasPotentialMarketsData } = usePotentialMarkets();
-    const { uiRefresh, pml: showLaunchMarkets } = testFlags;
-    const showProposeButton = hasPotentialMarketsData && !hideNewMarketButton;
+    const { uiRefresh } = testFlags;
     const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
 
     const onShouldHideLaunchableMarkets = useCallback(
@@ -73,20 +63,19 @@ export const MarketFilter = forwardRef(
     );
 
     const unlaunchedMarketSwitch = useMemo(
-      () =>
-        testFlags.pml && (
-          <WithLabel
-            label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
-            tw="flex flex-row items-center"
-          >
-            <Switch
-              name="show-launchable"
-              checked={!shouldHideLaunchableMarkets}
-              onCheckedChange={onShouldHideLaunchableMarkets}
-              tw="font-mini-book"
-            />
-          </WithLabel>
-        ),
+      () => (
+        <WithLabel
+          label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
+          tw="flex flex-row items-center"
+        >
+          <Switch
+            name="show-launchable"
+            checked={!shouldHideLaunchableMarkets}
+            onCheckedChange={onShouldHideLaunchableMarkets}
+            tw="font-mini-book"
+          />
+        </WithLabel>
+      ),
       [stringGetter, onShouldHideLaunchableMarkets, shouldHideLaunchableMarkets]
     );
 
@@ -116,24 +105,6 @@ export const MarketFilter = forwardRef(
       />
     );
 
-    const launchMarketButton = uiRefresh ? (
-      <Button
-        onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-        size={ButtonSize.Small}
-        shape={ButtonShape.Pill}
-        action={ButtonAction.Primary}
-      >
-        {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_WITH_PLUS })}
-      </Button>
-    ) : (
-      <Button
-        onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-        size={ButtonSize.Small}
-      >
-        {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-      </Button>
-    );
-
     return (
       <$MarketFilter ref={ref} $compactLayout={compactLayout} $uiRefreshEnabled={uiRefresh}>
         <div tw="flex items-center gap-0.5">
@@ -141,7 +112,6 @@ export const MarketFilter = forwardRef(
             placeholder={stringGetter({ key: searchPlaceholderKey })}
             onTextChange={onSearchTextChange}
           />
-          {uiRefresh && showProposeButton && showLaunchMarkets && launchMarketButton}
         </div>
 
         {uiRefresh ? (
@@ -151,8 +121,6 @@ export const MarketFilter = forwardRef(
             <$ToggleGroupContainer $compactLayout={compactLayout}>
               {filterToggles}
             </$ToggleGroupContainer>
-
-            {showProposeButton && launchMarketButton}
           </div>
         )}
       </$MarketFilter>
