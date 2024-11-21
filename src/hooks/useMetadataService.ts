@@ -105,15 +105,13 @@ export const useMetadataServiceCandles = (
     enabled: !!asset && !!timeframe,
     queryKey: ['candles', asset, timeframe],
     queryFn: async () => {
-      return metadataClient.getCandles({ asset: asset!, timeframe: timeframe! });
+      const candles = await metadataClient.getCandles({ asset: asset!, timeframe: timeframe! });
+      return candles[asset ?? '']?.map(mapMetadataServiceCandles);
     },
     refetchInterval: timeUnits.minute * 5,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
 
-  return {
-    ...candlesQuery,
-    data: candlesQuery.data?.[asset ?? '']?.map(mapMetadataServiceCandles),
-  };
+  return candlesQuery;
 };
