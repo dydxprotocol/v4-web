@@ -20,7 +20,6 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { forwardRefFn, getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isExternalLink } from '@/lib/isExternalLink';
-import { testFlags } from '@/lib/testFlags';
 
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
@@ -64,7 +63,6 @@ const NavItemWithRef = <MenuItemValue extends string>(
   ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
 ) => {
   const location = useLocation();
-  const { uiRefresh } = testFlags;
 
   const children = (
     <>
@@ -79,12 +77,7 @@ const NavItemWithRef = <MenuItemValue extends string>(
         )}
       </span>
       {slotAfter}
-      {subitems?.length && (
-        <$Icon
-          iconName={uiRefresh ? IconName.Caret : IconName.Triangle}
-          size={uiRefresh ? '1.5em' : '1em'}
-        />
-      )}
+      {subitems?.length && <$Icon iconName={IconName.Caret} size="1.5em" />}
     </>
   );
 

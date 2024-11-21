@@ -80,9 +80,7 @@ export const FundingPaymentsTable = ({
             columnKey: 'marketId',
             getCellValue: (row) => row.marketId,
             label: stringGetter({ key: STRING_KEYS.MARKET }),
-            renderCell: ({ asset, marketId }) => (
-              <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
-            ),
+            renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
           },
           {
             columnKey: 'time',

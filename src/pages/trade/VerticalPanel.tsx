@@ -10,8 +10,6 @@ import { Tabs } from '@/components/Tabs';
 import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
-import { testFlags } from '@/lib/testFlags';
-
 enum Tab {
   Orderbook = 'Orderbook',
   Trades = 'Trades',
@@ -26,8 +24,6 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Orderbook);
   const [rowsPerSide, setRowsPerSide] = useState<number | undefined>(undefined);
-
-  const { uiRefresh } = testFlags;
 
   const canvasOrderbookRef = useRef<HTMLDivElement>(null);
   const canvasOrderbook = canvasOrderbookRef.current;
@@ -67,7 +63,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   return (
     <Tabs
       fullWidthTabs
-      dividerStyle={uiRefresh ? 'underline' : 'border'}
+      dividerStyle="underline"
       value={value}
       onValueChange={(v: Tab) => {
         setValue(v);

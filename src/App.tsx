@@ -178,19 +178,18 @@ const Content = () => {
 function useUiRefreshMigrations() {
   const themeSetting = useAppSelector(getAppThemeSetting);
   const dispatch = useAppDispatch();
-  const { uiRefresh } = testFlags;
   const [seenUiRefresh, setSeenUiRefresh] = useLocalStorage({
     key: LocalStorageKey.HasSeenUiRefresh,
     defaultValue: false,
   });
   useEffect(() => {
-    if (uiRefresh && !seenUiRefresh) {
+    if (!seenUiRefresh) {
       setSeenUiRefresh(true);
       if (themeSetting === AppTheme.Classic) {
         dispatch(setAppThemeSetting(AppTheme.Dark));
       }
     }
-  }, [themeSetting, seenUiRefresh, uiRefresh, dispatch, setSeenUiRefresh]);
+  }, [themeSetting, seenUiRefresh, dispatch, setSeenUiRefresh]);
 }
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {

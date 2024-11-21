@@ -1,14 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { AbacusPositionSides, Nullable, SubaccountOrder } from '@/constants/abacus';
+import { AbacusPositionSides, Nullable } from '@/constants/abacus';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { IconName } from '@/components/Icon';
@@ -22,7 +20,6 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -33,11 +30,8 @@ type ElementProps = {
   unrealizedPnl: Nullable<number>;
   side: Nullable<AbacusPositionSides>;
   sideLabel: Nullable<string>;
-  stopLossOrders: SubaccountOrder[];
-  takeProfitOrders: SubaccountOrder[];
   isDisabled?: boolean;
   showClosePositionAction: boolean;
-  navigateToMarketOrders: (market: string) => void;
 };
 
 export const PositionsActionsCell = ({
@@ -49,11 +43,8 @@ export const PositionsActionsCell = ({
   unrealizedPnl,
   side,
   sideLabel,
-  stopLossOrders,
-  takeProfitOrders,
   isDisabled,
   showClosePositionAction,
-  navigateToMarketOrders,
 }: ElementProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -61,9 +52,6 @@ export const PositionsActionsCell = ({
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const stringGetter = useStringGetter();
-  const { complianceState } = useComplianceState();
-
-  const { uiRefresh } = testFlags;
 
   const onCloseButtonToggle = (isPressed: boolean) => {
     navigate(`${AppRoute.Trade}/${marketId}`);
@@ -76,23 +64,6 @@ export const PositionsActionsCell = ({
     if (!isPressed) {
       abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
     }
-  };
-
-  const openTriggersDialog = () => {
-    if (isDisabled) {
-      return;
-    }
-    dispatch(
-      openDialog(
-        DialogTypes.Triggers({
-          marketId,
-          assetId,
-          stopLossOrders,
-          takeProfitOrders,
-          navigateToMarketOrders,
-        })
-      )
-    );
   };
 
   const openShareDialog = () => {
@@ -113,20 +84,7 @@ export const PositionsActionsCell = ({
   };
 
   return (
-    <$ActionsTableCell $uiRefreshEnabled={uiRefresh} tw="mr-[-0.5rem]">
-      {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && !uiRefresh && (
-        <WithTooltip
-          tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
-        >
-          <$TriggersButton
-            key="edittriggers"
-            onClick={openTriggersDialog}
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            $uiRefreshEnabled={uiRefresh}
-          />
-        </WithTooltip>
-      )}
+    <$ActionsTableCell tw="mr-[-0.5rem]">
       <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.SHARE })}>
         <$TriggersButton
           key="share"
@@ -134,8 +92,7 @@ export const PositionsActionsCell = ({
           iconName={IconName.Share}
           shape={ButtonShape.Square}
           disabled={isDisabled}
-          buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
-          $uiRefreshEnabled={uiRefresh}
+          buttonStyle={ButtonStyle.WithoutBackground}
         />
       </WithTooltip>
       {showClosePositionAction && (
@@ -152,7 +109,7 @@ export const PositionsActionsCell = ({
             iconName={IconName.Close}
             shape={ButtonShape.Square}
             disabled={isDisabled}
-            buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+            buttonStyle={ButtonStyle.WithoutBackground}
           />
         </WithTooltip>
       )}
@@ -160,24 +117,16 @@ export const PositionsActionsCell = ({
   );
 };
 
-const $ActionsTableCell = styled(ActionsTableCell)<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --toolbar-margin: 0.25rem;
-    `}
+const $ActionsTableCell = styled(ActionsTableCell)`
+  --toolbar-margin: 0.25rem;
 `;
 
-const $TriggersButton = styled(IconButton)<{ $uiRefreshEnabled: boolean }>`
+const $TriggersButton = styled(IconButton)`
   --button-icon-size: 1.25em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
 
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      --button-icon-size: 1em;
-    `}
+  --button-icon-size: 1em;
 `;
 
 const $CloseButtonToggle = styled(IconButton)`

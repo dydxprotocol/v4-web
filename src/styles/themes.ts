@@ -4,14 +4,11 @@ import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
 import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
 
 import { generateFadedColorVariant } from '@/lib/styles';
-import { testFlags } from '@/lib/testFlags';
 
-const ClassicThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
-  uiRefreshEnabled: boolean
-) => ({
+const ClassicThemeBase: () => ThemeColorBase = () => ({
   black: ColorToken.Black,
   white: ColorToken.White,
-  green: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
+  green: ColorToken.Green3,
   red: ColorToken.Red2,
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
@@ -41,28 +38,22 @@ const ClassicThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   accentFaded: generateFadedColorVariant(ColorToken.Purple1, OpacityToken.Opacity16),
   favorite: ColorToken.Yellow0,
 
-  success: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
+  success: ColorToken.Green3,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red2,
-  successBackground: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
-  successFaded: generateFadedColorVariant(
-    uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
-    OpacityToken.Opacity16
-  ),
+  successBackground: ColorToken.Green3,
+  successFaded: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity16),
   warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
   errorFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
-  positive: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
+  positive: ColorToken.Green3,
   negative: ColorToken.Red2,
   positiveDark: ColorToken.Green6,
   negativeDark: ColorToken.Red4,
-  positiveFaded: generateFadedColorVariant(
-    uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
-    OpacityToken.Opacity16
-  ),
+  positiveFaded: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
-  riskLow: uiRefreshEnabled ? ColorToken.Green3 : ColorToken.Green2,
+  riskLow: ColorToken.Green3,
   riskMedium: ColorToken.Yellow0,
   riskHigh: ColorToken.Red2,
 
@@ -81,9 +72,7 @@ const ClassicThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   overlayFilter: BrightnessFilterToken.Darken30,
 });
 
-const DarkThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
-  uiRefreshEnabled: boolean
-) => ({
+const DarkThemeBase: () => ThemeColorBase = () => ({
   black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green1,
@@ -92,9 +81,9 @@ const DarkThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.Black,
-  layer1: uiRefreshEnabled ? ColorToken.DarkGray14 : ColorToken.DarkGray12,
-  layer2: uiRefreshEnabled ? ColorToken.DarkGray11 : ColorToken.DarkGray15,
-  layer3: uiRefreshEnabled ? ColorToken.DarkGray9 : ColorToken.DarkGray11,
+  layer1: ColorToken.DarkGray14,
+  layer2: ColorToken.DarkGray11,
+  layer3: ColorToken.DarkGray9,
   layer4: ColorToken.DarkGray6,
   layer5: ColorToken.DarkGray5,
   layer6: ColorToken.DarkGray4,
@@ -150,18 +139,16 @@ const DarkThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   overlayFilter: BrightnessFilterToken.Darken30,
 });
 
-const LightThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
-  uiRefreshEnabled: boolean
-) => ({
+const LightThemeBase: () => ThemeColorBase = () => ({
   black: ColorToken.Black,
   white: ColorToken.White,
-  green: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
+  green: ColorToken.Green5,
   red: ColorToken.Red1,
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
-  layer0: uiRefreshEnabled ? ColorToken.LightGray7 : ColorToken.White,
-  layer1: uiRefreshEnabled ? ColorToken.LightGray5 : ColorToken.LightGray7,
+  layer0: ColorToken.LightGray7,
+  layer1: ColorToken.LightGray5,
   layer2: ColorToken.White,
   layer3: ColorToken.LightGray1,
   layer4: ColorToken.White,
@@ -185,28 +172,22 @@ const LightThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   accentFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity16),
   favorite: ColorToken.Yellow0,
 
-  success: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
-  successBackground: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
+  success: ColorToken.Green5,
+  successBackground: ColorToken.Green5,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red1,
-  successFaded: generateFadedColorVariant(
-    uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
-    OpacityToken.Opacity16
-  ),
+  successFaded: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity16),
   warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
   errorFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
-  positive: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
+  positive: ColorToken.Green5,
   negative: ColorToken.Red1,
   positiveDark: ColorToken.Green0,
   negativeDark: ColorToken.Red5,
-  positiveFaded: generateFadedColorVariant(
-    uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
-    OpacityToken.Opacity16
-  ),
+  positiveFaded: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
-  riskLow: uiRefreshEnabled ? ColorToken.Green5 : ColorToken.Green3,
+  riskLow: ColorToken.Green5,
   riskMedium: ColorToken.Yellow0,
   riskHigh: ColorToken.Red1,
 
@@ -225,9 +206,8 @@ const LightThemeBase: (uiRefreshEnabled: boolean) => ThemeColorBase = (
   overlayFilter: BrightnessFilterToken.Darken10,
 });
 
-const generateTheme = (themeBase: (uiRefreshEnabled: boolean) => ThemeColorBase): Theme => {
-  const { uiRefresh } = testFlags;
-  const themeColors = themeBase(uiRefresh);
+const generateTheme = (themeBase: () => ThemeColorBase): Theme => {
+  const themeColors = themeBase();
 
   return {
     [AppColorMode.GreenUp]: themeColors,

@@ -38,7 +38,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
@@ -71,7 +70,6 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
-  const { uiRefresh } = testFlags;
 
   const { data: ensName } = useEnsName({
     address:
@@ -261,20 +259,12 @@ const Profile = () => {
         hasSeparator
       >
         <FillsTable
-          columnKeys={
-            uiRefresh
-              ? [
-                  FillsTableColumnKey.Time,
-                  FillsTableColumnKey.Action,
-                  FillsTableColumnKey.Type,
-                  FillsTableColumnKey.Total,
-                ]
-              : [
-                  FillsTableColumnKey.Action,
-                  FillsTableColumnKey.Type,
-                  FillsTableColumnKey.AmountTag,
-                ]
-          }
+          columnKeys={[
+            FillsTableColumnKey.Time,
+            FillsTableColumnKey.Action,
+            FillsTableColumnKey.Type,
+            FillsTableColumnKey.Total,
+          ]}
           withInnerBorders={false}
           initialPageSize={5}
         />

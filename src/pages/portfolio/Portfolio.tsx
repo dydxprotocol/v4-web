@@ -33,7 +33,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -70,7 +69,6 @@ const PortfolioPage = () => {
   const usdcBalance = freeCollateral?.current ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
-  const { uiRefresh } = testFlags;
 
   const routesComponent = (
     <Suspense fallback={<LoadingSpace id="portfolio" />}>
@@ -94,27 +92,17 @@ const PortfolioPage = () => {
                         FillsTableColumnKey.TypeAmount,
                         FillsTableColumnKey.PriceFee,
                       ]
-                    : uiRefresh
-                      ? [
-                          FillsTableColumnKey.Market,
-                          FillsTableColumnKey.Time,
-                          FillsTableColumnKey.Type,
-                          FillsTableColumnKey.Side,
-                          FillsTableColumnKey.AmountTag,
-                          FillsTableColumnKey.Price,
-                          FillsTableColumnKey.Total,
-                          FillsTableColumnKey.Fee,
-                          FillsTableColumnKey.Liquidity,
-                        ]
-                      : [
-                          FillsTableColumnKey.Time,
-                          FillsTableColumnKey.Market,
-                          FillsTableColumnKey.Side,
-                          FillsTableColumnKey.AmountPrice,
-                          FillsTableColumnKey.TotalFee,
-                          FillsTableColumnKey.Type,
-                          FillsTableColumnKey.Liquidity,
-                        ]
+                    : [
+                        FillsTableColumnKey.Market,
+                        FillsTableColumnKey.Time,
+                        FillsTableColumnKey.Type,
+                        FillsTableColumnKey.Side,
+                        FillsTableColumnKey.AmountTag,
+                        FillsTableColumnKey.Price,
+                        FillsTableColumnKey.Total,
+                        FillsTableColumnKey.Fee,
+                        FillsTableColumnKey.Liquidity,
+                      ]
                 }
                 withOuterBorder={isNotTablet}
               />

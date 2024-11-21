@@ -1,6 +1,6 @@
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -37,7 +37,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
-import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -53,7 +52,7 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const { enableVaults: showVaults, uiRefresh: uiRefreshEnabled } = testFlags;
+  const { enableVaults: showVaults } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -66,31 +65,16 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
-        ...(uiRefreshEnabled
-          ? [
-              {
-                value: 'MARKETS',
-                label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                href: AppRoute.Markets,
-              },
-              {
-                value: 'PORTFOLIO',
-                label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-                href: AppRoute.Portfolio,
-              },
-            ]
-          : [
-              {
-                value: 'PORTFOLIO',
-                label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-                href: AppRoute.Portfolio,
-              },
-              {
-                value: 'MARKETS',
-                label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                href: AppRoute.Markets,
-              },
-            ]),
+        {
+          value: 'MARKETS',
+          label: stringGetter({ key: STRING_KEYS.MARKETS }),
+          href: AppRoute.Markets,
+        },
+        {
+          value: 'PORTFOLIO',
+          label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
+          href: AppRoute.Portfolio,
+        },
         showVaults && {
           value: 'VAULT',
           label: (
@@ -176,16 +160,16 @@ export const HeaderDesktop = () => {
   ];
 
   return (
-    <$Header $uiRefreshEnabled={uiRefreshEnabled}>
+    <$Header>
       <$LogoLink to="/">
         <LogoShortIcon />
       </$LogoLink>
 
       <VerticalSeparator />
 
-      <$NavBefore $uiRefreshEnabled={uiRefreshEnabled}>
+      <$NavBefore>
         <$LanguageSelector sideOffset={16}>
-          {uiRefreshEnabled ? <Icon iconName={IconName.Translate} size="1.25em" /> : undefined}
+          <Icon iconName={IconName.Translate} size="1.25em" />
         </$LanguageSelector>
         <VerticalSeparator />
         <NetworkSelectMenu sideOffset={16} />
@@ -194,36 +178,29 @@ export const HeaderDesktop = () => {
       <VerticalSeparator />
 
       <$NavigationScrollBar>
-        <$NavigationMenu
-          items={navItems}
-          orientation="horizontal"
-          $uiRefreshEnabled={uiRefreshEnabled}
-          dividerStyle={uiRefreshEnabled ? 'underline' : 'tab'}
-        />
+        <$NavigationMenu items={navItems} orientation="horizontal" dividerStyle="underline" />
       </$NavigationScrollBar>
 
       <div role="separator" />
 
       <$NavAfter>
-        {uiRefreshEnabled && (
-          <>
-            <Button
-              tw="mr-[0.5em]"
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              action={
-                !availableBalance || MustBigNumber(availableBalance.current).gt(0)
-                  ? ButtonAction.Secondary
-                  : ButtonAction.Primary
-              }
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
-              state={{ isDisabled: !dydxAccounts }}
-            >
-              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-            </Button>
-            <VerticalSeparator />
-          </>
-        )}
+        <>
+          <Button
+            tw="mr-[0.5em]"
+            shape={ButtonShape.Pill}
+            size={ButtonSize.XSmall}
+            action={
+              !availableBalance || MustBigNumber(availableBalance.current).gt(0)
+                ? ButtonAction.Secondary
+                : ButtonAction.Primary
+            }
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+            state={{ isDisabled: !dydxAccounts }}
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+          </Button>
+          <VerticalSeparator />
+        </>
 
         <MobileDownloadLinks />
 
@@ -251,9 +228,7 @@ export const HeaderDesktop = () => {
     </$Header>
   );
 };
-const $Header = styled.header<{
-  $uiRefreshEnabled: boolean;
-}>`
+const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
   --logo-width: 3.5rem;
@@ -270,17 +245,10 @@ const $Header = styled.header<{
   display: grid;
   align-items: stretch;
   grid-auto-flow: column;
-  grid-template: ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled
-      ? css`'Logo . NavBefore . Nav . NavAfter' 100%
-      / var(--logo-width) var(--border-width) auto
-      var(--border-width) 1fr var(--border-width) auto`
-      : css`'Logo . NavBefore . Nav . NavAfter' 100%
-    / var(--logo-width) var(--border-width) calc(
-      var(--sidebar-width) - var(--logo-width) - var(--border-width)
-    )
-    var(--border-width) 1fr var(--border-width) auto`}
-  `};
+  grid-template:
+    'Logo . NavBefore . Nav . NavAfter' 100%
+    / var(--logo-width) var(--border-width) auto
+    var(--border-width) 1fr var(--border-width) auto;
 
   z-index: 2;
 
@@ -305,39 +273,19 @@ const $NavigationScrollBar = styled.div`
   ${layoutMixins.scrollAreaFade}
 `;
 
-const navigationMenuType = getSimpleStyledOutputType(
-  NavigationMenu,
-  {} as { $uiRefreshEnabled: boolean }
-);
-
-const $NavigationMenu = styled(NavigationMenu)<{ $uiRefreshEnabled: boolean }>`
+const $NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
-    --navigationMenu-item-height: ${({ $uiRefreshEnabled }) =>
-      $uiRefreshEnabled ? css`var(--stickyArea-topHeight)` : css`var(--trigger-height)`};
+    --navigationMenu-item-height: var(--stickyArea-topHeight);
   }
 
   ${layoutMixins.scrollArea}
   padding: 0 1rem;
   scroll-padding: 0 0.5rem;
-` as typeof navigationMenuType;
+` as typeof NavigationMenu;
 
-const $NavBefore = styled.div<{
-  $uiRefreshEnabled: boolean;
-}>`
-  ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled
-      ? css`
-          ${layoutMixins.row}
-        `
-      : css`
-          direction: rtl;
-          > * {
-            direction: initial;
-          }
-          ${layoutMixins.flexEqualColumns}
-        `}
-  `}
+const $NavBefore = styled.div`
+  ${layoutMixins.row}
 
   > * {
     align-self: center;
