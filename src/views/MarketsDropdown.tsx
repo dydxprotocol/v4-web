@@ -11,9 +11,9 @@ import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/m
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
