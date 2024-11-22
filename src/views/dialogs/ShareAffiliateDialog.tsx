@@ -21,6 +21,7 @@ import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
 
 import { triggerTwitterIntent } from '@/lib/twitter';
@@ -74,13 +75,16 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
   const dialogDescription = (
     <span>
-      {stringGetter({
-        key: STRING_KEYS.EARN_FOR_EACH_TRADER,
-        params: {
-          AMOUNT_USD:
-            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
-        },
-      })}
+      {!data?.isEligible
+        ? 'In order to become an affiliate, you will need to trade at least $10,000 in volume'
+        : stringGetter({
+            key: STRING_KEYS.EARN_FOR_EACH_TRADER,
+            params: {
+              AMOUNT_USD:
+                maxEarning?.toLocaleString() ??
+                DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
+            },
+          })}
       .{' '}
       <Link href={affiliateProgramFaq} isInline>
         {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
@@ -104,34 +108,17 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           }}
         />
       )}
-      {dydxAddress && (
+      {dydxAddress && !data?.isEligible && <NotEligibleYetContent volume={data?.totalVolume} />}
+      {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
           <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
             <div>
               <div tw="text-small text-color-text-0">
-                {data?.isEligible
-                  ? stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })
-                  : stringGetter({
-                      key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
-                      params: {
-                        AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
-                      },
-                    })}
+                {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
               </div>
-              <div>
-                {data?.isEligible && affiliatesUrl
-                  ? affiliatesUrl
-                  : stringGetter({
-                      key: STRING_KEYS.YOUVE_TRADED,
-                      params: {
-                        AMOUNT_USD: data?.totalVolume
-                          ? Math.floor(data.totalVolume).toLocaleString()
-                          : '0',
-                      },
-                    })}
-              </div>
+              <div>{affiliatesUrl}</div>
             </div>
-            {data?.isEligible && affiliatesUrl && (
+            {affiliatesUrl && (
               <CopyButton
                 action={ButtonAction.Primary}
                 size={ButtonSize.Small}
@@ -141,7 +128,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               </CopyButton>
             )}
           </div>
-          {data?.isEligible && affiliatesUrl && (
+          {affiliatesUrl && (
             <div
               ref={(domNode) => {
                 if (domNode) {
@@ -176,38 +163,77 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             </div>
           )}
 
-          {data?.isEligible && (
-            <div tw="flex gap-1">
-              <Button
-                action={ButtonAction.Base}
-                slotLeft={<Icon iconName={IconName.Rocket} />}
-                state={{
-                  isLoading: isCopying,
-                }}
-                tw="flex-1"
-                type={ButtonType.Link}
-                href={affiliateProgram}
-              >
-                {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-              </Button>
-              <Button
-                action={ButtonAction.Base}
-                slotLeft={<Icon iconName={IconName.SocialX} />}
-                onClick={() => {
-                  convertShare();
-                }}
-                state={{
-                  isLoading: isSharing,
-                }}
-                tw="flex-1 flex-grow-0 px-2"
-              >
-                {stringGetter({ key: STRING_KEYS.SHARE })}
-              </Button>
-            </div>
-          )}
+          <div tw="flex gap-1">
+            <Button
+              action={ButtonAction.Base}
+              slotLeft={<Icon iconName={IconName.Rocket} />}
+              state={{
+                isLoading: isCopying,
+              }}
+              tw="flex-1"
+              type={ButtonType.Link}
+              href={affiliateProgram}
+            >
+              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+            </Button>
+            <Button
+              action={ButtonAction.Base}
+              slotLeft={<Icon iconName={IconName.SocialX} />}
+              onClick={() => {
+                convertShare();
+              }}
+              state={{
+                isLoading: isSharing,
+              }}
+              tw="flex-1 flex-grow-0 px-2"
+            >
+              {stringGetter({ key: STRING_KEYS.SHARE })}
+            </Button>
+          </div>
         </div>
       )}
     </Dialog>
+  );
+};
+
+const NotEligibleYetContent = ({ volume = 9233.2332 }: { volume?: number }) => {
+  const progressPercent = ((volume / AFFILIATES_REQUIRED_VOLUME_USD) * 100).toFixed(0).toString();
+  const remaining = (AFFILIATES_REQUIRED_VOLUME_USD - volume).toLocaleString();
+  return (
+    <div tw="flex flex-col gap-1">
+      <div tw="flex flex-col gap-1">
+        <div tw="flex flex-col gap-1.5 rounded-1 bg-color-layer-5 p-1">
+          <div tw="flex items-center justify-between">
+            <div tw="flex flex-col gap-0.375">
+              <div tw="font-semibold">Become an affiliate</div>
+              <div tw="text-color-text-0">You will need to trade more volume.</div>
+            </div>
+            <div tw="text-large font-medium">{progressPercent}%</div>
+          </div>
+          <div tw="flex flex-col gap-0.75">
+            <div tw="flex justify-between">
+              <div tw="flex items-end">
+                <Output value={volume} type={OutputType.Fiat} slotRight=" traded" />
+              </div>
+              <div tw="text-color-text-0">
+                <Output value={remaining} type={OutputType.Fiat} slotRight=" remaining" />
+              </div>
+            </div>
+            <div tw="relative h-2.5 w-full overflow-hidden rounded-0.5 bg-color-layer-7">
+              <div tw="absolute h-full bg-color-accent" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div tw="flex flex-col gap-0.375">
+        <div tw="text-color-text-0">Benefits</div>
+        <ul tw="flex list-inside flex-col gap-0.375">
+          <li>You can earn up to $3,000 per month for each trader.</li>
+          <li>If you’re a VIP, you can earn up to $10,000 per month.</li>
+          <li>The person you refer will save up to $550 in fees.</li>
+        </ul>
+      </div>
+    </div>
   );
 };
 

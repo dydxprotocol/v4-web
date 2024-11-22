@@ -76,7 +76,7 @@ export const AffiliatesPage = () => {
           </section>
         </$Section>
 
-        <AffiliatesLeaderboard {...{ accountStats }} />
+        <AffiliatesLeaderboard accountStats={accountStats} />
       </$Page>
     </Suspense>
   );
