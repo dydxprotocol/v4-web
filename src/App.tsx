@@ -201,7 +201,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 function useUnlimitedLaunchDialog() {
-  const showUnlimitedAnnouncement = testFlags.pml && testFlags.enableVaults;
+  const showUnlimitedAnnouncement = testFlags.pml;
   const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
   const isAccountConnected = useAppSelector(getIsAccountConnected);
 

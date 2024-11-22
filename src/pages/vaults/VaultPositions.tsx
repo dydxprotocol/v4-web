@@ -14,8 +14,6 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { PortfolioCard } from '@/components/PortfolioCard';
 
-import { testFlags } from '@/lib/testFlags';
-
 type MaybeVaultPositionsPanelProps = {
   onViewVault: () => void;
   className?: string;
@@ -30,7 +28,6 @@ export const MaybeVaultPositionsPanel = ({
   className,
 }: MaybeVaultPositionsPanelProps) => {
   const userVault = useLoadedVaultAccount().data;
-  if (!testFlags.enableVaults) return null;
 
   return (
     <div className={className}>

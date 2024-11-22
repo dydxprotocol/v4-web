@@ -40,10 +40,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get enableVaults() {
-    return true;
-  }
-
   get referrer() {
     return this.queryParams.utm_source;
   }
@@ -58,10 +54,6 @@ class TestFlags {
 
   get referralCode() {
     return this.queryParams.ref;
-  }
-
-  get enableStaticTyping() {
-    return true;
   }
 
   get uiRefresh() {

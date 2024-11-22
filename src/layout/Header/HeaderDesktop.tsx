@@ -53,7 +53,7 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const { enableVaults: showVaults, uiRefresh: uiRefreshEnabled } = testFlags;
+  const { uiRefresh: uiRefreshEnabled } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -91,7 +91,7 @@ export const HeaderDesktop = () => {
                 href: AppRoute.Markets,
               },
             ]),
-        showVaults && {
+        {
           value: 'VAULT',
           label: (
             <>
