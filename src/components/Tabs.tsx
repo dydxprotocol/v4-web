@@ -16,7 +16,6 @@ import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
-import { testFlags } from '@/lib/testFlags';
 
 export type TabItem<TabItemsValue> = {
   value: TabItemsValue;
@@ -69,7 +68,6 @@ export const Tabs = <TabItemsValue extends string>({
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
-  const { uiRefresh } = testFlags;
   const withBorders = dividerStyle === 'border';
   const withUnderline = dividerStyle === 'underline';
 
@@ -139,7 +137,6 @@ export const Tabs = <TabItemsValue extends string>({
       onWheel={onWheel}
       $side={side}
       $withInnerBorder={withBorders || withUnderline}
-      $uiRefreshEnabled={uiRefresh}
     >
       <$HorizontalScrollContainer
         $side={side}
@@ -173,7 +170,6 @@ export const Tabs = <TabItemsValue extends string>({
 const $Root = styled(Root)<{
   $side: 'top' | 'bottom';
   $withInnerBorder?: boolean;
-  $uiRefreshEnabled: boolean;
 }>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
@@ -182,9 +178,7 @@ const $Root = styled(Root)<{
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
   --trigger-hover-textColor: var(--trigger-active-textColor);
-  --trigger-active-underlineColor: ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled ? css`var(--color-accent);` : css`var(--color-text-2);`}
-  `};
+  --trigger-active-underlineColor: var(--color-accent);
   --trigger-active-underline-backgroundColor: transparent;
   --trigger-active-underline-size: 2px;
   --trigger-underline-size: 0px;

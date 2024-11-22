@@ -60,10 +60,6 @@ class TestFlags {
     return true;
   }
 
-  get uiRefresh() {
-    return true;
-  }
-
   get onboardingRewrite() {
     return !!this.queryParams.onboarding_rewrite;
   }

@@ -11,7 +11,6 @@ import { IconButton } from '@/components/IconButton';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
@@ -19,8 +18,6 @@ export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: strin
   const { coinMarketCapsLink, websiteLink, whitepaperLink } = orEmptyObj(resources);
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const { urls } = orEmptyObj(launchableAsset);
-
-  const { uiRefresh } = testFlags;
 
   const linkItems = [
     {
@@ -44,12 +41,7 @@ export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: strin
     <div tw="row ml-auto gap-0.5">
       {linkItems.map(
         ({ key, href, icon }) =>
-          href &&
-          (uiRefresh ? (
-            <$IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
-          ) : (
-            <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
-          ))
+          href && <$IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
       )}
     </div>
   );

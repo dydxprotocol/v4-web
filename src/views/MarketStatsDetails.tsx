@@ -32,7 +32,6 @@ import {
 } from '@/state/perpetualsSelectors';
 
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { MidMarketPrice } from './MidMarketPrice';
 
@@ -51,17 +50,6 @@ enum MarketStats {
   MaxLeverage = 'MaxLeverage',
 }
 
-const defaultMarketStatistics = [
-  MarketStats.OraclePrice,
-  MarketStats.PriceChange24H,
-  MarketStats.OpenInterest,
-  MarketStats.Funding1H,
-  MarketStats.Volume24H,
-  MarketStats.Trades24H,
-  MarketStats.NextFunding,
-  MarketStats.MaxLeverage,
-];
-
 export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
@@ -72,8 +60,6 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const lastMidMarketPrice = useRef(midMarketPrice);
   const currentMarketData = useAppSelector(getCurrentMarketData, shallowEqual);
   const isLoading = currentMarketData === undefined;
-
-  const { uiRefresh } = testFlags;
 
   const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent, assetId } =
     currentMarketData ?? {};
@@ -122,7 +108,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
       )}
 
       <$Details
-        items={(uiRefresh ? Object.values(MarketStats) : defaultMarketStatistics).map((stat) => ({
+        items={Object.values(MarketStats).map((stat) => ({
           key: stat,
           label: labelMap[stat],
           tooltip: stat as unknown as TooltipStringKeys, // just force for now, component will handle non-existing ones

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
@@ -14,7 +14,6 @@ import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 import { TradeSideTabs } from './TradeSideTabs';
 import { TradeForm } from './forms/TradeForm';
@@ -34,13 +33,11 @@ export const TradeBoxOrderView = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
-  const { uiRefresh } = testFlags;
-
   return (
     <TradeSideTabs
       sharedContent={
         <div tw="flex min-h-full flex-col">
-          <$MarginAndLeverageButtons openInTradeBox $uiRefreshEnabled={uiRefresh} />
+          <$MarginAndLeverageButtons />
           <$OrderTypeTabs
             value={selectedTradeType}
             items={tradeTypeItems}
@@ -63,15 +60,8 @@ const $Container = styled.div`
   ${layoutMixins.scrollArea}
 `;
 
-const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled
-      ? css`
-          padding: 0 1rem;
-        `
-      : css`
-          padding: 0.75rem 1rem;
-        `};
+const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
+  padding: 0 1rem;
   box-shadow: inset 0 calc(-1 * var(--border-width)) var(--border-color);
 `;
 

@@ -169,9 +169,7 @@ const getFillsTableColumnDef = ({
         columnKey: 'market',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, displayId }) => (
-          <MarketTableCell asset={asset ?? undefined} marketId={displayId} />
-        ),
+        renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',

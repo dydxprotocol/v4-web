@@ -46,7 +46,6 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import {
   calculateCrossPositionMargin,
   getTradeStateWithDoubleValuesHasDiff,
@@ -102,7 +101,6 @@ export const PlaceOrderButtonAndReceipt = ({
   );
 
   const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
-  const { uiRefresh } = testFlags;
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
@@ -371,18 +369,16 @@ export const PlaceOrderButtonAndReceipt = ({
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
               </Button>
             ),
-            uiRefresh && (
-              <$HideButton
-                slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                onPressedChange={setIsReceiptOpen}
-                isPressed={isReceiptOpen}
-                key="hide"
-              >
-                {stringGetter({ key: STRING_KEYS.RECEIPT })}
-              </$HideButton>
-            ),
+            <$HideButton
+              slotRight={<Icon iconName={IconName.Caret} size="0.66em" />}
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              onPressedChange={setIsReceiptOpen}
+              isPressed={isReceiptOpen}
+              key="hide"
+            >
+              {stringGetter({ key: STRING_KEYS.RECEIPT })}
+            </$HideButton>,
           ].filter(isTruthy)}
         </$WithSeparators>
       </div>

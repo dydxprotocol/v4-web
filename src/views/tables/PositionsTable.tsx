@@ -41,10 +41,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { getNumberSign, MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
-import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -52,7 +50,6 @@ import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButto
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
-import { PositionsTriggersCellDeprecated } from './PositionsTable/PositionsTriggersCellDeprecated';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -97,7 +94,6 @@ const getPositionsTableColumnDef = ({
   showClosePositionAction,
   navigateToOrders,
   isSinglePosition,
-  uiRefresh,
   isTablet,
 }: {
   key: PositionsTableColumnKey;
@@ -107,7 +103,6 @@ const getPositionsTableColumnDef = ({
   showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
   isSinglePosition: boolean;
-  uiRefresh: boolean;
   isTablet: boolean;
 }) => ({
   width,
@@ -185,9 +180,8 @@ const getPositionsTableColumnDef = ({
         columnKey: 'combinedPnl',
         getCellValue: (row) => row.unrealizedPnl.current,
         label: stringGetter({ key: STRING_KEYS.PNL }),
-        hideOnBreakpoint: uiRefresh ? undefined : MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => {
-          return uiRefresh && !isTablet ? (
+          return !isTablet ? (
             <TableCell>
               <$OutputSigned
                 sign={getNumberSign(unrealizedPnl.current)}
@@ -227,15 +221,8 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.displayId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ displayId, asset, leverage }) => {
-          return (
-            <MarketTableCell
-              asset={asset}
-              marketId={displayId}
-              leverage={leverage.current ?? undefined}
-              isHighlighted
-            />
-          );
+        renderCell: ({ asset }) => {
+          return <MarketTableCell asset={asset} />;
         },
       },
       [PositionsTableColumnKey.Leverage]: {
@@ -263,12 +250,12 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.Size]: {
         columnKey: 'size',
         getCellValue: (row) => {
-          return uiRefresh ? row.size.current : row.notionalTotal.current;
+          return row.size.current;
         },
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, stepSizeDecimals }) => {
-          return uiRefresh ? (
+        renderCell: ({ size, stepSizeDecimals }) => {
+          return (
             <TableCell>
               <$OutputSigned
                 type={OutputType.Asset}
@@ -277,18 +264,6 @@ const getPositionsTableColumnDef = ({
                 sign={getNumberSign(size.current)}
                 fractionDigits={stepSizeDecimals}
               />
-            </TableCell>
-          ) : (
-            <TableCell stacked>
-              <$OutputSigned
-                type={OutputType.Asset}
-                value={size.current}
-                tag={getDisplayableAssetFromBaseAsset(assetId)}
-                showSign={ShowSign.Negative}
-                sign={getNumberSign(size.current)}
-                fractionDigits={stepSizeDecimals}
-              />
-              <Output type={OutputType.Fiat} value={notionalTotal.current} />
             </TableCell>
           );
         },
@@ -298,18 +273,11 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal.current,
         label: stringGetter({ key: STRING_KEYS.VALUE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ displayId, asset, leverage, notionalTotal }) => {
-          return uiRefresh ? (
+        renderCell: ({ notionalTotal }) => {
+          return (
             <TableCell>
               <Output type={OutputType.Fiat} value={notionalTotal.current} />
             </TableCell>
-          ) : (
-            <MarketTableCell
-              asset={asset}
-              marketId={displayId}
-              leverage={leverage.current ?? undefined}
-              isHighlighted
-            />
           );
         },
       },
@@ -342,16 +310,8 @@ const getPositionsTableColumnDef = ({
         columnKey: 'oracle',
         getCellValue: (row) => row.oraclePrice,
         label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED }),
-        renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
-          <TableCell stacked={!uiRefresh}>
-            {!uiRefresh && (
-              <Output
-                withSubscript
-                type={OutputType.Fiat}
-                value={liquidationPrice.current}
-                fractionDigits={tickSizeDecimals}
-              />
-            )}
+        renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+          <TableCell>
             <Output
               withSubscript
               type={OutputType.Fiat}
@@ -365,39 +325,24 @@ const getPositionsTableColumnDef = ({
         columnKey: 'liquidation',
         getCellValue: (row) => row.liquidationPrice.current,
         label: stringGetter({ key: STRING_KEYS.LIQUIDATION }),
-        renderCell: ({ liquidationPrice, oraclePrice, tickSizeDecimals }) => (
-          <TableCell stacked={!uiRefresh}>
+        renderCell: ({ liquidationPrice, tickSizeDecimals }) => (
+          <TableCell>
             <Output
               withSubscript
               type={OutputType.Fiat}
               value={liquidationPrice.current}
               fractionDigits={tickSizeDecimals}
             />
-            {!uiRefresh && (
-              <Output
-                withSubscript
-                type={OutputType.Fiat}
-                value={oraclePrice}
-                fractionDigits={tickSizeDecimals}
-              />
-            )}
           </TableCell>
         ),
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
         getCellValue: (row) => row.netFunding,
-        label: uiRefresh ? (
-          stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })
-        ) : (
-          <TableColumnHeader>
-            <span>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })}</span>
-            <span>{stringGetter({ key: STRING_KEYS.RATE })}</span>
-          </TableColumnHeader>
-        ),
+        label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT }),
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ netFunding, fundingRate }) => {
-          return uiRefresh ? (
+        renderCell: ({ netFunding }) => {
+          return (
             <TableCell>
               <$OutputSigned
                 sign={getNumberSign(netFunding)}
@@ -405,15 +350,6 @@ const getPositionsTableColumnDef = ({
                 value={netFunding}
                 showSign={ShowSign.Negative}
               />
-            </TableCell>
-          ) : (
-            <TableCell stacked>
-              <$OutputSigned
-                sign={getNumberSign(netFunding)}
-                type={OutputType.Fiat}
-                value={netFunding}
-              />
-              <Output showSign={ShowSign.Negative} type={OutputType.Percent} value={fundingRate} />
             </TableCell>
           );
         },
@@ -506,18 +442,16 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Triggers]: {
         columnKey: 'triggers',
-        label: uiRefresh ? (
+        label: (
           <$TriggersContainer tw="flex gap-[0.75em] pr-[2.75em]">
             <$TriggerLabel>TP</$TriggerLabel> <$VerticalSeparator />
             <$TriggerLabel>SL</$TriggerLabel>
           </$TriggersContainer>
-        ) : (
-          stringGetter({ key: STRING_KEYS.TRIGGERS })
         ),
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        align: uiRefresh ? 'center' : undefined,
+        align: 'center',
         renderCell: ({
           id,
           assetId,
@@ -528,21 +462,8 @@ const getPositionsTableColumnDef = ({
           stopLossOrders,
           takeProfitOrders,
         }) => {
-          return uiRefresh ? (
+          return (
             <PositionsTriggersCell
-              marketId={id}
-              assetId={assetId}
-              tickSizeDecimals={tickSizeDecimals}
-              liquidationPrice={liquidationPrice.current}
-              stopLossOrders={stopLossOrders}
-              takeProfitOrders={takeProfitOrders}
-              positionSide={side.current}
-              positionSize={size.current}
-              isDisabled={isAccountViewOnly}
-              onViewOrdersClick={navigateToOrders}
-            />
-          ) : (
-            <PositionsTriggersCellDeprecated
               marketId={id}
               assetId={assetId}
               tickSizeDecimals={tickSizeDecimals}
@@ -566,12 +487,10 @@ const getPositionsTableColumnDef = ({
         renderCell: ({
           id,
           assetId,
-          stopLossOrders,
           leverage,
           side,
           oraclePrice,
           entryPrice,
-          takeProfitOrders,
           unrealizedPnl,
           resources,
         }) => (
@@ -589,9 +508,6 @@ const getPositionsTableColumnDef = ({
             }
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
-            stopLossOrders={stopLossOrders}
-            takeProfitOrders={takeProfitOrders}
-            navigateToMarketOrders={navigateToOrders}
           />
         ),
       },
@@ -633,7 +549,6 @@ export const PositionsTable = forwardRef(
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
-    const { uiRefresh } = testFlags;
     const { isTablet } = useBreakpoints();
 
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -702,7 +617,6 @@ export const PositionsTable = forwardRef(
             showClosePositionAction,
             navigateToOrders,
             isSinglePosition: positionsData.length === 1,
-            uiRefresh,
             isTablet,
           })
         )}

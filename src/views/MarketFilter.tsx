@@ -9,7 +9,6 @@ import { MenuItem } from '@/constants/menus';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon } from '@/components/Icon';
 import { SearchInput } from '@/components/SearchInput';
@@ -22,8 +21,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
-
-import { testFlags } from '@/lib/testFlags';
 
 type MarketFilterProps = {
   selectedFilter: MarketFilters;
@@ -48,7 +45,6 @@ export const MarketFilter = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-    const { uiRefresh } = testFlags;
     const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
 
     const onShouldHideLaunchableMarkets = useCallback(
@@ -100,13 +96,13 @@ export const MarketFilter = forwardRef(
         }
         value={selectedFilter}
         onValueChange={onChangeFilter}
-        overflow={uiRefresh ? 'wrap' : 'scroll'}
+        overflow="wrap"
         slotBefore={unlaunchedMarketSwitch}
       />
     );
 
     return (
-      <$MarketFilter ref={ref} $compactLayout={compactLayout} $uiRefreshEnabled={uiRefresh}>
+      <$MarketFilter ref={ref} $compactLayout={compactLayout}>
         <div tw="flex items-center gap-0.5">
           <$SearchInput
             placeholder={stringGetter({ key: searchPlaceholderKey })}
@@ -114,21 +110,13 @@ export const MarketFilter = forwardRef(
           />
         </div>
 
-        {uiRefresh ? (
-          filterToggles
-        ) : (
-          <div tw="row overflow-x-scroll">
-            <$ToggleGroupContainer $compactLayout={compactLayout}>
-              {filterToggles}
-            </$ToggleGroupContainer>
-          </div>
-        )}
+        {filterToggles}
       </$MarketFilter>
     );
   }
 );
 
-const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: boolean }>`
+const $MarketFilter = styled.div<{ $compactLayout: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -136,51 +124,16 @@ const $MarketFilter = styled.div<{ $compactLayout: boolean; $uiRefreshEnabled: b
   flex: 1;
   overflow: hidden;
 
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled &&
-    css`
-      button {
-        --button-toggle-off-border: none;
-        --button-toggle-off-backgroundColor: transparent;
-      }
-    `}
+  button {
+    --button-toggle-off-border: none;
+    --button-toggle-off-backgroundColor: transparent;
+  }
 
   ${({ $compactLayout }) =>
     $compactLayout &&
     css`
       @media ${breakpoints.mobile} {
         flex-direction: column;
-      }
-    `}
-`;
-
-const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
-  ${layoutMixins.row}
-  justify-content: space-between;
-  overflow-x: hidden;
-  position: relative;
-  --toggle-group-paddingRight: 0.75rem;
-
-  &:after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: var(--toggle-group-paddingRight);
-    background: linear-gradient(to right, transparent 10%, var(--color-layer-2));
-  }
-
-  ${({ $compactLayout }) =>
-    $compactLayout &&
-    css`
-      & button {
-        --button-toggle-off-backgroundColor: ${({ theme }) => theme.toggleBackground};
-        --button-toggle-off-textColor: ${({ theme }) => theme.textSecondary};
-        --border-color: ${({ theme }) => theme.layer6};
-        --button-height: 2rem;
-        --button-padding: 0 0.625rem;
-        --button-font: var(--font-small-book);
       }
     `}
 `;
