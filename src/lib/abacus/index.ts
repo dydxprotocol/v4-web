@@ -64,7 +64,6 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
-import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -139,7 +138,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
-    appConfigs.staticTyping = testFlags.enableStaticTyping;
+    appConfigs.staticTyping = true;
     appConfigs.metadataService = true;
 
     this.stateManager = new AsyncAbacusStateManager(

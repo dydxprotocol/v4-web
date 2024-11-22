@@ -39,7 +39,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -52,7 +51,6 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const { enableVaults: showVaults } = testFlags;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -75,7 +73,7 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
         },
-        showVaults && {
+        {
           value: 'VAULT',
           label: (
             <>
