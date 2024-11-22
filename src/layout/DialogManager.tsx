@@ -1,4 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
+import React from 'react';
+
 import { DialogTypes } from '@/constants/dialogs';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
@@ -52,7 +54,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
-export const DialogManager = () => {
+export const DialogManager = React.memo(() => {
   const dispatch = useAppDispatch();
   const activeDialog = useAppSelector(getActiveDialog);
 
@@ -116,4 +118,4 @@ export const DialogManager = () => {
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
-};
+});
