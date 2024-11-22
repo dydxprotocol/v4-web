@@ -48,20 +48,6 @@ export enum MarketFilters {
   NEW = 'new',
   PREDICTION_MARKET = 'prediction-market',
 
-  // Existing Custom Tags from public/configs/markets.json
-  // TODO: Remove when metadataService is default
-  PREDICTION_MARKET_DEPRECATED = 'Prediction Market',
-  FX_DEPRECATED = 'FX',
-  LAYER_1_DEPRECATED = 'Layer 1',
-  LAYER_2_DEPRECATED = 'Layer 2',
-  DEFI_DEPRECATED = 'Defi',
-  AI_DEPRECATED = 'AI',
-  NFT_DEPRECATED = 'NFT',
-  GAMING_DEPRECATED = 'Gaming',
-  MEME_DEPRECATED = 'Meme',
-  RWA_DEPRECATED = 'RWA',
-  ENT_DEPRECATED = 'Entertainment',
-
   // CMC Sector Tags.
   FX = 'fiat',
   LAYER_1 = 'layer-1',
@@ -97,20 +83,11 @@ export const MARKET_FILTER_OPTIONS: Record<
     labelStringKey: STRING_KEYS.LAUNCHABLE,
     isNew: true,
   },
-  [MarketFilters.MEME_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.MEME,
-  },
   [MarketFilters.MEMES]: {
     labelStringKey: STRING_KEYS.MEME,
   },
-  [MarketFilters.AI_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.AI,
-  },
   [MarketFilters.AI]: {
     labelStringKey: STRING_KEYS.AI_BIG_DATA,
-  },
-  [MarketFilters.DEFI_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.DEFI,
   },
   [MarketFilters.DEFI]: {
     labelStringKey: STRING_KEYS.DEFI,
@@ -118,47 +95,22 @@ export const MARKET_FILTER_OPTIONS: Record<
   [MarketFilters.DEPIN]: {
     labelStringKey: STRING_KEYS.DEPIN,
   },
-  [MarketFilters.LAYER_1_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.LAYER_1,
-  },
   [MarketFilters.LAYER_1]: {
     labelStringKey: STRING_KEYS.LAYER_1,
-  },
-  [MarketFilters.LAYER_2_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.LAYER_2,
   },
   [MarketFilters.LAYER_2]: {
     labelStringKey: STRING_KEYS.LAYER_2,
   },
-  [MarketFilters.RWA_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
-  },
   [MarketFilters.RWA]: {
     labelStringKey: STRING_KEYS.REAL_WORLD_ASSET_SHORT,
-  },
-  [MarketFilters.GAMING_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.GAMING,
   },
   [MarketFilters.GAMING]: {
     labelStringKey: STRING_KEYS.GAMING,
   },
-  [MarketFilters.FX_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.FOREX,
-  },
   [MarketFilters.FX]: {
     labelStringKey: STRING_KEYS.FOREX,
   },
-  [MarketFilters.NFT_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.NFT,
-  },
-  [MarketFilters.ENT_DEPRECATED]: {
-    labelStringKey: STRING_KEYS.ENTERTAINMENT,
-  },
   [MarketFilters.PREDICTION_MARKET]: {
-    labelStringKey: STRING_KEYS.PREDICTION_MARKET,
-    isNew: true,
-  },
-  [MarketFilters.PREDICTION_MARKET_DEPRECATED]: {
     labelStringKey: STRING_KEYS.PREDICTION_MARKET,
     isNew: true,
   },

@@ -6,7 +6,7 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { SubaccountPosition } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_MARKETID, MarketFilters, PREDICTION_MARKET } from '@/constants/markets';
+import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
@@ -26,7 +26,6 @@ import {
 } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 import { useMarketsData } from './useMarketsData';
 
@@ -70,7 +69,7 @@ export const useCurrentMarketId = () => {
   }, [hasMarketIds, marketId]);
 
   const isViewingUnlaunchedMarket = useMemo(() => {
-    if (!hasMarketIds || !hasLoadedLaunchableMarkets || !testFlags.pml) return false;
+    if (!hasMarketIds || !hasLoadedLaunchableMarkets) return false;
 
     // Continue displaying unlaunched market view if marketId is in launchedMarketIds state
     if (marketId && launchedMarketIds.includes(marketId)) {
@@ -122,11 +121,7 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketId(marketId));
 
         // If changed to a prediction market, display Prediction Market explainer
-        if (
-          testFlags.pml
-            ? isViewingPredictionMarket
-            : Object.values(PREDICTION_MARKET).includes(marketId)
-        ) {
+        if (isViewingPredictionMarket) {
           onNavigateToPredictionMarket();
         }
 

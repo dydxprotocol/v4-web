@@ -20,8 +20,6 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import LaunchableMarket from './LaunchableMarket';
@@ -35,8 +33,6 @@ import { VerticalPanel } from './VerticalPanel';
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
 
-  const { pml } = testFlags;
-
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const { isTablet } = useBreakpoints();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
@@ -47,7 +43,7 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  if (isViewingUnlaunchedMarket && pml) {
+  if (isViewingUnlaunchedMarket) {
     return <LaunchableMarket />;
   }
 

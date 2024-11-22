@@ -12,17 +12,13 @@ import { shallowEqual } from 'react-redux';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
-import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
-import { useNextClobPairId } from '@/hooks/useNextClobPairId';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useVaultCalculationForLaunchingMarket } from '@/hooks/vaultsHooks';
 
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 
@@ -31,13 +27,8 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
-import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { NewMarketPreviewStep } from './NewMarketPreviewStep';
-import { NewMarketSelectionStep } from './NewMarketSelectionStep';
-import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 import { NewMarketPreviewStep as NewMarketPreviewStep2 } from './v7/NewMarketPreviewStep';
 import { NewMarketSelectionStep as NewMarketSelectionStep2 } from './v7/NewMarketSelectionStep';
 import { NewMarketSuccessStep as NewMarketSuccessStep2 } from './v7/NewMarketSuccessStep';
@@ -60,15 +51,11 @@ export const NewMarketForm = ({
   updateTickerToAdd,
 }: NewMarketFormProps) => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
   const [tickerToAdd, setTickerToAdd] = useState<string | undefined>(defaultLaunchableMarketId);
-  const [liquidityTier, setLiquidityTier] = useState<number>();
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
   const stringGetter = useStringGetter();
 
-  const { tickersFromProposals } = useNextClobPairId();
-  const { hasPotentialMarketsData } = usePotentialMarkets();
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
   const currentFreeCollateral = freeCollateral?.current ?? 0;
@@ -84,10 +71,6 @@ export const NewMarketForm = ({
   }).summaryData;
   const { freeCollateral: freeCollateralUpdated, marginUsage: marginUsageUpdated } =
     orEmptyObj(summaryData);
-
-  const tickSizeDecimals = useMemo(() => {
-    return getTickSizeDecimalsFromPrice(assetToAdd?.meta.referencePrice);
-  }, [assetToAdd]);
 
   useEffect(() => {
     setFormStep?.(step);
@@ -195,97 +178,53 @@ export const NewMarketForm = ({
   /**
    * Permissionless Markets Flow
    */
-  if (testFlags.pml) {
-    if (NewMarketFormStep.SUCCESS === step && tickerToAdd && proposalTxHash) {
-      return (
-        <NewMarketSuccessStep2
-          transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
-          tickerToAdd={tickerToAdd}
-        />
-      );
-    }
 
-    if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
-      return (
-        <NewMarketPreviewStep2
-          onSuccess={onSuccess}
-          onBack={() => {
-            setStep(NewMarketFormStep.SELECTION);
-
-            trackLaunchMarketFormStepChange({
-              currentStep: NewMarketFormStep.PREVIEW,
-              updatedStep: NewMarketFormStep.SELECTION,
-              ticker: tickerToAdd,
-            });
-          }}
-          receiptItems={receiptItems}
-          shouldHideTitleAndDescription={shouldHideTitleAndDescription}
-          ticker={tickerToAdd}
-        />
-      );
-    }
-
+  if (NewMarketFormStep.SUCCESS === step && tickerToAdd && proposalTxHash) {
     return (
-      <NewMarketSelectionStep2
-        hasDefault={!!defaultLaunchableMarketId}
-        onConfirmMarket={() => {
-          setStep(NewMarketFormStep.PREVIEW);
-
-          trackLaunchMarketFormStepChange({
-            currentStep: NewMarketFormStep.SELECTION,
-            updatedStep: NewMarketFormStep.PREVIEW,
-            ticker: tickerToAdd,
-          });
-        }}
-        freeCollateralDetailItem={freeCollateralDetailItem}
-        receiptItems={receiptItems}
-        setTickerToAdd={setTickerToAdd}
-        shouldHideTitleAndDescription={shouldHideTitleAndDescription}
+      <NewMarketSuccessStep2
+        transactionUrl={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)}
         tickerToAdd={tickerToAdd}
       />
     );
   }
 
-  /**
-   * Current Market Proposal Flow
-   */
+  if (NewMarketFormStep.PREVIEW === step && tickerToAdd) {
+    return (
+      <NewMarketPreviewStep2
+        onSuccess={onSuccess}
+        onBack={() => {
+          setStep(NewMarketFormStep.SELECTION);
 
-  if (!hasPotentialMarketsData) {
-    return <LoadingSpace id="new-market-form" tw="min-h-[18.75rem]" />;
-  }
-
-  if (NewMarketFormStep.SUCCESS === step && proposalTxHash) {
-    return <NewMarketSuccessStep href={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)} />;
-  }
-
-  if (NewMarketFormStep.PREVIEW === step) {
-    if (assetToAdd && liquidityTier) {
-      return (
-        <NewMarketPreviewStep
-          assetData={assetToAdd}
-          liquidityTier={liquidityTier}
-          onBack={() => setStep(NewMarketFormStep.SELECTION)}
-          onSuccess={(hash: string) => {
-            setProposalTxHash(hash);
-            setStep(NewMarketFormStep.SUCCESS);
-          }}
-          tickSizeDecimals={tickSizeDecimals}
-        />
-      );
-    }
+          trackLaunchMarketFormStepChange({
+            currentStep: NewMarketFormStep.PREVIEW,
+            updatedStep: NewMarketFormStep.SELECTION,
+            ticker: tickerToAdd,
+          });
+        }}
+        receiptItems={receiptItems}
+        shouldHideTitleAndDescription={shouldHideTitleAndDescription}
+        ticker={tickerToAdd}
+      />
+    );
   }
 
   return (
-    <NewMarketSelectionStep
+    <NewMarketSelectionStep2
+      hasDefault={!!defaultLaunchableMarketId}
       onConfirmMarket={() => {
         setStep(NewMarketFormStep.PREVIEW);
+
+        trackLaunchMarketFormStepChange({
+          currentStep: NewMarketFormStep.SELECTION,
+          updatedStep: NewMarketFormStep.PREVIEW,
+          ticker: tickerToAdd,
+        });
       }}
-      assetToAdd={assetToAdd}
-      setAssetToAdd={setAssetToAdd}
-      liquidityTier={liquidityTier}
-      setLiquidityTier={setLiquidityTier}
-      tickSizeDecimals={tickSizeDecimals}
-      tickersFromProposals={tickersFromProposals}
+      freeCollateralDetailItem={freeCollateralDetailItem}
+      receiptItems={receiptItems}
+      setTickerToAdd={setTickerToAdd}
+      shouldHideTitleAndDescription={shouldHideTitleAndDescription}
+      tickerToAdd={tickerToAdd}
     />
   );
 };

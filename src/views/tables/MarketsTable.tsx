@@ -4,22 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { FUNDING_DECIMALS } from '@/constants/numbers';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { Button } from '@/components/Button';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
@@ -35,7 +32,6 @@ import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { FavoriteButton } from './MarketsTable/FavoriteButton';
 
@@ -52,8 +48,6 @@ export const MarketsTable = forwardRef(
       filter,
       searchFilter,
     });
-
-    const { hasPotentialMarketsData } = usePotentialMarkets();
 
     const columns = useMemo<ColumnDef<MarketData>[]>(
       () =>
@@ -283,7 +277,6 @@ export const MarketsTable = forwardRef(
         <$Toolbar>
           <MarketFilter
             ref={ref}
-            hideNewMarketButton
             compactLayout
             searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
             selectedFilter={filter}
@@ -308,23 +301,18 @@ export const MarketsTable = forwardRef(
           }}
           columns={columns}
           initialPageSize={50}
-          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          paginationBehavior="paginate"
           shouldResetOnTotalRowsChange
           className={className}
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
-                <>
-                  <h2>
-                    {stringGetter({
-                      key: STRING_KEYS.QUERY_NOT_FOUND,
-                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
-                    })}
-                  </h2>
-                  {hasPotentialMarketsData && (
-                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
-                  )}
-                </>
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                  })}
+                </h2>
               ) : searchFilter ? (
                 <>
                   <h2>
@@ -337,17 +325,6 @@ export const MarketsTable = forwardRef(
                 </>
               ) : (
                 <LoadingSpace id="markets-table" />
-              )}
-
-              {hasPotentialMarketsData && hasMarketIds && (
-                <div>
-                  <Button
-                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-                    size={ButtonSize.Small}
-                  >
-                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-                  </Button>
-                </div>
               )}
             </$MarketNotFound>
           }

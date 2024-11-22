@@ -4,18 +4,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
-import { ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,7 +22,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -42,7 +40,6 @@ import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 import { FavoriteButton } from './tables/MarketsTable/FavoriteButton';
@@ -58,9 +55,7 @@ const MarketsDropdownContent = ({
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
-  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const setFilter = (newFilter: MarketFilters) => {
     dispatch(setMarketFilter(newFilter));
@@ -249,22 +244,17 @@ const MarketsDropdownContent = ({
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           initialPageSize={50}
-          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          paginationBehavior="paginate"
           shouldResetOnTotalRowsChange
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
-                <>
-                  <h2>
-                    {stringGetter({
-                      key: STRING_KEYS.QUERY_NOT_FOUND,
-                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
-                    })}
-                  </h2>
-                  {hasPotentialMarketsData && (
-                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
-                  )}
-                </>
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                  })}
+                </h2>
               ) : (
                 <>
                   <h2>
@@ -275,17 +265,6 @@ const MarketsDropdownContent = ({
                   </h2>
                   <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
                 </>
-              )}
-
-              {hasPotentialMarketsData && (
-                <div>
-                  <Button
-                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-                    size={ButtonSize.Small}
-                  >
-                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-                  </Button>
-                </div>
               )}
             </$MarketNotFound>
           }

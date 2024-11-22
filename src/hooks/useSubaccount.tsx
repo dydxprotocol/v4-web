@@ -4,12 +4,7 @@ import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
-import {
-  SubaccountClient,
-  utils,
-  type GovAddNewMarketParams,
-  type LocalWallet,
-} from '@dydxprotocol/v4-client-js';
+import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { shallowEqual } from 'react-redux';
@@ -58,7 +53,6 @@ import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
-import { useGovernanceVariables } from './useGovernanceVariables';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -708,35 +702,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
-  const { newMarketProposal } = useGovernanceVariables();
-
-  // ------ Governance Methods ------ //
-  const submitNewMarketProposal = useCallback(
-    async (params: GovAddNewMarketParams) => {
-      if (!compositeClient) {
-        throw new Error('client not initialized');
-      } else if (!localDydxWallet) {
-        throw new Error('wallet not initialized');
-      } else if (!newMarketProposal) {
-        throw new Error('governance variables not initialized');
-      }
-
-      const response = await compositeClient.submitGovAddNewMarketProposal(
-        localDydxWallet,
-        params,
-        utils.getGovAddNewMarketTitle(params.ticker),
-        utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-        BigInt(newMarketProposal.initialDepositAmount).toString(),
-        undefined,
-        undefined,
-        true
-      );
-
-      return response;
-    },
-    [compositeClient, localDydxWallet, newMarketProposal]
-  );
-
   // ------ Listing Method ------ //
   const createPermissionlessMarket = useCallback(
     async (ticker: string) => {
@@ -1076,9 +1041,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     cancelOrder,
     cancelAllOrders,
     placeTriggerOrders,
-
-    // Governance Methods
-    submitNewMarketProposal,
 
     // Listing Methods
     createPermissionlessMarket,
