@@ -12,7 +12,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { config as grazConfig } from '@/constants/graz';
-import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
+import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -21,7 +21,6 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
-import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { StatsigProvider } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
@@ -71,7 +70,6 @@ import { openDialog } from './state/dialogs';
 import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
 
-const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
 const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
@@ -132,7 +130,6 @@ const Content = () => {
               </Route>
 
               <Route path={AppRoute.Markets}>
-                {!testFlags.pml && <Route path={MarketsRoute.New} element={<NewMarket />} />}
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
@@ -201,16 +198,15 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 function useUnlimitedLaunchDialog() {
-  const showUnlimitedAnnouncement = testFlags.pml && testFlags.enableVaults;
   const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
   const isAccountConnected = useAppSelector(getIsAccountConnected);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (isAccountConnected && showUnlimitedAnnouncement && !hasSeenUnlimitedAnnouncement) {
+    if (isAccountConnected && !hasSeenUnlimitedAnnouncement) {
       dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
     }
-  }, [dispatch, showUnlimitedAnnouncement, hasSeenUnlimitedAnnouncement, isAccountConnected]);
+  }, [dispatch, hasSeenUnlimitedAnnouncement, isAccountConnected]);
 }
 
 const providers = [
@@ -237,7 +233,6 @@ const providers = [
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
-  wrapProvider(PotentialMarketsProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),
 ].filter(isTruthy);

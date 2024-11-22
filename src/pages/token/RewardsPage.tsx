@@ -36,7 +36,6 @@ import { GeoblockedPanel } from './GeoblockedPanel';
 import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
-import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
@@ -114,7 +113,6 @@ const RewardsPage = () => {
             <UnbondingPanels />
             <LaunchIncentivesPanel />
             <TradingRewardsChartPanel />
-            <NewMarketsPanel />
             <GovernancePanel />
             <RewardHistoryPanel />
             <RewardsHelpPanel />
@@ -135,7 +133,6 @@ const RewardsPage = () => {
               {showStakingRewardPanel && stakingRewardPanel}
               <StakingPanel />
               <UnbondingPanels />
-              <NewMarketsPanel />
               <GovernancePanel />
               <RewardsHelpPanel />
               {legalDisclaimer}

@@ -44,7 +44,6 @@ import { truncateAddress } from '@/lib/wallet';
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
 import { MigratePanel } from './token/MigratePanel';
-import { NewMarketsPanel } from './token/NewMarketsPanel';
 import { StakingPanel } from './token/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
@@ -294,7 +293,6 @@ const Profile = () => {
         })}
       </Panel>
       <GovernancePanel tw="[grid-area:governance]" />
-      <NewMarketsPanel tw="[grid-area:newMarkets]" />
     </$MobileProfileLayout>
   );
 };
@@ -318,7 +316,7 @@ const $MobileProfileLayout = styled.div`
     'staking staking'
     'rewards fees'
     'history history'
-    'governance newMarkets'
+    'governance governance'
     'incentives incentives'
     'legal legal';
 
@@ -332,7 +330,6 @@ const $MobileProfileLayout = styled.div`
       'rewards fees'
       'history history'
       'governance governance'
-      'newMarkets newMarkets'
       'incentives incentives'
       'legal legal';
   }
