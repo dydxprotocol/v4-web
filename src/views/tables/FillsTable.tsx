@@ -347,15 +347,18 @@ type StyleProps = {
 };
 
 export const FillsTable = forwardRef(
-  ({
-    columnKeys,
-    columnWidths,
-    currentMarket,
-    initialPageSize,
-    withGradientCardRows,
-    withOuterBorder,
-    withInnerBorders = true,
-  }: ElementProps & StyleProps) => {
+  (
+    {
+      columnKeys,
+      columnWidths,
+      currentMarket,
+      initialPageSize,
+      withGradientCardRows,
+      withOuterBorder,
+      withInnerBorders = true,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isMobile } = useBreakpoints();

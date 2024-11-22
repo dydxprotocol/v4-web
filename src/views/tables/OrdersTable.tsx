@@ -405,14 +405,17 @@ type StyleProps = {
 };
 
 export const OrdersTable = forwardRef(
-  ({
-    columnKeys = [],
-    columnWidths,
-    currentMarket,
-    marketTypeFilter,
-    initialPageSize,
-    withOuterBorder,
-  }: ElementProps & StyleProps) => {
+  (
+    {
+      columnKeys = [],
+      columnWidths,
+      currentMarket,
+      marketTypeFilter,
+      initialPageSize,
+      withOuterBorder,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isTablet } = useBreakpoints();

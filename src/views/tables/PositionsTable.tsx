@@ -533,19 +533,22 @@ type StyleProps = {
 };
 
 export const PositionsTable = forwardRef(
-  ({
-    columnKeys,
-    columnWidths,
-    currentRoute,
-    currentMarket,
-    marketTypeFilter,
-    showClosePositionAction,
-    initialPageSize,
-    onNavigate,
-    navigateToOrders,
-    withGradientCardRows,
-    withOuterBorder,
-  }: ElementProps & StyleProps) => {
+  (
+    {
+      columnKeys,
+      columnWidths,
+      currentRoute,
+      currentMarket,
+      marketTypeFilter,
+      showClosePositionAction,
+      initialPageSize,
+      onNavigate,
+      navigateToOrders,
+      withGradientCardRows,
+      withOuterBorder,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
     const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
