@@ -82,7 +82,7 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
   const stringGetter = useStringGetter();
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
-  const { affiliates } = useAffiliatesLeaderboard();
+  const { data: affiliates } = useAffiliatesLeaderboard();
 
   const columns: ColumnDef<IAffiliateLeaderboardStats>[] = isTablet
     ? [
@@ -217,7 +217,6 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           filters={affiliatesFilters}
           onChangeFilter={setFilter}
         />
-
         <$Table
           withInnerBorders
           data={affiliates ?? EMPTY_ARR}

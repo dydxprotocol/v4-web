@@ -7,6 +7,7 @@ import {
   MAX_AFFILIATE_VIP_SHARE,
   REF_SHARE_VOLUME_CAP_USD,
 } from '@/constants/affiliates';
+import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
@@ -32,6 +33,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     if (!compositeClient || !dydxAddress) {
       return {};
     }
+
     const metadataEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
     const totalVolumeEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/total_volume`;
 
@@ -89,12 +91,14 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     queryKey: ['affiliateMetadata', dydxAddress],
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress && affiliatesBaseUrl),
+    staleTime: 5 * timeUnits.minute,
   });
 
   const affiliateStatsQuery = useQuery({
     queryKey: ['accountStats', dydxAddress],
     queryFn: fetchAccountStats,
     enabled: Boolean(compositeClient && dydxAddress),
+    staleTime: 5 * timeUnits.minute,
   });
 
   const fetchAffiliateMaxEarning = async () => {
@@ -114,6 +118,7 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     queryKey: ['affiliateMaxEarning', feeTiers],
     queryFn: fetchAffiliateMaxEarning,
     enabled: Boolean(compositeClient && feeTiers && affiliatesBaseUrl),
+    staleTime: Infinity,
   });
 
   return {

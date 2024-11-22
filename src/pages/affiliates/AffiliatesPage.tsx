@@ -1,5 +1,3 @@
-import { Suspense } from 'react';
-
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -10,12 +8,13 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { bytesToBigInt } from '@/lib/numbers';
 
@@ -23,7 +22,7 @@ export const AffiliatesPage = () => {
   const { dydxAddress } = useAccounts();
   const { affiliateStatsQuery, affiliateMetadataQuery } = useAffiliatesInfo(dydxAddress);
   const { data: accountStats } = affiliateStatsQuery;
-  const { data: affiliateMetadata, isPending: isAffiliateMetadataPending } = affiliateMetadataQuery;
+  const { data: affiliateMetadata } = affiliateMetadataQuery;
 
   const stringGetter = useStringGetter();
 
@@ -41,44 +40,41 @@ export const AffiliatesPage = () => {
     totalVolume: totalVolume.toLocaleString(),
   };
 
-  if (dydxAddress && isAffiliateMetadataPending) {
-    return <LoadingSpace id="affiliates" />;
-  }
-
   return (
-    <Suspense fallback={<LoadingSpace id="affiliates" />}>
-      <$Page tw="flex flex-col gap-1">
-        <$Section tw="flex flex-col gap-1 px-1 pt-1">
-          <AffiliatesBanner />
-          <h3 tw="px-0.5 text-color-text-2 font-large-medium">
-            {stringGetter({ key: STRING_KEYS.YOUR_STATS })}
-          </h3>
+    <$Page tw="flex flex-col gap-1">
+      <$Section tw="flex flex-col gap-1 px-1 pt-1">
+        <AffiliatesBanner />
+        {!dydxAddress && <ConnectWallet />}
+        {dydxAddress && (
+          <>
+            <h3 tw="px-0.5 text-color-text-2 font-large-medium">
+              {stringGetter({ key: STRING_KEYS.YOUR_STATS })}
+            </h3>
 
-          <section tw="flex flex-row flex-wrap items-center justify-between gap-y-1">
-            {dydxAddress && !userStatus.isAffiliate && !userStatus.isVip ? (
-              <div tw="w-full notTablet:w-7/12">
+            <section tw="flex flex-row flex-wrap justify-between gap-1">
+              {!affiliateMetadata ? (
+                <div tw="flex min-h-4 flex-1 items-center justify-center rounded-0.625 bg-color-layer-3">
+                  <LoadingSpinner />
+                </div>
+              ) : !userStatus.isAffiliate && !userStatus.isVip ? (
                 <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
-              </div>
-            ) : (
-              <AffiliateStatsCard
-                currentAffiliateTier={userStatus.currentAffiliateTier}
-                isVip={userStatus.isVip}
-                stakedDydx={userStatus.stakedDydx}
-                tw="h-fit w-full notTablet:h-full notTablet:w-7/12"
-                accountStats={accountStats}
-              />
-            )}
+              ) : (
+                <AffiliateStatsCard
+                  currentAffiliateTier={userStatus.currentAffiliateTier}
+                  isVip={userStatus.isVip}
+                  stakedDydx={userStatus.stakedDydx}
+                  accountStats={accountStats}
+                />
+              )}
 
-            <ProgramStatusCard
-              tw="h-fit w-full notTablet:h-full notTablet:w-4/12"
-              isVip={!!userStatus.isVip}
-            />
-          </section>
-        </$Section>
+              <ProgramStatusCard tw="w-full notTablet:w-4/12" isVip={!!userStatus.isVip} />
+            </section>
+          </>
+        )}
+      </$Section>
 
-        <AffiliatesLeaderboard {...{ accountStats }} />
-      </$Page>
-    </Suspense>
+      <AffiliatesLeaderboard accountStats={accountStats} />
+    </$Page>
   );
 };
 
@@ -90,3 +86,16 @@ const $Section = styled.section`
   ${layoutMixins.contentSectionDetached}
   ${layoutMixins.flexColumn}
 `;
+
+const ConnectWallet = () => {
+  const stringGetter = useStringGetter();
+
+  return (
+    <div tw="h-full rounded-0.625 bg-color-layer-3">
+      <div tw="flex flex-col items-center justify-center gap-y-1 px-4 py-2 text-center">
+        <p>{stringGetter({ key: STRING_KEYS.AFFILIATE_CONNECT_WALLET })}</p>
+        <OnboardingTriggerButton />
+      </div>
+    </div>
+  );
+};

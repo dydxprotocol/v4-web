@@ -17,7 +17,7 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
   const stringGetter = useStringGetter();
 
   return (
-    <$Container tw="column gap-1">
+    <$Container tw="column flex-1 gap-1">
       <div tw="text-medium text-color-text-1">
         {stringGetter({
           key: STRING_KEYS.SHARE_AFFILIATE_BANNER_TITLE,
