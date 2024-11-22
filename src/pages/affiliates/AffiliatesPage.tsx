@@ -67,7 +67,7 @@ export const AffiliatesPage = () => {
                 />
               )}
 
-              <ProgramStatusCard tw="w-full notTablet:w-4/12" isVip={!!userStatus.isVip} />
+              <ProgramStatusCard isVip={!!userStatus.isVip} />
             </section>
           </>
         )}

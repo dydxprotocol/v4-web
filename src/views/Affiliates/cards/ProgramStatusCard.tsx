@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -16,11 +15,10 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 interface IProgramCardProps {
-  className?: string;
   isVip: boolean;
 }
 
-export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProps) => {
+export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const { affiliateProgram, vipsChannel, affiliateProgramSupportEmail } = useURLConfigs();
@@ -63,7 +61,7 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
     : stringGetter({ key: STRING_KEYS.APPLY_NOW });
 
   return (
-    <$Container className={className}>
+    <div tw="w-full rounded-0.625 bg-color-layer-3 notTablet:w-4/12">
       {dydxAddress && (
         <div tw="flex flex-col gap-y-1 p-1">
           <$Header tw="flex items-center">
@@ -106,11 +104,9 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
           )}
         </div>
       )}
-    </$Container>
+    </div>
   );
 };
-
-const $Container = tw.div`rounded-0.625 bg-color-layer-3`;
 
 const $Header = styled.div`
   font-size: 18px;
