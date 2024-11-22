@@ -38,13 +38,11 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
 import { MigratePanel } from './token/MigratePanel';
-import { NewMarketsPanel } from './token/NewMarketsPanel';
 import { StakingPanel } from './token/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
@@ -71,7 +69,6 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
-  const { uiRefresh } = testFlags;
 
   const { data: ensName } = useEnsName({
     address:
@@ -261,20 +258,12 @@ const Profile = () => {
         hasSeparator
       >
         <FillsTable
-          columnKeys={
-            uiRefresh
-              ? [
-                  FillsTableColumnKey.Time,
-                  FillsTableColumnKey.Action,
-                  FillsTableColumnKey.Type,
-                  FillsTableColumnKey.Total,
-                ]
-              : [
-                  FillsTableColumnKey.Action,
-                  FillsTableColumnKey.Type,
-                  FillsTableColumnKey.AmountTag,
-                ]
-          }
+          columnKeys={[
+            FillsTableColumnKey.Time,
+            FillsTableColumnKey.Action,
+            FillsTableColumnKey.Type,
+            FillsTableColumnKey.Total,
+          ]}
           withInnerBorders={false}
           initialPageSize={5}
         />
@@ -294,7 +283,6 @@ const Profile = () => {
         })}
       </Panel>
       <GovernancePanel tw="[grid-area:governance]" />
-      <NewMarketsPanel tw="[grid-area:newMarkets]" />
     </$MobileProfileLayout>
   );
 };
@@ -318,7 +306,7 @@ const $MobileProfileLayout = styled.div`
     'staking staking'
     'rewards fees'
     'history history'
-    'governance newMarkets'
+    'governance governance'
     'incentives incentives'
     'legal legal';
 
@@ -332,7 +320,6 @@ const $MobileProfileLayout = styled.div`
       'rewards fees'
       'history history'
       'governance governance'
-      'newMarkets newMarkets'
       'incentives incentives'
       'legal legal';
   }

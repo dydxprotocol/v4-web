@@ -18,7 +18,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 
 type PositionsMarginCellProps = {
@@ -29,9 +28,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const { uiRefresh } = testFlags;
-
-  const { marginMode, marginModeLabel, margin } = useMemo(() => {
+  const { marginMode, margin } = useMemo(() => {
     const { childSubaccountNumber } = position;
     const derivedMarginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
@@ -45,7 +42,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     };
   }, [position, stringGetter]);
 
-  return uiRefresh ? (
+  return (
     <TableCell
       slotRight={
         marginMode === AbacusMarginMode.Isolated && (
@@ -65,27 +62,6 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     >
       <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />
     </TableCell>
-  ) : (
-    <TableCell
-      stacked
-      slotRight={
-        marginMode === AbacusMarginMode.Isolated && (
-          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
-            <$EditButtonDeprecated
-              key="edit-margin"
-              iconName={IconName.Pencil}
-              shape={ButtonShape.Square}
-              onClick={() =>
-                dispatch(openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.id })))
-              }
-            />
-          </WithTooltip>
-        )
-      }
-    >
-      <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />
-      <span>{marginModeLabel}</span>
-    </TableCell>
   );
 };
 
@@ -95,13 +71,4 @@ const $EditButton = styled(IconButton)`
   --button-backgroundColor: transparent;
   --button-border: none;
   --button-width: min-content;
-`;
-
-const $EditButtonDeprecated = styled(IconButton)`
-  --button-icon-size: 1.5em;
-  --button-padding: 0;
-  --button-textColor: var(--color-text-0);
-  --button-hover-textColor: var(--color-text-1);
-
-  margin-left: 0.5rem;
 `;

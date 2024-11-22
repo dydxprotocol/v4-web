@@ -113,9 +113,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, displayId }) => (
-          <MarketTableCell asset={asset ?? undefined} marketId={displayId} />
-        ),
+        renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',

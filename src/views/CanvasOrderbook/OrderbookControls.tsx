@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { clamp } from 'lodash';
 import { shallowEqual, useDispatch } from 'react-redux';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
@@ -21,7 +21,6 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { testFlags } from '@/lib/testFlags';
 
 type OrderbookControlsProps = {
   className?: string;
@@ -32,8 +31,6 @@ type OrderbookControlsProps = {
 export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
-
-  const { uiRefresh } = testFlags;
 
   const modifyScale = useCallback(
     (direction: number) => {
@@ -64,12 +61,12 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     <$OrderbookControlsContainer className={className}>
       <div tw="flex justify-between gap-0.5">
         <div tw="flex gap-0.5">
-          <$ButtonGroup $uiRefreshEnabled={uiRefresh}>
-            <$WithSeparators layout="row" withSeparators={uiRefresh}>
+          <$ButtonGroup>
+            <$WithSeparators layout="row" withSeparators>
               <Button
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
-                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+                buttonStyle={ButtonStyle.WithoutBackground}
                 onClick={() => modifyScale(-1)}
               >
                 -
@@ -77,7 +74,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
               <Button
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
-                buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+                buttonStyle={ButtonStyle.WithoutBackground}
                 onClick={() => modifyScale(1)}
               >
                 +
@@ -125,18 +122,14 @@ const $WithSeparators = styled(WithSeparators)`
   --separatorHeight-padding: 0.5rem;
 `;
 
-const $ButtonGroup = styled.div<{ $uiRefreshEnabled: boolean }>`
+const $ButtonGroup = styled.div`
   display: flex;
   gap: 0.25rem;
   > button {
     --button-font: var(--font-medium-book);
 
-    ${({ $uiRefreshEnabled }) =>
-      $uiRefreshEnabled &&
-      css`
-        --button-textColor: var(--color-text-2);
-        --button-padding: 0 0.5rem;
-        --button-width: min-content;
-      `}
+    --button-textColor: var(--color-text-2);
+    --button-padding: 0 0.5rem;
+    --button-width: min-content;
   }
 `;

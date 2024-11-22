@@ -44,20 +44,12 @@ class TestFlags {
     return this.queryParams.utm_source;
   }
 
-  get pml() {
-    return true;
-  }
-
   get showLimitClose() {
     return this.booleanFlag(this.queryParams.limitclose);
   }
 
   get referralCode() {
     return this.queryParams.ref;
-  }
-
-  get uiRefresh() {
-    return true;
   }
 
   get onboardingRewrite() {

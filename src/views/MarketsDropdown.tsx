@@ -1,21 +1,20 @@
 import { Key, memo, useEffect, useMemo, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
-import { ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,7 +22,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -36,13 +34,12 @@ import { Toolbar } from '@/components/Toolbar';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
-import { getMarketFilter, getMarketMaxLeverage } from '@/state/perpetualsSelectors';
+import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { MarketFilter } from './MarketFilter';
 import { FavoriteButton } from './tables/MarketsTable/FavoriteButton';
@@ -58,10 +55,7 @@ const MarketsDropdownContent = ({
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const stringGetter = useStringGetter();
   const [searchFilter, setSearchFilter] = useState<string>();
-  const navigate = useNavigate();
   const featureFlags = useAllStatsigGateValues();
-  const { hasPotentialMarketsData } = usePotentialMarkets();
-  const { uiRefresh } = testFlags;
 
   const setFilter = (newFilter: MarketFilters) => {
     dispatch(setMarketFilter(newFilter));
@@ -91,7 +85,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <div tw="flex items-center gap-0.25">
               <FavoriteButton marketId={id} />
-              <$AssetIcon $uiRefreshEnabled={uiRefresh} logoUrl={imageUrl} symbol={assetId} />
+              <$AssetIcon logoUrl={imageUrl} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 {isUnlaunched ? (
@@ -166,16 +160,8 @@ const MarketsDropdownContent = ({
             <$Output type={OutputType.CompactFiat} value={row.marketCap} />
           ),
         },
-        !uiRefresh && {
-          columnKey: 'openInterest',
-          getCellValue: (row: MarketData) => row.openInterestUSDC,
-          label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-          renderCell: (row: MarketData) => (
-            <$Output type={OutputType.CompactFiat} value={row.openInterestUSDC} />
-          ),
-        },
       ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
-    [stringGetter, uiRefresh]
+    [stringGetter]
   );
 
   const slotBottom = useMemo(() => {
@@ -258,22 +244,17 @@ const MarketsDropdownContent = ({
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           initialPageSize={50}
-          paginationBehavior={testFlags.pml ? 'paginate' : 'showAll'}
+          paginationBehavior="paginate"
           shouldResetOnTotalRowsChange
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
-                <>
-                  <h2>
-                    {stringGetter({
-                      key: STRING_KEYS.QUERY_NOT_FOUND,
-                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
-                    })}
-                  </h2>
-                  {hasPotentialMarketsData && (
-                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
-                  )}
-                </>
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                  })}
+                </h2>
               ) : (
                 <>
                   <h2>
@@ -284,17 +265,6 @@ const MarketsDropdownContent = ({
                   </h2>
                   <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
                 </>
-              )}
-
-              {hasPotentialMarketsData && (
-                <div>
-                  <Button
-                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-                    size={ButtonSize.Small}
-                  >
-                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-                  </Button>
-                </div>
               )}
             </$MarketNotFound>
           }
@@ -318,18 +288,7 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
-    const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, currentMarketId);
     const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
-    const isViewingUnlaunchedMarket = !!launchableAsset;
-
-    const { uiRefresh: uiRefreshEnabled } = testFlags;
-
-    const leverageTag =
-      !uiRefreshEnabled && !isViewingUnlaunchedMarket && currentMarketId != null ? (
-        <Tag>
-          <Output type={OutputType.Multiple} value={marketMaxLeverage} fractionDigits={0} />
-        </Tag>
-      ) : undefined;
 
     const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
 
@@ -357,55 +316,42 @@ export const MarketsDropdown = memo(
 
     return (
       <$Popover
-        $uiRefreshEnabled={uiRefreshEnabled}
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
           <>
             {triggerBackground}
-            <$TriggerContainer $isOpen={isOpen} $uiRefreshEnabled={uiRefreshEnabled}>
-              {!uiRefreshEnabled && isOpen ? (
-                <h2 tw="text-color-text-2 font-medium-medium">
-                  {stringGetter({ key: STRING_KEYS.SELECT_MARKET })}
-                </h2>
-              ) : (
-                <div tw="spacedRow gap-0.625">
-                  {launchableAsset ? (
-                    <>
-                      <img
-                        src={launchableAsset.logo}
-                        alt={launchableAsset.name}
-                        tw="h-[1em] w-auto rounded-[50%]"
-                      />
+            <$TriggerContainer $isOpen={isOpen}>
+              <div tw="spacedRow gap-0.625">
+                {launchableAsset ? (
+                  <>
+                    <img
+                      src={launchableAsset.logo}
+                      alt={launchableAsset.name}
+                      tw="h-[1em] w-auto rounded-[50%]"
+                    />
 
-                      <div tw="flex flex-col text-start">
-                        <span tw="font-mini-book">
-                          {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
-                        </span>
-                        <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
-                          {currentMarketId}
-                        </h2>
-                      </div>
-                    </>
-                  ) : (
-                    <div tw="flex items-center gap-0.25">
-                      <$AssetIconWithStar>
-                        {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
-                        <$AssetIcon
-                          logoUrl={logoUrl}
-                          $uiRefreshEnabled={uiRefreshEnabled}
-                          tw="mr-0.25"
-                        />
-                      </$AssetIconWithStar>
-                      <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    <div tw="flex flex-col text-start">
+                      <span tw="font-mini-book">
+                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                      </span>
+                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                        {currentMarketId}
+                      </h2>
                     </div>
-                  )}
-                  {leverageTag}
-                </div>
-              )}
+                  </>
+                ) : (
+                  <div tw="flex items-center gap-0.25">
+                    <$AssetIconWithStar>
+                      {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
+                      <$AssetIcon logoUrl={logoUrl} tw="mr-0.25" />
+                    </$AssetIconWithStar>
+                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  </div>
+                )}
+              </div>
               <p tw="row gap-0.5 text-color-text-0 font-small-book">
-                {!uiRefreshEnabled && isOpen && stringGetter({ key: STRING_KEYS.TAP_TO_CLOSE })}
                 <DropdownIcon isOpen={isOpen} />
               </p>
             </$TriggerContainer>
@@ -425,29 +371,19 @@ export const MarketsDropdown = memo(
   }
 );
 
-const $TriggerContainer = styled.div<{ $isOpen: boolean; $uiRefreshEnabled: boolean }>`
+const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
   position: relative;
 
   ${layoutMixins.spacedRow}
   padding: 0 1.25rem;
 
   transition: width 0.1s;
-
-  ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled
-      ? css`
-          gap: 1rem;
-        `
-      : css`
-          width: var(--sidebar-width);
-        `}
-  `}
+  gap: 1rem;
 `;
 
-const $Popover = styled(Popover)<{ $uiRefreshEnabled: boolean }>`
+const $Popover = styled(Popover)`
   ${popoverMixins.popover}
-  --popover-item-height: ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled ? css`2.75rem` : css`3.375rem`};
+  --popover-item-height: 2.75rem;
 
   --popover-backgroundColor: var(--color-layer-2);
   display: flex;
@@ -457,15 +393,8 @@ const $Popover = styled(Popover)<{ $uiRefreshEnabled: boolean }>`
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
 
-  ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled
-      ? css`
-          width: var(--marketsDropdown-openWidth);
-        `
-      : css`
-          width: var(--marketsDropdown-openWidth-deprecated);
-        `}
-  `}
+  width: var(--marketsDropdown-openWidth);
+
   max-width: 100vw;
 
   box-shadow: 0 0 0 1px var(--color-border);
@@ -516,13 +445,8 @@ const $MarketDropdownBanner = styled.div`
   }
 `;
 
-const $AssetIcon = styled(AssetIcon)<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) => css`
-    ${$uiRefreshEnabled &&
-    css`
-      --asset-icon-size: 1.5em;
-    `}
-  `}
+const $AssetIcon = styled(AssetIcon)`
+  --asset-icon-size: 1.5em;
 `;
 
 const $FlagGradient = styled.div`

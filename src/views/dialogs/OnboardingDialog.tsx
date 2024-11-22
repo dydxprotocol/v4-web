@@ -33,7 +33,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { LanguageSelector } from '../menus/LanguageSelector';
@@ -50,7 +49,6 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const { selectWallet, sourceAccount } = useAccounts();
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
-  const { uiRefresh } = testFlags;
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen(false);
@@ -109,7 +107,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
               </$Content>
             ),
             hasFooterBorder: true,
-            slotFooter: uiRefresh ? (
+            slotFooter: (
               <$Footer>
                 <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
                   <h3 tw="text-color-text-2 font-medium-book">
@@ -119,7 +117,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
                 </div>
                 <$LanguageSelector />
               </$Footer>
-            ) : undefined,
+            ),
           },
           [OnboardingSteps.KeyDerivation]: {
             slotIcon: {

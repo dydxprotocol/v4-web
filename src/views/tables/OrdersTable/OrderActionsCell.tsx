@@ -20,7 +20,6 @@ import { clearOrder } from '@/state/account';
 import { useAppDispatch } from '@/state/appTypes';
 
 import { isOrderStatusClearable } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   orderId: string;
@@ -32,8 +31,6 @@ type ElementProps = {
 export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-
-  const { uiRefresh } = testFlags;
 
   const [isCanceling, setIsCanceling] = useState(false);
 
@@ -68,7 +65,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
           iconName={IconName.Close}
           iconSize="0.875em"
           shape={ButtonShape.Square}
-          buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
+          buttonStyle={ButtonStyle.WithoutBackground}
           {...(isOrderStatusClearable(status)
             ? { onClick: () => dispatch(clearOrder(orderId)) }
             : {

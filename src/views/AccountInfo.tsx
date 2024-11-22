@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
@@ -14,8 +14,6 @@ import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { AccountInfoSection } from './AccountInfo/AccountInfoSection';
 
 type StyleProps = {
@@ -29,17 +27,9 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const canViewAccountInfo = useAppSelector(calculateCanViewAccount);
 
-  const { uiRefresh } = testFlags;
-
   return (
-    <$AccountInfoSectionContainer
-      className={className}
-      showAccountInfo={canViewAccountInfo}
-      $uiRefreshEnabled={uiRefresh}
-    >
-      {onboardingState === OnboardingState.AccountConnected ||
-      canViewAccountInfo ||
-      (uiRefresh && !isTablet) ? (
+    <$AccountInfoSectionContainer className={className}>
+      {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo || !isTablet ? (
         <AccountInfoSection />
       ) : (
         <$DisconnectedAccountInfoContainer>
@@ -72,27 +62,9 @@ const $DisconnectedAccountInfoContainer = styled.div`
   }
 `;
 
-const $AccountInfoSectionContainer = styled.div<{
-  showAccountInfo?: boolean;
-  $uiRefreshEnabled: boolean;
-}>`
+const $AccountInfoSectionContainer = styled.div`
   ${layoutMixins.column}
 
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled
-      ? css`
-          height: var(--account-info-section-height);
-          min-height: var(--account-info-section-height);
-        `
-      : css`
-          height: var(--account-info-section-height-deprecated);
-          min-height: var(--account-info-section-height-deprecated);
-        `}
-
-  ${({ showAccountInfo, $uiRefreshEnabled }) =>
-    !showAccountInfo &&
-    !$uiRefreshEnabled &&
-    css`
-      padding: 1.125em 1.25em 0.875em;
-    `}
+  height: var(--account-info-section-height);
+  min-height: var(--account-info-section-height);
 `;

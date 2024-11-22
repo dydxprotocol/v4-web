@@ -27,8 +27,6 @@ import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
-import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
-import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketIntroDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
@@ -95,8 +93,6 @@ export const DialogManager = () => {
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
     MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,
-    NewMarketAgreement: (args) => <NewMarketAgreementDialog {...args} {...modalProps} />,
-    NewMarketMessageDetails: (args) => <NewMarketMessageDetailsDialog {...args} {...modalProps} />,
     Onboarding: (args) => <OnboardingDialog {...args} {...modalProps} />,
     OrderDetails: (args) => <OrderDetailsDialog {...args} {...modalProps} />,
     PredictionMarketIntro: (args) => <PredictionMarketIntroDialog {...args} {...modalProps} />,
