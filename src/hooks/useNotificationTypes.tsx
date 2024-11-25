@@ -134,6 +134,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
                   groupKey: abacusNotificationType,
+                  searchableContent: `${parsedData?.ASSET}|${parsedData?.MARKET}}|${parsedData?.ORDER_TYPE_TEXT}`,
                   renderCustomBody: ({ isToast, notification }) => (
                     <TradeNotification
                       isToast={isToast}
@@ -615,6 +616,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               toastSensitivity: 'background',
               groupKey: key, // do not collapse
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              searchableContent: `${localPlace.marketId}|${localPlace.orderType}`,
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderStatusNotification
                   isToast={isToast}
@@ -651,6 +653,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               toastSensitivity: 'background',
               groupKey: key,
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              searchableContent: `${existingOrder.displayId}|${existingOrder.marketId}`,
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderCancelNotification
                   isToast={isToast}

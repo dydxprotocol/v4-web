@@ -96,6 +96,7 @@ export const NotificationsMenu = ({
               value: key,
               label: displayData.title,
               description: displayData.body,
+              searchableContent: displayData.searchableContent,
               slotCustomContent: displayData.renderCustomBody?.({ notification }) ?? (
                 <NotificationCard
                   isToast={false}
