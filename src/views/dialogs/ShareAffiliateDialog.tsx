@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import {
   AFFILIATES_FEE_DISCOUNT_USD,
-  AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -21,11 +20,11 @@ import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-import { Output, OutputType } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
 
 import { triggerTwitterIntent } from '@/lib/twitter';
 
+import { AffiliateProgress } from '../Affiliates/AffiliateProgress';
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
 const copyBlobToClipboard = async (blob: Blob | null) => {
@@ -108,7 +107,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           }}
         />
       )}
-      {dydxAddress && !data?.isEligible && <NotEligibleYetContent volume={data?.totalVolume} />}
+      {dydxAddress && !data?.isEligible && <AffiliateProgress volume={data?.totalVolume} />}
       {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
           <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
@@ -193,47 +192,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         </div>
       )}
     </Dialog>
-  );
-};
-
-const NotEligibleYetContent = ({ volume = 9233.2332 }: { volume?: number }) => {
-  const progressPercent = ((volume / AFFILIATES_REQUIRED_VOLUME_USD) * 100).toFixed(0).toString();
-  const remaining = (AFFILIATES_REQUIRED_VOLUME_USD - volume).toLocaleString();
-  return (
-    <div tw="flex flex-col gap-1">
-      <div tw="flex flex-col gap-1">
-        <div tw="flex flex-col gap-1.5 rounded-1 bg-color-layer-5 p-1">
-          <div tw="flex items-center justify-between">
-            <div tw="flex flex-col gap-0.375">
-              <div tw="font-semibold">Become an affiliate</div>
-              <div tw="text-color-text-0">You will need to trade more volume.</div>
-            </div>
-            <div tw="text-large font-medium">{progressPercent}%</div>
-          </div>
-          <div tw="flex flex-col gap-0.75">
-            <div tw="flex justify-between">
-              <div tw="flex items-end">
-                <Output value={volume} type={OutputType.Fiat} slotRight=" traded" />
-              </div>
-              <div tw="text-color-text-0">
-                <Output value={remaining} type={OutputType.Fiat} slotRight=" remaining" />
-              </div>
-            </div>
-            <div tw="relative h-2.5 w-full overflow-hidden rounded-0.5 bg-color-layer-7">
-              <div tw="absolute h-full bg-color-accent" style={{ width: `${progressPercent}%` }} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div tw="flex flex-col gap-0.375">
-        <div tw="text-color-text-0">Benefits</div>
-        <ul tw="flex list-inside flex-col gap-0.375">
-          <li>You can earn up to $3,000 per month for each trader.</li>
-          <li>If you’re a VIP, you can earn up to $10,000 per month.</li>
-          <li>The person you refer will save up to $550 in fees.</li>
-        </ul>
-      </div>
-    </div>
   );
 };
 

@@ -10,7 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
-import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
+import { AffiliateProgressCard } from '@/views/Affiliates/cards/AffiliateProgressCard';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
@@ -37,7 +37,7 @@ export const AffiliatesPage = () => {
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
       ? bytesToBigInt(affiliateMetadata.affiliateInfo.stakedAmount)
       : undefined,
-    totalVolume: totalVolume.toLocaleString(),
+    totalVolume,
   };
 
   return (
@@ -57,7 +57,11 @@ export const AffiliatesPage = () => {
                   <LoadingSpinner />
                 </div>
               ) : !userStatus.isAffiliate && !userStatus.isVip ? (
-                <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
+                <AffiliateProgressCard
+                  tw="flex-1 bg-color-layer-3"
+                  volume={userStatus.totalVolume || 234.23}
+                  description="You will need to trade more volume to become an affiliate."
+                />
               ) : (
                 <AffiliateStatsCard
                   currentAffiliateTier={userStatus.currentAffiliateTier}
