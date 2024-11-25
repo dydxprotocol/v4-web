@@ -65,8 +65,8 @@ export const TradeFormInputs = () => {
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
-  const { market } = orEmptyObj(useAppSelector(getCurrentMarketData));
 
+  const { market } = orEmptyObj(useAppSelector(getCurrentMarketData));
   const marketThatWaitsForMidMarketPriceToUpdate = useGatedValue(market, midMarketPrice != null);
 
   useEffect(() => {
