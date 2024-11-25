@@ -77,7 +77,7 @@ export const UnlimitedAnnouncementDialog = ({
   return (
     <$Dialog
       isOpen
-      setIsOpen={setIsOpen}
+      setIsOpen={(isOpen) => (isOpen ? setIsOpen(true) : onCloseDialog())}
       slotHeader={<UnlimitedAnnouncementHeader currentStep={currentStep} />}
       slotFooter={
         <UnlimitedAnnouncementFooter

@@ -465,6 +465,7 @@ const $Close = styled(Close)<{ $absolute?: boolean }>`
   align-items: center;
 
   border-radius: 0.25rem;
+  z-index: 1;
 
   color: var(--color-text-0);
 
