@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 
-import { IAffiliateLeaderboardStats, IAffiliateStats } from '@/constants/affiliates';
+import { IAffiliateStats } from '@/constants/affiliates';
 
 import { log } from '@/lib/telemetry';
 
@@ -27,29 +25,22 @@ export const useAffiliatesLeaderboard = () => {
       });
 
       const data = await response.json();
-      return data?.affiliateList;
+      return data?.affiliateList?.map((stat: IAffiliateStats, i: number) => ({
+        ...stat,
+        rank: i + 1,
+      }));
     } catch (error) {
       log('useAffiliateLeaderboard', error, { endpoint });
       throw error;
     }
   };
 
-  const affiliatesLeaderboardQuery = useQuery({
+  return useQuery({
     queryKey: ['affiliatesLeaderboard'],
     queryFn: fetchAffiliateStats,
     enabled: Boolean(compositeClient),
     refetchOnMount: false,
+    staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
-
-  const affiliates: IAffiliateLeaderboardStats[] | undefined = useMemo(
-    () =>
-      affiliatesLeaderboardQuery.data?.map((stat: IAffiliateStats, i: number) => ({
-        ...stat,
-        rank: i + 1,
-      })),
-    [affiliatesLeaderboardQuery.data]
-  );
-
-  return { affiliates };
 };

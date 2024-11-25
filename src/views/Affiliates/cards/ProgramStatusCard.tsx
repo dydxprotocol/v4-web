@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -14,25 +13,12 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 interface IProgramCardProps {
-  className?: string;
   isVip: boolean;
 }
 
-const ConnectWallet = () => {
-  const stringGetter = useStringGetter();
-
-  return (
-    <div tw="flex flex-col items-center justify-center gap-y-1 px-4 py-2 text-center">
-      <p>{stringGetter({ key: STRING_KEYS.AFFILIATE_CONNECT_WALLET })}</p>
-      <OnboardingTriggerButton />
-    </div>
-  );
-};
-
-export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProps) => {
+export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const { affiliateProgram, vipsChannel, affiliateProgramSupportEmail } = useURLConfigs();
@@ -75,9 +61,7 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
     : stringGetter({ key: STRING_KEYS.APPLY_NOW });
 
   return (
-    <$Container className={className}>
-      {!dydxAddress && <ConnectWallet />}
-
+    <div tw="w-full rounded-0.625 bg-color-layer-3 notTablet:w-4/12">
       {dydxAddress && (
         <div tw="flex flex-col gap-y-1 p-1">
           <$Header tw="flex items-center">
@@ -120,11 +104,9 @@ export const ProgramStatusCard = ({ className, isVip = false }: IProgramCardProp
           )}
         </div>
       )}
-    </$Container>
+    </div>
   );
 };
-
-const $Container = tw.div`h-full rounded-0.625 bg-color-layer-3`;
 
 const $Header = styled.div`
   font-size: 18px;

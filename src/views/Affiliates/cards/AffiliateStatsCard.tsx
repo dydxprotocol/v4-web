@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import { IAffiliateStats } from '@/constants/affiliates';
 import { DialogTypes } from '@/constants/dialogs';
@@ -176,7 +175,6 @@ const DesktopView = ({
 };
 
 interface IAffiliateStatsProps {
-  className?: string;
   accountStats?: IAffiliateStats;
   isVip: boolean;
   currentAffiliateTier?: number;
@@ -184,7 +182,6 @@ interface IAffiliateStatsProps {
 }
 
 export const AffiliateStatsCard = ({
-  className,
   accountStats,
   isVip,
   stakedDydx,
@@ -206,7 +203,7 @@ export const AffiliateStatsCard = ({
   };
 
   return (
-    <$Container className={className}>
+    <div tw="flex-1 rounded-0.625 bg-color-layer-3">
       {isNotTablet ? (
         <DesktopView
           accountStats={accountStats}
@@ -222,12 +219,10 @@ export const AffiliateStatsCard = ({
           toggleCriteria={toggleCriteria}
         />
       )}
-    </$Container>
+    </div>
   );
 };
 
 const MobileStatsHeader = styled.div`
   border-bottom: 1px solid var(--color-border);
 `;
-
-const $Container = tw.div`rounded-0.625 bg-color-layer-3`;
