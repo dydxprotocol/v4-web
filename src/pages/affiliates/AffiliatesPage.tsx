@@ -60,7 +60,6 @@ export const AffiliatesPage = () => {
                 <AffiliateProgressCard
                   tw="flex-1 bg-color-layer-3"
                   volume={userStatus.totalVolume}
-                  description="You will need to trade more volume to become an affiliate."
                 />
               ) : (
                 <AffiliateStatsCard

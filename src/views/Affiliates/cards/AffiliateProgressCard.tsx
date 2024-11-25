@@ -8,11 +8,9 @@ import { Output, OutputType } from '@/components/Output';
 export const AffiliateProgressCard = ({
   volume = 0,
   className,
-  description,
 }: {
   volume?: number;
   className?: string;
-  description?: string;
 }) => {
   const stringGetter = useStringGetter();
 
@@ -24,7 +22,7 @@ export const AffiliateProgressCard = ({
         <div tw="flex flex-col gap-0.375">
           <div tw="font-semibold">{stringGetter({ key: STRING_KEYS.BECOME_AN_AFFILIATE })}</div>
           <div tw="text-color-text-0">
-            {description ?? stringGetter({ key: STRING_KEYS.TRADE_MORE_VOLUME_REQUIREMENT })}
+            {stringGetter({ key: STRING_KEYS.TRADE_MORE_VOLUME_REQUIREMENT })}
           </div>
         </div>
         <div tw="text-large font-medium">{progressPercent}%</div>
