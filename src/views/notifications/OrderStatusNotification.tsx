@@ -35,7 +35,6 @@ import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
-import { getTradeType } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
@@ -91,7 +90,6 @@ export const OrderStatusNotification = ({
           customContent = (
             <FillDetails
               orderSide={ORDER_SIDES[order.side.name]}
-              tradeType={getTradeType(order.type.rawValue) ?? undefined}
               filledAmount={order.totalFilled}
               assetId={assetId}
               averagePrice={averageFillPrice ?? order.price}
