@@ -66,7 +66,6 @@ export const WithTooltip = ({
       urlConfigs,
       featureFlags,
     });
-    console.log("title", title, "body", body)
     tooltipTitle = title;
     tooltipBody = body;
     tooltipLearnMore = learnMoreLink;
