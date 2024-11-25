@@ -52,17 +52,14 @@ export const FillDetails = ({
         {
           key: 'price',
           label: stringGetter({ key: STRING_KEYS.PRICE }),
-          value:
-            tradeType === TradeTypes.MARKET ? (
-              <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
-            ) : (
-              <Output
-                withSubscript
-                type={OutputType.Fiat}
-                value={averagePrice}
-                fractionDigits={tickSizeDecimals}
-              />
-            ),
+          value: (
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={averagePrice}
+              fractionDigits={tickSizeDecimals}
+            />
+          ),
         },
       ]}
     />
