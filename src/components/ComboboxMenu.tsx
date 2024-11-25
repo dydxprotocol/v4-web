@@ -61,14 +61,12 @@ export const ComboboxMenu = <
 
   const placeholderWithDefault = inputPlaceholder ?? stringGetter({ key: STRING_KEYS.SEARCH });
 
-  console.log(searchValue, items);
   return (
     <$Command
       label={typeof title === 'string' ? title : undefined}
       // value={highlightedCommand}
       // onValueChange={setHighlightedCommand}
       filter={(value: string, search: string) => {
-        console.log(value, search);
         return value
           .replace(/ /g, '')
           .toLowerCase()
