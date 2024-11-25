@@ -1,4 +1,4 @@
-import { Ref } from 'react';
+import { Ref, useEffect, useState } from 'react';
 
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -24,10 +24,12 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import {
   getCurrentMarketConfig,
+  getCurrentMarketData,
   getCurrentMarketMidMarketPrice,
 } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
@@ -41,6 +43,19 @@ type TradeBoxInputConfig = {
   slotRight?: React.ReactNode;
 };
 
+// a reference to source that only updates once gate is true
+function useGatedValue<T>(source: T, gate: boolean): T | undefined {
+  const [value, setValue] = useState<T>();
+  useEffect(() => {
+    if (value !== source && gate) {
+      setValue(source);
+    }
+    // don't depend on the thing we change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source, gate]);
+  return value;
+}
+
 export const TradeFormInputs = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -50,6 +65,21 @@ export const TradeFormInputs = () => {
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
   const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const { market } = orEmptyObj(useAppSelector(getCurrentMarketData));
+
+  const marketThatWaitsForMidMarketPriceToUpdate = useGatedValue(market, midMarketPrice != null);
+
+  useEffect(() => {
+    // when limit price input is empty and mid price is available, set limit price input to mid price
+    if (!midMarketPrice || !needsLimitPrice || limitPriceInput !== '') return;
+    dispatch(
+      setTradeFormInputs({
+        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+      })
+    );
+    // only set on market change or trade type change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, marketThatWaitsForMidMarketPriceToUpdate, needsLimitPrice, tickSizeDecimals]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
