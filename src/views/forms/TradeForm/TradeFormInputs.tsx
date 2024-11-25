@@ -21,10 +21,9 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
-import { getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
+import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import {
   getCurrentMarketConfig,
-  getCurrentMarketData,
   getCurrentMarketMidMarketPrice,
 } from '@/state/perpetualsSelectors';
 
@@ -36,23 +35,13 @@ type TradeBoxInputConfig = {
   inputType: InputType;
   label: React.ReactNode;
   onChange: (values: NumberFormatValues, e: SourceInfo) => void;
+  onInput?: () => void;
   ref?: Ref<HTMLInputElement>;
   validationConfig?: InputErrorData;
   value: string | number;
   decimals?: number;
   slotRight?: React.ReactNode;
 };
-
-// a reference to source that only updates once gate is true
-function useGatedValue<T>(source: T, gate: boolean): T | undefined {
-  const [value, setValue] = useState<T>();
-  useEffect(() => {
-    if (value !== source && gate) {
-      setValue(source);
-    }
-  }, [source, gate, value]);
-  return value;
-}
 
 export const TradeFormInputs = () => {
   const dispatch = useAppDispatch();
@@ -61,26 +50,39 @@ export const TradeFormInputs = () => {
   const { needsLimitPrice, needsTrailingPercent, needsTriggerPrice } = useTradeFormData();
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
-  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const { marketId, type } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
+  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
 
-  const { market } = orEmptyObj(useAppSelector(getCurrentMarketData));
-  const marketThatWaitsForMidMarketPriceToUpdate = useGatedValue(market, midMarketPrice != null);
+  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const [hasUserChanedLimitInput, setHasUserChanedLimitInput] = useState(false);
+
+  useEffect(() => {
+    setHasUserChanedLimitInput(false);
+  }, [marketId, type?.rawValue]);
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || limitPriceInput !== '') return;
+    if (!midMarketPrice || !needsLimitPrice || hasUserChanedLimitInput) {
+      return;
+    }
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
       })
     );
-    // only set on market change or trade type change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, marketThatWaitsForMidMarketPriceToUpdate, needsLimitPrice, tickSizeDecimals]);
+  }, [
+    dispatch,
+    limitPriceInput,
+    midMarketPrice,
+    needsLimitPrice,
+    tickSizeDecimals,
+    marketId,
+    hasUserChanedLimitInput,
+  ]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
+    setHasUserChanedLimitInput(false);
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
@@ -130,6 +132,7 @@ export const TradeFormInputs = () => {
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(setTradeFormInputs({ limitPriceInput: value }));
       },
+      onInput: () => setHasUserChanedLimitInput(true),
       value: limitPriceInput,
       decimals: tickSizeDecimals ?? USD_DECIMALS,
       slotRight: midMarketPrice ? midMarketPriceButton : undefined,
@@ -153,13 +156,24 @@ export const TradeFormInputs = () => {
   }
 
   return tradeFormInputs.map(
-    ({ key, inputType, label, onChange, validationConfig, value, decimals, slotRight }) => (
+    ({
+      key,
+      inputType,
+      label,
+      onChange,
+      onInput,
+      validationConfig,
+      value,
+      decimals,
+      slotRight,
+    }) => (
       <FormInput
         key={key}
         id={key}
         type={inputType}
         label={label}
         onChange={onChange}
+        onInput={onInput}
         validationConfig={validationConfig}
         value={value}
         decimals={decimals}
