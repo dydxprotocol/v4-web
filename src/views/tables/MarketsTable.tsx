@@ -306,11 +306,17 @@ export const MarketsTable = forwardRef(
           className={className}
           slotEmpty={
             <$MarketNotFound>
-              {filter === MarketFilters.NEW && !searchFilter ? (
+              {(filter === MarketFilters.NEW || filter === MarketFilters.FAVORITE) &&
+              !searchFilter ? (
                 <h2>
                   {stringGetter({
                     key: STRING_KEYS.QUERY_NOT_FOUND,
-                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                    params: {
+                      QUERY:
+                        filter === MarketFilters.FAVORITE
+                          ? stringGetter({ key: STRING_KEYS.FAVORITES })
+                          : stringGetter({ key: STRING_KEYS.NEW }),
+                    },
                   })}
                 </h2>
               ) : searchFilter ? (

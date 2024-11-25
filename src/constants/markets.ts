@@ -60,7 +60,9 @@ export enum MarketFilters {
   RWA = 'real-world-assets',
   LAUNCHABLE = 'launchable',
 }
-
+export enum HiddenMarketFilterTags {
+  DEX = 'decentralized-exchange-dex-token',
+}
 // ORDER IS INTENTIONAL
 export const MARKET_FILTER_OPTIONS: Record<
   MarketFilters,
