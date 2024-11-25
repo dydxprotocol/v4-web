@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 
 import { MetadataServiceAsset } from '@/constants/assetMetadata';
 import {
+  HiddenMarketFilterTags,
   LIQUIDITY_TIERS,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
@@ -31,13 +32,16 @@ import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 import { useMetadataService } from './useMetadataService';
 import { useAllStatsigGateValues } from './useStatsig';
 
-const filterFunctions = {
+const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | undefined> = {
   [MarketFilters.AI]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.AI);
   },
   [MarketFilters.ALL]: () => true,
   [MarketFilters.DEFI]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.DEFI);
+    return (
+      !!market.tags?.includes(MarketFilters.DEFI) ||
+      !!market.tags?.includes(HiddenMarketFilterTags.DEX)
+    );
   },
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
