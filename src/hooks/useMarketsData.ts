@@ -4,10 +4,10 @@ import { shallowEqual } from 'react-redux';
 
 import { MetadataServiceAsset } from '@/constants/assetMetadata';
 import {
+  HiddenMarketFilterTags,
   LIQUIDITY_TIERS,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
-  PREDICTION_MARKET,
   type MarketData,
 } from '@/constants/markets';
 import { StatsigFlags } from '@/constants/statsig';
@@ -27,19 +27,21 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useMetadataService } from './useMetadataService';
 import { useAllStatsigGateValues } from './useStatsig';
 
-const filterFunctions = {
+const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | undefined> = {
   [MarketFilters.AI]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.AI);
   },
   [MarketFilters.ALL]: () => true,
   [MarketFilters.DEFI]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.DEFI);
+    return (
+      !!market.tags?.includes(MarketFilters.DEFI) ||
+      !!market.tags?.includes(HiddenMarketFilterTags.DEX)
+    );
   },
   [MarketFilters.DEPIN]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.DEPIN);
@@ -66,47 +68,13 @@ const filterFunctions = {
     return market.isNew;
   },
   [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
-    return testFlags.pml && market.tags?.includes(MarketFilters.PREDICTION_MARKET);
-  },
-  [MarketFilters.PREDICTION_MARKET_DEPRECATED]: (market: MarketData) => {
-    return !testFlags.pml && Object.values(PREDICTION_MARKET).includes(market.id);
+    return market.tags?.includes(MarketFilters.PREDICTION_MARKET);
   },
   [MarketFilters.RWA]: (market: MarketData) => {
     return market.tags?.includes(MarketFilters.RWA);
   },
   [MarketFilters.LAUNCHABLE]: (market: MarketData) => {
-    return testFlags.pml && market.isUnlaunched;
-  },
-  // Soon to be deprecated filters
-  [MarketFilters.AI_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.AI_DEPRECATED);
-  },
-  [MarketFilters.DEFI_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.DEFI_DEPRECATED);
-  },
-  [MarketFilters.ENT_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.ENT_DEPRECATED);
-  },
-  [MarketFilters.FX_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.FX_DEPRECATED);
-  },
-  [MarketFilters.GAMING_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.GAMING_DEPRECATED);
-  },
-  [MarketFilters.LAYER_1_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.LAYER_1_DEPRECATED);
-  },
-  [MarketFilters.LAYER_2_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.LAYER_2_DEPRECATED);
-  },
-  [MarketFilters.MEME_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.MEME_DEPRECATED);
-  },
-  [MarketFilters.NFT_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.NFT_DEPRECATED);
-  },
-  [MarketFilters.RWA_DEPRECATED]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.RWA_DEPRECATED);
+    return market.isUnlaunched;
   },
 };
 
@@ -218,7 +186,7 @@ export const useMarketsData = ({
         );
       });
 
-    if (!shouldHideLaunchableMarkets && testFlags.pml) {
+    if (!shouldHideLaunchableMarkets) {
       const unlaunchedMarketsData = Object.values(metadataServiceInfo.data)
         .sort(sortByMarketCap)
         .map((market) => {

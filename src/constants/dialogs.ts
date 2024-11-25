@@ -6,7 +6,6 @@ import { BigNumberish } from '@/lib/numbers';
 
 import { AbacusPositionSides, Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
 import { IAffiliateStats } from './affiliates';
-import { NewMarketProposal } from './potentialMarkets';
 import { DydxChainAsset } from './wallets';
 
 type SharedDialogProps = { setIsOpen: (open: boolean) => void };
@@ -48,13 +47,6 @@ export type ManageFundsDialogProps = { selectedTransferType?: string };
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
 export type MobileSignInDialogProps = {};
-export type NewMarketAgreementDialogProps = { acceptTerms: () => void };
-export type NewMarketMessageDetailsDialogProps = {
-  preventClose?: boolean;
-  assetData: NewMarketProposal;
-  clobPairId?: number;
-  liquidityTier?: number;
-};
 export type OnboardingDialogProps = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
@@ -130,8 +122,6 @@ export const DialogTypes = unionize(
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
     MobileSignIn: ofType<MobileSignInDialogProps>(),
-    NewMarketAgreement: ofType<NewMarketAgreementDialogProps>(),
-    NewMarketMessageDetails: ofType<NewMarketMessageDetailsDialogProps>(),
     Onboarding: ofType<OnboardingDialogProps>(),
     OrderDetails: ofType<OrderDetailsDialogProps>(),
     PredictionMarketIntro: ofType<PredictionMarketIntroDialogProps>(),

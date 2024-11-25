@@ -7,6 +7,7 @@ import {
   MAX_AFFILIATE_VIP_SHARE,
   REF_SHARE_VOLUME_CAP_USD,
 } from '@/constants/affiliates';
+import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
@@ -15,7 +16,6 @@ import { safeFetch } from '@/lib/safeFetch';
 import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
-import { useEndpointsConfig } from './useEndpointsConfig';
 
 type AffiliatesMetadata = {
   referralCode: string;
@@ -26,12 +26,12 @@ type AffiliatesMetadata = {
 export const useAffiliatesInfo = (dydxAddress?: string) => {
   const { compositeClient, getAffiliateInfo, getAllAffiliateTiers } = useDydxClient();
   const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
-  const { affiliatesBaseUrl } = useEndpointsConfig();
 
   const fetchAffiliateMetadata = async () => {
     if (!compositeClient || !dydxAddress) {
       return {};
     }
+
     const metadataEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
     const totalVolumeEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/total_volume`;
 
@@ -88,13 +88,15 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   const affiliateMetadataQuery = useQuery({
     queryKey: ['affiliateMetadata', dydxAddress],
     queryFn: fetchAffiliateMetadata,
-    enabled: Boolean(compositeClient && dydxAddress && affiliatesBaseUrl),
+    enabled: Boolean(compositeClient && dydxAddress),
+    staleTime: 5 * timeUnits.minute,
   });
 
   const affiliateStatsQuery = useQuery({
     queryKey: ['accountStats', dydxAddress],
     queryFn: fetchAccountStats,
     enabled: Boolean(compositeClient && dydxAddress),
+    staleTime: 5 * timeUnits.minute,
   });
 
   const fetchAffiliateMaxEarning = async () => {
@@ -113,7 +115,8 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
   const affiliateMaxEarningQuery = useQuery({
     queryKey: ['affiliateMaxEarning', feeTiers],
     queryFn: fetchAffiliateMaxEarning,
-    enabled: Boolean(compositeClient && feeTiers && affiliatesBaseUrl),
+    enabled: Boolean(compositeClient && feeTiers),
+    staleTime: Infinity,
   });
 
   return {

@@ -352,7 +352,7 @@ export const TradeForm = ({
           tw="overflow-visible"
           sharedContent={
             <$Content tw="gap-0.75 shadow-none">
-              <$MarginAndLeverageButtons openInTradeBox={false} />
+              <$MarginAndLeverageButtons />
               {tabletActionsRow}
               {orderbookAndInputs}
             </$Content>

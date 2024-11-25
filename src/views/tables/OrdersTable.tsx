@@ -113,9 +113,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, displayId }) => (
-          <MarketTableCell asset={asset ?? undefined} marketId={displayId} />
-        ),
+        renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',
@@ -407,14 +405,17 @@ type StyleProps = {
 };
 
 export const OrdersTable = forwardRef(
-  ({
-    columnKeys = [],
-    columnWidths,
-    currentMarket,
-    marketTypeFilter,
-    initialPageSize,
-    withOuterBorder,
-  }: ElementProps & StyleProps) => {
+  (
+    {
+      columnKeys = [],
+      columnWidths,
+      currentMarket,
+      marketTypeFilter,
+      initialPageSize,
+      withOuterBorder,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isTablet } = useBreakpoints();

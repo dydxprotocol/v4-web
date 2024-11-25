@@ -21,8 +21,6 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { Tag } from '@/components/Tag';
 
-import { testFlags } from '@/lib/testFlags';
-
 type ElementProps<MenuItemValue extends string> = {
   disabled?: boolean;
   items: MenuItem<MenuItemValue>[];
@@ -61,18 +59,12 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
 
   disabled,
 }: ElementProps<MenuItemValue> & StyleProps) => {
-  const { uiRefresh } = testFlags;
-
   const triggerContent = (
     <>
       {children}
       {!hideIcon && (
         <$DropdownIcon aria-hidden="true">
-          <Icon
-            iconName={uiRefresh ? IconName.Caret : IconName.Triangle}
-            size={uiRefresh ? '1.5em' : '1em'}
-            aria-hidden="true"
-          />
+          <Icon iconName={IconName.Caret} size="1.5em" aria-hidden="true" />
         </$DropdownIcon>
       )}
     </>

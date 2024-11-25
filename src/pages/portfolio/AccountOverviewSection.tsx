@@ -26,8 +26,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { mapIfPresent } from '@/lib/do';
-import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const EMBARRASSING_APR_THRESHOLD = 0.02;
@@ -77,7 +75,6 @@ export const AccountOverviewSection = () => {
     });
   }, [navigate]);
 
-  const showVaults = testFlags.enableVaults;
   const { isTablet } = useBreakpoints();
 
   const pieSections = [
@@ -95,7 +92,7 @@ export const AccountOverviewSection = () => {
       ),
       color: ColorToken.Yellow1,
     },
-    (showVaults || (vaultBalance ?? 0) > 0.01) && {
+    {
       id: 'megavault',
       label: (
         <Link onClick={() => handleViewVault()} tw="text-color-text-0 underline">
@@ -106,7 +103,7 @@ export const AccountOverviewSection = () => {
       amount: vaultBalance,
       color: ColorToken.Purple1,
     },
-  ].filter(isTruthy);
+  ];
 
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);

@@ -22,8 +22,6 @@
     "build:set-last-commit-and-tag": "sh scripts/set-last-commit-and-tag.sh",
     "build:generate-entry-points": "node scripts/generate-entry-points.js",
     "build:generate-sitemap": "node scripts/generate-sitemap.js",
-    "assets": "node scripts/check-assets.js",
-    "merge-asset-icons": "node scripts/merge-asset-icon-maps.js >> assets.txt",
     "deploy:ipfs": "node scripts/upload-ipfs.js --verbose",
     "deploy:update-ipns": "node scripts/update-ipns.js",
     "deploy:update-dnslink": "node scripts/update-dnslink.js",

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonShape, ButtonType } from '@/constants/buttons';
+import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
@@ -16,12 +16,9 @@ import { Link } from '@/components/Link';
 import { Popover, TriggerType } from '@/components/Popover';
 import { VerticalSeparator } from '@/components/Separator';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
   const stringGetter = useStringGetter();
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
-  const { uiRefresh } = testFlags;
 
   if (!appleAppStoreUrl && !googlePlayStoreUrl) return null;
 
@@ -43,7 +40,7 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
     );
   }
 
-  return uiRefresh ? (
+  return (
     <>
       <Popover
         triggerType={TriggerType.MobileDownloadTrigger}
@@ -69,30 +66,6 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
       </Popover>
       <VerticalSeparator />
     </>
-  ) : (
-    <>
-      <div tw="flex flex-row items-center gap-0.5">
-        <$Download>{stringGetter({ key: STRING_KEYS.DOWNLOAD })}</$Download>
-        {googlePlayStoreUrl && (
-          <$AppLink
-            type={ButtonType.Link}
-            href={googlePlayStoreUrl}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.GooglePlay}
-          />
-        )}
-        {appleAppStoreUrl && (
-          <$AppLink
-            type={ButtonType.Link}
-            href={appleAppStoreUrl}
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.Apple}
-          />
-        )}
-      </div>
-
-      <VerticalSeparator />
-    </>
   );
 };
 
@@ -112,16 +85,6 @@ const $DownloadLinksInDropdown = styled.div`
   }
 `;
 const $Download = tw.span`text-color-text-0 font-small-medium [grid-area:label]`;
-
-const $AppLink = styled(IconButton)`
-  --button-icon-size: 1rem;
-  --button-padding: 0 0.5em;
-
-  // apple logo is white.
-  svg {
-    fill: var(--color-white);
-  }
-`;
 
 const $IconButton = styled(IconButton)`
   ${headerMixins.button}

@@ -13,7 +13,6 @@ import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketSelectorAndStats = ({
@@ -27,8 +26,6 @@ export const MarketSelectorAndStats = ({
   const { imageUrl } = orEmptyObj(resources);
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
-  const { uiRefresh } = testFlags;
-
   const displayableId = launchableMarketId
     ? getDisplayableTickerFromMarket(launchableMarketId)
     : launchableMarketId;
@@ -41,7 +38,7 @@ export const MarketSelectorAndStats = ({
         logoUrl={imageUrl}
       />
 
-      <VerticalSeparator fullHeight={!!uiRefresh} />
+      <VerticalSeparator fullHeight />
 
       {launchableMarketId ? (
         <LaunchableMarketStatsDetails launchableMarketId={launchableMarketId} />

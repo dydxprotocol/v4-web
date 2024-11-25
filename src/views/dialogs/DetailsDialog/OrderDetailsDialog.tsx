@@ -1,5 +1,6 @@
 import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import {
   AbacusMarginMode,
@@ -11,6 +12,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { AppRoute } from '@/constants/routes';
 import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -104,7 +106,11 @@ export const OrderDetailsDialog = ({
       {
         key: 'market',
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        value: displayId,
+        value: (
+          <Link to={`${AppRoute.Trade}/${marketId}`} tw="underline">
+            {displayId}
+          </Link>
+        ),
       },
       {
         key: 'market-id',

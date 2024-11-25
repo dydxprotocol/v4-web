@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import tw from 'twin.macro';
 
 import {
   AFFILIATES_REQUIRED_VOLUME_USD,
@@ -17,7 +16,7 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
   const stringGetter = useStringGetter();
 
   return (
-    <$Container tw="column gap-1">
+    <div tw="column flex-1 gap-1 rounded-0.625 bg-color-layer-3 p-1">
       <div tw="text-medium text-color-text-1">
         {stringGetter({
           key: STRING_KEYS.SHARE_AFFILIATE_BANNER_TITLE,
@@ -64,11 +63,10 @@ export const ShareAffiliateBanner = ({ totalVolume }: IShareAffiliateBannerProps
           </div>
         </div>
       </$Requirements>
-    </$Container>
+    </div>
   );
 };
 
-const $Container = tw.div`rounded-0.625 bg-color-layer-3 p-1`;
 const $Requirements = styled.div`
   border: var(--border-width) solid var(--border-color);
 `;

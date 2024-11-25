@@ -45,7 +45,6 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
 import { TargetLeverageInput } from './TargetLeverageInput';
@@ -60,8 +59,6 @@ export const TradeSizeInputs = () => {
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
-
-  const { uiRefresh } = testFlags;
 
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
@@ -245,7 +242,7 @@ export const TradeSizeInputs = () => {
           }
         />
       )}
-      {uiRefresh && needsTargetLeverage && <TargetLeverageInput />}
+      {needsTargetLeverage && <TargetLeverageInput />}
 
       {needsBalancePercent && (
         <TradePercentSizeToggle

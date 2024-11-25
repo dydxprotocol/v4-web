@@ -6,7 +6,6 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -18,8 +17,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
 import { OutputType } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
@@ -31,7 +28,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
@@ -61,8 +57,6 @@ export const AccountInfoSection = () => {
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
-  const { uiRefresh } = testFlags;
-
   const { freeCollateral: availableBalance, marginUsage } = subAccount ?? {};
   const portfolioValue = subAccount?.equity;
 
@@ -75,9 +69,8 @@ export const AccountInfoSection = () => {
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
-      buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
-      action={uiRefresh ? ButtonAction.Primary : undefined}
-      $uiRefreshEnabled={uiRefresh}
+      buttonStyle={ButtonStyle.WithoutBackground}
+      action={ButtonAction.Primary}
     >
       {stringGetter({ key: STRING_KEYS.WITHDRAW })}
     </$Button>
@@ -89,32 +82,11 @@ export const AccountInfoSection = () => {
       onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
-      buttonStyle={uiRefresh ? ButtonStyle.WithoutBackground : ButtonStyle.Default}
-      action={uiRefresh ? ButtonAction.Primary : undefined}
-      $uiRefreshEnabled={uiRefresh}
+      buttonStyle={ButtonStyle.WithoutBackground}
+      action={ButtonAction.Primary}
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT })}
     </$Button>
-  );
-
-  const deprecatedActionButtons = (
-    <div tw="inlineRow gap-1">
-      {withdrawButton}
-      {complianceState === ComplianceStates.FULL_ACCESS && (
-        <>
-          {depositButton}
-          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
-            <$IconButton
-              shape={ButtonShape.Square}
-              iconName={IconName.Send}
-              onClick={() =>
-                dispatch(openDialog(DialogTypes.Transfer({ selectedAsset: DydxChainAsset.USDC })))
-              }
-            />
-          </WithTooltip>
-        </>
-      )}
-    </div>
   );
 
   const depositWithdrawRow = (
@@ -125,67 +97,6 @@ export const AccountInfoSection = () => {
       </$WithSeparators>
     </div>
   );
-
-  const deprecatedDetailItems = [
-    {
-      key: AccountInfoItem.PortfolioValue,
-      hideDiff: true,
-      hasError: false,
-      isPositive: MustBigNumber(portfolioValue?.postOrder).gt(
-        MustBigNumber(portfolioValue?.current)
-      ),
-      label: (
-        <WithTooltip tooltip="portfolio-value" side="right">
-          {stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE })}
-        </WithTooltip>
-      ),
-      type: OutputType.Fiat,
-      value: portfolioValue,
-    },
-    {
-      key: AccountInfoItem.AvailableBalance,
-      hasError: isPostOrderBalanceNegative,
-      hideDiff: isPostOrderBalanceNegative,
-      isPositive: MustBigNumber(availableBalance?.postOrder).gt(
-        MustBigNumber(availableBalance?.current)
-      ),
-      label: (
-        <WithTooltip tooltip="available-balance" side="right">
-          {stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}
-        </WithTooltip>
-      ),
-      type: OutputType.Fiat,
-      value:
-        MustBigNumber(availableBalance?.current).lt(0) && availableBalance?.postOrder === null
-          ? undefined
-          : availableBalance,
-      slotRight: (
-        <WithTooltip tooltip="cross-margin-usage" side="right">
-          <MarginUsageRing value={getUsageValue(marginUsage)} />
-        </WithTooltip>
-      ),
-    },
-  ].map(({ key, hasError, hideDiff = false, isPositive, label, type, value, slotRight }) => ({
-    key,
-    label:
-      hasError || slotRight ? (
-        <$WithUsage>
-          {label}
-          {hasError ? <Icon iconName={IconName.CautionCircle} tw="text-color-error" /> : slotRight}
-        </$WithUsage>
-      ) : (
-        label
-      ),
-    value: (
-      <AccountInfoDiffOutput
-        hasError={hasError}
-        hideDiff={hideDiff}
-        isPositive={isPositive}
-        type={type}
-        value={value}
-      />
-    ),
-  }));
 
   const detailItems = [
     {
@@ -256,58 +167,25 @@ export const AccountInfoSection = () => {
   ];
 
   return (
-    <$Container $uiRefreshEnabled={uiRefresh}>
+    <$Container>
       <header tw="spacedRow px-1 py-0 font-small-book">
-        <span>
-          {stringGetter({ key: uiRefresh ? STRING_KEYS.YOUR_ACCOUNT : STRING_KEYS.ACCOUNT })}
-        </span>
-        {uiRefresh ? depositWithdrawRow : deprecatedActionButtons}
+        <span>{stringGetter({ key: STRING_KEYS.YOUR_ACCOUNT })}</span>
+        {depositWithdrawRow}
       </header>
       <$StackContainer $isTablet={isTablet}>
-        <$Details
-          items={uiRefresh ? detailItems : deprecatedDetailItems}
-          layout="column"
-          withOverflow={false}
-          isLoading={isLoading}
-          $uiRefreshEnabled={uiRefresh}
-        />
+        <$Details items={detailItems} layout="column" withOverflow={false} isLoading={isLoading} />
       </$StackContainer>
     </$Container>
   );
 };
 
-const $WithUsage = styled.div`
-  ${layoutMixins.row}
+const $Details = styled(Details)`
+  font: var(--font-mini-book);
+  padding: 0 1rem;
 
-  & > :last-child {
-    margin-left: 0.4rem;
+  > * {
+    padding: 0 0 0.5rem;
   }
-
-  @media ${breakpoints.tablet} {
-    justify-content: end;
-  }
-`;
-
-const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled
-      ? css`
-          font: var(--font-mini-book);
-          padding: 0 1rem;
-
-          > * {
-            padding: 0 0 0.5rem;
-          }
-        `
-      : css`
-          font: var(--font-mini-book);
-          padding: 0.25rem 1rem;
-
-          > * {
-            padding: 0;
-            display: flex;
-          }
-        `}
 
   @media ${breakpoints.tablet} {
     clip-path: none;
@@ -317,26 +195,11 @@ const $Details = styled(Details)<{ $uiRefreshEnabled: boolean }>`
     }
   }
 `;
-const $Container = styled.div<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled
-      ? css`
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 0.5rem 0;
-        `
-      : css`
-          ${layoutMixins.column}
-          grid-template-rows: var(--tabs-height) 1fr;
-
-          @media ${breakpoints.notTablet} {
-            ${layoutMixins.withOuterAndInnerBorders}
-            > *:last-child {
-              box-shadow: none;
-            }
-          }
-        `};
+const $Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.5rem 0;
 `;
 
 const $StackContainer = styled.div<{ $isTablet: boolean }>`
@@ -353,18 +216,6 @@ const $WithSeparators = styled(WithSeparators)`
   --separatorHeight-padding: 0.5rem;
 `;
 
-const $Button = styled(Button)<{ $uiRefreshEnabled: boolean }>`
-  ${({ $uiRefreshEnabled }) =>
-    $uiRefreshEnabled
-      ? css`
-          --button-padding: 0;
-        `
-      : css`
-          margin-right: -0.3rem;
-        `};
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-padding: 0 0.25rem;
-  --button-border: solid var(--border-width) var(--color-layer-6);
+const $Button = styled(Button)`
+  --button-padding: 0;
 `;

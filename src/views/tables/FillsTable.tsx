@@ -169,9 +169,7 @@ const getFillsTableColumnDef = ({
         columnKey: 'market',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, displayId }) => (
-          <MarketTableCell asset={asset ?? undefined} marketId={displayId} />
-        ),
+        renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',
@@ -349,15 +347,18 @@ type StyleProps = {
 };
 
 export const FillsTable = forwardRef(
-  ({
-    columnKeys,
-    columnWidths,
-    currentMarket,
-    initialPageSize,
-    withGradientCardRows,
-    withOuterBorder,
-    withInnerBorders = true,
-  }: ElementProps & StyleProps) => {
+  (
+    {
+      columnKeys,
+      columnWidths,
+      currentMarket,
+      initialPageSize,
+      withGradientCardRows,
+      withOuterBorder,
+      withInnerBorders = true,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
     const { isMobile } = useBreakpoints();

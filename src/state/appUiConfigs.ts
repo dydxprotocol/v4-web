@@ -4,7 +4,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { DisplayUnit } from '@/constants/trade';
 
 import { track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 
 export enum AppTheme {
   Classic = 'Classic',
@@ -40,10 +39,8 @@ export interface AppUIConfigsState {
   favoritedMarkets: string[];
 }
 
-const { uiRefresh } = testFlags;
-
 export const initialState: AppUIConfigsState = {
-  appThemeSetting: uiRefresh ? AppTheme.Dark : AppTheme.Classic,
+  appThemeSetting: AppTheme.Dark,
   appColorMode: AppColorMode.GreenUp,
   hasSeenLaunchIncentives: false,
   defaultToAllMarketsInPositionsOrdersFills: true,

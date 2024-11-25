@@ -1,4 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
+import React from 'react';
+
 import { DialogTypes } from '@/constants/dialogs';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
@@ -27,8 +29,6 @@ import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
-import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
-import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketIntroDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
@@ -54,7 +54,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
-export const DialogManager = () => {
+export const DialogManager = React.memo(() => {
   const dispatch = useAppDispatch();
   const activeDialog = useAppSelector(getActiveDialog);
 
@@ -95,8 +95,6 @@ export const DialogManager = () => {
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
     MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,
-    NewMarketAgreement: (args) => <NewMarketAgreementDialog {...args} {...modalProps} />,
-    NewMarketMessageDetails: (args) => <NewMarketMessageDetailsDialog {...args} {...modalProps} />,
     Onboarding: (args) => <OnboardingDialog {...args} {...modalProps} />,
     OrderDetails: (args) => <OrderDetailsDialog {...args} {...modalProps} />,
     PredictionMarketIntro: (args) => <PredictionMarketIntroDialog {...args} {...modalProps} />,
@@ -120,4 +118,4 @@ export const DialogManager = () => {
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
-};
+});
