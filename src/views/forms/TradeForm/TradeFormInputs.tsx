@@ -1,4 +1,4 @@
-import { Ref, useEffect } from 'react';
+import { Ref, useEffect, useState } from 'react';
 
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -21,19 +21,21 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
-import { getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
+import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import {
   getCurrentMarketConfig,
   getCurrentMarketMidMarketPrice,
 } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
   inputType: InputType;
   label: React.ReactNode;
   onChange: (values: NumberFormatValues, e: SourceInfo) => void;
+  onInput?: () => void;
   ref?: Ref<HTMLInputElement>;
   validationConfig?: InputErrorData;
   value: string | number;
@@ -48,21 +50,39 @@ export const TradeFormInputs = () => {
   const { needsLimitPrice, needsTrailingPercent, needsTriggerPrice } = useTradeFormData();
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
-  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { marketId, type } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
+  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
+
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const [hasUserChangedLimitInput, setHasUserChangedLimitInput] = useState(false);
+
+  useEffect(() => {
+    setHasUserChangedLimitInput(false);
+  }, [marketId, type?.rawValue]);
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || limitPriceInput !== '') return;
+    if (!midMarketPrice || !needsLimitPrice || hasUserChangedLimitInput) {
+      return;
+    }
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
       })
     );
-  }, [dispatch, limitPriceInput, midMarketPrice, needsLimitPrice, tickSizeDecimals]);
+  }, [
+    dispatch,
+    limitPriceInput,
+    midMarketPrice,
+    needsLimitPrice,
+    tickSizeDecimals,
+    marketId,
+    hasUserChangedLimitInput,
+  ]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
+    setHasUserChangedLimitInput(false);
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
@@ -112,6 +132,7 @@ export const TradeFormInputs = () => {
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(setTradeFormInputs({ limitPriceInput: value }));
       },
+      onInput: () => setHasUserChangedLimitInput(true),
       value: limitPriceInput,
       decimals: tickSizeDecimals ?? USD_DECIMALS,
       slotRight: midMarketPrice ? midMarketPriceButton : undefined,
@@ -135,13 +156,24 @@ export const TradeFormInputs = () => {
   }
 
   return tradeFormInputs.map(
-    ({ key, inputType, label, onChange, validationConfig, value, decimals, slotRight }) => (
+    ({
+      key,
+      inputType,
+      label,
+      onChange,
+      onInput,
+      validationConfig,
+      value,
+      decimals,
+      slotRight,
+    }) => (
       <FormInput
         key={key}
         id={key}
         type={inputType}
         label={label}
         onChange={onChange}
+        onInput={onInput}
         validationConfig={validationConfig}
         value={value}
         decimals={decimals}
