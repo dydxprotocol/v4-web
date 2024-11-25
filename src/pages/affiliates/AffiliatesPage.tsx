@@ -59,7 +59,7 @@ export const AffiliatesPage = () => {
               ) : !userStatus.isAffiliate && !userStatus.isVip ? (
                 <AffiliateProgressCard
                   tw="flex-1 bg-color-layer-3"
-                  volume={userStatus.totalVolume || 234.23}
+                  volume={userStatus.totalVolume}
                   description="You will need to trade more volume to become an affiliate."
                 />
               ) : (
@@ -70,7 +70,6 @@ export const AffiliatesPage = () => {
                   accountStats={accountStats}
                 />
               )}
-
               <ProgramStatusCard isVip={!!userStatus.isVip} />
             </section>
           </>

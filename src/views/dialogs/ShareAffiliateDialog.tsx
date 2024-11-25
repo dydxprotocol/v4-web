@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import {
   AFFILIATES_FEE_DISCOUNT_USD,
+  AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -75,7 +76,12 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   const dialogDescription = (
     <span>
       {!data?.isEligible
-        ? 'In order to become an affiliate, you will need to trade at least $10,000 in volume'
+        ? stringGetter({
+            key: STRING_KEYS.AFFILIATE_PROGRAM_TRADING_REQUIREMENT,
+            params: {
+              AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
+            },
+          })
         : stringGetter({
             key: STRING_KEYS.EARN_FOR_EACH_TRADER,
             params: {
@@ -83,8 +89,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 maxEarning?.toLocaleString() ??
                 DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
             },
-          })}
-      .{' '}
+          })}{' '}
       <Link href={affiliateProgramFaq} isInline>
         {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
       </Link>
@@ -95,7 +100,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+      title={stringGetter({ key: STRING_KEYS.UNLOCK_AFFILIATE_PROGRAM })}
       description={dialogDescription}
     >
       {!dydxAddress && (
