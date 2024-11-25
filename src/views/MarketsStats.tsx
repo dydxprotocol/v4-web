@@ -30,7 +30,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
 
   const { hasResults: hasNewMarkets } = useMarketsData({
     filter: MarketFilters.NEW,
-    hideUnlaunchedMarkets: true,
+    forceHideUnlaunchedMarkets: true,
   });
 
   const { isTablet } = useBreakpoints();

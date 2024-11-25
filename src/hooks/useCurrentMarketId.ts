@@ -48,7 +48,7 @@ export const useCurrentMarketId = () => {
 
   const { filteredMarkets: predictionMarkets } = useMarketsData({
     filter: MarketFilters.PREDICTION_MARKET,
-    hideUnlaunchedMarkets: true,
+    forceHideUnlaunchedMarkets: true,
   });
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({

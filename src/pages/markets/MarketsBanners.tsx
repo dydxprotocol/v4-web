@@ -1,6 +1,5 @@
-import { RefObject } from 'react';
+import { RefObject, useMemo } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -8,7 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
+import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -24,7 +23,6 @@ import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import { setHasDismissedPmlBanner } from '@/state/dismissable';
 import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
-import { getMarketIds } from '@/state/perpetualsSelectors';
 
 export const MarketsBanners = ({
   marketsTableRef,
@@ -32,8 +30,12 @@ export const MarketsBanners = ({
   marketsTableRef?: RefObject<HTMLDivElement>;
 }) => {
   const stringGetter = useStringGetter();
-  const { data: launchableMarkets } = useLaunchableMarkets();
-  const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const allMarkets = useMarketsData({
+    filter: MarketFilters.ALL,
+    forceShowUnlaunchedMarkets: true,
+  }).markets;
+  const launchable = useMemo(() => allMarkets.filter((f) => f.isUnlaunched), [allMarkets]);
+  const launched = useMemo(() => allMarkets.filter((f) => !f.isUnlaunched), [allMarkets]);
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
   const dispatch = useAppDispatch();
@@ -73,14 +75,14 @@ export const MarketsBanners = ({
               label: (
                 <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.MARKETS })}</span>
               ),
-              value: <Output type={OutputType.CompactNumber} value={marketIds.length} />,
+              value: <Output type={OutputType.CompactNumber} value={launched.length} />,
             },
             {
               key: 'launchable',
               label: (
                 <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.LAUNCHABLE })}</span>
               ),
-              value: <Output type={OutputType.CompactNumber} value={launchableMarkets.length} />,
+              value: <Output type={OutputType.CompactNumber} value={launchable.length} />,
             },
           ]}
         />

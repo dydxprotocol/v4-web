@@ -85,11 +85,13 @@ const sortByMarketCap = (a: MetadataServiceAsset, b: MetadataServiceAsset) => {
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
-  hideUnlaunchedMarkets,
+  forceHideUnlaunchedMarkets,
+  forceShowUnlaunchedMarkets,
 }: {
   filter: MarketFilters;
   searchFilter?: string;
-  hideUnlaunchedMarkets?: boolean;
+  forceHideUnlaunchedMarkets?: boolean;
+  forceShowUnlaunchedMarkets?: boolean;
 }): {
   markets: MarketData[];
   filteredMarkets: MarketData[];
@@ -106,14 +108,18 @@ export const useMarketsData = ({
   const featureFlags = useAllStatsigGateValues();
   const metadataServiceInfo = useMetadataService();
   const shouldHideLaunchableMarkets =
-    useAppSelector(getShouldHideLaunchableMarkets) || hideUnlaunchedMarkets;
+    useAppSelector(getShouldHideLaunchableMarkets) || forceHideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
 
-  const allPerpetualMarketIdsSet = new Set(
-    Object.values(allPerpetualMarkets)
-      .filter(isTruthy)
-      .map((m) => m.assetId)
+  const allPerpetualMarketIdsSet = useMemo(
+    () =>
+      new Set(
+        Object.values(allPerpetualMarkets)
+          .filter(isTruthy)
+          .map((m) => m.assetId)
+      ),
+    [allPerpetualMarkets]
   );
 
   const markets = useMemo(() => {
@@ -186,7 +192,7 @@ export const useMarketsData = ({
         );
       });
 
-    if (!shouldHideLaunchableMarkets) {
+    if (!!forceShowUnlaunchedMarkets || !shouldHideLaunchableMarkets) {
       const unlaunchedMarketsData = Object.values(metadataServiceInfo.data)
         .sort(sortByMarketCap)
         .map((market) => {
@@ -247,12 +253,14 @@ export const useMarketsData = ({
     return listOfMarkets;
   }, [
     allPerpetualMarkets,
+    allPerpetualMarketIdsSet,
+    forceShowUnlaunchedMarkets,
     shouldHideLaunchableMarkets,
     featureFlags,
     sevenDaysSparklineData,
     allPerpetualClobIds,
-    allAssets,
     metadataServiceInfo.data,
+    allAssets,
     favoritedMarkets,
   ]);
 
