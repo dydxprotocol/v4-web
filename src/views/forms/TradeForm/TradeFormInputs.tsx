@@ -50,9 +50,7 @@ function useGatedValue<T>(source: T, gate: boolean): T | undefined {
     if (value !== source && gate) {
       setValue(source);
     }
-    // don't depend on the thing we change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source, gate]);
+  }, [source, gate, value]);
   return value;
 }
 
