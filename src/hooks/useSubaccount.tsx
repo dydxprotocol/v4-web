@@ -936,7 +936,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       mutationFn: async (affiliateAddress: string) => {
         const tx = await registerAffiliate(affiliateAddress);
         dispatch(removeLatestReferrer());
-        track(AnalyticsEvents.AffiliateRegistration({ referralAddress: affiliateAddress }));
+        track(AnalyticsEvents.AffiliateRegistration({ affiliateAddress }));
         return tx;
       },
     });

@@ -39,7 +39,7 @@ export function useReferralCode() {
     if (referredBy?.affiliateAddress) return;
 
     if (referralAddress) {
-      track(AnalyticsEvents.AffiliateSaveReferralAddress({ referralAddress }));
+      track(AnalyticsEvents.AffiliateSaveReferralAddress({ affiliateAddress: referralAddress }));
       dispatch(updateLatestReferrer(referralAddress));
     }
   }, [
