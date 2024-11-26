@@ -14,7 +14,6 @@ export const AffiliateProgressCard = ({
 }) => {
   const stringGetter = useStringGetter();
 
-  const progressPercent = ((volume / AFFILIATES_REQUIRED_VOLUME_USD) * 100).toFixed(0).toString();
   const progressRatio = volume / AFFILIATES_REQUIRED_VOLUME_USD;
   const remaining = AFFILIATES_REQUIRED_VOLUME_USD - volume;
   return (
@@ -48,7 +47,7 @@ export const AffiliateProgressCard = ({
           </div>
         </div>
         <div tw="relative h-2.5 w-full overflow-hidden rounded-0.5 bg-color-layer-7">
-          <div tw="absolute h-full bg-color-accent" style={{ width: `${progressPercent}%` }} />
+          <div tw="absolute h-full bg-color-accent" style={{ width: `${progressRatio * 100}%` }} />
         </div>
       </div>
     </div>

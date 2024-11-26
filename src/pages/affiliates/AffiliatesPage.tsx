@@ -26,18 +26,15 @@ export const AffiliatesPage = () => {
 
   const stringGetter = useStringGetter();
 
-  const totalVolume = affiliateMetadata?.totalVolume
-    ? Math.floor(affiliateMetadata.totalVolume)
-    : 0;
-
   const userStatus = {
-    isAffiliate: Boolean(affiliateMetadata?.metadata?.isAffiliate) || totalVolume > 10_000,
+    isAffiliate:
+      Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
+      (affiliateMetadata?.totalVolume && affiliateMetadata.totalVolume > 10_000),
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
       ? bytesToBigInt(affiliateMetadata.affiliateInfo.stakedAmount)
       : undefined,
-    totalVolume,
   };
 
   return (
@@ -59,7 +56,7 @@ export const AffiliatesPage = () => {
               ) : !userStatus.isAffiliate && !userStatus.isVip ? (
                 <AffiliateProgressCard
                   tw="flex-1 bg-color-layer-3"
-                  volume={userStatus.totalVolume}
+                  volume={affiliateMetadata.totalVolume}
                 />
               ) : (
                 <AffiliateStatsCard
