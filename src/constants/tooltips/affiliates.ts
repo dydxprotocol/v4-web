@@ -1,8 +1,8 @@
-import { TOOLTIP_STRING_KEYS, TooltipStrings } from '../localization';
+import { TooltipStrings } from '../localization';
 
 export const affiliateTooltips = {
   'affiliate-commissions': ({ stringGetter }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.AFFILIATE_COMMISSIONS_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.AFFILIATE_COMMISSIONS_BODY }),
+    title: "Affiliate commissions",
+    body: 'Affiliates earn commission on taker fees paid by referred users. To generate affiliate fee share, referred users must have rolling 30-day volume below $50M when they make the trade. ',
   }),
 } satisfies TooltipStrings;

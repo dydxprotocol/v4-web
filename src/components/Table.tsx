@@ -862,7 +862,6 @@ const $Th = styled.th<{ allowSorting: boolean; withScrollSnapColumns?: boolean }
         `
       : css`
           cursor: default;
-          pointer-events: none;
         `}
 
   white-space: nowrap;
