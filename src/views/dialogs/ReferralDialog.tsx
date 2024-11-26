@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { styled } from 'twin.macro';
 
 import { AFFILIATES_FEE_DISCOUNT_USD } from '@/constants/affiliates';
@@ -49,19 +51,25 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
   } = useAffiliatesInfo(referralAddress);
 
   const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
-
   const isNotEligible = isAffiliatesInfoSuccess && !affiliatesInfo.isEligible;
   const isOwnReferralCode = isReferralAddressFetched && referralAddress === dydxAddress;
-
   const invalidReferralCode = isReferralAddressFetched && !referralAddress;
+
+  useEffect(() => {
+    // User has already registered a referral or is using their own referral
+    if (Boolean(referredBy?.affiliateAddress) || isOwnReferralCode) {
+      setIsOpen(false);
+    }
+  }, [referredBy?.affiliateAddress, setIsOpen, isOwnReferralCode]);
 
   if (
     isReferralAddressPending ||
     isReferredByPending ||
     !!referredBy?.affiliateAddress ||
     isOwnReferralCode
-  )
+  ) {
     return null;
+  }
 
   return (
     <Dialog
