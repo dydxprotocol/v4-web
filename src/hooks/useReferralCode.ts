@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { removeLatestReferrer, updateLatestReferrer } from '@/state/affiliates';
@@ -7,6 +8,7 @@ import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
 import { useReferralAddress } from './useReferralAddress';
@@ -37,6 +39,7 @@ export function useReferralCode() {
     if (referredBy?.affiliateAddress) return;
 
     if (referralAddress) {
+      track(AnalyticsEvents.AffiliateSaveReferralAddress({ referralAddress }));
       dispatch(updateLatestReferrer(referralAddress));
     }
   }, [

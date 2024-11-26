@@ -370,7 +370,10 @@ export const AnalyticsEvents = unionize(
     }>(),
 
     // Affiliate
-    AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
+    AffiliateSaveReferralAddress: ofType<{ referralAddress: string }>(),
+    AffiliateRegistration: ofType<{ referralAddress: string }>(),
+    AffiliateURLCopied: ofType<{ url: string }>(),
+    AffiliateInviteFriendsModalOpened: ofType<{ isAffiliateEligible: boolean }>(),
 
     // Favoriting Markets
     FavoriteMarket: ofType<{ marketId: string }>(),

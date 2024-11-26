@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
@@ -6,6 +8,7 @@ import {
   AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,6 +26,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
 
+import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
@@ -44,6 +48,14 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     affiliateMetadataQuery: { data },
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo(dydxAddress);
+
+  useEffect(() => {
+    if (data?.isEligible === undefined) return;
+
+    track(
+      AnalyticsEvents.AffiliateInviteFriendsModalOpened({ isAffiliateEligible: data.isEligible })
+    );
+  }, [data?.isEligible]);
 
   const maxEarning = maxEarningData?.maxEarning;
 
@@ -136,6 +148,9 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                 action={ButtonAction.Primary}
                 size={ButtonSize.Small}
                 value={affiliatesUrl}
+                onCopy={() => {
+                  track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
+                }}
               >
                 {stringGetter({ key: STRING_KEYS.COPY_LINK })}
               </CopyButton>
