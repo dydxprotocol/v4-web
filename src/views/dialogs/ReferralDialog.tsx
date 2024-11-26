@@ -37,20 +37,30 @@ const CONTENT_SECTIONS = [
 export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialogProps>) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
+
   const {
     data: referralAddress,
     isPending: isReferralAddressPending,
     isFetched: isReferralAddressFetched,
   } = useReferralAddress(refCode);
+
   const {
     affiliateMetadataQuery: { data: affiliatesInfo, isSuccess: isAffiliatesInfoSuccess },
   } = useAffiliatesInfo(referralAddress);
+
   const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
 
   const isNotEligible = isAffiliatesInfoSuccess && !affiliatesInfo.isEligible;
+  const isOwnReferralCode = isReferralAddressFetched && referralAddress === dydxAddress;
+
   const invalidReferralCode = isReferralAddressFetched && !referralAddress;
 
-  if (isReferralAddressPending || isReferredByPending || !!referredBy?.affiliateAddress)
+  if (
+    isReferralAddressPending ||
+    isReferredByPending ||
+    !!referredBy?.affiliateAddress ||
+    isOwnReferralCode
+  )
     return null;
 
   return (
