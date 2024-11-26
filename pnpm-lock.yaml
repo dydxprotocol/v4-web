@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-abacus':
-    specifier: 1.13.34
-    version: 1.13.34
+    specifier: 1.13.35
+    version: 1.13.35
   '@dydxprotocol/v4-client-js':
     specifier: 1.12.2
     version: 1.12.2
@@ -3284,8 +3284,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.13.34:
-    resolution: {integrity: sha512-j53owq8Oh8ebeUCNDgdMrFj94YaYXq9Ez/loUTrojFZF3KWcHABBjVPRr+M8kZ1Y2ry9xGcc+bPg707etyZRRw==}
+  /@dydxprotocol/v4-abacus@1.13.35:
+    resolution: {integrity: sha512-g5ZodZAgQeN9cRCh8zazyeoZSe5z3G38vqXlYwTqUmhRPSxeTVuPbFNj1JD6Q5QL28zkZ1ThsNS2mRFTDjHRRw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
