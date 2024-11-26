@@ -269,8 +269,7 @@ const CriteriaTable = ({
       allowsSorting: false,
       label: (
         <WithTooltip tooltip="affiliate-commissions" side="right">
-          {/* {stringGetter({ key: STRING_KEYS.AFFILIATE_COMISSIONS })} */}
-          Comissions
+          {stringGetter({ key: STRING_KEYS.COMMISSIONS })}
         </WithTooltip>
       ),
       renderCell: ({ tier, affiliateEarnRate }) => (

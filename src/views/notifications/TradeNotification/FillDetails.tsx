@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { TradeTypes } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,14 +15,12 @@ import { BigNumberish } from '@/lib/numbers';
 
 export const FillDetails = ({
   orderSide,
-  tradeType,
   filledAmount,
   assetId,
   averagePrice,
   tickSizeDecimals,
 }: {
   orderSide: OrderSide;
-  tradeType?: TradeTypes;
   filledAmount: Nullable<BigNumberish>;
   assetId?: string;
   averagePrice?: BigNumberish;
@@ -52,17 +49,14 @@ export const FillDetails = ({
         {
           key: 'price',
           label: stringGetter({ key: STRING_KEYS.PRICE }),
-          value:
-            tradeType === TradeTypes.MARKET ? (
-              <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
-            ) : (
-              <Output
-                withSubscript
-                type={OutputType.Fiat}
-                value={averagePrice}
-                fractionDigits={tickSizeDecimals}
-              />
-            ),
+          value: (
+            <Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={averagePrice}
+              fractionDigits={tickSizeDecimals}
+            />
+          ),
         },
       ]}
     />

@@ -15,6 +15,7 @@ export const AffiliateProgressCard = ({
   const stringGetter = useStringGetter();
 
   const progressPercent = ((volume / AFFILIATES_REQUIRED_VOLUME_USD) * 100).toFixed(0).toString();
+  const progressRatio = volume / AFFILIATES_REQUIRED_VOLUME_USD;
   const remaining = AFFILIATES_REQUIRED_VOLUME_USD - volume;
   return (
     <div className={className} tw="flex flex-col gap-1.5 rounded-1 p-1">
@@ -25,7 +26,9 @@ export const AffiliateProgressCard = ({
             {stringGetter({ key: STRING_KEYS.TRADE_MORE_VOLUME_REQUIREMENT })}
           </div>
         </div>
-        <div tw="text-large font-medium">{progressPercent}%</div>
+        <div tw="text-large font-medium">
+          <Output tw="inline" value={progressRatio} type={OutputType.Percent} fractionDigits={0} />
+        </div>
       </div>
       <div tw="flex flex-col gap-0.75">
         <div tw="flex justify-between">

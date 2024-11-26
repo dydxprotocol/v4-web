@@ -13,6 +13,8 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Tag } from '@/components/Tag';
 
+import { isTruthy } from '@/lib/isTruthy';
+
 import { SearchInput } from './SearchInput';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
@@ -64,11 +66,14 @@ export const ComboboxMenu = <
       label={typeof title === 'string' ? title : undefined}
       // value={highlightedCommand}
       // onValueChange={setHighlightedCommand}
-      filter={(value: string, search: string) =>
-        value.replace(/ /g, '').toLowerCase().includes(search.replace(/ /g, '').toLowerCase())
+      filter={(value: string, search: string) => {
+        return value
+          .replace(/ /g, '')
+          .toLowerCase()
+          .includes(search.replace(/ /g, '').toLowerCase())
           ? 1
-          : 0
-      }
+          : 0;
+      }}
       className={className}
       $withStickyLayout={withStickyLayout}
     >
@@ -107,10 +112,15 @@ export const ComboboxMenu = <
             {group.items.map((item) => (
               <Fragment key={item.value}>
                 <$Item
-                  // value={item.value} // search by both value and textContent
-                  // value={[group.groupLabel, item.label, item.tag].filter(Boolean).join('|')} // exclude item.value from searchable terms (not guaranteed to be unique)
-                  value={[group.groupLabel, item.value, item.description, item.label, item.tag]
-                    .filter(Boolean)
+                  value={[
+                    group.groupLabel,
+                    item.value,
+                    item.description,
+                    item.label,
+                    item.tag,
+                    item.searchableContent,
+                  ]
+                    .filter(isTruthy)
                     .join('|')}
                   onSelect={() => {
                     if (item.subitems) {
@@ -150,16 +160,15 @@ export const ComboboxMenu = <
                   item.subitems?.map((subitem) => (
                     <Fragment key={subitem.value}>
                       <$Item
-                        // value={subitem.value} // search by both value and textContent
-                        // value={[group.groupLabel, item.label, subitem.label, subitem.tag].filter(Boolean).join('|')}
                         value={[
                           group.groupLabel,
                           item.value,
                           item.description,
                           item.label,
                           item.tag,
+                          item.searchableContent,
                         ]
-                          .filter(Boolean)
+                          .filter(isTruthy)
                           .join('|')}
                         onSelect={() => {
                           subitem.onSelect?.(subitem.value);

@@ -70,7 +70,6 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotCustomContent={
         <FillDetails
           orderSide={SIDE === STRING_KEYS.BUY ? OrderSide.BUY : OrderSide.SELL}
-          tradeType={tradeType}
           filledAmount={FILLED_AMOUNT}
           assetId={marketData?.assetId}
           averagePrice={AVERAGE_PRICE}
