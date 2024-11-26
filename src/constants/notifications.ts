@@ -150,6 +150,7 @@ export type NotificationDisplayData = {
   icon?: React.ReactNode;
   title: string; // Title for Toast, Notification, and Push Notification
   body?: string; // Description body for Toast, Notification, and Push Notification
+  searchableContent?: string; // never rendered, but searchable
 
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;
