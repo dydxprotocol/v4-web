@@ -112,5 +112,6 @@ export const useComplianceState = () => {
     complianceState,
     complianceMessage,
     disableConnectButton,
+    showRestrictionWarning: true, // complianceState === ComplianceStates.READ_ONLY,
   };
 };
