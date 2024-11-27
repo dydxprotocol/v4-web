@@ -28,7 +28,7 @@ const DEFAULT_USDC_AMT = 0;
 export function useFunkitBuyNobleUsdc() {
   const stringGetter = useStringGetter();
   const appThemeSetting: AppThemeSetting = useAppSelector(getAppTheme);
-  const { lightMode, darkMode, setTheme } = useActiveTheme();
+  const { lightTheme, darkTheme, setTheme } = useActiveTheme();
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
 
@@ -47,7 +47,7 @@ export function useFunkitBuyNobleUsdc() {
   );
   const { beginCheckout } = useFunkitCheckout(config);
   const startCheckout = useCallback(async () => {
-    setTheme(appThemeSetting === AppTheme.Light ? (lightMode as any) : (darkMode as any));
+    setTheme(appThemeSetting === AppTheme.Light ? (lightTheme as any) : (darkTheme as any));
     await beginCheckout({
       modalTitle: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       iconSrc: TOKEN_ICON_SRC,
@@ -59,6 +59,6 @@ export function useFunkitBuyNobleUsdc() {
       customRecipient: dydxAddress,
       expirationTimestampMs: CHECKOUT_EXPIRATION_MS,
     });
-  }, [appThemeSetting, beginCheckout, darkMode, dydxAddress, lightMode, setTheme, stringGetter]);
+  }, [appThemeSetting, beginCheckout, darkTheme, dydxAddress, lightTheme, setTheme, stringGetter]);
   return startCheckout;
 }
