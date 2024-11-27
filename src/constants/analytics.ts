@@ -372,7 +372,7 @@ export const AnalyticsEvents = unionize(
     // Affiliate
     AffiliateInviteFriendsModalOpened: ofType<{ isAffiliateEligible: boolean }>(),
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
-    AffiliateRemovalSavedReferralAddress: ofType<{ affiliateAddress: string; reason: string }>(),
+    AffiliateRemoveSavedReferralAddress: ofType<{ affiliateAddress: string; reason: string }>(),
     AffiliateSaveReferralAddress: ofType<{ affiliateAddress: string }>(),
     AffiliateURLCopied: ofType<{ url: string }>(),
 
@@ -408,6 +408,11 @@ export enum TransactionMemo {
   cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
 
   launchMarket = `${DEFAULT_TRANSACTION_MEMO} | Launch Market`,
+}
+
+export enum AffiliateRemovalReason {
+  OwnReferralCode = 'own_referral_code',
+  AffiliateAlreadyRegistered = 'affiliate_already_registered',
 }
 
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};

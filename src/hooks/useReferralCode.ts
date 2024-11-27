@@ -73,7 +73,7 @@ export function useReferralCode() {
 
     if (isOwnReferralCode) {
       track(
-        AnalyticsEvents.AffiliateRemovalSavedReferralAddress({
+        AnalyticsEvents.AffiliateRemoveSavedReferralAddress({
           affiliateAddress: latestReferrer,
           reason: AffiliateRemovalReason.OwnReferralCode,
         })
@@ -81,7 +81,7 @@ export function useReferralCode() {
       dispatch(removeLatestReferrer());
     } else if (referredBy?.affiliateAddress) {
       track(
-        AnalyticsEvents.AffiliateRemovalSavedReferralAddress({
+        AnalyticsEvents.AffiliateRemoveSavedReferralAddress({
           affiliateAddress: latestReferrer,
           reason: AffiliateRemovalReason.AffiliateAlreadyRegistered,
         })
