@@ -54,7 +54,7 @@ const defaultCustomColors = {
 };
 
 export const funkitTheme = {
-  darkMode: darkTheme({
+  darkTheme: darkTheme({
     customFontFamily: 'inherit',
     accentColor: ACCENT_COLOR,
     customColors: {
@@ -65,7 +65,7 @@ export const funkitTheme = {
       buttonIconBackgroundHover: OFF_BACKGROUND_DARK,
     },
   }),
-  lightMode: lightTheme({
+  lightTheme: lightTheme({
     customFontFamily: 'inherit',
     accentColor: ACCENT_COLOR,
     customColors: {
