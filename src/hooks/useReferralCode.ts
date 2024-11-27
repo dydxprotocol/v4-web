@@ -57,6 +57,12 @@ export function useReferralCode() {
   // 3. Remove saved affiliate address
   useEffect(() => {
     if (referredBy?.affiliateAddress && latestReferrer) {
+      track(
+        AnalyticsEvents.AffiliateRemovalSavedReferralAddress({
+          affiliateAddress: latestReferrer,
+          reason: '',
+        })
+      );
       dispatch(removeLatestReferrer());
     }
   }, [dispatch, latestReferrer, referredBy?.affiliateAddress]);
