@@ -19,17 +19,6 @@ curl -o $TMP_DIR/swagger.json https://raw.githubusercontent.com/dydxprotocol/v4-
 # Remove required attribute
 # ${CURRENT_DIR}/json_remove_attr.sh -f $TMP_DIR/swagger.json -a required
 
-# Remove APIOrderStatus
-# ${CURRENT_DIR}/json_remove_attr.sh -f  $TMP_DIR/swagger.json -a APIOrderStatus
-
-# Codegen doesn't support allOf with enum, so we need to replace it with the enum directly
-
-# Add APIOrderStatus with content of OrderStatus and BestEffortOrderStatus
-# ${CURRENT_DIR}/json_add_attr.sh $TMP_DIR/swagger.json '.components.schemas' APIOrderStatus TO_REPLACE
-
-# Remove "TO_REPLACE" with the content of OrderStatus and BestEffortOrderStatus
-# sed -i '' "s/\"TO_REPLACE\"/{ \"enum\": [\"OPEN\",\"FILLED\",\"CANCELED\",\"BEST_EFFORT_CANCELED\",\"UNTRIGGERED\",\"BEST_EFFORT_OPENED\"],\"type\": \"string\" }/g" $TMP_DIR/swagger.json 
-
 cd "$TMP_DIR"
 
 swagger-codegen generate -i swagger.json -o generated -l typescript-fetch
@@ -51,5 +40,6 @@ cd $CURRENT_DIR
 
 npx tsx scripts/indexer-renames.ts 
 pnpm prettier ./src/types/indexer/indexerApiGen.ts --write
+sed -i '' 's/export interface IndexerAPIOrderStatus {}/export type APIOrderStatus = IndexerOrderStatus | IndexerBestEffortOpenedStatus;/' ./src/types/indexer/indexerApiGen.ts
 
 
