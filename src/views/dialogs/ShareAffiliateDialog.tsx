@@ -29,6 +29,7 @@ import { QrCode } from '@/components/QrCode';
 import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
+import { AffiliateProgress } from '../Affiliates/AffiliateProgress';
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
 const copyBlobToClipboard = async (blob: Blob | null) => {
@@ -86,14 +87,21 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
   const dialogDescription = (
     <span>
-      {stringGetter({
-        key: STRING_KEYS.EARN_FOR_EACH_TRADER,
-        params: {
-          AMOUNT_USD:
-            maxEarning?.toLocaleString() ?? DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
-        },
-      })}
-      .{' '}
+      {!data?.isEligible
+        ? stringGetter({
+            key: STRING_KEYS.AFFILIATE_PROGRAM_TRADING_REQUIREMENT,
+            params: {
+              AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
+            },
+          })
+        : stringGetter({
+            key: STRING_KEYS.EARN_FOR_EACH_TRADER,
+            params: {
+              AMOUNT_USD:
+                maxEarning?.toLocaleString() ??
+                DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
+            },
+          })}{' '}
       <Link href={affiliateProgramFaq} isInline>
         {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
       </Link>
@@ -104,7 +112,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+      title={stringGetter({ key: STRING_KEYS.UNLOCK_AFFILIATE_PROGRAM })}
       description={dialogDescription}
     >
       {!dydxAddress && (
@@ -116,34 +124,17 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
           }}
         />
       )}
-      {dydxAddress && (
+      {dydxAddress && !data?.isEligible && <AffiliateProgress volume={data?.totalVolume} />}
+      {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
           <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
             <div>
               <div tw="text-small text-color-text-0">
-                {data?.isEligible
-                  ? stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })
-                  : stringGetter({
-                      key: STRING_KEYS.AFFILIATE_LINK_REQUIREMENT,
-                      params: {
-                        AMOUNT_USD: AFFILIATES_REQUIRED_VOLUME_USD.toLocaleString(),
-                      },
-                    })}
+                {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
               </div>
-              <div>
-                {data?.isEligible && affiliatesUrl
-                  ? affiliatesUrl
-                  : stringGetter({
-                      key: STRING_KEYS.YOUVE_TRADED,
-                      params: {
-                        AMOUNT_USD: data?.totalVolume
-                          ? Math.floor(data.totalVolume).toLocaleString()
-                          : '0',
-                      },
-                    })}
-              </div>
+              <div>{affiliatesUrl}</div>
             </div>
-            {data?.isEligible && affiliatesUrl && (
+            {affiliatesUrl && (
               <CopyButton
                 action={ButtonAction.Primary}
                 size={ButtonSize.Small}
@@ -156,7 +147,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               </CopyButton>
             )}
           </div>
-          {data?.isEligible && affiliatesUrl && (
+          {affiliatesUrl && (
             <div
               ref={(domNode) => {
                 if (domNode) {
@@ -191,35 +182,33 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             </div>
           )}
 
-          {data?.isEligible && (
-            <div tw="flex gap-1">
-              <Button
-                action={ButtonAction.Base}
-                slotLeft={<Icon iconName={IconName.Rocket} />}
-                state={{
-                  isLoading: isCopying,
-                }}
-                tw="flex-1"
-                type={ButtonType.Link}
-                href={affiliateProgram}
-              >
-                {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-              </Button>
-              <Button
-                action={ButtonAction.Base}
-                slotLeft={<Icon iconName={IconName.SocialX} />}
-                onClick={() => {
-                  convertShare();
-                }}
-                state={{
-                  isLoading: isSharing,
-                }}
-                tw="flex-1 flex-grow-0 px-2"
-              >
-                {stringGetter({ key: STRING_KEYS.SHARE })}
-              </Button>
-            </div>
-          )}
+          <div tw="flex gap-1">
+            <Button
+              action={ButtonAction.Base}
+              slotLeft={<Icon iconName={IconName.Rocket} />}
+              state={{
+                isLoading: isCopying,
+              }}
+              tw="flex-1"
+              type={ButtonType.Link}
+              href={affiliateProgram}
+            >
+              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
+            </Button>
+            <Button
+              action={ButtonAction.Base}
+              slotLeft={<Icon iconName={IconName.SocialX} />}
+              onClick={() => {
+                convertShare();
+              }}
+              state={{
+                isLoading: isSharing,
+              }}
+              tw="flex-1 flex-grow-0 px-2"
+            >
+              {stringGetter({ key: STRING_KEYS.SHARE })}
+            </Button>
+          </div>
         </div>
       )}
     </Dialog>

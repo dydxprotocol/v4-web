@@ -1,11 +1,12 @@
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { fromPairs } from 'lodash';
+import { fromPairs, throttle } from 'lodash';
 
 import type {
   AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
+  MarketOrderbook,
   Nullable,
   ParsingErrors,
   PerpetualMarket,
@@ -15,6 +16,7 @@ import type {
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
+import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import {
@@ -50,6 +52,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   constructor() {
     this.store = undefined;
   }
+
+  private throttledOrderbookUpdateByMarketId: {
+    [marketId: string]: (orderbook: MarketOrderbook) => void;
+  } = {};
 
   environmentsChanged(): void {}
 
@@ -226,10 +232,14 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       marketIds?.forEach((market: string) => {
         if (changes.has(Changes.orderbook)) {
-          const orderbook = updatedState.marketOrderbook(market);
+          this.throttledOrderbookUpdateByMarketId[market] ??= throttle(
+            (orderbook) => this.store?.dispatch(setOrderbook({ orderbook, marketId: market })),
+            timeUnits.second / 3
+          );
 
+          const orderbook = updatedState.marketOrderbook(market);
           if (orderbook) {
-            dispatch(setOrderbook({ orderbook, marketId: market }));
+            this.throttledOrderbookUpdateByMarketId[market](orderbook);
           }
         }
 

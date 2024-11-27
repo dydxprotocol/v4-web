@@ -10,7 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
-import { ShareAffiliateBanner } from '@/views/Affiliates/ShareAffiliateBanner';
+import { AffiliateProgressCard } from '@/views/Affiliates/cards/AffiliateProgressCard';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
 import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
@@ -26,18 +26,15 @@ export const AffiliatesPage = () => {
 
   const stringGetter = useStringGetter();
 
-  const totalVolume = affiliateMetadata?.totalVolume
-    ? Math.floor(affiliateMetadata.totalVolume)
-    : 0;
-
   const userStatus = {
-    isAffiliate: Boolean(affiliateMetadata?.metadata?.isAffiliate) || totalVolume > 10_000,
+    isAffiliate:
+      Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
+      (affiliateMetadata?.totalVolume && affiliateMetadata.totalVolume > 10_000),
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
       ? bytesToBigInt(affiliateMetadata.affiliateInfo.stakedAmount)
       : undefined,
-    totalVolume: totalVolume.toLocaleString(),
   };
 
   return (
@@ -57,7 +54,10 @@ export const AffiliatesPage = () => {
                   <LoadingSpinner />
                 </div>
               ) : !userStatus.isAffiliate && !userStatus.isVip ? (
-                <ShareAffiliateBanner totalVolume={userStatus.totalVolume} />
+                <AffiliateProgressCard
+                  tw="flex-1 bg-color-layer-3"
+                  volume={affiliateMetadata.totalVolume}
+                />
               ) : (
                 <AffiliateStatsCard
                   currentAffiliateTier={userStatus.currentAffiliateTier}
@@ -66,7 +66,6 @@ export const AffiliatesPage = () => {
                   accountStats={accountStats}
                 />
               )}
-
               <ProgramStatusCard isVip={!!userStatus.isVip} />
             </section>
           </>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { AnalyticsEvents } from '@/constants/analytics';
+import { AffiliateRemovalReason, AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { removeLatestReferrer, updateLatestReferrer } from '@/state/affiliates';
@@ -11,11 +11,17 @@ import { openDialog } from '@/state/dialogs';
 import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
+import { useAccounts } from './useAccounts';
+import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useReferralAddress } from './useReferralAddress';
 import { useReferredBy } from './useReferredBy';
 
 export function useReferralCode() {
   const dispatch = useAppDispatch();
+  const { dydxAddress } = useAccounts();
+
+  const { data: affiliateMetadata, isPending: isAffiliateMetadataPending } =
+    useAffiliateMetadata(dydxAddress);
 
   const { data: referralAddress, isSuccess: isReferralAddressSuccess } = useReferralAddress(
     testFlags.referralCode
@@ -25,6 +31,8 @@ export function useReferralCode() {
 
   const latestReferrer = useAppSelector(getLatestReferrer);
 
+  const isOwnReferralCode = affiliateMetadata?.metadata?.referralCode === testFlags.referralCode;
+
   useEffect(() => {
     if (testFlags.referralCode) {
       dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
@@ -33,10 +41,13 @@ export function useReferralCode() {
 
   useEffect(() => {
     // wait for relevant data to load
-    if (!isReferralAddressSuccess || isReferredByPending) return;
+    if (!isReferralAddressSuccess || isReferredByPending || isAffiliateMetadataPending) return;
 
     // current user already has a referrer registered
     if (referredBy?.affiliateAddress) return;
+
+    // current user is using their own code
+    if (isOwnReferralCode) return;
 
     if (referralAddress) {
       track(AnalyticsEvents.AffiliateSaveReferralAddress({ affiliateAddress: referralAddress }));
@@ -48,22 +59,34 @@ export function useReferralCode() {
     dispatch,
     isReferredByPending,
     referredBy?.affiliateAddress,
+    isAffiliateMetadataPending,
+    isOwnReferralCode,
   ]);
 
   // If the current user already has a referrer registered, remove the pending referrer address
   // This handles the case of:
   // 1. User opens referral link without a wallet connected, affiliate address is saved
-  // 2. User connects their wallet, and their account already has an affiliate registered
+  // 2. User connects their wallet, and their account already has an affiliate registered or they are using their own code
   // 3. Remove saved affiliate address
   useEffect(() => {
-    if (referredBy?.affiliateAddress && latestReferrer) {
+    if (!latestReferrer) return;
+
+    if (isOwnReferralCode) {
       track(
         AnalyticsEvents.AffiliateRemovalSavedReferralAddress({
           affiliateAddress: latestReferrer,
-          reason: '',
+          reason: AffiliateRemovalReason.OwnReferralCode,
+        })
+      );
+      dispatch(removeLatestReferrer());
+    } else if (referredBy?.affiliateAddress) {
+      track(
+        AnalyticsEvents.AffiliateRemovalSavedReferralAddress({
+          affiliateAddress: latestReferrer,
+          reason: AffiliateRemovalReason.AffiliateAlreadyRegistered,
         })
       );
       dispatch(removeLatestReferrer());
     }
-  }, [dispatch, latestReferrer, referredBy?.affiliateAddress]);
+  }, [dispatch, latestReferrer, referredBy?.affiliateAddress, isOwnReferralCode]);
 }

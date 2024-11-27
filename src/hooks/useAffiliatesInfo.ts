@@ -23,15 +23,13 @@ type AffiliatesMetadata = {
   isAffiliate: boolean;
 };
 
-export const useAffiliatesInfo = (dydxAddress?: string) => {
-  const { compositeClient, getAffiliateInfo, getAllAffiliateTiers } = useDydxClient();
-  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
+export const useAffiliateMetadata = (dydxAddress?: string) => {
+  const { compositeClient, getAffiliateInfo } = useDydxClient();
 
   const fetchAffiliateMetadata = async () => {
     if (!compositeClient || !dydxAddress) {
       return {};
     }
-
     const metadataEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/metadata`;
     const totalVolumeEndpoint = `${compositeClient.indexerClient.config.restEndpoint}/v4/affiliates/total_volume`;
 
@@ -63,6 +61,19 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     }
   };
 
+  const affiliateMetadataQuery = useQuery({
+    queryKey: ['affiliateMetadata', dydxAddress],
+    queryFn: fetchAffiliateMetadata,
+    enabled: Boolean(compositeClient && dydxAddress),
+    staleTime: 5 * timeUnits.minute,
+  });
+
+  return affiliateMetadataQuery;
+};
+
+const useAffiliatesStatus = (dydxAddress?: string) => {
+  const { compositeClient } = useDydxClient();
+
   const fetchAccountStats = async () => {
     if (!dydxAddress || !compositeClient) return undefined;
 
@@ -85,19 +96,19 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     }
   };
 
-  const affiliateMetadataQuery = useQuery({
-    queryKey: ['affiliateMetadata', dydxAddress],
-    queryFn: fetchAffiliateMetadata,
-    enabled: Boolean(compositeClient && dydxAddress),
-    staleTime: 5 * timeUnits.minute,
-  });
-
   const affiliateStatsQuery = useQuery({
     queryKey: ['accountStats', dydxAddress],
     queryFn: fetchAccountStats,
     enabled: Boolean(compositeClient && dydxAddress),
     staleTime: 5 * timeUnits.minute,
   });
+
+  return affiliateStatsQuery;
+};
+
+const useAffiliateMaxEarning = () => {
+  const { compositeClient, getAllAffiliateTiers } = useDydxClient();
+  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
 
   const fetchAffiliateMaxEarning = async () => {
     const allAffiliateTiers = await getAllAffiliateTiers();
@@ -118,6 +129,14 @@ export const useAffiliatesInfo = (dydxAddress?: string) => {
     enabled: Boolean(compositeClient && feeTiers),
     staleTime: Infinity,
   });
+
+  return affiliateMaxEarningQuery;
+};
+
+export const useAffiliatesInfo = (dydxAddress?: string) => {
+  const affiliateMetadataQuery = useAffiliateMetadata(dydxAddress);
+  const affiliateStatsQuery = useAffiliatesStatus(dydxAddress);
+  const affiliateMaxEarningQuery = useAffiliateMaxEarning();
 
   return {
     affiliateMetadataQuery,
