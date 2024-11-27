@@ -372,7 +372,10 @@ export const AnalyticsEvents = unionize(
     // Affiliate
     AffiliateInviteFriendsModalOpened: ofType<{ isAffiliateEligible: boolean }>(),
     AffiliateRegistration: ofType<{ affiliateAddress: string }>(),
-    AffiliateRemoveSavedReferralAddress: ofType<{ affiliateAddress: string; reason: string }>(),
+    AffiliateRemoveSavedReferralAddress: ofType<{
+      affiliateAddress: string;
+      reason: AffiliateRemovalReason;
+    }>(),
     AffiliateSaveReferralAddress: ofType<{ affiliateAddress: string }>(),
     AffiliateURLCopied: ofType<{ url: string }>(),
 
