@@ -12,6 +12,7 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 interface IProgramCardProps {
@@ -21,7 +22,8 @@ interface IProgramCardProps {
 export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { affiliateProgram, vipsChannel, affiliateProgramSupportEmail } = useURLConfigs();
+  const { affiliateProgram, vipsChannel, affiliateProgramSupportEmail, affiliateProgramFaq } =
+    useURLConfigs();
 
   const title: ReactNode = isVip
     ? stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE_VIP })
@@ -52,7 +54,10 @@ export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
             />
           ),
         },
-      })}
+      })}{' '}
+      <Link href={affiliateProgramFaq} isInline>
+        {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+      </Link>
     </p>
   );
 

@@ -19,27 +19,30 @@ export type CopyButtonProps = {
   value?: string;
   buttonType?: 'text' | 'icon' | 'default';
   children?: React.ReactNode;
+  onCopy?: () => void;
 } & ButtonProps;
 
 export const CopyButton = ({
   value,
   buttonType = 'default',
   children,
+  onCopy,
   ...buttonProps
 }: CopyButtonProps) => {
   const stringGetter = useStringGetter();
   const [copied, setCopied] = useState(false);
 
-  const onCopy = () => {
+  const copy = () => {
     if (!value) return;
 
     setCopied(true);
     navigator.clipboard.writeText(value);
     setTimeout(() => setCopied(false), MODERATE_DEBOUNCE_MS);
+    onCopy?.();
   };
 
   return buttonType === 'text' ? (
-    <$InlineRow onClick={onCopy} copied={copied}>
+    <$InlineRow onClick={copy} copied={copied}>
       {children}
       <$Icon copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
     </$InlineRow>
@@ -52,14 +55,14 @@ export const CopyButton = ({
         copied={copied}
         action={ButtonAction.Base}
         iconName={copied ? IconName.Check : IconName.Copy}
-        onClick={onCopy}
+        onClick={copy}
       />
     </WithTooltip>
   ) : (
     <Button
       {...buttonProps}
       action={copied ? ButtonAction.Create : ButtonAction.Primary}
-      onClick={onCopy}
+      onClick={copy}
     >
       <Icon iconName={IconName.Copy} />
       {children ?? stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}

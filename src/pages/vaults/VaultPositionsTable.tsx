@@ -19,7 +19,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -173,18 +173,13 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 sparklinePoints: undefined,
               };
               return (
-                <TableCell stacked>
+                <TableCell>
                   <$OutputSigned
                     tw="w-5"
                     sign={getNumberSign(thirtyDayPnl.absolute)}
                     value={thirtyDayPnl.absolute}
                     type={OutputType.Fiat}
                     fractionDigits={0}
-                  />
-                  <Output
-                    value={thirtyDayPnl.percent}
-                    type={OutputType.Percent}
-                    showSign={ShowSign.Both}
                   />
                 </TableCell>
               );
