@@ -6,6 +6,8 @@ import {
   type IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
 
+import { DEFAULT_INITIAL_MARGIN_FRACTION } from '@/constants/trade';
+
 import { BIG_NUMBERS, MustBigNumber } from '../numbers';
 import { orEmptyObj } from '../typeUtils';
 
@@ -112,9 +114,9 @@ export const calculateCumulativeSubaccountPositionDetails = ({
   openPerpetualPositions?: { [market: string]: IndexerPerpetualPositionResponseObject };
   perpetualMarkets?: { [market: string]: IndexerPerpetualMarketResponseObject };
 }): {
-  valueTotal: string;
-  notionalTotal: string;
-  initialRiskTotal: string;
+  openPerpetualPositionsValueTotal: string;
+  openPerpetualPositionsNotionalTotal: string;
+  openPerpetualPositionsInitialRiskTotal: string;
 } => {
   const subaccountPositionDetails = calculateSubaccountPositionDetails({
     openPerpetualPositions,
@@ -140,9 +142,9 @@ export const calculateCumulativeSubaccountPositionDetails = ({
   });
 
   return {
-    valueTotal: valueTotalBN.toString(),
-    notionalTotal: notionalTotalBN.toString(),
-    initialRiskTotal: initialRiskTotalBN.toString(),
+    openPerpetualPositionsValueTotal: valueTotalBN.toString(),
+    openPerpetualPositionsNotionalTotal: notionalTotalBN.toString(),
+    openPerpetualPositionsInitialRiskTotal: initialRiskTotalBN.toString(),
   };
 };
 
@@ -163,6 +165,136 @@ export const calculateSubaccountQuoteBalance = ({
         .times(side === IndexerPositionSide.LONG ? 1 : -1)
         .toString();
     }
+  }
+
+  return undefined;
+};
+
+/**
+ *
+ * @param openPerpetualPositionsValueTotal cumulative value of all open perpetual positions
+ * @param quoteBalance subaccount's quote balance
+ * @returns subaccount equity
+ */
+export const calculateSubaccountEquity = ({
+  openPerpetualPositionsValueTotal,
+  quoteBalance,
+}: {
+  openPerpetualPositionsValueTotal?: string;
+  quoteBalance?: string;
+}): string | undefined => {
+  if (openPerpetualPositionsValueTotal && quoteBalance) {
+    return MustBigNumber(openPerpetualPositionsValueTotal).plus(quoteBalance).toString();
+  }
+
+  return undefined;
+};
+
+/**
+ *
+ * @param equity subaccount equity
+ * @param openPerpetualPositionsInitialRiskTotal cumulative initial risk of all open perpetual positions
+ * @returns subaccount free collateral
+ */
+export const calculateSubaccountFreeCollateral = ({
+  equity,
+  openPerpetualPositionsInitialRiskTotal,
+}: {
+  equity?: string;
+  openPerpetualPositionsInitialRiskTotal?: string;
+}): string | undefined => {
+  if (openPerpetualPositionsInitialRiskTotal && equity) {
+    return MustBigNumber(equity).minus(openPerpetualPositionsInitialRiskTotal).toString();
+  }
+
+  return undefined;
+};
+
+/**
+ *
+ * @param equity subaccount equity
+ * @param openPerpetualPositionsNotionalTotal cumulative notional value of all open perpetual positions
+ * @returns subaccount leverage
+ */
+export const calculateSubaccountLeverage = ({
+  equity,
+  openPerpetualPositionsNotionalTotal,
+}: {
+  equity?: string;
+  openPerpetualPositionsNotionalTotal?: string;
+}): string | undefined => {
+  if (equity && openPerpetualPositionsNotionalTotal) {
+    return MustBigNumber(openPerpetualPositionsNotionalTotal).div(equity).toString();
+  }
+
+  return undefined;
+};
+
+/**
+ *
+ * @param equity subaccount equity
+ * @param freeCollateral subaccount free collateral
+ * @returns subaccount margin usage
+ */
+export const calculateSubaccountMarginUsage = ({
+  equity,
+  freeCollateral,
+}: {
+  equity?: string;
+  freeCollateral?: string;
+}): string | undefined => {
+  if (equity && freeCollateral) {
+    const freeCollateralBN = MustBigNumber(freeCollateral);
+    return BIG_NUMBERS.ONE.minus(freeCollateralBN.div(equity)).toString();
+  }
+
+  return undefined;
+};
+
+/**
+ *
+ * @description Calculate Subaccount or Position Buying Power
+ * @param equity subaccount equity
+ * @param openPerpetualPositionsInitialRiskTotal cumulative initial risk of all open perpetual positions
+ * @param initialMarginFraction initial margin fraction of the perpetual market
+ * @returns buying power
+ */
+export const calculateBuyingPower = ({
+  equity,
+  openPerpetualPositionsInitialRiskTotal,
+  initialMarginFraction,
+}: {
+  equity?: string;
+  openPerpetualPositionsInitialRiskTotal?: string;
+  initialMarginFraction?: number;
+}): string | undefined => {
+  const buyingPowerFreeCollateralBN = MustBigNumber(equity).minus(
+    openPerpetualPositionsInitialRiskTotal ?? 0
+  );
+
+  const divisor =
+    initialMarginFraction && initialMarginFraction > 0
+      ? initialMarginFraction
+      : DEFAULT_INITIAL_MARGIN_FRACTION;
+
+  return buyingPowerFreeCollateralBN.div(divisor).toString();
+};
+
+/**
+ *
+ * @param equity subaccount equity
+ * @param notionalValue position notional value
+ * @returns leverage for a position
+ */
+export const calculatePositionLeverage = ({
+  equity,
+  notionalValue,
+}: {
+  equity?: string;
+  notionalValue?: string;
+}): string | undefined => {
+  if (equity && Number(equity) > 0 && notionalValue) {
+    return MustBigNumber(notionalValue).div(equity).toString();
   }
 
   return undefined;
