@@ -107,8 +107,18 @@ export const EU_LOCALES: SupportedLocale[] = [
   SupportedLocales.FR,
 ];
 
+export const CONFIGURED_LOCALES = (import.meta.env.VITE_APP_LOCALES?.split(',') ??
+  []) as SupportedLocales[];
+
+if (!CONFIGURED_LOCALES.length) {
+  // eslint-disable-next-line no-console
+  console.error('No locales configured. Check value of VITE_APP_LOCALES in .env file');
+}
+
 export const SUPPORTED_BASE_TAGS_LOCALE_MAPPING = Object.fromEntries(
-  Object.entries(SUPPORTED_LOCALE_BASE_TAGS).map(([locale, baseTag]) => [baseTag, locale])
+  Object.entries(SUPPORTED_LOCALE_BASE_TAGS)
+    .filter(([locale]) => CONFIGURED_LOCALES.includes(locale as SupportedLocales))
+    .map(([locale, baseTag]) => [baseTag, locale])
 );
 
 export type TooltipStrings = {
