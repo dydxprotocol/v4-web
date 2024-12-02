@@ -72,7 +72,7 @@ export const AffiliatesPage = () => {
         )}
       </$Section>
 
-      <AffiliatesLeaderboard accountStats={accountStats} />
+      <AffiliatesLeaderboard />
     </$Page>
   );
 };
