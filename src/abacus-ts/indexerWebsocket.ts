@@ -4,6 +4,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { ReconnectingWebSocket } from './reconnectingWebsocket';
 
 const NO_ID_SPECIAL_STRING_ID = '____EMPTY_ID______';
+
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
 
