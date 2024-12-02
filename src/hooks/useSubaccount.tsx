@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
-import { Method } from '@cosmjs/tendermint-rpc';
+import { BroadcastTxSyncResponse, Method } from '@cosmjs/tendermint-rpc';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
@@ -52,6 +52,7 @@ import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
+import { useCustomNotification } from './useCustomNotification';
 import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -915,10 +916,11 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw new Error('affiliate can not be the same as referree');
       }
       try {
-        const response = await compositeClient.validatorClient.post.registerAffiliate(
+        const response = (await compositeClient.validatorClient.post.registerAffiliate(
           subaccountClient,
-          affiliate
-        );
+          affiliate,
+          Method.BroadcastTxSync
+        )) as BroadcastTxSyncResponse;
         return response;
       } catch (error) {
         log('useSubaccount/registerAffiliate', error);
@@ -931,15 +933,23 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const latestReferrer = useAppSelector(getLatestReferrer);
   const { data: referredBy, isFetched: isReferredByFetched } = useReferredBy();
 
-  const { mutateAsync: registerAffiliateMutate, isPending: isRegisterAffiliatePending } =
-    useMutation({
-      mutationFn: async (affiliateAddress: string) => {
-        const tx = await registerAffiliate(affiliateAddress);
-        dispatch(removeLatestReferrer());
+  const notify = useCustomNotification();
+  const { mutateAsync: registerAffiliateMutate } = useMutation({
+    mutationFn: async (affiliateAddress: string) => {
+      const tx = await registerAffiliate(affiliateAddress);
+      if (!tx.code) {
+        // success
+        notify({
+          title: 'Your referral code was succesfully registered.',
+          body: 'You are now saving fees',
+          toastDuration: Infinity,
+        });
         track(AnalyticsEvents.AffiliateRegistration({ affiliateAddress }));
-        return tx;
-      },
-    });
+      }
+      dispatch(removeLatestReferrer());
+      return tx;
+    },
+  });
 
   useEffect(() => {
     if (!subaccountClient) return;
@@ -948,6 +958,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       dispatch(removeLatestReferrer());
       return;
     }
+
     if (
       compositeClient &&
       latestReferrer &&
@@ -955,8 +966,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       usdcCoinBalance &&
       parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE &&
       isReferredByFetched &&
-      !referredBy?.affiliateAddress &&
-      !isRegisterAffiliatePending
+      !referredBy?.affiliateAddress
     ) {
       registerAffiliateMutate(latestReferrer);
     }
@@ -970,7 +980,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     isReferredByFetched,
     referredBy?.affiliateAddress,
     dispatch,
-    isRegisterAffiliatePending,
   ]);
 
   useEffect(() => {
