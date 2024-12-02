@@ -1,4 +1,3 @@
-// do websocket thigns
 import { assertNever } from '@/lib/assertNever';
 import { isTruthy } from '@/lib/isTruthy';
 
