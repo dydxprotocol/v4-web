@@ -97,7 +97,7 @@ export function setUpMarkets(store: RootStore) {
     const newUrl = selectWebsocketUrl(store.getState());
     if (newUrl !== lastUrl) {
       lastTracker?.teardown();
-      // let the manager know we're not using it anymore either
+      // todo: let the manager know we're not using it anymore either
       // but this is getting to be a lot of bookkeeping
       lastUrl = undefined;
       lastTracker = undefined;
