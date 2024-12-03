@@ -80,8 +80,8 @@ export const EU_LOCALES: SupportedLocales[] = [
   SupportedLocales.FR,
 ];
 
-export const CONFIGURED_LOCALES: SupportedLocales[] = import.meta.env.VITE_APP_LOCALES
-  ? import.meta.env.VITE_APP_LOCALES?.split(',')
+const DEPLOYER_RESTRICTED_LOCALES: SupportedLocales[] = import.meta.env.VITE_APP_RESTRICTED_LOCALES
+  ? import.meta.env.VITE_APP_RESTRICTED_LOCALES?.split(',')
   : [];
 
 export const SUPPORTED_LOCALES = [
@@ -145,7 +145,9 @@ export const SUPPORTED_LOCALES = [
     label: 'Deutsch',
     browserLanguage: 'de-DE',
   },
-].filter(({ locale }) => (CONFIGURED_LOCALES.length ? CONFIGURED_LOCALES.includes(locale) : true));
+].filter(({ locale }) =>
+  DEPLOYER_RESTRICTED_LOCALES.length ? !DEPLOYER_RESTRICTED_LOCALES.includes(locale) : true
+);
 
 export type TooltipStrings = {
   [key: string]: ({
