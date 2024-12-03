@@ -6,12 +6,12 @@ import { formatNumberOutput, OutputType } from '@/components/Output';
 
 // for each locale, an array of the correct compact number suffix to use for 10^{index}
 // e.g. for "en" we have ['', '', '', 'k', 'k', 'k', 'm', 'm', 'm', 'b', 'b', 'b', 't', 't', 't']
-const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
-  Object.fromEntries(SUPPORTED_LOCALES.map(({ locale, label }) => [locale, label])),
-  (name, lang) =>
+const supportedLocaleToCompactSuffixByPowerOfTen = Object.fromEntries(
+  SUPPORTED_LOCALES.map(({ locale }) => [
+    locale,
     range(15)
       .map((a) =>
-        Intl.NumberFormat(lang, {
+        Intl.NumberFormat(locale, {
           style: 'decimal',
           notation: 'compact',
           maximumSignificantDigits: 6,
@@ -19,7 +19,8 @@ const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
       )
       // first capture group grabs all the numbers with normal separator, then we grab any groups of whitespace+numbers
       // this is so we know which languages keep whitespace before the suffix
-      .map((b) => b.replace(/(^[\d,.]+){1}(\s\d+)*/, ''))
+      .map((b) => b.replace(/(^[\d,.]+){1}(\s\d+)*/, '')),
+  ])
 );
 
 const zipObjectFn = <T extends string, K>(arr: T[], valueGenerator: (val: T) => K) =>
