@@ -9,7 +9,8 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   EU_LOCALES,
-  SUPPORTED_BASE_TAGS_LOCALE_MAPPING,
+  SUPPORTED_LOCALE_MAP,
+  SUPPORTED_LOCALES,
   SupportedLocales,
   type LocaleData,
 } from '@/constants/localization';
@@ -19,6 +20,7 @@ import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/local
 
 import { getBrowserLanguage } from '@/lib/language';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
+import { objectKeys } from '@/lib/objectHelpers';
 
 const getNewLocaleData = ({
   store,
@@ -50,18 +52,19 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
 
   switch (type) {
     case initializeLocalization().type: {
-      const localStorageLocale = getLocalStorage({
+      const localStorageLocale = getLocalStorage<SupportedLocales | undefined>({
         key: LocalStorageKey.SelectedLocale,
-      }) as SupportedLocales;
+      });
 
-      if (localStorageLocale) {
+      if (localStorageLocale && objectKeys(SUPPORTED_LOCALE_MAP).includes(localStorageLocale)) {
         store.dispatch(setSelectedLocale({ locale: localStorageLocale }));
       } else {
         const browserLanguage = getBrowserLanguage();
         const browserLanguageBaseTag = browserLanguage.split('-')[0]!.toLowerCase();
 
-        let locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
-          SupportedLocales.EN) as SupportedLocales;
+        let locale =
+          SUPPORTED_LOCALES.find(({ baseTag }) => baseTag === browserLanguageBaseTag)?.locale ??
+          SupportedLocales.EN;
 
         // regulatory: do not default to browser language if it's an EU language, default to English instead
         if (EU_LOCALES.includes(locale)) {
