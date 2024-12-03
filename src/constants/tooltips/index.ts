@@ -7,7 +7,6 @@ import { newMarketsTooltips } from './newMarkets';
 import { portfolioTooltips } from './portfolio';
 import { stakeTooltips } from './stake';
 import { tradeTooltips } from './trade';
-import { tradeChartTooltips } from './tradeChart';
 import { triggersTooltips } from './triggers';
 import { vaultTooltips } from './vault';
 import { withdrawTooltips } from './withdraw';
@@ -19,7 +18,6 @@ export const tooltipStrings = {
   ...portfolioTooltips,
   ...stakeTooltips,
   ...tradeTooltips,
-  ...tradeChartTooltips,
   ...triggersTooltips,
   ...withdrawTooltips,
   ...vaultTooltips,

@@ -6,7 +6,6 @@ import type { TvWidget } from '@/constants/tvchart';
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
 import { useChartLines } from '@/hooks/tradingView/useChartLines';
 import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
-import { useOrderbookCandles } from '@/hooks/tradingView/useOrderbookCandles';
 import { useTradingView } from '@/hooks/tradingView/useTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
@@ -24,16 +23,12 @@ export const TvChart = () => {
   const orderLineToggleRef = useRef<HTMLElement | null>(null);
   const orderLineToggle = orderLineToggleRef.current;
 
-  const orderbookCandlesToggleRef = useRef<HTMLElement | null>(null);
-  const orderbookCandlesToggle = orderbookCandlesToggleRef.current;
   const buySellMarksToggleRef = useRef<HTMLElement | null>(null);
   const buySellMarksToggle = buySellMarksToggleRef.current;
 
   const {
     orderLinesToggleOn,
     setOrderLinesToggleOn,
-    orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     setBuySellMarksToggleOn,
     buySellMarksToggleOn,
   } = useTradingViewToggles();
@@ -44,9 +39,6 @@ export const TvChart = () => {
     orderLineToggleRef,
     orderLinesToggleOn,
     setOrderLinesToggleOn,
-    orderbookCandlesToggleRef,
-    orderbookCandlesToggleOn,
-    setOrderbookCandlesToggleOn,
     buySellMarksToggleRef,
     buySellMarksToggleOn,
     setBuySellMarksToggleOn,
@@ -59,11 +51,6 @@ export const TvChart = () => {
     tvWidget,
     orderLineToggle,
     orderLinesToggleOn,
-  });
-  useOrderbookCandles({
-    orderbookCandlesToggle,
-    orderbookCandlesToggleOn,
-    tvWidget,
   });
   useBuySellMarks({
     buySellMarksToggle,

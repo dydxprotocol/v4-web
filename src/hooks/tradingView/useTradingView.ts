@@ -13,7 +13,6 @@ import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
-import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
@@ -25,15 +24,15 @@ import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSe
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from '../useDydxClient';
 import { useLocaleSeparators } from '../useLocaleSeparators';
-import { useAllStatsigGateValues, useStatsigGateValue } from '../useStatsig';
+import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
-import { useURLConfigs } from '../useURLConfigs';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
 /**
@@ -45,9 +44,6 @@ export const useTradingView = ({
   orderLineToggleRef,
   orderLinesToggleOn,
   setOrderLinesToggleOn,
-  orderbookCandlesToggleRef,
-  orderbookCandlesToggleOn,
-  setOrderbookCandlesToggleOn,
   buySellMarksToggleRef,
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
@@ -57,16 +53,11 @@ export const useTradingView = ({
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
   setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
-  orderbookCandlesToggleRef: React.MutableRefObject<HTMLElement | null>;
-  orderbookCandlesToggleOn: boolean;
-  setOrderbookCandlesToggleOn: Dispatch<SetStateAction<boolean>>;
   buySellMarksToggleRef: React.MutableRefObject<HTMLElement | null>;
   buySellMarksToggleOn: boolean;
   setBuySellMarksToggleOn: Dispatch<SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
-  const urlConfigs = useURLConfigs();
-  const featureFlags = useAllStatsigGateValues();
   const dispatch = useAppDispatch();
 
   const { group, decimal } = useLocaleSeparators();
@@ -82,6 +73,9 @@ export const useTradingView = ({
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
   const ffEnableOrderbookCandles = useStatsigGateValue(StatsigFlags.ffEnableOhlc);
+  useEffect(() => {
+    abacusStateManager.toggleOrderbookCandles(ffEnableOrderbookCandles);
+  }, [ffEnableOrderbookCandles]);
 
   const savedResolution = useMemo(
     () => getSavedResolution({ savedConfig: savedTvChartConfig }),
@@ -155,7 +149,7 @@ export const useTradingView = ({
           store,
           getCandlesForDatafeed,
           initialPriceScale,
-          orderbookCandlesToggleOn,
+          ffEnableOrderbookCandles,
           { decimal, group },
           selectedLocale,
           stringGetter
@@ -189,26 +183,6 @@ export const useTradingView = ({
             }),
           });
 
-          if (ffEnableOrderbookCandles) {
-            // Orderbook Candles (OHLC)
-            const getOhlcTooltipString = tooltipStrings.ohlc;
-            const { title: ohlcTitle, body: ohlcBody } = getOhlcTooltipString({
-              stringGetter,
-              stringParams: {},
-              urlConfigs,
-              featureFlags,
-            });
-
-            initializeToggle({
-              toggleRef: orderbookCandlesToggleRef,
-              widget: tvChartWidget,
-              isOn: orderbookCandlesToggleOn,
-              setToggleOn: setOrderbookCandlesToggleOn,
-              label: `${ohlcTitle}*`,
-              tooltip: ohlcBody as string,
-            });
-          }
-
           // Buy/Sell Marks
           initializeToggle({
             toggleRef: buySellMarksToggleRef,
@@ -235,8 +209,6 @@ export const useTradingView = ({
     return () => {
       orderLineToggleRef.current?.remove();
       orderLineToggleRef.current = null;
-      orderbookCandlesToggleRef.current?.remove();
-      orderbookCandlesToggleRef.current = null;
       buySellMarksToggleRef.current?.remove();
       buySellMarksToggleRef.current = null;
       tvWidget?.remove();
@@ -246,13 +218,11 @@ export const useTradingView = ({
     selectedNetwork,
     !!marketId,
     tickSizeDecimals !== undefined,
+    orderLinesToggleOn,
     orderLineToggleRef,
-    orderbookCandlesToggleRef,
     buySellMarksToggleRef,
     setBuySellMarksToggleOn,
     setOrderLinesToggleOn,
-    setOrderbookCandlesToggleOn,
-    orderbookCandlesToggleOn,
     tvWidget,
     setTvWidget,
   ]);

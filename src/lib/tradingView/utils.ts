@@ -37,17 +37,17 @@ const getOhlcValues = ({
   orderbookOpen?: number;
   orderbookClose?: number;
 }) => {
-  const useOrderbookCandles =
+  const showOrderbookCandles =
     orderbookCandlesToggleOn &&
     trades <= MIN_NUM_TRADES_FOR_ORDERBOOK_PRICES &&
     orderbookOpen !== undefined &&
     orderbookClose !== undefined;
 
   return {
-    low: useOrderbookCandles ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
-    high: useOrderbookCandles ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
-    open: useOrderbookCandles ? orderbookOpen : tradeOpen,
-    close: useOrderbookCandles ? orderbookClose : tradeClose,
+    low: showOrderbookCandles ? Math.min(orderbookOpen, orderbookClose) : tradeLow,
+    high: showOrderbookCandles ? Math.max(orderbookOpen, orderbookClose) : tradeHigh,
+    open: showOrderbookCandles ? orderbookOpen : tradeOpen,
+    close: showOrderbookCandles ? orderbookClose : tradeClose,
   };
 };
 
