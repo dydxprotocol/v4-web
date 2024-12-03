@@ -1,8 +1,4 @@
-import {
-  CONFIGURED_LOCALES,
-  SUPPORTED_LOCALE_STRING_LABELS,
-  SupportedLocales,
-} from '@/constants/localization';
+import { SUPPORTED_LOCALES, SupportedLocales } from '@/constants/localization';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 
@@ -20,12 +16,10 @@ type StyleProps = {
   className?: string;
 };
 
-const localizationItems = Object.values(SupportedLocales)
-  .filter((locale) => CONFIGURED_LOCALES.includes(locale))
-  .map((locale) => ({
-    value: locale,
-    label: SUPPORTED_LOCALE_STRING_LABELS[locale],
-  }));
+const localizationItems = SUPPORTED_LOCALES.map(({ locale, label }) => ({
+  value: locale,
+  label,
+}));
 
 export const LanguageSelector = ({
   children,

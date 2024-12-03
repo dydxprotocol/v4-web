@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { SUPPORTED_BASE_TAGS_LOCALE_MAPPING } from '@/constants/localization';
+import { SUPPORTED_LOCALES } from '@/constants/localization';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -27,14 +27,12 @@ const useLocaleContext = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedLocale) {
-      const updatedBrowserLanguage = Object.entries(SUPPORTED_BASE_TAGS_LOCALE_MAPPING).find(
-        ([, value]) => value === selectedLocale
-      );
+    const updatedBrowserLanguage = SUPPORTED_LOCALES.find(
+      ({ locale }) => locale === selectedLocale
+    )?.browserLanguage;
 
-      if (updatedBrowserLanguage) {
-        setBrowserLanguage(selectedLocale);
-      }
+    if (updatedBrowserLanguage) {
+      setBrowserLanguage(updatedBrowserLanguage);
     }
   }, [selectedLocale]);
 

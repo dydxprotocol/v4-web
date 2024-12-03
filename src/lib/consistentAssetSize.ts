@@ -1,13 +1,13 @@
 import { mapValues, range, zipObject } from 'lodash';
 
-import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/localization';
+import { SUPPORTED_LOCALES, SupportedLocales } from '@/constants/localization';
 
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
 // for each locale, an array of the correct compact number suffix to use for 10^{index}
 // e.g. for "en" we have ['', '', '', 'k', 'k', 'k', 'm', 'm', 'm', 'b', 'b', 'b', 't', 't', 't']
 const supportedLocaleToCompactSuffixByPowerOfTen = mapValues(
-  SUPPORTED_LOCALE_STRING_LABELS,
+  Object.fromEntries(SUPPORTED_LOCALES.map(({ locale, label }) => [locale, label])),
   (name, lang) =>
     range(15)
       .map((a) =>

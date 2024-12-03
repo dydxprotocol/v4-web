@@ -10,7 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
-import { SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
+import { SUPPORTED_LOCALES } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -52,13 +52,15 @@ export const useTradingViewLaunchable = ({
     if (marketId && !isDataLoading && !tvWidget) {
       const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+      const languageCode =
+        SUPPORTED_LOCALES.find(({ locale }) => locale === selectedLocale)?.baseTag ?? 'en';
 
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getLaunchableMarketDatafeed(metadataServiceData),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
-        locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
+        locale: languageCode as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
         auto_save_delay: 1,
