@@ -218,7 +218,6 @@ export const useTradingView = ({
     selectedNetwork,
     !!marketId,
     tickSizeDecimals !== undefined,
-    orderLinesToggleOn,
     orderLineToggleRef,
     buySellMarksToggleRef,
     setBuySellMarksToggleOn,
