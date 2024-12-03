@@ -3,7 +3,7 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { ReconnectingWebSocket } from './reconnectingWebsocket';
 
-const NO_ID_SPECIAL_STRING_ID = '____EMPTY_ID______';
+const NO_ID_SPECIAL_STRING_ID = '______EMPTY_ID______';
 
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
@@ -16,6 +16,7 @@ export class IndexerWebsocket {
         batched: boolean;
         handleBaseData: (data: any) => void;
         handleUpdates: (updates: any[]) => void;
+        sentSubMessage: boolean;
       };
     };
   } = {};
@@ -57,8 +58,10 @@ export class IndexerWebsocket {
       batched,
       handleBaseData,
       handleUpdates,
+      sentSubMessage: false,
     };
     if (this.socket != null && this.socket.isActive()) {
+      this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage = true;
       this.socket.send({
         batched,
         channel,
@@ -74,7 +77,11 @@ export class IndexerWebsocket {
       if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
         return;
       }
-      if (this.socket != null && this.socket.isActive()) {
+      if (
+        this.socket != null &&
+        this.socket.isActive() &&
+        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage
+      ) {
         this.socket.send({
           channel,
           id,
@@ -136,6 +143,7 @@ export class IndexerWebsocket {
         .flatMap((o) => Object.values(o))
         .filter(isTruthy)
         .forEach(({ batched, channel, id }) => {
+          this.subscriptions[channel]![id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage = true;
           this.socket!.send({
             batched,
             channel,
