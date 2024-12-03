@@ -99,11 +99,9 @@ export function setUpMarkets(store: RootStore) {
       lastTracker?.teardown();
       // todo: let the manager know we're not using it anymore either
       // but this is getting to be a lot of bookkeeping
-      lastUrl = undefined;
-      lastTracker = undefined;
+      lastUrl = newUrl;
+      lastTracker = new MarketsTracker(IndexerWebsocketManager.get(newUrl));
+      lastTracker.addSubscriber((val) => store.dispatch(SetRawMarkets(val)));
     }
-    lastUrl = newUrl;
-    lastTracker = new MarketsTracker(IndexerWebsocketManager.get(newUrl));
-    lastTracker.addSubscriber((val) => store.dispatch(SetRawMarkets(val)));
   });
 }
