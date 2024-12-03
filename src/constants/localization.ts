@@ -151,8 +151,9 @@ export const SUPPORTED_LOCALES = [
 );
 
 // Map with locale as key and locale object as value
-export const SUPPORTED_LOCALE_MAP: Record<SupportedLocales, (typeof SUPPORTED_LOCALES)[number]> =
-  objectFromEntries(SUPPORTED_LOCALES.map((locale) => [locale.locale, locale]));
+export const SUPPORTED_LOCALE_MAP = objectFromEntries(
+  SUPPORTED_LOCALES.map((locale) => [locale.locale, locale])
+);
 
 export type TooltipStrings = {
   [key: string]: ({

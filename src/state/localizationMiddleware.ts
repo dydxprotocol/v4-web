@@ -9,6 +9,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   EU_LOCALES,
+  SUPPORTED_LOCALE_MAP,
   SUPPORTED_LOCALES,
   SupportedLocales,
   type LocaleData,
@@ -19,6 +20,7 @@ import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/local
 
 import { getBrowserLanguage } from '@/lib/language';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
+import { objectKeys } from '@/lib/objectHelpers';
 
 const getNewLocaleData = ({
   store,
@@ -50,11 +52,11 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
 
   switch (type) {
     case initializeLocalization().type: {
-      const localStorageLocale = getLocalStorage({
+      const localStorageLocale = getLocalStorage<SupportedLocales | undefined>({
         key: LocalStorageKey.SelectedLocale,
-      }) as SupportedLocales;
+      });
 
-      if (localStorageLocale) {
+      if (localStorageLocale && objectKeys(SUPPORTED_LOCALE_MAP).includes(localStorageLocale)) {
         store.dispatch(setSelectedLocale({ locale: localStorageLocale }));
       } else {
         const browserLanguage = getBrowserLanguage();
