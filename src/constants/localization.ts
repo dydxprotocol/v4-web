@@ -14,6 +14,7 @@ import { StatsigConfigType } from '@/constants/statsig';
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
 import formatString from '@/lib/formatString';
+import { objectFromEntries } from '@/lib/objectHelpers';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -148,6 +149,10 @@ export const SUPPORTED_LOCALES = [
 ].filter(({ locale }) =>
   DEPLOYER_RESTRICTED_LOCALES.length ? !DEPLOYER_RESTRICTED_LOCALES.includes(locale) : true
 );
+
+// Map with locale as key and locale object as value
+export const SUPPORTED_LOCALE_MAP: Record<SupportedLocales, (typeof SUPPORTED_LOCALES)[number]> =
+  objectFromEntries(SUPPORTED_LOCALES.map((locale) => [locale.locale, locale]));
 
 export type TooltipStrings = {
   [key: string]: ({

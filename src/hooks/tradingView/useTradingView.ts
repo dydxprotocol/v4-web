@@ -11,7 +11,7 @@ import {
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
-import { STRING_KEYS, SUPPORTED_LOCALES } from '@/constants/localization';
+import { STRING_KEYS, SUPPORTED_LOCALE_MAP } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { tooltipStrings } from '@/constants/tooltips';
 import type { TvWidget } from '@/constants/tvchart';
@@ -146,8 +146,7 @@ export const useTradingView = ({
     if (marketId && tickSizeDecimals !== undefined && !tvWidget) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-      const languageCode =
-        SUPPORTED_LOCALES.find(({ locale }) => locale === selectedLocale)?.baseTag ?? 'en';
+      const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
       const initialPriceScale = BigNumber(10).exponentiatedBy(tickSizeDecimals).toNumber();
       const options: TradingTerminalWidgetOptions = {
