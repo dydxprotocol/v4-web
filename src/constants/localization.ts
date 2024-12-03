@@ -5,7 +5,6 @@ import {
   LOCALE_DATA,
   NOTIFICATIONS,
   NOTIFICATIONS_STRING_KEYS,
-  SupportedLocale,
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
@@ -74,15 +73,16 @@ export type StringGetterFunction = <T extends StringGetterParams>(
   ? string
   : ReturnType<typeof formatString>;
 
-export const EU_LOCALES: SupportedLocale[] = [
+export const EU_LOCALES: SupportedLocales[] = [
   SupportedLocales.DE,
   SupportedLocales.PT,
   SupportedLocales.ES,
   SupportedLocales.FR,
 ];
 
-export const CONFIGURED_LOCALES = (import.meta.env.VITE_APP_LOCALES?.split(',') ??
-  []) as SupportedLocales[];
+export const CONFIGURED_LOCALES: SupportedLocales[] = import.meta.env.VITE_APP_LOCALES
+  ? import.meta.env.VITE_APP_LOCALES?.split(',')
+  : [];
 
 export const SUPPORTED_LOCALES = [
   {
