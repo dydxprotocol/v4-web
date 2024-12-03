@@ -145,7 +145,7 @@ export const SUPPORTED_LOCALES = [
     label: 'Deutsch',
     browserLanguage: 'de-DE',
   },
-].filter(({ locale }) => CONFIGURED_LOCALES.includes(locale));
+].filter(({ locale }) => (CONFIGURED_LOCALES.length ? CONFIGURED_LOCALES.includes(locale) : true));
 
 export type TooltipStrings = {
   [key: string]: ({
