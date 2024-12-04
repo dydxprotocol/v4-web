@@ -1,0 +1,12 @@
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+
+import { EndpointsConfig } from '@/hooks/useEndpointsConfig';
+
+import { getSelectedNetwork } from '@/state/appSelectors';
+import { createAppSelector } from '@/state/appTypes';
+
+const suffix = '/v4/ws';
+export const selectWebsocketUrl = createAppSelector(getSelectedNetwork, (network) => {
+  const endpointsConfig: EndpointsConfig = ENVIRONMENT_CONFIG_MAP[network].endpoints;
+  return `${endpointsConfig.indexers[0]!.socket}${suffix}`;
+});

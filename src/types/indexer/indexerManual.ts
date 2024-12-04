@@ -1,14 +1,20 @@
 import {
   IndexerAPIOrderStatus,
   IndexerAPITimeInForce,
+  IndexerAssetPositionResponseObject,
   IndexerFillType,
+  IndexerHistoricalBlockTradingReward,
   IndexerIsoString,
   IndexerLiquidity,
   IndexerMarketType,
+  IndexerOrderResponseObject,
   IndexerOrderSide,
   IndexerOrderType,
+  IndexerParentSubaccountResponse,
   IndexerPerpetualMarketStatus,
   IndexerPerpetualMarketType,
+  IndexerPerpetualPositionResponseObject,
+  IndexerTransferResponseObject,
 } from './indexerApiGen';
 
 export interface IndexerCompositeFillResponse {
@@ -114,4 +120,20 @@ export interface IndexerCompositeFillObject {
   clientMetadata?: string;
   subaccountNumber?: number;
   ticker?: string;
+}
+
+export interface IndexerWsParentSubaccountSubscribedResponse {
+  subaccount: IndexerParentSubaccountResponse;
+  blockHeight: string;
+  orders: IndexerOrderResponseObject[];
+}
+
+export interface IndexerWsParentSubaccountUpdateObject {
+  blockHeight: string;
+  assetPositions?: IndexerAssetPositionResponseObject[];
+  perpetualPositions?: IndexerPerpetualPositionResponseObject[];
+  tradingReward?: IndexerHistoricalBlockTradingReward;
+  fills?: IndexerCompositeFillObject[];
+  orders?: IndexerCompositeOrderObject[];
+  transfers?: IndexerTransferResponseObject[] | IndexerTransferResponseObject;
 }
