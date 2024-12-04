@@ -2,6 +2,7 @@ import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -32,7 +33,7 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
-import { getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -46,6 +47,7 @@ export const HeaderDesktop = () => {
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
+  const onboardingState = useAppSelector(getOnboardingState);
 
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const { freeCollateral: availableBalance } = subAccount ?? {};
@@ -182,23 +184,25 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
-        <>
-          <Button
-            tw="mr-[0.5em]"
-            shape={ButtonShape.Pill}
-            size={ButtonSize.XSmall}
-            action={
-              !availableBalance || MustBigNumber(availableBalance.current).gt(0)
-                ? ButtonAction.Secondary
-                : ButtonAction.Primary
-            }
-            onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
-            state={{ isDisabled: !dydxAccounts }}
-          >
-            {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-          </Button>
-          <VerticalSeparator />
-        </>
+        {onboardingState === OnboardingState.AccountConnected && (
+          <>
+            <Button
+              tw="mr-[0.5em]"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              action={
+                !availableBalance || MustBigNumber(availableBalance.current).gt(0)
+                  ? ButtonAction.Secondary
+                  : ButtonAction.Primary
+              }
+              onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+              state={{ isDisabled: !dydxAccounts }}
+            >
+              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+            </Button>
+            <VerticalSeparator />
+          </>
+        )}
 
         <MobileDownloadLinks />
 
