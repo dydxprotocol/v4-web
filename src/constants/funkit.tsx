@@ -29,6 +29,7 @@ export const funkitConfig = () =>
         customRecipientConfig: {
           destinationIcon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
         },
+        showPaymentAmountUsd: true,
       },
       paymentMethods: {
         isCardEnabled: false,
