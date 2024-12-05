@@ -54,31 +54,33 @@ export const TradeFormInputs = () => {
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hasUserChangedLimitInput, setHasUserChangedLimitInput] = useState(false);
 
   useEffect(() => {
     setHasUserChangedLimitInput(false);
   }, [marketId, type?.rawValue]);
 
-  useEffect(() => {
-    // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || hasUserChangedLimitInput) {
-      return;
-    }
-    dispatch(
-      setTradeFormInputs({
-        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-      })
-    );
-  }, [
-    dispatch,
-    limitPriceInput,
-    midMarketPrice,
-    needsLimitPrice,
-    tickSizeDecimals,
-    marketId,
-    hasUserChangedLimitInput,
-  ]);
+  // TODO: reenable this when we have a fix for abacus bug
+  // useEffect(() => {
+  //   // when limit price input is empty and mid price is available, set limit price input to mid price
+  //   if (!midMarketPrice || !needsLimitPrice || hasUserChangedLimitInput) {
+  //     return;
+  //   }
+  //   dispatch(
+  //     setTradeFormInputs({
+  //       limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+  //     })
+  //   );
+  // }, [
+  //   dispatch,
+  //   limitPriceInput,
+  //   midMarketPrice,
+  //   needsLimitPrice,
+  //   tickSizeDecimals,
+  //   marketId,
+  //   hasUserChangedLimitInput,
+  // ]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
