@@ -20,7 +20,6 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getActiveDialog } from '@/state/dialogsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import {
@@ -55,16 +54,15 @@ export const TradeFormInputs = () => {
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
-  const [hasUserChangedLimitInput, setHasUserChangedLimitInput] = useState(false);
-  const activeDialog = useAppSelector(getActiveDialog);
+  const [hasSetMidMarketLimit, setHasSetMidMarketLimit] = useState(false);
 
   useEffect(() => {
-    setHasUserChangedLimitInput(false);
+    setHasSetMidMarketLimit(false);
   }, [marketId, type?.rawValue]);
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (activeDialog != null || !midMarketPrice || !needsLimitPrice || hasUserChangedLimitInput) {
+    if (!midMarketPrice || !needsLimitPrice || hasSetMidMarketLimit) {
       return;
     }
     dispatch(
@@ -72,20 +70,11 @@ export const TradeFormInputs = () => {
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
       })
     );
-  }, [
-    dispatch,
-    limitPriceInput,
-    midMarketPrice,
-    needsLimitPrice,
-    tickSizeDecimals,
-    marketId,
-    hasUserChangedLimitInput,
-    activeDialog,
-  ]);
+    setHasSetMidMarketLimit(true);
+  }, [dispatch, midMarketPrice, needsLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
-    setHasUserChangedLimitInput(false);
     dispatch(
       setTradeFormInputs({
         limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
@@ -135,7 +124,6 @@ export const TradeFormInputs = () => {
       onChange: ({ value }: NumberFormatValues) => {
         dispatch(setTradeFormInputs({ limitPriceInput: value }));
       },
-      onInput: () => setHasUserChangedLimitInput(true),
       value: limitPriceInput,
       decimals: tickSizeDecimals ?? USD_DECIMALS,
       slotRight: midMarketPrice ? midMarketPriceButton : undefined,
