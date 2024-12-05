@@ -7,7 +7,6 @@ import styled, { css, keyframes } from 'styled-components';
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -52,10 +51,9 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const { isTablet } = useBreakpoints();
   const currentMarketAssetData = useAppSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-  const currentMarketLiveTrades =
-    useAppSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
+  const currentMarketLiveTrades = useAppSelector(getCurrentMarketLiveTrades, shallowEqual);
 
-  const { id = '' } = currentMarketAssetData ?? {};
+  const { displayableAssetId } = currentMarketAssetData ?? {};
   const { stepSizeDecimals, tickSizeDecimals, stepSize } = currentMarketConfig ?? {};
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -103,7 +101,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         columnKey: 'size',
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
-        tag: id,
+        tag: displayableAssetId,
         renderCell: (row: RowData) => (
           <Output
             type={OutputType.Text}
@@ -134,7 +132,17 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       },
       !isTablet && timeColumn,
     ].filter(isTruthy);
-  }, [stepSizeDecimals, tickSizeDecimals, id, histogramSide, stringGetter]);
+  }, [
+    stringGetter,
+    isTablet,
+    displayableAssetId,
+    decimalSeparator,
+    groupSeparator,
+    selectedLocale,
+    stepSize,
+    stepSizeDecimals,
+    tickSizeDecimals,
+  ]);
 
   return (
     <$LiveTradesTable
