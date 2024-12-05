@@ -11,8 +11,8 @@ export class WebsocketDerivedValue<T> {
     sub: {
       channel: string;
       id: string | undefined;
-      handleBaseData: (data: any, value: T) => T;
-      handleUpdates: (updates: any[], value: T) => T;
+      handleBaseData: (data: any, value: T, fullMessage: any) => T;
+      handleUpdates: (updates: any[], value: T, fullMessage: any) => T;
     },
     private value: T,
     private changeHandler: ((val: T) => void) | undefined
@@ -20,8 +20,10 @@ export class WebsocketDerivedValue<T> {
     this.unsubFromWs = websocket.addChannelSubscription({
       channel: sub.channel,
       id: sub.id,
-      handleBaseData: (data) => this._setValue(sub.handleBaseData(data, this.value)),
-      handleUpdates: (updates) => this._setValue(sub.handleUpdates(updates, this.value)),
+      handleBaseData: (data, fullMessage) =>
+        this._setValue(sub.handleBaseData(data, this.value, fullMessage)),
+      handleUpdates: (updates, fullMessage) =>
+        this._setValue(sub.handleUpdates(updates, this.value, fullMessage)),
     });
   }
 

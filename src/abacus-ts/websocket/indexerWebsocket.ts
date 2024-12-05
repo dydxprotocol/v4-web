@@ -14,8 +14,8 @@ export class IndexerWebsocket {
         channel: string;
         id: string | undefined;
         batched: boolean;
-        handleBaseData: (data: any) => void;
-        handleUpdates: (updates: any[]) => void;
+        handleBaseData: (data: any, fullMessage: any) => void;
+        handleUpdates: (updates: any[], fullMessage: any) => void;
         sentSubMessage: boolean;
       };
     };
@@ -45,8 +45,8 @@ export class IndexerWebsocket {
     channel: string;
     id: string | undefined;
     batched?: boolean;
-    handleBaseData: (data: any) => void;
-    handleUpdates: (data: any[]) => void;
+    handleBaseData: (data: any, fullMessage: any) => void;
+    handleUpdates: (data: any[], fullMessage: any) => void;
   }): () => void {
     this.subscriptions[channel] ??= {};
     if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] != null) {
@@ -118,15 +118,20 @@ export class IndexerWebsocket {
       }
       if (message.type === 'subscribed') {
         this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleBaseData(
-          message.contents
+          message.contents,
+          message
         );
       } else if (message.type === 'channel_data') {
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates([
-          message.contents,
-        ]);
+        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
+          [message.contents],
+          message
+        );
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (message.type === 'channel_batch_data') {
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(message.contents);
+        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
+          message.contents,
+          message
+        );
       } else {
         assertNever(message);
       }

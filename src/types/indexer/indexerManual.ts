@@ -135,5 +135,5 @@ export interface IndexerWsParentSubaccountUpdateObject {
   tradingReward?: IndexerHistoricalBlockTradingReward;
   fills?: IndexerCompositeFillObject[];
   orders?: IndexerCompositeOrderObject[];
-  transfers?: IndexerTransferResponseObject[] | IndexerTransferResponseObject;
+  transfers?: IndexerTransferResponseObject;
 }

@@ -68,6 +68,9 @@ export class ReconnectingWebSocket {
 
       this.ws.onopen = () => {
         this.currentReconnectInterval = this.initialReconnectInterval;
+        // eslint-disable-next-line no-console
+        console.log('ReconnectingWebsocket: Connected to ', this.url);
+
         this.handleFreshConnect();
       };
     } catch (error) {
