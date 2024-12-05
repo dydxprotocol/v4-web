@@ -8,7 +8,8 @@ import {
 
 import { DEFAULT_INITIAL_MARGIN_FRACTION } from '@/constants/trade';
 
-import { BIG_NUMBERS, MustBigNumber } from '../numbers';
+import { isTruthy } from '../isTruthy';
+import { BIG_NUMBERS, BigNumberish, MustBigNumber } from '../numbers';
 import { orEmptyObj } from '../typeUtils';
 
 /**
@@ -180,8 +181,8 @@ export const calculateSubaccountEquity = ({
   openPerpetualPositionsValueTotal,
   quoteBalance,
 }: {
-  openPerpetualPositionsValueTotal?: string;
-  quoteBalance?: string;
+  openPerpetualPositionsValueTotal?: BigNumberish;
+  quoteBalance?: BigNumberish;
 }): string | undefined => {
   if (openPerpetualPositionsValueTotal && quoteBalance) {
     return MustBigNumber(openPerpetualPositionsValueTotal).plus(quoteBalance).toString();
@@ -200,8 +201,8 @@ export const calculateSubaccountFreeCollateral = ({
   equity,
   openPerpetualPositionsInitialRiskTotal,
 }: {
-  equity?: string;
-  openPerpetualPositionsInitialRiskTotal?: string;
+  equity?: BigNumberish;
+  openPerpetualPositionsInitialRiskTotal?: BigNumberish;
 }): string | undefined => {
   if (openPerpetualPositionsInitialRiskTotal && equity) {
     return MustBigNumber(equity).minus(openPerpetualPositionsInitialRiskTotal).toString();
@@ -220,8 +221,8 @@ export const calculateSubaccountLeverage = ({
   equity,
   openPerpetualPositionsNotionalTotal,
 }: {
-  equity?: string;
-  openPerpetualPositionsNotionalTotal?: string;
+  equity?: BigNumberish;
+  openPerpetualPositionsNotionalTotal?: BigNumberish;
 }): string | undefined => {
   if (equity && openPerpetualPositionsNotionalTotal) {
     return MustBigNumber(openPerpetualPositionsNotionalTotal).div(equity).toString();
@@ -240,8 +241,8 @@ export const calculateSubaccountMarginUsage = ({
   equity,
   freeCollateral,
 }: {
-  equity?: string;
-  freeCollateral?: string;
+  equity?: BigNumberish;
+  freeCollateral?: BigNumberish;
 }): string | undefined => {
   if (equity && freeCollateral) {
     const freeCollateralBN = MustBigNumber(freeCollateral);
@@ -264,8 +265,8 @@ export const calculateBuyingPower = ({
   openPerpetualPositionsInitialRiskTotal,
   initialMarginFraction,
 }: {
-  equity?: string;
-  openPerpetualPositionsInitialRiskTotal?: string;
+  equity?: BigNumberish;
+  openPerpetualPositionsInitialRiskTotal?: BigNumberish;
   initialMarginFraction?: number;
 }): string | undefined => {
   const buyingPowerFreeCollateralBN = MustBigNumber(equity).minus(
@@ -290,10 +291,10 @@ export const calculatePositionLeverage = ({
   equity,
   notionalValue,
 }: {
-  equity?: string;
-  notionalValue?: string;
+  equity?: BigNumberish;
+  notionalValue?: BigNumberish;
 }): string | undefined => {
-  if (equity && Number(equity) > 0 && notionalValue) {
+  if (isTruthy(equity) && notionalValue) {
     return MustBigNumber(notionalValue).div(equity).toString();
   }
 
