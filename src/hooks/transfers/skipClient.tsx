@@ -1,19 +1,22 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import {
   MsgWithdrawFromSubaccount,
   TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
 } from '@dydxprotocol/v4-client-js';
 import { SkipClient } from '@skip-go/client';
+import { useClient } from 'wagmi';
 
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
+import { WalletNetworkType } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { RPCUrlsByChainId } from '@/lib/wagmi';
 
+import { useAccounts } from '../useAccounts';
 import { useDydxClient } from '../useDydxClient';
 import { useEndpointsConfig } from '../useEndpointsConfig';
 
@@ -31,11 +34,24 @@ const useSkipClientContext = () => {
   const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators } =
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
+  const { sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  // reactQuery only accepts serializable objects/values, so we return a string id
-  // so any useQuery that uses the skipClient can use that id as a query key
-  // to ensure it has the most up-to-date skipClient
-  const { skipClient, skipClientId } = useMemo(
+  const client = useClient();
+
+  const getEvmSigner = useCallback(() => {
+    if (!sourceAccount.walletInfo || sourceAccount.chain !== WalletNetworkType.Evm) {
+      throw new Error('Wallet is not evm');
+    }
+
+    if (!client) {
+      throw new Error('wallet not connected');
+    }
+
+    return client;
+  }, [client, sourceAccount.chain, sourceAccount.walletInfo]);
+
+  // skipInstanceId is used to track unique instances of skipClient
+  const { skipClient, skipInstanceId } = useMemo(
     () => ({
       skipClient: new SkipClient({
         endpointOptions: {
@@ -52,8 +68,9 @@ const useSkipClientContext = () => {
           },
         },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
+        getEVMSigner: () => getEvmSigner(),
       }),
-      skipClientId: crypto.randomUUID(),
+      skipInstanceId: crypto.randomUUID(),
     }),
     [
       compositeClient?.network.validatorConfig.restEndpoint,
@@ -65,5 +82,5 @@ const useSkipClientContext = () => {
       validators,
     ]
   );
-  return { skipClient, skipClientId };
+  return { skipClient, skipInstanceId };
 };

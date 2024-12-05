@@ -178,6 +178,7 @@ export const WithdrawButtonAndReceipt = ({
     );
   }
 
+  console.log("requestPayload", requestPayload)
   return (
     <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
       <RouteWarningMessage

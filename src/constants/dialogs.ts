@@ -108,6 +108,7 @@ export const DialogTypes = unionize(
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
+    Deposit2: ofType<{}>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),

@@ -192,7 +192,7 @@ export const HeaderDesktop = () => {
                 ? ButtonAction.Secondary
                 : ButtonAction.Primary
             }
-            onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit2()))}
             state={{ isDisabled: !dydxAccounts }}
           >
             {stringGetter({ key: STRING_KEYS.DEPOSIT })}
