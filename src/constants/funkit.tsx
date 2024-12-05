@@ -35,6 +35,9 @@ export const funkitConfig = () =>
         isCardEnabled: false,
       },
     },
+    textCustomizations: {
+      sourceMethodTitle: 'Deposit from',
+    },
   }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
