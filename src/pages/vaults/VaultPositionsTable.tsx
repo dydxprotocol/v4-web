@@ -119,7 +119,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           },
           {
             columnKey: 'size',
-            getCellValue: (row) => row.currentPosition?.usdc,
+            getCellValue: (row) => row.currentPosition?.usdc ?? 0,
             label: stringGetter({ key: STRING_KEYS.SIZE }),
             renderCell: ({ currentPosition, marketId }) => (
               <TableCell stacked>
@@ -164,7 +164,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           },
           !isTablet && {
             columnKey: 'pnl',
-            getCellValue: (row) => row.thirtyDayPnl?.absolute,
+            getCellValue: (row) => row.thirtyDayPnl?.absolute ?? 0,
             label: stringGetter({ key: STRING_KEYS.VAULT_THIRTY_DAY_PNL }),
             renderCell: ({ thirtyDayPnl: thirtyDayPnlRaw }) => {
               const thirtyDayPnl = thirtyDayPnlRaw ?? {
