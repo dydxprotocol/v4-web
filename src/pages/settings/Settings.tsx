@@ -1,10 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import {
-  STRING_KEYS,
-  SUPPORTED_LOCALE_STRING_LABELS,
-  SupportedLocales,
-} from '@/constants/localization';
+import { STRING_KEYS, SUPPORTED_LOCALES, SupportedLocales } from '@/constants/localization';
 import type { MenuItem } from '@/constants/menus';
 import { DydxNetwork } from '@/constants/networks';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
@@ -41,7 +37,7 @@ const SettingsPage = () => {
       type: PageMenuItemType.Navigation,
       href: `${AppRoute.Settings}/${MobileSettingsRoute.Language}`,
       label: stringGetter({ key: STRING_KEYS.LANGUAGE }),
-      labelRight: SUPPORTED_LOCALE_STRING_LABELS[selectedLocale],
+      labelRight: SUPPORTED_LOCALES.find(({ locale }) => locale === selectedLocale)?.label,
     },
     {
       value: 'network-nav-item',
@@ -75,9 +71,9 @@ const SettingsPage = () => {
     onSelect: (locale: string) => {
       dispatch(setSelectedLocale({ locale: locale as SupportedLocales }));
     },
-    subitems: Object.values(SupportedLocales).map((locale) => ({
+    subitems: SUPPORTED_LOCALES.map(({ locale, label }) => ({
       value: locale as string,
-      label: SUPPORTED_LOCALE_STRING_LABELS[locale],
+      label,
     })),
   };
 

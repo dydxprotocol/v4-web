@@ -66,6 +66,7 @@ export const useAffiliateMetadata = (dydxAddress?: string) => {
     queryFn: fetchAffiliateMetadata,
     enabled: Boolean(compositeClient && dydxAddress),
     staleTime: 5 * timeUnits.minute,
+    refetchOnMount: 'always',
   });
 
   return affiliateMetadataQuery;
