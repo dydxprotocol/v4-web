@@ -210,3 +210,5 @@ export enum DisplayUnit {
   Asset = 'asset',
   Fiat = 'fiat',
 }
+
+export const DEFAULT_INITIAL_MARGIN_FRACTION = 0.5;
