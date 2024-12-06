@@ -5,6 +5,7 @@ import { setAccountFillsRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../loadable';
 import { createIndexerQueryStoreEffect } from './indexerQueryStoreEffect';
 
@@ -15,7 +16,8 @@ export function setUpFillsQuery(store: RootStore) {
     (wallet, subaccount) => ({ wallet, subaccount })
   );
 
-  return createIndexerQueryStoreEffect(store, {
+  const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'fills']);
+  const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'fills', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
@@ -38,4 +40,8 @@ export function setUpFillsQuery(store: RootStore) {
       );
     },
   });
+  return () => {
+    cleanupListener();
+    cleanupEffect();
+  };
 }

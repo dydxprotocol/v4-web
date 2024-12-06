@@ -7,6 +7,7 @@ import { setAccountOrdersRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../loadable';
 import { createIndexerQueryStoreEffect } from './indexerQueryStoreEffect';
 
@@ -17,7 +18,8 @@ export function setUpOrdersQuery(store: RootStore) {
     (wallet, subaccount) => ({ wallet, subaccount })
   );
 
-  return createIndexerQueryStoreEffect(store, {
+  const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'orders']);
+  const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'orders', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
@@ -51,4 +53,8 @@ export function setUpOrdersQuery(store: RootStore) {
       );
     },
   });
+  return () => {
+    cleanupListener();
+    cleanupEffect();
+  };
 }
