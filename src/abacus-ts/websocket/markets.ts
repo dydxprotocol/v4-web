@@ -1,5 +1,8 @@
 import { IndexerPerpetualMarketResponse } from '@/types/indexer/indexerApiGen';
 import { IndexerWsMarketUpdateResponse } from '@/types/indexer/indexerManual';
+import { throttle } from 'lodash';
+
+import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import { setAllMarketsRaw } from '@/state/raw';
@@ -66,9 +69,13 @@ function marketsWebsocketValue(
 }
 
 export function setUpMarkets(store: RootStore) {
+  const throttledSetMarkets = throttle((val: Loadable<MarketsData>) => {
+    store.dispatch(setAllMarketsRaw(val));
+  }, 2 * timeUnits.second);
+
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
     const thisTracker = marketsWebsocketValue(IndexerWebsocketManager.use(wsUrl), (val) =>
-      store.dispatch(setAllMarketsRaw(val))
+      throttledSetMarkets(val)
     );
 
     return () => {

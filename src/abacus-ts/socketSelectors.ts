@@ -10,3 +10,8 @@ export const selectWebsocketUrl = createAppSelector(getSelectedNetwork, (network
   const endpointsConfig: EndpointsConfig = ENVIRONMENT_CONFIG_MAP[network].endpoints;
   return `${endpointsConfig.indexers[0]!.socket}${suffix}`;
 });
+
+export const selectIndexerUrl = createAppSelector(getSelectedNetwork, (network) => {
+  const endpointsConfig: EndpointsConfig = ENVIRONMENT_CONFIG_MAP[network].endpoints;
+  return `${endpointsConfig.indexers[0]!.api}`;
+});

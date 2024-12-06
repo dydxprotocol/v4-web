@@ -5,14 +5,16 @@ import {
 } from '@/types/indexer/indexerManual';
 import { keyBy } from 'lodash';
 
-import { type RootState, type RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
+import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import { setParentSubaccountRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../createStoreEffect';
-import { Loadable, loadableLoaded, loadablePending } from '../loadable';
+import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../loadable';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { ChildSubaccountData, ParentSubaccountData } from '../types';
 import { IndexerWebsocket } from './indexerWebsocket';
@@ -68,6 +70,8 @@ function accountWebsocketValue(
       id: `${address}/${subaccount}`,
       handleBaseData: (baseMessage) => {
         const message = baseMessage as IndexerWsParentSubaccountSubscribedResponse;
+        accountRefreshSignal.notify();
+
         return loadableLoaded({
           address: message.subaccount.address,
           parentSubaccount: message.subaccount.parentSubaccountNumber,
@@ -162,18 +166,19 @@ function accountWebsocketValue(
   );
 }
 
-const getUserWalletAddress = (state: RootState) => state.account.wallet?.walletAddress;
-const getUserSubaccount = (state: RootState) => state.account.subaccount?.subaccountNumber;
 const selectParentSubaccountInfo = createAppSelector(
   selectWebsocketUrl,
   getUserWalletAddress,
-  getUserSubaccount,
+  getUserSubaccountNumber,
   (wsUrl, wallet, subaccount) => ({ wsUrl, wallet, subaccount })
 );
 
 export function setUpParentSubaccount(store: RootStore) {
   return createStoreEffect(store, selectParentSubaccountInfo, ({ subaccount, wallet, wsUrl }) => {
     if (!isTruthy(wallet) || subaccount == null) {
+      if (store.getState().raw.account.parentSubaccount.data != null) {
+        store.dispatch(setParentSubaccountRaw(loadableIdle()));
+      }
       return undefined;
     }
     const thisTracker = accountWebsocketValue(
