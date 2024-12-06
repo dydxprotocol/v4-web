@@ -16,6 +16,8 @@ import { type LinksConfigs } from '@/hooks/useURLConfigs';
 import formatString from '@/lib/formatString';
 import { objectFromEntries } from '@/lib/objectHelpers';
 
+import environments from '../../public/configs/v1/env.json';
+
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
 export enum SupportedLocales {
@@ -81,9 +83,11 @@ export const EU_LOCALES: SupportedLocales[] = [
   SupportedLocales.FR,
 ];
 
-const DEPLOYER_RESTRICTED_LOCALES: SupportedLocales[] = import.meta.env.VITE_APP_RESTRICTED_LOCALES
-  ? import.meta.env.VITE_APP_RESTRICTED_LOCALES?.split(',')
-  : [];
+// Deployer Restricted Locales read from environment configs.
+// Filter to ensure we never remove EN
+const DEPLOYER_RESTRICTED_LOCALES = environments.restrictedLocales.filter(
+  (locale) => locale !== SupportedLocales.EN
+) as SupportedLocales[];
 
 export const SUPPORTED_LOCALES = [
   {
