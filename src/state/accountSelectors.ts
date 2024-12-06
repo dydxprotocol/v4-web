@@ -682,3 +682,8 @@ export const getComplianceUpdatedAt = (state: RootState) => state.account.compli
  * @returns compliance geo of the current session
  */
 export const getGeo = (state: RootState) => state.account.compliance?.geo;
+
+export const getUserWalletAddress = (state: RootState) => state.account.wallet?.walletAddress;
+
+export const getUserSubaccountNumber = (state: RootState) =>
+  state.account.subaccount?.subaccountNumber;

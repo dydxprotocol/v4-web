@@ -1,3 +1,4 @@
+import { storeLifecycles } from '@/abacus-ts/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
@@ -23,6 +24,7 @@ import localizationMiddleware from './localizationMiddleware';
 import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
+import { rawSlice } from './raw';
 import { tradingViewSlice } from './tradingView';
 import { vaultsSlice } from './vaults';
 import { walletSlice } from './wallet';
@@ -46,6 +48,7 @@ const reducers = {
   tradingView: tradingViewSlice.reducer,
   vaults: vaultsSlice.reducer,
   wallet: walletSlice.reducer,
+  raw: rawSlice.reducer,
 } as const;
 
 const rootReducer = combineReducers(reducers);
@@ -90,6 +93,12 @@ export const persistor = persistStore(store);
 
 // Set store so (Abacus & v4-Client) classes can getState and dispatch
 abacusStateManager.setStore(store);
+
+const useAbacusTs: boolean = true;
+if (useAbacusTs) {
+  // we ignore the cleanups for now since we want these running forever
+  storeLifecycles.forEach((fn) => fn(store));
+}
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;

@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.13.39
     version: 1.13.39
   '@dydxprotocol/v4-client-js':
-    specifier: 1.12.2
-    version: 1.12.2
+    specifier: 1.15.1
+    version: 1.15.1
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.254
     version: 1.1.254
@@ -481,6 +481,9 @@ devDependencies:
   tailwindcss:
     specifier: ^3.4.6
     version: 3.4.6(ts-node@10.9.2)
+  ts-morph:
+    specifier: ^24.0.0
+    version: 24.0.0
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@20.12.13)(typescript@5.6.3)
@@ -2637,8 +2640,8 @@ packages:
       - fp-ts
     dev: false
 
-  /@chain-registry/types@0.50.28:
-    resolution: {integrity: sha512-cIgnjh27j/enf1K6syZ0Q1hmqJEfmbgG2LbMnFnev4l/Kg/D3UI0BWifFsoN84TT1W8Jje7Savm4rFICxq/1+w==}
+  /@chain-registry/types@0.50.29:
+    resolution: {integrity: sha512-y/szqUT5oSKSolMQ4pM65Nh6qbiWChBfYUyUP5NqGzhpkBCXcmMoT8pzLudrjWi2Iheccb/TIg1is6eEsNUGkQ==}
     dev: false
 
   /@coinbase/wallet-sdk@3.9.3:
@@ -3306,8 +3309,8 @@ packages:
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.12.2:
-    resolution: {integrity: sha512-iW1HoOx8XcFzsGfldVyh64Tdy3GRDfeaEWQvy1KT4KWZ6xINMyqs5i6E7Wl8IHtkPQzkzWMN1Exw3JPkXJfGXA==}
+  /@dydxprotocol/v4-client-js@1.15.1:
+    resolution: {integrity: sha512-Dd+uQUcPw+pRAPkcw7rBIOjrANJD35e97DY/uxmNobN1cD3lDZx4ztrSMkaokrKWj/KugnFLUFRGCeSBiSi8ag==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -9543,7 +9546,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.53
+      chain-registry: 1.69.54
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -10524,6 +10527,14 @@ packages:
       prettier: 3.2.5
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /@ts-morph/common@0.25.0:
+    resolution: {integrity: sha512-kMnZz+vGGHi4GoHnLmMhGNjm44kGtKUXGnOvrKmMwAuvNjM/PgKVGfUnL7IDvK7Jb2QQ82jq3Zmp04Gy+r3Dkg==}
+    dependencies:
+      minimatch: 9.0.4
+      path-browserify: 1.0.1
+      tinyglobby: 0.2.10
     dev: true
 
   /@tsconfig/node10@1.0.9:
@@ -14188,10 +14199,10 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.53:
-    resolution: {integrity: sha512-5Rz7zgtUFH5ownAkl3fLLobLFT5vGJxm2XATGIIvbAcb/dvArqOVbke1mNc54Ndb3eAHNCBxf36QmDBfIU44kA==}
+  /chain-registry@1.69.54:
+    resolution: {integrity: sha512-LqcYWprXXAV0H/4TJWBKV2uqiqXLiyP4TeCZ7+53nI27s2JsY8/LeOoK8TWTuhB9bqIp78pAlnmhK/M/VZSlEg==}
     dependencies:
-      '@chain-registry/types': 0.50.28
+      '@chain-registry/types': 0.50.29
     dev: false
 
   /chalk@2.4.2:
@@ -14437,6 +14448,10 @@ packages:
   /co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
     engines: {iojs: '>= 1.0.0', node: '>= 0.12.0'}
+    dev: true
+
+  /code-block-writer@13.0.3:
+    resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
     dev: true
 
   /collapse-white-space@2.1.0:
@@ -16939,6 +16954,17 @@ packages:
     requiresBuild: true
     dependencies:
       pend: 1.2.0
+    dev: true
+
+  /fdir@6.4.2(picomatch@4.0.2):
+    resolution: {integrity: sha512-KnhMXsKSPZlAhp7+IjUkRZKPb4fUyccpDrdFXbi4QL1qkmFh9kVY09Yox+n4MaOb3lHZ1Tv829C3oaaXoMYPDQ==}
+    peerDependencies:
+      picomatch: ^3 || ^4
+    peerDependenciesMeta:
+      picomatch:
+        optional: true
+    dependencies:
+      picomatch: 4.0.2
     dev: true
 
   /fecha@4.2.3:
@@ -19604,7 +19630,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.53
+      chain-registry: 1.69.54
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
@@ -22118,6 +22144,11 @@ packages:
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  /picomatch@4.0.2:
+    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
+    engines: {node: '>=12'}
+    dev: true
 
   /pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
@@ -24946,6 +24977,14 @@ packages:
     resolution: {integrity: sha512-XPaBkWQJdsf3pLKJV9p4qN/S+fm2Oj8AIPo1BTUhg5oxkvm9+SVEGFdhyOz7tTdUTfvxMiAs4sp6/eZO2Ew+pw==}
     dev: false
 
+  /tinyglobby@0.2.10:
+    resolution: {integrity: sha512-Zc+8eJlFMvgatPZTl6A9L/yht8QqdmUNtURHaKZLmKBE12hNPSrqNkUp2cs3M/UKmNVVAMFQYSjYIVHDjW5zew==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      fdir: 6.4.2(picomatch@4.0.2)
+      picomatch: 4.0.2
+    dev: true
+
   /tinypool@0.8.4:
     resolution: {integrity: sha512-i11VH5gS6IFeLY3gMBQ00/MmLncVP7JLXOw1vlgkytLmJK7QnEr7NXf0LBdxfmNPAeyetukOk0bOYrJrFGjYJQ==}
     engines: {node: '>=14.0.0'}
@@ -25049,6 +25088,13 @@ packages:
     dependencies:
       tslib: 2.6.2
     dev: false
+
+  /ts-morph@24.0.0:
+    resolution: {integrity: sha512-2OAOg/Ob5yx9Et7ZX4CvTCc0UFoZHwLEJ+dpDPSUi5TgwwlTlX47w+iFRrEwzUZwYACjq83cgjS/Da50Ga37uw==}
+    dependencies:
+      '@ts-morph/common': 0.25.0
+      code-block-writer: 13.0.3
+    dev: true
 
   /ts-node@10.9.2(@types/node@20.12.13)(typescript@5.6.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
