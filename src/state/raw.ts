@@ -1,6 +1,10 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/loadable';
 import { MarketsData, ParentSubaccountData } from '@/abacus-ts/types';
 import {
+  IndexerHistoricalBlockTradingRewardsResponse,
+  IndexerParentSubaccountTransferResponse,
+} from '@/types/indexer/indexerApiGen';
+import {
   IndexerCompositeFillResponse,
   IndexerCompositeOrderObject,
 } from '@/types/indexer/indexerManual';
@@ -14,6 +18,8 @@ export interface RawDataState {
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<{ [id: string]: IndexerCompositeOrderObject }>;
+    transfers: Loadable<IndexerParentSubaccountTransferResponse>;
+    blockTradingRewards: Loadable<IndexerHistoricalBlockTradingRewardsResponse>;
   };
 }
 
@@ -23,6 +29,8 @@ const initialState: RawDataState = {
     parentSubaccount: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
+    transfers: loadableIdle(),
+    blockTradingRewards: loadableIdle(),
   },
 };
 
@@ -39,6 +47,18 @@ export const rawSlice = createSlice({
     setAccountFillsRaw: (state, action: PayloadAction<Loadable<IndexerCompositeFillResponse>>) => {
       state.account.fills = action.payload;
     },
+    setAccountTransfersRaw: (
+      state,
+      action: PayloadAction<Loadable<IndexerParentSubaccountTransferResponse>>
+    ) => {
+      state.account.transfers = action.payload;
+    },
+    setAccountBlockTradingRewardsRaw: (
+      state,
+      action: PayloadAction<Loadable<IndexerHistoricalBlockTradingRewardsResponse>>
+    ) => {
+      state.account.blockTradingRewards = action.payload;
+    },
     setAccountOrdersRaw: (
       state,
       action: PayloadAction<Loadable<{ [id: string]: IndexerCompositeOrderObject }>>
@@ -48,5 +68,11 @@ export const rawSlice = createSlice({
   },
 });
 
-export const { setAllMarketsRaw, setParentSubaccountRaw, setAccountFillsRaw, setAccountOrdersRaw } =
-  rawSlice.actions;
+export const {
+  setAllMarketsRaw,
+  setParentSubaccountRaw,
+  setAccountFillsRaw,
+  setAccountOrdersRaw,
+  setAccountTransfersRaw,
+  setAccountBlockTradingRewardsRaw,
+} = rawSlice.actions;

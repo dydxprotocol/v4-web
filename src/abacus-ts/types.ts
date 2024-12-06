@@ -12,6 +12,11 @@ import {
 
 export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
 
+export type OrderbookData = {
+  bids: { [price: string]: string };
+  asks: { [price: string]: string };
+};
+
 export interface ParentSubaccountData {
   address: string;
   parentSubaccount: number;

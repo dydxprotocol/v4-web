@@ -89,7 +89,7 @@ export interface IndexerWsOrderbookUpdateResponse {
   bids?: IndexerWsOrderbookUpdateItem[];
 }
 
-export type IndexerWsOrderbookUpdateItem = string[];
+export type IndexerWsOrderbookUpdateItem = [string, string];
 
 export interface IndexerWsMarketUpdateResponse {
   trading?: { [key: string]: IndexerCompositeMarketObject };

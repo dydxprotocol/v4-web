@@ -1,23 +1,16 @@
 import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
-import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
-import { createAppSelector } from '@/state/appTypes';
 import { setAccountOrdersRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../loadable';
+import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './indexerQueryStoreEffect';
 
 export function setUpOrdersQuery(store: RootStore) {
-  const selectParentSubaccountInfo = createAppSelector(
-    getUserWalletAddress,
-    getUserSubaccountNumber,
-    (wallet, subaccount) => ({ wallet, subaccount })
-  );
-
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'orders']);
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectParentSubaccountInfo,

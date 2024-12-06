@@ -6,7 +6,6 @@ import {
 import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
-import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import { setParentSubaccountRaw } from '@/state/raw';
 
@@ -15,7 +14,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../loadable';
-import { selectWebsocketUrl } from '../socketSelectors';
+import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
 import { ChildSubaccountData, ParentSubaccountData } from '../types';
 import { IndexerWebsocket } from './indexerWebsocket';
 import { IndexerWebsocketManager } from './indexerWebsocketManager';
@@ -166,15 +165,14 @@ function accountWebsocketValue(
   );
 }
 
-const selectParentSubaccountInfo = createAppSelector(
+const selectParentSubaccount = createAppSelector(
   selectWebsocketUrl,
-  getUserWalletAddress,
-  getUserSubaccountNumber,
-  (wsUrl, wallet, subaccount) => ({ wsUrl, wallet, subaccount })
+  selectParentSubaccountInfo,
+  (wsUrl, { wallet, subaccount }) => ({ wsUrl, wallet, subaccount })
 );
 
 export function setUpParentSubaccount(store: RootStore) {
-  return createStoreEffect(store, selectParentSubaccountInfo, ({ subaccount, wallet, wsUrl }) => {
+  return createStoreEffect(store, selectParentSubaccount, ({ subaccount, wallet, wsUrl }) => {
     if (!isTruthy(wallet) || subaccount == null) {
       if (store.getState().raw.account.parentSubaccount.data != null) {
         store.dispatch(setParentSubaccountRaw(loadableIdle()));

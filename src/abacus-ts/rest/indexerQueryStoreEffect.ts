@@ -1,6 +1,8 @@
 import { IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 
+import { timeUnits } from '@/constants/time';
+
 import { type RootState, type RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
@@ -24,6 +26,10 @@ type QuerySetupConfig<T, R> = {
   | 'refetchOnReconnect'
   | 'refetchOnMount'
 >;
+
+const baseOptions = {
+  refetchInterval: timeUnits.minute,
+};
 
 export function createIndexerQueryStoreEffect<T, R>(
   store: RootStore,
@@ -59,6 +65,7 @@ export function createIndexerQueryStoreEffect<T, R>(
     const observer = new QueryObserver(appQueryClient, {
       queryKey: ['indexer', ...config.getQueryKey(queryData), indexerClientConfig],
       queryFn,
+      ...baseOptions,
       ...otherOpts,
     });
 

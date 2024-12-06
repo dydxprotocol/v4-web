@@ -1,21 +1,14 @@
 import { type RootStore } from '@/state/_store';
-import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
-import { createAppSelector } from '@/state/appTypes';
 import { setAccountFillsRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../loadable';
+import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './indexerQueryStoreEffect';
 
 export function setUpFillsQuery(store: RootStore) {
-  const selectParentSubaccountInfo = createAppSelector(
-    getUserWalletAddress,
-    getUserSubaccountNumber,
-    (wallet, subaccount) => ({ wallet, subaccount })
-  );
-
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'fills']);
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectParentSubaccountInfo,
