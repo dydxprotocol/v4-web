@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -294,7 +295,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
-      <CollapsibleTabs
+      <$CollapsibleTabs
         defaultTab={InfoSection.Position}
         tab={tab}
         setTab={setTab}
@@ -316,3 +317,11 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     </>
   );
 };
+
+const $CollapsibleTabs = styled(CollapsibleTabs)`
+  header {
+    background-color: var(--color-layer-2);
+  }
+
+  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+`;
