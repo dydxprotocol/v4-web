@@ -144,7 +144,7 @@ export class IndexerWebsocket {
       }
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error('IndexerWebsocket: Error handling websocket message', message, e);
+      console.error('IndexerWebsocket: Error handling websocket message', messagePre, e);
     }
   };
 
