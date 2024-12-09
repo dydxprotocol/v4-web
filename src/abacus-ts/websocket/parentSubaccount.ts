@@ -174,9 +174,6 @@ const selectParentSubaccount = createAppSelector(
 export function setUpParentSubaccount(store: RootStore) {
   return createStoreEffect(store, selectParentSubaccount, ({ subaccount, wallet, wsUrl }) => {
     if (!isTruthy(wallet) || subaccount == null) {
-      if (store.getState().raw.account.parentSubaccount.data != null) {
-        store.dispatch(setParentSubaccountRaw(loadableIdle()));
-      }
       return undefined;
     }
     const thisTracker = accountWebsocketValue(
@@ -189,6 +186,7 @@ export function setUpParentSubaccount(store: RootStore) {
     return () => {
       thisTracker.teardown();
       IndexerWebsocketManager.markDone(wsUrl);
+      store.dispatch(setParentSubaccountRaw(loadableIdle()));
     };
   });
 }

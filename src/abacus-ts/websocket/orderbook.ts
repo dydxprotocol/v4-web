@@ -1,8 +1,17 @@
 import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
-import { keyBy, mapValues } from 'lodash';
+import { keyBy, mapValues, throttle } from 'lodash';
 
-import { Loadable, loadableLoaded, loadablePending } from '../loadable';
-import { ResourceCacheManager } from '../resourceCacheManager';
+import { timeUnits } from '@/constants/time';
+
+import { type RootStore } from '@/state/_store';
+import { createAppSelector } from '@/state/appTypes';
+import { setOrderbookRaw } from '@/state/raw';
+
+import { isTruthy } from '@/lib/isTruthy';
+
+import { createStoreEffect } from '../createStoreEffect';
+import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../loadable';
+import { selectWebsocketUrl } from '../socketSelectors';
 import { OrderbookData } from '../types';
 import { IndexerWebsocket } from './indexerWebsocket';
 import { IndexerWebsocketManager } from './indexerWebsocketManager';
@@ -56,11 +65,32 @@ function orderbookWebsocketValue(
   );
 }
 
-// todo simplify api to just take market id
-// needs to allow adding/removing callbacks too
-export const OrderbooksManager = new ResourceCacheManager({
-  constructor: ({ wsUrl, marketId }: { wsUrl: string; marketId: string }) =>
-    orderbookWebsocketValue(IndexerWebsocketManager.use(wsUrl), marketId, () => null),
-  destroyer: (obj) => obj.teardown(),
-  keySerializer: ({ marketId, wsUrl }) => `${wsUrl}//////\\\\\\${marketId}`,
-});
+const selectMarketAndWsInfo = createAppSelector(
+  selectWebsocketUrl,
+  (state) => state.perpetuals.currentMarketId,
+  (wsUrl, currentMarketId) => ({ wsUrl, currentMarketId })
+);
+
+export function setUpOrderbook(store: RootStore) {
+  return createStoreEffect(store, selectMarketAndWsInfo, ({ currentMarketId, wsUrl }) => {
+    if (!isTruthy(currentMarketId)) {
+      return undefined;
+    }
+    const throttledSetOrderbook = throttle((data: Loadable<OrderbookData>) => {
+      store.dispatch(setOrderbookRaw({ marketId: currentMarketId, data }));
+    }, timeUnits.second / 2);
+
+    const thisTracker = orderbookWebsocketValue(
+      IndexerWebsocketManager.use(wsUrl),
+      currentMarketId,
+      (data) => throttledSetOrderbook(data)
+    );
+
+    return () => {
+      thisTracker.teardown();
+      IndexerWebsocketManager.markDone(wsUrl);
+      throttledSetOrderbook.cancel();
+      store.dispatch(setOrderbookRaw({ marketId: currentMarketId, data: loadableIdle() }));
+    };
+  });
+}

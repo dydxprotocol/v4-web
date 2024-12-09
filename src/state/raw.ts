@@ -1,5 +1,5 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/loadable';
-import { MarketsData, ParentSubaccountData } from '@/abacus-ts/types';
+import { MarketsData, OrderbookData, ParentSubaccountData } from '@/abacus-ts/types';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
@@ -13,6 +13,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
+    orderbooks: { [marketId: string]: Loadable<OrderbookData> };
   };
   account: {
     parentSubaccount: Loadable<ParentSubaccountData>;
@@ -24,7 +25,7 @@ export interface RawDataState {
 }
 
 const initialState: RawDataState = {
-  markets: { allMarkets: loadableIdle() },
+  markets: { allMarkets: loadableIdle(), orderbooks: {} },
   account: {
     parentSubaccount: loadableIdle(),
     fills: loadableIdle(),
@@ -40,6 +41,12 @@ export const rawSlice = createSlice({
   reducers: {
     setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
       state.markets.allMarkets = action.payload;
+    },
+    setOrderbookRaw: (
+      state,
+      action: PayloadAction<{ marketId: string; data: Loadable<OrderbookData> }>
+    ) => {
+      state.markets.orderbooks[action.payload.marketId] = action.payload.data;
     },
     setParentSubaccountRaw: (state, action: PayloadAction<Loadable<ParentSubaccountData>>) => {
       state.account.parentSubaccount = action.payload;
@@ -69,6 +76,7 @@ export const rawSlice = createSlice({
 });
 
 export const {
+  setOrderbookRaw,
   setAllMarketsRaw,
   setParentSubaccountRaw,
   setAccountFillsRaw,

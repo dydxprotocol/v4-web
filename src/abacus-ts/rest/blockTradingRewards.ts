@@ -21,9 +21,6 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
     getQueryKey: (data) => ['account', 'blockTradingRewards', data],
     getQueryFn: (indexerClient, data) => {
       if (!isTruthy(data.wallet) || data.subaccount == null) {
-        if (store.getState().raw.account.blockTradingRewards.data != null) {
-          store.dispatch(setAccountBlockTradingRewardsRaw(loadableIdle()));
-        }
         return null;
       }
       return () => indexerClient.account.getHistoricalBlockTradingRewards(data.wallet!);
@@ -45,5 +42,6 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
   return () => {
     cleanupListener();
     cleanupEffect();
+    store.dispatch(setAccountBlockTradingRewardsRaw(loadableIdle()));
   };
 }

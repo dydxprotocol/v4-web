@@ -18,9 +18,6 @@ export function setUpTransfersQuery(store: RootStore) {
     getQueryKey: (data) => ['account', 'transfers', data],
     getQueryFn: (indexerClient, data) => {
       if (!isTruthy(data.wallet) || data.subaccount == null) {
-        if (store.getState().raw.account.transfers.data != null) {
-          store.dispatch(setAccountTransfersRaw(loadableIdle()));
-        }
         return null;
       }
       return () =>
@@ -43,5 +40,6 @@ export function setUpTransfersQuery(store: RootStore) {
   return () => {
     cleanupListener();
     cleanupEffect();
+    store.dispatch(setAccountTransfersRaw(loadableIdle()));
   };
 }

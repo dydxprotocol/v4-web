@@ -17,9 +17,6 @@ export function setUpFillsQuery(store: RootStore) {
     getQueryKey: (data) => ['account', 'fills', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
       if (!isTruthy(data.wallet) || data.subaccount == null) {
-        if (store.getState().raw.account.fills.data != null) {
-          store.dispatch(setAccountFillsRaw(loadableIdle()));
-        }
         return null;
       }
       return () =>
@@ -38,5 +35,6 @@ export function setUpFillsQuery(store: RootStore) {
   return () => {
     cleanupListener();
     cleanupEffect();
+    store.dispatch(setAccountFillsRaw(loadableIdle()));
   };
 }

@@ -18,9 +18,6 @@ export function setUpOrdersQuery(store: RootStore) {
     getQueryKey: (data) => ['account', 'orders', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
       if (!isTruthy(data.wallet) || data.subaccount == null) {
-        if (store.getState().raw.account.orders.data != null) {
-          store.dispatch(setAccountOrdersRaw(loadableIdle()));
-        }
         return null;
       }
       return () =>
@@ -53,5 +50,6 @@ export function setUpOrdersQuery(store: RootStore) {
   return () => {
     cleanupListener();
     cleanupEffect();
+    store.dispatch(setAccountOrdersRaw(loadableIdle()));
   };
 }
