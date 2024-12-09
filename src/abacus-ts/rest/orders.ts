@@ -1,3 +1,4 @@
+import { isParentSubaccountOrders } from '@/types/indexer/indexerChecks';
 import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
@@ -40,7 +41,10 @@ export function setUpOrdersQuery(store: RootStore) {
       store.dispatch(
         setAccountOrdersRaw({
           status: orders.status,
-          data: orders.data != null ? keyBy(orders.data, (o) => o.id ?? '') : orders.data,
+          data:
+            orders.data != null
+              ? keyBy(isParentSubaccountOrders(orders.data), (o) => o.id ?? '')
+              : orders.data,
           error: orders.error,
         })
       );

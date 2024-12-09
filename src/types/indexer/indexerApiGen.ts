@@ -363,13 +363,13 @@ export interface IndexerCandleResponseObject {
    * @type {string}
    * @memberof CandleResponseObject
    */
-  orderbookMidPriceOpen?: string;
+  orderbookMidPriceOpen?: string | null;
   /**
    *
    * @type {string}
    * @memberof CandleResponseObject
    */
-  orderbookMidPriceClose?: string;
+  orderbookMidPriceClose?: string | null;
   /**
    *
    * @type {string}
@@ -407,7 +407,7 @@ export interface IndexerComplianceResponse {
    * @type {string}
    * @memberof ComplianceResponse
    */
-  reason?: string;
+  reason?: string | null;
 }
 /**
  *
@@ -438,13 +438,13 @@ export interface IndexerComplianceV2Response {
    * @type {IndexerComplianceReason}
    * @memberof ComplianceV2Response
    */
-  reason?: IndexerComplianceReason;
+  reason?: IndexerComplianceReason | null;
   /**
    *
    * @type {string}
    * @memberof ComplianceV2Response
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 /**
  *
@@ -457,19 +457,19 @@ export interface IndexerFillResponse {
    * @type {number}
    * @memberof FillResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof FillResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof FillResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerFillResponseObject>}
@@ -560,13 +560,13 @@ export interface IndexerFillResponseObject {
    * @type {string}
    * @memberof FillResponseObject
    */
-  orderId?: string;
+  orderId?: string | null;
   /**
    *
    * @type {string}
    * @memberof FillResponseObject
    */
-  clientMetadata?: string;
+  clientMetadata?: string | null;
   /**
    *
    * @type {number}
@@ -704,19 +704,19 @@ export interface IndexerHistoricalPnlResponse {
    * @type {number}
    * @memberof HistoricalPnlResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof HistoricalPnlResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof HistoricalPnlResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerPnlTicksResponseObject>}
@@ -753,13 +753,13 @@ export interface IndexerHistoricalTradingRewardAggregation {
    * @type {IndexerIsoString}
    * @memberof HistoricalTradingRewardAggregation
    */
-  endedAt?: IndexerIsoString;
+  endedAt?: IndexerIsoString | null;
   /**
    *
    * @type {string}
    * @memberof HistoricalTradingRewardAggregation
    */
-  endedAtHeight?: string;
+  endedAtHeight?: string | null;
   /**
    *
    * @type {IndexerTradingRewardAggregationPeriod}
@@ -906,19 +906,19 @@ export interface IndexerOrderResponseObject {
    * @type {string}
    * @memberof OrderResponseObject
    */
-  goodTilBlock?: string;
+  goodTilBlock?: string | null;
   /**
    *
    * @type {string}
    * @memberof OrderResponseObject
    */
-  goodTilBlockTime?: string;
+  goodTilBlockTime?: string | null;
   /**
    *
    * @type {string}
    * @memberof OrderResponseObject
    */
-  createdAtHeight?: string;
+  createdAtHeight?: string | null;
   /**
    *
    * @type {string}
@@ -930,7 +930,7 @@ export interface IndexerOrderResponseObject {
    * @type {string}
    * @memberof OrderResponseObject
    */
-  triggerPrice?: string;
+  triggerPrice?: string | null;
   /**
    *
    * @type {IndexerAPITimeInForce}
@@ -960,13 +960,13 @@ export interface IndexerOrderResponseObject {
    * @type {IndexerIsoString}
    * @memberof OrderResponseObject
    */
-  updatedAt?: IndexerIsoString;
+  updatedAt?: IndexerIsoString | null;
   /**
    *
    * @type {string}
    * @memberof OrderResponseObject
    */
-  updatedAtHeight?: string;
+  updatedAtHeight?: string | null;
   /**
    *
    * @type {number}
@@ -1095,19 +1095,19 @@ export interface IndexerParentSubaccountTransferResponse {
    * @type {number}
    * @memberof ParentSubaccountTransferResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof ParentSubaccountTransferResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof ParentSubaccountTransferResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerTransferResponseObject>}
@@ -1247,13 +1247,13 @@ export interface IndexerPerpetualMarketResponseObject {
    * @type {string}
    * @memberof PerpetualMarketResponseObject
    */
-  openInterestLowerCap?: string;
+  openInterestLowerCap?: string | null;
   /**
    *
    * @type {string}
    * @memberof PerpetualMarketResponseObject
    */
-  openInterestUpperCap?: string;
+  openInterestUpperCap?: string | null;
   /**
    *
    * @type {string}
@@ -1385,13 +1385,13 @@ export interface IndexerPerpetualPositionResponseObject {
    * @type {IndexerIsoString}
    * @memberof PerpetualPositionResponseObject
    */
-  closedAt?: IndexerIsoString;
+  closedAt?: IndexerIsoString | null;
   /**
    *
    * @type {string}
    * @memberof PerpetualPositionResponseObject
    */
-  exitPrice?: string;
+  exitPrice?: string | null;
   /**
    *
    * @type {number}
@@ -1582,19 +1582,19 @@ export interface IndexerTradeResponse {
    * @type {number}
    * @memberof TradeResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof TradeResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof TradeResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerTradeResponseObject>}
@@ -1672,7 +1672,7 @@ export interface IndexerTraderSearchResponse {
    * @type {IndexerTraderSearchResponseObject}
    * @memberof TraderSearchResponse
    */
-  result?: IndexerTraderSearchResponseObject;
+  result?: IndexerTraderSearchResponseObject | null;
 }
 /**
  *
@@ -1726,19 +1726,19 @@ export interface IndexerTransferBetweenResponse {
    * @type {number}
    * @memberof TransferBetweenResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof TransferBetweenResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof TransferBetweenResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerTransferResponseObject>}
@@ -1763,19 +1763,19 @@ export interface IndexerTransferResponse {
    * @type {number}
    * @memberof TransferResponse
    */
-  pageSize?: number;
+  pageSize?: number | null;
   /**
    *
    * @type {number}
    * @memberof TransferResponse
    */
-  totalResults?: number;
+  totalResults?: number | null;
   /**
    *
    * @type {number}
    * @memberof TransferResponse
    */
-  offset?: number;
+  offset?: number | null;
   /**
    *
    * @type {Array<IndexerTransferResponseObject>}
@@ -1855,7 +1855,7 @@ export interface IndexerTransferResponseObjectSender {
    * @type {number}
    * @memberof TransferResponseObjectSender
    */
-  subaccountNumber?: number;
+  subaccountNumber?: number | null;
   /**
    *
    * @type {string}
@@ -1916,7 +1916,7 @@ export interface IndexerVaultPosition {
    * @type {IndexerPerpetualPositionResponseObject}
    * @memberof VaultPosition
    */
-  perpetualPosition?: IndexerPerpetualPositionResponseObject;
+  perpetualPosition?: IndexerPerpetualPositionResponseObject | null;
   /**
    *
    * @type {string}

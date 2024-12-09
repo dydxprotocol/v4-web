@@ -1,3 +1,5 @@
+import { isParentSubaccountBlockRewardResponse } from '@/types/indexer/indexerChecks';
+
 import { type RootStore } from '@/state/_store';
 import { setAccountBlockTradingRewardsRaw } from '@/state/raw';
 
@@ -30,7 +32,10 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
       store.dispatch(
         setAccountBlockTradingRewardsRaw({
           status: blockTradingRewards.status,
-          data: blockTradingRewards.data,
+          data:
+            blockTradingRewards.data != null
+              ? isParentSubaccountBlockRewardResponse(blockTradingRewards.data)
+              : blockTradingRewards.data,
           error: blockTradingRewards.error,
         })
       );

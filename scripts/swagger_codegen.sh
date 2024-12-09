@@ -41,5 +41,3 @@ cd $CURRENT_DIR
 npx tsx scripts/indexer-renames.ts 
 pnpm prettier ./src/types/indexer/indexerApiGen.ts --write
 sed -i '' 's/export interface IndexerAPIOrderStatus {}/export type IndexerAPIOrderStatus = IndexerOrderStatus | IndexerBestEffortOpenedStatus;/' ./src/types/indexer/indexerApiGen.ts
-
-

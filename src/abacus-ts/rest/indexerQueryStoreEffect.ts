@@ -11,12 +11,7 @@ import { createStoreEffect } from '../createStoreEffect';
 import { selectIndexerUrl, selectWebsocketUrl } from '../socketSelectors';
 import { IndexerClientManager } from './indexerClientManager';
 
-type QuerySetupConfig<T, R> = {
-  selector: (state: RootState) => T;
-  getQueryKey: (selectorResult: NoInfer<T>) => any[];
-  getQueryFn: (client: IndexerClient, selectorResult: NoInfer<T>) => (() => Promise<R>) | null;
-  onResult: (result: NoInfer<QueryObserverResult<R, Error>>) => void;
-} & Pick<
+type PassedQueryOptions<R> = Pick<
   QueryObserverOptions<R>,
   | 'staleTime'
   | 'gcTime'
@@ -27,8 +22,16 @@ type QuerySetupConfig<T, R> = {
   | 'refetchOnMount'
 >;
 
-const baseOptions = {
+type QuerySetupConfig<T, R> = {
+  selector: (state: RootState) => T;
+  getQueryKey: (selectorResult: NoInfer<T>) => any[];
+  getQueryFn: (client: IndexerClient, selectorResult: NoInfer<T>) => (() => Promise<R>) | null;
+  onResult: (result: NoInfer<QueryObserverResult<R, Error>>) => void;
+} & PassedQueryOptions<R>;
+
+const baseOptions: PassedQueryOptions<any> = {
   refetchInterval: timeUnits.minute,
+  staleTime: timeUnits.second * 30,
 };
 
 export function createIndexerQueryStoreEffect<T, R>(
@@ -70,7 +73,16 @@ export function createIndexerQueryStoreEffect<T, R>(
     });
 
     const unsubscribe = observer.subscribe((result) => {
-      config.onResult(result);
+      try {
+        config.onResult(result);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'IndexerQueryStoreEffect: Error handling result from react query store effect',
+          e,
+          result
+        );
+      }
     });
 
     return () => {

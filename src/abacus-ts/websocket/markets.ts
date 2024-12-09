@@ -1,5 +1,7 @@
-import { IndexerPerpetualMarketResponse } from '@/types/indexer/indexerApiGen';
-import { IndexerWsMarketUpdateResponse } from '@/types/indexer/indexerManual';
+import {
+  isWsMarketUpdateResponses,
+  isWsPerpetualMarketResponse,
+} from '@/types/indexer/indexerChecks';
 import { throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
@@ -25,11 +27,11 @@ function marketsWebsocketValue(
       channel: 'v4_markets',
       id: undefined,
       handleBaseData: (baseMessage) => {
-        const message = baseMessage as IndexerPerpetualMarketResponse;
+        const message = isWsPerpetualMarketResponse(baseMessage);
         return loadableLoaded(message.markets);
       },
       handleUpdates: (baseUpdates, value) => {
-        const updates = baseUpdates as IndexerWsMarketUpdateResponse[];
+        const updates = isWsMarketUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
           // eslint-disable-next-line no-console

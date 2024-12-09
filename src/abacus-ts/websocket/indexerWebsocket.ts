@@ -1,3 +1,5 @@
+import typia from 'typia';
+
 import { assertNever } from '@/lib/assertNever';
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -92,51 +94,57 @@ export class IndexerWebsocket {
     };
   }
 
-  private _handleMessage = (message: IndexerWebsocketMessageType) => {
-    if (message.type === 'error') {
-      // eslint-disable-next-line no-console
-      console.error('IndexerWebsocket encountered server side error:', message.message);
-    } else if (message.type === 'connected') {
-      // do nothing
-    } else if (
-      message.type === 'subscribed' ||
-      message.type === 'channel_batch_data' ||
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      message.type === 'channel_data'
-    ) {
-      const channel = message.channel;
-      const id = message.id;
-      if (this.subscriptions[channel] == null) {
+  private _handleMessage = (messagePre: any) => {
+    try {
+      const message = isWsMessage(messagePre);
+      if (message.type === 'error') {
         // eslint-disable-next-line no-console
-        console.error('IndexerWebsocket encountered message with unknown target', channel, id);
-        return;
-      }
-      if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
-        // eslint-disable-next-line no-console
-        console.error('IndexerWebsocket encountered message with unknown target', channel, id);
-        return;
-      }
-      if (message.type === 'subscribed') {
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleBaseData(
-          message.contents,
-          message
-        );
-      } else if (message.type === 'channel_data') {
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
-          [message.contents],
-          message
-        );
+        console.error('IndexerWebsocket encountered server side error:', message.message);
+      } else if (message.type === 'connected') {
+        // do nothing
+      } else if (
+        message.type === 'subscribed' ||
+        message.type === 'channel_batch_data' ||
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      } else if (message.type === 'channel_batch_data') {
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
-          message.contents,
-          message
-        );
+        message.type === 'channel_data'
+      ) {
+        const channel = message.channel;
+        const id = message.id;
+        if (this.subscriptions[channel] == null) {
+          // eslint-disable-next-line no-console
+          console.error('IndexerWebsocket encountered message with unknown target', channel, id);
+          return;
+        }
+        if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
+          // eslint-disable-next-line no-console
+          console.error('IndexerWebsocket encountered message with unknown target', channel, id);
+          return;
+        }
+        if (message.type === 'subscribed') {
+          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleBaseData(
+            message.contents,
+            message
+          );
+        } else if (message.type === 'channel_data') {
+          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
+            [message.contents],
+            message
+          );
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        } else if (message.type === 'channel_batch_data') {
+          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
+            message.contents,
+            message
+          );
+        } else {
+          assertNever(message);
+        }
       } else {
         assertNever(message);
       }
-    } else {
-      assertNever(message);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('IndexerWebsocket: Error handling websocket message', message, e);
     }
   };
 
@@ -173,6 +181,7 @@ type IndexerWebsocketMessageType =
       channel: string;
       id: string | undefined;
       version: string;
+      subaccountNumber?: number;
       contents: any[];
     }
   | {
@@ -180,6 +189,9 @@ type IndexerWebsocketMessageType =
       channel: string;
       id: string | undefined;
       version: string;
+      subaccountNumber?: number;
       contents: any;
     }
   | { type: 'subscribed'; channel: string; id: string | undefined; contents: any };
+
+export const isWsMessage = typia.createAssert<IndexerWebsocketMessageType>();

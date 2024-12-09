@@ -1,3 +1,5 @@
+import { isParentSubaccountFillResponse } from '@/types/indexer/indexerChecks';
+
 import { type RootStore } from '@/state/_store';
 import { setAccountFillsRaw } from '@/state/raw';
 
@@ -27,7 +29,7 @@ export function setUpFillsQuery(store: RootStore) {
       store.dispatch(
         setAccountFillsRaw({
           status: fills.status,
-          data: fills.data,
+          data: fills.data != null ? isParentSubaccountFillResponse(fills.data) : fills.data,
           error: fills.error,
         })
       );

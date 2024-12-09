@@ -36,17 +36,17 @@ export interface IndexerCompositeOrderObject {
   type?: IndexerOrderType;
   reduceOnly?: boolean;
   orderFlags?: string;
-  goodTilBlock?: string;
-  goodTilBlockTime?: string;
-  createdAtHeight?: string;
+  goodTilBlock?: string | null;
+  goodTilBlockTime?: string | null;
+  createdAtHeight?: string | null;
   clientMetadata?: string;
-  triggerPrice?: string;
+  triggerPrice?: string | null;
   timeInForce?: IndexerAPITimeInForce;
   status?: IndexerAPIOrderStatus;
   postOnly?: boolean;
   ticker?: string;
-  updatedAt?: IndexerIsoString;
-  updatedAtHeight?: string;
+  updatedAt?: IndexerIsoString | null;
+  updatedAtHeight?: string | null;
   subaccountNumber?: number;
   removalReason?: string;
   totalOptimisticFilled?: string;
@@ -116,8 +116,8 @@ export interface IndexerCompositeFillObject {
   affiliateRevShare?: string;
   createdAt?: IndexerIsoString;
   createdAtHeight?: string;
-  orderId?: string;
-  clientMetadata?: string;
+  orderId?: string | null;
+  clientMetadata?: string | null;
   subaccountNumber?: number;
   ticker?: string;
 }

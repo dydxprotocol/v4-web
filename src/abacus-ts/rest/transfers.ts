@@ -1,3 +1,5 @@
+import { isParentSubaccountTransferResponse } from '@/types/indexer/indexerChecks';
+
 import { type RootStore } from '@/state/_store';
 import { setAccountTransfersRaw } from '@/state/raw';
 
@@ -28,7 +30,10 @@ export function setUpTransfersQuery(store: RootStore) {
       store.dispatch(
         setAccountTransfersRaw({
           status: transfers.status,
-          data: transfers.data,
+          data:
+            transfers.data != null
+              ? isParentSubaccountTransferResponse(transfers.data)
+              : transfers.data,
           error: transfers.error,
         })
       );

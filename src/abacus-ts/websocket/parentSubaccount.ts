@@ -1,8 +1,8 @@
 import { IndexerSubaccountResponseObject } from '@/types/indexer/indexerApiGen';
 import {
-  IndexerWsParentSubaccountSubscribedResponse,
-  IndexerWsParentSubaccountUpdateObject,
-} from '@/types/indexer/indexerManual';
+  isWsParentSubaccountSubscribed,
+  isWsParentSubaccountUpdates,
+} from '@/types/indexer/indexerChecks';
 import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
@@ -68,7 +68,7 @@ function accountWebsocketValue(
       channel: 'v4_parent_subaccounts',
       id: `${address}/${subaccount}`,
       handleBaseData: (baseMessage) => {
-        const message = baseMessage as IndexerWsParentSubaccountSubscribedResponse;
+        const message = isWsParentSubaccountSubscribed(baseMessage);
         accountRefreshSignal.notify();
 
         return loadableLoaded({
@@ -86,7 +86,7 @@ function accountWebsocketValue(
         });
       },
       handleUpdates: (baseUpdates, value, fullMessage) => {
-        const updates = baseUpdates as IndexerWsParentSubaccountUpdateObject[];
+        const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
         if (value.data == null || updates.length === 0 || subaccountNumber == null) {
           return value;

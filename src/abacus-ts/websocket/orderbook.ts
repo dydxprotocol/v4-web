@@ -1,5 +1,4 @@
-import { IndexerOrderbookResponseObject } from '@/types/indexer/indexerApiGen';
-import { IndexerWsOrderbookUpdateResponse } from '@/types/indexer/indexerManual';
+import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
 import { keyBy, mapValues } from 'lodash';
 
 import { Loadable, loadableLoaded, loadablePending } from '../loadable';
@@ -20,7 +19,7 @@ function orderbookWebsocketValue(
       channel: 'v4_orderbook',
       id: marketId,
       handleBaseData: (baseMessage) => {
-        const message = baseMessage as IndexerOrderbookResponseObject;
+        const message = isWsOrderbookResponse(baseMessage);
         return loadableLoaded({
           asks: mapValues(
             keyBy(message.asks, (a) => a.price),
@@ -33,7 +32,7 @@ function orderbookWebsocketValue(
         });
       },
       handleUpdates: (baseUpdates, value) => {
-        const updates = baseUpdates as IndexerWsOrderbookUpdateResponse[];
+        const updates = isWsOrderbookUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
           // eslint-disable-next-line no-console
