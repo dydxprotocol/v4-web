@@ -107,6 +107,7 @@ export const FooterMobile = () => {
 };
 const $MobileNav = styled.footer`
   grid-area: Footer;
+  background-color: var(--color-layer-2);
 
   ${layoutMixins.stickyFooter}
 `;
@@ -161,8 +162,6 @@ const $NavigationMenu = styled(NavigationMenu)`
         top: 12.5%;
         bottom: 12.5%;
         right: 0;
-
-        background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
       }
     }
   }
