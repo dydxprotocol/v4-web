@@ -149,7 +149,6 @@ const sticky = css`
   --stickyArea-totalInsetBottom: ;
   --stickyArea-totalInsetLeft: ;
   --stickyArea-totalInsetRight: ;
-  --stickyArea-backdropFilter: blur(10px);
 
   z-index: 1;
 
@@ -159,9 +158,6 @@ const sticky = css`
   bottom: var(--stickyArea-totalInsetBottom, 0px);
   left: var(--stickyArea-totalInsetLeft, 0px);
   right: var(--stickyArea-totalInsetRight, 0px);
-
-  -webkit-backdrop-filter: var(--stickyArea-backdropFilter);
-  backdrop-filter: var(--stickyArea-backdropFilter);
 `;
 
 /**
@@ -185,8 +181,6 @@ const stickyArea = css`
   --stickyArea-paddingRight: ;
   --stickyArea-rightGap: ;
   --stickyArea-rightWidth: ;
-
-  --stickyArea-background: ;
 
   /* Computed */
   --stickyArea-totalInsetTop: var(--stickyArea-paddingTop);
@@ -217,14 +211,6 @@ const stickyArea = css`
       )
   );
 
-  /* Rules */
-  /* scroll-padding-top: var(--stickyArea-topHeight);
-scroll-padding-bottom: var(--stickyArea-bottomHeight); */
-  /* scroll-padding-top: var(--stickyArea-totalInsetTop);
-scroll-padding-bottom: var(--stickyArea-totalInsetBottom); */
-  /* scroll-padding-block-end: 4rem; */
-
-  /* Firefox: opaque background required for backdrop-filter to work */
   background: var(--stickyArea-background, var(--color-layer-2));
 `;
 
@@ -235,29 +221,6 @@ const stickyFooter = css`
   flex-shrink: 0;
 
   ${() => scrollSnapItem}
-`;
-
-// Use with layoutMixins.stickyFooter
-const withStickyFooterBackdrop = css`
-  /* Params */
-  --stickyFooterBackdrop-outsetY: ;
-  --stickyFooterBackdrop-outsetX: ;
-
-  /* Rules */
-  backdrop-filter: none;
-
-  &:before {
-    content: '';
-
-    z-index: -1;
-    position: absolute;
-    inset: calc(-1 * var(--stickyFooterBackdrop-outsetY, 0px))
-      calc(-1 * var(--stickyFooterBackdrop-outsetX, 0px));
-
-    background: linear-gradient(transparent, var(--stickyArea-background));
-
-    pointer-events: none;
-  }
 `;
 
 export const layoutMixins = {
@@ -869,8 +832,6 @@ export const layoutMixins = {
 
   scrollSnapItem,
 
-  withStickyFooterBackdrop,
-
   withOuterBorder,
 
   // Show "borders" between and around grid/flex items using gap + box-shadow
@@ -1004,7 +965,6 @@ export const layoutMixins = {
 
     > :last-child {
       ${() => stickyFooter}
-      ${() => withStickyFooterBackdrop}
     }
   `,
 

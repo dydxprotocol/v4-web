@@ -341,6 +341,7 @@ const $FeeTable = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
   --table-cell-align: end;
+  border-top: var(--border-width) solid var(--color-border);
 
   font: var(--font-base-book);
 
@@ -360,7 +361,7 @@ const $FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableStickyRow-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-2);
   }
 ` as typeof Table;
 const $Highlighted = tw.strong`text-color-text-1`;

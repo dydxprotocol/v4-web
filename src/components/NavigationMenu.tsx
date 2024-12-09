@@ -285,7 +285,6 @@ const $Viewport = styled(Viewport)`
 
   &[data-orientation='vertical'] {
     left: 100%;
-    /* top: 100%; */
   }
 `;
 
@@ -312,11 +311,6 @@ const $Content = styled(Content)`
     max-height: 100vh;
 
     ${$List}[data-orientation="horizontal"] & {
-      /* position: absolute;
-      top: calc(100% + var(--submenu-side-offset));
-      left: 50%;
-      right: 50%; */
-
       position: relative;
       width: 0;
       left: 50%;

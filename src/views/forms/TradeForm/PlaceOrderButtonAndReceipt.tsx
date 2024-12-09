@@ -400,7 +400,6 @@ export const PlaceOrderButtonAndReceipt = ({
 const $Footer = styled.footer`
   ${formMixins.footer}
   padding-bottom: var(--dialog-content-paddingBottom);
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 
   ${layoutMixins.column}
 `;

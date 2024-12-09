@@ -126,7 +126,6 @@ const $Trigger = styled(Trigger)`
   gap: 1rem;
 
   ${popoverMixins.trigger}
-  ${popoverMixins.backdropOverlay}
 `;
 
 const $DropdownIcon = styled.span`

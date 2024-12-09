@@ -218,4 +218,8 @@ const $WithSeparators = styled(WithSeparators)`
 
 const $Button = styled(Button)`
   --button-padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;

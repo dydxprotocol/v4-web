@@ -68,6 +68,7 @@ export const TradeDialogTrigger = () => {
 };
 const $TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
   ${layoutMixins.stickyFooter}
+  background-color: var(--color-layer-2);
 
   ${layoutMixins.spacedRow}
 
