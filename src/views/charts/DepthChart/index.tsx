@@ -342,7 +342,7 @@ export const DepthChart = ({
               )}
               showHorizontalCrosshair
               horizontalCrosshairStyle={{ strokeWidth: 1, strokeDasharray: '5 5', opacity: 0.7 }}
-              snapCrosshairToDatumY={!isEditingOrder}
+              snapCrosshairToDatumY={false}
               renderYAxisLabel={({ tooltipData }) =>
                 (isEditingOrder || tooltipData!.nearestDatum?.datum.depth) && (
                   <$YAxisLabelOutput
@@ -392,6 +392,7 @@ export const DepthChart = ({
     </$Container>
   );
 };
+
 const $Container = styled.div`
   width: 0;
   min-width: 100%;
@@ -428,6 +429,7 @@ const $Container = styled.div`
     }
   }
 `;
+
 const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 
