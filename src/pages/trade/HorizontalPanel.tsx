@@ -324,4 +324,4 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
   }
 
   --trigger-active-underline-backgroundColor: var(--color-layer-2);
-`;
+` as typeof CollapsibleTabs;
