@@ -321,8 +321,6 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
     pointer-events: none;
   }
 
-  pointer-events: auto;
-
   ${({ $hide }) =>
     $hide &&
     css`
