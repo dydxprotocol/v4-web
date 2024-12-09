@@ -415,7 +415,6 @@ const $Container = styled.div`
       animation: ${keyframes`
         from {
           opacity: 0;
-          /* filter: blur(2px); */
         }
       `} 0.1s var(--ease-out-expo);
     }
@@ -424,7 +423,6 @@ const $Container = styled.div`
       animation: ${keyframes`
         to {
           opacity: 0;
-          /* filter: blur(2px); */
         }
       `} 0.2s 0.3s var(--ease-out-expo) forwards;
     }

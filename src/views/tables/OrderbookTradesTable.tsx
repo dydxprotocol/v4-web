@@ -3,7 +3,7 @@ import styled, { css, keyframes } from 'styled-components';
 import breakpoints from '@/styles/breakpoints';
 
 import { Output } from '@/components/Output';
-import { Table, BaseTableRowData, AllTableProps } from '@/components/Table';
+import { AllTableProps, BaseTableRowData, Table } from '@/components/Table';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 
@@ -53,6 +53,7 @@ const $OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
 
   thead {
     font: var(--font-mini-book);
+    background-color: var(--color-layer-2);
   }
 
   tbody tr {

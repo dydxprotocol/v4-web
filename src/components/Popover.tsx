@@ -82,7 +82,6 @@ export const Popover = ({
   );
 };
 const $Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType }>`
-  ${popoverMixins.backdropOverlay}
   ${popoverMixins.trigger}
 
   ${({ $triggerType }) =>

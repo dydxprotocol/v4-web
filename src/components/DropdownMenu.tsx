@@ -124,7 +124,6 @@ const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }
 
 const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
-  ${popoverMixins.backdropOverlay}
 `;
 
 const $DropdownIcon = styled.span`

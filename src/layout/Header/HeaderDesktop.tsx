@@ -239,7 +239,7 @@ const $Header = styled.header`
   ${layoutMixins.stickyHeader}
   ${layoutMixins.scrollSnapItem}
   backdrop-filter: none;
-
+  background-color: var(--color-layer-2);
   height: var(--page-currentHeaderHeight);
 
   grid-area: Header;
@@ -263,12 +263,6 @@ const $Header = styled.header`
   }
 
   font-size: 0.9375rem;
-
-  &:before {
-    --backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: var(--backdrop-filter);
-    backdrop-filter: var(--backdrop-filter);
-  }
 `;
 
 const $NavigationScrollBar = styled.div`
