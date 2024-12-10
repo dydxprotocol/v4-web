@@ -12,13 +12,13 @@ import { setParentSubaccountRaw } from '@/state/raw';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { accountRefreshSignal } from '../accountRefreshSignal';
-import { createStoreEffect } from '../createStoreEffect';
-import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../loadable';
+import { createStoreEffect } from '../lib/createStoreEffect';
+import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
 import { ChildSubaccountData, ParentSubaccountData } from '../types';
-import { IndexerWebsocket } from './indexerWebsocket';
-import { IndexerWebsocketManager } from './indexerWebsocketManager';
-import { WebsocketDerivedValue } from './websocketDerivedValue';
+import { IndexerWebsocket } from './lib/indexerWebsocket';
+import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
+import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
   return (

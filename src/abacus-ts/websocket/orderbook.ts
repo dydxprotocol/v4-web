@@ -9,13 +9,13 @@ import { setOrderbookRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import { createStoreEffect } from '../createStoreEffect';
-import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../loadable';
+import { createStoreEffect } from '../lib/createStoreEffect';
+import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { OrderbookData } from '../types';
-import { IndexerWebsocket } from './indexerWebsocket';
-import { IndexerWebsocketManager } from './indexerWebsocketManager';
-import { WebsocketDerivedValue } from './websocketDerivedValue';
+import { IndexerWebsocket } from './lib/indexerWebsocket';
+import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
+import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function orderbookWebsocketValue(
   websocket: IndexerWebsocket,

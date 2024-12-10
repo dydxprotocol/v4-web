@@ -9,13 +9,13 @@ import { timeUnits } from '@/constants/time';
 import { type RootStore } from '@/state/_store';
 import { setAllMarketsRaw } from '@/state/raw';
 
-import { createStoreEffect } from '../createStoreEffect';
-import { Loadable, loadableLoaded, loadablePending } from '../loadable';
+import { createStoreEffect } from '../lib/createStoreEffect';
+import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { MarketsData } from '../types';
-import { IndexerWebsocket } from './indexerWebsocket';
-import { IndexerWebsocketManager } from './indexerWebsocketManager';
-import { WebsocketDerivedValue } from './websocketDerivedValue';
+import { IndexerWebsocket } from './lib/indexerWebsocket';
+import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
+import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function marketsWebsocketValue(
   websocket: IndexerWebsocket,

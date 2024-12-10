@@ -1,6 +1,6 @@
 import { IndexerClient, IndexerConfig } from '@dydxprotocol/v4-client-js';
 
-import { ResourceCacheManager } from '../resourceCacheManager';
+import { ResourceCacheManager } from '../../lib/resourceCacheManager';
 
 export const IndexerClientManager = new ResourceCacheManager({
   constructor: ({ wsUrl, url }: { url: string; wsUrl: string }) =>

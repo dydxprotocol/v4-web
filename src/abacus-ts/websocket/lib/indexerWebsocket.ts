@@ -1,3 +1,4 @@
+import { logAbacusTsError } from '@/abacus-ts/logs';
 import typia from 'typia';
 
 import { assertNever } from '@/lib/assertNever';
@@ -52,6 +53,7 @@ export class IndexerWebsocket {
   }): () => void {
     this.subscriptions[channel] ??= {};
     if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] != null) {
+      logAbacusTsError('IndexerWebsocket', 'this subscription already exists', `${channel}/${id}`);
       throw new Error(`IndexerWebsocket error: this subscription already exists. ${channel}/${id}`);
     }
     this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] = {
@@ -98,8 +100,7 @@ export class IndexerWebsocket {
     try {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
-        // eslint-disable-next-line no-console
-        console.error('IndexerWebsocket encountered server side error:', message.message);
+        logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
       } else if (message.type === 'connected') {
         // do nothing
       } else if (
@@ -111,13 +112,21 @@ export class IndexerWebsocket {
         const channel = message.channel;
         const id = message.id;
         if (this.subscriptions[channel] == null) {
-          // eslint-disable-next-line no-console
-          console.error('IndexerWebsocket encountered message with unknown target', channel, id);
+          logAbacusTsError(
+            'IndexerWebsocket',
+            'encountered message with unknown target',
+            channel,
+            id
+          );
           return;
         }
         if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
-          // eslint-disable-next-line no-console
-          console.error('IndexerWebsocket encountered message with unknown target', channel, id);
+          logAbacusTsError(
+            'IndexerWebsocket',
+            'encountered message with unknown target',
+            channel,
+            id
+          );
           return;
         }
         if (message.type === 'subscribed') {
@@ -143,8 +152,7 @@ export class IndexerWebsocket {
         assertNever(message);
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('IndexerWebsocket: Error handling websocket message', messagePre, e);
+      logAbacusTsError('IndexerWebsocket', 'Error handling websocket message', messagePre, e);
     }
   };
 
@@ -165,9 +173,9 @@ export class IndexerWebsocket {
           });
         });
     } else {
-      // eslint-disable-next-line no-console
-      console.error(
-        "IndexerWebsocket error: handle fresh connect called when websocket isn't ready."
+      logAbacusTsError(
+        'IndexerWebsocket',
+        "handle fresh connect called when websocket isn't ready."
       );
     }
   };

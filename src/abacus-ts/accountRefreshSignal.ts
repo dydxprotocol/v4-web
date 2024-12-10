@@ -4,13 +4,14 @@ import { timeUnits } from '@/constants/time';
 
 import { appQueryClient } from '@/state/appQueryClient';
 
-import { Signal } from './signal';
+import { Signal } from './lib/signal';
 
 // triggers when we got fresh parent subaccount data from the websocket for any reason
 // mostly network reconnects, refreshes, page visibility changes, etc
 export const accountRefreshSignal = new Signal();
 
 const BUFFER_REFRESH_TIME = timeUnits.second * 5;
+
 export function refreshIndexerQueryOnAccountSocketRefresh(key: any[]) {
   return accountRefreshSignal.onTrigger(() => {
     // we don't refresh if all data was updated within the last few seconds

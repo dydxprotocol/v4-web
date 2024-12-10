@@ -6,9 +6,9 @@ import { setAccountBlockTradingRewardsRaw } from '@/state/raw';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
-import { loadableIdle } from '../loadable';
+import { loadableIdle } from '../lib/loadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { createIndexerQueryStoreEffect } from './indexerQueryStoreEffect';
+import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
 
 export function setUpBlockTradingRewardsQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh([

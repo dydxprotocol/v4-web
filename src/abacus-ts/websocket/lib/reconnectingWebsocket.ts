@@ -1,3 +1,5 @@
+import { logAbacusTsError } from '@/abacus-ts/logs';
+
 interface WebSocketConfig {
   url: string;
   handleMessage: (data: any) => void;
@@ -50,8 +52,7 @@ export class ReconnectingWebSocket {
           const data = JSON.parse(event.data);
           this.handleMessage(data);
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error('ReconnectingWebSocket: error in handler', e);
+          logAbacusTsError('ReconnectingWebSocket', 'error in handler', e);
         }
       };
 
@@ -61,8 +62,7 @@ export class ReconnectingWebSocket {
       };
 
       this.ws.onerror = (error) => {
-        // eslint-disable-next-line no-console
-        console.error('ReconnectingWebSocket error:', error);
+        logAbacusTsError('ReconnectingWebSocket', 'socket error encountered', error);
         this.ws?.close();
       };
 
@@ -70,12 +70,10 @@ export class ReconnectingWebSocket {
         this.currentReconnectInterval = this.initialReconnectInterval;
         // eslint-disable-next-line no-console
         console.log('ReconnectingWebsocket: Connected to ', this.url);
-
         this.handleFreshConnect();
       };
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('ReconnectingWebSocket connection error:', error);
+      logAbacusTsError('ReconnectingWebSocket', 'connection error', error);
       this.ws?.close();
       this.ws = null;
       this.handleReconnect();
@@ -112,6 +110,11 @@ export class ReconnectingWebSocket {
 
   public send(data: any): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      logAbacusTsError(
+        'ReconnectingWebsocket',
+        'Someone attempted to send data on socket in invalid state',
+        this.url
+      );
       throw new Error('ReconnectingWebSocket: WebSocket is not connected');
     }
 

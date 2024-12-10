@@ -1,3 +1,4 @@
+import { logAbacusTsError } from '@/abacus-ts/logs';
 import { IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 
@@ -7,8 +8,8 @@ import { type RootState, type RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 
-import { createStoreEffect } from '../createStoreEffect';
-import { selectIndexerUrl, selectWebsocketUrl } from '../socketSelectors';
+import { createStoreEffect } from '../../lib/createStoreEffect';
+import { selectIndexerUrl, selectWebsocketUrl } from '../../socketSelectors';
 import { IndexerClientManager } from './indexerClientManager';
 
 type PassedQueryOptions<R> = Pick<
@@ -76,9 +77,9 @@ export function createIndexerQueryStoreEffect<T, R>(
       try {
         config.onResult(result);
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(
-          'IndexerQueryStoreEffect: Error handling result from react query store effect',
+        logAbacusTsError(
+          'IndexerQueryStoreEffect',
+          'Error handling result from react query store effect',
           e,
           result
         );

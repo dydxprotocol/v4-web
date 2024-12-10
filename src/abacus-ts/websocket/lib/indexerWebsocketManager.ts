@@ -1,4 +1,4 @@
-import { ResourceCacheManager } from '../resourceCacheManager';
+import { ResourceCacheManager } from '../../lib/resourceCacheManager';
 import { IndexerWebsocket } from './indexerWebsocket';
 
 export const IndexerWebsocketManager = new ResourceCacheManager({
