@@ -98,18 +98,18 @@ export const EquityTiers = () => {
           }
           selectionBehavior="replace"
           paginationBehavior="showAll"
-          withOuterBorder={isNotTablet}
+          withOuterBorder
           withInnerBorders
         />
       </div>
     </AttachedExpandingSection>
   );
 };
+
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
   --table-cell-align: end;
-  border-top: var(--border-width) solid var(--color-border);
   font: var(--font-base-book);
 
   @media ${breakpoints.mobile} {
@@ -123,6 +123,7 @@ const $Table = styled(Table)`
 ` as typeof Table;
 
 const $HighlightOutput = tw(Output)`text-color-text-1`;
+
 const $Description = styled.div`
   color: var(--color-text-0);
   padding: 0 1rem;

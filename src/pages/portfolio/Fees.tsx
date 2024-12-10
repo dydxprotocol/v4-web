@@ -240,7 +240,7 @@ export const Fees = () => {
           ).filter(isTruthy)}
           selectionBehavior="replace"
           paginationBehavior="showAll"
-          withOuterBorder={isNotTablet}
+          withOuterBorder
           withInnerBorders
         />
       </div>
@@ -341,7 +341,6 @@ const $FeeTable = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
   --table-cell-align: end;
-  border-top: var(--border-width) solid var(--color-border);
 
   font: var(--font-base-book);
 
