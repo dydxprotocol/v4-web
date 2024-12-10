@@ -148,7 +148,6 @@ export const WithdrawForm = () => {
     });
 
     return () => {
-      console.log("resetting input state");
       abacusStateManager.resetInputState();
     };
   }, [dydxAddress, sourceAccount.walletInfo]);
@@ -158,7 +157,6 @@ export const WithdrawForm = () => {
       try {
         setIsLoading(true);
         const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
-        console.log("hasInvalidInput"), hasInvalidInput
         if (hasInvalidInput) {
           abacusStateManager.setTransferValue({
             value: 0,
@@ -320,7 +318,6 @@ export const WithdrawForm = () => {
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    console.log("onChangeAddress", e.target.value)
     abacusStateManager.setTransferValue({
       field: TransferInputField.address,
       value: e.target.value,
@@ -589,7 +586,6 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     !isValidDestinationAddress;
-  console.log("isDisabled", isDisabled, "isLoading", isLoading)
 
   return (
     <$Form onSubmit={onSubmit}>

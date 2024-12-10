@@ -6,15 +6,15 @@ import { useSkipClient } from './transfers/skipClient';
 import { assetsQueryFn, chainsQueryFn } from './transfers/useTransfers';
 
 export const usePrefetchedQueries = () => {
-  const { skipClient, skipInstanceId } = useSkipClient();
+  const { skipClient } = useSkipClient();
   useEffect(() => {
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleChains', skipInstanceId],
+      queryKey: ['transferEligibleChains'],
       queryFn: () => chainsQueryFn(skipClient),
     });
     appQueryClient.prefetchQuery({
-      queryKey: ['transferEligibleAssets', skipInstanceId],
+      queryKey: ['transferEligibleAssets'],
       queryFn: () => assetsQueryFn(skipClient),
     });
-  }, [skipClient, skipInstanceId]);
+  }, [skipClient]);
 };

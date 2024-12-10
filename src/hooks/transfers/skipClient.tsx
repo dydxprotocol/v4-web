@@ -5,7 +5,7 @@ import {
   TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
 } from '@dydxprotocol/v4-client-js';
 import { SkipClient } from '@skip-go/client';
-import { useClient } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
@@ -36,9 +36,9 @@ const useSkipClientContext = () => {
   const { compositeClient } = useDydxClient();
   const { sourceAccount } = useAccounts();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const client = useClient();
 
-  const getEvmSigner = useCallback(() => {
+  const { data: client } = useWalletClient();
+  const getEVMSigner = useCallback(() => {
     if (!sourceAccount.walletInfo || sourceAccount.chain !== WalletNetworkType.Evm) {
       throw new Error('Wallet is not evm');
     }
@@ -47,7 +47,7 @@ const useSkipClientContext = () => {
       throw new Error('wallet not connected');
     }
 
-    return client;
+    return Promise.resolve(client);
   }, [client, sourceAccount.chain, sourceAccount.walletInfo]);
 
   // skipInstanceId is used to track unique instances of skipClient
@@ -68,7 +68,7 @@ const useSkipClientContext = () => {
           },
         },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
-        getEVMSigner: () => getEvmSigner(),
+        getEVMSigner,
       }),
       skipInstanceId: crypto.randomUUID(),
     }),
@@ -80,7 +80,9 @@ const useSkipClientContext = () => {
       selectedDydxChainId,
       solanaRpcUrl,
       validators,
+      getEVMSigner,
     ]
   );
+
   return { skipClient, skipInstanceId };
 };
