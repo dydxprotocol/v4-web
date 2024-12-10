@@ -449,10 +449,10 @@ export const VaultDepositWithdrawForm = ({
   const inputFormConfig =
     operation === 'DEPOSIT'
       ? {
-          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_ADD }),
           buttonLabel: confirmationStep
-            ? stringGetter({ key: STRING_KEYS.CONFIRM_DEPOSIT })
-            : stringGetter({ key: STRING_KEYS.PREVIEW_DEPOSIT }),
+            ? stringGetter({ key: STRING_KEYS.CONFIRM })
+            : stringGetter({ key: STRING_KEYS.REVIEW }),
           inputReceiptItems: [
             {
               key: 'cross-free-collateral',
@@ -481,15 +481,15 @@ export const VaultDepositWithdrawForm = ({
           },
         }
       : {
-          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_WITHDRAW }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_REMOVE }),
           buttonLabel: confirmationStep
-            ? stringGetter({ key: STRING_KEYS.CONFIRM_WITHDRAW })
-            : stringGetter({ key: STRING_KEYS.PREVIEW_WITHDRAW }),
+            ? stringGetter({ key: STRING_KEYS.CONFIRM })
+            : stringGetter({ key: STRING_KEYS.REVIEW }),
           inputReceiptItems: [
             {
               key: 'vault-balance',
               tooltip: 'vault-available-to-withdraw',
-              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_WITHDRAW }),
+              label: stringGetter({ key: STRING_KEYS.AVAILABLE_TO_REMOVE }),
               value: availableToWithdrawDiff,
             },
           ] satisfies DetailsItem[],
@@ -568,7 +568,7 @@ export const VaultDepositWithdrawForm = ({
           $active={operation === 'DEPOSIT'}
           onClick={() => setOperation('DEPOSIT')}
         >
-          {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+          {stringGetter({ key: STRING_KEYS.ADD_FUNDS })}
         </$TypeButton>
         <$TypeButton
           shape={ButtonShape.Rectangle}
@@ -577,7 +577,7 @@ export const VaultDepositWithdrawForm = ({
           $active={operation === 'WITHDRAW'}
           onClick={() => setOperation('WITHDRAW')}
         >
-          {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+          {stringGetter({ key: STRING_KEYS.REMOVE_FUNDS })}
         </$TypeButton>
       </div>
 

@@ -33,7 +33,7 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
         <>
           <div tw="flex justify-between px-1 py-0.625">
             <h3 tw="leading-7">
-              {stringGetter({ key: STRING_KEYS.YOUR_DEPOSITS_AND_WITHDRAWALS })}
+              {stringGetter({ key: STRING_KEYS.YOUR_MEGAVAULT_HISTORY })}
               <span tw="ml-0.5 text-color-text-0">{transactions.length}</span>
             </h3>
             <$ShowHideHistoryButton
@@ -53,13 +53,15 @@ export const VaultTransactionsCard = ({ className }: { className?: string }) => 
           <div>
             <Icon iconName={IconName.OrderPending} size="2rem" tw="mb-0.75" />
           </div>
-          <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}</div>
+          <div>{stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}</div>
         </div>
       )}
     </div>
   );
 };
+
 const $ShowHideHistoryButton = styled(Button)``;
+
 export const VaultTransactionsTable = ({
   className,
   withOuterBorders,
@@ -105,9 +107,9 @@ export const VaultTransactionsTable = ({
               <Output
                 value={
                   type?.name === 'DEPOSIT'
-                    ? stringGetter({ key: STRING_KEYS.DEPOSIT })
+                    ? stringGetter({ key: STRING_KEYS.ADD_FUNDS })
                     : type?.name === 'WITHDRAWAL'
-                      ? stringGetter({ key: STRING_KEYS.WITHDRAW })
+                      ? stringGetter({ key: STRING_KEYS.REMOVE_FUNDS })
                       : undefined
                 }
                 type={OutputType.Text}
