@@ -324,7 +324,7 @@ export const AnalyticsEvents = unionize(
 
     Error: ofType<{
       location: string;
-      error: Error;
+      error?: Error;
       metadata?: any;
     }>(),
     RouteError: ofType<{
