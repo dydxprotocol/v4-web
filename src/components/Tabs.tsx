@@ -321,14 +321,11 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
     pointer-events: none;
   }
 
-  &[data-state='active'] {
-    z-index: var(--activeTab-zIndex);
-  }
-
   ${({ $hide }) =>
     $hide &&
     css`
       display: none;
+      opacity: 0;
     `}
 
   @media (prefers-reduced-motion: no-preference) {
@@ -340,7 +337,6 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
             from {
               translate: 0 -0.25rem -1.5rem;
               opacity: 0;
-              /* filter: blur(3px); */
             }
           `} 0.2s var(--ease-out-expo);
         }
@@ -352,7 +348,6 @@ const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
             to {
               translate: 0 -0.25rem -1.5rem;
               opacity: 0;
-              /* filter: blur(3px); */
             }
           `} 0.2s var(--ease-out-expo);
         }
@@ -366,6 +361,7 @@ const $DropdownTabTrigger = styled(Trigger)<{
   ${tabMixins.tabTriggerStyle}
   height: 100%;
   width: 100%;
+  --trigger-hover-filter: none;
 
   ${({ $withUnderline }) =>
     $withUnderline &&

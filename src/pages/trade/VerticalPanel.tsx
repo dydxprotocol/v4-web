@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import styled from 'styled-components';
+
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEADER_HEIGHT, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
@@ -61,7 +63,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
   }, [calculateNumRows, canvasOrderbook]);
 
   return (
-    <Tabs
+    <$Tabs
       fullWidthTabs
       dividerStyle="underline"
       value={value}
@@ -92,3 +94,7 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     />
   );
 };
+
+const $Tabs = styled(Tabs)`
+  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+` as typeof Tabs;

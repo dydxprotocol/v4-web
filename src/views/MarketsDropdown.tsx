@@ -1,7 +1,7 @@
 import { Key, memo, useEffect, useMemo, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 import { ButtonStyle } from '@/constants/buttons';
@@ -391,7 +391,7 @@ const $Popover = styled(Popover)`
 
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height) - var(
-        --restriction-warning-height
+        --restriction-warning-currentHeight
       )
   );
 
@@ -402,25 +402,6 @@ const $Popover = styled(Popover)`
   box-shadow: 0 0 0 1px var(--color-border);
   border-radius: 0;
 
-  &[data-state='open'] {
-    animation: ${keyframes`
-      from {
-        opacity: 0;
-        scale: 0.9;
-        max-height: 0;
-      }
-    `} 0.2s var(--ease-out-expo);
-  }
-
-  &[data-state='closed'] {
-    animation: ${keyframes`
-      to {
-        opacity: 0;
-        scale: 0.95;
-        max-height: 0;
-      }
-    `} 0.2s;
-  }
   &:focus-visible {
     outline: none;
   }
@@ -487,6 +468,8 @@ const $Table = styled(Table)`
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
+    background-color: var(--color-layer-2);
+
     tr {
       height: var(--stickyArea-topHeight);
     }
@@ -495,6 +478,7 @@ const $Table = styled(Table)`
   tfoot {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 3px;
+    background-color: var(--color-layer-2);
 
     tr {
       height: var(--stickyArea-bottomHeight);

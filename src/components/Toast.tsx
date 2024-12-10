@@ -138,23 +138,17 @@ const $Root = styled(Root)`
       animation:
         ${keyframes`
           from {
-            /* scale: 0; */
             grid-template-rows: 0fr; // height transition
-            /* grid-template-rows: 0fr 0fr; // height transition */
-
             margin-top: calc(-1 * var(--toasts-gap));
           }
         `} var(--toast-transition-duration) var(--ease-out-expo),
         ${keyframes`
           from {
             opacity: 0;
-            /* filter: blur(1px); */
           }
         `} var(--toast-transition-duration) var(--ease-out-expo),
         ${keyframes`
           33% {
-            /* scale: 1.05; */
-            /* filter: brightness(120%); */
             filter: drop-shadow(0 0 var(--color-text-0));
           }
         `} calc(var(--toast-transition-duration) * 3) 0.1s;
