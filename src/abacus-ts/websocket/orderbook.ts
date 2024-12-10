@@ -11,8 +11,8 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
+import { OrderbookData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
-import { OrderbookData } from '../types';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
