@@ -15,6 +15,7 @@ import styled, { css, keyframes } from 'styled-components';
 import tw from 'twin.macro';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
+import { useResizeObserver } from '@/hooks/useResizeObserver';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -100,6 +101,14 @@ export const Dialog = ({
   className,
 }: DialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const { width = 0, height = 0 } = useResizeObserver({
+    ref,
+    box: 'border-box',
+  });
+
+  console.log({ width, height, title });
 
   return (
     <Root modal={withOverlay} open={isOpen} onOpenChange={setIsOpen}>
@@ -117,66 +126,69 @@ export const Dialog = ({
               e.preventDefault();
             }
           }}
+          $height={height}
           $stacked={stacked}
           $withAnimation={withAnimation}
         >
-          {slotHeaderAbove}
-          {stacked ? (
-            <$StackedHeaderTopRow $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
-              {onBack && <$BackButton onClick={onBack} />}
+          <div ref={ref}>
+            {slotHeaderAbove}
+            {stacked ? (
+              <$StackedHeaderTopRow $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
+                {onBack && <$BackButton onClick={onBack} />}
 
-              {slotIcon}
+                {slotIcon}
 
-              {!preventClose && withClose && (
-                <$Close ref={closeButtonRef} $absolute={stacked}>
-                  <Icon iconName={IconName.Close} />
-                </$Close>
-              )}
-
-              {title && <$Title>{title}</$Title>}
-
-              {description && <$Description>{description}</$Description>}
-
-              {slotHeaderInner}
-            </$StackedHeaderTopRow>
-          ) : slotHeader ? (
-            <div>
-              {!preventClose && withClose && (
-                <$Close ref={closeButtonRef} $absolute>
-                  <Icon iconName={IconName.Close} />
-                </$Close>
-              )}
-              {slotHeader}
-            </div>
-          ) : (
-            <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
-              <div tw="row gap-[--dialog-title-gap]">
-                {onBack && <BackButton onClick={onBack} />}
-
-                {slotIcon && (
-                  <div tw="row h-[1em] w-[1em] text-[length:--dialog-icon-size] leading-none">
-                    {slotIcon}
-                  </div>
+                {!preventClose && withClose && (
+                  <$Close ref={closeButtonRef} $absolute={stacked}>
+                    <Icon iconName={IconName.Close} />
+                  </$Close>
                 )}
 
                 {title && <$Title>{title}</$Title>}
 
+                {description && <$Description>{description}</$Description>}
+
+                {slotHeaderInner}
+              </$StackedHeaderTopRow>
+            ) : slotHeader ? (
+              <div>
                 {!preventClose && withClose && (
-                  <$Close ref={closeButtonRef}>
+                  <$Close ref={closeButtonRef} $absolute>
                     <Icon iconName={IconName.Close} />
                   </$Close>
                 )}
+                {slotHeader}
               </div>
+            ) : (
+              <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
+                <div tw="row gap-[--dialog-title-gap]">
+                  {onBack && <BackButton onClick={onBack} />}
 
-              {description && <$Description>{description}</$Description>}
+                  {slotIcon && (
+                    <div tw="row h-[1em] w-[1em] text-[length:--dialog-icon-size] leading-none">
+                      {slotIcon}
+                    </div>
+                  )}
 
-              {slotHeaderInner}
-            </$Header>
-          )}
+                  {title && <$Title>{title}</$Title>}
 
-          <$Content>{children}</$Content>
+                  {!preventClose && withClose && (
+                    <$Close ref={closeButtonRef}>
+                      <Icon iconName={IconName.Close} />
+                    </$Close>
+                  )}
+                </div>
 
-          {slotFooter && <$Footer $withBorder={hasFooterBorder}>{slotFooter}</$Footer>}
+                {description && <$Description>{description}</$Description>}
+
+                {slotHeaderInner}
+              </$Header>
+            )}
+
+            <$Content>{children}</$Content>
+
+            {slotFooter && <$Footer $withBorder={hasFooterBorder}>{slotFooter}</$Footer>}
+          </div>
         </$Container>
       </DialogPortal>
     </Root>
@@ -196,6 +208,7 @@ const $Overlay = styled(Overlay)`
 
 const $Container = styled(Content)<{
   placement: DialogPlacement;
+  $height?: number;
   $stacked?: boolean;
   $withAnimation?: boolean;
 }>`
@@ -255,15 +268,16 @@ const $Container = styled(Content)<{
 
   outline: none;
 
-  ${({ placement, $withAnimation }) =>
+  ${({ placement, $height, $withAnimation }) =>
     ({
       [DialogPlacement.Default]: css`
         inset: var(--dialog-inset);
         margin: auto;
 
         max-width: var(--dialog-width);
-        height: fit-content;
+        height: ${$height ? `${$height}px` : '100%'};
         max-height: var(--dialog-height);
+        transition: height 0.25s ease-in-out;
 
         display: flex;
         flex-direction: column;
