@@ -16,9 +16,6 @@ trap cleanup EXIT
 
 curl -o $TMP_DIR/swagger.json https://raw.githubusercontent.com/dydxprotocol/v4-chain/main/indexer/services/comlink/public/swagger.json
 
-# Remove required attribute
-# ${CURRENT_DIR}/json_remove_attr.sh -f $TMP_DIR/swagger.json -a required
-
 cd "$TMP_DIR"
 
 swagger-codegen generate -i swagger.json -o generated -l typescript-fetch
