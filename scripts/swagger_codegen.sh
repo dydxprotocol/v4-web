@@ -20,6 +20,7 @@ cd "$TMP_DIR"
 
 swagger-codegen generate -i swagger.json -o generated -l typescript-fetch
 
+# a bunch of one off fixes to massage this thing into a reasonable state, probably very fragile
 sed -i '' '1,79d; /export const DefaultApiFetchParamCreator/,$d' generated/api.ts
 sed -i '' -e ':a' -e '$d;N;2,4ba' -e 'P;D' generated/api.ts
 line_num=$(grep -n "export interface SparklineResponseObject" generated/api.ts | cut -d: -f1) && sed -i '' "$((line_num-5)),$((line_num+3))d" generated/api.ts
