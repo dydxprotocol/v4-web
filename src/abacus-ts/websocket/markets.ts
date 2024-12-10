@@ -11,8 +11,8 @@ import { setAllMarketsRaw } from '@/state/raw';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
+import { MarketsData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
-import { MarketsData } from '../types';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';

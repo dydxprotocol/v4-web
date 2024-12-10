@@ -1,5 +1,5 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/lib/loadable';
-import { MarketsData, OrderbookData, ParentSubaccountData } from '@/abacus-ts/types';
+import { MarketsData, OrderbookData, ParentSubaccountData } from '@/abacus-ts/rawTypes';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
