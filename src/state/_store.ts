@@ -1,12 +1,10 @@
-import { storeLifecycles } from '@/abacus-ts/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import { isDev } from '@/constants/networks';
-
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 import { accountSlice } from './account';
 import { affiliatesSlice } from './affiliates';
@@ -96,8 +94,8 @@ export const persistor = persistStore(store);
 // Set store so (Abacus & v4-Client) classes can getState and dispatch
 abacusStateManager.setStore(store);
 
-const useAbacusTs: boolean = isDev;
-if (useAbacusTs) {
+if (testFlags.useAbacusTs) {
+  const { storeLifecycles } = await import('@/abacus-ts/storeLifecycles');
   // we ignore the cleanups for now since we want these running forever
   storeLifecycles.forEach((fn) => fn(store));
 }
