@@ -36,6 +36,7 @@ import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
 
 type ElementProps = {
+  className?: string;
   rowsPerSide?: number;
   layout?: 'vertical' | 'horizontal';
 };
@@ -48,6 +49,7 @@ type StyleProps = {
 export const CanvasOrderbook = forwardRef(
   (
     {
+      className,
       histogramSide = 'right',
       hideHeader = false,
       layout = 'vertical',
@@ -130,7 +132,7 @@ export const CanvasOrderbook = forwardRef(
           );
         }
       },
-      [currentInput, tickSizeDecimals]
+      [dispatch, currentInput, tickSizeDecimals]
     );
 
     const displayUnit = useAppSelector(getSelectedDisplayUnit);
@@ -201,7 +203,7 @@ export const CanvasOrderbook = forwardRef(
     );
 
     return (
-      <div ref={ref} tw="flex flex-1 flex-col overflow-hidden">
+      <div className={className} ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
           {!hideHeader && <OrderbookControls assetId={id} grouping={currentGrouping} />}
           {!hideHeader && (
