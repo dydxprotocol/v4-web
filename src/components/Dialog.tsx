@@ -103,12 +103,10 @@ export const Dialog = ({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const { width = 0, height = 0 } = useResizeObserver({
+  const { height = 0 } = useResizeObserver({
     ref,
     box: 'border-box',
   });
-
-  console.log({ width, height, title });
 
   return (
     <Root modal={withOverlay} open={isOpen} onOpenChange={setIsOpen}>
@@ -275,7 +273,7 @@ const $Container = styled(Content)<{
         margin: auto;
 
         max-width: var(--dialog-width);
-        height: ${$height ? `${$height}px` : '100%'};
+        height: ${$height ? `${$height}px` : 'fit-content'};
         max-height: var(--dialog-height);
         transition: height 0.25s ease-in-out;
 
