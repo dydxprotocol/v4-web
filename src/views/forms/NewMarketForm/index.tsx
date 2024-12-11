@@ -124,17 +124,17 @@ export const NewMarketForm = ({
   const receiptItems: DetailsItem[] = useMemo(() => {
     return [
       {
-        key: 'deposit-apr',
-        label: `${stringGetter({ key: STRING_KEYS.DEPOSIT_APR })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
+        key: 'est-apr',
+        label: `${stringGetter({ key: STRING_KEYS.EST_APR_PLAIN })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
         value: <MegaVaultYieldOutput />,
       },
       {
-        key: 'deposit-lockup',
-        label: stringGetter({ key: STRING_KEYS.DEPOSIT_LOCKUP }),
+        key: 'lockup-period',
+        label: stringGetter({ key: STRING_KEYS.LOCKUP_PERIOD }),
         value: (
           <Output
             type={OutputType.Text}
-            value={`30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`}
+            value={`~30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`}
           />
         ),
       },
