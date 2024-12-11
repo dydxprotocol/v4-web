@@ -18,6 +18,10 @@ const initialSize: Size = {
   height: undefined,
 };
 
+/**
+ * @description Custom hook that observes the size of an element using the ResizeObserver API.
+ * @url https://usehooks-ts.com/react-hook/use-resize-observer
+ */
 export function useResizeObserver<T extends HTMLElement = HTMLElement>(
   options: UseResizeObserverOptions<T>
 ): Size {
