@@ -347,7 +347,7 @@ export const NewMarketPreviewStep = ({
               {stringGetter({
                 key: STRING_KEYS.MEGAVAULT_TERMS_TEXT,
                 params: {
-                  CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH }),
+                  CONFIRM_BUTTON_TEXT: stringGetter({ key: STRING_KEYS.ADD_FUNDS_AND_LAUNCH }),
                   LINK: (
                     <Link tw="inline-flex" href={launchMarketTos} withIcon>
                       {stringGetter({ key: STRING_KEYS.LAUNCH_MARKET_TERMS })}
@@ -368,7 +368,7 @@ export const NewMarketPreviewStep = ({
             action={ButtonAction.Primary}
             state={{ isDisabled: shouldDisableForm || !hasAcceptedTerms, isLoading }}
           >
-            {stringGetter({ key: STRING_KEYS.DEPOSIT_AND_LAUNCH })}
+            {stringGetter({ key: STRING_KEYS.ADD_FUNDS_AND_LAUNCH })}
           </Button>
         </div>
       </div>
