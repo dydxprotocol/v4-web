@@ -123,7 +123,7 @@ const PortfolioPage = () => {
               <VaultTransactionsTable
                 withOuterBorders
                 withTxHashLink
-                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_DEPOSITS })}
+                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}
               />
             }
           />
