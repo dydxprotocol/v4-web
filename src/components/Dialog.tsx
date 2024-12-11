@@ -11,7 +11,7 @@ import {
   Title,
   Trigger,
 } from '@radix-ui/react-dialog';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
@@ -273,18 +273,21 @@ const $Container = styled(Content)<{
         margin: auto;
 
         max-width: var(--dialog-width);
-        height: ${$height ? `${$height}px` : 'fit-content'};
         max-height: var(--dialog-height);
-        transition: height 0.25s ease-in-out;
+
+        ${$withAnimation
+          ? css`
+              height: ${$height ? `${$height}px` : 'fit-content'};
+              transition: height 0.25s ease-in-out;
+            `
+          : css`
+              height: fit-content;
+            `}
 
         display: flex;
         flex-direction: column;
 
         border-radius: var(--dialog-radius);
-        /* clip-path: inset(
-          calc(-1 * var(--border-width)) round calc(var(--dialog-radius) + var(--border-width))
-        );
-        overflow-clip-margin: var(--border-width); */
 
         @media ${breakpoints.mobile} {
           top: calc(var(--dialog-inset) * 2);
@@ -296,94 +299,18 @@ const $Container = styled(Content)<{
 
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
-
-          /* Hack (uneven border-radius causes overflow issues) */
-          /* top: auto;
-          bottom: calc(-1 * var(--dialog-radius));
-          padding-bottom: var(--dialog-radius); */
         }
-
-        ${$withAnimation &&
-        css`
-          @media (prefers-reduced-motion: no-preference) {
-            &[data-state='open'] {
-              animation: ${keyframes`
-              from {
-                opacity: 0;
-              }
-              0.01% {
-                max-height: 0;
-              }
-            `} 0.15s var(--ease-out-expo);
-            }
-
-            &[data-state='closed'] {
-              animation: ${keyframes`
-              to {
-                opacity: 0;
-                scale: 0.9;
-                max-height: 0;
-              }
-            `} 0.15s;
-            }
-          }
-        `}
       `,
       [DialogPlacement.Sidebar]: css`
         --dialog-width: var(--sidebar-width);
+        height: 100%;
 
         @media ${breakpoints.notMobile} {
           max-width: var(--dialog-width);
           margin-left: auto;
         }
-
-        ${$withAnimation &&
-        css`
-          @media (prefers-reduced-motion: no-preference) {
-            &[data-state='open'] {
-              animation: ${keyframes`
-              from {
-                translate: 100% 0;
-                opacity: 0;
-              }
-            `} 0.15s var(--ease-out-expo);
-            }
-
-            &[data-state='closed'] {
-              animation: ${keyframes`
-              to {
-                translate: 100% 0;
-                opacity: 0;
-              }
-            `} 0.15s var(--ease-out-expo);
-            }
-          }
-        `}
       `,
-      [DialogPlacement.Inline]: css`
-        ${$withAnimation &&
-        css`
-          @media (prefers-reduced-motion: no-preference) {
-            &[data-state='open'] {
-              animation: ${keyframes`
-              from {
-                scale: 0.99;
-                opacity: 0;
-              }
-            `} 0.15s var(--ease-out-expo);
-            }
-
-            &[data-state='closed'] {
-              animation: ${keyframes`
-              to {
-                scale: 0.99;
-                opacity: 0;
-              }
-            `} 0.15s var(--ease-out-expo);
-            }
-          }
-        `}
-      `,
+      [DialogPlacement.Inline]: css``,
       [DialogPlacement.FullScreen]: css`
         --dialog-width: 100vw;
         --dialog-height: 100vh;
