@@ -128,7 +128,7 @@ export const Dialog = ({
           $stacked={stacked}
           $withAnimation={withAnimation}
         >
-          <div ref={ref}>
+          <$InnerContainer ref={ref} placement={placement}>
             {slotHeaderAbove}
             {stacked ? (
               <$StackedHeaderTopRow $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
@@ -186,7 +186,7 @@ export const Dialog = ({
             <$Content>{children}</$Content>
 
             {slotFooter && <$Footer $withBorder={hasFooterBorder}>{slotFooter}</$Footer>}
-          </div>
+          </$InnerContainer>
         </$Container>
       </DialogPortal>
     </Root>
@@ -325,6 +325,25 @@ const $Container = styled(Content)<{
       justify-content: center;
       text-align: center;
     `}
+`;
+
+const $InnerContainer = styled.div<{ placement: DialogPlacement }>`
+  ${({ placement }) =>
+    ({
+      [DialogPlacement.Default]: css``,
+      [DialogPlacement.Sidebar]: css`
+        ${layoutMixins.flexColumn}
+        height: 100%;
+      `,
+      [DialogPlacement.Inline]: css`
+        ${layoutMixins.flexColumn}
+        height: 100%;
+      `,
+      [DialogPlacement.FullScreen]: css`
+        ${layoutMixins.flexColumn}
+        height: 100%;
+      `,
+    })[placement]}
 `;
 
 const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
