@@ -36,8 +36,6 @@ export const DetailsDialog = ({ slotIcon, title, items, slotFooter, setIsOpen }:
 };
 const $Content = styled.div`
   ${layoutMixins.expandingColumnWithStickyFooter}
-  --stickyFooterBackdrop-outsetX: var(--dialog-paddingX);
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
   gap: 1rem;
 `;
 const $Footer = styled.footer`

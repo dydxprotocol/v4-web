@@ -142,7 +142,6 @@ export const formMixins = {
   withStickyFooter: css`
     footer {
       ${layoutMixins.stickyFooter}
-      ${layoutMixins.withStickyFooterBackdrop}
     }
   `,
 
