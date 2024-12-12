@@ -4,7 +4,7 @@ import { Asset, RouteResponse, UserAddress } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { formatUnits, parseUnits } from 'viem';
 
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
 import { DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -45,6 +45,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
   const { sourceAccount, dydxAddress, nobleAddress } = useAccounts();
   const [balances, setBalances] = useState<Balance[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<'normal' | 'fast'>('fast');
+  const [depositing, setDepositing] = useState(false);
 
   const getUserAddressesByChain = (route: RouteResponse): UserAddress[] => {
     const chains = route.requiredChainAddresses;
@@ -64,12 +65,12 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
       if (chain === 'noble-1') {
         return { chainID: chain, address: nobleAddress };
       }
-      
+
       if (chain === 'dydx-mainnet-1') {
         return { chainID: chain, address: dydxAddress };
       }
 
-      throw new Error("CHAIN ADDRESS NOT HERE!")
+      throw new Error('CHAIN ADDRESS NOT HERE!');
     });
   };
 
@@ -197,7 +198,6 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
   // @ts-ignore
   const fastOperationFee = fastRoute?.operations.find((op) => Boolean(op.goFastTransfer))
     ?.goFastTransfer?.fee;
-  console.log('fastOperationFee', fastOperationFee);
   const totalFastFee = fastOperationFee
     ? formatUnits(
         BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
@@ -207,32 +207,39 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
       )
     : '-';
 
-  const onDeposit = () => {
+  const onDeposit = async () => {
     const depositRoute = selectedRoute === 'fast' ? fastRoute : route;
     if (!depositRoute) return;
-    skipClient.executeRoute({
-      route: depositRoute,
-      userAddresses: getUserAddressesByChain(depositRoute),
-      onTransactionCompleted: async (chainID, txHash, status) => {
-        console.log('onTransactionCompleted', chainID, txHash, status);
-      },
-      // called after the transaction that the user signs gets broadcast on chain
-      onTransactionBroadcast: async ({ txHash, chainID }) => {
-        console.log(`Transaction broadcasted with tx hash: ${txHash}`, chainID);
-      },
-      // called after the transaction that the user signs is successfully registered for tracking
-      onTransactionTracked: async ({ txHash, chainID }) => {
-        console.log(`Transaction tracked with tx hash: ${txHash}`, chainID);
-      },
-      // called after the user signs a transaction
-      onTransactionSigned: async ({ txHash, chainID }) => {
-        console.log(`Transaction signed with tx hash: ${txHash}`, chainID);
-      },
-      // validate gas balance on each chain
-      onValidateGasBalance: async ({ chainID, txIndex, status }) => {
-        console.log(`Validating gas balance for chain ${chainID}...`, txIndex, status);
-      },
-    });
+    setDepositing(true);
+    try {
+      await skipClient.executeRoute({
+        route: depositRoute,
+        userAddresses: getUserAddressesByChain(depositRoute),
+        onTransactionCompleted: async (chainID, txHash, status) => {
+          setDepositing(false);
+          console.log('onTransactionCompleted', chainID, txHash, status);
+        },
+        // called after the transaction that the user signs gets broadcast on chain
+        onTransactionBroadcast: async ({ txHash, chainID }) => {
+          console.log(`Transaction broadcasted with tx hash: ${txHash}`, chainID);
+        },
+        // called after the transaction that the user signs is successfully registered for tracking
+        onTransactionTracked: async ({ txHash, chainID }) => {
+          console.log(`Transaction tracked with tx hash: ${txHash}`, chainID);
+        },
+        // called after the user signs a transaction
+        onTransactionSigned: async ({ txHash, chainID }) => {
+          console.log(`Transaction signed with tx hash: ${txHash}`, chainID);
+        },
+        // validate gas balance on each chain
+        onValidateGasBalance: async ({ chainID, txIndex, status }) => {
+          console.log(`Validating gas balance for chain ${chainID}...`, txIndex, status);
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      setDepositing(false);
+    }
   };
 
   const depositRoute = selectedRoute === 'fast' ? fastRoute : route;
@@ -300,8 +307,13 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
             <div>Fee: ${route?.estimatedFees[0]?.usdAmount}</div>
           </button>
         </div>
-        <div tw="mt-1 self-center text-small">+$4,200.69 buying power</div>
+        {depositRoute && (
+          <div tw="mt-1 self-center text-small">
+            +${formatUnits(BigInt(depositRoute.amountOut), 6)} available balance
+          </div>
+        )}
         <Button
+          state={depositing ? ButtonState.Loading : ButtonState.Default}
           disabled={!depositRoute}
           onClick={onDeposit}
           action={ButtonAction.Primary}
