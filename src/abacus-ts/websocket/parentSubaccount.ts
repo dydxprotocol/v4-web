@@ -166,8 +166,7 @@ function accountWebsocketValue(
 }
 
 const selectParentSubaccount = createAppSelector(
-  selectWebsocketUrl,
-  selectParentSubaccountInfo,
+  [selectWebsocketUrl, selectParentSubaccountInfo],
   (wsUrl, { wallet, subaccount }) => ({ wsUrl, wallet, subaccount })
 );
 
