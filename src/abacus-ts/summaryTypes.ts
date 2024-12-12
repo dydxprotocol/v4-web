@@ -17,17 +17,17 @@ type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
 export type SubaccountSummaryCore = {
   quoteBalance: BigNumber;
   valueTotal: BigNumber;
+  notionalTotal: BigNumber;
   initialRiskTotal: BigNumber;
+  maintenanceRiskTotal: BigNumber;
 };
 
 export type SubaccountSummaryDerived = {
-  notionalTotal: BigNumber;
-
   freeCollateral: BigNumber;
   equity: BigNumber;
 
-  leverage: BigNumber;
-  marginUsage: BigNumber;
+  leverage: BigNumber | null;
+  marginUsage: BigNumber | null;
 };
 
 export type SubaccountSummary = SubaccountSummaryCore & SubaccountSummaryDerived;
@@ -60,24 +60,26 @@ export type SubaccountPositionDerivedArgs = {
 export type SubaccountPositionDerivedCore = {
   marginMode: 'ISOLATED' | 'CROSS';
 
+  // indexer size is signed by default I think
   signedSize: BigNumber;
-  size: BigNumber;
+  unsignedSize: BigNumber; // always positive
   notional: BigNumber; // always positive
   value: BigNumber; // can be negative
 
   adjustedImf: BigNumber;
   adjustedMmf: BigNumber;
 
-  initialRiskTotal: BigNumber;
+  initialRisk: BigNumber;
+  maintenanceRisk: BigNumber;
   maxLeverage: BigNumber | null;
 };
 
 export type SubaccountPositionDerivedExtra = {
   // all these depend on the subaccount being calculated
-  leverage: BigNumber;
+  leverage: BigNumber | null;
   marginValue: BigNumber;
-  liquidationPrice: BigNumber;
+  liquidationPrice: BigNumber | null;
 
   updatedUnrealizedPnl: BigNumber;
-  updatedUnrealizedPnlPercent: BigNumber;
+  updatedUnrealizedPnlPercent: BigNumber | null;
 };
