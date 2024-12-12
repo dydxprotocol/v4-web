@@ -1,6 +1,7 @@
 export function runFn<T>(fn: () => T): T {
   return fn();
 }
+export const calc = runFn;
 
 type NonNullableArray<T extends readonly any[]> = {
   [K in keyof T]: NonNullable<T[K]>;
