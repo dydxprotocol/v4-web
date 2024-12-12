@@ -46,6 +46,7 @@ export function setUpOrdersQuery(store: RootStore) {
         })
       );
     },
+    onNoQuery: () => store.dispatch(setAccountOrdersRaw(loadableIdle())),
   });
   return () => {
     cleanupListener();
