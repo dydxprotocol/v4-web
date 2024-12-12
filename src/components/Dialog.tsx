@@ -412,6 +412,7 @@ const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
       --stickyArea-backdropFilter: none;
     `};
 `;
+
 const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean; $withBlur: boolean }>`
   ${layoutMixins.flexColumn}
   align-items: center;
@@ -452,6 +453,7 @@ const $Content = styled.div`
 
   isolation: isolate;
 `;
+
 const $Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;
@@ -509,8 +511,6 @@ const $Description = tw(Description)`mt-0.5 text-color-text-0 font-base-book`;
 const $Footer = styled.footer<{ $withBorder: boolean }>`
   display: grid;
   ${layoutMixins.stickyFooter}
-  ${layoutMixins.withStickyFooterBackdrop}
-  --stickyFooterBackdrop-outsetX: var(--dialog-paddingX);
 
   ${({ $withBorder }) =>
     $withBorder &&

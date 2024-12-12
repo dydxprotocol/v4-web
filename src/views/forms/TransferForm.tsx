@@ -474,7 +474,6 @@ const $Form = styled.form`
 
 const $Footer = styled.footer`
   ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 const $Row = styled.div`

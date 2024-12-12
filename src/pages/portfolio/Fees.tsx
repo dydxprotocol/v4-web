@@ -240,7 +240,7 @@ export const Fees = () => {
           ).filter(isTruthy)}
           selectionBehavior="replace"
           paginationBehavior="showAll"
-          withOuterBorder={isNotTablet}
+          withOuterBorder
           withInnerBorders
         />
       </div>
@@ -360,7 +360,7 @@ const $FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableStickyRow-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-2);
   }
 ` as typeof Table;
 const $Highlighted = tw.strong`text-color-text-1`;

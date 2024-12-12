@@ -186,7 +186,6 @@ export const KEPLR_MIPD_RDNS = 'app.keplr';
 export const COINBASE_MIPD_RDNS = 'com.coinbase.wallet';
 export const METAMASK_MIPD_RDNS = 'io.metamask';
 
-export const METAMASK_DOWNLOAD_LINK = 'https://metamask.io/download/';
 export const PHANTOM_DOWNLOAD_LINK = 'https://phantom.app/download';
 export const KEPLR_DOWNLOAD_LINK = 'https://www.keplr.app/get';
 

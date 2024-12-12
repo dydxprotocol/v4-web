@@ -170,7 +170,7 @@ export const NewMarketSelectionStep = ({
             <FormInput
               disabled
               type={InputType.Currency}
-              label={stringGetter({ key: STRING_KEYS.REQUIRED_AMOUNT_TO_DEPOSIT })}
+              label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_ADD })}
               placeholder="$10,000"
               value={`$${DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}`}
             />
