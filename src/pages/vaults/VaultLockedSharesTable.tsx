@@ -38,7 +38,7 @@ export const VaultLockedSharesCard = ({ className }: { className?: string }) => 
     <div className={className} tw="rounded-[0.7rem] border border-solid border-color-border">
       <div tw="flex justify-between px-1 py-0.625">
         <div tw="flex gap-0.5">
-          <h3 tw="pt-[5px]">Locked Balance</h3>
+          <h3 tw="pt-[5px]">{stringGetter({ key: STRING_KEYS.LOCKED_BALANCE })}</h3>
           <span tw="text-color-text-0">
             <Output value={lockedSharesTotalValue} type={OutputType.CompactFiat} />
           </span>

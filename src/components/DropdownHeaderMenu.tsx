@@ -65,7 +65,6 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
 };
 const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
-  ${popoverMixins.backdropOverlay}
 
   --trigger-padding: 0.33rem 0.5rem;
   --trigger-textColor: var(--color-text-2);

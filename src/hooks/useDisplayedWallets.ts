@@ -8,7 +8,6 @@ import {
   ConnectorType,
   KEPLR_DOWNLOAD_LINK,
   KEPLR_MIPD_RDNS,
-  METAMASK_DOWNLOAD_LINK,
   METAMASK_MIPD_RDNS,
   OKX_MIPD_RDNS,
   PHANTOM_DOWNLOAD_LINK,
@@ -46,12 +45,12 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       (wallet) => wallet.detail.info.rdns === METAMASK_MIPD_RDNS
     );
 
-    const enabledInjectedWallets = injectedWallets
+    const otherInjectedWallets = injectedWallets
       .filter(
         (wallet) =>
-          // Remove Metamask. We will always show it at the first spot regardless of detection
+          // Remove Metamask. We will always show it at the first spot if it exists
           wallet.detail.info.rdns !== METAMASK_MIPD_RDNS &&
-          // Remove Phantom EVM support, but enable Phantom Solana support based on EIP-6963 detection
+          // Remove Phantom EVM support
           wallet.detail.info.rdns !== PHANTOM_MIPD_RDNS &&
           // Remove Keplr EVM support since Keplr Cosmos is supported
           wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
@@ -60,14 +59,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
       )
       .map(getWalletInfoFromInjectedWallet);
-
-    const metamaskWallet = injectedMetaMask
-      ? getWalletInfoFromInjectedWallet(injectedMetaMask)
-      : {
-          connectorType: ConnectorType.DownloadWallet,
-          name: WalletType.MetaMask,
-          downloadLink: METAMASK_DOWNLOAD_LINK,
-        };
 
     const phantomWallet = phantomDetected
       ? {
@@ -92,15 +83,12 @@ export const useDisplayedWallets = (): WalletInfo[] => {
         };
 
     return [
-      // If the user does not have any injected wallets installed, show Metamask as the first option
-      // with a download link since it the recommended wallet
-      metamaskWallet,
+      // always show Metamask extension first if it is detected
+      injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
+      ...otherInjectedWallets,
       phantomWallet,
       keplrEnabled && keplrWallet,
       { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
-
-      ...enabledInjectedWallets,
-
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
       Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
         connectorType: ConnectorType.Privy,

@@ -10,7 +10,7 @@ export function createStoreEffect<T>(
   let lastValue = selector(store.getState());
   let lastCleanup = handleChange(lastValue);
 
-  return store.subscribe(() => {
+  const removeStoreListener = store.subscribe(() => {
     const thisValue = selector(store.getState());
     if (thisValue !== lastValue) {
       lastCleanup?.();
@@ -18,4 +18,8 @@ export function createStoreEffect<T>(
       lastCleanup = handleChange(thisValue);
     }
   });
+  return () => {
+    lastCleanup?.();
+    removeStoreListener();
+  };
 }

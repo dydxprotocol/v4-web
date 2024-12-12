@@ -35,6 +35,7 @@ export function setUpTransfersQuery(store: RootStore) {
         })
       );
     },
+    onNoQuery: () => store.dispatch(setAccountTransfersRaw(loadableIdle())),
   });
 
   return () => {

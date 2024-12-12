@@ -141,6 +141,7 @@ const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   ${layoutMixins.spacedRow}
   grid-area: Footer;
+  background-color: var(--color-layer-2);
 `;
 
 const $Row = styled.div`

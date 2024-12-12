@@ -31,6 +31,7 @@ export function setUpFillsQuery(store: RootStore) {
         })
       );
     },
+    onNoQuery: () => store.dispatch(setAccountFillsRaw(loadableIdle())),
   });
   return () => {
     cleanupListener();

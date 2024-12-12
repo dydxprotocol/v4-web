@@ -28,6 +28,7 @@ type QuerySetupConfig<T, R> = {
   getQueryKey: (selectorResult: NoInfer<T>) => any[];
   getQueryFn: (client: IndexerClient, selectorResult: NoInfer<T>) => (() => Promise<R>) | null;
   onResult: (result: NoInfer<QueryObserverResult<R, Error>>) => void;
+  onNoQuery: () => void;
 } & PassedQueryOptions<R>;
 
 const baseOptions: PassedQueryOptions<any> = {
@@ -61,6 +62,7 @@ export function createIndexerQueryStoreEffect<T, R>(
     const queryFn = config.getQueryFn(indexerClient, queryData);
     if (!queryFn) {
       IndexerClientManager.markDone(indexerClientConfig);
+      config.onNoQuery();
       return undefined;
     }
 

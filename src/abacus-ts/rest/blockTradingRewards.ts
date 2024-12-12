@@ -37,6 +37,7 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
         })
       );
     },
+    onNoQuery: () => store.dispatch(setAccountBlockTradingRewardsRaw(loadableIdle())),
   });
 
   return () => {
