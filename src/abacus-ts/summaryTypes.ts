@@ -59,22 +59,25 @@ export type SubaccountPositionDerivedArgs = {
 
 export type SubaccountPositionDerivedCore = {
   marginMode: 'ISOLATED' | 'CROSS';
-  notionalTotal: BigNumber; // always positive
-  valueTotal: BigNumber; // can be negative
+
+  signedSize: BigNumber;
+  size: BigNumber;
+  notional: BigNumber; // always positive
+  value: BigNumber; // can be negative
+
   adjustedImf: BigNumber;
   adjustedMmf: BigNumber;
 
   initialRiskTotal: BigNumber;
+  maxLeverage: BigNumber | null;
 };
 
 export type SubaccountPositionDerivedExtra = {
-  maxLeverage: BigNumber;
-
-  marginValue: BigNumber;
+  // all these depend on the subaccount being calculated
   leverage: BigNumber;
+  marginValue: BigNumber;
+  liquidationPrice: BigNumber;
 
   updatedUnrealizedPnl: BigNumber;
   updatedUnrealizedPnlPercent: BigNumber;
-
-  liquidationPrice: BigNumber;
 };

@@ -32,8 +32,10 @@ export function calculateSubaccountSummaryCore(
       if (market == null) {
         return acc;
       }
-      const { notionalTotal: positionValue, initialRiskTotal: positionRisk } =
-        getDerivedPositionInfo(position, market);
+      const { value: positionValue, initialRiskTotal: positionRisk } = getDerivedPositionInfo(
+        position,
+        market
+      );
       return {
         valueTotal: acc.valueTotal.plus(positionValue),
         initialRiskTotal: acc.initialRiskTotal.plus(positionRisk),
@@ -59,25 +61,35 @@ function getDerivedPositionInfo(
   market: IndexerPerpetualMarketResponseObject
 ): SubaccountPositionDerivedCore {
   const marginMode = position.subaccountNumber < NUM_PARENT_SUBACCOUNTS ? 'CROSS' : 'ISOLATED';
-  const effectiveImf = getMarketEffectiveInitialMargin(market) ?? MustBigNumber(0);
+  const effectiveImf = getMarketEffectiveInitialMarginForMarket(market) ?? MustBigNumber(0);
 
-  const size = MustBigNumber(position.size);
+  // indexer position size is already signed I think but we will be extra sure
+  const size = MustBigNumber(position.size).abs();
   const oracle = MustBigNumber(market.oraclePrice);
   const signedSize = position.side === IndexerPositionSide.SHORT ? size.negated() : size;
+
   const notional = size.times(oracle);
   const value = signedSize.times(oracle);
 
   return {
     marginMode,
-    valueTotal: value,
-    notionalTotal: notional,
+    size,
+    signedSize,
+    value,
+    notional,
     initialRiskTotal: notional.times(effectiveImf),
     adjustedImf: effectiveImf,
     adjustedMmf: MaybeBigNumber(market.maintenanceMarginFraction) ?? MustBigNumber(0),
+    maxLeverage: calc(() => {
+      if (effectiveImf.isZero()) {
+        return null;
+      }
+      return MustBigNumber(1).div(effectiveImf);
+    }),
   };
 }
 
-function getMarketEffectiveInitialMargin(config: IndexerPerpetualMarketResponseObject) {
+function getMarketEffectiveInitialMarginForMarket(config: IndexerPerpetualMarketResponseObject) {
   const initialMarginFraction = MaybeBigNumber(config.initialMarginFraction);
   const openInterest = MaybeBigNumber(config.openInterest);
   const openInterestLowerCap = MaybeBigNumber(config.openInterestLowerCap);
@@ -95,7 +107,7 @@ function getMarketEffectiveInitialMargin(config: IndexerPerpetualMarketResponseO
   }
 
   // if these are equal we can throw an error from dividing by zero
-  if (openInterestUpperCap === openInterestLowerCap) {
+  if (openInterestUpperCap.eq(openInterestLowerCap)) {
     return initialMarginFraction;
   }
 
