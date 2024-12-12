@@ -336,6 +336,7 @@ export const AnalyticsEvents = unionize(
       assetSymbol?: string;
       assetName?: string;
     }>(),
+    WebsocketParseError: ofType<{ message: string }>(),
 
     // vaults
     ClickViewVaultFromPositionCard: ofType<{}>(),
