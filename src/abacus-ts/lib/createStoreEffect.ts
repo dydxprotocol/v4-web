@@ -18,6 +18,7 @@ export function createStoreEffect<T>(
       lastCleanup = handleChange(thisValue);
     }
   });
+
   return () => {
     lastCleanup?.();
     removeStoreListener();

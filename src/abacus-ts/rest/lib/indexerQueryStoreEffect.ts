@@ -41,9 +41,7 @@ export function createIndexerQueryStoreEffect<T, R>(
   config: QuerySetupConfig<T, R>
 ) {
   const fullSelector = createAppSelector(
-    selectWebsocketUrl,
-    selectIndexerUrl,
-    config.selector,
+    [selectWebsocketUrl, selectIndexerUrl, config.selector],
     (wsUrl, indexerUrl, selectorResult) => ({
       infrastructure: { wsUrl, indexerUrl },
       queryData: selectorResult,
