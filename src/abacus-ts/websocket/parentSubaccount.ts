@@ -59,14 +59,14 @@ function freshChildSubaccount({
 function accountWebsocketValue(
   websocket: IndexerWebsocket,
   address: string,
-  subaccount: string,
+  parentSubaccountNumber: string,
   onChange: (val: Loadable<ParentSubaccountData>) => void
 ) {
   return new WebsocketDerivedValue<Loadable<ParentSubaccountData>>(
     websocket,
     {
       channel: 'v4_parent_subaccounts',
-      id: `${address}/${subaccount}`,
+      id: `${address}/${parentSubaccountNumber}`,
       handleBaseData: (baseMessage) => {
         const message = isWsParentSubaccountSubscribed(baseMessage);
         accountRefreshSignal.notify();
