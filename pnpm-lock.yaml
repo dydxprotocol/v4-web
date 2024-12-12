@@ -2649,13 +2649,8 @@ packages:
       - fp-ts
     dev: false
 
-<<<<<<< HEAD
-  /@chain-registry/types@0.50.31:
-    resolution: {integrity: sha512-WOVNfC0ss4+LsWDqoeBFxHuVHNasxuNvjMWYf8h1x2axUlMDgTLFubkTdW0Hj93uk1fOBTC07bJXCf915NMVnA==}
-=======
-  /@chain-registry/types@0.50.33:
-    resolution: {integrity: sha512-1zArCjYizFdfbP3L1WCUm3iL7Kf7VBS8N87SEqaTg6rC+fePYsq90LGpFuq2wzNPfQWPT7tsMT22ISeDIYflLA==}
->>>>>>> origin/main
+  /@chain-registry/types@0.50.34:
+    resolution: {integrity: sha512-CMhHOOiICw/mHHJNqiqbwlwrAnexGsmVdtTv0IdV0NphxfkqzvUomiUpQsHnU0hjjLoFPxoe8atMNIMJs9v4vg==}
     dev: false
 
   /@coinbase/wallet-sdk@3.9.3:
@@ -8464,7 +8459,7 @@ packages:
       hermes-profile-transformer: 0.0.6
       node-stream-zip: 1.15.0
       ora: 5.4.1
-      semver: 7.6.2
+      semver: 7.6.3
       strip-ansi: 5.2.0
       wcwidth: 1.0.1
       yaml: 2.4.5
@@ -8547,7 +8542,7 @@ packages:
       node-fetch: 2.7.0(encoding@0.1.13)
       open: 6.4.0
       ora: 5.4.1
-      semver: 7.6.2
+      semver: 7.6.3
       shell-quote: 1.8.1
       sudo-prompt: 9.2.1
     transitivePeerDependencies:
@@ -8581,7 +8576,7 @@ packages:
       fs-extra: 8.1.0
       graceful-fs: 4.2.11
       prompts: 2.4.2
-      semver: 7.6.2
+      semver: 7.6.3
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -9878,7 +9873,7 @@ packages:
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
       axios: 1.6.7
-      chain-registry: 1.69.59
+      chain-registry: 1.69.60
       cosmjs-types: 0.8.0
       keccak256: 1.0.6
       kujira.js: 0.9.162
@@ -14551,10 +14546,10 @@ packages:
       type-detect: 4.1.0
     dev: true
 
-  /chain-registry@1.69.59:
-    resolution: {integrity: sha512-8NUDiFtgXJAOpFTGwAnBzps3Kfn/tlvLNVZ8W6J/5JbGf7R8ZSSeuMM+g8xm1toI7nbjgzN1HDGh/VjazVbbQw==}
+  /chain-registry@1.69.60:
+    resolution: {integrity: sha512-uh8b/RsxP9QfwxPKldcZronEnU/BRYNRxDcCCW4chyr3vxBbGoXkCk2PtK6JgPV53W4CukhcxNgawzhKO2YnEw==}
     dependencies:
-      '@chain-registry/types': 0.50.33
+      '@chain-registry/types': 0.50.34
     dev: false
 
   /chalk@2.4.2:
@@ -20059,7 +20054,7 @@ packages:
       '@ethersproject/bignumber': 5.7.0
       '@keplr-wallet/types': 0.11.64
       '@types/google-protobuf': 3.15.12
-      chain-registry: 1.69.59
+      chain-registry: 1.69.60
       cosmjs-types: 0.8.0
       long: 4.0.0
       text-encoding: 0.7.0
@@ -24459,7 +24454,6 @@ packages:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: true
 
   /send@0.18.0:
     resolution: {integrity: sha512-qqWzuOjSFOuqPjFe4NOsMLafToQQwBSOEpS+FwEt3A2V3vKubTquT3vmLTQpFgMXp8AlFWFuP1qKaJZOtPpVXg==}
