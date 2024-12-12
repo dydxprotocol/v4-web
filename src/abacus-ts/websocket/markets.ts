@@ -1,16 +1,21 @@
-import { IndexerPerpetualMarketResponse } from '@/types/indexer/indexerApiGen';
-import { IndexerWsMarketUpdateResponse } from '@/types/indexer/indexerManual';
+import {
+  isWsMarketUpdateResponses,
+  isWsPerpetualMarketResponse,
+} from '@/types/indexer/indexerChecks';
+import { throttle } from 'lodash';
+
+import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import { setAllMarketsRaw } from '@/state/raw';
 
-import { createStoreEffect } from '../createStoreEffect';
-import { Loadable, loadableLoaded, loadablePending } from '../loadable';
+import { createStoreEffect } from '../lib/createStoreEffect';
+import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
+import { MarketsData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
-import { MarketsData } from '../types';
-import { IndexerWebsocket } from './indexerWebsocket';
-import { IndexerWebsocketManager } from './indexerWebsocketManager';
-import { WebsocketDerivedValue } from './websocketDerivedValue';
+import { IndexerWebsocket } from './lib/indexerWebsocket';
+import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
+import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function marketsWebsocketValue(
   websocket: IndexerWebsocket,
@@ -22,11 +27,11 @@ function marketsWebsocketValue(
       channel: 'v4_markets',
       id: undefined,
       handleBaseData: (baseMessage) => {
-        const message = baseMessage as IndexerPerpetualMarketResponse;
+        const message = isWsPerpetualMarketResponse(baseMessage);
         return loadableLoaded(message.markets);
       },
       handleUpdates: (baseUpdates, value) => {
-        const updates = baseUpdates as IndexerWsMarketUpdateResponse[];
+        const updates = isWsMarketUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
           // eslint-disable-next-line no-console
@@ -66,9 +71,13 @@ function marketsWebsocketValue(
 }
 
 export function setUpMarkets(store: RootStore) {
+  const throttledSetMarkets = throttle((val: Loadable<MarketsData>) => {
+    store.dispatch(setAllMarketsRaw(val));
+  }, 2 * timeUnits.second);
+
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
     const thisTracker = marketsWebsocketValue(IndexerWebsocketManager.use(wsUrl), (val) =>
-      store.dispatch(setAllMarketsRaw(val))
+      throttledSetMarkets(val)
     );
 
     return () => {

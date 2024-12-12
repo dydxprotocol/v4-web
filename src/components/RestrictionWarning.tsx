@@ -16,17 +16,19 @@ export const RestrictionWarning = () => {
 
   return (
     <$RestrictedWarning>
-      {stringGetter({
-        key: STRING_KEYS.BLOCKED_BANNER_MESSAGE,
-        params: {
-          TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
-          HELP_LINK: (
-            <Link href={help} isInline>
-              {stringGetter({ key: STRING_KEYS.HELP_CENTER })}
-            </Link>
-          ),
-        },
-      })}
+      <span>
+        {stringGetter({
+          key: STRING_KEYS.BLOCKED_BANNER_MESSAGE,
+          params: {
+            TERMS_OF_USE_LINK: <TermsOfUseLink isInline />,
+            HELP_LINK: (
+              <Link href={help} isInline>
+                {stringGetter({ key: STRING_KEYS.HELP_CENTER })}
+              </Link>
+            ),
+          },
+        })}
+      </span>
     </$RestrictedWarning>
   );
 };
@@ -34,6 +36,9 @@ export const RestrictionWarning = () => {
 const $RestrictedWarning = styled.div`
   ${layoutMixins.sticky}
   --stickyArea-totalInsetTop: var(--page-currentHeaderHeight);
+  height: var(--restriction-warning-currentHeight);
+  display: flex;
+  align-items: center;
 
   grid-area: RestrictionWarning;
   z-index: 1;

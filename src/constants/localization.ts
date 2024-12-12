@@ -5,7 +5,6 @@ import {
   LOCALE_DATA,
   NOTIFICATIONS,
   NOTIFICATIONS_STRING_KEYS,
-  SupportedLocale,
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
@@ -15,6 +14,9 @@ import { StatsigConfigType } from '@/constants/statsig';
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
 import formatString from '@/lib/formatString';
+import { objectFromEntries } from '@/lib/objectHelpers';
+
+import environments from '../../public/configs/v1/env.json';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -74,41 +76,87 @@ export type StringGetterFunction = <T extends StringGetterParams>(
   ? string
   : ReturnType<typeof formatString>;
 
-export const SUPPORTED_LOCALE_STRING_LABELS: { [key in SupportedLocales]: string } = {
-  [SupportedLocales.EN]: 'English',
-  [SupportedLocales.ZH_CN]: '中文',
-  [SupportedLocales.JA]: '日本語',
-  [SupportedLocales.KO]: '한국어',
-  [SupportedLocales.RU]: 'русский',
-  [SupportedLocales.TR]: 'Türkçe',
-  [SupportedLocales.FR]: 'Français',
-  [SupportedLocales.PT]: 'Português',
-  [SupportedLocales.ES]: 'Español',
-  [SupportedLocales.DE]: 'Deutsch',
-};
-
-export const SUPPORTED_LOCALE_BASE_TAGS = {
-  [SupportedLocales.EN]: 'en',
-  [SupportedLocales.ZH_CN]: 'zh',
-  [SupportedLocales.JA]: 'ja',
-  [SupportedLocales.KO]: 'ko',
-  [SupportedLocales.RU]: 'ru',
-  [SupportedLocales.TR]: 'tr',
-  [SupportedLocales.FR]: 'fr',
-  [SupportedLocales.PT]: 'pt',
-  [SupportedLocales.ES]: 'es',
-  [SupportedLocales.DE]: 'de',
-};
-
-export const EU_LOCALES: SupportedLocale[] = [
+export const EU_LOCALES: SupportedLocales[] = [
   SupportedLocales.DE,
   SupportedLocales.PT,
   SupportedLocales.ES,
   SupportedLocales.FR,
 ];
 
-export const SUPPORTED_BASE_TAGS_LOCALE_MAPPING = Object.fromEntries(
-  Object.entries(SUPPORTED_LOCALE_BASE_TAGS).map(([locale, baseTag]) => [baseTag, locale])
+// Deployer Restricted Locales read from environment configs.
+// Filter to ensure we never remove EN
+const DEPLOYER_RESTRICTED_LOCALES = environments.restrictedLocales.filter(
+  (locale) => locale !== SupportedLocales.EN
+) as SupportedLocales[];
+
+export const SUPPORTED_LOCALES = [
+  {
+    locale: SupportedLocales.EN,
+    baseTag: 'en',
+    label: 'English',
+    browserLanguage: 'en-US',
+  },
+  {
+    locale: SupportedLocales.ZH_CN,
+    baseTag: 'zh',
+    label: '中文',
+    browserLanguage: 'zh-CN',
+  },
+  {
+    locale: SupportedLocales.JA,
+    baseTag: 'ja',
+    label: '日本語',
+    browserLanguage: 'ja-JP',
+  },
+  {
+    locale: SupportedLocales.KO,
+    baseTag: 'ko',
+    label: '한국어',
+    browserLanguage: 'ko-KR',
+  },
+  {
+    locale: SupportedLocales.RU,
+    baseTag: 'ru',
+    label: 'русский',
+    browserLanguage: 'ru-RU',
+  },
+  {
+    locale: SupportedLocales.TR,
+    baseTag: 'tr',
+    label: 'Türkçe',
+    browserLanguage: 'tr-TR',
+  },
+  {
+    locale: SupportedLocales.FR,
+    baseTag: 'fr',
+    label: 'Français',
+    browserLanguage: 'fr-FR',
+  },
+  {
+    locale: SupportedLocales.PT,
+    baseTag: 'pt',
+    label: 'Português',
+    browserLanguage: 'pt-PT',
+  },
+  {
+    locale: SupportedLocales.ES,
+    baseTag: 'es',
+    label: 'Español',
+    browserLanguage: 'es-ES',
+  },
+  {
+    locale: SupportedLocales.DE,
+    baseTag: 'de',
+    label: 'Deutsch',
+    browserLanguage: 'de-DE',
+  },
+].filter(({ locale }) =>
+  DEPLOYER_RESTRICTED_LOCALES.length ? !DEPLOYER_RESTRICTED_LOCALES.includes(locale) : true
+);
+
+// Map with locale as key and locale object as value
+export const SUPPORTED_LOCALE_MAP = objectFromEntries(
+  SUPPORTED_LOCALES.map((locale) => [locale.locale, locale])
 );
 
 export type TooltipStrings = {

@@ -135,6 +135,7 @@ export const NotificationsMenu = ({
 
   return (
     <$ComboboxDialogMenu
+      withOverlay={false}
       withItemBorders
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}

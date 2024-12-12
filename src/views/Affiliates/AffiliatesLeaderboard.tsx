@@ -7,6 +7,7 @@ import { IAffiliateLeaderboardStats, IAffiliateStats } from '@/constants/affilia
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesLeaderboard } from '@/hooks/useAffiliatesLeaderboard';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -73,13 +74,10 @@ const AffiliatesFilter = ({
   );
 };
 
-interface IAffiliatesLeaderboardProps {
-  accountStats?: IAffiliateStats;
-}
-
-export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardProps) => {
+export const AffiliatesLeaderboard = () => {
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const { dydxAddress } = useAccounts();
   const affiliatesFilters = Object.values(AffiliateEpochsFilter);
   const [epochFilter, setEpochFilter] = useState<AffiliateEpochsFilter>(AffiliateEpochsFilter.ALL);
   const { data: affiliates } = useAffiliatesLeaderboard();
@@ -94,10 +92,9 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
               <TableCell>
                 {rank}
 
-                {accountStats?.affiliateAddress &&
-                  affiliateAddress === accountStats.affiliateAddress && (
-                    <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-                  )}
+                {affiliateAddress && affiliateAddress === dydxAddress && (
+                  <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+                )}
               </TableCell>
             );
           },
@@ -146,10 +143,9 @@ export const AffiliatesLeaderboard = ({ accountStats }: IAffiliatesLeaderboardPr
           renderCell: ({ rank, affiliateAddress }) => (
             <TableCell tw="text-color-text-1 font-base-medium">
               {rank}
-              {accountStats?.affiliateAddress &&
-                affiliateAddress === accountStats.affiliateAddress && (
-                  <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
-                )}
+              {affiliateAddress && affiliateAddress === dydxAddress && (
+                <Tag tw="bg-color-accent">{stringGetter({ key: STRING_KEYS.YOU })}</Tag>
+              )}
             </TableCell>
           ),
         },

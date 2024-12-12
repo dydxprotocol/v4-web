@@ -23,9 +23,7 @@ export function useReferralCode() {
   const { data: affiliateMetadata, isPending: isAffiliateMetadataPending } =
     useAffiliateMetadata(dydxAddress);
 
-  const { data: referralAddress, isSuccess: isReferralAddressSuccess } = useReferralAddress(
-    testFlags.referralCode
-  );
+  const { data: referralAddress } = useReferralAddress(testFlags.referralCode);
 
   const { data: referredBy, isPending: isReferredByPending } = useReferredBy();
 
@@ -40,22 +38,12 @@ export function useReferralCode() {
   }, [dispatch]);
 
   useEffect(() => {
-    // wait for relevant data to load
-    if (!isReferralAddressSuccess || isReferredByPending || isAffiliateMetadataPending) return;
-
-    // current user already has a referrer registered
-    if (referredBy?.affiliateAddress) return;
-
-    // current user is using their own code
-    if (isOwnReferralCode) return;
-
     if (referralAddress) {
       track(AnalyticsEvents.AffiliateSaveReferralAddress({ affiliateAddress: referralAddress }));
       dispatch(updateLatestReferrer(referralAddress));
     }
   }, [
     referralAddress,
-    isReferralAddressSuccess,
     dispatch,
     isReferredByPending,
     referredBy?.affiliateAddress,

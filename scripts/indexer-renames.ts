@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   EnumDeclaration,
   InterfaceDeclaration,
@@ -48,6 +49,17 @@ types.forEach((typeDecl: TypeAliasDeclaration) => {
   const newName = `Indexer${currentName}`;
   // Rename the type alias
   typeDecl.rename(newName);
+});
+
+interfaces.forEach((interfaceDeclaration) => {
+  interfaceDeclaration.getProperties().forEach((property) => {
+    if (property.hasQuestionToken()) {
+      const typeNode = property.getTypeNode();
+      if (typeNode && !typeNode.getText().includes('null')) {
+        property.setType(`${typeNode.getText()} | null`);
+      }
+    }
+  });
 });
 
 // Save the changes

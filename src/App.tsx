@@ -43,7 +43,6 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
-import { ComplianceStates } from './constants/compliance';
 import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
 import { LocalStorageKey } from './constants/localStorage';
@@ -96,8 +95,7 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
 
-  const { complianceState } = useComplianceState();
-  const showRestrictionWarning = complianceState === ComplianceStates.READ_ONLY;
+  const { showRestrictionWarning } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -268,6 +266,7 @@ const $Content = styled.div<{
   /* Computed */
   --page-currentHeaderHeight: 0px;
   --page-currentFooterHeight: 0px;
+  --restriction-warning-currentHeight: 0px;
 
   ${({ isShowingHeader }) =>
     isShowingHeader &&
@@ -289,6 +288,16 @@ const $Content = styled.div<{
       }
     `}
 
+  ${({ showRestrictionWarning }) =>
+    showRestrictionWarning &&
+    css`
+      --restriction-warning-currentHeight: var(--restriction-warning-height);
+
+      @media ${breakpoints.tablet} {
+        --restriction-warning-currentHeight: var(--restriction-warning-height-mobile);
+      }
+    `}
+
     /* Rules */
     ${layoutMixins.contentContainer}
 
@@ -307,10 +316,13 @@ const $Content = styled.div<{
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
+
   ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:
       ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
-      ${showRestrictionWarning ? css`'RestrictionWarning' min-content` : ''}
+      ${showRestrictionWarning
+        ? css`'RestrictionWarning' var(--restriction-warning-currentHeight)`
+        : ''}
       'Main' minmax(min-content, 1fr)
       'Footer' var(--page-currentFooterHeight)
       / 100%;

@@ -16,13 +16,11 @@ trap cleanup EXIT
 
 curl -o $TMP_DIR/swagger.json https://raw.githubusercontent.com/dydxprotocol/v4-chain/main/indexer/services/comlink/public/swagger.json
 
-# Remove required attribute
-# ${CURRENT_DIR}/json_remove_attr.sh -f $TMP_DIR/swagger.json -a required
-
 cd "$TMP_DIR"
 
 swagger-codegen generate -i swagger.json -o generated -l typescript-fetch
 
+# a bunch of one off fixes to massage this thing into a reasonable state, probably very fragile
 sed -i '' '1,79d; /export const DefaultApiFetchParamCreator/,$d' generated/api.ts
 sed -i '' -e ':a' -e '$d;N;2,4ba' -e 'P;D' generated/api.ts
 line_num=$(grep -n "export interface SparklineResponseObject" generated/api.ts | cut -d: -f1) && sed -i '' "$((line_num-5)),$((line_num+3))d" generated/api.ts
@@ -41,5 +39,3 @@ cd $CURRENT_DIR
 npx tsx scripts/indexer-renames.ts 
 pnpm prettier ./src/types/indexer/indexerApiGen.ts --write
 sed -i '' 's/export interface IndexerAPIOrderStatus {}/export type IndexerAPIOrderStatus = IndexerOrderStatus | IndexerBestEffortOpenedStatus;/' ./src/types/indexer/indexerApiGen.ts
-
-

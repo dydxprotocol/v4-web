@@ -8,6 +8,10 @@
   --page-footer-height: 2rem;
   --page-footer-height-mobile: 4.5rem;
 
+  /* Restriction Warning */
+  --restriction-warning-height: 3.25rem;
+  --restriction-warning-height-mobile: min-content;
+
   /* Sidebar constants */
   --sidebar-width: 20.25rem;
   --collapsed-sidebar-width: 3.5rem;

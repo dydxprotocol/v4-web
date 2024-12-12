@@ -29,12 +29,19 @@ export const funkitConfig = () =>
         customRecipientConfig: {
           destinationIcon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
         },
+        showPaymentAmountUsd: true,
       },
+      paymentMethods: {
+        isCardEnabled: false,
+      },
+    },
+    textCustomizations: {
+      sourceMethodTitle: 'Deposit from',
     },
   }) as FunkitConfig;
 
 const ACCENT_COLOR = 'var(--color-accent)';
-const ACCENT_COLOR_WASH = 'var(--color-accent-faced)'; // dydx uses brightness
+const ACCENT_COLOR_WASH = 'rgb(114,122,255)'; // dydx uses brightness
 const OFF_BACKGROUND_DARK = 'var(--color-layer-4)';
 const OFF_BACKGROUND_LIGHT = 'var(--color-layer-4)';
 
@@ -51,7 +58,7 @@ const defaultCustomColors = {
 };
 
 export const funkitTheme = {
-  darkMode: darkTheme({
+  darkTheme: darkTheme({
     customFontFamily: 'inherit',
     accentColor: ACCENT_COLOR,
     customColors: {
@@ -62,7 +69,7 @@ export const funkitTheme = {
       buttonIconBackgroundHover: OFF_BACKGROUND_DARK,
     },
   }),
-  lightMode: lightTheme({
+  lightTheme: lightTheme({
     customFontFamily: 'inherit',
     accentColor: ACCENT_COLOR,
     customColors: {
