@@ -10,12 +10,20 @@ export const BIG_NUMBERS = {
   ONE: new BigNumber(1),
 };
 
+// defaults to zero if null or empty
 export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   new BigNumber(amount || 0);
 
+// undefined if falsey otherwise a valid bignumber
 export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined =>
   amount ? MustBigNumber(amount) : undefined;
+
+// doesnt allow null, always returns big number
+// empty string becomes null though
+export const ToBigNumber = (amount: BigNumberish): BigNumber => {
+  return MustBigNumber(amount);
+};
 
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.

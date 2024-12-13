@@ -31,37 +31,26 @@ export type SubaccountSummaryDerived = {
 };
 
 export type SubaccountSummary = SubaccountSummaryCore & SubaccountSummaryDerived;
+export type GroupedSubaccountSummary = SubaccountSummaryDerived;
 
-// type SubaccountPositionCore = ConvertStringToBigNumber<
-//   IndexerPerpetualPositionResponseObject,
-//   | 'size'
-//   | 'maxSize'
-//   | 'entryPrice'
-//   | 'realizedPnl'
-//   | 'createdAtHeight'
-//   | 'sumOpen'
-//   | 'sumClose'
-//   | 'netFunding'
-//   | 'unrealizedPnl'
-//   | 'exitPrice'
-// >;
-
-export type SubaccountPositionBase = IndexerPerpetualPositionResponseObject;
-
-export type SubaccountPositionDerivedArgs = {
-  marketConfigs: {
-    effectiveInitialMarginFraction: BigNumber;
-    maintenanceMarginFraction: BigNumber;
-  };
-  marketOraclePrice: BigNumber;
-  containingSubaccountInfo: SubaccountSummaryCore;
-};
+export type SubaccountPositionBase = ConvertStringToBigNumber<
+  IndexerPerpetualPositionResponseObject,
+  | 'size'
+  | 'maxSize'
+  | 'entryPrice'
+  | 'realizedPnl'
+  | 'createdAtHeight'
+  | 'sumOpen'
+  | 'sumClose'
+  | 'netFunding'
+  | 'unrealizedPnl'
+  | 'exitPrice'
+>;
 
 export type SubaccountPositionDerivedCore = {
   marginMode: 'ISOLATED' | 'CROSS';
 
-  // indexer size is signed by default I think
-  signedSize: BigNumber;
+  signedSize: BigNumber; // indexer size is signed by default but we make it obvious here
   unsignedSize: BigNumber; // always positive
   notional: BigNumber; // always positive
   value: BigNumber; // can be negative
@@ -72,6 +61,10 @@ export type SubaccountPositionDerivedCore = {
   initialRisk: BigNumber;
   maintenanceRisk: BigNumber;
   maxLeverage: BigNumber | null;
+
+  // these are just copied from the perpetual position for aesthetic reasons honestly
+  baseEntryPrice: BigNumber;
+  baseNetFunding: BigNumber;
 };
 
 export type SubaccountPositionDerivedExtra = {
@@ -83,3 +76,7 @@ export type SubaccountPositionDerivedExtra = {
   updatedUnrealizedPnl: BigNumber;
   updatedUnrealizedPnlPercent: BigNumber | null;
 };
+
+export type SubaccountPosition = SubaccountPositionBase &
+  SubaccountPositionDerivedCore &
+  SubaccountPositionDerivedExtra;
