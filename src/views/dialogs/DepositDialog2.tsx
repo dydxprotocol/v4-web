@@ -145,7 +145,6 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
   useEffect(() => {
     async function getRoute() {
       const [sourceAssetChainID, sourceAssetDenom] = selectedToken.split(',');
-      console.log('getting route with', sourceAssetChainID, sourceAssetDenom);
       if (!sourceAssetChainID || !sourceAssetDenom) return;
 
       const decimals = tokensWithBalances.find(
@@ -179,8 +178,6 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
         goFast: true,
       });
 
-      console.log('route response', response);
-      console.log('fast route', fastResponse);
       setRoute(response);
 
       // @ts-ignore
@@ -195,9 +192,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
     getRoute();
   }, [selectedToken, amount, tokensWithBalances, skipClient, usdcDenom]);
 
-  // @ts-ignore
-  const fastOperationFee = fastRoute?.operations.find((op) => Boolean(op.goFastTransfer))
-    ?.goFastTransfer?.fee;
+  const fastOperationFee = // @ts-ignore
+    fastRoute?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
   const totalFastFee = fastOperationFee
     ? formatUnits(
         BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
@@ -215,29 +211,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<{}>) => {
       await skipClient.executeRoute({
         route: depositRoute,
         userAddresses: getUserAddressesByChain(depositRoute),
-        onTransactionCompleted: async (chainID, txHash, status) => {
-          setDepositing(false);
-          console.log('onTransactionCompleted', chainID, txHash, status);
-        },
-        // called after the transaction that the user signs gets broadcast on chain
-        onTransactionBroadcast: async ({ txHash, chainID }) => {
-          console.log(`Transaction broadcasted with tx hash: ${txHash}`, chainID);
-        },
-        // called after the transaction that the user signs is successfully registered for tracking
-        onTransactionTracked: async ({ txHash, chainID }) => {
-          console.log(`Transaction tracked with tx hash: ${txHash}`, chainID);
-        },
-        // called after the user signs a transaction
-        onTransactionSigned: async ({ txHash, chainID }) => {
-          console.log(`Transaction signed with tx hash: ${txHash}`, chainID);
-        },
-        // validate gas balance on each chain
-        onValidateGasBalance: async ({ chainID, txIndex, status }) => {
-          console.log(`Validating gas balance for chain ${chainID}...`, txIndex, status);
-        },
       });
     } catch (e) {
-      console.error(e);
       setDepositing(false);
     }
   };
