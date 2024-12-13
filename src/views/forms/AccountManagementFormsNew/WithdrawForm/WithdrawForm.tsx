@@ -2,10 +2,10 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
-import { parseUnits } from 'ethers';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import { parseUnits } from 'viem';
 
 import { AutoSweepConfig } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -180,7 +180,7 @@ export const WithdrawForm = () => {
             },
             recipient: dydxAddress,
             assetId: 0,
-            quantums: parseUnits(debouncedAmount, usdcDecimals),
+            quantums: parseUnits(debouncedAmount, usdcDecimals).toString(),
           }),
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
