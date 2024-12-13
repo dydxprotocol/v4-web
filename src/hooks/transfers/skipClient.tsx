@@ -32,10 +32,7 @@ const useSkipClientContext = () => {
     useEndpointsConfig();
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  // reactQuery only accepts serializable objects/values, so we return a string id
-  // so any useQuery that uses the skipClient can use that id as a query key
-  // to ensure it has the most up-to-date skipClient
-  const { skipClient, skipClientId } = useMemo(
+  const { skipClient, skipInstanceId } = useMemo(
     () => ({
       skipClient: new SkipClient({
         endpointOptions: {
@@ -53,7 +50,7 @@ const useSkipClientContext = () => {
         },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
-      skipClientId: crypto.randomUUID(),
+      skipInstanceId: crypto.randomUUID(),
     }),
     [
       compositeClient?.network.validatorConfig.restEndpoint,
@@ -65,5 +62,5 @@ const useSkipClientContext = () => {
       validators,
     ]
   );
-  return { skipClient, skipClientId };
+  return { skipClient, skipInstanceId };
 };
