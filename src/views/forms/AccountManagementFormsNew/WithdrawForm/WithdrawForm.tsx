@@ -180,7 +180,7 @@ export const WithdrawForm = () => {
             },
             recipient: dydxAddress,
             assetId: 0,
-            quantums: parseUnits(debouncedAmount, usdcDecimals),
+            quantums: parseUnits(debouncedAmount, usdcDecimals).toString(),
           }),
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
