@@ -40,6 +40,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -195,7 +196,15 @@ export const HeaderDesktop = () => {
                   ? ButtonAction.Secondary
                   : ButtonAction.Primary
               }
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+              onClick={() => {
+                dispatch(
+                  openDialog(
+                    testFlags.showNewDepositFlow
+                      ? DialogTypes.Deposit2({})
+                      : DialogTypes.Deposit({})
+                  )
+                );
+              }}
               state={{ isDisabled: !dydxAccounts }}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}

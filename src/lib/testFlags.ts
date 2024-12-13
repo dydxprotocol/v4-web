@@ -59,6 +59,10 @@ class TestFlags {
   get showInstantDepositToggle() {
     return !!this.queryParams.funkit_toggle;
   }
+
+  get showNewDepositFlow() {
+    return !!this.queryParams.deposit_rewrite;
+  }
 }
 
 export const testFlags = new TestFlags();
