@@ -1,6 +1,7 @@
 import {
   IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
+  IndexerPerpetualPositionStatus,
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
@@ -37,6 +38,7 @@ export function calculateParentSubaccountPositions(
       const subaccount = calculateSubaccountSummary(child, markets);
       return Object.values(child.openPerpetualPositions)
         .filter(isPresent)
+        .filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN)
         .map((perp) => calculateSubaccountPosition(subaccount, perp, markets[perp.market]));
     });
 }
@@ -63,7 +65,7 @@ export function calculateParentSubaccountSummary(
   };
 }
 
-function calculateSubaccountSummary(
+export function calculateSubaccountSummary(
   subaccountData: ChildSubaccountData,
   markets: MarketsData
 ): SubaccountSummary {

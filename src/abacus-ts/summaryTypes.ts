@@ -1,4 +1,9 @@
-import { IndexerPerpetualPositionResponseObject } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerAPITimeInForce,
+  IndexerOrderSide,
+  IndexerOrderType,
+  IndexerPerpetualPositionResponseObject,
+} from '@/types/indexer/indexerApiGen';
 import { type BigNumber } from 'bignumber.js';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
@@ -47,8 +52,10 @@ export type SubaccountPositionBase = ConvertStringToBigNumber<
   | 'exitPrice'
 >;
 
+export type MarginMode = 'ISOLATED' | 'CROSS';
+
 export type SubaccountPositionDerivedCore = {
-  marginMode: 'ISOLATED' | 'CROSS';
+  marginMode: MarginMode;
 
   signedSize: BigNumber; // indexer size is signed by default but we make it obvious here
   unsignedSize: BigNumber; // always positive
@@ -80,3 +87,45 @@ export type SubaccountPositionDerivedExtra = {
 export type SubaccountPosition = SubaccountPositionBase &
   SubaccountPositionDerivedCore &
   SubaccountPositionDerivedExtra;
+
+export enum OrderStatus {
+  Canceled = 'CANCELED',
+  Canceling = 'BEST_EFFORT_CANCELED',
+  Filled = 'FILLED',
+  Open = 'OPEN',
+  Pending = 'PENDING',
+  Untriggered = 'UNTRIGGERED',
+  PartiallyFilled = 'PARTIALLY_FILLED',
+  PartiallyCanceled = 'PARTIALLY_CANCELED',
+}
+
+export type SubaccountOrder = {
+  subaccountNumber: number;
+  id: string;
+  clientId: string | null;
+  type: IndexerOrderType;
+  side: IndexerOrderSide;
+  status: OrderStatus;
+  timeInForce: IndexerAPITimeInForce | null;
+  marketId: string;
+  displayId: string;
+  clobPairId: number | null;
+  orderFlags: string | null;
+  price: BigNumber;
+  triggerPrice: BigNumber | null;
+  trailingPercent: BigNumber | null;
+  size: BigNumber;
+  remainingSize: BigNumber | null;
+  totalFilled: BigNumber | null;
+  goodTilBlock: number | null;
+  goodTilBlockTime: number | null;
+  createdAtHeight: number | null;
+  createdAtMilliseconds: number | null;
+  unfillableAtMilliseconds: number | null;
+  expiresAtMilliseconds: number | null;
+  updatedAtMilliseconds: number | null;
+  postOnly: boolean;
+  reduceOnly: boolean;
+  cancelReason: string | null;
+  marginMode: MarginMode | null;
+};
