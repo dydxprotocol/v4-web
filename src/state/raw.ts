@@ -8,7 +8,15 @@ import {
   IndexerCompositeFillResponse,
   IndexerCompositeOrderObject,
 } from '@/types/indexer/indexerManual';
+import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { DydxNetwork } from '@/constants/networks';
+
+interface NetworkState {
+  indexerClientReady: boolean;
+  compositeClientReady: boolean;
+}
 
 export interface RawDataState {
   markets: {
@@ -22,6 +30,13 @@ export interface RawDataState {
     transfers: Loadable<IndexerParentSubaccountTransferResponse>;
     blockTradingRewards: Loadable<IndexerHistoricalBlockTradingRewardsResponse>;
   };
+  network: {
+    [networkId: string]: NetworkState;
+  };
+  heights: {
+    indexerHeight: Loadable<HeightResponse>;
+    validatorHeight: Loadable<HeightResponse>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -32,6 +47,11 @@ const initialState: RawDataState = {
     orders: loadableIdle(),
     transfers: loadableIdle(),
     blockTradingRewards: loadableIdle(),
+  },
+  network: {},
+  heights: {
+    indexerHeight: loadableIdle(),
+    validatorHeight: loadableIdle(),
   },
 };
 
@@ -72,6 +92,22 @@ export const rawSlice = createSlice({
     ) => {
       state.account.orders = action.payload;
     },
+    setNetworkStateRaw: (
+      state,
+      action: PayloadAction<{ networkId: DydxNetwork; stateToMerge: Partial<NetworkState> }>
+    ) => {
+      const { networkId, stateToMerge } = action.payload;
+      state.network[networkId] = {
+        ...(state.network[networkId] ?? { compositeClientReady: false, indexerClientReady: false }),
+        ...stateToMerge,
+      };
+    },
+    setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
+      state.heights.indexerHeight = action.payload;
+    },
+    setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
+      state.heights.validatorHeight = action.payload;
+    },
   },
 });
 
@@ -83,4 +119,7 @@ export const {
   setAccountOrdersRaw,
   setAccountTransfersRaw,
   setAccountBlockTradingRewardsRaw,
+  setNetworkStateRaw,
+  setIndexerHeightRaw,
+  setValidatorHeightRaw,
 } = rawSlice.actions;
