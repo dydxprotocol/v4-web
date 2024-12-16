@@ -7,7 +7,7 @@ import { Loadable } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 
-function calculateTransfers(
+export function calculateTransfers(
   liveTransfers: Loadable<IndexerTransferResponseObject[]>,
   restTransfers: Loadable<IndexerTransferResponseObject[]>
 ) {

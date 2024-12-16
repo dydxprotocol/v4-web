@@ -7,7 +7,7 @@ import { Loadable } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 
-function calculateBlockRewards(
+export function calculateBlockRewards(
   liveTransfers: Loadable<IndexerHistoricalBlockTradingReward[]>,
   restTransfers: Loadable<IndexerHistoricalBlockTradingReward[]>
 ) {

@@ -7,7 +7,7 @@ import { Loadable } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 
-function calculateFills(
+export function calculateFills(
   liveFills: Loadable<IndexerCompositeFillObject[]>,
   restFills: Loadable<IndexerCompositeFillObject[]>
 ) {
