@@ -7,6 +7,7 @@ import { parseUnits } from 'viem';
 import { CHAIN_INFO } from '@/constants/chains';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalances } from './queries';
@@ -54,9 +55,15 @@ export const TokenSelect = ({
     onBack();
   };
 
+  if (isLoading)
+    return (
+      <div tw="flex h-full flex-col items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+
   return (
     <div tw="flex flex-col gap-0.5 py-1">
-      {isLoading && <div>LOADING!!!</div>}
       {withBalances.length > 0 && (
         <div tw="px-1.25 pt-0.125 font-medium text-color-text-0">Your tokens</div>
       )}
