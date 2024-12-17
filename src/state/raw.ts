@@ -1,5 +1,11 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/lib/loadable';
-import { MarketsData, OrderbookData, OrdersData, ParentSubaccountData } from '@/abacus-ts/rawTypes';
+import {
+  AssetInfos,
+  MarketsData,
+  OrderbookData,
+  OrdersData,
+  ParentSubaccountData,
+} from '@/abacus-ts/rawTypes';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
@@ -8,7 +14,6 @@ import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { MetadataServiceInfoResponse } from '@/constants/assetMetadata';
 import { DydxNetwork } from '@/constants/networks';
 
 interface NetworkState {
@@ -19,7 +24,7 @@ interface NetworkState {
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
-    assets: Loadable<MetadataServiceInfoResponse>;
+    assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
   };
   account: {
@@ -61,7 +66,7 @@ export const rawSlice = createSlice({
     setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
       state.markets.allMarkets = action.payload;
     },
-    setAllAssetsRaw: (state, action: PayloadAction<Loadable<MetadataServiceInfoResponse>>) => {
+    setAllAssetsRaw: (state, action: PayloadAction<Loadable<AssetInfos>>) => {
       state.markets.assets = action.payload;
     },
     setOrderbookRaw: (

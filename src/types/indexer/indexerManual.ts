@@ -128,12 +128,25 @@ export interface IndexerWsParentSubaccountSubscribedResponse {
   orders: IndexerOrderResponseObject[];
 }
 
+export type IndexerWsAssetUpdate = Partial<IndexerAssetPositionResponseObject> & {
+  subaccountNumber: number;
+  assetId: string;
+};
+export type IndexerWsPositionUpdate = Partial<IndexerPerpetualPositionResponseObject> & {
+  subaccountNumber: number;
+  market: string;
+};
+
+export type IndexerWsOrderUpdate = Partial<
+  Omit<IndexerCompositeOrderObject, 'subaccountNumber'>
+> & { id: string };
+
 export interface IndexerWsParentSubaccountUpdateObject {
   blockHeight: string;
-  assetPositions?: IndexerAssetPositionResponseObject[];
-  perpetualPositions?: IndexerPerpetualPositionResponseObject[];
+  assetPositions?: Array<IndexerAssetPositionResponseObject | IndexerWsAssetUpdate>;
+  perpetualPositions?: Array<IndexerPerpetualPositionResponseObject | IndexerWsPositionUpdate>;
   tradingReward?: IndexerHistoricalBlockTradingReward;
   fills?: IndexerCompositeFillObject[];
-  orders?: IndexerCompositeOrderObject[];
+  orders?: Array<IndexerWsOrderUpdate | IndexerCompositeOrderObject>;
   transfers?: IndexerTransferResponseObject;
 }
