@@ -10,7 +10,7 @@ import { mapValues } from 'lodash';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
 import { calc } from '@/lib/do';
-import { MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../rawTypes';
@@ -24,9 +24,6 @@ import {
   SubaccountSummaryCore,
   SubaccountSummaryDerived,
 } from '../summaryTypes';
-
-const BN_0 = MustBigNumber(0);
-const BN_1 = MustBigNumber(1);
 
 export function calculateParentSubaccountPositions(
   parent: Omit<ParentSubaccountData, 'ephemeral'>,
@@ -61,7 +58,7 @@ export function calculateParentSubaccountSummary(
     equity: Object.values(summaries)
       .filter(isPresent)
       .map((s) => s.equity)
-      .reduce((a, b) => a.plus(b), BN_0),
+      .reduce((a, b) => a.plus(b), BIG_NUMBERS.ZERO),
   };
 }
 
@@ -82,7 +79,7 @@ function calculateSubaccountSummaryCore(
 ): SubaccountSummaryCore {
   const quoteBalance = calc(() => {
     const usdcPosition = subaccountData.assetPositions.USDC;
-    if (!usdcPosition?.size) return BN_0;
+    if (!usdcPosition?.size) return BIG_NUMBERS.ZERO;
 
     const size = MustBigNumber(usdcPosition.size);
     return usdcPosition.side === IndexerPositionSide.LONG ? size : size.negated();
@@ -111,10 +108,10 @@ function calculateSubaccountSummaryCore(
       };
     },
     {
-      valueTotal: BN_0,
-      notionalTotal: BN_0,
-      initialRiskTotal: BN_0,
-      maintenanceRiskTotal: BN_0,
+      valueTotal: BIG_NUMBERS.ZERO,
+      notionalTotal: BIG_NUMBERS.ZERO,
+      initialRiskTotal: BIG_NUMBERS.ZERO,
+      maintenanceRiskTotal: BIG_NUMBERS.ZERO,
     }
   );
 
@@ -138,7 +135,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 
   if (equity.gt(0)) {
     leverage = notionalTotal.div(equity);
-    marginUsage = BN_1.minus(freeCollateral.div(equity));
+    marginUsage = BIG_NUMBERS.ONE.minus(freeCollateral.div(equity));
   }
 
   return {
@@ -185,12 +182,14 @@ function calculateDerivedPositionCore(
 ): SubaccountPositionDerivedCore {
   const marginMode = position.subaccountNumber < NUM_PARENT_SUBACCOUNTS ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
-    market != null ? getMarketEffectiveInitialMarginForMarket(market) ?? BN_0 : BN_0;
-  const effectiveMmf = MaybeBigNumber(market?.maintenanceMarginFraction) ?? BN_0;
+    market != null
+      ? getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO
+      : BIG_NUMBERS.ZERO;
+  const effectiveMmf = MaybeBigNumber(market?.maintenanceMarginFraction) ?? BIG_NUMBERS.ZERO;
 
   // indexer position size is already signed I think but we will be extra sure
   const unsignedSize = position.size.abs();
-  const oracle = MaybeBigNumber(market?.oraclePrice) ?? BN_0;
+  const oracle = MaybeBigNumber(market?.oraclePrice) ?? BIG_NUMBERS.ZERO;
   const signedSize =
     position.side === IndexerPositionSide.SHORT ? unsignedSize.negated() : unsignedSize;
 
@@ -211,7 +210,7 @@ function calculateDerivedPositionCore(
       if (effectiveImf.isZero()) {
         return null;
       }
-      return BN_1.div(effectiveImf);
+      return BIG_NUMBERS.ONE.div(effectiveImf);
     }),
     baseEntryPrice: position.entryPrice,
     baseNetFunding: position.netFunding,
@@ -254,7 +253,9 @@ function calculatePositionDerivedExtra(
     const entryValue = signedSize.multipliedBy(MustBigNumber(position.baseEntryPrice));
     const unrealizedPnlInner = value.minus(entryValue).plus(MustBigNumber(position.baseNetFunding));
 
-    const scaledLeverage = leverage ? BigNumber.max(leverage.abs(), BN_1) : BN_1;
+    const scaledLeverage = leverage
+      ? BigNumber.max(leverage.abs(), BIG_NUMBERS.ONE)
+      : BIG_NUMBERS.ONE;
 
     const unrealizedPnlPercentInner = !entryValue.isZero()
       ? unrealizedPnlInner.dividedBy(entryValue.abs()).multipliedBy(scaledLeverage)

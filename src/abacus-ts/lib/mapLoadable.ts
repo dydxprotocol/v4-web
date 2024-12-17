@@ -6,3 +6,15 @@ export function mapLoadableData<T, R>(load: Loadable<T>, map: (obj: T) => R): Lo
     data: load.data != null ? map(load.data) : undefined,
   } as Loadable<R>;
 }
+
+export function mergeLoadableData<T, R>(
+  one: Loadable<T>,
+  two: Loadable<R>
+): Loadable<[T | undefined, R | undefined]> {
+  const priority = ['pending', 'error', 'success', 'idle'] as const;
+  return {
+    status: priority[Math.min(priority.indexOf(one.status), priority.indexOf(two.status))]!,
+    error: (one as any).error ?? (two as any).error ?? undefined,
+    data: [one.data, two.data],
+  } as any;
+}

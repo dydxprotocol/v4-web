@@ -1,47 +1,87 @@
 import { IndexerBestEffortOpenedStatus, IndexerOrderStatus } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
-import { maxBy, pickBy } from 'lodash';
-
-import { SubaccountOrder } from '@/constants/abacus';
+import { HeightResponse } from '@dydxprotocol/v4-client-js';
+import { mapValues, maxBy, pickBy } from 'lodash';
 
 import { assertNever } from '@/lib/assertNever';
-import { MustBigNumber } from '@/lib/numbers';
+import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
+import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { Loadable } from '../lib/loadable';
-import { mapLoadableData } from '../lib/mapLoadable';
+import { mapLoadableData, mergeLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../rawTypes';
-import { OrderStatus } from '../summaryTypes';
+import { OrderStatus, SubaccountOrder, SubaccountOrdersData } from '../summaryTypes';
 
-// todo these are calculating the same thing twice pasically
-function calculateOpenOrders(liveOrders: Loadable<OrdersData>, restOrders: Loadable<OrdersData>) {
-  const getOpenOrders = (data: Loadable<OrdersData>) =>
-    mapLoadableData(data, (d) =>
-      pickBy(
-        d,
-        (order) =>
-          getSimpleOrderStatus(calculateOrderStatus(order) ?? OrderStatus.Open) === OrderStatus.Open
-      )
-    );
-  return calculateMergedOrders(getOpenOrders(liveOrders), getOpenOrders(restOrders));
+export function calculateOpenOrders(orders: Loadable<SubaccountOrdersData>) {
+  return mapLoadableData(orders, (d) =>
+    pickBy(
+      d,
+      (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) === OrderStatus.Open
+    )
+  );
 }
 
-function calculateOrderHistory(liveOrders: Loadable<OrdersData>, restOrders: Loadable<OrdersData>) {
-  const getNonOpenOrders = (data: Loadable<OrdersData>) =>
-    mapLoadableData(data, (d) =>
-      pickBy(
-        d,
-        (order) =>
-          getSimpleOrderStatus(calculateOrderStatus(order) ?? OrderStatus.Open) !== OrderStatus.Open
-      )
-    );
-  return calculateMergedOrders(getNonOpenOrders(liveOrders), getNonOpenOrders(restOrders));
+export function calculateOrderHistory(orders: Loadable<SubaccountOrdersData>) {
+  return mapLoadableData(orders, (d) =>
+    pickBy(
+      d,
+      (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
+    )
+  );
+}
+
+export function calculateAllOrders(
+  liveOrders: Loadable<OrdersData>,
+  restOrders: Loadable<OrdersData>,
+  height: HeightResponse
+): Loadable<SubaccountOrdersData> {
+  const merged = mergeLoadableData(liveOrders, restOrders);
+  const actuallyMerged = mapLoadableData(merged, ([a, b]) =>
+    calculateMergedOrders(a ?? {}, b ?? {})
+  );
+  const mapped = mapLoadableData(actuallyMerged, (d) =>
+    mapValues(d, (order) => calculateSubaccountOrder(order, height))
+  );
+  return mapped;
 }
 
 function calculateSubaccountOrder(
-  order: IndexerCompositeOrderObject,
-  protocolHeight: number
-): SubaccountOrder {}
+  base: IndexerCompositeOrderObject,
+  protocolHeight: HeightResponse
+): SubaccountOrder {
+  let order: SubaccountOrder = {
+    marketId: base.ticker,
+    status: calculateBaseOrderStatus(base),
+    displayId: getDisplayableTickerFromMarket(base.ticker),
+    expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
+    updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).valueOf()),
+    updatedAtHeight: MaybeBigNumber(base.updatedAtHeight)?.toNumber(),
+    marginMode: undefined,
+    subaccountNumber: base.subaccountNumber,
+    id: base.id,
+    clientId: base.clientId,
+    type: base.type,
+    side: base.side,
+    timeInForce: base.timeInForce,
+    clobPairId: MaybeBigNumber(base.clobPairId)?.toNumber(),
+    orderFlags: base.orderFlags,
+    price: MustBigNumber(base.price),
+    triggerPrice: MaybeBigNumber(base.triggerPrice),
+    size: MustBigNumber(base.size),
+    totalFilled: MustBigNumber(base.totalFilled),
+    goodTilBlock: MaybeBigNumber(base.goodTilBlock)?.toNumber(),
+    goodTilBlockTime: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
+    createdAtHeight: MaybeBigNumber(base.createdAtHeight)?.toNumber(),
+    postOnly: !!base.postOnly,
+    reduceOnly: !!base.reduceOnly,
+    remainingSize: MustBigNumber(base.size).minus(MustBigNumber(base.totalFilled)),
+    removalReason: base.removalReason,
+  };
+  order = maybeUpdateOrderIfExpired(order, protocolHeight);
+  return order;
+}
 
 function getSimpleOrderStatus(status: OrderStatus) {
   switch (status) {
@@ -61,6 +101,44 @@ function getSimpleOrderStatus(status: OrderStatus) {
       // should never happen since we made OrderStatus manually
       return OrderStatus.Open;
   }
+}
+
+function maybeUpdateOrderIfExpired(
+  order: SubaccountOrder,
+  height: HeightResponse
+): SubaccountOrder {
+  if (order.status == null) {
+    return order;
+  }
+  // todo: why not handle Open?
+  if (
+    ![OrderStatus.Pending, OrderStatus.Canceling, OrderStatus.PartiallyFilled].includes(
+      order.status
+    )
+  ) {
+    return order;
+  }
+
+  // Check if order has expired based on goodTilBlock
+  if (order.goodTilBlock && order.goodTilBlock !== 0 && height.height >= order.goodTilBlock) {
+    let status = OrderStatus.Canceled;
+
+    // Check for partial fills
+    if (order.totalFilled != null && order.totalFilled.gt(0)) {
+      const remainingSize = order.size.minus(order.totalFilled);
+      if (order.totalFilled.gt(0) && remainingSize.gt(0)) {
+        status = OrderStatus.PartiallyCanceled;
+      }
+    }
+
+    return {
+      ...order,
+      status,
+      updatedAtMilliseconds: new Date(height.time).valueOf(),
+    };
+  }
+
+  return order;
 }
 
 function calculateBaseOrderStatus(order: IndexerCompositeOrderObject): OrderStatus | undefined {
@@ -118,9 +196,7 @@ function calculateBaseOrderStatus(order: IndexerCompositeOrderObject): OrderStat
   }
 }
 
-function calculateMergedOrders(liveOrders: Loadable<OrdersData>, restOrders: Loadable<OrdersData>) {
-  const liveData = liveOrders.data ?? {};
-  const restData = restOrders.data ?? {};
+function calculateMergedOrders(liveData: OrdersData, restData: OrdersData) {
   return mergeObjects(
     liveData,
     restData,

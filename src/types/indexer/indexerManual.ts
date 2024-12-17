@@ -25,15 +25,15 @@ export interface IndexerCompositeFillResponse {
 }
 
 export interface IndexerCompositeOrderObject {
-  id?: string;
+  id: string;
   subaccountId?: string;
   clientId?: string;
   clobPairId?: string;
-  side?: IndexerOrderSide;
-  size?: string;
-  totalFilled?: string;
-  price?: string;
-  type?: IndexerOrderType;
+  side: IndexerOrderSide;
+  size: string;
+  totalFilled: string;
+  price: string;
+  type: IndexerOrderType;
   reduceOnly?: boolean;
   orderFlags?: string;
   goodTilBlock?: string | null;
@@ -44,10 +44,10 @@ export interface IndexerCompositeOrderObject {
   timeInForce?: IndexerAPITimeInForce;
   status?: IndexerAPIOrderStatus;
   postOnly?: boolean;
-  ticker?: string;
+  ticker: string;
   updatedAt?: IndexerIsoString | null;
   updatedAtHeight?: string | null;
-  subaccountNumber?: number;
+  subaccountNumber: number;
   removalReason?: string;
   totalOptimisticFilled?: string;
 }
