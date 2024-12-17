@@ -90,20 +90,24 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
-      // only cosmos chains are supported on kepler
+      // only Cosmos chains are supported on Keplr
       if (isKeplrWallet) {
         return selectedDydxChainId !== chain.value && SUPPORTED_COSMOS_CHAINS.includes(chain.value);
       }
-      // only solana chains are supported on phantom
+      // only Solana chains are supported on Phantom
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.PhantomSolana) {
         return selectedDydxChainId !== chain.value && chain.value.startsWith(solanaChainIdPrefix);
       }
-      // other wallets do not support solana
+      // other wallets do not support Solana
       if (chain.value.startsWith(solanaChainIdPrefix)) return false;
 
       return true;
     })
     .filter((chain) => {
+      if (type === TransferType.withdrawal && isKeplrWallet) {
+        return true;
+      }
+
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -136,12 +140,11 @@ export const SourceSelectMenu = ({
   return (
     <SearchSelectMenu
       items={[
-        !isKeplrWallet &&
-          exchangeItems.length > 0 && {
-            group: 'exchanges',
-            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-            items: exchangeItems,
-          },
+        exchangeItems.length > 0 && {
+          group: 'exchanges',
+          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+          items: exchangeItems,
+        },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {
