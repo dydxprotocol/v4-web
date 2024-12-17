@@ -56,6 +56,7 @@ export const DepositDialog = ({
   return (
     <Dialog
       isOpen
+      withAnimation
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DEPOSIT })}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}

@@ -85,6 +85,7 @@ export type UnlimitedAnnouncementDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
+export type DepositDialog2Props = {};
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
   estimatedUnblockTime?: string | null;
@@ -108,6 +109,8 @@ export const DialogTypes = unionize(
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
+    /* TODO: rename Deposit2 to Deposit once old deposit flow is deprecated */
+    Deposit2: ofType<DepositDialog2Props>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),

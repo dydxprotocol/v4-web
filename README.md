@@ -66,9 +66,6 @@ This will automatically open your default browser at `http://localhost:61000`.
 
 Add or modify the relevant endpoints, links and options in `/public/configs/v1/env.json`.
 
-NOTE: There exists a deprecated file `/public/configs/env.json`. If you have users running older mobile versions you may
-need to keep feature flags between the two files in sync but may otherwise ignore it.
-
 You'll need to provide a Wallet Connect project id to enable onboarding and wallet connection:
 
 - Create a project on https://cloud.walletconnect.com/app
