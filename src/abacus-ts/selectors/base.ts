@@ -5,11 +5,14 @@ export const selectRawState = (state: RootState) => state.raw;
 export const selectRawAccountState = (state: RootState) => state.raw.account;
 
 export const selectRawMarketsState = (state: RootState) => state.raw.markets.allMarkets;
+export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
 
-export const selectParentSubaccountData = (state: RootState) =>
+export const selectRawParentSubaccount = (state: RootState) => state.raw.account.parentSubaccount;
+export const selectRawParentSubaccountData = (state: RootState) =>
   state.raw.account.parentSubaccount.data;
-export const selectFillsData = (state: RootState) => state.raw.account.fills.data;
-export const selectOrdersData = (state: RootState) => state.raw.account.orders.data;
-export const selectTransfersData = (state: RootState) => state.raw.account.transfers.data;
-export const selectBlockTradingRewardsData = (state: RootState) =>
+
+export const selectRawFillsData = (state: RootState) => state.raw.account.fills.data;
+export const selectRawOrdersData = (state: RootState) => state.raw.account.orders.data;
+export const selectRawTransfersData = (state: RootState) => state.raw.account.transfers.data;
+export const selectRawBlockTradingRewardsData = (state: RootState) =>
   state.raw.account.blockTradingRewards.data;

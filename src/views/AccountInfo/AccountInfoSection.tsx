@@ -1,3 +1,4 @@
+import { selectParentSubaccountSummary } from '@/abacus-ts/selectors/account';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -54,6 +55,7 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
+  const otherSubaccount = useAppSelector(selectParentSubaccountSummary);
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
