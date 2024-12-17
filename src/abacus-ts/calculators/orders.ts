@@ -3,6 +3,8 @@ import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { mapValues, maxBy, pickBy } from 'lodash';
 
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
+
 import { assertNever } from '@/lib/assertNever';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
@@ -58,7 +60,7 @@ function calculateSubaccountOrder(
     expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
     updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).valueOf()),
     updatedAtHeight: MaybeBigNumber(base.updatedAtHeight)?.toNumber(),
-    marginMode: undefined,
+    marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
     subaccountNumber: base.subaccountNumber,
     id: base.id,
     clientId: base.clientId,

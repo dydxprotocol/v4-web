@@ -62,7 +62,15 @@ export function calculateParentSubaccountSummary(
   };
 }
 
-export function calculateSubaccountSummary(
+export function calculateMarketsNeededForSubaccount(
+  parent: Omit<ParentSubaccountData, 'ephemeral'>
+) {
+  return Object.values(parent.childSubaccounts).flatMap((o) =>
+    Object.values(o?.openPerpetualPositions ?? {}).map((p) => p.market)
+  );
+}
+
+function calculateSubaccountSummary(
   subaccountData: ChildSubaccountData,
   markets: MarketsData
 ): SubaccountSummary {
