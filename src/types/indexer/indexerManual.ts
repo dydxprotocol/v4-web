@@ -25,7 +25,7 @@ export interface IndexerCompositeFillResponse {
 }
 
 export interface IndexerCompositeOrderObject {
-  id?: string;
+  id: string;
   subaccountId?: string;
   clientId?: string;
   clobPairId?: string;
@@ -137,9 +137,9 @@ export type IndexerWsPositionUpdate = Partial<IndexerPerpetualPositionResponseOb
   market: string;
 };
 
-export type IndexerWsOrderUpdate = { id: string } & Partial<
+export type IndexerWsOrderUpdate = Partial<
   Omit<IndexerCompositeOrderObject, 'subaccountNumber'>
->;
+> & { id: string };
 
 export interface IndexerWsParentSubaccountUpdateObject {
   blockHeight: string;
