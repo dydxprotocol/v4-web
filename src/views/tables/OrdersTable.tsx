@@ -1,5 +1,7 @@
 import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
 
+import { AssetInfo } from '@/abacus-ts/rawTypes';
+import { SubaccountOrder } from '@/abacus-ts/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
@@ -7,7 +9,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -73,16 +75,13 @@ export enum OrdersTableColumnKey {
   Actions = 'Actions',
   MarginType = 'Margin-Type',
 
-  // TODO: CT-1292 remove deprecated fields
-  AmountFill = 'Amount-Fill',
-
   // Tablet Only
   StatusFill = 'Status-Fill',
   PriceType = 'Price-Type',
 }
 
 export type OrderTableRow = {
-  asset: Nullable<Asset>;
+  asset: Nullable<AssetInfo>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
   orderSide?: Nullable<OrderSide>;
@@ -144,31 +143,6 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: ({ orderSide }) => (
           <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
-        ),
-      },
-      [OrdersTableColumnKey.AmountFill]: {
-        columnKey: 'size',
-        getCellValue: (row) => row.size,
-        label: (
-          <TableColumnHeader>
-            <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
-            <span>{stringGetter({ key: STRING_KEYS.AMOUNT_FILLED })}</span>
-          </TableColumnHeader>
-        ),
-        tag: symbol,
-        renderCell: ({ size, totalFilled, stepSizeDecimals }) => (
-          <TableCell stacked>
-            <Output
-              type={OutputType.Asset}
-              value={size}
-              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
-            />
-            <Output
-              type={OutputType.Asset}
-              value={totalFilled}
-              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
-            />
-          </TableCell>
         ),
       },
       [OrdersTableColumnKey.Amount]: {
