@@ -55,7 +55,7 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
               <Output
                 tw="inline font-medium text-color-text-0"
                 fractionDigits={4}
-                slotRight=" held"
+                slotRight=" held" // TODO(deposit2.0): localization here
                 value={BigNumber(tokenBalance.formatted)}
                 type={OutputType.Number}
               />
