@@ -25,10 +25,12 @@ export const useAffiliatesLeaderboard = () => {
       });
 
       const data = await response.json();
-      return data?.affiliateList?.map((stat: IAffiliateStats, i: number) => ({
-        ...stat,
-        rank: i + 1,
-      }));
+      return data?.affiliateList
+        ?.filter((stat: IAffiliateStats) => Boolean(stat.affiliateReferralCode))
+        ?.map((stat: IAffiliateStats, i: number) => ({
+          ...stat,
+          rank: i + 1,
+        }));
     } catch (error) {
       log('useAffiliateLeaderboard', error, { endpoint });
       throw error;

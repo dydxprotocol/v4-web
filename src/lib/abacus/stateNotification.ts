@@ -16,6 +16,7 @@ import type {
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
@@ -44,6 +45,7 @@ import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localO
 import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
+import { track } from '../analytics/analytics';
 import { isTruthy } from '../isTruthy';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
@@ -267,8 +269,11 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   errorsEmitted(errors: ParsingErrors) {
+    const arr = errors.toArray();
+
+    track(AnalyticsEvents.WebsocketParseError({ message: arr.map((a) => a.message).join(', ') }));
     // eslint-disable-next-line no-console
-    console.error('parse errors', errors.toArray());
+    console.error('parse errors', arr);
   }
 
   apiStateChanged(apiState: AbacusApiState) {

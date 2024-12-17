@@ -65,6 +65,10 @@ class TestFlags {
   get useAbacusTs() {
     return isDev;
   }
+
+  get showNewDepositFlow() {
+    return !!this.queryParams.deposit_rewrite;
+  }
 }
 
 export const testFlags = new TestFlags();
