@@ -47,8 +47,9 @@ function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
 }
 
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const [amount, setAmount] = useState('');
   const { sourceAccount } = useAccounts();
+
+  const [amount, setAmount] = useState('');
   const [token, setToken] = useState<DepositToken>(getDefaultToken(sourceAccount));
 
   const { isMobile } = useBreakpoints();
@@ -56,6 +57,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const [formState, setFormState] = useState<'form' | 'token-select'>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
+
   // TODO(deposit2): localization
   const dialogTitle =
     formState === 'form' ? stringGetter({ key: STRING_KEYS.DEPOSIT }) : 'Select Token';
