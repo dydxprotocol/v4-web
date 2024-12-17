@@ -1,10 +1,11 @@
 import { ReactNode } from 'react';
 
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { BigNumberish } from '@/lib/numbers';
 
-import { AbacusPositionSides, Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
+import { Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 
@@ -64,7 +65,7 @@ export type SharePNLAnalyticsDialogProps = {
   oraclePrice: Nullable<number>;
   entryPrice: Nullable<number>;
   unrealizedPnl: Nullable<number>;
-  side: Nullable<AbacusPositionSides>;
+  side: Nullable<IndexerPositionSide>;
   sideLabel: Nullable<string>;
 };
 export type StakeDialogProps = {};
