@@ -1,21 +1,27 @@
-import { useState } from 'react';
-
-import { mainnet } from 'viem/chains';
+import { Dispatch, SetStateAction } from 'react';
 
 import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
-import { USDC_ADDRESSES } from '@/constants/tokens';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 
 import { AmountInput } from './AmountInput';
+import { DepositToken } from './types';
 
-export const DepositForm = ({ onTokenSelect }: { onTokenSelect: () => void }) => {
-  const [amount, setAmount] = useState('');
-  const [token] = useState({
-    chain: mainnet.id.toString(),
-    address: USDC_ADDRESSES[mainnet.id],
-    symbol: 'USDC',
-  });
+export const DepositForm = ({
+  onTokenSelect,
+  amount,
+  setAmount,
+  token,
+}: {
+  onTokenSelect: () => void;
+  amount: string;
+  setAmount: Dispatch<SetStateAction<string>>;
+  token: DepositToken;
+}) => {
+  const stringGetter = useStringGetter();
 
   return (
     <div tw="flex min-h-10 flex-col gap-1 p-1">
@@ -27,7 +33,7 @@ export const DepositForm = ({ onTokenSelect }: { onTokenSelect: () => void }) =>
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
       >
-        Deposit
+        {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
       </Button>
     </div>
   );
