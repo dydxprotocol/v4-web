@@ -160,7 +160,12 @@ function accountWebsocketValue(
               returnValue.ephemeral.fills ??= [];
               returnValue.ephemeral.fills = [
                 ...returnValue.ephemeral.fills,
-                ...update.fills.map((f) => ({ ...f, subaccountNumber })),
+                ...update.fills.map((f) => ({
+                  ...f,
+                  subaccountNumber,
+                  // NOTE: provides ticker in ws response instead of market for soem reason
+                  market: f.market ?? ((f as any).ticker as string),
+                })),
               ];
             }
             if (update.orders != null) {

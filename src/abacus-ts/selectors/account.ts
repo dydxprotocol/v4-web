@@ -2,7 +2,10 @@ import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 import { pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
+import { EMPTY_ARR } from '@/constants/objects';
+
 import { createAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { calculateFills } from '../calculators/fills';
 import {
@@ -131,6 +134,12 @@ export const selectAccountFills = createAppSelector(
   (rest, live) => {
     return calculateFills(rest?.fills, live);
   }
+);
+
+export const getCurrentMarketAccountFills = createAppSelector(
+  [getCurrentMarketId, selectAccountFills],
+  (currentMarketId, fills) =>
+    !currentMarketId ? EMPTY_ARR : fills.filter((f) => f.market === currentMarketId)
 );
 
 export const selectAccountFillsLoading = createAppSelector(
