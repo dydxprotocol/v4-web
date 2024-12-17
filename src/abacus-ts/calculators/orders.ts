@@ -10,42 +10,31 @@ import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
-import { Loadable } from '../lib/loadable';
-import { mapLoadableData, mergeLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../rawTypes';
 import { OrderStatus, SubaccountOrder, SubaccountOrdersData } from '../summaryTypes';
 
-export function calculateOpenOrders(orders: Loadable<SubaccountOrdersData>) {
-  return mapLoadableData(orders, (d) =>
-    pickBy(
-      d,
-      (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) === OrderStatus.Open
-    )
+export function calculateOpenOrders(orders: SubaccountOrdersData) {
+  return pickBy(
+    orders,
+    (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) === OrderStatus.Open
   );
 }
 
-export function calculateOrderHistory(orders: Loadable<SubaccountOrdersData>) {
-  return mapLoadableData(orders, (d) =>
-    pickBy(
-      d,
-      (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
-    )
+export function calculateOrderHistory(orders: SubaccountOrdersData) {
+  return pickBy(
+    orders,
+    (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
   );
 }
 
 export function calculateAllOrders(
-  liveOrders: Loadable<OrdersData>,
-  restOrders: Loadable<OrdersData>,
+  liveOrders: OrdersData | undefined,
+  restOrders: OrdersData | undefined,
   height: HeightResponse
-): Loadable<SubaccountOrdersData> {
-  const merged = mergeLoadableData(liveOrders, restOrders);
-  const actuallyMerged = mapLoadableData(merged, ([a, b]) =>
-    calculateMergedOrders(a ?? {}, b ?? {})
-  );
-  const mapped = mapLoadableData(actuallyMerged, (d) =>
-    mapValues(d, (order) => calculateSubaccountOrder(order, height))
-  );
+): SubaccountOrdersData {
+  const actuallyMerged = calculateMergedOrders(liveOrders ?? {}, restOrders ?? {});
+  const mapped = mapValues(actuallyMerged, (order) => calculateSubaccountOrder(order, height));
   return mapped;
 }
 

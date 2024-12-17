@@ -1,14 +1,27 @@
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 import { pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { createAppSelector } from '@/state/appTypes';
 
 import {
+  calculateAllOrders,
+  calculateOpenOrders,
+  calculateOrderHistory,
+} from '../calculators/orders';
+import {
   calculateMarketsNeededForSubaccount,
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
 } from '../calculators/subaccount';
-import { selectRawMarketsData, selectRawParentSubaccountData } from './base';
+import {
+  selectRawIndexerHeight,
+  selectRawMarketsData,
+  selectRawOrdersLiveData,
+  selectRawOrdersRestData,
+  selectRawParentSubaccountData,
+  selectRawValidatorHeight,
+} from './base';
 
 const selectRelevantMarketsList = createAppSelector(
   [selectRawParentSubaccountData],
@@ -54,3 +67,31 @@ export const selectParentSubaccountPositions = createAppSelector(
     return calculateParentSubaccountPositions(parentSubaccount, markets);
   }
 );
+
+export const selectParentSubaccountOpenPositions = createAppSelector(
+  [selectParentSubaccountPositions],
+  (positions) => {
+    return positions?.filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN);
+  }
+);
+
+const baseTime = { height: 0, time: '1971-01-01T00:00:00Z' };
+export const selectAccountOrders = createAppSelector(
+  [
+    selectRawOrdersRestData,
+    selectRawOrdersLiveData,
+    selectRawValidatorHeight,
+    selectRawIndexerHeight,
+  ],
+  (rest, live, indexerHeight, validatorHeight) => {
+    return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? baseTime);
+  }
+);
+
+export const selectOpenOrders = createAppSelector([selectAccountOrders], (orders) => {
+  return calculateOpenOrders(orders);
+});
+
+export const selectOrderHistory = createAppSelector([selectAccountOrders], (orders) => {
+  return calculateOrderHistory(orders);
+});
