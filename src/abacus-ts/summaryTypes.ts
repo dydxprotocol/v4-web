@@ -55,6 +55,8 @@ export type SubaccountPositionBase = ConvertStringToBigNumber<
 export type MarginMode = 'ISOLATED' | 'CROSS';
 
 export type SubaccountPositionDerivedCore = {
+  uniqueId: string;
+  assetId: string;
   marginMode: MarginMode;
 
   signedSize: BigNumber; // indexer size is signed by default but we make it obvious here
@@ -77,7 +79,8 @@ export type SubaccountPositionDerivedCore = {
 export type SubaccountPositionDerivedExtra = {
   // all these depend on the subaccount being calculated
   leverage: BigNumber | null;
-  marginValue: BigNumber;
+  marginValueMaintenance: BigNumber;
+  marginValueInitial: BigNumber;
   liquidationPrice: BigNumber | null;
 
   updatedUnrealizedPnl: BigNumber;

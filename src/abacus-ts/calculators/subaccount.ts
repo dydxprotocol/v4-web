@@ -5,10 +5,11 @@ import {
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
-import { mapValues } from 'lodash';
+import { mapValues, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
+import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
@@ -33,10 +34,14 @@ export function calculateParentSubaccountPositions(
     .filter(isPresent)
     .flatMap((child) => {
       const subaccount = calculateSubaccountSummary(child, markets);
-      return Object.values(child.openPerpetualPositions)
-        .filter(isPresent)
-        .filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN)
-        .map((perp) => calculateSubaccountPosition(subaccount, perp, markets[perp.market]));
+      return orderBy(
+        Object.values(child.openPerpetualPositions)
+          .filter(isPresent)
+          .filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN)
+          .map((perp) => calculateSubaccountPosition(subaccount, perp, markets[perp.market])),
+        [(f) => f.createdAt],
+        ['desc']
+      );
     });
 }
 
@@ -205,6 +210,8 @@ function calculateDerivedPositionCore(
   const value = signedSize.times(oracle);
 
   return {
+    uniqueId: `${position.market}-${position.subaccountNumber}`,
+    assetId: getAssetFromMarketId(position.market),
     marginMode,
     unsignedSize,
     signedSize,
@@ -230,11 +237,13 @@ function calculatePositionDerivedExtra(
   subaccountSummary: SubaccountSummary
 ): SubaccountPositionDerivedExtra {
   const { equity, maintenanceRiskTotal } = subaccountSummary;
-  const { signedSize, notional, value, marginMode, adjustedMmf, maintenanceRisk } = position;
+  const { signedSize, notional, value, marginMode, adjustedMmf, adjustedImf, maintenanceRisk } =
+    position;
 
   const leverage = equity.gt(0) ? notional.div(equity) : null;
 
-  const marginValue = marginMode === 'ISOLATED' ? equity : notional.times(adjustedMmf);
+  const marginValueMaintenance = marginMode === 'ISOLATED' ? equity : notional.times(adjustedMmf);
+  const marginValueInitial = marginMode === 'ISOLATED' ? equity : notional.times(adjustedImf);
 
   const liquidationPrice = calc(() => {
     const otherPositionsRisk = maintenanceRiskTotal.minus(maintenanceRisk);
@@ -273,7 +282,8 @@ function calculatePositionDerivedExtra(
 
   return {
     leverage,
-    marginValue,
+    marginValueMaintenance,
+    marginValueInitial,
     liquidationPrice,
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
