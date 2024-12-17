@@ -4,7 +4,7 @@ export const selectRawState = (state: RootState) => state.raw;
 
 export const selectRawAccountState = (state: RootState) => state.raw.account;
 
-export const selectRawMarketsState = (state: RootState) => state.raw.markets.allMarkets;
+export const selectRawMarkets = (state: RootState) => state.raw.markets.allMarkets;
 export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
 
 export const selectRawParentSubaccount = (state: RootState) => state.raw.account.parentSubaccount;
@@ -26,6 +26,16 @@ export const selectRawTransfersLiveData = (state: RootState) =>
 export const selectRawBlockTradingRewardsLiveData = (state: RootState) =>
   state.raw.account.parentSubaccount.data?.ephemeral.tradingRewards;
 
-export const selectRawIndexerHeight = (state: RootState) => state.raw.heights.indexerHeight.data;
-export const selectRawValidatorHeight = (state: RootState) =>
+export const selectRawIndexerHeightData = (state: RootState) =>
+  state.raw.heights.indexerHeight.data;
+export const selectRawValidatorHeightData = (state: RootState) =>
   state.raw.heights.validatorHeight.data;
+
+export const selectRawFillsRest = (state: RootState) => state.raw.account.fills;
+export const selectRawOrdersRest = (state: RootState) => state.raw.account.orders;
+export const selectRawTransfersRest = (state: RootState) => state.raw.account.transfers;
+export const selectRawBlockTradingRewardsRest = (state: RootState) =>
+  state.raw.account.blockTradingRewards;
+
+export const selectRawIndexerHeight = (state: RootState) => state.raw.heights.indexerHeight;
+export const selectRawValidatorHeight = (state: RootState) => state.raw.heights.validatorHeight;

@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 
 import { createAppSelector } from '@/state/appTypes';
 
+import { calculateFills } from '../calculators/fills';
 import {
   calculateAllOrders,
   calculateOpenOrders,
@@ -14,13 +15,26 @@ import {
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
 } from '../calculators/subaccount';
+import { calculateTransfers } from '../calculators/transfers';
+import { mergeLoadableStatus } from '../lib/mapLoadable';
 import {
+  selectRawFillsLiveData,
+  selectRawFillsRest,
+  selectRawFillsRestData,
   selectRawIndexerHeight,
+  selectRawIndexerHeightData,
+  selectRawMarkets,
   selectRawMarketsData,
   selectRawOrdersLiveData,
+  selectRawOrdersRest,
   selectRawOrdersRestData,
+  selectRawParentSubaccount,
   selectRawParentSubaccountData,
+  selectRawTransfersLiveData,
+  selectRawTransfersRest,
+  selectRawTransfersRestData,
   selectRawValidatorHeight,
+  selectRawValidatorHeightData,
 } from './base';
 
 const selectRelevantMarketsList = createAppSelector(
@@ -68,20 +82,26 @@ export const selectParentSubaccountPositions = createAppSelector(
   }
 );
 
+export const selectParentSubaccountSummaryLoading = createAppSelector(
+  [selectRawParentSubaccount, selectRawMarkets],
+  mergeLoadableStatus
+);
+
 export const selectParentSubaccountOpenPositions = createAppSelector(
   [selectParentSubaccountPositions],
   (positions) => {
     return positions?.filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN);
   }
 );
+export const selectParentSubaccountOpenPositionsLoading = selectParentSubaccountSummaryLoading;
 
 const baseTime = { height: 0, time: '1971-01-01T00:00:00Z' };
 export const selectAccountOrders = createAppSelector(
   [
     selectRawOrdersRestData,
     selectRawOrdersLiveData,
-    selectRawValidatorHeight,
-    selectRawIndexerHeight,
+    selectRawValidatorHeightData,
+    selectRawIndexerHeightData,
   ],
   (rest, live, indexerHeight, validatorHeight) => {
     return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? baseTime);
@@ -95,3 +115,37 @@ export const selectOpenOrders = createAppSelector([selectAccountOrders], (orders
 export const selectOrderHistory = createAppSelector([selectAccountOrders], (orders) => {
   return calculateOrderHistory(orders);
 });
+
+export const selectAccountOrdersLoading = createAppSelector(
+  [
+    selectRawOrdersRest,
+    selectRawParentSubaccount,
+    selectRawValidatorHeight,
+    selectRawIndexerHeight,
+  ],
+  mergeLoadableStatus
+);
+
+export const selectAccountFills = createAppSelector(
+  [selectRawFillsRestData, selectRawFillsLiveData],
+  (rest, live) => {
+    return calculateFills(rest?.fills, live);
+  }
+);
+
+export const selectAccountFillsLoading = createAppSelector(
+  [selectRawFillsRest, selectRawParentSubaccount],
+  mergeLoadableStatus
+);
+
+export const selectAccountTransfers = createAppSelector(
+  [selectRawTransfersRestData, selectRawTransfersLiveData],
+  (rest, live) => {
+    return calculateTransfers(rest?.transfers, live);
+  }
+);
+
+export const selectAccountTransfersLoading = createAppSelector(
+  [selectRawTransfersRest, selectRawParentSubaccount],
+  mergeLoadableStatus
+);
