@@ -1,3 +1,4 @@
+import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
 import { setUpFillsQuery } from './rest/fills';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
@@ -11,6 +12,7 @@ import { setUpParentSubaccount } from './websocket/parentSubaccount';
 export const storeLifecycles = [
   alwaysUseCurrentNetworkClient,
   setUpMarkets,
+  setUpAssetsQuery,
   setUpParentSubaccount,
   setUpFillsQuery,
   setUpOrdersQuery,

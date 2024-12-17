@@ -8,6 +8,7 @@ import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { MetadataServiceInfoResponse } from '@/constants/assetMetadata';
 import { DydxNetwork } from '@/constants/networks';
 
 interface NetworkState {
@@ -18,6 +19,7 @@ interface NetworkState {
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
+    assets: Loadable<MetadataServiceInfoResponse>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
   };
   account: {
@@ -37,7 +39,7 @@ export interface RawDataState {
 }
 
 const initialState: RawDataState = {
-  markets: { allMarkets: loadableIdle(), orderbooks: {} },
+  markets: { allMarkets: loadableIdle(), assets: loadableIdle(), orderbooks: {} },
   account: {
     parentSubaccount: loadableIdle(),
     fills: loadableIdle(),
@@ -58,6 +60,9 @@ export const rawSlice = createSlice({
   reducers: {
     setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
       state.markets.allMarkets = action.payload;
+    },
+    setAllAssetsRaw: (state, action: PayloadAction<Loadable<MetadataServiceInfoResponse>>) => {
+      state.markets.assets = action.payload;
     },
     setOrderbookRaw: (
       state,
@@ -108,6 +113,7 @@ export const rawSlice = createSlice({
 export const {
   setOrderbookRaw,
   setAllMarketsRaw,
+  setAllAssetsRaw,
   setParentSubaccountRaw,
   setAccountFillsRaw,
   setAccountOrdersRaw,
