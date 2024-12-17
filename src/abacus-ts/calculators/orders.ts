@@ -137,6 +137,7 @@ function maybeUpdateOrderIfExpired(
       ...order,
       status,
       updatedAtMilliseconds: new Date(height.time).valueOf(),
+      updatedAtHeight: height.height,
     };
   }
 
