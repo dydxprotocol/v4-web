@@ -31,7 +31,7 @@ export const FunkitToggle = ({ onToggle }: ElementProps) => {
           {stringGetter({ key: STRING_KEYS.INSTANT })}
           <Icon iconName={IconName.FunkitInstant} tw="float-right" />
         </div>
-        <div tw="font-small-regular text-left">
+        <div tw="text-left font-small-regular">
           {stringGetter({
             key: STRING_KEYS.HIGHER_FEES,
             params: { AMOUNT_USD: formattedLimitLabel },
