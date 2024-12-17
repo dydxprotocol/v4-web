@@ -108,7 +108,6 @@ export interface IndexerCompositeFillObject {
   side?: IndexerOrderSide;
   liquidity?: IndexerLiquidity;
   type?: IndexerFillType;
-  market?: string;
   marketType?: IndexerMarketType;
   price?: string;
   size?: string;
@@ -119,7 +118,7 @@ export interface IndexerCompositeFillObject {
   orderId?: string | null;
   clientMetadata?: string | null;
   subaccountNumber?: number;
-  ticker?: string;
+  market?: string;
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {
