@@ -1,4 +1,5 @@
 import { QueryObserver } from '@tanstack/react-query';
+import { mapValues } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 
@@ -9,6 +10,7 @@ import { setAllAssetsRaw } from '@/state/raw';
 import metadataClient from '@/clients/metadataService';
 
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { logAbacusTsError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
@@ -22,7 +24,13 @@ export function setUpAssetsQuery(store: RootStore) {
 
   const unsubscribe = observer.subscribe((result) => {
     try {
-      store.dispatch(setAllAssetsRaw(queryResultToLoadable(result)));
+      store.dispatch(
+        setAllAssetsRaw(
+          mapLoadableData(queryResultToLoadable(result), (map) =>
+            mapValues(map, (v, id) => ({ ...v, id }))
+          )
+        )
+      );
     } catch (e) {
       logAbacusTsError('setUpAssetsQuery', 'Error handling result from react query', e, result);
     }

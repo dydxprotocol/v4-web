@@ -10,6 +10,8 @@ import {
   IndexerCompositeOrderObject,
 } from '@/types/indexer/indexerManual';
 
+import { MetadataServiceAssetInfo } from '@/constants/assetMetadata';
+
 export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
 
 export type OrderbookData = {
@@ -42,3 +44,6 @@ export interface ChildSubaccountData {
 
   assetPositions: { [symbol: string]: IndexerAssetPositionResponseObject };
 }
+
+export type AssetInfo = MetadataServiceAssetInfo & { id: string };
+export type AssetInfos = Record<string, AssetInfo>;

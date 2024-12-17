@@ -1,8 +1,15 @@
-import { IndexerSubaccountResponseObject } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerAssetPositionResponseObject,
+  IndexerOrderResponseObject,
+  IndexerPerpetualPositionResponseObject,
+  IndexerSubaccountResponseObject,
+} from '@/types/indexer/indexerApiGen';
 import {
   isWsParentSubaccountSubscribed,
   isWsParentSubaccountUpdates,
 } from '@/types/indexer/indexerChecks';
+import { IndexerWsOrderUpdate } from '@/types/indexer/indexerManual';
+import { produce } from 'immer';
 import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
@@ -91,73 +98,101 @@ function accountWebsocketValue(
         if (value.data == null || updates.length === 0 || subaccountNumber == null) {
           return value;
         }
-        const returnValue = { ...value.data };
-        updates.forEach((update) => {
-          if (update.assetPositions != null) {
-            update.assetPositions.forEach((positionUpdate) => {
-              returnValue.childSubaccounts[positionUpdate.subaccountNumber] ??=
-                freshChildSubaccount({
-                  address,
-                  subaccountNumber: positionUpdate.subaccountNumber,
-                });
+        const resultData = produce(value.data, (returnValue) => {
+          updates.forEach((update) => {
+            if (update.assetPositions != null) {
+              update.assetPositions.forEach((positionUpdate) => {
+                returnValue.childSubaccounts[positionUpdate.subaccountNumber] ??=
+                  freshChildSubaccount({
+                    address,
+                    subaccountNumber: positionUpdate.subaccountNumber,
+                  });
 
-              returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions[
-                positionUpdate.assetId
-              ] = {
-                ...(returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions[
-                  positionUpdate.assetId
-                ] ?? {}),
-                ...positionUpdate,
-              };
-            });
-          }
-          if (update.perpetualPositions != null) {
-            update.perpetualPositions.forEach((positionUpdate) => {
-              returnValue.childSubaccounts[positionUpdate.subaccountNumber] ??=
-                freshChildSubaccount({
-                  address,
-                  subaccountNumber: positionUpdate.subaccountNumber,
-                });
+                const assetPositions =
+                  returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions;
 
-              returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.openPerpetualPositions[
-                positionUpdate.market
-              ] = {
-                ...(returnValue.childSubaccounts[positionUpdate.subaccountNumber]!
-                  .openPerpetualPositions[positionUpdate.market] ?? {}),
-                ...positionUpdate,
-              };
-            });
-          }
-          if (update.tradingReward != null) {
-            returnValue.ephemeral.tradingRewards ??= [];
-            returnValue.ephemeral.tradingRewards = [
-              ...returnValue.ephemeral.tradingRewards,
-              update.tradingReward,
-            ];
-          }
-          if (update.fills != null) {
-            returnValue.ephemeral.fills ??= [];
-            returnValue.ephemeral.fills = [
-              ...returnValue.ephemeral.fills,
-              ...update.fills.map((f) => ({ ...f, subaccountNumber })),
-            ];
-          }
-          if (update.orders != null) {
-            returnValue.ephemeral.orders ??= {};
-            returnValue.ephemeral.orders = {
-              ...returnValue.ephemeral.orders,
-              ...keyBy(update.orders, (o) => o.id ?? ''),
-            };
-          }
-          if (update.transfers != null) {
-            returnValue.ephemeral.transfers ??= [];
-            returnValue.ephemeral.transfers = [
-              ...returnValue.ephemeral.transfers,
-              update.transfers,
-            ];
-          }
+                if (assetPositions[positionUpdate.assetId] == null) {
+                  assetPositions[positionUpdate.assetId] =
+                    positionUpdate as IndexerAssetPositionResponseObject;
+                } else {
+                  assetPositions[positionUpdate.assetId] = {
+                    ...(assetPositions[
+                      positionUpdate.assetId
+                    ] as IndexerAssetPositionResponseObject),
+                    ...positionUpdate,
+                  };
+                }
+              });
+            }
+            if (update.perpetualPositions != null) {
+              update.perpetualPositions.forEach((positionUpdate) => {
+                returnValue.childSubaccounts[positionUpdate.subaccountNumber] ??=
+                  freshChildSubaccount({
+                    address,
+                    subaccountNumber: positionUpdate.subaccountNumber,
+                  });
+
+                const perpPositions =
+                  returnValue.childSubaccounts[positionUpdate.subaccountNumber]!
+                    .openPerpetualPositions;
+
+                if (perpPositions[positionUpdate.market] == null) {
+                  perpPositions[positionUpdate.market] =
+                    positionUpdate as IndexerPerpetualPositionResponseObject;
+                } else {
+                  perpPositions[positionUpdate.market] = {
+                    ...(perpPositions[
+                      positionUpdate.market
+                    ] as IndexerPerpetualPositionResponseObject),
+                    ...positionUpdate,
+                  };
+                }
+              });
+            }
+            if (update.tradingReward != null) {
+              returnValue.ephemeral.tradingRewards ??= [];
+              returnValue.ephemeral.tradingRewards = [
+                ...returnValue.ephemeral.tradingRewards,
+                update.tradingReward,
+              ];
+            }
+            if (update.fills != null) {
+              returnValue.ephemeral.fills ??= [];
+              returnValue.ephemeral.fills = [
+                ...returnValue.ephemeral.fills,
+                ...update.fills.map((f) => ({ ...f, subaccountNumber })),
+              ];
+            }
+            if (update.orders != null) {
+              returnValue.ephemeral.orders = { ...(returnValue.ephemeral.orders ?? {}) };
+              const allOrders = returnValue.ephemeral.orders;
+              update.orders.forEach((o) => {
+                const previousOrder = allOrders[o.id];
+                if (previousOrder == null) {
+                  allOrders[o.id] = {
+                    ...(o as IndexerOrderResponseObject),
+                    subaccountNumber,
+                  };
+                } else {
+                  allOrders[o.id] = {
+                    ...(allOrders[o.id] as IndexerOrderResponseObject),
+                    ...(o as IndexerWsOrderUpdate),
+                    subaccountNumber,
+                  };
+                }
+              });
+            }
+            if (update.transfers != null) {
+              returnValue.ephemeral.transfers ??= [];
+              returnValue.ephemeral.transfers = [
+                ...returnValue.ephemeral.transfers,
+                update.transfers,
+              ];
+            }
+          });
         });
-        return { ...value, data: returnValue };
+
+        return { ...value, data: resultData };
       },
     },
     loadablePending(),

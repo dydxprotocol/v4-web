@@ -124,6 +124,7 @@
     "export-to-csv": "^1.2.3",
     "fast-json-stable-stringify": "^2.1.0",
     "graz": "^0.1.19",
+    "immer": "^10.1.1",
     "jsdom": "^24.1.0",
     "lodash": "^4.17.21",
     "long": "^5.2.3",
