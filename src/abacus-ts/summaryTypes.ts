@@ -2,6 +2,7 @@ import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
   IndexerOrderType,
+  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import { type BigNumber } from 'bignumber.js';
@@ -18,6 +19,12 @@ type SelectStringProperties<T> = {
 type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
   [P in keyof T]: P extends K ? ReplaceBigNumberInUnion<T[P]> : T[P];
 };
+
+export type MarketInfo = IndexerPerpetualMarketResponseObject & {
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
+};
+export type MarketsInfo = { [marketId: string]: MarketInfo };
 
 export type SubaccountSummaryCore = {
   quoteBalance: BigNumber;
@@ -87,7 +94,7 @@ export type SubaccountPositionDerivedExtra = {
   updatedUnrealizedPnlPercent: BigNumber | null;
 };
 
-export type SubaccountPosition = SubaccountPositionBase &
+export type SubaccountPosition = Omit<SubaccountPositionBase, 'size'> &
   SubaccountPositionDerivedCore &
   SubaccountPositionDerivedExtra;
 
@@ -130,4 +137,3 @@ export type SubaccountOrder = {
   removalReason: string | undefined;
   marginMode: MarginMode | undefined;
 };
-export type SubaccountOrdersData = { [orderId: string]: SubaccountOrder };
