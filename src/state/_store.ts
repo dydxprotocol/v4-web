@@ -5,7 +5,6 @@ import storage from 'redux-persist/lib/storage';
 
 import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
-import { testFlags } from '@/lib/testFlags';
 
 import { accountSlice } from './account';
 import { affiliatesSlice } from './affiliates';
@@ -95,13 +94,11 @@ export const persistor = persistStore(store);
 // Set store so (Abacus & v4-Client) classes can getState and dispatch
 abacusStateManager.setStore(store);
 
-if (testFlags.useAbacusTs) {
-  runFn(async () => {
-    const { storeLifecycles } = await import('@/abacus-ts/storeLifecycles');
-    // we ignore the cleanups for now since we want these running forever
-    storeLifecycles.forEach((fn) => fn(store));
-  });
-}
+runFn(async () => {
+  const { storeLifecycles } = await import('@/abacus-ts/storeLifecycles');
+  // we ignore the cleanups for now since we want these running forever
+  storeLifecycles.forEach((fn) => fn(store));
+});
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;
