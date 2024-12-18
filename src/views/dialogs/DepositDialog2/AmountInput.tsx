@@ -1,10 +1,10 @@
 import { EventHandler } from 'react';
 
-import BigNumber from 'bignumber.js';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -54,9 +54,9 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
               <span> • </span>
               <Output
                 tw="inline font-medium text-color-text-0"
-                fractionDigits={4}
+                fractionDigits={TOKEN_DECIMALS}
                 slotRight=" held" // TODO(deposit2.0): localization here
-                value={BigNumber(tokenBalance.formatted)}
+                value={tokenBalance.formatted}
                 type={OutputType.Number}
               />
             </>

@@ -101,7 +101,7 @@ function networkTypeToBalances(sourceAccount: SourceAccount): BalanceRequest {
         },
         [CosmosChainId.Noble]: {
           address: sourceAccount.address!,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],
+          denoms: [USDC_ADDRESSES[CosmosChainId.Noble]],
         },
       },
     };

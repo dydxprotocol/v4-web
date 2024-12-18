@@ -5,6 +5,7 @@ import { partition } from 'lodash';
 import { parseUnits } from 'viem';
 
 import { CHAIN_INFO } from '@/constants/chains';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
@@ -90,13 +91,13 @@ export const TokenSelect = ({
               <div tw="flex flex-col items-end gap-0.125">
                 <Output
                   tw="text-medium font-medium"
-                  fractionDigits={4}
+                  fractionDigits={TOKEN_DECIMALS}
                   type={OutputType.Number}
                   value={BigNumber(balance.formattedAmount)}
                 />
                 <Output
                   tw="text-color-text-0"
-                  fractionDigits={2}
+                  fractionDigits={USD_DECIMALS}
                   type={OutputType.SmallFiat}
                   value={balance.valueUSD}
                 />
