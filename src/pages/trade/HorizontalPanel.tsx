@@ -163,7 +163,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     () => ({
       asChild: true,
       value: InfoSection.Orders,
-      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS }),
 
       slotRight: isWaitingForOrderToIndex ? (
         <LoadingSpinner tw="[--spinner-width:1rem]" />
@@ -179,6 +179,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         <OrdersTable
           currentMarket={showCurrentMarket ? currentMarketId : undefined}
           marketTypeFilter={viewIsolated}
+          tableType="OPEN"
           columnKeys={
             isTablet
               ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]

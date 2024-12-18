@@ -22,6 +22,7 @@ export const Orders = () => {
       {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.ORDERS })} />}
 
       <OrdersTable
+        tableType="OPEN"
         columnKeys={
           isTablet
             ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]

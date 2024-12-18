@@ -1,3 +1,4 @@
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -7,7 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Tag, TagSign, TagSize, TagType } from './Tag';
 
 type ElementProps = {
-  orderSide: OrderSide;
+  orderSide: OrderSide | IndexerOrderSide;
 };
 
 type StyleProps = {
