@@ -7,6 +7,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
 import { CurrentMarketDetails } from '@/views/MarketDetails/CurrentMarketDetails';
+import { CurrentMarketDetails as CurrentMarketDetails2 } from '@/views/MarketDetails/CurrentMarketDetails2';
 import { LaunchableMarketDetails } from '@/views/MarketDetails/LaunchableMarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
 import { DepthChart } from '@/views/charts/DepthChart';
@@ -18,6 +19,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 enum Tab {
   Price = 'Price',
@@ -82,7 +84,7 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         value: Tab.Funding,
       },
       {
-        content: <CurrentMarketDetails />,
+        content: testFlags.useAbacusTs ? <CurrentMarketDetails2 /> : <CurrentMarketDetails />,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         value: Tab.Details,
       },
