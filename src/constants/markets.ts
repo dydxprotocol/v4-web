@@ -118,7 +118,7 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
 };
 
-export const DEFAULT_MARKETID = 'ETH-USD';
+export const DEFAULT_MARKETID = 'BTC-USD';
 export const DEFAULT_QUOTE_ASSET = 'USD';
 
 export enum FundingDirection {
