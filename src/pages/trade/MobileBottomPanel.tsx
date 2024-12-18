@@ -7,8 +7,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { MobileTabs } from '@/components/Tabs';
 import { LaunchableMarketStatsDetails } from '@/views/LaunchableMarketStatsDetails';
 import { CurrentMarketDetails } from '@/views/MarketDetails/CurrentMarketDetails';
+import { CurrentMarketDetails as CurrentMarketDetails2 } from '@/views/MarketDetails/CurrentMarketDetails2';
 import { LaunchableMarketDetails } from '@/views/MarketDetails/LaunchableMarketDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
+
+import { testFlags } from '@/lib/testFlags';
 
 enum InfoSection {
   Statistics = 'Statistics',
@@ -49,7 +52,7 @@ export const MobileBottomPanel = ({ launchableMarketId }: { launchableMarketId?:
       {
         value: InfoSection.About,
         label: stringGetter({ key: STRING_KEYS.ABOUT }),
-        content: <CurrentMarketDetails />,
+        content: testFlags.useAbacusTs ? <CurrentMarketDetails2 /> : <CurrentMarketDetails />,
       },
     ];
   }, [launchableMarketId, stringGetter]);
