@@ -50,12 +50,7 @@ import { assertNever } from '@/lib/assertNever';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
-import {
-  getHydratedOrder,
-  getOrderStatusInfoNew,
-  isMarketOrderTypeNew,
-  isNewOrderStatusClearable,
-} from '@/lib/orders';
+import { getHydratedOrder, getOrderStatusInfoNew, isMarketOrderTypeNew } from '@/lib/orders';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -73,6 +68,7 @@ export enum OrdersTableColumnKey {
   Price = 'Price',
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
+  Updated = 'Updated',
   Actions = 'Actions',
   MarginType = 'Margin-Type',
 
@@ -234,6 +230,22 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.RelativeTime}
               value={expiresAtMilliseconds}
+              relativeTimeOptions={{ format: 'singleCharacter' }}
+            />
+          );
+        },
+      },
+      [OrdersTableColumnKey.Updated]: {
+        columnKey: 'udpatedAt',
+        getCellValue: (row) => row.updatedAtMilliseconds ?? Infinity,
+        label: stringGetter({ key: STRING_KEYS.TIME }),
+        renderCell: ({ updatedAtMilliseconds }) => {
+          if (!updatedAtMilliseconds) return <Output type={OutputType.Text} />;
+
+          return (
+            <Output
+              type={OutputType.RelativeTime}
+              value={updatedAtMilliseconds}
               relativeTimeOptions={{ format: 'singleCharacter' }}
             />
           );
@@ -476,9 +488,6 @@ export const OrdersTable = forwardRef(
         label="Orders"
         data={ordersData}
         getRowKey={(row: OrderTableRow) => row.id}
-        getRowAttributes={(row: OrderTableRow) => ({
-          'data-clearable': row.status != null && isNewOrderStatusClearable(row.status),
-        })}
         onRowAction={(key: Key) =>
           dispatch(openDialog(DialogTypes.OrderDetails({ orderId: `${key}` })))
         }
@@ -513,12 +522,6 @@ export const OrdersTable = forwardRef(
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-
-  tbody tr {
-    &[data-clearable='true'] {
-      opacity: 0.5;
-    }
-  }
 ` as typeof Table;
 
 const $InlineRow = tw.div`inlineRow`;

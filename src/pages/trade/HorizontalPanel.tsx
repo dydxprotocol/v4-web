@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { selectAccountOrdersLoading } from '@/abacus-ts/selectors/account';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -46,6 +47,7 @@ import { MarketTypeFilter, PanelView } from './types';
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
+  OrderHistory = 'OrderHistory',
   Fills = 'Fills',
   Payments = 'Payments',
 }
@@ -83,6 +85,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     calculateShouldRenderActionsInPositionsTable
   );
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
+  const areOrdersLoading = useAppSelector(selectAccountOrdersLoading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(
@@ -163,17 +166,18 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     () => ({
       asChild: true,
       value: InfoSection.Orders,
-      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS }),
+      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
 
-      slotRight: isWaitingForOrderToIndex ? (
-        <LoadingSpinner tw="[--spinner-width:1rem]" />
-      ) : (
-        ordersTagNumber && (
-          <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
-            {ordersTagNumber}
-          </Tag>
-        )
-      ),
+      slotRight:
+        areOrdersLoading || isWaitingForOrderToIndex ? (
+          <LoadingSpinner tw="[--spinner-width:1rem]" />
+        ) : (
+          ordersTagNumber && (
+            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+              {ordersTagNumber}
+            </Tag>
+          )
+        ),
 
       content: (
         <OrdersTable
@@ -203,15 +207,55 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     }),
     [
       stringGetter,
-      currentMarketId,
-      viewIsolated,
-      showCurrentMarket,
-      isTablet,
+      areOrdersLoading,
       isWaitingForOrderToIndex,
-      isAccountViewOnly,
       ordersTagNumber,
       hasUnseenOrderUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
+      isAccountViewOnly,
     ]
+  );
+
+  const orderHistoryTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.OrderHistory,
+      label: stringGetter({ key: STRING_KEYS.ORDER_HISTORY_HEADER }),
+
+      slotRight: areOrdersLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : // todo calculate unread history items
+      null,
+
+      content: (
+        <OrdersTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          tableType="HISTORY"
+          columnKeys={
+            isTablet
+              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+              : [
+                  !showCurrentMarket && OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.Amount,
+                  OrdersTableColumnKey.Filled,
+                  OrdersTableColumnKey.OrderValue,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.Updated,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [stringGetter, areOrdersLoading, showCurrentMarket, currentMarketId, viewIsolated, isTablet]
   );
 
   const fillsTabItem = useMemo(
@@ -279,8 +323,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   // },
 
   const tabItems = useMemo(
-    () => [positionTabItem, fillsTabItem, ordersTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem]
   );
 
   const slotBottom = {
@@ -288,6 +332,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       <MaybeUnopenedIsolatedPositionsDrawer onViewOrders={onViewOrders} tw="mt-auto" />
     ),
     [InfoSection.Orders]: null,
+    [InfoSection.OrderHistory]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
   }[tab];
