@@ -3,7 +3,7 @@ import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-interface EndpointsConfig {
+export interface EndpointsConfig {
   indexers: {
     api: string;
     socket: string;

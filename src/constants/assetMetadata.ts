@@ -1,17 +1,16 @@
-export type MetadataServiceInfoResponse = Record<
-  string,
-  {
-    name: string;
-    logo: string;
-    urls: {
-      website: string | null;
-      technical_doc: string | null;
-      cmc: string | null;
-    };
-    sector_tags: string[] | null;
-    exchanges: any[] | null;
-  }
->;
+export type MetadataServiceAssetInfo = {
+  name: string;
+  logo: string;
+  urls: {
+    website: string | null;
+    technical_doc: string | null;
+    cmc: string | null;
+  };
+  sector_tags: string[] | null;
+  exchanges: any[] | null;
+};
+
+export type MetadataServiceInfoResponse = Record<string, MetadataServiceAssetInfo>;
 
 export type MetadataServicePricesResponse = Record<
   string,
