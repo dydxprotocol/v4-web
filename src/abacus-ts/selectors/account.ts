@@ -119,6 +119,18 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
   return calculateOrderHistory(orders);
 });
 
+export const selectCurrentMarketOpenOrders = createAppSelector(
+  [getCurrentMarketId, selectOpenOrders],
+  (currentMarketId, orders) =>
+    !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
+);
+
+export const selectCurrentMarketOrderHistory = createAppSelector(
+  [getCurrentMarketId, selectOrderHistory],
+  (currentMarketId, orders) =>
+    !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
+);
+
 export const selectAccountOrdersLoading = createAppSelector(
   [
     selectRawOrdersRest,

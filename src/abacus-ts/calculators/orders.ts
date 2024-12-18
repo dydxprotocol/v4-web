@@ -1,7 +1,7 @@
 import { IndexerBestEffortOpenedStatus, IndexerOrderStatus } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
-import { mapValues, maxBy, pickBy } from 'lodash';
+import { mapValues, maxBy, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
@@ -12,18 +12,16 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../rawTypes';
-import { OrderStatus, SubaccountOrder, SubaccountOrdersData } from '../summaryTypes';
+import { OrderStatus, SubaccountOrder } from '../summaryTypes';
 
-export function calculateOpenOrders(orders: SubaccountOrdersData) {
-  return pickBy(
-    orders,
+export function calculateOpenOrders(orders: SubaccountOrder[]) {
+  return orders.filter(
     (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) === OrderStatus.Open
   );
 }
 
-export function calculateOrderHistory(orders: SubaccountOrdersData) {
-  return pickBy(
-    orders,
+export function calculateOrderHistory(orders: SubaccountOrder[]) {
+  return orders.filter(
     (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
   );
 }
@@ -32,10 +30,10 @@ export function calculateAllOrders(
   liveOrders: OrdersData | undefined,
   restOrders: OrdersData | undefined,
   height: HeightResponse
-): SubaccountOrdersData {
+): SubaccountOrder[] {
   const actuallyMerged = calculateMergedOrders(liveOrders ?? {}, restOrders ?? {});
   const mapped = mapValues(actuallyMerged, (order) => calculateSubaccountOrder(order, height));
-  return mapped;
+  return orderBy(Object.values(mapped), [(o) => o.updatedAtHeight], ['desc']);
 }
 
 function calculateSubaccountOrder(
@@ -74,7 +72,7 @@ function calculateSubaccountOrder(
   return order;
 }
 
-function getSimpleOrderStatus(status: OrderStatus) {
+export function getSimpleOrderStatus(status: OrderStatus) {
   switch (status) {
     case OrderStatus.Open:
     case OrderStatus.Pending:
