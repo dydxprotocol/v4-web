@@ -200,6 +200,7 @@ type IndexerWebsocketMessageType =
       subaccountNumber?: number;
       contents: any;
     }
-  | { type: 'subscribed'; channel: string; id: string | undefined; contents: any };
+  | { type: 'subscribed'; channel: string; id: string | undefined; contents: any }
+  | { type: 'unsubscribed'; channel: string; id: string | undefined; contents: any };
 
 export const isWsMessage = typia.createAssert<IndexerWebsocketMessageType>();
