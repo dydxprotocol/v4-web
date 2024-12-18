@@ -132,15 +132,12 @@ export const TokenSelect = ({
                 </div>
               </div>
             </button>
-            {i < withBalances.length - 1 && (
+            {i < noBalances.length - 1 && (
               <hr tw="w-full border border-solid border-color-border" />
             )}
           </Fragment>
         ))}
       </div>
-      <button type="button" onClick={onBack}>
-        Go back
-      </button>
     </div>
   );
 };
