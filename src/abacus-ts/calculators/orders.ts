@@ -16,13 +16,13 @@ import { OrderStatus, SubaccountOrder } from '../summaryTypes';
 
 export function calculateOpenOrders(orders: SubaccountOrder[]) {
   return orders.filter(
-    (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) === OrderStatus.Open
+    (order) => order.status == null || getSimpleOrderStatus(order.status) === OrderStatus.Open
   );
 }
 
 export function calculateOrderHistory(orders: SubaccountOrder[]) {
   return orders.filter(
-    (order) => getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
+    (order) => order.status != null && getSimpleOrderStatus(order.status) !== OrderStatus.Open
   );
 }
 
