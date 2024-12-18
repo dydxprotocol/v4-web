@@ -13,6 +13,7 @@ import {
 import { MetadataServiceAssetInfo } from '@/constants/assetMetadata';
 
 export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
+export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {
   bids: { [price: string]: string };
@@ -27,10 +28,10 @@ export interface ParentSubaccountData {
 
   // this data is lost on websocket reconnect, should never be trusted as the ONLY source for this information
   // it should be used to trigger a rest call refresh (debounced) and merged with the rest call result until the refresh completes
-  ephemeral: {
+  live: {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
-    orders?: { [orderId: string]: IndexerCompositeOrderObject };
+    orders?: OrdersData;
     transfers?: IndexerTransferResponseObject[];
   };
 }

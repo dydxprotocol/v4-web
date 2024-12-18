@@ -1,13 +1,16 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/lib/loadable';
-import { AssetInfos, MarketsData, OrderbookData, ParentSubaccountData } from '@/abacus-ts/rawTypes';
+import {
+  AssetInfos,
+  MarketsData,
+  OrderbookData,
+  OrdersData,
+  ParentSubaccountData,
+} from '@/abacus-ts/rawTypes';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
 } from '@/types/indexer/indexerApiGen';
-import {
-  IndexerCompositeFillResponse,
-  IndexerCompositeOrderObject,
-} from '@/types/indexer/indexerManual';
+import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -27,7 +30,7 @@ export interface RawDataState {
   account: {
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
-    orders: Loadable<{ [id: string]: IndexerCompositeOrderObject }>;
+    orders: Loadable<OrdersData>;
     transfers: Loadable<IndexerParentSubaccountTransferResponse>;
     blockTradingRewards: Loadable<IndexerHistoricalBlockTradingRewardsResponse>;
   };
@@ -90,10 +93,7 @@ export const rawSlice = createSlice({
     ) => {
       state.account.blockTradingRewards = action.payload;
     },
-    setAccountOrdersRaw: (
-      state,
-      action: PayloadAction<Loadable<{ [id: string]: IndexerCompositeOrderObject }>>
-    ) => {
+    setAccountOrdersRaw: (state, action: PayloadAction<Loadable<OrdersData>>) => {
       state.account.orders = action.payload;
     },
     setNetworkStateRaw: (
