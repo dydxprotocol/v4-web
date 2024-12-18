@@ -5,7 +5,6 @@ import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { setOrderbookRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -67,17 +66,12 @@ function orderbookWebsocketValue(
 }
 
 const selectMarketAndWsInfo = createAppSelector(
-  [selectWebsocketUrl, getCurrentMarketId],
-  (wsUrl, currentMarketId) => {
-    console.log('computing', wsUrl, currentMarketId);
-    return { wsUrl, currentMarketId };
-  }
+  [selectWebsocketUrl, (state) => state.perpetuals.currentMarketId],
+  (wsUrl, currentMarketId) => ({ wsUrl, currentMarketId })
 );
 
 export function setUpOrderbook(store: RootStore) {
-  console.log('Setting up orderbook');
   return createStoreEffect(store, selectMarketAndWsInfo, ({ currentMarketId, wsUrl }) => {
-    console.log('here', currentMarketId, wsUrl);
     if (!isTruthy(currentMarketId)) {
       return undefined;
     }
@@ -92,7 +86,6 @@ export function setUpOrderbook(store: RootStore) {
     );
 
     return () => {
-      console.log('teardown');
       thisTracker.teardown();
       IndexerWebsocketManager.markDone(wsUrl);
       throttledSetOrderbook.cancel();
