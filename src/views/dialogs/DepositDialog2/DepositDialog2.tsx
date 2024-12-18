@@ -62,6 +62,11 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const dialogTitle =
     formState === 'form' ? stringGetter({ key: STRING_KEYS.DEPOSIT }) : 'Select Token';
 
+  const onShowForm = () => {
+    setFormState('form');
+    tokenSelectRef.current?.scroll({ top: 0 });
+  };
+
   return (
     <$Dialog
       isOpen
@@ -69,7 +74,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       hasHeaderBorder
       setIsOpen={setIsOpen}
       slotIcon={formState === 'form' && <div />} // Empty icon to help with center alignment of title
-      onBack={formState !== 'form' ? () => setFormState('form') : undefined}
+      onBack={formState !== 'form' ? onShowForm : undefined}
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
@@ -93,14 +98,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
             maxHeight: isMobile ? '50vh' : '20rem',
           }}
         >
-          <TokenSelect
-            token={token}
-            setToken={setToken}
-            onBack={() => {
-              setFormState('form');
-              tokenSelectRef.current?.scroll({ top: 0 });
-            }}
-          />
+          <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
         </div>
       </div>
     </$Dialog>
