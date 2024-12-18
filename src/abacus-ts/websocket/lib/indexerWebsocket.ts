@@ -101,7 +101,7 @@ export class IndexerWebsocket {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
         logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
-      } else if (message.type === 'connected') {
+      } else if (message.type === 'connected' || message.type === 'unsubscribed') {
         // do nothing
       } else if (
         message.type === 'subscribed' ||
