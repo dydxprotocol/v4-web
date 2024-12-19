@@ -101,7 +101,7 @@ export class IndexerWebsocket {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
         logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
-      } else if (message.type === 'connected') {
+      } else if (message.type === 'connected' || message.type === 'unsubscribed') {
         // do nothing
       } else if (
         message.type === 'subscribed' ||
@@ -200,6 +200,7 @@ type IndexerWebsocketMessageType =
       subaccountNumber?: number;
       contents: any;
     }
-  | { type: 'subscribed'; channel: string; id: string | undefined; contents: any };
+  | { type: 'subscribed'; channel: string; id: string | undefined; contents: any }
+  | { type: 'unsubscribed'; channel: string; id: string | undefined; contents: any };
 
 export const isWsMessage = typia.createAssert<IndexerWebsocketMessageType>();

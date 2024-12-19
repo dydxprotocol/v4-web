@@ -13,8 +13,10 @@ export function createStoreEffect<T>(
   const removeStoreListener = store.subscribe(() => {
     const thisValue = selector(store.getState());
     if (thisValue !== lastValue) {
-      lastCleanup?.();
       lastValue = thisValue;
+      // NOTE: some cleanups dispatch actions which cause this to happen recursively.
+      // we must ensure that those actions don't change the state they subscribe to or this will go infinitely
+      lastCleanup?.();
       lastCleanup = handleChange(thisValue);
     }
   });
