@@ -49,7 +49,7 @@ export function useViewPanel(
         }
       }
     };
-  }, [market, actionCreator, networkId, walletId, height, dispatch]);
+  }, [market, actionCreator, networkId, walletId, height, dispatch, componentWillUnmount]);
 }
 
 function useComponentWillUnmount() {
