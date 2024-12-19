@@ -98,8 +98,7 @@ const getOrdersTableColumnDef = ({
   symbol?: Nullable<string>;
   isAccountViewOnly: boolean;
   width?: ColumnSize;
-  // todo add back output type, undo this change before committing
-}) => ({
+}): ColumnDef<OrderTableRow> => ({
   width,
   ...(
     {
