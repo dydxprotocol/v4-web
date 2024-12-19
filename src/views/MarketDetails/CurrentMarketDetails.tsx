@@ -1,5 +1,5 @@
-import { createSelectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
-import { createSelectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
+import { selectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
+import { selectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
 import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
@@ -22,8 +22,8 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(createSelectCurrentMarketInfo, shallowEqual);
-  const asset = useAppSelector(createSelectCurrentMarketAssetInfo);
+  const currentMarketData = useAppSelector(selectCurrentMarketInfo, shallowEqual);
+  const asset = useAppSelector(selectCurrentMarketAssetInfo);
 
   const {
     displayableAsset,

@@ -7,12 +7,12 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { transformAssetsInfo } from '../calculators/assets';
 import { selectRawAssetsData } from './base';
 
-export const createSelectAllAssetsInfo = createSelector([selectRawAssetsData], (assets) =>
+export const selectAllAssetsInfo = createSelector([selectRawAssetsData], (assets) =>
   transformAssetsInfo(assets)
 );
 
-export const createSelectCurrentMarketAssetInfo = createSelector(
-  [getCurrentMarketId, createSelectAllAssetsInfo],
+export const selectCurrentMarketAssetInfo = createSelector(
+  [getCurrentMarketId, selectAllAssetsInfo],
   (currentMarket, assets) => {
     const assetId = getAssetFromMarketId(currentMarket ?? '');
     return assets?.[assetId];
