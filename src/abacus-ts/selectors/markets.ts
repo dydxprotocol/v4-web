@@ -1,5 +1,5 @@
-import { RootState } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { calculateAllMarkets } from '../calculators/markets';
 import { selectRawMarketsData } from './base';
@@ -9,6 +9,6 @@ export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (m
 );
 
 export const selectCurrentMarketInfo = createAppSelector(
-  [selectAllMarketsInfo, (state: RootState) => state.perpetuals.currentMarketId],
+  [selectAllMarketsInfo, getCurrentMarketId],
   (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );

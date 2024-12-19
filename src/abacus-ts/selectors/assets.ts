@@ -1,20 +1,20 @@
 import { createSelector } from 'reselect';
 
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
-
-import { getAssetFromMarketId } from '@/lib/assetUtils';
-
 import { transformAssetsInfo } from '../calculators/assets';
 import { selectRawAssetsData } from './base';
+import { selectCurrentMarketInfo } from './markets';
 
 export const selectAllAssetsInfo = createSelector([selectRawAssetsData], (assets) =>
   transformAssetsInfo(assets)
 );
 
 export const selectCurrentMarketAssetInfo = createSelector(
-  [getCurrentMarketId, selectAllAssetsInfo],
-  (currentMarket, assets) => {
-    const assetId = getAssetFromMarketId(currentMarket ?? '');
-    return assets?.[assetId];
+  [selectCurrentMarketInfo, selectAllAssetsInfo],
+  (currentMarketInfo, assets) => {
+    if (currentMarketInfo == null || assets == null) {
+      return undefined;
+    }
+
+    return assets[currentMarketInfo.assetId];
   }
 );

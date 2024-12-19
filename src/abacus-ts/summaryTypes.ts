@@ -21,6 +21,7 @@ type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
 };
 
 export type MarketInfo = IndexerPerpetualMarketResponseObject & {
+  assetId: string;
   displayableAsset: string;
   displayableTicker: string;
   effectiveInitialMarginFraction: BigNumber | null;

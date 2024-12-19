@@ -5,7 +5,11 @@ import { weakMapMemoize } from 'reselect';
 
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
-import { getDisplayableAssetFromTicker, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import {
+  getAssetFromMarketId,
+  getDisplayableAssetFromTicker,
+  getDisplayableTickerFromMarket,
+} from '@/lib/assetUtils';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { MarketsData } from '../rawTypes';
@@ -58,6 +62,7 @@ export function getMarketEffectiveInitialMarginForMarket(
 const calculateMarket = weakMapMemoize(
   (market: IndexerPerpetualMarketResponseObject): MarketInfo => ({
     ...market,
+    assetId: getAssetFromMarketId(market.ticker),
     displayableAsset: getDisplayableAssetFromTicker(market.ticker),
     effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
     displayableTicker: getDisplayableTickerFromMarket(market.ticker),

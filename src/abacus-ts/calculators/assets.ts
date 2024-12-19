@@ -4,8 +4,8 @@ import { weakMapMemoize } from 'reselect';
 import { MetadataServiceAssetInfo, MetadataServiceInfoResponse } from '@/constants/assetMetadata';
 
 export const parseAssetInfo = weakMapMemoize(
-  (assetInfo: MetadataServiceAssetInfo & { assetId: string }) => ({
-    assetId: assetInfo.assetId,
+  (assetInfo: MetadataServiceAssetInfo, assetId: string) => ({
+    assetId,
     name: assetInfo.name,
     logo: assetInfo.logo,
     urls: {
@@ -22,5 +22,5 @@ export const transformAssetsInfo = (assetsInfo: MetadataServiceInfoResponse | un
   }
 
   // Add id field to each assetInfo
-  return mapValues(assetsInfo, (assetInfo, key) => parseAssetInfo({ ...assetInfo, assetId: key }));
+  return mapValues(assetsInfo, (assetInfo, key) => parseAssetInfo(assetInfo, key));
 };
