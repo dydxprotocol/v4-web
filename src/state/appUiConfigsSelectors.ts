@@ -53,6 +53,9 @@ export const getShouldHideLaunchableMarkets = (state: RootState) =>
 
 export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favoritedMarkets;
 
+export const getHorizontalPanelHeightPx = (state: RootState) =>
+  state.appUiConfigs.horizontalPanelHeightPx;
+
 export const getIsMarketFavorited = () =>
   createAppSelector(
     [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],

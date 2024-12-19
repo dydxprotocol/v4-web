@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -16,7 +16,9 @@ import { DetachedSection } from '@/components/ContentSection';
 import { AccountInfo } from '@/views/AccountInfo';
 import { LaunchMarketSidePanel } from '@/views/LaunchMarketSidePanel';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setHorizontalPanelHeightPx } from '@/state/appUiConfigs';
+import { getHorizontalPanelHeightPx } from '@/state/appUiConfigsSelectors';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { track } from '@/lib/analytics/analytics';
@@ -27,6 +29,7 @@ import { MarketSelectorAndStats } from './MarketSelectorAndStats';
 import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
 import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { useResizablePanel } from './useResizablePanel';
 
 const LaunchableMarket = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
@@ -36,6 +39,18 @@ const LaunchableMarket = () => {
   const { marketId } = match?.params ?? {};
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
+  const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
+  const dispatch = useAppDispatch();
+  const setPanelHeight = useCallback(
+    (h: number) => {
+      dispatch(setHorizontalPanelHeightPx(h));
+    },
+    [dispatch]
+  );
+  const { handleMouseDown, horizontalPanelHeight, isDragging } = useResizablePanel(
+    horizontalPanelHeightPxBase,
+    setPanelHeight
+  );
 
   useEffect(() => {
     if (marketId) {
@@ -70,6 +85,7 @@ const LaunchableMarket = () => {
       ref={tradePageRef}
       tradeLayout={tradeLayout}
       isHorizontalPanelOpen={isHorizontalPanelOpen}
+      horizontalPanelHeightPx={horizontalPanelHeight}
     >
       <header tw="[grid-area:Top]">
         <MarketSelectorAndStats launchableMarketId={marketId} />
@@ -82,10 +98,15 @@ const LaunchableMarket = () => {
 
       <$GridSection gridArea="Inner">
         <InnerPanel launchableMarketId={marketId} />
+        {isDragging && <$CoverUpTradingView />}
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+        <HorizontalPanel
+          isOpen={isHorizontalPanelOpen}
+          setIsOpen={setIsHorizontalPanelOpen}
+          handleStartResize={handleMouseDown}
+        />
       </$GridSection>
     </$TradeLayout>
   );
@@ -96,8 +117,9 @@ export default LaunchableMarket;
 const $TradeLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
+  horizontalPanelHeightPx: number;
 }>`
-  --horizontalPanel-height: 18rem;
+  --horizontalPanel-height: ${({ horizontalPanelHeightPx }) => `${horizontalPanelHeightPx}px`};
 
   // Constants
   /* prettier-ignore */
@@ -197,4 +219,12 @@ const $SidePanel = styled($GridSection)`
 const $LaunchMarketSidePanel = styled(LaunchMarketSidePanel)`
   overflow: auto;
   border-top: var(--border-width) solid var(--color-border);
+`;
+
+const $CoverUpTradingView = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.2);
 `;
