@@ -20,17 +20,15 @@ export function mergeLoadableData<T, R>(
 }
 
 // converts idle to pending and if a status has valid data is counts as success
-export function mergeLoadableStatus(
-  ...status: Array<Loadable<any>>
-): Exclude<Loadable<any>['status'], 'idle'> {
+export function mergeLoadableStatus(...status: Array<Loadable<any>>): Loadable<any>['status'] {
   if (status.some((s) => s.status === 'error' && s.data == null)) {
     return 'error';
   }
-  if (status.some((s) => s.status === 'idle')) {
-    return 'pending';
-  }
   if (status.some((s) => s.status === 'pending' && s.data == null)) {
     return 'pending';
+  }
+  if (status.some((s) => s.status === 'idle')) {
+    return 'idle';
   }
   return 'success';
 }

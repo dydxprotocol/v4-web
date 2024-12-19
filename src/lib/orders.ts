@@ -1,3 +1,10 @@
+import { getSimpleOrderStatus } from '@/abacus-ts/calculators/orders';
+import { AssetInfo, AssetInfos, MarketsData } from '@/abacus-ts/rawTypes';
+import {
+  SubaccountOrder as NewSubaccountOrder,
+  OrderStatus as OrderStatusNew,
+} from '@/abacus-ts/summaryTypes';
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -8,10 +15,10 @@ import {
   AbacusOrderTypes,
   KotlinIrEnumValues,
   Nullable,
+  OrderStatus,
   SubaccountFills,
   TRADE_TYPES,
   type Asset,
-  type OrderStatus,
   type PerpetualMarket,
   type SubaccountFill,
   type SubaccountFundingPayment,
@@ -21,6 +28,9 @@ import {
 import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
+
+import { getAssetFromMarketId } from './assetUtils';
+import { MaybeBigNumber } from './numbers';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
@@ -71,6 +81,55 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
   }
 };
 
+export const getOrderStatusInfoNew = ({ status }: { status: OrderStatusNew }) => {
+  switch (status) {
+    case OrderStatusNew.Open: {
+      return {
+        statusIcon: IconName.OrderOpen,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+    case OrderStatusNew.PartiallyFilled:
+    case OrderStatusNew.PartiallyCanceled: {
+      return {
+        statusIcon: IconName.OrderPartiallyFilled,
+        statusIconColor: `var(--color-warning)`,
+      };
+    }
+    case OrderStatusNew.Filled: {
+      return {
+        statusIcon: IconName.OrderFilled,
+        statusIconColor: `var(--color-success)`,
+      };
+    }
+    case OrderStatusNew.Canceled: {
+      return {
+        statusIcon: IconName.OrderCanceled,
+        statusIconColor: `var(--color-error)`,
+      };
+    }
+    case OrderStatusNew.Canceling: {
+      return {
+        statusIcon: IconName.OrderPending,
+        statusIconColor: `var(--color-error)`,
+      };
+    }
+    case OrderStatusNew.Untriggered: {
+      return {
+        statusIcon: IconName.OrderUntriggered,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+    case OrderStatusNew.Pending:
+    default: {
+      return {
+        statusIcon: IconName.OrderPending,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+  }
+};
+
 export const isOrderStatusOpen = (status: OrderStatus) =>
   [
     AbacusOrderStatus.Open,
@@ -81,6 +140,10 @@ export const isOrderStatusOpen = (status: OrderStatus) =>
 
 export const isOrderStatusClearable = (status: OrderStatus) =>
   status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
+
+export const isNewOrderStatusClearable = (status: OrderStatusNew) =>
+  getSimpleOrderStatus(status) === OrderStatusNew.Canceled ||
+  getSimpleOrderStatus(status) === OrderStatusNew.Filled;
 
 export const isOrderStatusCanceled = (status: OrderStatus) =>
   [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
@@ -95,6 +158,15 @@ export const isMarketOrderType = (type?: AbacusOrderTypes) =>
     AbacusOrderType.TakeProfitMarket,
     AbacusOrderType.TrailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
+
+export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
+  type &&
+  [
+    IndexerOrderType.MARKET,
+    IndexerOrderType.STOPMARKET,
+    IndexerOrderType.TAKEPROFITMARKET,
+    IndexerOrderType.TRAILINGSTOP,
+  ].some((t) => t === type);
 
 export const isLimitOrderType = (type?: AbacusOrderTypes) =>
   type &&
@@ -144,6 +216,29 @@ export const getHydratedTradingData = <
   tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });
+
+type NewAddedProps = {
+  asset: AssetInfo | undefined;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+};
+
+export const getHydratedOrder = ({
+  data,
+  assets,
+  perpetualMarkets,
+}: {
+  data: NewSubaccountOrder;
+  assets: AssetInfos;
+  perpetualMarkets: MarketsData;
+}): NewSubaccountOrder & NewAddedProps => {
+  return {
+    ...data,
+    asset: assets[getAssetFromMarketId(data.marketId)],
+    stepSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.stepSize)?.decimalPlaces(),
+    tickSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.tickSize)?.decimalPlaces(),
+  };
+};
 
 export const getTradeType = (orderType: string) =>
   TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];
