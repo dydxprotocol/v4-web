@@ -54,7 +54,6 @@ export function useViewPanel(
 
 function useComponentWillUnmount() {
   const componentWillUnmount = useRef(false);
-  // This is componentWillUnmount
   useEffect(() => {
     componentWillUnmount.current = false;
     return () => {
