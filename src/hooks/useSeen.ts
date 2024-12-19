@@ -8,8 +8,6 @@ import { setSeenFills, setSeenOpenOrders, setSeenOrderHistory } from '@/state/ac
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
-import { assertNever } from '@/lib/assertNever';
-
 export function useViewPanel(
   market: string | undefined,
   kind: 'fills' | 'openOrders' | 'orderHistory'
@@ -20,15 +18,13 @@ export function useViewPanel(
   const lastSetCore = useRef<any[]>([]);
 
   const dispatch = useAppDispatch();
-  const actionCreator =
-    kind === 'fills'
-      ? setSeenFills
-      : kind === 'openOrders'
-        ? setSeenOpenOrders
-        : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          kind === 'orderHistory'
-          ? setSeenOrderHistory
-          : assertNever(kind);
+  const actionCreator = (
+    {
+      fills: setSeenFills,
+      openOrders: setSeenOpenOrders,
+      orderHistory: setSeenOrderHistory,
+    } as const
+  )[kind];
 
   const componentWillUnmount = useComponentWillUnmount();
 
