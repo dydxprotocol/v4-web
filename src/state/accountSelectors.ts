@@ -1,3 +1,4 @@
+import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
@@ -18,6 +19,7 @@ import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
+import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   getAverageFillPrice,
@@ -30,6 +32,8 @@ import {
 import { getHydratedPositionData } from '@/lib/positions';
 
 import { type RootState } from './_store';
+import { ALL_MARKETS_STRING } from './accountUiMemory';
+import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getAssets } from './assetsSelectors';
 import {
@@ -687,3 +691,73 @@ export const getUserWalletAddress = (state: RootState) => state.account.wallet?.
 
 export const getUserSubaccountNumber = (state: RootState) =>
   state.account.subaccount?.subaccountNumber;
+
+export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
+export const getCurrentAccountMemory = createAppSelector(
+  [getSelectedNetwork, getUserWalletAddress, getAccountUiMemory],
+  (networkId, walletId, memory) => memory[walletId ?? '']?.[networkId]
+);
+
+export const createGetUnseenOrdersCount = () =>
+  createAppSelector(
+    [
+      getCurrentAccountMemory,
+      selectRawIndexerHeightData,
+      getSubaccountOrders,
+      (state, market: string | undefined) => market,
+    ],
+    (memory, height, orders, market) => {
+      if (height == null) {
+        return 0;
+      }
+      const ourOrders =
+        (market == null ? orders : orders?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      if (ourOrders.length === 0) {
+        return 0;
+      }
+      if (memory == null) {
+        return ourOrders.length;
+      }
+      const unseen = ourOrders.filter(
+        (o) =>
+          (o.updatedAtMilliseconds ?? 0) >
+          (mapIfPresent(
+            (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
+            (t) => new Date(t).valueOf()
+          ) ?? 0)
+      );
+      return unseen.length;
+    }
+  );
+
+export const createGetUnseenFillsCount = () =>
+  createAppSelector(
+    [
+      getCurrentAccountMemory,
+      selectRawIndexerHeightData,
+      getSubaccountFills,
+      (state, market: string | undefined) => market,
+    ],
+    (memory, height, fills, market) => {
+      if (height == null) {
+        return 0;
+      }
+      const ourFills =
+        (market == null ? fills : fills?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      if (ourFills.length === 0) {
+        return 0;
+      }
+      if (memory == null) {
+        return ourFills.length;
+      }
+      const unseen = ourFills.filter(
+        (o) =>
+          o.createdAtMilliseconds >
+          (mapIfPresent(
+            (memory.seenFills[o.marketId] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
+            (t) => new Date(t).valueOf()
+          ) ?? 0)
+      );
+      return unseen.length;
+    }
+  );
