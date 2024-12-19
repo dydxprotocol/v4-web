@@ -19,13 +19,13 @@ export const selectRawBlockTradingRewardsRestData = (state: RootState) =>
   state.raw.account.blockTradingRewards.data;
 
 export const selectRawFillsLiveData = (state: RootState) =>
-  state.raw.account.parentSubaccount.data?.ephemeral.fills;
+  state.raw.account.parentSubaccount.data?.live.fills;
 export const selectRawOrdersLiveData = (state: RootState) =>
-  state.raw.account.parentSubaccount.data?.ephemeral.orders;
+  state.raw.account.parentSubaccount.data?.live.orders;
 export const selectRawTransfersLiveData = (state: RootState) =>
-  state.raw.account.parentSubaccount.data?.ephemeral.transfers;
+  state.raw.account.parentSubaccount.data?.live.transfers;
 export const selectRawBlockTradingRewardsLiveData = (state: RootState) =>
-  state.raw.account.parentSubaccount.data?.ephemeral.tradingRewards;
+  state.raw.account.parentSubaccount.data?.live.tradingRewards;
 
 export const selectRawIndexerHeightData = (state: RootState) =>
   state.raw.heights.indexerHeight.data;

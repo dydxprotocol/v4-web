@@ -28,7 +28,7 @@ export interface ParentSubaccountData {
 
   // this data is lost on websocket reconnect, should never be trusted as the ONLY source for this information
   // it should be used to trigger a rest call refresh (debounced) and merged with the rest call result until the refresh completes
-  ephemeral: {
+  live: {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
     orders?: OrdersData;

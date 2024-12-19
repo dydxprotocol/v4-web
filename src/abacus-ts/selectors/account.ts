@@ -40,6 +40,8 @@ import {
   selectRawValidatorHeightData,
 } from './base';
 
+const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };
+
 const selectRelevantMarketsList = createAppSelector(
   [selectRawParentSubaccountData],
   (parentSubaccount) => {
@@ -98,7 +100,6 @@ export const selectParentSubaccountOpenPositions = createAppSelector(
 );
 export const selectParentSubaccountOpenPositionsLoading = selectParentSubaccountSummaryLoading;
 
-const baseTime = { height: 0, time: '1971-01-01T00:00:00Z' };
 export const selectAccountOrders = createAppSelector(
   [
     selectRawOrdersRestData,
@@ -107,7 +108,7 @@ export const selectAccountOrders = createAppSelector(
     selectRawIndexerHeightData,
   ],
   (rest, live, indexerHeight, validatorHeight) => {
-    return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? baseTime);
+    return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? BACKUP_BLOCK_HEIGHT);
   }
 );
 
@@ -118,6 +119,18 @@ export const selectOpenOrders = createAppSelector([selectAccountOrders], (orders
 export const selectOrderHistory = createAppSelector([selectAccountOrders], (orders) => {
   return calculateOrderHistory(orders);
 });
+
+export const selectCurrentMarketOpenOrders = createAppSelector(
+  [getCurrentMarketId, selectOpenOrders],
+  (currentMarketId, orders) =>
+    !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
+);
+
+export const selectCurrentMarketOrderHistory = createAppSelector(
+  [getCurrentMarketId, selectOrderHistory],
+  (currentMarketId, orders) =>
+    !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
+);
 
 export const selectAccountOrdersLoading = createAppSelector(
   [

@@ -3,14 +3,16 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { WalletInfo, WalletNetworkType } from '@/constants/wallets';
 
+export type SourceAccount = {
+  address?: string;
+  chain?: WalletNetworkType;
+  encryptedSignature?: string;
+  walletInfo?: WalletInfo;
+};
+
 // NOTE: This app slice is persisted via redux-persist. Changes to this type may require migrations.
 export interface WalletState {
-  sourceAccount: {
-    address?: string;
-    chain?: WalletNetworkType;
-    encryptedSignature?: string;
-    walletInfo?: WalletInfo;
-  };
+  sourceAccount: SourceAccount;
 }
 
 const initialState: WalletState = {

@@ -87,7 +87,7 @@ function accountWebsocketValue(
               .map(convertToStoredChildSubaccount),
             (c) => c.subaccountNumber
           ),
-          ephemeral: {
+          live: {
             orders: keyBy(message.orders, (o) => o.id),
           },
         });
@@ -150,16 +150,16 @@ function accountWebsocketValue(
               });
             }
             if (update.tradingReward != null) {
-              returnValue.ephemeral.tradingRewards ??= [];
-              returnValue.ephemeral.tradingRewards = [
-                ...returnValue.ephemeral.tradingRewards,
+              returnValue.live.tradingRewards ??= [];
+              returnValue.live.tradingRewards = [
+                ...returnValue.live.tradingRewards,
                 update.tradingReward,
               ];
             }
             if (update.fills != null) {
-              returnValue.ephemeral.fills ??= [];
-              returnValue.ephemeral.fills = [
-                ...returnValue.ephemeral.fills,
+              returnValue.live.fills ??= [];
+              returnValue.live.fills = [
+                ...returnValue.live.fills,
                 ...update.fills.map((f) => ({
                   ...f,
                   subaccountNumber,
@@ -169,8 +169,8 @@ function accountWebsocketValue(
               ];
             }
             if (update.orders != null) {
-              returnValue.ephemeral.orders = { ...(returnValue.ephemeral.orders ?? {}) };
-              const allOrders = returnValue.ephemeral.orders;
+              returnValue.live.orders = { ...(returnValue.live.orders ?? {}) };
+              const allOrders = returnValue.live.orders;
               update.orders.forEach((o) => {
                 const previousOrder = allOrders[o.id];
                 if (previousOrder == null) {
@@ -188,11 +188,8 @@ function accountWebsocketValue(
               });
             }
             if (update.transfers != null) {
-              returnValue.ephemeral.transfers ??= [];
-              returnValue.ephemeral.transfers = [
-                ...returnValue.ephemeral.transfers,
-                update.transfers,
-              ];
+              returnValue.live.transfers ??= [];
+              returnValue.live.transfers = [...returnValue.live.transfers, update.transfers];
             }
           });
         });

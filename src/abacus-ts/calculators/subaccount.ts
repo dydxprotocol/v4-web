@@ -27,7 +27,7 @@ import {
 } from '../summaryTypes';
 
 export function calculateParentSubaccountPositions(
-  parent: Omit<ParentSubaccountData, 'ephemeral'>,
+  parent: Omit<ParentSubaccountData, 'live'>,
   markets: MarketsData
 ): SubaccountPosition[] {
   return Object.values(parent.childSubaccounts)
@@ -46,7 +46,7 @@ export function calculateParentSubaccountPositions(
 }
 
 export function calculateParentSubaccountSummary(
-  parent: Omit<ParentSubaccountData, 'ephemeral'>,
+  parent: Omit<ParentSubaccountData, 'live'>,
   markets: MarketsData
 ): GroupedSubaccountSummary {
   const summaries = mapValues(parent.childSubaccounts, (subaccount) =>
@@ -67,9 +67,7 @@ export function calculateParentSubaccountSummary(
   };
 }
 
-export function calculateMarketsNeededForSubaccount(
-  parent: Omit<ParentSubaccountData, 'ephemeral'>
-) {
+export function calculateMarketsNeededForSubaccount(parent: Omit<ParentSubaccountData, 'live'>) {
   return Object.values(parent.childSubaccounts).flatMap((o) =>
     Object.values(o?.openPerpetualPositions ?? {}).map((p) => p.market)
   );
