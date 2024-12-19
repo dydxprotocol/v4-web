@@ -25,6 +25,7 @@ import {
   SubaccountSummaryCore,
   SubaccountSummaryDerived,
 } from '../summaryTypes';
+import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
   parent: Omit<ParentSubaccountData, 'live'>,
@@ -286,39 +287,4 @@ function calculatePositionDerivedExtra(
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
   };
-}
-
-function getMarketEffectiveInitialMarginForMarket(config: IndexerPerpetualMarketResponseObject) {
-  const initialMarginFraction = MaybeBigNumber(config.initialMarginFraction);
-  const openInterest = MaybeBigNumber(config.openInterest);
-  const openInterestLowerCap = MaybeBigNumber(config.openInterestLowerCap);
-  const openInterestUpperCap = MaybeBigNumber(config.openInterestUpperCap);
-  const oraclePrice = MaybeBigNumber(config.oraclePrice);
-
-  if (initialMarginFraction == null) return null;
-  if (
-    oraclePrice == null ||
-    openInterest == null ||
-    openInterestLowerCap == null ||
-    openInterestUpperCap == null
-  ) {
-    return initialMarginFraction;
-  }
-
-  // if these are equal we can throw an error from dividing by zero
-  if (openInterestUpperCap.eq(openInterestLowerCap)) {
-    return initialMarginFraction;
-  }
-
-  const openNotional = openInterest.times(oraclePrice);
-  const scalingFactor = openNotional
-    .minus(openInterestLowerCap)
-    .div(openInterestUpperCap.minus(openInterestLowerCap));
-  const imfIncrease = scalingFactor.times(MustBigNumber(1).minus(initialMarginFraction));
-
-  const effectiveIMF = BigNumber.minimum(
-    initialMarginFraction.plus(BigNumber.maximum(imfIncrease, 0.0)),
-    1.0
-  );
-  return effectiveIMF;
 }
