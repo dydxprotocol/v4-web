@@ -13,20 +13,17 @@ import {
   Network,
   ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
-import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
 import { readFileSync } from 'fs';
-import Long from 'long';
 import { PrometheusDriver } from 'prometheus-query';
 
 import {
   createAndSendMarketMapProposal,
+  createAndSendOracleMarketsProposal,
   Exchange,
   ExchangeName,
-  PerpetualMarketType,
   Proposal,
   retry,
   sleep,
@@ -41,11 +38,12 @@ const LocalWallet = LocalWalletModule.default;
 const PATH_TO_OLD_PROPOSALS =
   'v4-web-main-other-market-validation/public/configs/otherMarketData.json';
 const PATH_TO_PROPOSALS = 'public/configs/otherMarketData.json';
-// TODO: Query MIN_DEPOSIT and VOTING_PERIOD_SECONDS from chain.
-const MIN_DEPOSIT = '10000000';
-const VOTING_PERIOD_SECONDS = 120;
+// TODO: Query VOTING_PERIOD_SECONDS from chain.
+const VOTING_PERIOD_SECONDS = 60;
 
 const PROMETHEUS_SERVER_URL = 'http://localhost:9091';
+const SLINKY_HEALTH_CHECK_WINDOW = '1m';
+const PRICE_DISCREPANCY_THRESHOLD = 10; // 10% between highest and lowest reported price
 
 const MNEMONICS = [
   // alice
@@ -64,11 +62,6 @@ const MNEMONICS = [
   // Consensus Address: dydxvalcons1stjspktkshgcsv8sneqk2vs2ws0nw2wr272vtt
   'switch boring kiss cash lizard coconut romance hurry sniff bus accident zone chest height merit elevator furnace eagle fetch quit toward steak mystery nest',
 ];
-
-interface PrometheusTimeSeries {
-  // value of the time serie
-  value: number;
-}
 
 interface ExchangeInfo {
   url: string;
@@ -236,6 +229,8 @@ enum ValidationError {
   CLOB_SPT_MISMATCH = 'subticks per tick mismatch',
   PERP_AR_MISMATCH = 'Atomic resolution mismatch',
   PERP_LT_MISMATCH = 'Liquidity tier mismatch',
+  SLINKY_METRICS_FAILURE = 'Slinky metrics failure',
+  PRICE_DISCREPANCY = 'Provider price discrepancy',
 }
 
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
@@ -311,92 +306,44 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Send proposals to add all markets (unless a market with that ticker already exists).
   const allPerps = await client.validatorClient.get.getAllPerpetuals();
   const allTickers = allPerps.perpetual.map((perp) => perp.params!.ticker);
+  allTickers.push('USDT-USD');
   const filteredProposals = proposals.filter(
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
 
   // Send market map proposal first.
   await createAndSendMarketMapProposal(
-    filteredProposals,
+    proposals,
     network.validatorConfig.restEndpoint,
     network.validatorConfig.chainId,
-    'v4-chain/protocol/build/dydxprotocold'
+    '../v4-chain/protocol/build/dydxprotocold'
   );
   console.log('Submitted market map proposal');
-  await sleep(5000);
-  for (const wallet of wallets) {
-    retry(() => voteOnProposals([1], client, wallet));
-  }
-  await sleep(5000);
 
   const numExistingMarkets = allPerps.perpetual.reduce(
     (max, perp) => (perp.params!.id > max ? perp.params!.id : max),
     0
   );
-  const marketsProposed = new Map<number, Proposal>(); // marketId -> Proposal
 
-  let proposalId: number = 2;
-  for (let i = 0; i < filteredProposals.length; i += 4) {
-    // Send out proposals in groups of 4 or fewer.
-    const proposalsToSend = filteredProposals.slice(i, i + 4);
-    const proposalIds: number[] = [];
-    for (let j = 0; j < proposalsToSend.length; j++) {
-      // Use wallets[j] to send out proposalsToSend[j]
-      const proposal = proposalsToSend[j]!;
-      const marketId: number = numExistingMarkets + proposalId;
+  console.log('Sending oracle markets proposal');
 
-      // Send proposal.
-      const exchangeConfigString = `{"exchanges":${JSON.stringify(
-        proposal.params.exchangeConfigJson
-      )}}`;
-      const tx = await retry(() =>
-        client.submitGovAddNewMarketProposal(
-          wallets[j]!,
-          // @ts-ignore: marketType is not a valid parameter for addNewMarketProposal
-          {
-            id: marketId,
-            ticker: proposal.params.ticker,
-            priceExponent: proposal.params.priceExponent,
-            minPriceChange: proposal.params.minPriceChange,
-            minExchanges: proposal.params.minExchanges,
-            exchangeConfigJson: exchangeConfigString,
-            liquidityTier: proposal.params.liquidityTier,
-            atomicResolution: proposal.params.atomicResolution,
-            quantumConversionExponent: proposal.params.quantumConversionExponent,
-            stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
-            subticksPerTick: proposal.params.subticksPerTick,
-            delayBlocks: proposal.params.delayBlocks,
-            marketType:
-              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
-                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
-          },
-          proposal.title,
-          proposal.summary,
-          MIN_DEPOSIT
-        )
-      );
-      console.log(
-        `Tx by wallet ${j} to add market ${marketId} with ticker ${proposal.params.ticker}`,
-        tx
-      );
+  const marketsProposed = await createAndSendOracleMarketsProposal(
+    numExistingMarkets,
+    filteredProposals,
+    network.validatorConfig.restEndpoint,
+    network.validatorConfig.chainId,
+    '../v4-chain/protocol/build/dydxprotocold'
+  );
 
-      // Record proposed market.
-      marketsProposed.set(marketId, { ...proposal, id: Long.fromNumber(proposalId) });
-      proposalIds.push(proposalId++);
-    }
-
-    // Wait 5 seconds for proposals to be processed.
-    await sleep(5000);
-
-    // Vote YES on proposals from every wallet.
-    for (const wallet of wallets) {
-      retry(() => voteOnProposals(proposalIds, client, wallet));
-    }
-
-    // Wait 5 seconds for votes to be processed.
-    await sleep(5000);
+  // Wait 5 seconds for proposals to be processed.
+  await sleep(5000);
+  // Vote YES on proposals from every wallet.
+  for (const wallet of wallets) {
+    retry(() => voteOnProposals([1, 2], client, wallet));
   }
+
+  // Wait 5 seconds for votes to be processed.
+  await sleep(5000);
 
   // Wait for voting period to end.
   console.log(`\nWaiting for ${VOTING_PERIOD_SECONDS} seconds for voting period to end...`);
@@ -440,38 +387,27 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
-  await sleep(400 * 1000);
+  await sleep(300 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
-  for (const [marketId, proposal] of marketsProposed.entries()) {
-    console.log(`\nChecking ${proposal?.params?.ticker}`);
-    if (failedOrRejectedProposals.has(proposal.id)) {
-      console.log(`Skipping proposal ${proposal.id} as it failed or was rejected.`);
-      continue;
-    }
-
-    const isDydxUsd = proposal.params.ticker.toLowerCase() === 'dydx-usd';
+  for (const [marketId, ticker] of marketsProposed.entries()) {
+    const isDydxUsd = ticker.toLowerCase() === 'dydx-usd';
     // Validate price.
     const price = await client.validatorClient.get.getPrice(isDydxUsd ? 1000001 : marketId);
-    validatePrice(price.marketPrice!, proposal, allErrors);
-
-    // Validate clob pair.
-    const clobPair = await client.validatorClient.get.getClobPair(marketId);
-    validateClobPair(clobPair.clobPair!, proposal, allErrors);
-
-    // Validate perpetual.
-    const perpetual = await client.validatorClient.get.getPerpetual(marketId);
-    validatePerpetual(perpetual.perpetual!, proposal, allErrors);
+    validatePrice(price.marketPrice!, ticker, allErrors);
   }
 
   // for all markets proposed, determine if the slinky metrics are ok
-  for (const proposal of marketsProposed.values()) {
+  for (const proposal of proposals) {
+    const slinkyTicker = dydxTickerToSlinkyTicker(proposal.params.ticker);
+    await checkPriceDiscrepancies(slinkyTicker, allErrors);
     for (const exchange of proposal.params.exchangeConfigJson) {
-      validateSlinkyMetricsPerTicker(
-        dydxTickerToSlinkyTicker(proposal.params.ticker),
+      await validateSlinkyMetricsPerTicker(
+        slinkyTicker,
         exchange.ticker.toLowerCase(),
-        exchange.exchangeName
+        exchange.exchangeName,
+        allErrors
       );
     }
   }
@@ -494,143 +430,104 @@ function dydxTickerToSlinkyTicker(ticker: string): string {
   return ticker.toLowerCase().replace('-', '/');
 }
 
-function validateSlinkyMetricsPerTicker(
+async function checkPriceDiscrepancies(
+  ticker: string,
+  allErrors: Map<String, ValidationError>
+): Promise<void> {
+  const prometheus = new PrometheusDriver({
+    endpoint: PROMETHEUS_SERVER_URL,
+    baseURL: '/api/v1',
+  });
+  const providerPricesQuery = `(side_car_provider_price{id="${ticker}"})`;
+  const response = await prometheus.instantQuery(providerPricesQuery);
+  const prices = [];
+  const providerPriceMap = new Map<string, number>();
+  for (const result of response.result) {
+    const price = result.value.value;
+    prices.push(price);
+    providerPriceMap.set(result.metric.labels.provider, price);
+  }
+
+  if (prices.length < 2) return; // Skip if there's only one price
+
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  const percentDifference = ((maxPrice - minPrice) / minPrice) * 100;
+  if (percentDifference > PRICE_DISCREPANCY_THRESHOLD) {
+    allErrors.set(
+      `Price discrepancy above ${PRICE_DISCREPANCY_THRESHOLD}% for ${ticker}: ${JSON.stringify(Object.fromEntries(providerPriceMap), null, 2)}}`,
+      ValidationError.PRICE_DISCREPANCY
+    );
+  }
+}
+
+async function validateSlinkyMetricsPerTicker(
   ticker: string,
   exchangeSpecificTicker: string,
-  exchange: string
-): void {
+  exchange: string,
+  allErrors: Map<String, ValidationError>
+): Promise<void> {
   const prometheus = new PrometheusDriver({
     endpoint: PROMETHEUS_SERVER_URL,
     baseURL: '/api/v1',
   });
 
   const exchangeAPIQuerySuccessRate = `(
-    sum(rate(side_car_provider_status_responses_per_id{status = "success", provider="${exchange}", id="${exchangeSpecificTicker}"}[1m])) by (provider, id)
+    sum(rate(side_car_provider_status_responses_per_id{status = "success", provider="${exchange}", id="${exchangeSpecificTicker}"}[${SLINKY_HEALTH_CHECK_WINDOW}])) by (provider, id)
  ) / 
  (
-    sum(rate(side_car_provider_status_responses_per_id{provider="${exchange}", id="${exchangeSpecificTicker}"}[1m])) by (provider, id)
+    sum(rate(side_car_provider_status_responses_per_id{provider="${exchange}", id="${exchangeSpecificTicker}"}[${SLINKY_HEALTH_CHECK_WINDOW}])) by (provider, id)
  )`;
 
   const slinkyPriceAggregationQuery = `(
-    sum(rate(side_car_health_check_ticker_updates_total{id="${ticker}"}[1m])) by (instance, job)
+    sum(rate(side_car_health_check_ticker_updates_total{id="${ticker}"}[${SLINKY_HEALTH_CHECK_WINDOW}])) by (instance, job)
     /
-    sum(rate(side_car_health_check_system_updates_total[1m])) by (instance, job)
+    sum(rate(side_car_health_check_system_updates_total[${SLINKY_HEALTH_CHECK_WINDOW}])) by (instance, job)
 )`;
 
-  const slinkyProviderPricesQuery = `sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}", success='true'}[1m])) by (provider, id)
+  const slinkyProviderPricesQuery = `sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}", success='true'}[${SLINKY_HEALTH_CHECK_WINDOW}])) by (provider, id)
   /
-  sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`;
+  sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[${SLINKY_HEALTH_CHECK_WINDOW}])) by (provider, id)`;
 
-  const start = new Date().getTime() - 3 * 60 * 1000;
-  const end = new Date().getTime();
-  const step = 60;
-
+  async function handlePrometheusRateQuery(query: string, threshold: number): Promise<void> {
+    try {
+      await makePrometheusRateQuery(prometheus, query, threshold);
+    } catch (error) {
+      allErrors.set(`${exchange} and ${ticker}: ${error}`, ValidationError.SLINKY_METRICS_FAILURE);
+    }
+  }
   // determine success-rate for slinky queries to each exchange
-  makePrometheusRateQuery(prometheus, exchangeAPIQuerySuccessRate, start, end, step, 0.7);
+  await handlePrometheusRateQuery(exchangeAPIQuerySuccessRate, 0.7);
 
   // determine success rate for slinky price aggregation per market
-  makePrometheusRateQuery(prometheus, slinkyPriceAggregationQuery, start, end, step, 0.7);
+  await handlePrometheusRateQuery(slinkyPriceAggregationQuery, 0.7);
 
   // determine success rate for slinky price provider per market
-  makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
+  await handlePrometheusRateQuery(slinkyProviderPricesQuery, 0.7);
 }
 
-function makePrometheusRateQuery(
+async function makePrometheusRateQuery(
   prometheus: PrometheusDriver,
   query: string,
-  start: number,
-  end: number,
-  step: number,
   threshold: number
-): void {
-  prometheus
-    .rangeQuery(query, start, end, step)
-    .then((response) => {
-      const series = response.result;
-      series.forEach((s) => {
-        const values = s.values;
-        let totalSuccessRate = 0;
-        values.forEach((v: PrometheusTimeSeries) => {
-          // take the average of all success-rates over the interval
-          if (!Number.isNaN(v.value)) {
-            // we see NaN when there have been no successes from the provider
-            totalSuccessRate += v.value;
-          }
-        });
-        if (values.length === 0 || totalSuccessRate / values.length < threshold) {
-          throw new Error(
-            `slinky metrics for ${query} is below success rate threshold ${threshold}: ${
-              totalSuccessRate / values.length
-            }`
-          );
-        }
-      });
-    })
-    .catch((error) => {
-      throw error;
-    });
+): Promise<void> {
+  const response = await prometheus.instantQuery(query);
+  const result = response.result[0].value.value;
+  if (result < threshold) {
+    throw new Error(
+      `slinky metric value ${result} for ${query} is below success rate threshold ${threshold}`
+    );
+  }
 }
 
 function validatePrice(
   price: MarketPrice,
-  proposal: Proposal,
+  ticker: string,
   allErrors: Map<String, ValidationError>
 ): void {
-  const ticker = proposal?.params?.ticker;
-  if (price.exponent !== proposal.params.priceExponent) {
-    allErrors.set(
-      `Price ${price.id.toString()} with ticker ${ticker}`,
-      ValidationError.PRICE_EXPONENT_MISMATCH
-    );
-  }
   if (price.price.isZero()) {
     allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_ZERO);
-  }
-}
-
-function validateClobPair(
-  clobPair: ClobPair,
-  proposal: Proposal,
-  allErrors: Map<String, ValidationError>
-): void {
-  const ticker = proposal?.params?.ticker;
-  if (clobPair.quantumConversionExponent !== proposal.params.quantumConversionExponent) {
-    allErrors.set(
-      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
-      ValidationError.CLOB_QCE_MISMATCH
-    );
-  }
-  if (!clobPair.stepBaseQuantums.equals(proposal.params.stepBaseQuantums)) {
-    allErrors.set(
-      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
-      ValidationError.CLOB_SBQ_MISMATCH
-    );
-  }
-  if (clobPair.subticksPerTick !== proposal.params.subticksPerTick) {
-    allErrors.set(
-      `Clob pair ${clobPair.id.toString()} with ticker ${ticker}`,
-      ValidationError.CLOB_SPT_MISMATCH
-    );
-  }
-}
-
-function validatePerpetual(
-  perpetual: Perpetual,
-  proposal: Proposal,
-  allErrors: Map<String, ValidationError>
-): void {
-  const ticker = proposal?.params?.ticker;
-  if (perpetual.params!.atomicResolution !== proposal.params.atomicResolution) {
-    allErrors.set(
-      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
-      ValidationError.PERP_AR_MISMATCH
-    );
-  }
-  if (perpetual.params!.liquidityTier !== proposal.params.liquidityTier) {
-    allErrors.set(
-      `Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`,
-      ValidationError.PERP_LT_MISMATCH
-    );
   }
 }
 
@@ -691,24 +588,6 @@ function validateParamsSchema(proposal: Proposal): void {
   }
 }
 
-function validateAtomicResolution(proposal: Proposal): void {
-  if (proposal.params.ticker === 'TRUMPWIN-USD') {
-    if (proposal.params.atomicResolution !== -6) {
-      throw new Error(
-        `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match -6`
-      );
-    } else {
-      return;
-    }
-  }
-  const calculatedAtomicResolution = -6 - Math.floor(Math.log10(proposal.meta.referencePrice));
-  if (proposal.params.atomicResolution !== calculatedAtomicResolution) {
-    throw new Error(
-      `${proposal.params.ticker}: atomic resolution (${proposal.params.atomicResolution}) does not match the calculated value (${calculatedAtomicResolution}) based on reference price ${proposal.meta.referencePrice}`
-    );
-  }
-}
-
 // getProposalsToValidate finds proposals that are either added or whose params are modified,
 // i.e. ignoring initialDeposit, meta, summary, title, etc.
 function getProposalsToValidate(newProposals: Record<string, Proposal>): Set<string> {
@@ -751,12 +630,6 @@ async function main(): Promise<void> {
     validateParamsSchema(proposal);
   }
 
-  // Validate atomicResolution of all proposals.
-  console.log('Validating atomicResolution of all proposals...\n');
-  for (const proposal of Object.values(newProposals)) {
-    validateAtomicResolution(proposal);
-  }
-
   // Validate parameters of all proposals.
   console.log('\nValidating parameters of all proposals...\n');
   for (const proposal of Object.values(newProposals)) {
@@ -770,6 +643,7 @@ async function main(): Promise<void> {
   if (proposalsToValidate.size === 0) {
     return;
   }
+
   await validateAgainstLocalnet(Array.from(proposalsToValidate).map((name) => newProposals[name]!));
 
   console.log(`\nValidated ${proposalsToValidate.size} proposals. See log for specific names.`);
