@@ -30,7 +30,7 @@ export function useIndexer() {
     };
   }, [selectedNetwork, indexerReady]);
 
-  return { indexerClient: client };
+  return { indexerClient: client, key: `${selectedNetwork}-${indexerReady}` };
 }
 
 export function useCompositeClient() {
@@ -54,5 +54,5 @@ export function useCompositeClient() {
     };
   }, [selectedNetwork, compositeClientReady]);
 
-  return { compositeClient: client };
+  return { compositeClient: client, key: `${selectedNetwork}-${compositeClientReady}` };
 }
