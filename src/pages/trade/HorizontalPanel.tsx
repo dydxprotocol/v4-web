@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { selectAccountFillsLoading } from '@/abacus-ts/selectors/account';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -90,6 +91,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   );
   const hasUnseenOrderUpdates = unseenOrders > 0;
 
+  const areFillsLoading = useAppSelector(selectAccountFillsLoading) === 'pending';
   const numUnseenFills = useParameterizedSelector(
     createGetUnseenFillsCount,
     showCurrentMarket ? currentMarketId : undefined
@@ -227,10 +229,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       value: InfoSection.Fills,
       label: stringGetter({ key: STRING_KEYS.FILLS }),
 
-      slotRight: fillsTagNumber && (
-        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-          {fillsTagNumber}
-        </Tag>
+      slotRight: areFillsLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        fillsTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+            {fillsTagNumber}
+          </Tag>
+        )
       ),
 
       content: (
