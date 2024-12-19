@@ -9,7 +9,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { CompositeClientManager } from './compositeClientManager';
 
-export function useIndexer() {
+export function useIndexerClient() {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const indexerReady = useAppSelector(selectIndexerReady);
 
