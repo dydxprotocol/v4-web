@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -17,7 +17,9 @@ import { AccountInfo } from '@/views/AccountInfo';
 import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setHorizontalPanelHeightPx } from '@/state/appUiConfigs';
+import { getHorizontalPanelHeightPx } from '@/state/appUiConfigsSelectors';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { HorizontalPanel } from './HorizontalPanel';
@@ -29,6 +31,7 @@ import { MobileTopPanel } from './MobileTopPanel';
 import { TradeDialogTrigger } from './TradeDialogTrigger';
 import { TradeHeaderMobile } from './TradeHeaderMobile';
 import { VerticalPanel } from './VerticalPanel';
+import { useResizablePanel } from './useResizablePanel';
 
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
@@ -38,6 +41,18 @@ const TradePage = () => {
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
+  const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
+  const dispatch = useAppDispatch();
+  const setPanelHeight = useCallback(
+    (h: number) => {
+      dispatch(setHorizontalPanelHeightPx(h));
+    },
+    [dispatch]
+  );
+  const { handleMouseDown, horizontalPanelHeight, isDragging } = useResizablePanel(
+    horizontalPanelHeightPxBase,
+    setPanelHeight
+  );
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
@@ -57,7 +72,7 @@ const TradePage = () => {
         </DetachedSection>
 
         <DetachedSection>
-          <HorizontalPanel />
+          <HorizontalPanel handleStartResize={handleMouseDown} />
         </DetachedSection>
 
         <DetachedSection>
@@ -72,6 +87,7 @@ const TradePage = () => {
       ref={tradePageRef}
       tradeLayout={tradeLayout}
       isHorizontalPanelOpen={isHorizontalPanelOpen}
+      horizontalPanelHeightPx={horizontalPanelHeight}
     >
       <header tw="[grid-area:Top]">
         <MarketSelectorAndStats />
@@ -88,10 +104,15 @@ const TradePage = () => {
 
       <$GridSection gridArea="Inner">
         <InnerPanel />
+        {isDragging && <$CoverUpTradingView />}
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
+        <HorizontalPanel
+          isOpen={isHorizontalPanelOpen}
+          setIsOpen={setIsHorizontalPanelOpen}
+          handleStartResize={handleMouseDown}
+        />
       </$GridSection>
     </$TradeLayout>
   );
@@ -101,16 +122,15 @@ export default TradePage;
 const $TradeLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
+  horizontalPanelHeightPx: number;
 }>`
-  --horizontalPanel-height: 18rem;
+  --horizontalPanel-height: ${({ horizontalPanelHeightPx }) => `${horizontalPanelHeightPx}px`};
 
   // Constants
   /* prettier-ignore */
-  --layout-default:
-    'Top Top Top' auto
-    'Inner Vertical Side' minmax(0, 1fr)
-    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
-    / 1fr minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
+  --layout-default: 'Top Top Top' auto 'Inner Vertical Side' minmax(0, 1fr)
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height)) / 1fr
+    minmax(0, var(--orderbook-trades-width)) var(--sidebar-width);
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
@@ -189,4 +209,12 @@ const $TradeLayoutMobile = styled.article`
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+`;
+
+const $CoverUpTradingView = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.2);
 `;
