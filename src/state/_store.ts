@@ -7,6 +7,7 @@ import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
 
 import { accountSlice } from './account';
+import { accountUiMemorySlice } from './accountUiMemory';
 import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
@@ -34,6 +35,7 @@ const reducers = {
   affiliates: affiliatesSlice.reducer,
   app: appSlice.reducer,
   appUiConfigs: appUiConfigsSlice.reducer,
+  accountUiMemory: accountUiMemorySlice.reducer,
   assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
@@ -63,6 +65,7 @@ const persistConfig = {
     'tradingView',
     'wallet',
     'appUiConfigs',
+    'accountUiMemory',
     'funkitDeposits',
   ],
   stateReconciler: autoMergeLevel2,

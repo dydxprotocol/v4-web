@@ -1,4 +1,4 @@
-import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { AssetInfo } from '@/abacus-ts/rawTypes';
 import {
@@ -21,6 +21,7 @@ import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -40,9 +41,7 @@ import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
-import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getHasUnseenOrderUpdates } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -456,11 +455,7 @@ export const OrdersTable = forwardRef(
     const allPerpetualMarkets = orEmptyRecord(useAppSelector(selectRawMarketsData));
     const allAssets = orEmptyRecord(useAppSelector(selectRawAssetsData));
 
-    const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
-
-    useEffect(() => {
-      if (hasUnseenOrderUpdates) dispatch(viewedOrders());
-    }, [dispatch, hasUnseenOrderUpdates]);
+    useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
 
     const symbol = mapIfPresent(currentMarket, (market) =>
       mapIfPresent(
