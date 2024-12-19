@@ -27,9 +27,10 @@ import {
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
+  createGetOpenOrdersCount,
   createGetUnseenFillsCount,
-  createGetUnseenOrdersCount,
-  getCurrentMarketTradeInfoNumbers,
+  createGetUnseenOpenOrdersCount,
+  createGetUnseenOrderHistoryCount,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -71,12 +72,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders } = useAppSelector(
-    getTradeInfoNumbers,
-    shallowEqual
-  );
-
-  const { numOpenOrders } = useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual);
+  const { numTotalPositions } = useAppSelector(getTradeInfoNumbers, shallowEqual);
 
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useShouldShowTriggers();
@@ -87,8 +83,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const areOrdersLoading = useAppSelector(selectAccountOrdersLoading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
+  const numOpenOrders = useParameterizedSelector(
+    createGetOpenOrdersCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
   const unseenOrders = useParameterizedSelector(
-    createGetUnseenOrdersCount,
+    createGetUnseenOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
   const hasUnseenOrderUpdates = unseenOrders > 0;
@@ -97,11 +97,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     createGetUnseenFillsCount,
     showCurrentMarket ? currentMarketId : undefined
   );
+  const numUnseenOrderHistory = useParameterizedSelector(
+    createGetUnseenOrderHistoryCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
   const hasUnseenFillUpdates = numUnseenFills > 0;
   const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
-  const ordersTagNumber = shortenNumberForDisplay(
-    showCurrentMarket ? numOpenOrders : numTotalOpenOrders
-  );
+  const ordersTagNumber = shortenNumberForDisplay(numOpenOrders);
+  const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
 
   const initialPageSize = 10;
 
@@ -235,8 +238,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
       slotRight: areOrdersLoading ? (
         <LoadingSpinner tw="[--spinner-width:1rem]" />
-      ) : // todo calculate unread history items
-      null,
+      ) : (
+        orderHistoryTagNumber &&
+        numUnseenOrderHistory > 0 && (
+          <Tag type={TagType.Number} isHighlighted={numUnseenOrderHistory > 0}>
+            {orderHistoryTagNumber}
+          </Tag>
+        )
+      ),
 
       content: (
         <OrdersTable
@@ -263,7 +272,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         />
       ),
     }),
-    [stringGetter, areOrdersLoading, showCurrentMarket, currentMarketId, viewIsolated, isTablet]
+    [
+      stringGetter,
+      areOrdersLoading,
+      orderHistoryTagNumber,
+      numUnseenOrderHistory,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
+    ]
   );
 
   const fillsTabItem = useMemo(
