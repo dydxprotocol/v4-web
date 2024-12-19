@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.3.0
     version: 1.3.0
   '@funkit/connect':
-    specifier: ^4.0.2
-    version: 4.0.2(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9)
+    specifier: ^4.0.3
+    version: 4.0.3(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9)
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
@@ -4391,15 +4391,16 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@funkit/api-base@1.4.1:
-    resolution: {integrity: sha512-pjT+CYKmQMbpsNan7+vn5JuP14DibpS4HuV22gBwlu08ej/7ITHX5wOSUMrcEzcypg8cfjAx0KaIFmtRbCnyZQ==}
+  /@funkit/api-base@1.4.2:
+    resolution: {integrity: sha512-nFVbwpm505T82A6PV0+oUvyv3wvJIhyRBcXRJs7JPBZIxtTiJdhhlrTW9l4ibS7npDSg8iMGrrKd9pQhCbpW4g==}
     dependencies:
+      '@funkit/utils': 1.0.3
       '@lifeomic/attempt': 3.1.0
       big.js: 6.2.2
     dev: false
 
-  /@funkit/connect@4.0.2(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9):
-    resolution: {integrity: sha512-aLUZD34S1MIl5k//UdNkhq+lbKoZkJG7Rk8wHpONFCzj3x7pYKDZyv82E1E3GnZsc50+4ONz05c1PL79HXg0vA==}
+  /@funkit/connect@4.0.3(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9):
+    resolution: {integrity: sha512-BCJ8zL+Y3SIzvxEsoJjsdawpPmX+WnnfX3Cd3hxuD4/thjRFdQSJMhbYf0JYo1pw35OiYBOmCWQBWr7GAVlkuw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -4409,10 +4410,10 @@ packages:
       wagmi: 2.x
     dependencies:
       '@datadog/browser-logs': 5.22.0
-      '@funkit/api-base': 1.4.1
-      '@funkit/core': 2.2.8(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2)
-      '@funkit/utils': 1.0.2
-      '@funkit/wagmi-tools': 3.0.19(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)
+      '@funkit/api-base': 1.4.2
+      '@funkit/core': 2.2.9(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2)
+      '@funkit/utils': 1.0.3
+      '@funkit/wagmi-tools': 3.0.20(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)
       '@meshconnect/web-link-sdk': 2.1.1
       '@moonpay/moonpay-react': 1.8.2(react@18.2.0)
       '@privy-io/js-sdk-core': 0.21.1
@@ -4451,14 +4452,15 @@ packages:
       - zod
     dev: false
 
-  /@funkit/core@2.2.8(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2):
-    resolution: {integrity: sha512-SvLc9pjjNOmIx0OyfWyfou/AAiaiHC3feIkDiIZZEfg5msffb5lBhVnpPTxXyj0B8YP49ya/SqRjBeQm5tDpDQ==}
+  /@funkit/core@2.2.9(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2):
+    resolution: {integrity: sha512-brhxGz3jpFxjudIDOcI7Y81U4g7T1IkFx1ExAEvLDDNiI5LGtowvSB39Ks1Wh8EBRWorN4L5Tle61Rf7tkw7OQ==}
     dependencies:
       '@aws-sdk/client-secrets-manager': 3.674.0
       '@ethersproject/abi': 5.7.0
       '@ethersproject/contracts': 5.7.0
       '@ethersproject/providers': 5.7.2
-      '@funkit/api-base': 1.4.1
+      '@funkit/api-base': 1.4.2
+      '@funkit/utils': 1.0.3
       '@lifeomic/attempt': 3.1.0
       '@uniswap/sdk': 3.0.3(@ethersproject/address@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)
       '@uniswap/sdk-core': 4.2.1
@@ -4481,19 +4483,19 @@ packages:
       - zod
     dev: false
 
-  /@funkit/utils@1.0.2:
-    resolution: {integrity: sha512-zIpykIcONGlvoI344nKBU20NZSYQuqT+6gPTO/6Tt0IPvbt83UlaxpQUns3AuzPbjfDBXpA19gLQdWkkuUNOfQ==}
+  /@funkit/utils@1.0.3:
+    resolution: {integrity: sha512-h86EaZk/FVXj8nO0EjTaT6YA9h6HuYtktuD6Qbz/JiJc/O5Bbvw7owJSoQUFkaxMFCI6PzAz257DeX/NwJMysg==}
     engines: {node: '>=18'}
     dev: false
 
-  /@funkit/wagmi-tools@3.0.19(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2):
-    resolution: {integrity: sha512-3k4df1OLkfSq5rh0J7tSXVFG3W82ux7kF8UT41pv4Lop2ZexLOkDLf6jiFhCYQ921YrMdzZCeu8Dh1DVV6Q4ZQ==}
+  /@funkit/wagmi-tools@3.0.20(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(@types/react@18.3.3)(hardhat@2.22.13)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2):
+    resolution: {integrity: sha512-7sNHr4CcdchiHERSOp2RQZXvSEzNX7PmsGRDlXALP9uqN2TUYcvTtmy2bH8z6s2RhUVJF0sWLpBtv8X9p2W67w==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18.3.0
       react-dom: ^18.3.0
     dependencies:
-      '@funkit/core': 2.2.8(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2)
+      '@funkit/core': 2.2.9(@ethersproject/address@5.7.0)(@ethersproject/networks@5.7.1)(@ethersproject/solidity@5.7.0)(hardhat@2.22.13)(typescript@5.7.2)
       '@wagmi/core': 2.13.8(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -6008,6 +6010,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.3
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -21600,6 +21603,10 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /napi-wasm@1.1.3:
+    resolution: {integrity: sha512-h/4nMGsHjZDCYmQVNODIrYACVJ+I9KItbG+0si6W/jSjdA9JbWDoU4LLeMXVcEQGHjttI2tuXqDrbGF7qkUHHg==}
+    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}

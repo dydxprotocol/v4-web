@@ -32,7 +32,7 @@ export const FunkitDepositNotification = ({
 
   useEffect(() => {
     if (funkitCheckoutItem?.state) {
-      dispatch(updateFunkitDeposit({ ...deposit, status: funkitCheckoutItem?.state }));
+      dispatch(updateFunkitDeposit({ ...deposit, status: funkitCheckoutItem.state }));
     }
   }, [funkitCheckoutItem?.state, dispatch, deposit]);
 
