@@ -1,11 +1,11 @@
-import { selectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
+import { createSelectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
+import { createSelectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
 import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DetailsItem } from '@/components/Details';
@@ -14,6 +14,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { getAssetDescriptionStringKeys } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -21,8 +22,8 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(selectCurrentMarketInfo, shallowEqual);
-  const asset = useMetadataServiceAssetFromId(currentMarketData?.ticker);
+  const currentMarketData = useAppSelector(createSelectCurrentMarketInfo, shallowEqual);
+  const asset = useAppSelector(createSelectCurrentMarketAssetInfo);
 
   const {
     displayableAsset,
@@ -37,8 +38,9 @@ export const CurrentMarketDetails = () => {
     stepSizeDecimals,
   } = orEmptyObj(currentMarketData);
 
-  const { id: assetId, logo, name, urls } = orEmptyObj(asset);
+  const { assetId, logo, name, urls } = orEmptyObj(asset);
   const { cmc, website, technicalDoc } = orEmptyObj(urls);
+  const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
 
   const preferEIMF = Boolean(
     effectiveInitialMarginFraction &&
@@ -146,8 +148,8 @@ export const CurrentMarketDetails = () => {
       assetName={name}
       assetIcon={{ symbol: assetId, logoUrl: logo }}
       marketDetailItems={items}
-      primaryDescription={stringGetter({ key: `APP.__ASSETS.${assetId}.PRIMARY` })}
-      secondaryDescription={stringGetter({ key: `APP.__ASSETS.${assetId}.SECONDARY` })}
+      primaryDescription={stringGetter({ key: primary })}
+      secondaryDescription={stringGetter({ key: secondary })}
       urls={{ technicalDoc, website, cmc }}
     />
   );
