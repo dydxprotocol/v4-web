@@ -1,0 +1,65 @@
+import { useEffect, useRef } from 'react';
+
+import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
+import { shallowEqual } from 'react-redux';
+
+import { getUserWalletAddress } from '@/state/accountSelectors';
+import { setSeenFills, setSeenOpenOrders, setSeenOrderHistory } from '@/state/accountUiMemory';
+import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+
+import { assertNever } from '@/lib/assertNever';
+
+export function useViewPanel(
+  market: string | undefined,
+  kind: 'fills' | 'openOrders' | 'orderHistory'
+) {
+  const networkId = useAppSelector(getSelectedNetwork);
+  const walletId = useAppSelector(getUserWalletAddress);
+  const height = useAppSelector(selectRawIndexerHeightData);
+  const lastSetCore = useRef<any[]>([]);
+
+  const dispatch = useAppDispatch();
+  const actionCreator =
+    kind === 'fills'
+      ? setSeenFills
+      : kind === 'openOrders'
+        ? setSeenOpenOrders
+        : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          kind === 'orderHistory'
+          ? setSeenOrderHistory
+          : assertNever(kind);
+
+  const componentWillUnmount = useComponentWillUnmount();
+
+  useEffect(() => {
+    if (height != null && walletId != null) {
+      // only set once for a given set of configurations
+      // effectively, view on mount as soon as we load height
+      const thisCore = [market, actionCreator, networkId, walletId];
+      if (!shallowEqual(lastSetCore.current, thisCore)) {
+        lastSetCore.current = thisCore;
+        dispatch(actionCreator({ scope: { networkId, walletId }, market, height }));
+      }
+    }
+    return () => {
+      if (componentWillUnmount.current) {
+        if (height != null && walletId != null) {
+          dispatch(actionCreator({ scope: { networkId, walletId }, market, height }));
+        }
+      }
+    };
+  }, [market, actionCreator, networkId, walletId, height, dispatch]);
+}
+
+function useComponentWillUnmount() {
+  const componentWillUnmount = useRef(false);
+  // This is componentWillUnmount
+  useEffect(() => {
+    componentWillUnmount.current = false;
+    return () => {
+      componentWillUnmount.current = true;
+    };
+  }, []);
+  return componentWillUnmount;
+}
