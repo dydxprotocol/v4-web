@@ -381,7 +381,7 @@ const getPositionsTableColumnDef = ({
           tickSizeDecimals,
           liquidationPrice,
           side,
-          size,
+          signedSize,
           stopLossOrders,
           takeProfitOrders,
         }) => {
@@ -394,7 +394,7 @@ const getPositionsTableColumnDef = ({
               stopLossOrders={stopLossOrders}
               takeProfitOrders={takeProfitOrders}
               positionSide={side}
-              positionSize={size}
+              positionSize={signedSize}
               isDisabled={isAccountViewOnly}
               onViewOrdersClick={navigateToOrders}
             />
