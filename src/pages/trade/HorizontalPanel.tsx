@@ -270,11 +270,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     }),
     [
       stringGetter,
-      currentMarketId,
-      showCurrentMarket,
-      isTablet,
+      areFillsLoading,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      isTablet,
     ]
   );
 
