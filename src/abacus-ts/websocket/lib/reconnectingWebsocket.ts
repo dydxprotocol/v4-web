@@ -39,7 +39,7 @@ export class ReconnectingWebSocket {
     this.handleFreshConnect = config.handleFreshConnect;
 
     this.initialReconnectInterval = config.initialReconnectInterval ?? 1000;
-    this.maxReconnectInterval = config.maxReconnectInterval ?? 60_000;
+    this.maxReconnectInterval = config.maxReconnectInterval ?? 120_000;
     this.backoffMultiplier = config.backoffMultiplier ?? 1.5;
 
     this.connect();
@@ -66,10 +66,11 @@ export class ReconnectingWebSocket {
     this.numberOfFailedAttempts += 1;
 
     const interval = Math.min(
-      this.initialReconnectInterval * this.backoffMultiplier ** this.numberOfFailedAttempts,
+      this.initialReconnectInterval * this.backoffMultiplier ** (this.numberOfFailedAttempts - 1),
       this.maxReconnectInterval
     );
 
+    clearTimeout(this.reconnectTimeout);
     this.reconnectTimeout = setTimeout(() => {
       // eslint-disable-next-line no-console
       console.log(`ReconnectingWebSocket: Attempting to reconnect after ${interval / 1000}s...`);
