@@ -1,4 +1,4 @@
-import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
@@ -694,24 +694,64 @@ export const getUserSubaccountNumber = (state: RootState) =>
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(
-  [getSelectedNetwork, getUserWalletAddress, getAccountUiMemory],
+  [getSelectedNetwork, (state) => state.wallet.localWallet?.address, getAccountUiMemory],
   (networkId, walletId, memory) => memory[walletId ?? '']?.[networkId]
 );
 
-export const createGetUnseenOrdersCount = () =>
+export const createGetOpenOrdersCount = () =>
+  createAppSelector(
+    [BonsaiCore.account.openOrders.data, (state, market: string | undefined) => market],
+    (orders, market) => {
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
+
+      return ourOrders.length;
+    }
+  );
+
+export const createGetUnseenOpenOrdersCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
-      getSubaccountOrders,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.openOrders.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, orders, market) => {
       if (height == null) {
         return 0;
       }
-      const ourOrders =
-        (market == null ? orders : orders?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
+      if (ourOrders.length === 0) {
+        return 0;
+      }
+      if (memory == null) {
+        return ourOrders.length;
+      }
+      const unseen = ourOrders.filter(
+        (o) =>
+          (o.updatedAtMilliseconds ?? 0) >
+          (mapIfPresent(
+            (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
+            (t) => new Date(t).valueOf()
+          ) ?? 0)
+      );
+      return unseen.length;
+    }
+  );
+
+export const createGetUnseenOrderHistoryCount = () =>
+  createAppSelector(
+    [
+      getCurrentAccountMemory,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.orderHistory.data,
+      (state, market: string | undefined) => market,
+    ],
+    (memory, height, orders, market) => {
+      if (height == null) {
+        return 0;
+      }
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
       if (ourOrders.length === 0) {
         return 0;
       }
@@ -734,16 +774,15 @@ export const createGetUnseenFillsCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
-      getSubaccountFills,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.fills.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, fills, market) => {
       if (height == null) {
         return 0;
       }
-      const ourFills =
-        (market == null ? fills : fills?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      const ourFills = market == null ? fills : fills.filter((o) => o.market === market);
       if (ourFills.length === 0) {
         return 0;
       }
@@ -752,9 +791,9 @@ export const createGetUnseenFillsCount = () =>
       }
       const unseen = ourFills.filter(
         (o) =>
-          o.createdAtMilliseconds >
+          (mapIfPresent(o.createdAt, (c) => new Date(c).valueOf()) ?? 0) >
           (mapIfPresent(
-            (memory.seenFills[o.marketId] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
+            (memory.seenFills[o.market ?? ''] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
             (t) => new Date(t).valueOf()
           ) ?? 0)
       );

@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { shallowEqual } from 'react-redux';
 
-import { getUserWalletAddress } from '@/state/accountSelectors';
 import { setSeenFills, setSeenOpenOrders, setSeenOrderHistory } from '@/state/accountUiMemory';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -13,8 +12,8 @@ export function useViewPanel(
   kind: 'fills' | 'openOrders' | 'orderHistory'
 ) {
   const networkId = useAppSelector(getSelectedNetwork);
-  const walletId = useAppSelector(getUserWalletAddress);
-  const height = useAppSelector(selectRawIndexerHeightData);
+  const walletId = useAppSelector((state) => state.wallet.localWallet?.address);
+  const height = useAppSelector(BonsaiCore.network.indexerHeight.data);
   const lastSetCore = useRef<any[]>([]);
 
   const dispatch = useAppDispatch();

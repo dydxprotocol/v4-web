@@ -1,5 +1,3 @@
-import { isDev } from '@/constants/networks';
-
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -63,11 +61,11 @@ class TestFlags {
   }
 
   get useAbacusTs() {
-    return isDev;
+    return true;
   }
 
   get disableAbacus() {
-    return this.booleanFlag(this.queryParams.disable_abacus);
+    return true;
   }
 
   get showNewDepositFlow() {

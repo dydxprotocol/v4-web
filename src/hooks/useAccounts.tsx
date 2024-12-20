@@ -18,7 +18,7 @@ import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo, getHasSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { clearSavedEncryptedSignature } from '@/state/wallet';
+import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -134,6 +134,10 @@ const useAccountsContext = () => {
     () => localDydxWallet?.address as DydxAddress | undefined,
     [localDydxWallet]
   );
+
+  useEffect(() => {
+    dispatch(setLocalWallet({ address: dydxAddress }));
+  }, [dispatch, dydxAddress]);
 
   const nobleAddress = useMemo(() => {
     return localNobleWallet?.address;
