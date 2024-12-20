@@ -694,7 +694,7 @@ export const getUserSubaccountNumber = (state: RootState) =>
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(
-  [getSelectedNetwork, getUserWalletAddress, getAccountUiMemory],
+  [getSelectedNetwork, (state) => state.wallet.localWallet?.address, getAccountUiMemory],
   (networkId, walletId, memory) => memory[walletId ?? '']?.[networkId]
 );
 
