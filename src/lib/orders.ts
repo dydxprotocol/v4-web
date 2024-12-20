@@ -5,6 +5,7 @@ import {
   OrderStatus as OrderStatusNew,
 } from '@/abacus-ts/summaryTypes';
 import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -16,11 +17,11 @@ import {
   KotlinIrEnumValues,
   Nullable,
   OrderStatus,
+  SubaccountFill,
   SubaccountFills,
   TRADE_TYPES,
   type Asset,
   type PerpetualMarket,
-  type SubaccountFill,
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
@@ -237,6 +238,27 @@ export const getHydratedOrder = ({
     asset: assets[getAssetFromMarketId(data.marketId)],
     stepSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.stepSize)?.decimalPlaces(),
     tickSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.tickSize)?.decimalPlaces(),
+  };
+};
+
+export const getHydratedFill = ({
+  data,
+  assets,
+  perpetualMarkets,
+}: {
+  data: IndexerCompositeFillObject;
+  assets: AssetInfos;
+  perpetualMarkets: MarketsData;
+}): IndexerCompositeFillObject & NewAddedProps => {
+  return {
+    ...data,
+    asset: assets[getAssetFromMarketId(data.market ?? '')],
+    stepSizeDecimals: MaybeBigNumber(
+      perpetualMarkets[data.market ?? '']?.stepSize
+    )?.decimalPlaces(),
+    tickSizeDecimals: MaybeBigNumber(
+      perpetualMarkets[data.market ?? '']?.tickSize
+    )?.decimalPlaces(),
   };
 };
 
