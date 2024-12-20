@@ -17,7 +17,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 export function setUpAssetsQuery(store: RootStore) {
   const observer = new QueryObserver(appQueryClient, {
     queryKey: ['metadata', 'assets'],
-    queryFn: () => metadataClient.getAssetInfo(),
+    queryFn: () => Promise.all([metadataClient.getAssetInfo(), metadataClient.getAssetPrices()]),
     refetchInterval: timeUnits.minute * 5,
     staleTime: timeUnits.minute * 5,
   });
@@ -26,9 +26,10 @@ export function setUpAssetsQuery(store: RootStore) {
     try {
       store.dispatch(
         setAllAssetsRaw(
-          mapLoadableData(queryResultToLoadable(result), (map) =>
-            mapValues(map, (v, id) => ({ ...v, id }))
-          )
+          mapLoadableData(queryResultToLoadable(result), (map) => {
+            const [info, prices] = map;
+            return mapValues(info, (v, id) => ({ ...v, id, priceData: prices[id] }));
+          })
         )
       );
     } catch (e) {
