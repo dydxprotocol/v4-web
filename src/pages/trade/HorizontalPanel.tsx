@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { selectParentSubaccountOpenPositions } from '@/abacus-ts/selectors/account';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -69,10 +71,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders } = useAppSelector(
-    getTradeInfoNumbers,
-    shallowEqual
-  );
+  const { numTotalOpenOrders } = useAppSelector(getTradeInfoNumbers, shallowEqual);
 
   const { numOpenOrders } = useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual);
 
@@ -83,6 +82,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   );
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
+
+  const numTotalPositions = (useAppSelector(selectParentSubaccountOpenPositions) ?? EMPTY_ARR)
+    .length;
 
   const unseenOrders = useParameterizedSelector(
     createGetUnseenOrdersCount,

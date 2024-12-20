@@ -4,8 +4,8 @@ import { isDev } from '@/constants/networks';
 import { track } from './analytics/analytics';
 import { dd } from './analytics/datadog';
 
-export const log = (location: string, error?: Error, metadata?: object) => {
-  if (isDev) {
+export const log = (location: string, error?: Error, metadata?: object, forceLog?: boolean) => {
+  if (isDev || forceLog) {
     // eslint-disable-next-line no-console
     console.warn('telemetry/log:', { location, error, metadata });
   }

@@ -19,6 +19,9 @@ export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
 export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined =>
   amount ? MustBigNumber(amount) : undefined;
 
+export const MaybeNumber = (amount?: BigNumberish | null): number | undefined =>
+  amount ? MustBigNumber(amount).toNumber() : undefined;
+
 // doesnt allow null, always returns big number
 // empty string becomes null though
 export const ToBigNumber = (amount: BigNumberish): BigNumber => {
