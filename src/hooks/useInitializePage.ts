@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { IndexerWebsocketManager } from '@/abacus-ts/websocket/lib/indexerWebsocketManager';
+
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
 
@@ -46,6 +48,7 @@ export const useInitializePage = () => {
           if (hiddenDuration >= RECONNECT_AFTER_HIDDEN_THRESHOLD) {
             // reconnect abacus (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             abacusStateManager.restart({ network: localStorageNetwork });
+            IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
           }
           hiddenTimeRef.current = null;
         }
@@ -54,6 +57,18 @@ export const useInitializePage = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [localStorageNetwork]);
+
+  // restart on network online
+  useEffect(() => {
+    const handleOnline = () => {
+      abacusStateManager.restart({ network: localStorageNetwork });
+      IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+    };
+    document.addEventListener('online', handleOnline);
+    return () => {
+      document.removeEventListener('online', handleOnline);
     };
   }, [localStorageNetwork]);
 };
