@@ -2,10 +2,15 @@ import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { calculateAllMarkets } from '../calculators/markets';
-import { selectRawMarketsData } from './base';
+import { selectRawMarkets, selectRawMarketsData } from './base';
 
 export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (markets) =>
   calculateAllMarkets(markets)
+);
+
+export const selectAllMarketsInfoLoading = createAppSelector(
+  [selectRawMarkets],
+  (markets) => markets.status
 );
 
 export const selectCurrentMarketInfo = createAppSelector(

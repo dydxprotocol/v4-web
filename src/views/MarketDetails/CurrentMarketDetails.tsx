@@ -1,8 +1,6 @@
-import { selectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
-import { selectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -22,8 +20,8 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(selectCurrentMarketInfo, shallowEqual);
-  const asset = useAppSelector(selectCurrentMarketAssetInfo);
+  const currentMarketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const asset = useAppSelector(BonsaiHelpers.currentMarket.assetInfo);
 
   const {
     displayableAsset,
