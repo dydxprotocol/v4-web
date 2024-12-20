@@ -13,7 +13,7 @@
   ],
   "overrides": [
     {
-      "files": ["@/abacus-ts/**"],
+      "files": ["**/abacus-ts/**"],
       "rules": {
         "no-restricted-imports": "off"
       }
