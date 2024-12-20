@@ -2,6 +2,7 @@
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
+  AbacusStateNotificationProtocol,
   AdjustIsolatedMarginInputFields,
   ClosePositionInputFields,
   HistoricalPnlPeriods,
@@ -64,6 +65,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
+import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -71,7 +73,7 @@ import AbacusFormatter from './formatter';
 import AbacusLocalizer from './localizer';
 import AbacusLogger from './logger';
 import AbacusRest from './rest';
-import AbacusStateNotifier from './stateNotification';
+import AbacusStateNotifier, { NoOpAbacusStateNotifier } from './stateNotification';
 import AbacusThreading from './threading';
 import AbacusWebsocket from './websocket';
 
@@ -102,7 +104,7 @@ class AbacusStateManager {
 
   websocket: AbacusWebsocket;
 
-  stateNotifier: AbacusStateNotifier;
+  stateNotifier: AbacusStateNotificationProtocol & { setStore: (store: RootStore) => void };
 
   analytics: AbacusAnalytics;
 
@@ -113,7 +115,9 @@ class AbacusStateManager {
   constructor() {
     this.store = undefined;
     this.currentMarket = undefined;
-    this.stateNotifier = new AbacusStateNotifier();
+    this.stateNotifier = testFlags.disableAbacus
+      ? new NoOpAbacusStateNotifier()
+      : new AbacusStateNotifier();
     this.analytics = new AbacusAnalytics();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
