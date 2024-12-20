@@ -157,6 +157,7 @@ class AbacusStateManager {
   }
 
   start = ({ network }: { network?: DydxNetwork } = {}) => {
+    if (testFlags.disableAbacus) return;
     if (network) {
       this.stateManager.environmentId = network;
     }
@@ -166,6 +167,7 @@ class AbacusStateManager {
   };
 
   restart = ({ network }: { network?: DydxNetwork } = {}) => {
+    if (testFlags.disableAbacus) return;
     this.stateManager.readyToConnect = false;
     this.start({ network });
   };
