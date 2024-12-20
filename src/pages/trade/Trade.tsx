@@ -2,7 +2,11 @@ import { useCallback, useRef, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { TradeLayouts } from '@/constants/layout';
+import {
+  HORIZONTAL_PANEL_MAX_HEIGHT,
+  HORIZONTAL_PANEL_MIN_HEIGHT,
+  TradeLayouts,
+} from '@/constants/layout';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
@@ -49,10 +53,14 @@ const TradePage = () => {
     },
     [dispatch]
   );
-  const { handleMouseDown, horizontalPanelHeight, isDragging } = useResizablePanel(
-    horizontalPanelHeightPxBase,
-    setPanelHeight
-  );
+  const {
+    handleMouseDown,
+    panelHeight: horizontalPanelHeight,
+    isDragging,
+  } = useResizablePanel(horizontalPanelHeightPxBase, setPanelHeight, {
+    min: HORIZONTAL_PANEL_MIN_HEIGHT,
+    max: HORIZONTAL_PANEL_MAX_HEIGHT,
+  });
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();

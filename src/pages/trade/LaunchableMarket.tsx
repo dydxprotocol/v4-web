@@ -4,7 +4,11 @@ import { useMatch } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { TradeLayouts } from '@/constants/layout';
+import {
+  HORIZONTAL_PANEL_MAX_HEIGHT,
+  HORIZONTAL_PANEL_MIN_HEIGHT,
+  TradeLayouts,
+} from '@/constants/layout';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -47,11 +51,14 @@ const LaunchableMarket = () => {
     },
     [dispatch]
   );
-  const { handleMouseDown, horizontalPanelHeight, isDragging } = useResizablePanel(
-    horizontalPanelHeightPxBase,
-    setPanelHeight
-  );
-
+  const {
+    handleMouseDown,
+    panelHeight: horizontalPanelHeight,
+    isDragging,
+  } = useResizablePanel(horizontalPanelHeightPxBase, setPanelHeight, {
+    min: HORIZONTAL_PANEL_MIN_HEIGHT,
+    max: HORIZONTAL_PANEL_MAX_HEIGHT,
+  });
   useEffect(() => {
     if (marketId) {
       track(
