@@ -11,7 +11,14 @@
     "plugin:react-hooks/recommended",
     "prettier"
   ],
-  "overrides": [],
+  "overrides": [
+    {
+      "files": ["@/abacus-ts/**"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
   "parserOptions": {
     "project": "./tsconfig.json",
     "ecmaVersion": "latest",
