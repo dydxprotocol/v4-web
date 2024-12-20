@@ -698,20 +698,60 @@ export const getCurrentAccountMemory = createAppSelector(
   (networkId, walletId, memory) => memory[walletId ?? '']?.[networkId]
 );
 
-export const createGetUnseenOrdersCount = () =>
+export const createGetOpenOrdersCount = () =>
+  createAppSelector(
+    [BonsaiCore.account.openOrders.data, (state, market: string | undefined) => market],
+    (orders, market) => {
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
+
+      return ourOrders.length;
+    }
+  );
+
+export const createGetUnseenOpenOrdersCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
       BonsaiCore.network.indexerHeight.data,
-      getSubaccountOrders,
+      BonsaiCore.account.openOrders.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, orders, market) => {
       if (height == null) {
         return 0;
       }
-      const ourOrders =
-        (market == null ? orders : orders?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
+      if (ourOrders.length === 0) {
+        return 0;
+      }
+      if (memory == null) {
+        return ourOrders.length;
+      }
+      const unseen = ourOrders.filter(
+        (o) =>
+          (o.updatedAtMilliseconds ?? 0) >
+          (mapIfPresent(
+            (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
+            (t) => new Date(t).valueOf()
+          ) ?? 0)
+      );
+      return unseen.length;
+    }
+  );
+
+export const createGetUnseenOrderHistoryCount = () =>
+  createAppSelector(
+    [
+      getCurrentAccountMemory,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.orderHistory.data,
+      (state, market: string | undefined) => market,
+    ],
+    (memory, height, orders, market) => {
+      if (height == null) {
+        return 0;
+      }
+      const ourOrders = market == null ? orders : orders.filter((o) => o.marketId === market);
       if (ourOrders.length === 0) {
         return 0;
       }

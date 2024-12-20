@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 
+import { OrderStatus } from '@/abacus-ts/summaryTypes';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
-import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -19,11 +19,11 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { clearOrder } from '@/state/account';
 import { useAppDispatch } from '@/state/appTypes';
 
-import { isOrderStatusClearable } from '@/lib/orders';
+import { isNewOrderStatusClearable } from '@/lib/orders';
 
 type ElementProps = {
   orderId: string;
-  orderFlags: Nullable<number>;
+  orderFlags: Nullable<number | string>;
   status: OrderStatus;
   isDisabled?: boolean;
 };
@@ -43,8 +43,8 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 
   // CT831: if order is stateful and is initially best effort canceled, it's a stuck order that
   // traders should be able to submit another cancel
-  const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  const isBestEffortCanceled = status === AbacusOrderStatus.Canceling;
+  const isShortTermOrder = orderFlags?.toString() === OrderFlags.SHORT_TERM.toString();
+  const isBestEffortCanceled = status === OrderStatus.Canceling;
   const isCancelDisabled =
     isCanceling || !!isDisabled || (isShortTermOrder && isBestEffortCanceled);
 
@@ -55,7 +55,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
         sideOffset={0}
         tw="[--tooltip-backgroundColor:--color-layer-5]"
         tooltipString={
-          isOrderStatusClearable(status)
+          isNewOrderStatusClearable(status)
             ? stringGetter({ key: STRING_KEYS.CLEAR })
             : stringGetter({ key: STRING_KEYS.CANCEL_ORDER })
         }
@@ -66,7 +66,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
           iconSize="0.875em"
           shape={ButtonShape.Square}
           buttonStyle={ButtonStyle.WithoutBackground}
-          {...(isOrderStatusClearable(status)
+          {...(isNewOrderStatusClearable(status)
             ? { onClick: () => dispatch(clearOrder(orderId)) }
             : {
                 onClick: onCancel,
