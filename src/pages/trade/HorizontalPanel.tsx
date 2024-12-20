@@ -101,7 +101,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
-  const initialPageSize = 10;
+  const initialPageSize = 20;
 
   const onViewOrders = useCallback(
     (market: string) => {
