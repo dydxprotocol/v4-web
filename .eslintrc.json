@@ -42,6 +42,17 @@
     "no-multi-assign": "off",
     "no-nested-ternary": "off",
     "no-param-reassign": ["error", { "props": false }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "@/abacus-ts/*",
+          "!@/abacus-ts/ontology",
+          "!@/abacus-ts/lib",
+          "!@/abacus-ts/summaryTypes"
+        ]
+      }
+    ],
     "no-return-assign": "off",
     "no-return-await": "off",
     "no-underscore-dangle": "off",
