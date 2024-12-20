@@ -26,9 +26,9 @@ import {
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
-  createGetUnseenFillsCount,
-  createGetUnseenOrdersCount,
   getCurrentMarketTradeInfoNumbers,
+  getHasUnseenFillUpdates,
+  getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -69,13 +69,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders } = useAppSelector(
-    getTradeInfoNumbers,
-    shallowEqual
-  );
+  const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
+    useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
 
-  const { numOpenOrders } = useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual);
+  const { numOpenOrders, numUnseenFills } =
+    useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
+  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
+  const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
@@ -84,18 +85,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
-  const unseenOrders = useParameterizedSelector(
-    createGetUnseenOrdersCount,
-    showCurrentMarket ? currentMarketId : undefined
+  const fillsTagNumber = shortenNumberForDisplay(
+    showCurrentMarket ? numUnseenFills : numTotalUnseenFills
   );
-  const hasUnseenOrderUpdates = unseenOrders > 0;
-
-  const numUnseenFills = useParameterizedSelector(
-    createGetUnseenFillsCount,
-    showCurrentMarket ? currentMarketId : undefined
-  );
-  const hasUnseenFillUpdates = numUnseenFills > 0;
-  const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
   const ordersTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );

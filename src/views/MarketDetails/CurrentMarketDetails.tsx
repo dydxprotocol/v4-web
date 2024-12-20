@@ -1,9 +1,7 @@
-import { selectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
-import { selectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
-import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 
+import { PerpetualMarketType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -13,51 +11,56 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
-import { getAssetDescriptionStringKeys } from '@/lib/assetUtils';
+import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(selectCurrentMarketInfo, shallowEqual);
-  const asset = useAppSelector(selectCurrentMarketAssetInfo);
+  const { configs, displayId } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name, resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+
+  if (!configs) return null;
 
   const {
-    displayableAsset,
-    displayableTicker,
-    effectiveInitialMarginFraction,
-    initialMarginFraction,
-    maintenanceMarginFraction,
-    marketType,
     tickSize,
-    tickSizeDecimals,
     stepSize,
+    initialMarginFraction,
+    effectiveInitialMarginFraction,
+    maintenanceMarginFraction,
+    minOrderSize,
+    perpetualMarketType,
     stepSizeDecimals,
-  } = orEmptyObj(currentMarketData);
+    tickSizeDecimals,
+  } = configs;
 
-  const { assetId, logo, name, urls } = orEmptyObj(asset);
-  const { cmc, website, technicalDoc } = orEmptyObj(urls);
-  const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
+  const {
+    coinMarketCapsLink,
+    primaryDescriptionKey,
+    secondaryDescriptionKey,
+    websiteLink,
+    whitepaperLink,
+  } = resources ?? {};
 
   const preferEIMF = Boolean(
-    effectiveInitialMarginFraction &&
-      initialMarginFraction !== effectiveInitialMarginFraction.toString()
+    effectiveInitialMarginFraction && initialMarginFraction !== effectiveInitialMarginFraction
   );
 
   const items = [
     {
       key: 'ticker',
       label: stringGetter({ key: STRING_KEYS.TICKER }),
-      value: displayableTicker,
+      value: displayId,
     },
     {
       key: 'market-type',
       label: stringGetter({ key: STRING_KEYS.TYPE }),
       value:
-        marketType === IndexerPerpetualMarketType.CROSS
+        perpetualMarketType === PerpetualMarketType.CROSS
           ? stringGetter({ key: STRING_KEYS.CROSS })
           : stringGetter({ key: STRING_KEYS.ISOLATED }),
     },
@@ -83,7 +86,7 @@ export const CurrentMarketDetails = () => {
           useGrouping
           value={stepSize}
           type={OutputType.Asset}
-          tag={displayableAsset}
+          tag={getDisplayableAssetFromBaseAsset(id)}
           fractionDigits={stepSizeDecimals}
         />
       ),
@@ -94,9 +97,9 @@ export const CurrentMarketDetails = () => {
       value: (
         <Output
           useGrouping
-          value={stepSize}
+          value={minOrderSize}
           type={OutputType.Asset}
-          tag={displayableAsset}
+          tag={getDisplayableAssetFromBaseAsset(id)}
           fractionDigits={stepSizeDecimals}
         />
       ),
@@ -146,11 +149,11 @@ export const CurrentMarketDetails = () => {
   return (
     <MarketDetails
       assetName={name}
-      assetIcon={{ symbol: assetId, logoUrl: logo }}
+      assetIcon={{ symbol: id, logoUrl: resources?.imageUrl }}
       marketDetailItems={items}
-      primaryDescription={stringGetter({ key: primary })}
-      secondaryDescription={stringGetter({ key: secondary })}
-      urls={{ technicalDoc, website, cmc }}
+      primaryDescription={stringGetter({ key: `APP.${primaryDescriptionKey}` })}
+      secondaryDescription={stringGetter({ key: `APP.${secondaryDescriptionKey}` })}
+      urls={{ technicalDoc: whitepaperLink, website: websiteLink, cmc: coinMarketCapsLink }}
     />
   );
 };
