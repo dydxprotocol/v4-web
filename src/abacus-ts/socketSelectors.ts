@@ -3,7 +3,7 @@ import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { EndpointsConfig } from '@/hooks/useEndpointsConfig';
 
 import { type RootState } from '@/state/_store';
-import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
+import { getUserSubaccountNumber } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
@@ -19,8 +19,8 @@ export const selectIndexerUrl = createAppSelector([getSelectedNetwork], (network
 });
 
 export const selectParentSubaccountInfo = createAppSelector(
-  [getUserWalletAddress, getUserSubaccountNumber],
-  (wallet, subaccount) => ({ wallet, subaccount })
+  [(state) => state.wallet.localWallet?.address, getUserSubaccountNumber],
+  (wallet, subaccount) => ({ wallet, subaccount: 0 }) // TODO DO NOT HARD CODE THIS
 );
 
 export const selectIndexerReady = createAppSelector(
