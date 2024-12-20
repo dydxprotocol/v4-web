@@ -42,7 +42,6 @@ type NestedSelectors = {
 
 // all data should be accessed via selectrs in this file
 // no files outside abacus-ts should access anything within abacus-ts except this file
-// TODO - enforce this via eslint
 export const MegalodonCore = {
   account: {
     parentSubaccountSummary: {
