@@ -46,5 +46,5 @@ export interface ChildSubaccountData {
   assetPositions: { [symbol: string]: IndexerAssetPositionResponseObject };
 }
 
-export type AssetInfo = MetadataServiceAssetInfo & { id: string; priceData?: MetadataServicePrice };
+export type AssetInfo = MetadataServiceAssetInfo & MetadataServicePrice & { id: string };
 export type AssetInfos = Record<string, AssetInfo>;
