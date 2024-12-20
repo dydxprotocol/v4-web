@@ -42,7 +42,7 @@ type NestedSelectors = {
 
 // all data should be accessed via selectrs in this file
 // no files outside abacus-ts should access anything within abacus-ts except this file
-export const MegalodonCore = {
+export const BonsaiCore = {
   account: {
     parentSubaccountSummary: {
       data: selectParentSubaccountSummary,
@@ -85,7 +85,7 @@ export const MegalodonCore = {
   },
 } as const satisfies NestedSelectors;
 
-export const MegalodonHelpers = {
+export const BonsaiHelpers = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
     assetInfo: selectCurrentMarketAssetInfo,

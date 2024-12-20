@@ -1,4 +1,4 @@
-import { MegalodonHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
 
@@ -20,8 +20,8 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(MegalodonHelpers.currentMarket.marketInfo);
-  const asset = useAppSelector(MegalodonHelpers.currentMarket.assetInfo);
+  const currentMarketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const asset = useAppSelector(BonsaiHelpers.currentMarket.assetInfo);
 
   const {
     displayableAsset,

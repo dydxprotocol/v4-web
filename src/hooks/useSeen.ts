@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { MegalodonCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { getUserWalletAddress } from '@/state/accountSelectors';
@@ -14,7 +14,7 @@ export function useViewPanel(
 ) {
   const networkId = useAppSelector(getSelectedNetwork);
   const walletId = useAppSelector(getUserWalletAddress);
-  const height = useAppSelector(MegalodonCore.network.indexerHeight.data);
+  const height = useAppSelector(BonsaiCore.network.indexerHeight.data);
   const lastSetCore = useRef<any[]>([]);
 
   const dispatch = useAppDispatch();

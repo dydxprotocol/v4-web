@@ -1,4 +1,4 @@
-import { MegalodonCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
@@ -702,7 +702,7 @@ export const createGetUnseenOrdersCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      MegalodonCore.network.indexerHeight.data,
+      BonsaiCore.network.indexerHeight.data,
       getSubaccountOrders,
       (state, market: string | undefined) => market,
     ],
@@ -734,7 +734,7 @@ export const createGetUnseenFillsCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      MegalodonCore.network.indexerHeight.data,
+      BonsaiCore.network.indexerHeight.data,
       getSubaccountFills,
       (state, market: string | undefined) => market,
     ],
