@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/abacus-ts/ontology';
-import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -31,7 +31,6 @@ import {
   createGetUnseenFillsCount,
   createGetUnseenOpenOrdersCount,
   createGetUnseenOrderHistoryCount,
-  getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
@@ -72,8 +71,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions } = useAppSelector(getTradeInfoNumbers, shallowEqual);
-
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
@@ -87,6 +84,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     createGetOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
+
   const unseenOrders = useParameterizedSelector(
     createGetUnseenOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined

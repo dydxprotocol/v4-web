@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -8,7 +9,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -82,10 +82,10 @@ export const SharePNLAnalyticsDialog = ({
   });
 
   const sideSign = useMemo(() => {
-    switch (side?.name) {
-      case PositionSide.Long:
+    switch (side) {
+      case IndexerPositionSide.LONG:
         return TagSign.Positive;
-      case PositionSide.Short:
+      case IndexerPositionSide.SHORT:
         return TagSign.Negative;
       default:
         return TagSign.Neutral;
