@@ -1,26 +1,29 @@
+import { selectAssetInfo } from '@/abacus-ts/selectors/assets';
+
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { getAssetFromMarketId, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { MarketDetails } from './MarketDetails';
 
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();
-  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const assetId = getAssetFromMarketId(launchableMarketId);
+  const launchableAsset = useParameterizedSelector(selectAssetInfo, assetId);
 
   if (!launchableAsset) return null;
 
-  const { name, id, logo, urls, marketCap, reportedMarketCap, volume24h } = launchableAsset;
+  const { name, logo, urls, marketCap, reportedMarketCap, volume24h } = launchableAsset;
   const { website, technicalDoc, cmc } = urls;
   const showSelfReportedMarketCap = marketCap ? false : !!reportedMarketCap;
 
@@ -54,7 +57,7 @@ export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMark
     {
       key: 'ticker',
       label: stringGetter({ key: STRING_KEYS.TICKER }),
-      value: getDisplayableTickerFromMarket(`${id}-USD`),
+      value: getDisplayableTickerFromMarket(`${assetId}-USD`),
     },
     {
       key: 'market-type',

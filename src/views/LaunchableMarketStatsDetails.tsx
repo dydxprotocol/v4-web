@@ -9,6 +9,7 @@ import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -18,8 +19,6 @@ import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
-
-import { useAppSelector } from '@/state/appTypes';
 
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -57,7 +56,7 @@ export const LaunchableMarketStatsDetails = ({
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useAppSelector(selectAssetInfo(assetId));
+  const launchableAsset = useParameterizedSelector(selectAssetInfo, assetId);
 
   const {
     marketCap,
