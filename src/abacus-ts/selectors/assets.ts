@@ -13,6 +13,12 @@ export const selectAllAssetsInfoLoading = createAppSelector(
   (assets) => assets.status
 );
 
+export const createSelectAssetInfo = () =>
+  createAppSelector(
+    [selectAllAssetsInfo, (_s, assetId: string) => assetId],
+    (assets, assetId) => assets?.[assetId]
+  );
+
 export const selectCurrentMarketAssetInfo = createAppSelector(
   [selectCurrentMarketInfo, selectAllAssetsInfo],
   (currentMarketInfo, assets) => {
