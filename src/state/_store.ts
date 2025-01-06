@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { storeLifecycles } from '@/abacus-ts/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';

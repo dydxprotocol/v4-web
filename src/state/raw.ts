@@ -1,4 +1,5 @@
 import { Loadable, loadableIdle } from '@/abacus-ts/lib/loadable';
+// eslint-disable-next-line no-restricted-imports
 import {
   AssetInfos,
   MarketsData,
