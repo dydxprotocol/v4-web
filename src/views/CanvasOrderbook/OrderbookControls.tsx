@@ -82,6 +82,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
             </$WithSeparators>
           </$ButtonGroup>
           <Output
+            withSubscript
             value={grouping?.tickSize}
             type={OutputType.Fiat}
             fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}

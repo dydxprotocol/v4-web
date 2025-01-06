@@ -62,6 +62,7 @@ export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & Elemen
         <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
         <span tw="flex flex-col">
           <Output
+            withSubscript
             type={OutputType.Number}
             value={orderbookMidMarketPrice}
             fractionDigits={tickSizeDecimals}

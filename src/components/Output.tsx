@@ -28,6 +28,7 @@ import { Tag } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
@@ -121,6 +122,7 @@ export function formatNumberOutput(
     fractionDigits,
     minimumFractionDigits,
     showSign = ShowSign.Negative,
+    withSubscript = false,
   }: {
     decimalSeparator: string | undefined;
     groupSeparator: string | undefined;
@@ -131,6 +133,7 @@ export function formatNumberOutput(
     roundingMode?: BigNumber.RoundingMode;
     useGrouping?: boolean;
     showSign?: ShowSign;
+    withSubscript?: boolean;
   }
 ) {
   const valueBN = MustBigNumber(value).abs();
@@ -204,7 +207,28 @@ export function formatNumberOutput(
     [OutputType.Multiple]: () => getFormattedVal(valueBN, LEVERAGE_DECIMALS, { suffix: '×' }),
   };
 
-  return `${sign ?? ''}${numberRenderers[type]()}`;
+  const renderedNumber = `${sign ?? ''}${numberRenderers[type]()}`;
+
+  if (withSubscript) {
+    const { currencySign, significantDigits, decimalDigits, zeros, punctuationSymbol } =
+      formatZeroNumbers(renderedNumber);
+
+    if (zeros) {
+      let subscript = '';
+
+      zeros
+        .toString()
+        .split('')
+        .map(Number)
+        .forEach((digit) => {
+          subscript += UNICODE.SUBSCRIPT[digit];
+        });
+
+      return `${currencySign ?? ''}${significantDigits}${punctuationSymbol}0${subscript}${decimalDigits}`;
+    }
+  }
+
+  return renderedNumber;
 }
 
 // must manually memoize options object if you want proper memoization
