@@ -25,6 +25,8 @@ export type MarketInfo = IndexerPerpetualMarketResponseObject & {
   displayableAsset: string;
   displayableTicker: string;
   effectiveInitialMarginFraction: BigNumber | null;
+  openInterestUSDC: string;
+  percentChange24h: number | null;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
 };

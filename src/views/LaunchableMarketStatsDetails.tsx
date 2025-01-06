@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { selectAssetInfo } from '@/abacus-ts/selectors/assets';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
@@ -8,7 +9,6 @@ import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -19,6 +19,9 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
+import { useAppSelector } from '@/state/appTypes';
+
+import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
@@ -53,7 +56,8 @@ export const LaunchableMarketStatsDetails = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const assetId = getAssetFromMarketId(launchableMarketId);
+  const launchableAsset = useAppSelector(selectAssetInfo(assetId));
 
   const {
     marketCap,
