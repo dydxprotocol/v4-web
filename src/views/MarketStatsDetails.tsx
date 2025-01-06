@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { selectCurrentMarketInfo, selectMarketsInfoLoading } from '@/abacus-ts/selectors/markets';
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -51,8 +51,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const marketData = useAppSelector(selectCurrentMarketInfo);
-  const isLoading = useAppSelector(selectMarketsInfoLoading) === 'pending';
+  const marketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const isLoading = useAppSelector(BonsaiCore.markets.markets.loading) === 'pending';
 
   const {
     displayableAsset,
