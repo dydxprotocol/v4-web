@@ -53,9 +53,10 @@ enum InfoSection {
 type ElementProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
+  handleStartResize?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
+export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
@@ -92,7 +93,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
-  const initialPageSize = 10;
+  const initialPageSize = 20;
 
   const onViewOrders = useCallback(
     (market: string) => {
@@ -264,19 +265,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     ]
   );
 
-  // TODO - TRCL-1693 - re-enable when funding payments are supported
-  // const paymentsTabItem = {
-  //   value: InfoSection.Payments,
-  //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
-
-  //   tag: shortenNumberForDisplay(
-  //     showCurrentMarket ? numFundingPayments : numTotalFundingPayments
-  //   ),
-  //   content: (
-  //     <FundingPaymentsTable currentMarket={showCurrentMarket ? currentMarket?.id : undefined} />
-  //   ),
-  // },
-
   const tabItems = useMemo(
     () => [positionTabItem, fillsTabItem, ordersTabItem],
     [positionTabItem, fillsTabItem, ordersTabItem]
@@ -295,6 +283,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <$DragHandle onMouseDown={handleStartResize} />
+
       <$CollapsibleTabs
         defaultTab={InfoSection.Position}
         tab={tab}
@@ -317,6 +308,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     </>
   );
 };
+
+const $DragHandle = styled.div`
+  width: 100%;
+  height: 0.5rem;
+  cursor: ns-resize;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+`;
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
   header {

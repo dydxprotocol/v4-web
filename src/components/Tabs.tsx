@@ -266,6 +266,7 @@ const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
   flex: 1;
   ${layoutMixins.row}
   justify-content: space-between;
+  background-color: var(--trigger-backgroundColor);
   z-index: var(--stickyHeader-zIndex);
 `;
 
