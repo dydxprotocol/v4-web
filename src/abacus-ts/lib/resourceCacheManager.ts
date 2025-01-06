@@ -62,4 +62,8 @@ export class ResourceCacheManager<T, U> {
       }, delay);
     }
   }
+
+  getActiveResources(): T[] {
+    return Object.values(this.cache).map((o) => o.resource);
+  }
 }

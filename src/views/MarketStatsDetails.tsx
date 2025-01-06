@@ -221,6 +221,7 @@ const DetailsItem = ({
   useFiatDisplayUnit: boolean;
 }) => {
   const valueBN = MustBigNumber(value);
+  const stringGetter = useStringGetter();
 
   const color = valueBN.isNegative() ? 'var(--color-negative)' : 'var(--color-positive)';
 
@@ -249,12 +250,28 @@ const DetailsItem = ({
     }
     case MarketStats.Funding1H: {
       return (
-        <$Output
-          type={OutputType.Percent}
-          value={value}
-          color={color}
-          fractionDigits={TINY_PERCENT_DECIMALS}
-        />
+        <WithTooltip
+          slotTooltip={
+            <dl>
+              <dd tw="flex">
+                {stringGetter({ key: STRING_KEYS.ANNUALIZED })}:
+                <Output
+                  tw="ml-0.25"
+                  type={OutputType.Percent}
+                  value={MustBigNumber(value).times(24 * 365)}
+                  fractionDigits={0}
+                />
+              </dd>
+            </dl>
+          }
+        >
+          <$Output
+            type={OutputType.Percent}
+            value={value}
+            color={color}
+            fractionDigits={TINY_PERCENT_DECIMALS}
+          />
+        </WithTooltip>
       );
     }
     case MarketStats.NextFunding: {

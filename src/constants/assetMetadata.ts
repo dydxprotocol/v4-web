@@ -10,18 +10,17 @@ export type MetadataServiceAssetInfo = {
   exchanges: any[] | null;
 };
 
+export type MetadataServicePrice = {
+  price: number | null;
+  percent_change_24h: number | null;
+  volume_24h: number | null;
+  market_cap: number | null;
+  self_reported_market_cap: number | null;
+};
+
 export type MetadataServiceInfoResponse = Record<string, MetadataServiceAssetInfo>;
 
-export type MetadataServicePricesResponse = Record<
-  string,
-  {
-    price: number | null;
-    percent_change_24h: number | null;
-    volume_24h: number | null;
-    market_cap: number | null;
-    self_reported_market_cap: number | null;
-  }
->;
+export type MetadataServicePricesResponse = Record<string, MetadataServicePrice>;
 
 export type MetadataServiceCandlesResponse = Record<
   string,

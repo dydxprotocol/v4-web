@@ -32,6 +32,10 @@ export class IndexerWebsocket {
     });
   }
 
+  restart(): void {
+    this.socket?.restart();
+  }
+
   teardown(): void {
     this.socket?.teardown();
     this.socket = null;
@@ -76,9 +80,20 @@ export class IndexerWebsocket {
 
     return () => {
       if (this.subscriptions[channel] == null) {
+        logAbacusTsError(
+          'IndexerWebsocket',
+          'unsubbing from nonexistent or already unsubbed channel',
+          channel
+        );
         return;
       }
       if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
+        logAbacusTsError(
+          'IndexerWebsocket',
+          'unsubbing from nonexistent or already unsubbed channel',
+          channel,
+          id
+        );
         return;
       }
       if (
