@@ -40,7 +40,7 @@ type NestedSelectors = {
     | (() => (state: RootState, ...other: any[]) => any);
 };
 
-// all data should be accessed via selectrs in this file
+// all data should be accessed via selectors in this file
 // no files outside abacus-ts should access anything within abacus-ts except this file
 export const BonsaiCore = {
   account: {

@@ -1,19 +1,19 @@
-import { createSelector } from 'reselect';
+import { createAppSelector } from '@/state/appTypes';
 
 import { transformAssetsInfo } from '../calculators/assets';
 import { selectRawAssets, selectRawAssetsData } from './base';
 import { selectCurrentMarketInfo } from './markets';
 
-export const selectAllAssetsInfo = createSelector([selectRawAssetsData], (assets) =>
+export const selectAllAssetsInfo = createAppSelector([selectRawAssetsData], (assets) =>
   transformAssetsInfo(assets)
 );
 
-export const selectAllAssetsInfoLoading = createSelector(
+export const selectAllAssetsInfoLoading = createAppSelector(
   [selectRawAssets],
   (assets) => assets.status
 );
 
-export const selectCurrentMarketAssetInfo = createSelector(
+export const selectCurrentMarketAssetInfo = createAppSelector(
   [selectCurrentMarketInfo, selectAllAssetsInfo],
   (currentMarketInfo, assets) => {
     if (currentMarketInfo == null || assets == null) {
