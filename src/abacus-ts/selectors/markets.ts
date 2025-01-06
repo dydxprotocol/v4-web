@@ -14,4 +14,7 @@ export const selectCurrentMarketInfo = createAppSelector(
   (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );
 
-export const selectMarketsInfoLoading = createAppSelector([selectRawMarkets], mergeLoadableStatus);
+export const selectAllMarketsInfoLoading = createAppSelector(
+  [selectRawMarkets],
+  mergeLoadableStatus
+);
