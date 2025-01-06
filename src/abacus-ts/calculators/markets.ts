@@ -59,14 +59,30 @@ export function getMarketEffectiveInitialMarginForMarket(
   return effectiveIMF;
 }
 
+function calculateDerivedMarketDisplayItems(market: IndexerPerpetualMarketResponseObject) {
+  return {
+    assetId: getAssetFromMarketId(market.ticker),
+    displayableAsset: getDisplayableAssetFromTicker(market.ticker),
+    displayableTicker: getDisplayableTickerFromMarket(market.ticker),
+  };
+}
+
+function calculateDerivedMarketCore(market: IndexerPerpetualMarketResponseObject) {
+  return {
+    effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
+    openInterestUSDC: MustBigNumber(market.openInterest).times(market.oraclePrice).toNumber(),
+    percentChange24h: MustBigNumber(market.oraclePrice).isZero()
+      ? null
+      : MustBigNumber(market.priceChange24H).div(market.oraclePrice).toNumber(),
+    stepSizeDecimals: MaybeBigNumber(market.stepSize)?.decimalPlaces() ?? TOKEN_DECIMALS,
+    tickSizeDecimals: MaybeBigNumber(market.tickSize)?.decimalPlaces() ?? USD_DECIMALS,
+  };
+}
+
 const calculateMarket = weakMapMemoize(
   (market: IndexerPerpetualMarketResponseObject): MarketInfo => ({
     ...market,
-    assetId: getAssetFromMarketId(market.ticker),
-    displayableAsset: getDisplayableAssetFromTicker(market.ticker),
-    effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
-    displayableTicker: getDisplayableTickerFromMarket(market.ticker),
-    stepSizeDecimals: MaybeBigNumber(market.stepSize)?.decimalPlaces() ?? TOKEN_DECIMALS,
-    tickSizeDecimals: MaybeBigNumber(market.tickSize)?.decimalPlaces() ?? USD_DECIMALS,
+    ...calculateDerivedMarketDisplayItems(market),
+    ...calculateDerivedMarketCore(market),
   })
 );
