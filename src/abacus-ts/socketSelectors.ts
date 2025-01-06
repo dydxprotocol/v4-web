@@ -3,7 +3,6 @@ import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { EndpointsConfig } from '@/hooks/useEndpointsConfig';
 
 import { type RootState } from '@/state/_store';
-import { getUserSubaccountNumber, getUserWalletAddress } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
@@ -18,9 +17,10 @@ export const selectIndexerUrl = createAppSelector([getSelectedNetwork], (network
   return `${endpointsConfig.indexers[0]!.api}`;
 });
 
+// TODO allow configurable parent subaccount number
 export const selectParentSubaccountInfo = createAppSelector(
-  [getUserWalletAddress, getUserSubaccountNumber],
-  (wallet, subaccount) => ({ wallet, subaccount })
+  [(state) => state.wallet.localWallet?.address],
+  (wallet) => ({ wallet, subaccount: 0 })
 );
 
 export const selectIndexerReady = createAppSelector(
