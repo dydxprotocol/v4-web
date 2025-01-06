@@ -68,6 +68,12 @@ export const funkitTheme = {
       offBackground: OFF_BACKGROUND_DARK,
       buttonIconBackgroundHover: OFF_BACKGROUND_DARK,
     },
+    // Increase certain font sizes slightly to match dydx design
+    customFontSizings: {
+      '10': { fontSize: '12px', lineHeight: '15px' },
+      '13': { fontSize: '14px', lineHeight: '18px' },
+      '16': { fontSize: '18px', lineHeight: '20px' },
+    },
   }),
   lightTheme: lightTheme({
     customFontFamily: 'inherit',
