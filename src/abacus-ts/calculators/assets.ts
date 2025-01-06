@@ -1,22 +1,28 @@
 import { mapValues } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
-import { MetadataServiceAssetInfo, MetadataServiceInfoResponse } from '@/constants/assetMetadata';
+import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
-export const parseAssetInfo = weakMapMemoize(
-  (assetInfo: MetadataServiceAssetInfo, assetId: string) => ({
-    assetId,
-    name: assetInfo.name,
-    logo: assetInfo.logo,
-    urls: {
-      website: assetInfo.urls.website,
-      technicalDoc: assetInfo.urls.technical_doc,
-      cmc: assetInfo.urls.cmc,
-    },
-  })
-);
+import { AssetInfo, AssetInfos } from '../rawTypes';
 
-export const transformAssetsInfo = (assetsInfo: MetadataServiceInfoResponse | undefined) => {
+export const parseAssetInfo = weakMapMemoize((assetInfo: AssetInfo, assetId: string) => ({
+  assetId,
+  name: assetInfo.name,
+  logo: assetInfo.logo,
+  price: assetInfo.price,
+  marketCap: assetInfo.market_cap,
+  volume24h: assetInfo.volume_24h,
+  percentChange24h: assetInfo.percent_change_24h,
+  reportedMarketCap: assetInfo.self_reported_market_cap,
+  tickSizeDecimals: getTickSizeDecimalsFromPrice(assetInfo.price),
+  urls: {
+    website: assetInfo.urls.website,
+    technicalDoc: assetInfo.urls.technical_doc,
+    cmc: assetInfo.urls.cmc,
+  },
+}));
+
+export const transformAssetsInfo = (assetsInfo: AssetInfos | undefined) => {
   if (assetsInfo == null) {
     return assetsInfo;
   }
