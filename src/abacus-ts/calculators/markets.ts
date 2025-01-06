@@ -70,9 +70,7 @@ function calculateDerivedMarketDisplayItems(market: IndexerPerpetualMarketRespon
 function calculateDerivedMarketCore(market: IndexerPerpetualMarketResponseObject) {
   return {
     effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
-    openInterestUSDC: MustBigNumber(market.openInterest)
-      .times(market.oraclePrice)
-      .toFixed(USD_DECIMALS),
+    openInterestUSDC: MustBigNumber(market.openInterest).times(market.oraclePrice).toNumber(),
     percentChange24h: MustBigNumber(market.oraclePrice).isZero()
       ? null
       : MustBigNumber(market.priceChange24H).div(market.oraclePrice).toNumber(),

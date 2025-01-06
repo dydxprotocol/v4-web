@@ -8,8 +8,11 @@ export const selectAllAssetsInfo = createAppSelector([selectRawAssetsData], (ass
   transformAssetsInfo(assets)
 );
 
-export const selectAssetInfo = (assetId: string) =>
-  createAppSelector([selectAllAssetsInfo], (assets) => assets?.[assetId]);
+export const selectAssetInfo = () =>
+  createAppSelector(
+    [selectAllAssetsInfo, (_s, assetId: string) => assetId],
+    (assets, assetId) => assets?.[assetId]
+  );
 
 export const selectCurrentMarketAssetInfo = createAppSelector(
   [selectCurrentMarketInfo, selectAllAssetsInfo],
