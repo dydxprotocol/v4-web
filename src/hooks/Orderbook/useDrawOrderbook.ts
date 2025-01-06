@@ -244,6 +244,7 @@ export const useDrawOrderbook = ({
             groupSeparator,
             selectedLocale,
             fractionDigits: tickSizeDecimals,
+            withSubscript: true,
           }),
           getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
           y
