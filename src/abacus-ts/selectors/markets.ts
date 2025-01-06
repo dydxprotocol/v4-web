@@ -9,14 +9,12 @@ export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (m
   calculateAllMarkets(markets)
 );
 
-export const selectAllMarketsInfoLoading = createAppSelector(
-  [selectRawMarkets],
-  (markets) => markets.status
-);
-
 export const selectCurrentMarketInfo = createAppSelector(
   [selectAllMarketsInfo, getCurrentMarketId],
   (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );
 
-export const selectMarketsInfoLoading = createAppSelector([selectRawMarkets], mergeLoadableStatus);
+export const selectAllMarketsInfoLoading = createAppSelector(
+  [selectRawMarkets],
+  mergeLoadableStatus
+);
