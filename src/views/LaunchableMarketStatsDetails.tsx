@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { selectAssetInfo } from '@/abacus-ts/selectors/assets';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
@@ -56,7 +56,7 @@ export const LaunchableMarketStatsDetails = ({
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useParameterizedSelector(selectAssetInfo, assetId);
+  const launchableAsset = useParameterizedSelector(BonsaiHelpers.assets.assetInfoById, assetId);
 
   const {
     marketCap,

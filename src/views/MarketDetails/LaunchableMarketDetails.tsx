@@ -1,4 +1,4 @@
-import { selectAssetInfo } from '@/abacus-ts/selectors/assets';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
@@ -19,7 +19,7 @@ import { MarketDetails } from './MarketDetails';
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useParameterizedSelector(selectAssetInfo, assetId);
+  const launchableAsset = useParameterizedSelector(BonsaiHelpers.assets.assetInfoById, assetId);
 
   if (!launchableAsset) return null;
 

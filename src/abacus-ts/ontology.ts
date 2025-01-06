@@ -16,6 +16,7 @@ import {
   selectParentSubaccountSummaryLoading,
 } from './selectors/account';
 import {
+  createSelectAssetInfo,
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
   selectCurrentMarketAssetInfo,
@@ -94,5 +95,8 @@ export const BonsaiHelpers = {
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
     },
+  },
+  assets: {
+    assetInfoById: createSelectAssetInfo,
   },
 } as const satisfies NestedSelectors;
