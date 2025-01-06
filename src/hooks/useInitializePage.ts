@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+// eslint-disable-next-line no-restricted-imports
 import { IndexerWebsocketManager } from '@/abacus-ts/websocket/lib/indexerWebsocketManager';
 
 import { LocalStorageKey } from '@/constants/localStorage';
