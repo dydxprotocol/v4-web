@@ -13,6 +13,9 @@ export type SourceAccount = {
 // NOTE: This app slice is persisted via redux-persist. Changes to this type may require migrations.
 export interface WalletState {
   sourceAccount: SourceAccount;
+  localWallet?: {
+    address?: string;
+  };
 }
 
 const initialState: WalletState = {
@@ -58,6 +61,9 @@ export const walletSlice = createSlice({
     clearSavedEncryptedSignature: (state) => {
       state.sourceAccount.encryptedSignature = undefined;
     },
+    setLocalWallet: (state, { payload }: PayloadAction<{ address?: string }>) => {
+      state.localWallet = payload;
+    },
     clearSourceAccount: (state) => {
       state.sourceAccount = {
         address: undefined,
@@ -75,4 +81,5 @@ export const {
   setSavedEncryptedSignature,
   clearSavedEncryptedSignature,
   clearSourceAccount,
+  setLocalWallet,
 } = walletSlice.actions;
