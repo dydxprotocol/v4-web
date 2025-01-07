@@ -6,12 +6,12 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectRawFunding } from './base';
 
-export const selectHistoricalFunding = createAppSelector(
+export const selectCurrentMarketFunding = createAppSelector(
   [selectRawFunding, getCurrentMarketId],
   (funding, marketId = '') => funding[marketId]?.data?.historicalFunding ?? EMPTY_ARR
 );
 
-export const selectFundingLoading = createAppSelector(
+export const selectCurrentMarketFundingLoading = createAppSelector(
   [selectRawFunding, getCurrentMarketId],
   (funding, marketId = '') => funding[marketId] && mergeLoadableStatus(funding[marketId])
 );

@@ -26,6 +26,7 @@ import {
   selectRawValidatorHeightData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
+import { selectCurrentMarketFunding, selectCurrentMarketFundingLoading } from './selectors/funding';
 import {
   selectAllMarketsInfo,
   selectAllMarketsInfoLoading,
@@ -71,10 +72,6 @@ export const BonsaiCore = {
       data: selectAllMarketsInfo,
       loading: selectAllMarketsInfoLoading,
     },
-    // fundingHistory: {
-    //   data: null,
-    //   loading: null,
-    // },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
   },
   network: {
@@ -97,6 +94,10 @@ export const BonsaiHelpers = {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
+    },
+    fundingHistory: {
+      data: selectCurrentMarketFunding,
+      loading: selectCurrentMarketFundingLoading,
     },
   },
 } as const satisfies NestedSelectors;
