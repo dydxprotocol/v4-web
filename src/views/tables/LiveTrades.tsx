@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers, BonsaiHooks } from '@/abacus-ts/ontology';
 import { LiveTrade } from '@/abacus-ts/summaryTypes';
-import { useCurrentMarketTradesValue } from '@/abacus-ts/websocket/trades';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css, keyframes } from 'styled-components';
@@ -51,7 +50,8 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const currentMarketConfig = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
-  const currentMarketLiveTrades = useCurrentMarketTradesValue().data?.trades ?? EMPTY_ARR;
+  const currentMarketLiveTrades =
+    BonsaiHooks.useCurrentMarketLiveTrades().data?.trades ?? EMPTY_ARR;
 
   const {
     stepSizeDecimals,
