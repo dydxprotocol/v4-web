@@ -16,3 +16,4 @@ export const USDC_ADDRESSES = {
 };
 
 export const USDC_DECIMALS = 6;
+export const ETH_DECIMALS = 18;

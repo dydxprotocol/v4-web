@@ -4,7 +4,11 @@ export function getTokenSymbol(denom: string) {
     return 'POL';
   }
 
-  if (denom.endsWith('native')) return 'ETH';
+  if (isNativeTokenDenom(denom)) return 'ETH';
 
   return 'USDC';
+}
+
+export function isNativeTokenDenom(denom: string) {
+  return denom.endsWith('native');
 }

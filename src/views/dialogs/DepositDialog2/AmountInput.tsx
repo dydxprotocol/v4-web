@@ -2,9 +2,11 @@ import { EventHandler } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
+import { parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { ETH_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -15,7 +17,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalance } from './queries';
-import { getTokenSymbol } from './utils';
+import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
 export type AmountInputProps = {
   value: string;
@@ -28,6 +30,8 @@ const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
 function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+const GAS_RESERVE_AMOUNT = parseUnits('0.01', ETH_DECIMALS);
 
 export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInputProps) => {
   const stringGetter = useStringGetter();
@@ -42,6 +46,20 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
   };
 
   const tokenBalance = useBalance(token.chainId, token.denom);
+
+  const onClickMax = () => {
+    if (!tokenBalance.raw) return;
+
+    const balanceAmount = BigInt(tokenBalance.raw!);
+    if (isNativeTokenDenom(token.denom)) {
+      const amount =
+        balanceAmount > GAS_RESERVE_AMOUNT ? balanceAmount - GAS_RESERVE_AMOUNT : balanceAmount;
+      onChange(amount.toString());
+      return;
+    }
+
+    onChange(balanceAmount.toString());
+  };
 
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
@@ -59,6 +77,15 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
                 value={tokenBalance.formatted}
                 type={OutputType.Number}
               />
+            </>
+          )}
+
+          {tokenBalance.raw && (
+            <>
+              <span> • </span>
+              <button onClick={onClickMax} type="button" tw="font-medium text-color-accent">
+                {stringGetter({ key: STRING_KEYS.MAX })}
+              </button>
             </>
           )}
         </div>
