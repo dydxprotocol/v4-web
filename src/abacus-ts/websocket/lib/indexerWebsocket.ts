@@ -115,6 +115,7 @@ export class IndexerWebsocket {
     try {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
+        // todo we should unsub and resub to the connection if we can
         logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
       } else if (message.type === 'connected' || message.type === 'unsubscribed') {
         // do nothing
@@ -127,21 +128,25 @@ export class IndexerWebsocket {
         const channel = message.channel;
         const id = message.id;
         if (this.subscriptions[channel] == null) {
-          logAbacusTsError(
-            'IndexerWebsocket',
-            'encountered message with unknown target',
-            channel,
-            id
-          );
+          if (channel !== 'v4_orderbook') {
+            logAbacusTsError(
+              'IndexerWebsocket',
+              'encountered message with unknown target',
+              channel,
+              id
+            );
+          }
           return;
         }
         if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
-          logAbacusTsError(
-            'IndexerWebsocket',
-            'encountered message with unknown target',
-            channel,
-            id
-          );
+          if (channel !== 'v4_orderbook') {
+            logAbacusTsError(
+              'IndexerWebsocket',
+              'encountered message with unknown target',
+              channel,
+              id
+            );
+          }
           return;
         }
         if (message.type === 'subscribed') {

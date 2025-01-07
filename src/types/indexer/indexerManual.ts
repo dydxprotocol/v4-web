@@ -143,6 +143,8 @@ export type IndexerWsOrderUpdate = Partial<
   Omit<IndexerCompositeOrderObject, 'subaccountNumber'>
 > & { id: string };
 
+export type IndexerTransferCommonResponseObject = Omit<IndexerTransferResponseObject, 'id'>;
+
 export interface IndexerWsParentSubaccountUpdateObject {
   blockHeight: string;
   assetPositions?: Array<IndexerAssetPositionResponseObject | IndexerWsAssetUpdate>;
@@ -150,7 +152,7 @@ export interface IndexerWsParentSubaccountUpdateObject {
   tradingReward?: IndexerHistoricalBlockTradingReward;
   fills?: IndexerCompositeFillObject[];
   orders?: Array<IndexerWsOrderUpdate | IndexerCompositeOrderObject>;
-  transfers?: IndexerTransferResponseObject;
+  transfers?: IndexerTransferCommonResponseObject;
 }
 
 export interface IndexerWsTradesUpdateObject {
