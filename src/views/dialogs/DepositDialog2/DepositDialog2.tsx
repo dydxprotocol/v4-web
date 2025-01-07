@@ -7,7 +7,7 @@ import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { USDC_ADDRESSES } from '@/constants/tokens';
+import { USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -30,6 +30,7 @@ function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
     return {
       chainId: mainnet.id.toString(),
       denom: USDC_ADDRESSES[mainnet.id],
+      decimals: USDC_DECIMALS,
     };
   }
 
@@ -37,12 +38,14 @@ function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
     return {
       chainId: SOLANA_MAINNET_ID,
       denom: USDC_ADDRESSES[SOLANA_MAINNET_ID],
+      decimals: USDC_DECIMALS,
     };
   }
 
   return {
     chainId: CosmosChainId.Osmosis,
     denom: USDC_ADDRESSES[CosmosChainId.Osmosis],
+    decimals: USDC_DECIMALS,
   };
 }
 
@@ -95,7 +98,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           tw="w-[50%] overflow-scroll"
           style={{
             height: formState === 'form' ? 0 : '100%',
-            maxHeight: isMobile ? '50vh' : '20rem',
+            maxHeight: isMobile ? '50vh' : '25rem',
           }}
         >
           <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />

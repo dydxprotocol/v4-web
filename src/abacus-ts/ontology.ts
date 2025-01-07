@@ -32,6 +32,7 @@ import {
   selectAllMarketsInfoLoading,
   selectCurrentMarketInfo,
 } from './selectors/markets';
+import { useCurrentMarketTradesValue } from './websocket/trades';
 
 // every leaf is a selector or a paramaterized selector
 type NestedSelectors = {
@@ -101,3 +102,7 @@ export const BonsaiHelpers = {
     },
   },
 } as const satisfies NestedSelectors;
+
+export const BonsaiHooks = {
+  useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
+} as const;
