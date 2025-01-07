@@ -56,8 +56,8 @@ export const RouteOptions = ({
           style={{
             color:
               selectedSpeed === 'fast' && !isLoading
-                ? 'var(--color-yellow-0)'
-                : 'var(--color-layer-2)',
+                ? 'var(--color-favorite)'
+                : 'var(--color-text-0)',
           }}
         >
           <LightningIcon />
