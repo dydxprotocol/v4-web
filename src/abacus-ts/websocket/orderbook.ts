@@ -5,6 +5,7 @@ import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 import { setOrderbookRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -66,7 +67,7 @@ function orderbookWebsocketValue(
 }
 
 const selectMarketAndWsInfo = createAppSelector(
-  [selectWebsocketUrl, (state) => state.perpetuals.currentMarketIdIfTradeable],
+  [selectWebsocketUrl, getCurrentMarketIdIfTradeable],
   (wsUrl, currentMarketId) => ({ wsUrl, currentMarketId })
 );
 
