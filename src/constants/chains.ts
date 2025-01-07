@@ -38,3 +38,5 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
 };
 
 export const EVM_DEPOSIT_CHAINS = [mainnet, base, optimism, arbitrum, polygon];
+
+export const DYDX_DEPOSIT_CHAIN = 'dydx-mainnet-1';

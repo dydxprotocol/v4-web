@@ -1,3 +1,5 @@
+import { PartialBy } from '@/lib/typeUtils';
+
 import {
   IndexerAPIOrderStatus,
   IndexerAPITimeInForce,
@@ -14,6 +16,7 @@ import {
   IndexerPerpetualMarketStatus,
   IndexerPerpetualMarketType,
   IndexerPerpetualPositionResponseObject,
+  IndexerTradeResponseObject,
   IndexerTransferResponseObject,
 } from './indexerApiGen';
 
@@ -150,4 +153,8 @@ export interface IndexerWsParentSubaccountUpdateObject {
   fills?: IndexerCompositeFillObject[];
   orders?: Array<IndexerWsOrderUpdate | IndexerCompositeOrderObject>;
   transfers?: IndexerTransferCommonResponseObject;
+}
+
+export interface IndexerWsTradesUpdateObject {
+  trades: PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>[];
 }
