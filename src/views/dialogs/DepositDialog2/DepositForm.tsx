@@ -4,6 +4,7 @@ import { formatUnits, parseUnits } from 'viem';
 
 import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -11,7 +12,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 
-import { USDC_DECIMALS } from '@/constants/tokens';
 import { AmountInput } from './AmountInput';
 import { RouteOptions } from './RouteOptions';
 import { useRoutes } from './queries';
