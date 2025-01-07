@@ -7,6 +7,8 @@ import {
 } from '@/types/indexer/indexerApiGen';
 import { type BigNumber } from 'bignumber.js';
 
+import { BaseTrade } from './rawTypes';
+
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
 // Helper type to select properties that can be strings (including in unions)
@@ -143,3 +145,5 @@ export type SubaccountOrder = {
   removalReason: string | undefined;
   marginMode: MarginMode | undefined;
 };
+
+export type LiveTrade = BaseTrade;
