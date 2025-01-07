@@ -9,6 +9,7 @@ import {
 } from '@/abacus-ts/rawTypes';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
+  IndexerHistoricalFundingResponse,
   IndexerParentSubaccountTransferResponse,
 } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
@@ -27,6 +28,7 @@ export interface RawDataState {
     allMarkets: Loadable<MarketsData>;
     assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
+    funding: { [marketId: string]: Loadable<IndexerHistoricalFundingResponse> };
   };
   account: {
     parentSubaccount: Loadable<ParentSubaccountData>;
@@ -45,7 +47,7 @@ export interface RawDataState {
 }
 
 const initialState: RawDataState = {
-  markets: { allMarkets: loadableIdle(), assets: loadableIdle(), orderbooks: {} },
+  markets: { allMarkets: loadableIdle(), assets: loadableIdle(), orderbooks: {}, funding: {} },
   account: {
     parentSubaccount: loadableIdle(),
     fills: loadableIdle(),
@@ -69,6 +71,15 @@ export const rawSlice = createSlice({
     },
     setAllAssetsRaw: (state, action: PayloadAction<Loadable<AssetInfos>>) => {
       state.markets.assets = action.payload;
+    },
+    setFundingRaw: (
+      state,
+      action: PayloadAction<{
+        marketId: string;
+        data: Loadable<IndexerHistoricalFundingResponse>;
+      }>
+    ) => {
+      state.markets.funding[action.payload.marketId] = action.payload.data;
     },
     setOrderbookRaw: (
       state,
@@ -117,6 +128,7 @@ export const rawSlice = createSlice({
 });
 
 export const {
+  setFundingRaw,
   setOrderbookRaw,
   setAllMarketsRaw,
   setAllAssetsRaw,

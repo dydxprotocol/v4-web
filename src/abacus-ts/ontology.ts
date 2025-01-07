@@ -71,6 +71,10 @@ export const BonsaiCore = {
       data: selectAllMarketsInfo,
       loading: selectAllMarketsInfoLoading,
     },
+    // fundingHistory: {
+    //   data: null,
+    //   loading: null,
+    // },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
   },
   network: {
