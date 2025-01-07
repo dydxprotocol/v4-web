@@ -23,6 +23,8 @@ interface CandleDataByMarket {
 
 export interface PerpetualsState {
   currentMarketId?: string;
+  // if user is viewing is a live, tradeable market: its id; otherwise: undefined
+  currentMarketIdIfTradeable?: string;
   candles: Record<string, CandleDataByMarket>;
   liveTrades?: Record<string, MarketTrade[]>;
   markets?: Record<string, PerpetualMarket>;
@@ -41,6 +43,7 @@ export interface PerpetualsState {
 
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
+  currentMarketIdIfTradeable: undefined,
   candles: {},
   liveTrades: {},
   markets: undefined,
@@ -62,6 +65,12 @@ export const perpetualsSlice = createSlice({
     },
     setCurrentMarketId: (state: PerpetualsState, action: PayloadAction<string>) => {
       state.currentMarketId = action.payload;
+    },
+    setCurrentMarketIdIfTradeable: (
+      state: PerpetualsState,
+      action: PayloadAction<string | undefined>
+    ) => {
+      state.currentMarketIdIfTradeable = action.payload;
     },
     setCandles: (
       state: PerpetualsState,
@@ -163,6 +172,7 @@ export const perpetualsSlice = createSlice({
 
 export const {
   setCurrentMarketId,
+  setCurrentMarketIdIfTradeable,
   setCandles,
   setLiveTrades,
   setMarkets,

@@ -17,6 +17,7 @@ import { createAppSelector } from '@/state/appTypes';
 import { setParentSubaccountRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { MustBigNumber } from '@/lib/numbers';
 
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
@@ -74,10 +75,26 @@ function accountWebsocketValue(
     {
       channel: 'v4_parent_subaccounts',
       id: `${address}/${parentSubaccountNumber}`,
-      handleBaseData: (baseMessage) => {
-        const message = isWsParentSubaccountSubscribed(baseMessage);
+      handleBaseData: (baseMessage): Loadable<ParentSubaccountData> => {
         accountRefreshSignal.notify();
 
+        // null message means account has had no transfers yet, but it's still valid
+        if (baseMessage == null) {
+          const parentSubaccountNumberParsed = MustBigNumber(parentSubaccountNumber).toNumber();
+          return loadableLoaded({
+            address,
+            parentSubaccount: parentSubaccountNumberParsed,
+            live: {},
+            childSubaccounts: {
+              [parentSubaccountNumberParsed]: freshChildSubaccount({
+                address,
+                subaccountNumber: parentSubaccountNumberParsed,
+              }),
+            },
+          });
+        }
+
+        const message = isWsParentSubaccountSubscribed(baseMessage);
         return loadableLoaded({
           address: message.subaccount.address,
           parentSubaccount: message.subaccount.parentSubaccountNumber,

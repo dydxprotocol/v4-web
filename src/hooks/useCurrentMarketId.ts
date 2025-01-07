@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
-import { setCurrentMarketId } from '@/state/perpetuals';
+import { setCurrentMarketId, setCurrentMarketIdIfTradeable } from '@/state/perpetuals';
 import {
   getLaunchedMarketIds,
   getMarketIds,
@@ -143,6 +143,7 @@ export const useCurrentMarketId = () => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
     if (isViewingUnlaunchedMarket) {
       abacusStateManager.setMarket(DEFAULT_MARKETID);
+      dispatch(setCurrentMarketIdIfTradeable(undefined));
       abacusStateManager.setTradeValue({ value: null, field: null });
     } else if (hasMarketIds) {
       if (marketId) {
@@ -150,14 +151,23 @@ export const useCurrentMarketId = () => {
 
         if (isMarketReadyForSubscription) {
           abacusStateManager.setMarket(marketId);
+          dispatch(setCurrentMarketIdIfTradeable(marketId));
         }
       } else {
         abacusStateManager.setMarket(DEFAULT_MARKETID);
+        dispatch(setCurrentMarketIdIfTradeable(undefined));
       }
 
       abacusStateManager.setTradeValue({ value: null, field: null });
     }
-  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketIds, hasMarketOraclePrice, marketId]);
+  }, [
+    isViewingUnlaunchedMarket,
+    selectedNetwork,
+    hasMarketIds,
+    hasMarketOraclePrice,
+    marketId,
+    dispatch,
+  ]);
 
   return {
     isViewingUnlaunchedMarket,
