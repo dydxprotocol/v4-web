@@ -97,6 +97,6 @@ export const BonsaiHelpers = {
     },
   },
   assets: {
-    assetInfoById: createSelectAssetInfo,
+    paramaterizedAssetInfo: createSelectAssetInfo,
   },
 } as const satisfies NestedSelectors;

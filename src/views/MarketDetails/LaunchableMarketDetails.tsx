@@ -19,7 +19,10 @@ import { MarketDetails } from './MarketDetails';
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useParameterizedSelector(BonsaiHelpers.assets.assetInfoById, assetId);
+  const launchableAsset = useParameterizedSelector(
+    BonsaiHelpers.assets.paramaterizedAssetInfo,
+    assetId
+  );
 
   if (!launchableAsset) return null;
 

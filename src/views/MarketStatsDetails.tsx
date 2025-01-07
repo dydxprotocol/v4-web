@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -126,10 +127,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               assetId={displayableAsset ?? ''}
               isLoading={isLoading}
               priceChange24HPercent={percentChange24h}
-              initialMarginFraction={MustBigNumber(initialMarginFraction).toNumber()}
-              effectiveInitialMarginFraction={MustBigNumber(
-                effectiveInitialMarginFraction
-              ).toNumber()}
+              initialMarginFraction={initialMarginFraction}
+              effectiveInitialMarginFraction={effectiveInitialMarginFraction}
               useFiatDisplayUnit={displayUnit === DisplayUnit.Fiat}
             />
           ),
@@ -224,8 +223,8 @@ const DetailsItem = ({
   assetId: string;
   isLoading: boolean;
   priceChange24HPercent: number | null | undefined;
-  initialMarginFraction: number | null | undefined;
-  effectiveInitialMarginFraction: number | null | undefined;
+  initialMarginFraction: string | null | undefined;
+  effectiveInitialMarginFraction: BigNumber | null | undefined;
   useFiatDisplayUnit: boolean;
 }) => {
   const valueBN = MustBigNumber(value);
@@ -321,7 +320,7 @@ const DetailsItem = ({
               ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
               : null
           }
-          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
+          withDiff={initialMarginFraction !== effectiveInitialMarginFraction?.toString()}
           type={OutputType.Multiple}
         />
       );
