@@ -45,12 +45,9 @@ export const TokenSelect = ({
       })
       .flat()
       // TODO: log when there are no decimals? this shouldnt happen
-      .filter(balance => balance.decimals); 
+      .filter((balance) => balance.decimals);
 
-    return partition(
-      allBalances,
-      (balance) => parseUnits(balance.amount, balance.decimals!) > 0
-    );
+    return partition(allBalances, (balance) => parseUnits(balance.amount, balance.decimals!) > 0);
   }, [data]);
 
   const onTokenClick = (newToken: DepositToken) => () => {
@@ -74,7 +71,11 @@ export const TokenSelect = ({
         {withBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
-              onClick={onTokenClick({ chainId: balance.chainId, denom: balance.denom, decimals: balance.decimals! })}
+              onClick={onTokenClick({
+                chainId: balance.chainId,
+                denom: balance.denom,
+                decimals: balance.decimals!,
+              })}
               type="button"
               style={{
                 backgroundColor: token.denom === balance.denom ? 'var(--color-layer-4)' : undefined,
@@ -122,7 +123,11 @@ export const TokenSelect = ({
         {noBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
-              onClick={onTokenClick({ chainId: balance.chainId, denom: balance.denom, decimals: balance.decimals! })}
+              onClick={onTokenClick({
+                chainId: balance.chainId,
+                denom: balance.denom,
+                decimals: balance.decimals!,
+              })}
               type="button"
               tw="flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4"
               key={balance.denom}
