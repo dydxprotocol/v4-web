@@ -2,7 +2,7 @@ import { EventHandler } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
-import { parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -17,12 +17,13 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalance } from './queries';
+import { DepositToken } from './types';
 import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
 export type AmountInputProps = {
   value: string;
   onChange: (newValue: string) => void;
-  token: { chainId: string; denom: string };
+  token: DepositToken;
   onTokenClick: () => void;
 };
 
@@ -54,11 +55,11 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
     if (isNativeTokenDenom(token.denom)) {
       const amount =
         balanceAmount > GAS_RESERVE_AMOUNT ? balanceAmount - GAS_RESERVE_AMOUNT : balanceAmount;
-      onChange(amount.toString());
+      onChange(formatUnits(amount, token.decimals));
       return;
     }
 
-    onChange(balanceAmount.toString());
+    onChange(formatUnits(balanceAmount, token.decimals));
   };
 
   return (
