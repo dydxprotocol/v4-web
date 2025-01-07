@@ -10,6 +10,7 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
   white: ColorToken.White,
   green: ColorToken.Green3,
   red: ColorToken.Red2,
+  yellow0: ColorToken.Yellow0,
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 

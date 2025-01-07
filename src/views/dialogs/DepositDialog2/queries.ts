@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { BalanceRequest } from '@skip-go/client';
+import { BalanceRequest, RouteRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import { Chain } from 'viem';
+import { Chain, parseUnits } from 'viem';
 import { optimism } from 'viem/chains';
 
 import { EVM_DEPOSIT_CHAINS } from '@/constants/chains';
@@ -16,6 +16,9 @@ import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { SourceAccount } from '@/state/wallet';
+
+import { DYDX_CHAIN_USDC_DENOM, DYDX_DEPOSIT_CHAIN } from './consts';
+import { DepositToken } from './types';
 
 export function useBalances() {
   const { sourceAccount } = useAccounts();
@@ -108,4 +111,38 @@ function networkTypeToBalances(sourceAccount: SourceAccount): BalanceRequest {
   }
 
   throw new Error('Fetching balances for unknown chain');
+}
+
+async function getSkipRoutes(skipClient: SkipClient, token: DepositToken, amount: string) {
+  const routeOptions: RouteRequest = {
+    sourceAssetDenom: token.denom,
+    sourceAssetChainID: token.chainId,
+    destAssetDenom: DYDX_CHAIN_USDC_DENOM,
+    destAssetChainID: DYDX_DEPOSIT_CHAIN,
+    amountIn: parseUnits(amount, token.decimals).toString(),
+    smartRelay: true,
+    smartSwapOptions: { evmSwaps: true },
+  };
+
+  const [slow, fast] = await Promise.all([
+    skipClient.route(routeOptions),
+    skipClient.route({ ...routeOptions, goFast: true }),
+  ]);
+
+  // @ts-ignore SDK doesn't know about .goFastTransfer
+  const isFastRouteAvailable = Boolean(fast.operations.find((op) => op.goFastTransfer));
+  return { slow, fast: isFastRouteAvailable ? fast : undefined };
+}
+
+export function useRoutes(token: DepositToken, amount: string) {
+  const { skipClient } = useSkipClient();
+  const rawAmount = amount && parseUnits(amount, token.decimals);
+  return useQuery({
+    queryKey: ['routes', token.chainId, token.denom, amount],
+    queryFn: () => getSkipRoutes(skipClient, token, amount),
+    enabled: Boolean(rawAmount && rawAmount > 0),
+    staleTime: 1 * timeUnits.minute,
+    refetchOnMount: 'always',
+    placeholderData: (prev) => prev,
+  });
 }

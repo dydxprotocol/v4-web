@@ -30,6 +30,7 @@ function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
     return {
       chainId: mainnet.id.toString(),
       denom: USDC_ADDRESSES[mainnet.id],
+      decimals: 6,
     };
   }
 
@@ -37,12 +38,14 @@ function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
     return {
       chainId: SOLANA_MAINNET_ID,
       denom: USDC_ADDRESSES[SOLANA_MAINNET_ID],
+      decimals: 6,
     };
   }
 
   return {
     chainId: CosmosChainId.Osmosis,
     denom: USDC_ADDRESSES[CosmosChainId.Osmosis],
+    decimals: 6, // TODO: confirm this
   };
 }
 
@@ -95,7 +98,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           tw="w-[50%] overflow-scroll"
           style={{
             height: formState === 'form' ? 0 : '100%',
-            maxHeight: isMobile ? '50vh' : '20rem',
+            maxHeight: isMobile ? '50vh' : '25rem',
           }}
         >
           <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
