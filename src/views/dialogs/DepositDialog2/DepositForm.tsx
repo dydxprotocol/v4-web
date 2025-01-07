@@ -11,6 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 
+import { USDC_DECIMALS } from '@/constants/tokens';
 import { AmountInput } from './AmountInput';
 import { RouteOptions } from './RouteOptions';
 import { useRoutes } from './queries';
@@ -63,13 +64,14 @@ export const DepositForm = ({
       {/* TODO(deposit2.0): Show difference between current and new balance here */}
       {selectedRoute && (
         <div tw="flex justify-between text-small">
+          {/* TODO(deposit2.0): localization */}
           <div tw="text-color-text-0">Available balance</div>
           <div>
             +
             <Output
               tw="inline"
               type={OutputType.Fiat}
-              value={formatUnits(BigInt(selectedRoute.amountOut), 6)}
+              value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
             />
           </div>
         </div>
