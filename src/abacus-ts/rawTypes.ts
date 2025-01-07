@@ -3,11 +3,11 @@ import {
   IndexerHistoricalBlockTradingReward,
   IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
   IndexerCompositeOrderObject,
+  IndexerTransferCommonResponseObject,
 } from '@/types/indexer/indexerManual';
 
 import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
@@ -32,7 +32,7 @@ export interface ParentSubaccountData {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
     orders?: OrdersData;
-    transfers?: IndexerTransferResponseObject[];
+    transfers?: IndexerTransferCommonResponseObject[];
   };
 }
 

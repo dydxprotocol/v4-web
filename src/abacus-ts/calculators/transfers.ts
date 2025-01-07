@@ -1,4 +1,4 @@
-import { IndexerTransferResponseObject } from '@/types/indexer/indexerApiGen';
+import { IndexerTransferCommonResponseObject } from '@/types/indexer/indexerManual';
 import { keyBy, maxBy } from 'lodash';
 
 import { EMPTY_ARR } from '@/constants/objects';
@@ -8,11 +8,12 @@ import { MustBigNumber } from '@/lib/numbers';
 import { mergeObjects } from '../lib/mergeObjects';
 
 export function calculateTransfers(
-  liveTransfers: IndexerTransferResponseObject[] | undefined,
-  restTransfers: IndexerTransferResponseObject[] | undefined
+  liveTransfers: IndexerTransferCommonResponseObject[] | undefined,
+  restTransfers: IndexerTransferCommonResponseObject[] | undefined
 ) {
-  const getTransfersById = (data: IndexerTransferResponseObject[]) =>
-    keyBy(data, (transfer) => transfer.id);
+  // TODO had to switch to keying by transaction hash, we should switch back when indexer is fixed
+  const getTransfersById = (data: IndexerTransferCommonResponseObject[]) =>
+    keyBy(data, (transfer) => transfer.transactionHash);
   return mergeObjects(
     getTransfersById(liveTransfers ?? EMPTY_ARR),
     getTransfersById(restTransfers ?? EMPTY_ARR),

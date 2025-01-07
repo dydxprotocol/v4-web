@@ -66,7 +66,7 @@ function orderbookWebsocketValue(
 }
 
 const selectMarketAndWsInfo = createAppSelector(
-  [selectWebsocketUrl, (state) => state.perpetuals.currentMarketId],
+  [selectWebsocketUrl, (state) => state.perpetuals.currentMarketIdIfTradeable],
   (wsUrl, currentMarketId) => ({ wsUrl, currentMarketId })
 );
 
