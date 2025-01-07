@@ -44,7 +44,8 @@ export const TokenSelect = ({
           : [];
       })
       .flat()
-      .filter(balance => balance.decimals); // TODO: log when there are no decimals? this shouldnt happen
+      // TODO: log when there are no decimals? this shouldnt happen
+      .filter(balance => balance.decimals); 
 
     return partition(
       allBalances,
