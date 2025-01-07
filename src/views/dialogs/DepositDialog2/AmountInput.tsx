@@ -62,6 +62,8 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
     onChange(formatUnits(balanceAmount, token.decimals));
   };
 
+  const onMaxDisabled = !tokenBalance.raw || BigInt(tokenBalance.raw) === BigInt(0);
+
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
       <div tw="flex flex-1 flex-col gap-0.5 text-small">
@@ -84,7 +86,13 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
           {tokenBalance.raw && (
             <>
               <span> • </span>
-              <button onClick={onClickMax} type="button" tw="font-medium text-color-accent">
+              <button
+                disabled={onMaxDisabled}
+                onClick={onClickMax}
+                type="button"
+                tw="font-medium"
+                style={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
+              >
                 {stringGetter({ key: STRING_KEYS.MAX })}
               </button>
             </>
