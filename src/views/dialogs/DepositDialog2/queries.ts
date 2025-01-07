@@ -5,11 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';
 import { optimism } from 'viem/chains';
 
-import { EVM_DEPOSIT_CHAINS } from '@/constants/chains';
+import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
-import { USDC_ADDRESSES } from '@/constants/tokens';
+import { DYDX_CHAIN_USDC_DENOM, USDC_ADDRESSES } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
@@ -17,7 +17,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { DYDX_CHAIN_USDC_DENOM, DYDX_DEPOSIT_CHAIN } from './consts';
 import { DepositToken } from './types';
 
 export function useBalances() {
