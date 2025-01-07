@@ -115,6 +115,7 @@ export class IndexerWebsocket {
     try {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
+        // todo we should unsub and resub to the connection if we can
         logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
       } else if (message.type === 'connected' || message.type === 'unsubscribed') {
         // do nothing
