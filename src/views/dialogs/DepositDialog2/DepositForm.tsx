@@ -10,6 +10,8 @@ import { USDC_DECIMALS } from '@/constants/tokens';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { CoinbaseBrandIcon } from '@/icons';
+
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 
@@ -79,9 +81,10 @@ export const DepositForm = ({
               onClose();
             }}
             type={ButtonType.Button}
-            tw="border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
+            tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
-            Deposit with Coinbase
+            <div>Deposit with </div>
+            <CoinbaseBrandIcon />
           </Button>
         </div>
       </div>

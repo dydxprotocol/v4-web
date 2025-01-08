@@ -2,8 +2,10 @@ import { useState } from 'react';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogProps } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { CopyIcon } from '@/icons';
 
@@ -11,8 +13,6 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
-import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks/useStringGetter';
 
 const THREE_SECOND_DELAY = 3000;
 export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
