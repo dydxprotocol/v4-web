@@ -6,7 +6,7 @@ import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { ETH_DECIMALS } from '@/constants/tokens';
+import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -17,13 +17,12 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalance } from './queries';
-import { DepositToken } from './types';
 import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
 export type AmountInputProps = {
   value: string;
   onChange: (newValue: string) => void;
-  token: DepositToken;
+  token: TokenForTransfer;
   onTokenClick: () => void;
 };
 

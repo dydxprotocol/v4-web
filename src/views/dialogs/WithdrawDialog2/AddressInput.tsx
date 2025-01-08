@@ -3,6 +3,7 @@ import { EventHandler } from 'react';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 
+import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -15,14 +16,14 @@ import { Icon, IconName } from '@/components/Icon';
 type AddressInputProps = {
   value: string;
   onChange: (newValue: string) => void;
-  _destinationChain: string;
+  destinationChain: string;
   onDestinationClicked: () => void;
 };
 
 export const AddressInput = ({
   value,
   onChange,
-  _destinationChain,
+  destinationChain,
   onDestinationClicked,
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
@@ -50,8 +51,8 @@ export const AddressInput = ({
         onClick={onDestinationClicked}
       >
         <div tw="flex items-center gap-0.5">
-          <AssetIcon tw="h-[2rem] w-[2rem]" symbol="ETH" />
-          <div>Ethereum</div>
+          <AssetIcon tw="h-[2rem] w-[2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
+          <div>{CHAIN_INFO[destinationChain]?.name}</div>
         </div>
         {sourceAccount.chain !== WalletNetworkType.Solana && (
           <$CaretIcon size="10px" iconName={IconName.Caret} />

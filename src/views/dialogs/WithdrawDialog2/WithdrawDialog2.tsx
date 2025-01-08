@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
+import { mainnet } from 'viem/chains';
 
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
+import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
+import { WalletNetworkType } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -14,8 +18,12 @@ import { ChainSelect } from './ChainSelect';
 import { WithdrawForm } from './WithdrawForm';
 
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const [destinationAddress, setDestinationAddress] = useState('');
-  const [destinationChain, setDestinationChain] = useState('');
+  const { sourceAccount } = useAccounts();
+  const [destinationAddress, setDestinationAddress] = useState(sourceAccount.address ?? '');
+  const [destinationChain, setDestinationChain] = useState(
+    sourceAccount.chain === WalletNetworkType.Evm ? mainnet.id.toString() : CosmosChainId.Noble
+  );
+
   const [amount, setAmount] = useState('');
 
   const { isMobile } = useBreakpoints();
