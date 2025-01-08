@@ -85,7 +85,6 @@ export const DepositForm = ({
         tw="w-full"
         state={depositDisabled ? ButtonState.Disabled : ButtonState.Default}
         disabled={depositDisabled}
-        // slotLeft={<LoadingDots />}
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
       >
