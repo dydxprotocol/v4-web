@@ -26,11 +26,6 @@ export const RouteOptions = ({
   onSelectSpeed,
   disabled,
 }: Props) => {
-  // TODO(deposit2.0): finalize error handling here
-  if (!routes.slow && !routes.fast) {
-    return <div>There was an error loading deposit quotes.</div>;
-  }
-
   const fastOperationFee = // @ts-ignore
     routes.fast?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
   const totalFastFee = fastOperationFee

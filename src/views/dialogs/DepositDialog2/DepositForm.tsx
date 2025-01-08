@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
 
@@ -15,8 +15,9 @@ import { Output, OutputType } from '@/components/Output';
 
 import { AmountInput } from './AmountInput';
 import { RouteOptions } from './RouteOptions';
-import { useRoutes } from './queries';
+import { useBalance, useRoutes } from './queries';
 import { DepositSpeed, DepositToken } from './types';
+import { getTokenSymbol } from './utils';
 
 export const DepositForm = ({
   onTokenSelect,
@@ -31,19 +32,38 @@ export const DepositForm = ({
 }) => {
   const stringGetter = useStringGetter();
   const [selectedSpeed, setSelectedSpeed] = useState<DepositSpeed>('fast');
+  const tokenBalance = useBalance(token.chainId, token.denom);
 
   const debouncedAmount = useDebounce(amount);
-  const { data: routes, isFetching } = useRoutes(token, debouncedAmount);
+  const { data: routes, isFetching, error } = useRoutes(token, debouncedAmount);
 
   useEffect(() => {
     if (debouncedAmount && !isFetching && !routes?.fast) setSelectedSpeed('slow');
   }, [isFetching, routes, debouncedAmount]);
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
+  const hasSufficientBalance = selectedRoute
+    ? tokenBalance.raw && BigInt(selectedRoute.amountIn) <= BigInt(tokenBalance.raw)
+    : true;
+
+  const depositDisabled = isFetching || !hasSufficientBalance || !selectedRoute;
+
+  const depositButtonInner = useMemo(() => {
+    if (isFetching) return <LoadingDots size={3} />;
+    if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
+
+    return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
+  }, [hasSufficientBalance, isFetching, stringGetter, token.denom]);
 
   return (
     <div tw="flex min-h-10 flex-col gap-1 p-1.25">
-      <AmountInput value={amount} onChange={setAmount} token={token} onTokenClick={onTokenSelect} />
+      <AmountInput
+        tokenBalance={tokenBalance}
+        value={amount}
+        onChange={setAmount}
+        token={token}
+        onTokenClick={onTokenSelect}
+      />
       {routes && (
         <RouteOptions
           routes={routes}
@@ -53,22 +73,28 @@ export const DepositForm = ({
           onSelectSpeed={setSelectedSpeed}
         />
       )}
+      {/* TODO(deposit2.0): make this error message better */}
+      {error && (
+        <div tw="text-center">
+          There was an error. Please increase your deposit amount and try again.
+        </div>
+      )}
       <Button
         tw="w-full"
-        state={isFetching ? ButtonState.Disabled : ButtonState.Default}
-        disabled
+        state={depositDisabled ? ButtonState.Disabled : ButtonState.Default}
+        disabled={depositDisabled}
         // slotLeft={<LoadingDots />}
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
       >
-        {isFetching ? <LoadingDots size={3} /> : stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+        {depositButtonInner}
       </Button>
       {/* TODO(deposit2.0): Show difference between current and new balance here */}
       {selectedRoute && (
         <div tw="flex justify-between text-small">
           {/* TODO(deposit2.0): localization */}
           <div tw="text-color-text-0">Available balance</div>
-          <div>
+          <div style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}>
             +
             <Output
               tw="inline"

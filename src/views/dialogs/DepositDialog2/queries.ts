@@ -143,5 +143,6 @@ export function useRoutes(token: DepositToken, amount: string) {
     staleTime: 1 * timeUnits.minute,
     refetchOnMount: 'always',
     placeholderData: (prev) => prev,
+    retry: false,
   });
 }

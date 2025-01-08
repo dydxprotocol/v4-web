@@ -16,7 +16,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { useBalance } from './queries';
 import { DepositToken } from './types';
 import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
@@ -25,6 +24,7 @@ export type AmountInputProps = {
   onChange: (newValue: string) => void;
   token: DepositToken;
   onTokenClick: () => void;
+  tokenBalance: { raw?: string; formatted?: string };
 };
 
 const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
@@ -34,7 +34,13 @@ function escapeRegExp(string: string): string {
 
 const GAS_RESERVE_AMOUNT = parseUnits('0.01', ETH_DECIMALS);
 
-export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInputProps) => {
+export const AmountInput = ({
+  value,
+  onChange,
+  token,
+  onTokenClick,
+  tokenBalance,
+}: AmountInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
 
@@ -45,8 +51,6 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
 
     onChange(e.target.value);
   };
-
-  const tokenBalance = useBalance(token.chainId, token.denom);
 
   const onClickMax = () => {
     if (!tokenBalance.raw) return;
