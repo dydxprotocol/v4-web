@@ -184,12 +184,26 @@ class WebSocketConnection {
       }
     };
 
-    this.ws.onerror = (error) => {
-      logAbacusTsError('WebSocketConnection', `socket ${this.id} error encountered`, error);
+    this.ws.onerror = () => {
       this.close();
     };
 
-    this.ws.onclose = () => {
+    this.ws.onclose = (close) => {
+      const allowedCodes = new Set([
+        // normal
+        1000,
+        // going away (nav or graceful server shutdown)
+        1001,
+        // normal but no code
+        1005,
+      ]);
+      if (!allowedCodes.has(close.code)) {
+        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
+          code: close.code,
+          reason: close.reason,
+          clean: close.wasClean,
+        });
+      }
       this.close();
     };
   }
