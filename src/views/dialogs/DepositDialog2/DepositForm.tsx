@@ -35,18 +35,20 @@ export const DepositForm = ({
   const tokenBalance = useBalance(token.chainId, token.denom);
 
   const debouncedAmount = useDebounce(amount);
-  const { data: routes, isFetching, error } = useRoutes(token, debouncedAmount);
+  const { data: routes, isFetching, error, isPlaceholderData } = useRoutes(token, debouncedAmount);
 
   useEffect(() => {
     if (debouncedAmount && !isFetching && !routes?.fast) setSelectedSpeed('slow');
   }, [isFetching, routes, debouncedAmount]);
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
-  const hasSufficientBalance = selectedRoute
-    ? tokenBalance.raw && BigInt(selectedRoute.amountIn) <= BigInt(tokenBalance.raw)
+  const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
+
+  const hasSufficientBalance = depositRoute
+    ? tokenBalance.raw && BigInt(depositRoute.amountIn) <= BigInt(tokenBalance.raw)
     : true;
 
-  const depositDisabled = isFetching || !hasSufficientBalance || !selectedRoute;
+  const depositDisabled = isFetching || !hasSufficientBalance || !depositRoute;
 
   const depositButtonInner = useMemo(() => {
     if (isFetching) return <LoadingDots size={3} />;
