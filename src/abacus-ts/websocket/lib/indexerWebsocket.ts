@@ -1,12 +1,15 @@
 import { logAbacusTsError } from '@/abacus-ts/logs';
 import typia from 'typia';
 
+import { timeUnits } from '@/constants/time';
+
 import { assertNever } from '@/lib/assertNever';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { ReconnectingWebSocket } from './reconnectingWebsocket';
 
 const NO_ID_SPECIAL_STRING_ID = '______EMPTY_ID______';
+const CHANNEL_RETRY_COOLDOWN_MS = timeUnits.minute;
 
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
@@ -23,6 +26,8 @@ export class IndexerWebsocket {
       };
     };
   } = {};
+
+  private lastRetryMsByChannel: { [channel: string]: number } = {};
 
   constructor(url: string) {
     this.socket = new ReconnectingWebSocket({
@@ -55,6 +60,25 @@ export class IndexerWebsocket {
     handleBaseData: (data: any, fullMessage: any) => void;
     handleUpdates: (data: any[], fullMessage: any) => void;
   }): () => void {
+    this._addSub({ channel, id, batched, handleUpdates, handleBaseData });
+    return () => {
+      this._performUnsub({ channel, id });
+    };
+  }
+
+  private _addSub = ({
+    channel,
+    id,
+    batched = true,
+    handleUpdates,
+    handleBaseData,
+  }: {
+    channel: string;
+    id: string | undefined;
+    batched?: boolean;
+    handleBaseData: (data: any, fullMessage: any) => void;
+    handleUpdates: (data: any[], fullMessage: any) => void;
+  }) => {
     this.subscriptions[channel] ??= {};
     if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] != null) {
       logAbacusTsError('IndexerWebsocket', 'this subscription already exists', `${channel}/${id}`);
@@ -77,46 +101,75 @@ export class IndexerWebsocket {
         type: 'subscribe',
       });
     }
+  };
 
-    return () => {
-      if (this.subscriptions[channel] == null) {
-        logAbacusTsError(
-          'IndexerWebsocket',
-          'unsubbing from nonexistent or already unsubbed channel',
-          channel
-        );
-        return;
+  private _performUnsub = ({ channel, id }: { channel: string; id: string | undefined }) => {
+    if (this.subscriptions[channel] == null) {
+      logAbacusTsError(
+        'IndexerWebsocket',
+        'unsubbing from nonexistent or already unsubbed channel',
+        channel
+      );
+      return;
+    }
+    if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
+      logAbacusTsError(
+        'IndexerWebsocket',
+        'unsubbing from nonexistent or already unsubbed channel',
+        channel,
+        id
+      );
+      return;
+    }
+    if (
+      this.socket != null &&
+      this.socket.isActive() &&
+      this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage
+    ) {
+      this.socket.send({
+        channel,
+        id,
+        type: 'unsubscribe',
+      });
+    }
+    delete this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID];
+  };
+
+  private _refreshChannelSubs = (channel: string) => {
+    const allSubs = Object.values(this.subscriptions[channel] ?? {});
+    allSubs.forEach((sub) => {
+      this._performUnsub(sub);
+      this._addSub(sub);
+    });
+  };
+
+  private _handleErrorReceived = (message: string) => {
+    if (message.startsWith('Internal error, could not fetch data for subscription: ')) {
+      const maybeChannel = message
+        .trim()
+        .split(/[\s,.]/)
+        .at(-2);
+      if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
+        const lastRefresh = this.lastRetryMsByChannel[maybeChannel] ?? 0;
+        if (new Date().valueOf() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
+          this._refreshChannelSubs(maybeChannel);
+          logAbacusTsError(
+            'IndexerWebsocket',
+            'error fetching data for channel, refetching',
+            maybeChannel
+          );
+          return;
+        }
       }
-      if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
-        logAbacusTsError(
-          'IndexerWebsocket',
-          'unsubbing from nonexistent or already unsubbed channel',
-          channel,
-          id
-        );
-        return;
-      }
-      if (
-        this.socket != null &&
-        this.socket.isActive() &&
-        this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage
-      ) {
-        this.socket.send({
-          channel,
-          id,
-          type: 'unsubscribe',
-        });
-      }
-      delete this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID];
-    };
-  }
+    }
+    logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message);
+  };
 
   private _handleMessage = (messagePre: any) => {
     try {
       const message = isWsMessage(messagePre);
       if (message.type === 'error') {
-        // todo we should unsub and resub to the connection if we can
-        logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message.message);
+        this._handleErrorReceived(message.message);
       } else if (message.type === 'connected' || message.type === 'unsubscribed') {
         // do nothing
       } else if (
