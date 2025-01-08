@@ -4,7 +4,7 @@ import { BonsaiCore } from '@/abacus-ts/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
 
@@ -122,7 +122,7 @@ export const WithdrawForm = ({
       {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
       <Button
         tw="w-full"
-        state={ButtonState.Disabled}
+        state={{ isLoading: isFetching }}
         disabled
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
