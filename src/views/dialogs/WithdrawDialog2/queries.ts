@@ -4,15 +4,13 @@ import { parseUnits } from 'viem';
 
 import { DYDX_DEPOSIT_CHAIN } from '@/constants/chains';
 import { timeUnits } from '@/constants/time';
-import { DYDX_CHAIN_USDC_DENOM } from '@/constants/tokens';
+import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 
-import { WithdrawalToken } from './types';
-
 async function getSkipWithdrawalRoutes(
   skipClient: SkipClient,
-  token: WithdrawalToken,
+  token: TokenForTransfer,
   amount: string
 ) {
   const routeOptions: RouteRequest = {
@@ -39,7 +37,7 @@ export function useWithdrawalRoutes({
   token,
   amount,
 }: {
-  token?: WithdrawalToken;
+  token?: TokenForTransfer;
   amount: string;
 }) {
   const { skipClient } = useSkipClient();
