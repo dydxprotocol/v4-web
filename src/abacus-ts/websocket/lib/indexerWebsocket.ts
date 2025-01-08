@@ -181,6 +181,7 @@ export class IndexerWebsocket {
         const channel = message.channel;
         const id = message.id;
         if (this.subscriptions[channel] == null) {
+          // hide error for channel we expect to see it on
           if (channel !== 'v4_orderbook') {
             logAbacusTsError(
               'IndexerWebsocket',
@@ -192,6 +193,7 @@ export class IndexerWebsocket {
           return;
         }
         if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
+          // hide error for channel we expect to see it on
           if (channel !== 'v4_orderbook') {
             logAbacusTsError(
               'IndexerWebsocket',
