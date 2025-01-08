@@ -27,7 +27,7 @@ export class IndexerWebsocket {
     };
   } = {};
 
-  private lastRetryMsByChannel: { [channel: string]: number } = {};
+  private lastRetryTimeMsByChannel: { [channel: string]: number } = {};
 
   constructor(url: string) {
     this.socket = new ReconnectingWebSocket({
@@ -143,6 +143,7 @@ export class IndexerWebsocket {
     });
   };
 
+  // if we get a "coud not fetch data" error, we retry once as long as this channel is not on cooldown
   private _handleErrorReceived = (message: string) => {
     if (message.startsWith('Internal error, could not fetch data for subscription: ')) {
       const maybeChannel = message
@@ -150,9 +151,9 @@ export class IndexerWebsocket {
         .split(/[\s,.]/)
         .at(-2);
       if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
-        const lastRefresh = this.lastRetryMsByChannel[maybeChannel] ?? 0;
+        const lastRefresh = this.lastRetryTimeMsByChannel[maybeChannel] ?? 0;
         if (new Date().valueOf() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
-          this.lastRetryMsByChannel[maybeChannel] = new Date().valueOf();
+          this.lastRetryTimeMsByChannel[maybeChannel] = new Date().valueOf();
           this._refreshChannelSubs(maybeChannel);
           logAbacusTsError(
             'IndexerWebsocket',
