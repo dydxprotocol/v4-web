@@ -100,10 +100,6 @@ export const persistor = persistStore(store);
 abacusStateManager.setStore(store);
 
 runFn(async () => {
-  if (process.env.NODE_ENV === 'test') {
-    return;
-  }
-
   // we ignore the cleanups for now since we want these running forever
   storeLifecycles.forEach((fn) => fn(store));
 });
