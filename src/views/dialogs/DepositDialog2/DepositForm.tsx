@@ -84,7 +84,7 @@ export const DepositForm = ({
           >
             {/* TODO(deposit2): localization */}
             <div>
-              Deposit with <span tw="hidden">Coinbase</span>
+              Deposit with <span tw="sr-only">Coinbase</span>
             </div>
             <div tw="flex">
               <CoinbaseBrandIcon />

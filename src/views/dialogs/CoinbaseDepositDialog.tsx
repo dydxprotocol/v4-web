@@ -48,8 +48,7 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
         <div tw="flex items-center justify-between gap-0.5 self-stretch rounded-0.5 bg-color-layer-2 px-1 py-0.5">
           <div tw="text-color-text-0">{nobleAddress}</div>
           <button onClick={onCopy} tw="flex items-center" type="button">
-            {/* text for a11y */}
-            <div tw="hidden">{stringGetter({ key: STRING_KEYS.COPY })}</div>
+            <div tw="sr-only">{stringGetter({ key: STRING_KEYS.COPY })}</div>
             {showCopyLogo ? <CopyIcon /> : <GreenCheckCircle />}
           </button>
         </div>
