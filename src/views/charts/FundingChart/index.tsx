@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
+import { BonsaiHooks } from '@/abacus-ts/ontology';
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -21,9 +21,6 @@ import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
-
-import { useAppSelector } from '@/state/appTypes';
-import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -49,7 +46,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const data = useAppSelector(calculateFundingRateHistory, shallowEqual);
+  const { data, isLoading } = BonsaiHooks.useCurrentMarketHistoricalFunding();
 
   const latestDatum = data[data.length - 1];
 
@@ -129,7 +126,15 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       onTooltipContext={(ttContext) => setTooltipContext(ttContext)}
       minZoomDomain={FUNDING_RATE_TIME_RESOLUTION * 4}
       numGridLines={1}
-      slotEmpty={<LoadingSpace id="funding-chart-loading" />}
+      slotEmpty={
+        isLoading ? (
+          <LoadingSpace id="funding-chart-loading" />
+        ) : (
+          <div tw="flex flex-col justify-center text-center align-middle">
+            {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
+          </div>
+        )
+      }
     >
       <div tw="isolate m-1 [place-self:start_end]">
         <ToggleGroup

@@ -30,7 +30,7 @@ const getDirectionFromFundingRate = (fundingRate: string) => {
 };
 
 const calculateFundingChartObject = (funding: IndexerHistoricalFundingResponseObject) => ({
-  fundingRate: funding.rate,
+  fundingRate: MustBigNumber(funding.rate).toNumber(),
   time: new Date(funding.effectiveAt).getTime(),
   direction: getDirectionFromFundingRate(funding.rate),
 });
@@ -61,12 +61,12 @@ export const useCurrentMarketHistoricalFunding = () => {
 
   const data = useMemo(() => {
     return [
-      nextFundingRate && {
-        fundingRate: nextFundingRate,
+      ...(historicalFundingQuery.data ?? []),
+      nextFundingRate != null && {
+        fundingRate: MustBigNumber(nextFundingRate).toNumber(),
         time: Date.now(),
         direction: getDirectionFromFundingRate(nextFundingRate),
       },
-      ...(historicalFundingQuery.data ?? []),
     ].filter(isTruthy);
   }, [historicalFundingQuery.data, nextFundingRate]);
 
