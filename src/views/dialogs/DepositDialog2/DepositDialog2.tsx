@@ -81,28 +81,30 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      <div tw="flex w-[200%] overflow-hidden">
-        <div
-          tw="w-[50%]"
-          style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
-        >
-          <DepositForm
-            onClose={() => setIsOpen(false)}
-            amount={amount}
-            setAmount={setAmount}
-            token={token}
-            onTokenSelect={() => setFormState('token-select')}
-          />
-        </div>
-        <div
-          ref={tokenSelectRef}
-          tw="w-[50%] overflow-scroll"
-          style={{
-            height: formState === 'form' ? 0 : '100%',
-            maxHeight: isMobile ? '50vh' : '25rem',
-          }}
-        >
-          <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+      <div tw="w-[100%] overflow-hidden">
+        <div tw="flex w-[200%]">
+          <div
+            tw="w-[50%]"
+            style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+          >
+            <DepositForm
+              onClose={() => setIsOpen(false)}
+              amount={amount}
+              setAmount={setAmount}
+              token={token}
+              onTokenSelect={() => setFormState('token-select')}
+            />
+          </div>
+          <div
+            ref={tokenSelectRef}
+            tw="w-[50%] overflow-scroll"
+            style={{
+              height: formState === 'form' ? 0 : '100%',
+              maxHeight: isMobile ? '50vh' : '25rem',
+            }}
+          >
+            <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+          </div>
         </div>
       </div>
     </$Dialog>
