@@ -184,12 +184,15 @@ class WebSocketConnection {
       }
     };
 
-    this.ws.onerror = (error) => {
-      logAbacusTsError('WebSocketConnection', `socket ${this.id} error encountered`, error);
+    this.ws.onerror = () => {
       this.close();
     };
 
-    this.ws.onclose = () => {
+    this.ws.onclose = (close) => {
+      // 1000 is expected and 1001 is for browser navigating away, below that are unused
+      if (close.code > 1001) {
+        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed`, close);
+      }
       this.close();
     };
   }
