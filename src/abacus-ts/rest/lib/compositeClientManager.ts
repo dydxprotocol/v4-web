@@ -17,7 +17,7 @@ import {
   TOKEN_CONFIG_MAP,
 } from '@/constants/networks';
 
-import { type RootStore } from '@/state/_store';
+import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
@@ -32,10 +32,10 @@ type CompositeClientWrapper = {
 
 function makeCompositeClient({
   network,
-  store,
+  dispatch,
 }: {
   network: DydxNetwork;
-  store: RootStore;
+  dispatch: AppDispatch;
 }): CompositeClientWrapper {
   const networkConfig = ENVIRONMENT_CONFIG_MAP[network];
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -52,7 +52,7 @@ function makeCompositeClient({
   const clientWrapper: CompositeClientWrapper = {
     tearDown: () => {
       clientWrapper.dead = true;
-      store.dispatch(
+      dispatch(
         setNetworkStateRaw({
           networkId: network,
           stateToMerge: { compositeClientReady: false, indexerClientReady: false },
@@ -61,7 +61,7 @@ function makeCompositeClient({
     },
   };
 
-  store.dispatch(
+  dispatch(
     setNetworkStateRaw({
       networkId: network,
       stateToMerge: { compositeClientReady: false, indexerClientReady: false },
@@ -83,7 +83,7 @@ function makeCompositeClient({
     }
     const indexerConfig = new IndexerConfig(indexerUrl.api, indexerUrl.socket);
     clientWrapper.indexer = new IndexerClient(indexerConfig);
-    store.dispatch(
+    dispatch(
       setNetworkStateRaw({
         networkId: network,
         stateToMerge: { indexerClientReady: true },
@@ -119,7 +119,7 @@ function makeCompositeClient({
       return;
     }
     clientWrapper.compositeClient = compositeClient;
-    store.dispatch(
+    dispatch(
       setNetworkStateRaw({
         networkId: network,
         stateToMerge: { compositeClientReady: true },
@@ -130,7 +130,8 @@ function makeCompositeClient({
 }
 
 export const CompositeClientManager = new ResourceCacheManager({
-  constructor: (config: { network: DydxNetwork; store: RootStore }) => makeCompositeClient(config),
+  constructor: (config: { network: DydxNetwork; dispatch: AppDispatch }) =>
+    makeCompositeClient(config),
   destroyer: (instance) => {
     instance.tearDown();
   },
@@ -141,9 +142,9 @@ export const CompositeClientManager = new ResourceCacheManager({
 // this just makes things simpler
 export function alwaysUseCurrentNetworkClient(store: RootStore) {
   return createStoreEffect(store, getSelectedNetwork, (network) => {
-    CompositeClientManager.use({ network, store });
+    CompositeClientManager.use({ network, dispatch: store.dispatch });
     return () => {
-      CompositeClientManager.markDone({ network, store });
+      CompositeClientManager.markDone({ network, dispatch: store.dispatch });
     };
   });
 }
