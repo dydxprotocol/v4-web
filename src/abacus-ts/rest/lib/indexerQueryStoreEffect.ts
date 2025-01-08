@@ -59,7 +59,7 @@ export function createIndexerQueryStoreEffect<T, R>(
 
     const clientConfig = {
       network: infrastructure.network,
-      store,
+      dispatch: store.dispatch,
     };
     const indexerClient = CompositeClientManager.use(clientConfig).indexer!;
 
@@ -120,7 +120,7 @@ export function createValidatorQueryStoreEffect<T, R>(
     }
     const clientConfig = {
       network: infrastructure.network,
-      store,
+      dispatch: store.dispatch,
     };
     const compositeClient = CompositeClientManager.use(clientConfig).compositeClient!;
 

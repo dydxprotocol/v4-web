@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 import { selectCompositeClientReady, selectIndexerReady } from '@/abacus-ts/socketSelectors';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 
-import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import { CompositeClientManager } from './compositeClientManager';
 
 export function useIndexerClient() {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const indexerReady = useAppSelector(selectIndexerReady);
+  const dispatch = useAppDispatch();
 
   const [client, setClient] = useState<IndexerClient | undefined>(undefined);
 
@@ -21,7 +21,7 @@ export function useIndexerClient() {
     }
     const clientConfig = {
       network: selectedNetwork,
-      store,
+      dispatch,
     };
     setClient(CompositeClientManager.use(clientConfig).indexer!);
     return () => {
@@ -36,6 +36,7 @@ export function useIndexerClient() {
 export function useCompositeClient() {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const compositeClientReady = useAppSelector(selectCompositeClientReady);
+  const dispatch = useAppDispatch();
 
   const [client, setClient] = useState<CompositeClient | undefined>(undefined);
 
@@ -45,7 +46,7 @@ export function useCompositeClient() {
     }
     const clientConfig = {
       network: selectedNetwork,
-      store,
+      dispatch,
     };
     setClient(CompositeClientManager.use(clientConfig).compositeClient!);
     return () => {
