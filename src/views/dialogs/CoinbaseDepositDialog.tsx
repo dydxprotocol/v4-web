@@ -11,9 +11,12 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
+import { STRING_KEYS } from '@/constants/localization';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 const THREE_SECOND_DELAY = 3000;
 export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
+  const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
   const { nobleAddress } = useAccounts();
 
@@ -35,6 +38,7 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
     >
       <div tw="flex flex-col gap-0.5 px-0.5 pt-1.25">
         <div tw="text-center text-color-text-0">
+          {/* TODO(deposit2.0): localization */}
           To deposit from Coinbase, send <span tw="text-color-text-1">USDC</span> on{' '}
           <span tw="text-color-text-1">Noble Network</span> to the address shown below.
         </div>
@@ -44,10 +48,12 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
         <div tw="flex items-center justify-between gap-0.5 self-stretch rounded-0.5 bg-color-layer-2 px-1 py-0.5">
           <div tw="text-color-text-0">{nobleAddress}</div>
           <button onClick={onCopy} tw="flex items-center" type="button">
-            <div tw="hidden">Copy</div>
+            {/* text for a11y */}
+            <div tw="hidden">{stringGetter({ key: STRING_KEYS.COPY })}</div>
             {showCopyLogo ? <CopyIcon /> : <GreenCheckCircle />}
           </button>
         </div>
+        {/* TODO(deposit2.0): localization */}
         <div tw="rounded-0.5 border border-solid border-color-border p-0.5 text-small">
           This address is only for Noble USDC transfers to the Noble Chain. Sending any funds from
           other blockchains will result in a loss of those funds.
@@ -58,7 +64,7 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
           onClick={() => setIsOpen(false)}
           type={ButtonType.Submit}
         >
-          Close
+          {stringGetter({ key: STRING_KEYS.CLOSE })}
         </Button>
       </div>
     </Dialog>
