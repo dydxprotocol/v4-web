@@ -22,6 +22,12 @@ export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilt
 export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
 
 /**
+ * @returns marketId of the market the user is currently viewing if it is tradeable (Internal)
+ */
+export const getCurrentMarketIdIfTradeable = (state: RootState) =>
+  state.perpetuals.currentMarketIdIfTradeable;
+
+/**
  * @returns displayId of the currentMarket the user is viewing (Render)
  */
 export const getCurrentMarketDisplayId = (state: RootState) => {

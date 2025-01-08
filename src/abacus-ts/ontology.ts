@@ -1,6 +1,7 @@
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import {
   getCurrentMarketAccountFills,
   selectAccountFills,
@@ -99,5 +100,6 @@ export const BonsaiHelpers = {
 } as const satisfies NestedSelectors;
 
 export const BonsaiHooks = {
+  useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
 } as const;

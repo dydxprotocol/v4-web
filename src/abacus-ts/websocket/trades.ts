@@ -7,7 +7,7 @@ import { DydxNetwork } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 
 import { mergeById } from '@/lib/mergeById';
 
@@ -67,7 +67,7 @@ export const TradeValuesManager = new ResourceCacheManager({
 
 export function useCurrentMarketTradesValue() {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
-  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
   // useSyncExternalStore is better but the API doesn't fit this use case very well
   const [trades, setTrades] = useState<Loadable<TradesData>>(loadableIdle());
 
