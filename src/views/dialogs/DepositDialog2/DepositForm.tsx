@@ -74,7 +74,6 @@ export const DepositForm = ({
             <div tw="text-color-text-0">or</div>
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
           </div>
-          {/* TODO(deposit2): localization */}
           <Button
             onClick={() => {
               dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
@@ -83,6 +82,7 @@ export const DepositForm = ({
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
+            {/* TODO(deposit2): localization */}
             <div>Deposit with </div>
             <CoinbaseBrandIcon />
           </Button>
