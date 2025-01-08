@@ -87,6 +87,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
         >
           <DepositForm
+            onClose={() => setIsOpen(false)}
             amount={amount}
             setAmount={setAmount}
             token={token}
