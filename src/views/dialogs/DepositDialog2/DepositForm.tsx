@@ -83,8 +83,12 @@ export const DepositForm = ({
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
             {/* TODO(deposit2): localization */}
-            <div>Deposit with </div>
-            <CoinbaseBrandIcon />
+            <div>
+              Deposit with <span tw="hidden">Coinbase</span>
+            </div>
+            <div tw="flex">
+              <CoinbaseBrandIcon />
+            </div>
           </Button>
         </div>
       </div>
