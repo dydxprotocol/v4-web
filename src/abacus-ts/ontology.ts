@@ -100,6 +100,6 @@ export const BonsaiHelpers = {
 } as const satisfies NestedSelectors;
 
 export const BonsaiHooks = {
-  useCurrentMarketHistoricalFunding,
+  // useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
 } as const;
