@@ -9,12 +9,12 @@ import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 import { useIndexerClient } from './lib/useIndexer';
 
 export const useCurrentMarketHistoricalFunding = () => {
-  const { indexerClient } = useIndexerClient();
+  const { indexerClient, key: indexerKey } = useIndexerClient();
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
 
   return useQuery({
     enabled: Boolean(currentMarketId) && Boolean(indexerClient),
-    queryKey: ['historicalFunding', currentMarketId],
+    queryKey: ['historicalFunding', currentMarketId, indexerKey],
     queryFn: async () => {
       if (!currentMarketId) {
         throw new Error('Invalid marketId found');
@@ -28,6 +28,5 @@ export const useCurrentMarketHistoricalFunding = () => {
     },
     refetchInterval: timeUnits.hour,
     staleTime: timeUnits.hour,
-    placeholderData: (prev) => prev ?? [],
   });
 };

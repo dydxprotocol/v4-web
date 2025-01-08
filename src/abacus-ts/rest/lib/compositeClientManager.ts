@@ -71,6 +71,7 @@ function makeCompositeClient({
   (async () => {
     const networkOptimizer = new NetworkOptimizer();
     const indexerUrl = networkConfig.endpoints.indexers[0];
+    console.log(networkConfig);
     if (indexerUrl == null) {
       throw new Error('No indexer urls found');
     }
