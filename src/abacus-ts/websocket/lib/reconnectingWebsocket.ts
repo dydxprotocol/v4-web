@@ -189,9 +189,13 @@ class WebSocketConnection {
     };
 
     this.ws.onclose = (close) => {
-      // 1000 is expected and 1001 is for browser navigating away, below that are unused
-      if (close.code > 1001) {
-        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, close);
+      // 1000 is expected and 1001 is for browser navigating away, 1005 is on purpose, below that are unused
+      if (close.code > 1001 && close.code !== 1005) {
+        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
+          code: close.code,
+          reason: close.reason,
+          clean: close.wasClean,
+        });
       }
       this.close();
     };
