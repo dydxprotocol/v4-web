@@ -30,7 +30,7 @@ import { useSelectedNetwork } from './useSelectedNetwork';
 import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
-  const latestTag = import.meta.env.VITE_LAST_TAG;
+  const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
   const { sourceAccount, selectedWallet, dydxAddress } = useAccounts();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
@@ -74,10 +74,10 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.Version
   useEffect(() => {
-    if (latestTag !== undefined) {
-      identify(AnalyticsUserProperties.Version(latestTag));
+    if (latestCommit !== undefined) {
+      identify(AnalyticsUserProperties.Version(latestCommit));
     }
-  }, [latestTag]);
+  }, [latestCommit]);
 
   // AnalyticsUserProperty.StatsigConfigs
   useEffect(() => {
