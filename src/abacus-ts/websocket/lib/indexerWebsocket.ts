@@ -144,6 +144,7 @@ export class IndexerWebsocket {
   };
 
   // if we get a "coud not fetch data" error, we retry once as long as this channel is not on cooldown
+  // TODO: when backend adds the channel and id to the error message, use that to retry only one subscription
   private _handleErrorReceived = (message: string) => {
     if (message.startsWith('Internal error, could not fetch data for subscription: ')) {
       const maybeChannel = message
