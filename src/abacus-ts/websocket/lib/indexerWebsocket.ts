@@ -143,7 +143,7 @@ export class IndexerWebsocket {
     });
   };
 
-  // if we get a "coud not fetch data" error, we retry once as long as this channel is not on cooldown
+  // if we get a "could not fetch data" error, we retry once as long as this channel is not on cooldown
   // TODO: when backend adds the channel and id to the error message, use that to retry only one subscription
   // TODO: remove this entirely when backend is more reliable
   private _handleErrorReceived = (message: string) => {
@@ -154,8 +154,8 @@ export class IndexerWebsocket {
         .at(-2);
       if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
         const lastRefresh = this.lastRetryTimeMsByChannel[maybeChannel] ?? 0;
-        if (new Date().valueOf() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
-          this.lastRetryTimeMsByChannel[maybeChannel] = new Date().valueOf();
+        if (Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
+          this.lastRetryTimeMsByChannel[maybeChannel] = Date.now();
           this._refreshChannelSubs(maybeChannel);
           logAbacusTsError(
             'IndexerWebsocket',
