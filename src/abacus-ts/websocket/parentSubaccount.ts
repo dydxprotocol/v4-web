@@ -10,7 +10,7 @@ import {
 } from '@/types/indexer/indexerChecks';
 import { IndexerWsOrderUpdate } from '@/types/indexer/indexerManual';
 import { produce } from 'immer';
-import { keyBy } from 'lodash';
+import { isEmpty, keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -78,8 +78,8 @@ function accountWebsocketValue(
       handleBaseData: (baseMessage): Loadable<ParentSubaccountData> => {
         accountRefreshSignal.notify();
 
-        // null message means account has had no transfers yet, but it's still valid
-        if (baseMessage == null) {
+        // empty message means account has had no transfers yet, but it's still valid
+        if (baseMessage == null || isEmpty(baseMessage)) {
           const parentSubaccountNumberParsed = MustBigNumber(parentSubaccountNumber).toNumber();
           return loadableLoaded({
             address,
