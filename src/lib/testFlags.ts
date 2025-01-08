@@ -73,6 +73,10 @@ class TestFlags {
   get showNewDepositFlow() {
     return !!this.queryParams.deposit_rewrite;
   }
+
+  get showNewWithdrawFlow() {
+    return !!this.queryParams.withdraw_rewrite;
+  }
 }
 
 export const testFlags = new TestFlags();

@@ -49,6 +49,7 @@ import { UnlimitedAnnouncementDialog } from '@/views/dialogs/UnlimitedAnnounceme
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
+import { WithdrawDialog2 } from '@/views/dialogs/WithdrawDialog2/WithdrawDialog2';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -117,6 +118,7 @@ export const DialogManager = React.memo(() => {
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
+    Withdraw2: (args) => <WithdrawDialog2 {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });

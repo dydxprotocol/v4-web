@@ -28,6 +28,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
@@ -66,7 +67,13 @@ export const AccountInfoSection = () => {
   const withdrawButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
+      onClick={() =>
+        dispatch(
+          openDialog(
+            testFlags.showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw()
+          )
+        )
+      }
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
       buttonStyle={ButtonStyle.WithoutBackground}
@@ -79,7 +86,13 @@ export const AccountInfoSection = () => {
   const depositButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+      onClick={() =>
+        dispatch(
+          openDialog(
+            testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
+          )
+        )
+      }
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
       buttonStyle={ButtonStyle.WithoutBackground}

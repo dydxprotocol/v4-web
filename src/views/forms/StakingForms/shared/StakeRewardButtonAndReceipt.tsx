@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 type StakeButtonWarning = {
   type: AlertType.Warning | AlertType.Info;
@@ -79,7 +80,12 @@ export const StakeRewardButtonAndReceipt = ({
   const [errorToDisplay, setErrorToDisplay] = useState(alert);
 
   const depositFunds = useCallback(
-    () => dispatch(forceOpenDialog(DialogTypes.Deposit({}))),
+    () =>
+      dispatch(
+        forceOpenDialog(
+          testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
+        )
+      ),
     [dispatch]
   );
 
