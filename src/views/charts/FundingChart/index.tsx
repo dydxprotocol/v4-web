@@ -46,7 +46,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const { data, isLoading } = BonsaiHooks.useCurrentMarketHistoricalFunding();
+  const { data, isLoading, isError } = BonsaiHooks.useCurrentMarketHistoricalFunding();
 
   const latestDatum = data[data.length - 1];
 
@@ -130,9 +130,11 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         isLoading ? (
           <LoadingSpace id="funding-chart-loading" />
         ) : (
-          <div tw="flex flex-col justify-center text-center align-middle">
-            {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
-          </div>
+          isError && (
+            <div tw="flex flex-col justify-center text-center align-middle">
+              {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
+            </div>
+          )
         )
       }
     >

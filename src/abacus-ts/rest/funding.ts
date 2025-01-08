@@ -1,12 +1,8 @@
 import { useMemo } from 'react';
 
-import {
-  IndexerHistoricalFundingResponse,
-  IndexerHistoricalFundingResponseObject,
-} from '@/types/indexer/indexerApiGen';
+import { IndexerHistoricalFundingResponse } from '@/types/indexer/indexerApiGen';
 import { useQuery } from '@tanstack/react-query';
 
-import { FundingDirection } from '@/constants/markets';
 import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -16,24 +12,9 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { getDirectionFromFundingRate, mapFundingChartObject } from '../calculators/funding';
 import { selectCurrentMarketInfo } from '../selectors/markets';
 import { useIndexerClient } from './lib/useIndexer';
-
-const getDirectionFromFundingRate = (fundingRate: string) => {
-  const fundingRateBN = MustBigNumber(fundingRate);
-
-  return fundingRateBN.isZero()
-    ? FundingDirection.None
-    : fundingRateBN.isPositive()
-      ? FundingDirection.ToShort
-      : FundingDirection.ToLong;
-};
-
-const calculateFundingChartObject = (funding: IndexerHistoricalFundingResponseObject) => ({
-  fundingRate: MustBigNumber(funding.rate).toNumber(),
-  time: new Date(funding.effectiveAt).getTime(),
-  direction: getDirectionFromFundingRate(funding.rate),
-});
 
 export const useCurrentMarketHistoricalFunding = () => {
   const { indexerClient, key: indexerKey } = useIndexerClient();
@@ -53,7 +34,7 @@ export const useCurrentMarketHistoricalFunding = () => {
       const result: IndexerHistoricalFundingResponse =
         await indexerClient.markets.getPerpetualMarketHistoricalFunding(currentMarketId);
 
-      return result.historicalFunding.reverse().map(calculateFundingChartObject);
+      return result.historicalFunding.reverse().map(mapFundingChartObject);
     },
     refetchInterval: timeUnits.hour,
     staleTime: timeUnits.hour,
