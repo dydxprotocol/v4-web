@@ -52,5 +52,6 @@ export function useWithdrawalRoutes({
     staleTime: 1 * timeUnits.minute,
     refetchOnMount: 'always',
     placeholderData: (prev) => prev,
+    retry: false,
   });
 }
