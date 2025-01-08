@@ -152,6 +152,7 @@ export class IndexerWebsocket {
       if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
         const lastRefresh = this.lastRetryMsByChannel[maybeChannel] ?? 0;
         if (new Date().valueOf() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
+          this.lastRetryMsByChannel[maybeChannel] = new Date().valueOf();
           this._refreshChannelSubs(maybeChannel);
           logAbacusTsError(
             'IndexerWebsocket',
@@ -160,6 +161,8 @@ export class IndexerWebsocket {
           );
           return;
         }
+        logAbacusTsError('IndexerWebsocket', 'hit max retries for channel:', maybeChannel);
+        return;
       }
     }
     logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message);
