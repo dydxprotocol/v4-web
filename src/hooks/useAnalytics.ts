@@ -75,7 +75,7 @@ export const useAnalytics = () => {
   // AnalyticsUserProperty.Version
   useEffect(() => {
     if (latestTag !== undefined) {
-      identify(AnalyticsUserProperties.Version(latestTag.split(`release/v`).at(-1)));
+      identify(AnalyticsUserProperties.Version(latestTag));
     }
   }, [latestTag]);
 
