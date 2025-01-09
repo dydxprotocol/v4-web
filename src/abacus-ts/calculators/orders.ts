@@ -1,9 +1,9 @@
-import { IndexerBestEffortOpenedStatus, IndexerOrderStatus } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { mapValues, maxBy, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
+import { IndexerBestEffortOpenedStatus, IndexerOrderStatus } from '@/types/indexer/indexerApiGen';
+import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
 
 import { assertNever } from '@/lib/assertNever';
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
@@ -11,8 +11,8 @@ import { mapIfPresent } from '@/lib/do';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { mergeObjects } from '../lib/mergeObjects';
-import { OrdersData } from '../rawTypes';
-import { OrderStatus, SubaccountOrder } from '../summaryTypes';
+import { OrdersData } from '../types/rawTypes';
+import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
 
 export function calculateOpenOrders(orders: SubaccountOrder[]) {
   return orders.filter(

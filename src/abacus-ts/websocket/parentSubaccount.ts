@@ -1,3 +1,6 @@
+import { produce } from 'immer';
+import { isEmpty, keyBy } from 'lodash';
+
 import {
   IndexerAssetPositionResponseObject,
   IndexerOrderResponseObject,
@@ -9,8 +12,6 @@ import {
   isWsParentSubaccountUpdates,
 } from '@/types/indexer/indexerChecks';
 import { IndexerWsOrderUpdate } from '@/types/indexer/indexerManual';
-import { produce } from 'immer';
-import { isEmpty, keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -22,8 +23,8 @@ import { MustBigNumber } from '@/lib/numbers';
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { ChildSubaccountData, ParentSubaccountData } from '../rawTypes';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
+import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
