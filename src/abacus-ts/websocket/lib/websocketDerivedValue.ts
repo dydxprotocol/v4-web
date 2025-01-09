@@ -18,14 +18,9 @@ export class WebsocketDerivedValue<T> {
       handleBaseData: (data: any, value: T, fullMessage: any) => T;
       handleUpdates: (updates: any[], value: T, fullMessage: any) => T;
     },
-    value: T,
-    changeHandler: ((val: T) => void) | undefined
+    value: T
   ) {
     this.value = value;
-
-    if (changeHandler) {
-      this.subscribe(changeHandler);
-    }
 
     this.unsubFromWs = websocket.addChannelSubscription({
       channel: sub.channel,
