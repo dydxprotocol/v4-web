@@ -5,6 +5,9 @@ import { IndexerWebsocket } from './indexerWebsocket';
 import { IndexerWebsocketManager } from './indexerWebsocketManager';
 import { WebsocketDerivedValue } from './websocketDerivedValue';
 
+// this is set to just above the websocket subscribe timeout because of race conditions in the indexer backend
+const DESTROY_DELAY_MS = 21000;
+
 type WebsocketValueCreator<Args, ReturnType> = (
   websocket: IndexerWebsocket,
   args: Args
@@ -27,8 +30,7 @@ export function makeWsValueManager<Args, ReturnType>(
     // only ever pass the exact key type for correct behavior
     keySerializer: (allArgs) => stableStringify(allArgs),
 
-    // this is set to just above the websocket subscribe timeout because of race conditions in the indexer backend
-    destroyDelayMs: 21000,
+    destroyDelayMs: DESTROY_DELAY_MS,
   });
 }
 

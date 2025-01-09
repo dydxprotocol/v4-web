@@ -49,7 +49,7 @@ export class ResourceCacheManager<T, U> {
       return;
     }
     if (entry.count <= 0) {
-      logAbacusTsError('ResourceCacheManager', 'tried to mark done key with no users', key);
+      logAbacusTsError('ResourceCacheManager', 'tried to mark done key with no subscribers', key);
       entry.count = 1;
     }
 
@@ -65,11 +65,7 @@ export class ResourceCacheManager<T, U> {
       entry.destroyTimeout = setTimeout(() => {
         const latestVal = this.cache[serializedKey];
         if (!latestVal) {
-          logAbacusTsError(
-            'ResourceCacheManager',
-            'unexpectedly couldnt find resource to destroy',
-            key
-          );
+          logAbacusTsError('ResourceCacheManager', 'could not find resource to destroy', key);
           return;
         }
 
