@@ -1,32 +1,34 @@
+import { ofType, unionize, UnionOf } from 'unionize';
+
 import {
   IndexerAssetPositionResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
 
-interface AddPerpetualPosition {
-  operation: 'ADD_PERPETUAL';
-  subaccountNumber: string;
-  market: string;
-  position: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
-}
+export const SubaccountOperations = unionize(
+  {
+    AddPerpetualPosition: ofType<{
+      operation: 'ADD_PERPETUAL';
+      subaccountNumber: string;
+      market: string;
+      position: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
+    }>(),
+    ModifyPerpetualPosition: ofType<{
+      operation: 'MODIFY_PERPETUAL';
+      subaccountNumber: string;
+      market: string;
+      changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
+    }>(),
+    ModifyUsdcAssetPosition: ofType<{
+      operation: 'MODIFY_USDC_ASSET';
+      subaccountNumber: string;
+      changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size' | 'side'>>;
+    }>(),
+  },
+  { tag: 'operation' as const, value: 'payload' as const }
+);
 
-interface ModifyPerpetualPosition {
-  operation: 'MODIFY_PERPETUAL';
-  subaccountNumber: string;
-  market: string;
-  changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
-}
-
-interface ModifyUsdcAssetPosition {
-  operation: 'MODIFY_USDC_ASSET';
-  subaccountNumber: string;
-  changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size' | 'side'>>;
-}
-
-export type SubaccountOperation =
-  | AddPerpetualPosition
-  | ModifyPerpetualPosition
-  | ModifyUsdcAssetPosition;
+export type SubaccountOperation = UnionOf<typeof SubaccountOperations>;
 
 export interface SubaccountBatchedOperations {
   operations: SubaccountOperation[];
