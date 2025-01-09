@@ -196,6 +196,8 @@ class WebSocketConnection {
         1001,
         // normal but no code
         1005,
+        // supposedly abnormal tcp failure but super super common
+        1006,
       ]);
       if (!allowedCodes.has(close.code)) {
         logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {

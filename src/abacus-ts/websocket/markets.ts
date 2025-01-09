@@ -11,16 +11,14 @@ import { setAllMarketsRaw } from '@/state/raw';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
+import { logAbacusTsError } from '../logs';
 import { MarketsData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
+import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
-function marketsWebsocketValue(
-  websocket: IndexerWebsocket,
-  onChange: (val: Loadable<MarketsData>) => void
-) {
+function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
   return new WebsocketDerivedValue<Loadable<MarketsData>>(
     websocket,
     {
@@ -34,8 +32,7 @@ function marketsWebsocketValue(
         const updates = isWsMarketUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          // eslint-disable-next-line no-console
-          console.log('MarketsTracker found unexpectedly null base data in update');
+          logAbacusTsError('MarketsTracker', 'found unexpectedly null base data in update');
           return value;
         }
         startingValue = { ...startingValue };
@@ -65,10 +62,11 @@ function marketsWebsocketValue(
         return loadableLoaded(startingValue);
       },
     },
-    loadablePending(),
-    onChange
+    loadablePending()
   );
 }
+
+const MarketsValueManager = makeWsValueManager(marketsWebsocketValueCreator);
 
 export function setUpMarkets(store: RootStore) {
   const throttledSetMarkets = throttle((val: Loadable<MarketsData>) => {
@@ -76,13 +74,13 @@ export function setUpMarkets(store: RootStore) {
   }, 2 * timeUnits.second);
 
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
-    const thisTracker = marketsWebsocketValue(IndexerWebsocketManager.use(wsUrl), (val) =>
+    const unsub = subscribeToWsValue(MarketsValueManager, { wsUrl }, (val) =>
       throttledSetMarkets(val)
     );
-
     return () => {
-      thisTracker.teardown();
-      IndexerWebsocketManager.markDone(wsUrl);
+      unsub();
+      throttledSetMarkets.cancel();
+      store.dispatch(setAllMarketsRaw(loadablePending()));
     };
   });
 }

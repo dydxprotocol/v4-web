@@ -24,8 +24,8 @@ import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { ChildSubaccountData, ParentSubaccountData } from '../rawTypes';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
+import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
@@ -64,11 +64,14 @@ function freshChildSubaccount({
   };
 }
 
-function accountWebsocketValue(
+interface AccountValueArgsBase {
+  address: string;
+  parentSubaccountNumber: string;
+}
+
+function accountWebsocketValueCreator(
   websocket: IndexerWebsocket,
-  address: string,
-  parentSubaccountNumber: string,
-  onChange: (val: Loadable<ParentSubaccountData>) => void
+  { address, parentSubaccountNumber }: AccountValueArgsBase
 ) {
   return new WebsocketDerivedValue<Loadable<ParentSubaccountData>>(
     websocket,
@@ -214,10 +217,11 @@ function accountWebsocketValue(
         return { ...value, data: resultData };
       },
     },
-    loadablePending(),
-    onChange
+    loadablePending()
   );
 }
+
+const AccountValueManager = makeWsValueManager(accountWebsocketValueCreator);
 
 const selectParentSubaccount = createAppSelector(
   [selectWebsocketUrl, selectParentSubaccountInfo],
@@ -229,16 +233,15 @@ export function setUpParentSubaccount(store: RootStore) {
     if (!isTruthy(wallet) || subaccount == null) {
       return undefined;
     }
-    const thisTracker = accountWebsocketValue(
-      IndexerWebsocketManager.use(wsUrl),
-      wallet,
-      subaccount.toString(),
+
+    const unsub = subscribeToWsValue(
+      AccountValueManager,
+      { wsUrl, address: wallet, parentSubaccountNumber: subaccount.toString() },
       (val) => store.dispatch(setParentSubaccountRaw(val))
     );
 
     return () => {
-      thisTracker.teardown();
-      IndexerWebsocketManager.markDone(wsUrl);
+      unsub();
       store.dispatch(setParentSubaccountRaw(loadableIdle()));
     };
   });

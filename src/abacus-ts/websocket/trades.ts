@@ -3,28 +3,23 @@ import { useEffect, useState } from 'react';
 import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
 import { orderBy } from 'lodash';
 
-import { DydxNetwork } from '@/constants/networks';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 
 import { mergeById } from '@/lib/mergeById';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { ResourceCacheManager } from '../lib/resourceCacheManager';
 import { TradesData } from '../rawTypes';
-import { getWebsocketUrlForNetwork } from '../socketSelectors';
+import { selectWebsocketUrl } from '../socketSelectors';
+import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 const POST_LIMIT = 250;
 
-function tradesWebsocketValue(
+function tradesWebsocketValueCreator(
   websocket: IndexerWebsocket,
-  marketId: string,
-  onChange?: (val: Loadable<TradesData>) => void
+  { marketId }: { marketId: string }
 ) {
   return new WebsocketDerivedValue<Loadable<TradesData>>(
     websocket,
@@ -51,23 +46,16 @@ function tradesWebsocketValue(
         return loadableLoaded({ trades: sortedMerged.slice(0, POST_LIMIT) });
       },
     },
-    loadablePending(),
-    onChange
+    loadablePending()
   );
 }
 
-export const TradeValuesManager = new ResourceCacheManager({
-  constructor: ({ marketId, network }: { network: DydxNetwork; marketId: string }) =>
-    tradesWebsocketValue(IndexerWebsocketManager.use(getWebsocketUrlForNetwork(network)), marketId),
-  destroyer: (instance) => {
-    instance.teardown();
-  },
-  keySerializer: ({ network, marketId }) => `${network}//////${marketId}`,
-});
+export const TradeValuesManager = makeWsValueManager(tradesWebsocketValueCreator);
 
 export function useCurrentMarketTradesValue() {
-  const selectedNetwork = useAppSelector(getSelectedNetwork);
+  const wsUrl = useAppSelector(selectWebsocketUrl);
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
+
   // useSyncExternalStore is better but the API doesn't fit this use case very well
   const [trades, setTrades] = useState<Loadable<TradesData>>(loadableIdle());
 
@@ -75,17 +63,17 @@ export function useCurrentMarketTradesValue() {
     if (currentMarketId == null) {
       return () => null;
     }
-    const tradesManager = TradeValuesManager.use({
-      marketId: currentMarketId,
-      network: selectedNetwork,
-    });
-    const unsubListener = tradesManager.subscribe((val) => setTrades(val));
+
+    const unsubListener = subscribeToWsValue(
+      TradeValuesManager,
+      { wsUrl, marketId: currentMarketId },
+      (val) => setTrades(val)
+    );
 
     return () => {
       setTrades(loadableIdle());
       unsubListener();
-      TradeValuesManager.markDone({ marketId: currentMarketId, network: selectedNetwork });
     };
-  }, [selectedNetwork, currentMarketId]);
+  }, [currentMarketId, wsUrl]);
   return trades;
 }
