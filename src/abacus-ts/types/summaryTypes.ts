@@ -1,3 +1,5 @@
+import { type BigNumber } from 'bignumber.js';
+
 import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
@@ -5,7 +7,6 @@ import {
   IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
-import { type BigNumber } from 'bignumber.js';
 
 import { BaseTrade } from './rawTypes';
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
 import { orderBy } from 'lodash';
+
+import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
@@ -9,8 +10,8 @@ import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 import { mergeById } from '@/lib/mergeById';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { TradesData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
+import { TradesData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';

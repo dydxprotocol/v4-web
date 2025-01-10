@@ -1,7 +1,7 @@
-import { IndexerTransferCommonResponseObject } from '@/types/indexer/indexerManual';
 import { keyBy, maxBy } from 'lodash';
 
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerTransferCommonResponseObject } from '@/types/indexer/indexerManual';
 
 import { MustBigNumber } from '@/lib/numbers';
 

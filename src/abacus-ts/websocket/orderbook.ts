@@ -1,7 +1,7 @@
-import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
 import { keyBy, mapValues, throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
+import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -13,8 +13,8 @@ import { isTruthy } from '@/lib/isTruthy';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { logAbacusTsError } from '../logs';
-import { OrderbookData } from '../rawTypes';
 import { selectWebsocketUrl } from '../socketSelectors';
+import { OrderbookData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
