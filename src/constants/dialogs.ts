@@ -107,6 +107,7 @@ export const DialogTypes = unionize(
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
+    CoinbaseDepositDialog: ofType<{}>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),

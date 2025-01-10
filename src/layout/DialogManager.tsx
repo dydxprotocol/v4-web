@@ -11,6 +11,7 @@ import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrde
 import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
 import { CloseAllPositionsConfirmationDialog } from '@/views/dialogs/CloseAllPositionsConfirmationDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
+import { CoinbaseDepositDialog } from '@/views/dialogs/CoinbaseDepositDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
@@ -80,6 +81,7 @@ export const DialogManager = React.memo(() => {
       <CancelAllOrdersConfirmationDialog {...args} {...modalProps} />
     ),
     CancelPendingOrders: (args) => <CancelPendingOrdersDialog {...args} {...modalProps} />,
+    CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
