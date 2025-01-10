@@ -3,8 +3,6 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import {
-  createSelectParentSubaccountPositionsPostOp,
-  createSelectParentSubaccountSummaryPostOp,
   getCurrentMarketAccountFills,
   selectAccountFills,
   selectAccountFillsLoading,
@@ -18,6 +16,12 @@ import {
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
 } from './selectors/account';
+import {
+  createSelectParentSubaccountPositionsDeposit,
+  createSelectParentSubaccountPositionsWithdrawal,
+  createSelectParentSubaccountSummaryDeposit,
+  createSelectParentSubaccountSummaryWithdrawal,
+} from './selectors/accountActions';
 import {
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
@@ -99,9 +103,15 @@ export const BonsaiHelpers = {
       fills: getCurrentMarketAccountFills,
     },
   },
-  modify: {
-    parentSubaccountSummary: createSelectParentSubaccountSummaryPostOp,
-    parentSubaccountPositions: createSelectParentSubaccountPositionsPostOp,
+  account: {
+    deposit: {
+      parentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
+      parentSubaccountPositions: createSelectParentSubaccountPositionsDeposit,
+    },
+    withdraw: {
+      parentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
+      parentSubaccountPositions: createSelectParentSubaccountPositionsWithdrawal,
+    },
   },
 } as const satisfies NestedSelectors;
 

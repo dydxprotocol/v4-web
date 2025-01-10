@@ -291,7 +291,7 @@ function calculatePositionDerivedExtra(
   };
 }
 
-export function createUsdcDepositOperation({
+export function createUsdcDepositOperations({
   subaccountNumber,
   depositAmount,
 }: {
@@ -310,7 +310,7 @@ export function createUsdcDepositOperation({
   };
 }
 
-export function createUsdcWithdrawalOperation({
+export function createUsdcWithdrawalOperations({
   subaccountNumber,
   withdrawAmount,
 }: {
@@ -344,11 +344,22 @@ function modifyUsdcAssetPosition(
   let childSubaccount: ChildSubaccountData | undefined =
     parentSubaccountData.childSubaccounts[subaccountNumber];
 
-  if (childSubaccount) {
+  if (childSubaccount != null) {
     // Modify childSubaccount
-    if (childSubaccount.assetPositions.USDC) {
-      const currentUsdcSizeBN = MustBigNumber(childSubaccount.assetPositions.USDC.size);
-      childSubaccount.assetPositions.USDC.size = currentUsdcSizeBN.plus(sizeBN).toString();
+    if (childSubaccount.assetPositions.USDC != null) {
+      const size = MustBigNumber(childSubaccount.assetPositions.USDC.size).plus(sizeBN).toString();
+      const assetPositions = {
+        ...childSubaccount.assetPositions,
+        USDC: {
+          ...childSubaccount.assetPositions.USDC,
+          size,
+        },
+      };
+
+      childSubaccount = {
+        ...childSubaccount,
+        assetPositions,
+      };
     } else {
       if (sizeBN.gt(0)) {
         childSubaccount.assetPositions.USDC = {
@@ -378,7 +389,10 @@ function modifyUsdcAssetPosition(
     };
   }
 
-  parentSubaccountData.childSubaccounts[subaccountNumber] = childSubaccount;
+  parentSubaccountData.childSubaccounts = {
+    ...parentSubaccountData.childSubaccounts,
+    [subaccountNumber]: childSubaccount,
+  };
 }
 
 export function applyOperationsToSubaccount(
