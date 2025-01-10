@@ -1,19 +1,21 @@
+import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
-import type { Nullable, TradeState } from '@/constants/abacus';
+import type { Nullable } from '@/constants/abacus';
 import { NumberSign } from '@/constants/numbers';
 
 import { DiffOutput } from '@/components/DiffOutput';
 import { type OutputType } from '@/components/Output';
 
-import { isNumber } from '@/lib/numbers';
+import { MaybeBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   hasError?: boolean | null;
   hideDiff?: boolean;
   isPositive: boolean;
   type: OutputType;
-  value: Nullable<TradeState<number>>;
+  value: Nullable<BigNumber>;
+  valuePost: Nullable<number>;
 };
 
 export const AccountInfoDiffOutput = ({
@@ -22,10 +24,15 @@ export const AccountInfoDiffOutput = ({
   isPositive,
   type,
   value,
+  valuePost,
 }: ElementProps) => {
-  const currentValue = value?.current;
-  const postOrderValue = value?.postOrder;
-  const hasDiffPostOrder = isNumber(postOrderValue) && currentValue !== postOrderValue && !hideDiff;
+  const currentValue = MaybeBigNumber(value);
+  const postOrderValue = MaybeBigNumber(valuePost);
+  const hasDiffPostOrder =
+    postOrderValue != null &&
+    postOrderValue.isFinite() &&
+    !currentValue?.eq(postOrderValue) &&
+    !hideDiff;
 
   return (
     <$DiffOutput
