@@ -1,7 +1,7 @@
-import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
 import { keyBy, mapValues, throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
+import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -12,16 +12,16 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { OrderbookData } from '../rawTypes';
+import { logAbacusTsError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
+import { OrderbookData } from '../types/rawTypes';
+import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
-function orderbookWebsocketValue(
+function orderbookWebsocketValueCreator(
   websocket: IndexerWebsocket,
-  marketId: string,
-  onChange: (val: Loadable<OrderbookData>) => void
+  { marketId }: { marketId: string }
 ) {
   return new WebsocketDerivedValue<Loadable<OrderbookData>>(
     websocket,
@@ -45,8 +45,7 @@ function orderbookWebsocketValue(
         const updates = isWsOrderbookUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          // eslint-disable-next-line no-console
-          console.log('MarketsTracker found unexpectedly null base data in update');
+          logAbacusTsError('OrderbookTracker', 'found unexpectedly null base data in update');
           return value;
         }
         startingValue = { asks: { ...startingValue.asks }, bids: { ...startingValue.bids } };
@@ -61,10 +60,11 @@ function orderbookWebsocketValue(
         return loadableLoaded(startingValue);
       },
     },
-    loadablePending(),
-    onChange
+    loadablePending()
   );
 }
+
+const OrderbookValueManager = makeWsValueManager(orderbookWebsocketValueCreator);
 
 const selectMarketAndWsInfo = createAppSelector(
   [selectWebsocketUrl, getCurrentMarketIdIfTradeable],
@@ -80,15 +80,14 @@ export function setUpOrderbook(store: RootStore) {
       store.dispatch(setOrderbookRaw({ marketId: currentMarketId, data }));
     }, timeUnits.second / 2);
 
-    const thisTracker = orderbookWebsocketValue(
-      IndexerWebsocketManager.use(wsUrl),
-      currentMarketId,
+    const unsub = subscribeToWsValue(
+      OrderbookValueManager,
+      { wsUrl, marketId: currentMarketId },
       (data) => throttledSetOrderbook(data)
     );
 
     return () => {
-      thisTracker.teardown();
-      IndexerWebsocketManager.markDone(wsUrl);
+      unsub();
       throttledSetOrderbook.cancel();
       store.dispatch(setOrderbookRaw({ marketId: currentMarketId, data: loadableIdle() }));
     };

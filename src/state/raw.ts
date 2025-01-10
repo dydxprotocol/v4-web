@@ -6,16 +6,16 @@ import {
   OrderbookData,
   OrdersData,
   ParentSubaccountData,
-} from '@/abacus-ts/rawTypes';
+} from '@/abacus-ts/types/rawTypes';
+import { HeightResponse } from '@dydxprotocol/v4-client-js';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { DydxNetwork } from '@/constants/networks';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
 } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import { DydxNetwork } from '@/constants/networks';
 
 interface NetworkState {
   indexerClientReady: boolean;

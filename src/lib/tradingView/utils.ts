@@ -98,7 +98,7 @@ export const mapCandle =
         orderbookClose,
       }),
       time: new Date(startedAt).getTime(),
-      volume: tokenVolume,
+      volume: Math.ceil(Number(usdVolume)),
       assetVolume: tokenVolume,
       usdVolume: Math.ceil(Number(usdVolume)),
       tradeOpen,

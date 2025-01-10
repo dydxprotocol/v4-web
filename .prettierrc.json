@@ -10,7 +10,7 @@
     "^./polyfills$",
     "^react$",
     "<THIRD_PARTY_MODULES>",
-    "^@/(constants|abi)(.*)$",
+    "^@/(constants|abi|types)(.*)$",
     "^@/(hooks|contexts)(.*)$",
     "^@/(styles|icons)(.*)$",
     "^@/(components|views|pages|layout)(.*)$",
