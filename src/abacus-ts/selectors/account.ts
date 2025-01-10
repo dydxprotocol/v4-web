@@ -1,8 +1,8 @@
-import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 import { pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';

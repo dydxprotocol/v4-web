@@ -3,7 +3,7 @@ import { weakMapMemoize } from 'reselect';
 
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
-import { AssetInfo, AssetInfos } from '../rawTypes';
+import { AssetInfo, AssetInfos } from '../types/rawTypes';
 
 export const parseAssetInfo = weakMapMemoize((assetInfo: AssetInfo, assetId: string) => ({
   assetId,
