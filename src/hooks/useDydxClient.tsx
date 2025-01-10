@@ -19,7 +19,7 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
-import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
+import { RESOLUTION_MAP, RESOLUTION_TO_INTERVAL_MS, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
@@ -420,7 +420,7 @@ const useDydxClientContext = () => {
     let toIso = new Date(toMs).toISOString();
     const candlesInRange: Candle[] = [];
 
-    // eslint-disable-next-line no-constant-condition
+    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     while (true) {
       // eslint-disable-next-line no-await-in-loop
       const candles = await requestCandles({
@@ -430,6 +430,7 @@ const useDydxClientContext = () => {
         toIso,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!candles || candles.length === 0) {
         break;
       }
@@ -438,10 +439,11 @@ const useDydxClientContext = () => {
       const length = candlesInRange.length;
 
       if (length) {
-        const oldestTime = new Date(candlesInRange[length - 1]!.startedAt).getTime();
+        const oldestTime = new Date(candlesInRange.at(-1)!.startedAt).getTime();
 
-        if (oldestTime > fromMs) {
-          toIso = candlesInRange[length - 1]!.startedAt;
+        // don't retry if gap is smaller than resolution
+        if (oldestTime - fromMs > RESOLUTION_TO_INTERVAL_MS[resolution]!) {
+          toIso = candlesInRange.at(-1)!.startedAt;
         } else {
           break;
         }

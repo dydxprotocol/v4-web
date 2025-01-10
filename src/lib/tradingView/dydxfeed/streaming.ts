@@ -1,5 +1,4 @@
 import type {
-  Bar,
   LibrarySymbolInfo,
   ResolutionString,
   SubscribeBarsCallback,
@@ -16,14 +15,12 @@ export const subscribeOnStream = ({
   resolution,
   onRealtimeCallback,
   listenerGuid,
-  lastBar,
 }: {
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
   onRealtimeCallback: SubscribeBarsCallback;
   listenerGuid: string;
   onResetCacheNeededCallback: Function;
-  lastBar: Bar;
 }) => {
   if (!symbolInfo.ticker) return;
 
@@ -45,7 +42,6 @@ export const subscribeOnStream = ({
   subscriptionItem = {
     subscribeUID: listenerGuid,
     resolution,
-    lastBar,
     handlers: {
       [listenerGuid]: handler,
     },
