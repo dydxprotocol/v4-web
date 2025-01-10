@@ -1,4 +1,4 @@
-import { forwardRef, Key, useEffect, useMemo } from 'react';
+import { forwardRef, Key, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -13,6 +13,7 @@ import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -28,7 +29,6 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
-import { viewedFills } from '@/state/account';
 import { getCurrentMarketFills, getSubaccountFills } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
@@ -370,13 +370,7 @@ export const FillsTable = forwardRef(
     const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
     const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
-    useEffect(() => {
-      // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
-      dispatch(viewedFills(currentMarket));
-      return () => {
-        dispatch(viewedFills(currentMarket));
-      };
-    }, [currentMarket, dispatch]);
+    useViewPanel(currentMarket, 'fills');
 
     const symbol = mapIfPresent(currentMarket, (market) =>
       mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)

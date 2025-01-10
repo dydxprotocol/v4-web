@@ -1,4 +1,4 @@
-import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -14,6 +14,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -33,13 +34,8 @@ import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
-import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import {
-  getCurrentMarketOrders,
-  getHasUnseenOrderUpdates,
-  getSubaccountUnclearedOrders,
-} from '@/state/accountSelectors';
+import { getCurrentMarketOrders, getSubaccountUnclearedOrders } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -436,11 +432,7 @@ export const OrdersTable = forwardRef(
     const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
     const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
 
-    const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
-
-    useEffect(() => {
-      if (hasUnseenOrderUpdates) dispatch(viewedOrders());
-    }, [hasUnseenOrderUpdates]);
+    useViewPanel(currentMarket, 'openOrders');
 
     const symbol = mapIfPresent(currentMarket, (market) =>
       mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
