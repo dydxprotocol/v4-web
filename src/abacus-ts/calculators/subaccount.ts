@@ -3,6 +3,7 @@ import { mapValues, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
+  IndexerAssetPositionResponseObject,
   IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
@@ -14,6 +15,7 @@ import { calc } from '@/lib/do';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { SubaccountBatchedOperations, SubaccountOperations } from '../types/operationTypes';
 import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
@@ -287,4 +289,124 @@ function calculatePositionDerivedExtra(
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
   };
+}
+
+export function createUsdcDepositOperation({
+  subaccountNumber,
+  depositAmount,
+}: {
+  subaccountNumber: number;
+  depositAmount: string;
+}): SubaccountBatchedOperations {
+  return {
+    operations: [
+      SubaccountOperations.ModifyUsdcAssetPosition({
+        subaccountNumber,
+        changes: {
+          size: depositAmount,
+        },
+      }),
+    ],
+  };
+}
+
+export function createUsdcWithdrawalOperation({
+  subaccountNumber,
+  withdrawAmount,
+}: {
+  subaccountNumber: number;
+  withdrawAmount: string;
+}): SubaccountBatchedOperations {
+  return {
+    operations: [
+      SubaccountOperations.ModifyUsdcAssetPosition({
+        subaccountNumber,
+        changes: {
+          size: MustBigNumber(withdrawAmount).negated().toString(),
+        },
+      }),
+    ],
+  };
+}
+
+function modifyUsdcAssetPosition(
+  parentSubaccountData: ParentSubaccountData,
+  payload: {
+    subaccountNumber: number;
+    changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
+  }
+): void {
+  const { subaccountNumber, changes } = payload;
+
+  if (!changes.size) return;
+  const sizeBN = MustBigNumber(changes.size);
+
+  let childSubaccount: ChildSubaccountData | undefined =
+    parentSubaccountData.childSubaccounts[subaccountNumber];
+
+  if (childSubaccount) {
+    // Modify childSubaccount
+    if (childSubaccount.assetPositions.USDC) {
+      const currentUsdcSizeBN = MustBigNumber(childSubaccount.assetPositions.USDC.size);
+      childSubaccount.assetPositions.USDC.size = currentUsdcSizeBN.plus(sizeBN).toString();
+    } else {
+      if (sizeBN.gt(0)) {
+        childSubaccount.assetPositions.USDC = {
+          assetId: '0',
+          symbol: 'USDC',
+          size: sizeBN.toString(),
+          side: IndexerPositionSide.LONG,
+          subaccountNumber,
+        };
+      }
+    }
+  } else {
+    // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
+    childSubaccount = {
+      address: parentSubaccountData.address,
+      subaccountNumber,
+      openPerpetualPositions: {},
+      assetPositions: {
+        USDC: {
+          assetId: '0',
+          symbol: 'USDC',
+          size: sizeBN.toString(),
+          side: IndexerPositionSide.LONG,
+          subaccountNumber,
+        },
+      },
+    };
+  }
+
+  parentSubaccountData.childSubaccounts[subaccountNumber] = childSubaccount;
+}
+
+export function applyOperationsToSubaccount(
+  parentSubaccount: ParentSubaccountData,
+  batchedOperations: SubaccountBatchedOperations
+): ParentSubaccountData {
+  const parentSubaccountData: ParentSubaccountData = { ...parentSubaccount };
+
+  batchedOperations.operations.forEach((op) => {
+    const { payload, operation } = op;
+
+    switch (operation) {
+      case 'AddPerpetualPosition': {
+        // TODO: Implement addPerpetualPosition
+        break;
+      }
+      case 'ModifyPerpetualPosition': {
+        // TODO: Implement modifyPerpetualPosition
+        break;
+      }
+      case 'ModifyUsdcAssetPosition': {
+        modifyUsdcAssetPosition(parentSubaccountData, payload);
+        break;
+      }
+      default:
+        throw new Error(`Error processing invalid operation type`);
+    }
+  });
+
+  return parentSubaccountData;
 }

@@ -3,6 +3,8 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import {
+  createSelectParentSubaccountPositionsPostOp,
+  createSelectParentSubaccountSummaryPostOp,
   getCurrentMarketAccountFills,
   selectAccountFills,
   selectAccountFillsLoading,
@@ -96,6 +98,10 @@ export const BonsaiHelpers = {
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
     },
+  },
+  modify: {
+    parentSubaccountSummary: createSelectParentSubaccountSummaryPostOp,
+    parentSubaccountPositions: createSelectParentSubaccountPositionsPostOp,
   },
 } as const satisfies NestedSelectors;
 

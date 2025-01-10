@@ -14,12 +14,14 @@ import {
   calculateOrderHistory,
 } from '../calculators/orders';
 import {
+  applyOperationsToSubaccount,
   calculateMarketsNeededForSubaccount,
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
+import { SubaccountBatchedOperations } from '../types/operationTypes';
 import {
   selectRawFillsLiveData,
   selectRawFillsRest,
@@ -77,6 +79,24 @@ export const selectParentSubaccountSummary = createAppSelector(
   }
 );
 
+export const createSelectParentSubaccountSummaryPostOp = () =>
+  createAppSelector(
+    [
+      selectRawParentSubaccountData,
+      selectRelevantMarketsData,
+      (_s, operations: SubaccountBatchedOperations) => operations,
+    ],
+    (parentSubaccount, markets, operations) => {
+      if (parentSubaccount == null || markets == null) {
+        return undefined;
+      }
+
+      const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
+      const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
+      return result;
+    }
+  );
+
 export const selectParentSubaccountPositions = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData],
   (parentSubaccount, markets) => {
@@ -86,6 +106,23 @@ export const selectParentSubaccountPositions = createAppSelector(
     return calculateParentSubaccountPositions(parentSubaccount, markets);
   }
 );
+
+export const createSelectParentSubaccountPositionsPostOp = () =>
+  createAppSelector(
+    [
+      selectRawParentSubaccountData,
+      selectRelevantMarketsData,
+      (_s, operations: SubaccountBatchedOperations) => operations,
+    ],
+    (parentSubaccount, markets, operations) => {
+      if (parentSubaccount == null || markets == null) {
+        return undefined;
+      }
+
+      const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
+      return calculateParentSubaccountPositions(modifiedParentSubaccount, markets);
+    }
+  );
 
 export const selectParentSubaccountSummaryLoading = createAppSelector(
   [selectRawParentSubaccount, selectRawMarkets],
