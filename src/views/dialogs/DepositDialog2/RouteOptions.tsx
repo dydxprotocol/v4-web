@@ -92,7 +92,7 @@ export const RouteOptions = ({
           </span>
         }
         selected={selectedSpeed === 'slow'}
-        disabled={disabled || !routes.slow}
+        disabled={disabled || isLoading || !routes.slow}
         onClick={() => onSelectSpeed('slow')}
         // TODO(deposit2.0): localization
         title="~20 mins"

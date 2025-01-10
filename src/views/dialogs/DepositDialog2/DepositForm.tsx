@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
 
-import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS } from '@/constants/tokens';
@@ -95,7 +95,7 @@ export const DepositForm = ({
       <div tw="flex flex-col gap-0.5">
         <Button
           tw="w-full"
-          state={ButtonState.Disabled}
+          state={{ isDisabled: true, isLoading: isFetching }}
           disabled
           action={ButtonAction.Primary}
           type={ButtonType.Submit}
