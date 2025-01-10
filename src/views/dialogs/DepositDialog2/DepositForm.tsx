@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
 
-import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
@@ -10,7 +10,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
-import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
 import { AmountInput } from './AmountInput';
@@ -55,13 +54,11 @@ export const DepositForm = ({
       )}
       <Button
         tw="w-full"
-        state={isFetching ? ButtonState.Disabled : ButtonState.Default}
-        disabled
-        // slotLeft={<LoadingDots />}
+        state={{ isLoading: isFetching, isDisabled: true }}
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
       >
-        {isFetching ? <LoadingDots size={3} /> : stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+        {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
       </Button>
       {/* TODO(deposit2.0): Show difference between current and new balance here */}
       {selectedRoute && (
