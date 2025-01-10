@@ -25,6 +25,7 @@ export type AmountInputProps = {
   token: DepositToken;
   onTokenClick: () => void;
   tokenBalance: { raw?: string; formatted?: string };
+  error?: Error | null;
 };
 
 const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
@@ -40,6 +41,7 @@ export const AmountInput = ({
   token,
   onTokenClick,
   tokenBalance,
+  error,
 }: AmountInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
@@ -106,6 +108,7 @@ export const AmountInput = ({
           type="number"
           placeholder="0.00"
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
+          style={{ color: error ? 'var(--color-error)' : undefined }}
           value={value}
           onChange={onValueChange}
         />

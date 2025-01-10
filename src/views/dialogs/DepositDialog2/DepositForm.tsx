@@ -2,15 +2,16 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
 
-import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { WarningIcon } from '@/icons';
+
 import { Button } from '@/components/Button';
-import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
 import { AmountInput } from './AmountInput';
@@ -38,7 +39,7 @@ export const DepositForm = ({
   const { data: routes, isFetching, error, isPlaceholderData } = useRoutes(token, debouncedAmount);
 
   useEffect(() => {
-    if (debouncedAmount && !isFetching && !routes?.fast) setSelectedSpeed('slow');
+    if (debouncedAmount && !isFetching && routes && !routes.fast) setSelectedSpeed('slow');
   }, [isFetching, routes, debouncedAmount]);
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
@@ -51,11 +52,19 @@ export const DepositForm = ({
   const depositDisabled = isFetching || !hasSufficientBalance || !depositRoute;
 
   const depositButtonInner = useMemo(() => {
-    if (isFetching) return <LoadingDots size={3} />;
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
+    if (error)
+      return (
+        <div tw="flex items-center gap-0.5">
+          <div tw="flex items-center text-color-error">
+            <WarningIcon />
+          </div>
+          <div>Min deposit is $10</div>
+        </div>
+      );
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [hasSufficientBalance, isFetching, stringGetter, token.denom]);
+  }, [error, hasSufficientBalance, stringGetter, token.denom]);
 
   return (
     <div tw="flex min-h-10 flex-col gap-1 p-1.25">
@@ -65,25 +74,18 @@ export const DepositForm = ({
         onChange={setAmount}
         token={token}
         onTokenClick={onTokenSelect}
+        error={error}
       />
-      {routes && (
-        <RouteOptions
-          routes={routes}
-          isLoading={isFetching}
-          disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={setSelectedSpeed}
-        />
-      )}
-      {/* TODO(deposit2.0): make this error message better */}
-      {error && (
-        <div tw="text-center">
-          There was an error. Please increase your deposit amount and try again.
-        </div>
-      )}
+      <RouteOptions
+        routes={routes}
+        isLoading={isFetching}
+        disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
+        selectedSpeed={selectedSpeed}
+        onSelectSpeed={setSelectedSpeed}
+      />
       <Button
         tw="w-full"
-        state={depositDisabled ? ButtonState.Disabled : ButtonState.Default}
+        state={{ isDisabled: depositDisabled, isLoading: isFetching }}
         disabled={depositDisabled}
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
