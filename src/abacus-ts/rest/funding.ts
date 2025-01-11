@@ -1,7 +1,7 @@
-import { IndexerHistoricalFundingResponse } from '@/types/indexer/indexerApiGen';
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
+import { IndexerHistoricalFundingResponse } from '@/types/indexer/indexerApiGen';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';

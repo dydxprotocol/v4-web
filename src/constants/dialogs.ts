@@ -85,6 +85,7 @@ export type UnlimitedAnnouncementDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
+export type WithdrawDialog2Props = {};
 export type DepositDialog2Props = {};
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
@@ -106,6 +107,7 @@ export const DialogTypes = unionize(
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
+    CoinbaseDepositDialog: ofType<{}>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
@@ -145,6 +147,7 @@ export const DialogTypes = unionize(
     Unstake: ofType<UnstakeDialogProps>(),
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw: ofType<WithdrawDialogProps>(),
+    Withdraw2: ofType<WithdrawDialog2Props>(),
     WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
   },
   { tag: 'type' as const, value: 'props' as const }

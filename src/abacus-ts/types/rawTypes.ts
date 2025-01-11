@@ -1,3 +1,4 @@
+import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
 import {
   IndexerAssetPositionResponseObject,
   IndexerHistoricalBlockTradingReward,
@@ -10,8 +11,6 @@ import {
   IndexerCompositeOrderObject,
   IndexerTransferCommonResponseObject,
 } from '@/types/indexer/indexerManual';
-
-import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
 
 import { PartialBy } from '@/lib/typeUtils';
 

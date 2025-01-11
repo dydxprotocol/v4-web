@@ -1,7 +1,7 @@
-import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 import { keyBy, maxBy, orderBy } from 'lodash';
 
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { MustBigNumber } from '@/lib/numbers';
 

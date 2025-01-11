@@ -1,20 +1,20 @@
+import BigNumber from 'bignumber.js';
+import { mapValues, orderBy } from 'lodash';
+
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
   IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
-import BigNumber from 'bignumber.js';
-import { mapValues, orderBy } from 'lodash';
-
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../rawTypes';
+import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
   SubaccountPosition,
@@ -24,7 +24,7 @@ import {
   SubaccountSummary,
   SubaccountSummaryCore,
   SubaccountSummaryDerived,
-} from '../summaryTypes';
+} from '../types/summaryTypes';
 import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
