@@ -59,6 +59,7 @@ export const DepositForm = ({
           <div tw="flex items-center text-color-error">
             <WarningIcon />
           </div>
+          {/* TODO(deposit2.0): localization */}
           <div>Min deposit is $10</div>
         </div>
       );
@@ -93,20 +94,18 @@ export const DepositForm = ({
         {depositButtonInner}
       </Button>
       {/* TODO(deposit2.0): Show difference between current and new balance here */}
-      {selectedRoute && (
-        <div tw="flex justify-between text-small">
-          {/* TODO(deposit2.0): localization */}
-          <div tw="text-color-text-0">Available balance</div>
-          <div style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}>
-            +
-            <Output
-              tw="inline"
-              type={OutputType.Fiat}
-              value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
-            />
-          </div>
+      <div tw="flex justify-between text-small">
+        {/* TODO(deposit2.0): localization */}
+        <div tw="text-color-text-0">Available balance</div>
+        <div style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}>
+          +
+          <Output
+            tw="inline"
+            type={OutputType.Fiat}
+            value={formatUnits(BigInt(depositRoute?.amountOut ?? 0), USDC_DECIMALS)}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 };
