@@ -120,6 +120,8 @@ async function getSkipRoutes(skipClient: SkipClient, token: DepositToken, amount
     destAssetChainID: DYDX_DEPOSIT_CHAIN,
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
+    // allow quotes even if they have large price impact, as the user would see the difference in fees anyway
+    allowUnsafe: true,
     smartSwapOptions: { evmSwaps: true },
   };
 
