@@ -74,7 +74,7 @@ export const RouteOptions = ({
   }, [routes, disabled]);
 
   return (
-    <div tw="flex gap-1">
+    <div tw="flex gap-0.5">
       <RouteOption
         icon={
           <span
