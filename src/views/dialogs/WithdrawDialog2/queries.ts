@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import { RouteRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
@@ -57,12 +59,17 @@ export function useWithdrawalRoutes({
 }
 
 export function useWithdrawalDeltas({ withdrawAmount }: { withdrawAmount: string }) {
-  const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.account.withdraw.parentSubaccountSummary,
-    {
+  const withdrawInput = useMemo(
+    () => ({
       subaccountNumber: 0,
       withdrawAmount,
-    }
+    }),
+    [withdrawAmount]
+  );
+
+  const modifiedParentSubaccount = useParameterizedSelector(
+    BonsaiHelpers.forms.withdraw.parentSubaccountSummary,
+    withdrawInput
   );
 
   return modifiedParentSubaccount;

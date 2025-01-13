@@ -3,7 +3,6 @@ import { mapValues, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
-  IndexerAssetPositionResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
   IndexerPositionSide,
@@ -15,7 +14,6 @@ import { calc } from '@/lib/do';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { SubaccountBatchedOperations, SubaccountOperations } from '../types/operationTypes';
 import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
@@ -289,138 +287,4 @@ function calculatePositionDerivedExtra(
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
   };
-}
-
-export function createUsdcDepositOperations({
-  subaccountNumber,
-  depositAmount,
-}: {
-  subaccountNumber: number;
-  depositAmount: string;
-}): SubaccountBatchedOperations {
-  return {
-    operations: [
-      SubaccountOperations.ModifyUsdcAssetPosition({
-        subaccountNumber,
-        changes: {
-          size: depositAmount,
-        },
-      }),
-    ],
-  };
-}
-
-export function createUsdcWithdrawalOperations({
-  subaccountNumber,
-  withdrawAmount,
-}: {
-  subaccountNumber: number;
-  withdrawAmount: string;
-}): SubaccountBatchedOperations {
-  return {
-    operations: [
-      SubaccountOperations.ModifyUsdcAssetPosition({
-        subaccountNumber,
-        changes: {
-          size: MustBigNumber(withdrawAmount).negated().toString(),
-        },
-      }),
-    ],
-  };
-}
-
-function modifyUsdcAssetPosition(
-  parentSubaccountData: ParentSubaccountData,
-  payload: {
-    subaccountNumber: number;
-    changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
-  }
-): void {
-  const { subaccountNumber, changes } = payload;
-
-  if (!changes.size) return;
-  const sizeBN = MustBigNumber(changes.size);
-
-  let childSubaccount: ChildSubaccountData | undefined =
-    parentSubaccountData.childSubaccounts[subaccountNumber];
-
-  if (childSubaccount != null) {
-    // Modify childSubaccount
-    if (childSubaccount.assetPositions.USDC != null) {
-      const size = MustBigNumber(childSubaccount.assetPositions.USDC.size).plus(sizeBN).toString();
-      const assetPositions = {
-        ...childSubaccount.assetPositions,
-        USDC: {
-          ...childSubaccount.assetPositions.USDC,
-          size,
-        },
-      };
-
-      childSubaccount = {
-        ...childSubaccount,
-        assetPositions,
-      };
-    } else {
-      if (sizeBN.gt(0)) {
-        childSubaccount.assetPositions.USDC = {
-          assetId: '0',
-          symbol: 'USDC',
-          size: sizeBN.toString(),
-          side: IndexerPositionSide.LONG,
-          subaccountNumber,
-        };
-      }
-    }
-  } else {
-    // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
-    childSubaccount = {
-      address: parentSubaccountData.address,
-      subaccountNumber,
-      openPerpetualPositions: {},
-      assetPositions: {
-        USDC: {
-          assetId: '0',
-          symbol: 'USDC',
-          size: sizeBN.toString(),
-          side: IndexerPositionSide.LONG,
-          subaccountNumber,
-        },
-      },
-    };
-  }
-
-  parentSubaccountData.childSubaccounts = {
-    ...parentSubaccountData.childSubaccounts,
-    [subaccountNumber]: childSubaccount,
-  };
-}
-
-export function applyOperationsToSubaccount(
-  parentSubaccount: ParentSubaccountData,
-  batchedOperations: SubaccountBatchedOperations
-): ParentSubaccountData {
-  const parentSubaccountData: ParentSubaccountData = { ...parentSubaccount };
-
-  batchedOperations.operations.forEach((op) => {
-    const { payload, operation } = op;
-
-    switch (operation) {
-      case 'AddPerpetualPosition': {
-        // TODO: Implement addPerpetualPosition
-        break;
-      }
-      case 'ModifyPerpetualPosition': {
-        // TODO: Implement modifyPerpetualPosition
-        break;
-      }
-      case 'ModifyUsdcAssetPosition': {
-        modifyUsdcAssetPosition(parentSubaccountData, payload);
-        break;
-      }
-      default:
-        throw new Error(`Error processing invalid operation type`);
-    }
-  });
-
-  return parentSubaccountData;
 }

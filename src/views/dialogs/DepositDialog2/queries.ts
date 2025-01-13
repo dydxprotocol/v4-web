@@ -151,12 +151,17 @@ export function useDepositRoutes(token: TokenForTransfer, amount: string) {
 }
 
 export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {
-  const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.account.deposit.parentSubaccountSummary,
-    {
+  const depositInput = useMemo(
+    () => ({
       subaccountNumber: 0,
       depositAmount,
-    }
+    }),
+    [depositAmount]
+  );
+
+  const modifiedParentSubaccount = useParameterizedSelector(
+    BonsaiHelpers.forms.deposit.parentSubaccountSummary,
+    depositInput
   );
 
   return modifiedParentSubaccount;

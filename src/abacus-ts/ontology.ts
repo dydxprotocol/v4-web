@@ -17,8 +17,6 @@ import {
   selectParentSubaccountSummaryLoading,
 } from './selectors/account';
 import {
-  createSelectParentSubaccountPositionsDeposit,
-  createSelectParentSubaccountPositionsWithdrawal,
   createSelectParentSubaccountSummaryDeposit,
   createSelectParentSubaccountSummaryWithdrawal,
 } from './selectors/accountActions';
@@ -103,14 +101,12 @@ export const BonsaiHelpers = {
       fills: getCurrentMarketAccountFills,
     },
   },
-  account: {
+  forms: {
     deposit: {
       parentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
-      parentSubaccountPositions: createSelectParentSubaccountPositionsDeposit,
     },
     withdraw: {
       parentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
-      parentSubaccountPositions: createSelectParentSubaccountPositionsWithdrawal,
     },
   },
 } as const satisfies NestedSelectors;
