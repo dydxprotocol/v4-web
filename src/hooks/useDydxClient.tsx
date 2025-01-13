@@ -47,6 +47,10 @@ export const DydxProvider = ({ ...props }) => (
 
 export const useDydxClient = () => useContext(DydxContext);
 
+const DEFAULT_PAGE_SIZE_TARGET = 1000;
+// parallel requests should be limited to prevent hitting 429 errors and failing the whole operation
+const DEFAULT_MAX_REQUESTS = 15;
+
 const useDydxClientContext = () => {
   // ------ Network ------ //
 
@@ -256,7 +260,7 @@ const useDydxClientContext = () => {
         subaccountNumber,
         undefined,
         undefined,
-        100,
+        DEFAULT_PAGE_SIZE_TARGET,
         undefined,
         undefined,
         1
@@ -268,7 +272,7 @@ const useDydxClientContext = () => {
           length: Math.ceil(totalResults / pageSize) - 1,
         },
         (_, index) => index + 2
-      );
+      ).slice(0, DEFAULT_MAX_REQUESTS);
 
       const results = await Promise.all(
         pages.map((page) =>
@@ -277,7 +281,7 @@ const useDydxClientContext = () => {
             subaccountNumber,
             undefined,
             undefined,
-            100,
+            pageSize,
             undefined,
             undefined,
             page
@@ -306,7 +310,7 @@ const useDydxClientContext = () => {
       } = await indexerClient.account.getParentSubaccountNumberTransfers(
         address,
         subaccountNumber,
-        100,
+        DEFAULT_PAGE_SIZE_TARGET,
         undefined,
         undefined,
         1
@@ -318,14 +322,14 @@ const useDydxClientContext = () => {
           length: Math.ceil(totalResults / pageSize) - 1,
         },
         (_, index) => index + 2
-      );
+      ).slice(0, DEFAULT_MAX_REQUESTS);
 
       const results = await Promise.all(
         pages.map((page) =>
           indexerClient.account.getParentSubaccountNumberTransfers(
             address,
             subaccountNumber,
-            100,
+            pageSize,
             undefined,
             undefined,
             page
