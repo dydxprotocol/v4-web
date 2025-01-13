@@ -4,9 +4,9 @@ import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
   IndexerOrderType,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
 import { BaseTrade } from './rawTypes';
 
@@ -23,7 +23,7 @@ type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
   [P in keyof T]: P extends K ? ReplaceBigNumberInUnion<T[P]> : T[P];
 };
 
-export type MarketInfo = IndexerPerpetualMarketResponseObject & {
+export type MarketInfo = IndexerWsBaseMarketObject & {
   assetId: string;
   displayableAsset: string;
   displayableTicker: string;
