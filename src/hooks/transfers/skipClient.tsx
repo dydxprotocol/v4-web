@@ -18,6 +18,7 @@ import { useDydxClient } from '../useDydxClient';
 import { useEndpointsConfig } from '../useEndpointsConfig';
 
 type SkipContextType = ReturnType<typeof useSkipClientContext>;
+export type SkipRouteSpeed = 'slow' | 'fast';
 const SkipContext = createContext<SkipContextType>({} as SkipContextType);
 SkipContext.displayName = 'skipClient';
 

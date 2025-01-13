@@ -6,13 +6,13 @@ import { parseUnits } from 'viem';
 
 import { CHAIN_INFO } from '@/constants/chains';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { TokenForTransfer } from '@/constants/tokens';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalances } from './queries';
-import { DepositToken } from './types';
 import { getTokenSymbol } from './utils';
 
 export const TokenSelect = ({
@@ -21,8 +21,8 @@ export const TokenSelect = ({
   setToken,
 }: {
   onBack: () => void;
-  token: DepositToken;
-  setToken: Dispatch<SetStateAction<DepositToken>>;
+  token: TokenForTransfer;
+  setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
   const { isLoading, data } = useBalances();
 
@@ -50,7 +50,7 @@ export const TokenSelect = ({
     return partition(allBalances, (balance) => parseUnits(balance.amount, balance.decimals!) > 0);
   }, [data]);
 
-  const onTokenClick = (newToken: DepositToken) => () => {
+  const onTokenClick = (newToken: TokenForTransfer) => () => {
     setToken(newToken);
     onBack();
   };

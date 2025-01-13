@@ -5,18 +5,18 @@ import { formatUnits } from 'viem';
 
 import { USD_DECIMALS } from '@/constants/numbers';
 
+import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
+
 import { LightningIcon, ShieldIcon } from '@/icons';
 
 import { Output, OutputType } from '@/components/Output';
-
-import { DepositSpeed } from './types';
 
 type Props = {
   routes: { slow?: RouteResponse; fast?: RouteResponse };
   isLoading: boolean;
   disabled: boolean;
-  selectedSpeed: DepositSpeed;
-  onSelectSpeed: (route: DepositSpeed) => void;
+  selectedSpeed: SkipRouteSpeed;
+  onSelectSpeed: (route: SkipRouteSpeed) => void;
 };
 
 export const RouteOptions = ({

@@ -7,7 +7,7 @@ import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
+import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -20,9 +20,8 @@ import { SourceAccount } from '@/state/wallet';
 
 import { DepositForm } from './DepositForm';
 import { TokenSelect } from './TokenSelect';
-import { DepositToken } from './types';
 
-function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
+function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
   if (!sourceAccount.chain) throw new Error('No user chain detected');
 
   // TODO(deposit2.0): Use user's biggest balance as the default token
@@ -53,7 +52,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const { sourceAccount } = useAccounts();
 
   const [amount, setAmount] = useState('');
-  const [token, setToken] = useState<DepositToken>(getDefaultToken(sourceAccount));
+  const [token, setToken] = useState<TokenForTransfer>(getDefaultToken(sourceAccount));
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
