@@ -8,18 +8,18 @@ import {
 export const SubaccountOperations = unionize(
   {
     AddPerpetualPosition: ofType<{
-      subaccountNumber: string;
+      subaccountNumber: number;
       market: string;
       position: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
     }>(),
     ModifyPerpetualPosition: ofType<{
-      subaccountNumber: string;
+      subaccountNumber: number;
       market: string;
       changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
     }>(),
     ModifyUsdcAssetPosition: ofType<{
-      subaccountNumber: string;
-      changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size' | 'side'>>;
+      subaccountNumber: number;
+      changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
     }>(),
   },
   { tag: 'operation' as const, value: 'payload' as const }
