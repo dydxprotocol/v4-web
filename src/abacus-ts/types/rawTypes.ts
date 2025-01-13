@@ -2,7 +2,6 @@ import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/asse
 import {
   IndexerAssetPositionResponseObject,
   IndexerHistoricalBlockTradingReward,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerTradeResponseObject,
 } from '@/types/indexer/indexerApiGen';
@@ -10,11 +9,12 @@ import {
   IndexerCompositeFillObject,
   IndexerCompositeOrderObject,
   IndexerTransferCommonResponseObject,
+  IndexerWsBaseMarketObject,
 } from '@/types/indexer/indexerManual';
 
 import { PartialBy } from '@/lib/typeUtils';
 
-export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
+export type MarketsData = { [marketId: string]: IndexerWsBaseMarketObject };
 export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {

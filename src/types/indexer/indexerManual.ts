@@ -13,6 +13,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerParentSubaccountResponse,
+  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualMarketStatus,
   IndexerPerpetualMarketType,
   IndexerPerpetualPositionResponseObject,
@@ -85,6 +86,14 @@ export interface IndexerCompositeMarketObject {
   incrementalPositionSize?: string;
   maxPositionSize?: string;
   incrementalInitialMarginFraction?: string;
+}
+
+// just make oraclePrice optional
+export type IndexerWsBaseMarketObject = Omit<IndexerPerpetualMarketResponseObject, 'oraclePrice'> &
+  Partial<Pick<IndexerPerpetualMarketResponseObject, 'oraclePrice'>>;
+
+export interface IndexerWsPerpetualMarketResponse {
+  markets: { [key: string]: IndexerWsBaseMarketObject };
 }
 
 export interface IndexerWsOrderbookUpdateResponse {
