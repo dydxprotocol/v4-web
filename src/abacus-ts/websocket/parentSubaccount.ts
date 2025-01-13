@@ -23,6 +23,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
+import { logAbacusTsError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
 import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -116,7 +117,14 @@ function accountWebsocketValueCreator(
       handleUpdates: (baseUpdates, value, fullMessage) => {
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
-        if (value.data == null || updates.length === 0 || subaccountNumber == null) {
+        if (value.data == null) {
+          logAbacusTsError(
+            'ParentSubaccountTracker',
+            'found unexpectedly null base data in update'
+          );
+          return value;
+        }
+        if (updates.length === 0 || subaccountNumber == null) {
           return value;
         }
         const resultData = produce(value.data, (returnValue) => {
