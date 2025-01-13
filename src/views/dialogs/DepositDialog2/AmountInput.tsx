@@ -16,7 +16,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { useBalance } from './queries';
 import { DepositToken } from './types';
 import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
@@ -25,6 +24,8 @@ export type AmountInputProps = {
   onChange: (newValue: string) => void;
   token: DepositToken;
   onTokenClick: () => void;
+  tokenBalance: { raw?: string; formatted?: string };
+  error?: Error | null;
 };
 
 const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
@@ -34,7 +35,14 @@ function escapeRegExp(string: string): string {
 
 const GAS_RESERVE_AMOUNT = parseUnits('0.01', ETH_DECIMALS);
 
-export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInputProps) => {
+export const AmountInput = ({
+  value,
+  onChange,
+  token,
+  onTokenClick,
+  tokenBalance,
+  error,
+}: AmountInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
 
@@ -45,8 +53,6 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
 
     onChange(e.target.value);
   };
-
-  const tokenBalance = useBalance(token.chainId, token.denom);
 
   const onClickMax = () => {
     if (!tokenBalance.raw) return;
@@ -99,9 +105,12 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
           )}
         </div>
         <input
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
           type="number"
           placeholder="0.00"
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
+          style={{ color: error ? 'var(--color-error)' : undefined }}
           value={value}
           onChange={onValueChange}
         />
