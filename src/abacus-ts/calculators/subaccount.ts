@@ -4,11 +4,11 @@ import { mapValues, orderBy } from 'lodash';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
   IndexerAssetPositionResponseObject,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
@@ -163,7 +163,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 function calculateSubaccountPosition(
   subaccountSummary: SubaccountSummary,
   position: IndexerPerpetualPositionResponseObject,
-  market: IndexerPerpetualMarketResponseObject | undefined
+  market: IndexerWsBaseMarketObject | undefined
 ): SubaccountPosition {
   const bnPosition = getBnPosition(position);
   const core = calculateDerivedPositionCore(bnPosition, market);
@@ -192,7 +192,7 @@ function getBnPosition(position: IndexerPerpetualPositionResponseObject): Subacc
 
 function calculateDerivedPositionCore(
   position: SubaccountPositionBase,
-  market: IndexerPerpetualMarketResponseObject | undefined
+  market: IndexerWsBaseMarketObject | undefined
 ): SubaccountPositionDerivedCore {
   const marginMode = position.subaccountNumber < NUM_PARENT_SUBACCOUNTS ? 'CROSS' : 'ISOLATED';
   const effectiveImf =

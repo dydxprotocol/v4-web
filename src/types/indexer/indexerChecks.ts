@@ -4,7 +4,6 @@ import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerOrderbookResponseObject,
   IndexerParentSubaccountTransferResponse,
-  IndexerPerpetualMarketResponse,
   IndexerTradeResponse,
 } from './indexerApiGen';
 import {
@@ -14,6 +13,7 @@ import {
   IndexerWsOrderbookUpdateResponse,
   IndexerWsParentSubaccountSubscribedResponse,
   IndexerWsParentSubaccountUpdateObject,
+  IndexerWsPerpetualMarketResponse,
   IndexerWsTradesUpdateObject,
 } from './indexerManual';
 
@@ -21,7 +21,7 @@ export const isWsParentSubaccountSubscribed =
   typia.createAssert<IndexerWsParentSubaccountSubscribedResponse>();
 export const isWsParentSubaccountUpdates =
   typia.createAssert<IndexerWsParentSubaccountUpdateObject[]>();
-export const isWsPerpetualMarketResponse = typia.createAssert<IndexerPerpetualMarketResponse>();
+export const isWsPerpetualMarketResponse = typia.createAssert<IndexerWsPerpetualMarketResponse>();
 export const isWsMarketUpdateResponses = typia.createAssert<IndexerWsMarketUpdateResponse[]>();
 export const isWsOrderbookResponse = typia.createAssert<IndexerOrderbookResponseObject>();
 export const isWsOrderbookUpdateResponses =
