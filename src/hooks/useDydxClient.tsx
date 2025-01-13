@@ -49,7 +49,7 @@ export const useDydxClient = () => useContext(DydxContext);
 
 const DEFAULT_PAGE_SIZE_TARGET = 1000;
 // parallel requests should be limited to prevent hitting 429 errors and failing the whole operation
-const DEFAULT_MAX_REQUESTS = 15;
+const DEFAULT_MAX_REQUESTS = 20;
 
 const useDydxClientContext = () => {
   // ------ Network ------ //
