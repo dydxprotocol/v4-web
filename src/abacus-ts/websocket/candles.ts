@@ -11,13 +11,13 @@ import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 function candlesWebsocketValueCreator(
   websocket: IndexerWebsocket,
-  { marketId }: { marketId: string }
+  { marketIdAndResolution }: { marketIdAndResolution: string }
 ) {
   return new WebsocketDerivedValue<Loadable<IndexerWsCandleResponse>>(
     websocket,
     {
       channel: 'v4_candles',
-      id: marketId,
+      id: marketIdAndResolution,
       handleBaseData: (baseMessage) => {
         const message = isWsCandlesResponse(baseMessage);
         return loadableLoaded({
