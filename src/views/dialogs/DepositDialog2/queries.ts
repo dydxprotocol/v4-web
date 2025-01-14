@@ -9,15 +9,13 @@ import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
-import { DYDX_CHAIN_USDC_DENOM, USDC_ADDRESSES } from '@/constants/tokens';
+import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer, USDC_ADDRESSES } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { SourceAccount } from '@/state/wallet';
-
-import { DepositToken } from './types';
 
 export function useBalances() {
   const { sourceAccount } = useAccounts();
@@ -112,7 +110,11 @@ function networkTypeToBalances(sourceAccount: SourceAccount): BalanceRequest {
   throw new Error('Fetching balances for unknown chain');
 }
 
-async function getSkipRoutes(skipClient: SkipClient, token: DepositToken, amount: string) {
+async function getSkipDepositRoutes(
+  skipClient: SkipClient,
+  token: TokenForTransfer,
+  amount: string
+) {
   const routeOptions: RouteRequest = {
     sourceAssetDenom: token.denom,
     sourceAssetChainID: token.chainId,
@@ -133,12 +135,12 @@ async function getSkipRoutes(skipClient: SkipClient, token: DepositToken, amount
   return { slow, fast: isFastRouteAvailable ? fast : undefined };
 }
 
-export function useRoutes(token: DepositToken, amount: string) {
+export function useDepositRoutes(token: TokenForTransfer, amount: string) {
   const { skipClient } = useSkipClient();
   const rawAmount = amount && parseUnits(amount, token.decimals);
   return useQuery({
     queryKey: ['routes', token.chainId, token.denom, amount],
-    queryFn: () => getSkipRoutes(skipClient, token, amount),
+    queryFn: () => getSkipDepositRoutes(skipClient, token, amount),
     enabled: Boolean(rawAmount && rawAmount > 0),
     staleTime: 1 * timeUnits.minute,
     refetchOnMount: 'always',
