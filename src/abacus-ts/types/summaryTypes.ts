@@ -6,9 +6,10 @@ import {
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
-import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
-
-import { BaseTrade } from './rawTypes';
+import {
+  IndexerWsBaseMarketObject,
+  IndexerWsTradeResponseObject,
+} from '@/types/indexer/indexerManual';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
@@ -147,4 +148,4 @@ export type SubaccountOrder = {
   marginMode: MarginMode | undefined;
 };
 
-export type LiveTrade = BaseTrade;
+export type LiveTrade = IndexerWsTradeResponseObject;
