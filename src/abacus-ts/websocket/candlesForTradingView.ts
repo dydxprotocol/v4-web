@@ -15,10 +15,12 @@ import { type RootStore } from '@/state/_store';
 import { mapCandle } from '../../lib/tradingView/utils';
 
 export const subscriptionsByGuid: {
-  [guid: string]: {
-    guid: string;
-    unsub: () => void;
-  };
+  [guid: string]:
+    | {
+        guid: string;
+        unsub: () => void;
+      }
+    | undefined;
 } = {};
 
 export const subscribeOnStream = ({
@@ -48,7 +50,7 @@ export const subscribeOnStream = ({
     if (isFirstRun) {
       isFirstRun = false;
     } else {
-      onResetCacheNeededCallback();
+      setTimeout(() => onResetCacheNeededCallback(), 0);
     }
 
     let mostRecentFirstPointStartedAt: string | undefined;
@@ -94,4 +96,5 @@ export const subscribeOnStream = ({
 
 export const unsubscribeFromStream = (subscriberUID: string) => {
   subscriptionsByGuid[subscriberUID]?.unsub();
+  subscriptionsByGuid[subscriberUID] = undefined;
 };
