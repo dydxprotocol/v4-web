@@ -3,7 +3,6 @@ import {
   IndexerAssetPositionResponseObject,
   IndexerHistoricalBlockTradingReward,
   IndexerPerpetualPositionResponseObject,
-  IndexerTradeResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
@@ -12,19 +11,12 @@ import {
   IndexerWsBaseMarketObject,
 } from '@/types/indexer/indexerManual';
 
-import { PartialBy } from '@/lib/typeUtils';
-
 export type MarketsData = { [marketId: string]: IndexerWsBaseMarketObject };
 export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {
   bids: { [price: string]: string };
   asks: { [price: string]: string };
-};
-
-export type BaseTrade = PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>;
-export type TradesData = {
-  trades: Array<BaseTrade>;
 };
 
 export interface ParentSubaccountData {

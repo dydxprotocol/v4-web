@@ -9,6 +9,8 @@ import {
 import {
   IndexerCompositeFillResponse,
   IndexerCompositeOrderObject,
+  IndexerWsCandleResponse,
+  IndexerWsCandleResponseObject,
   IndexerWsMarketUpdateResponse,
   IndexerWsOrderbookUpdateResponse,
   IndexerWsParentSubaccountSubscribedResponse,
@@ -28,6 +30,8 @@ export const isWsOrderbookUpdateResponses =
   typia.createAssert<IndexerWsOrderbookUpdateResponse[]>();
 export const isWsTradesResponse = typia.createAssert<IndexerTradeResponse>();
 export const isWsTradesUpdateResponses = typia.createAssert<IndexerWsTradesUpdateObject[]>();
+export const isWsCandlesResponse = typia.createAssert<IndexerWsCandleResponse>();
+export const isWsCandlesUpdateResponse = typia.createAssert<IndexerWsCandleResponseObject[]>();
 export const isParentSubaccountFillResponse = typia.createAssert<IndexerCompositeFillResponse>();
 export const isParentSubaccountOrders = typia.createAssert<IndexerCompositeOrderObject[]>();
 export const isParentSubaccountTransferResponse =
