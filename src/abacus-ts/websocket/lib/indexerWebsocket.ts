@@ -181,7 +181,12 @@ export class IndexerWebsocket {
         return;
       }
     }
-    logAbacusTsError('IndexerWebsocket', 'encountered server side error:', message);
+    logAbacusTsError(
+      'IndexerWebsocket',
+      'encountered server side error:',
+      message,
+      this.socket?.url
+    );
   };
 
   private _handleMessage = (messagePre: any) => {
@@ -212,7 +217,8 @@ export class IndexerWebsocket {
               'IndexerWebsocket',
               'encountered message with unknown target',
               channel,
-              id
+              id,
+              this.socket?.url
             );
           }
           return;
@@ -224,7 +230,8 @@ export class IndexerWebsocket {
               'IndexerWebsocket',
               'encountered message with unknown target',
               channel,
-              id
+              id,
+              this.socket?.url
             );
           }
           return;
@@ -233,6 +240,7 @@ export class IndexerWebsocket {
           logAbacusTsInfo('IndexerWebsocket', `subscription confirmed`, {
             channel,
             id,
+            socketUrl: this.socket?.url,
           });
           this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleBaseData(
             message.contents,
@@ -263,6 +271,7 @@ export class IndexerWebsocket {
   // when websocket churns, reconnect all known subscribers
   private _handleFreshConnect = () => {
     logAbacusTsInfo('IndexerWebsocket', 'freshly connected', {
+      socketUrl: this.socket?.url,
       socketNonNull: this.socket != null,
       socketActive: this.socket?.isActive(),
       numSubs: Object.values(this.subscriptions)

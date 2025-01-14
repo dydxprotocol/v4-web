@@ -11,7 +11,7 @@ interface ReconnectingWebSocketConfig {
 }
 
 export class ReconnectingWebSocket {
-  private readonly url: string;
+  public readonly url: string;
 
   private readonly handleMessage: (data: any) => void;
 
