@@ -285,9 +285,10 @@ export class IndexerWebsocket {
       wsId: this.indexerWsId,
       socketNonNull: this.socket != null,
       socketActive: this.socket?.isActive(),
-      numSubs: Object.values(this.subscriptions)
+      subs: Object.values(this.subscriptions)
         .flatMap((o) => Object.values(o))
-        .filter(isTruthy).length,
+        .filter(isTruthy)
+        .map((o) => `${o.channel}///${o.id}`),
     });
     if (this.socket != null && this.socket.isActive()) {
       Object.values(this.subscriptions)
