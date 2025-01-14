@@ -1,5 +1,4 @@
 import { logAbacusTsError, logAbacusTsInfo } from '@/abacus-ts/logs';
-import { randomUUID } from 'crypto';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';
@@ -17,7 +16,7 @@ export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
 
   // for logging purposes, to differentiate when user has many tabs open
-  private indexerWsId = randomUUID();
+  private indexerWsId = crypto.randomUUID();
 
   private subscriptions: {
     [channel: string]: {
