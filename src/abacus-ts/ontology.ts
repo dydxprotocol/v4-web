@@ -15,6 +15,7 @@ import {
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
+  selectUnopenedIsolatedPositions,
 } from './selectors/account';
 import {
   selectAllAssetsInfo,
@@ -97,6 +98,7 @@ export const BonsaiHelpers = {
       fills: getCurrentMarketAccountFills,
     },
   },
+  unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
 } as const satisfies NestedSelectors;
 
 export const BonsaiHooks = {
