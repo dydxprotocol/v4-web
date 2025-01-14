@@ -57,57 +57,49 @@ function modifyUsdcAssetPosition(
 ): ParentSubaccountData {
   const { subaccountNumber, changes } = payload;
   if (!changes.size) return parentSubaccountData;
-  const sizeBN = MustBigNumber(changes.size);
 
-  let childSubaccount: ChildSubaccountData | undefined =
-    parentSubaccountData.childSubaccounts[subaccountNumber];
+  return produce(parentSubaccountData, (draftParentSubaccountData) => {
+    const sizeBN = MustBigNumber(changes.size);
 
-  if (childSubaccount != null) {
-    // Modify childSubaccount
-    if (childSubaccount.assetPositions.USDC != null) {
-      const size = MustBigNumber(childSubaccount.assetPositions.USDC.size).plus(sizeBN).toString();
+    let childSubaccount: ChildSubaccountData | undefined =
+      draftParentSubaccountData.childSubaccounts[subaccountNumber];
 
-      const updatedChildSubaccount = produce(childSubaccount, (draftChildSubaccount) => {
-        if (draftChildSubaccount.assetPositions.USDC) {
-          draftChildSubaccount.assetPositions.USDC.size = size;
-        }
-      });
+    if (childSubaccount != null) {
+      // Modify childSubaccount
+      if (childSubaccount.assetPositions.USDC != null) {
+        const size = MustBigNumber(childSubaccount.assetPositions.USDC.size)
+          .plus(sizeBN)
+          .toString();
 
-      childSubaccount = updatedChildSubaccount;
-    } else {
-      if (sizeBN.gt(0)) {
-        const updatedChildSubaccount = produce(childSubaccount, (draftChildSubaccount) => {
-          draftChildSubaccount.assetPositions.USDC = {
-            assetId: '0',
-            symbol: 'USDC',
-            size: sizeBN.toString(),
-            side: IndexerPositionSide.LONG,
-            subaccountNumber,
-          };
-        });
-
-        childSubaccount = updatedChildSubaccount;
-      }
-    }
-  } else {
-    // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
-    childSubaccount = {
-      address: parentSubaccountData.address,
-      subaccountNumber,
-      openPerpetualPositions: {},
-      assetPositions: {
-        USDC: {
+        childSubaccount.assetPositions.USDC.size = size;
+      } else if (sizeBN.gt(0)) {
+        // Upsert USDC Asset Position
+        childSubaccount.assetPositions.USDC = {
           assetId: '0',
           symbol: 'USDC',
           size: sizeBN.toString(),
           side: IndexerPositionSide.LONG,
           subaccountNumber,
+        } satisfies IndexerAssetPositionResponseObject;
+      }
+    } else {
+      // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
+      childSubaccount = {
+        address: parentSubaccountData.address,
+        subaccountNumber,
+        openPerpetualPositions: {},
+        assetPositions: {
+          USDC: {
+            assetId: '0',
+            symbol: 'USDC',
+            size: sizeBN.toString(),
+            side: IndexerPositionSide.LONG,
+            subaccountNumber,
+          },
         },
-      },
-    } satisfies ChildSubaccountData;
-  }
+      } satisfies ChildSubaccountData;
+    }
 
-  return produce(parentSubaccountData, (draftParentSubaccountData) => {
     draftParentSubaccountData.childSubaccounts[subaccountNumber] = childSubaccount;
   });
 }
