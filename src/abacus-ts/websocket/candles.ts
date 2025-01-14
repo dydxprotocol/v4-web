@@ -21,8 +21,7 @@ function candlesWebsocketValueCreator(
       handleBaseData: (baseMessage) => {
         const message = isWsCandlesResponse(baseMessage);
         return loadableLoaded({
-          // subscribed message is in descending order
-          candles: message.candles.toReversed(),
+          candles: orderBy(message.candles, [(a) => a.startedAt], ['asc']),
         });
       },
       handleUpdates: (baseUpdates, value) => {
@@ -41,7 +40,7 @@ function candlesWebsocketValueCreator(
           ...updates,
           ...startingValue.candles.filter(({ startedAt }) => !allNewTimes.has(startedAt)),
         ];
-        const sorted = orderBy(newArr, [(a) => a.startedAt], ['desc']);
+        const sorted = orderBy(newArr, [(a) => a.startedAt], ['asc']);
         return loadableLoaded({ candles: sorted });
       },
     },
