@@ -148,8 +148,8 @@ export class IndexerWebsocket {
     delete this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID];
   };
 
-  private _refreshSub = (channel: string, id: string) => {
-    const sub = this.subscriptions[channel]?.[id];
+  private _refreshSub = (channel: string, id: string | undefined) => {
+    const sub = this.subscriptions[channel]?.[id ?? NO_ID_SPECIAL_STRING_ID];
     if (sub == null) {
       return;
     }
@@ -163,8 +163,8 @@ export class IndexerWebsocket {
     if (message.message.startsWith('Internal error, could not fetch data for subscription: ')) {
       const maybeChannel = message.channel;
       const maybeId = message.id;
-      if (maybeChannel != null && maybeId != null && maybeChannel.startsWith('v4_')) {
-        const channelAndId = `${maybeChannel}${CHANNEL_ID_SAFE_DIVIDER}${maybeId}`;
+      if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
+        const channelAndId = `${maybeChannel}${CHANNEL_ID_SAFE_DIVIDER}${maybeId ?? NO_ID_SPECIAL_STRING_ID}`;
         const lastRefresh = this.lastRetryTimeMsByChannelAndId[channelAndId] ?? 0;
         if (Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
           this.lastRetryTimeMsByChannelAndId[channelAndId] = Date.now();
