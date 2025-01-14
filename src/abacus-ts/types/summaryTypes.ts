@@ -147,4 +147,13 @@ export type SubaccountOrder = {
   marginMode: MarginMode | undefined;
 };
 
+export type PendingIsolatedPosition = {
+  marketId: string;
+  displayId: string;
+  assetId: string;
+  displayableAsset: string;
+  equity: BigNumber;
+  orders: SubaccountOrder[];
+};
+
 export type LiveTrade = BaseTrade;

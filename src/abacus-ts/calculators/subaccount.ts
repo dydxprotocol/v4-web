@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { mapValues, orderBy } from 'lodash';
+import { groupBy, map, mapValues, orderBy, pickBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
@@ -9,7 +9,11 @@ import {
 } from '@/types/indexer/indexerApiGen';
 import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
-import { getAssetFromMarketId } from '@/lib/assetUtils';
+import {
+  getAssetFromMarketId,
+  getDisplayableAssetFromBaseAsset,
+  getDisplayableTickerFromMarket,
+} from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
@@ -18,6 +22,7 @@ import { isPresent } from '@/lib/typeUtils';
 import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
+  PendingIsolatedPosition,
   SubaccountOrder,
   SubaccountPosition,
   SubaccountPositionBase,
@@ -295,14 +300,12 @@ export function calculateChildSubaccountSummaries(
   parent: Omit<ParentSubaccountData, 'live'>,
   markets: MarketsData
 ): Record<string, SubaccountSummary> {
-  return Object.fromEntries(
-    Object.values(parent.childSubaccounts)
-      .map((subaccount) => {
-        if (!subaccount) return undefined;
-        const summary = calculateSubaccountSummary(subaccount, markets);
-        return [subaccount.subaccountNumber, summary];
-      })
-      .filter(isTruthy)
+  return pickBy(
+    mapValues(
+      parent.childSubaccounts,
+      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+    ),
+    isTruthy
   );
 }
 
@@ -317,15 +320,31 @@ export function calculateUnopenedIsolatedPositions(
   childSubaccounts: Record<string, SubaccountSummary>,
   orders: SubaccountOrder[],
   positions: SubaccountPosition[]
-): Array<SubaccountOrder & Pick<SubaccountSummary, 'equity'>> {
+): PendingIsolatedPosition[] {
   const setOfOpenPositionMarkets = new Set(positions.map(({ market }) => market));
 
   const filteredOrders = orders.filter(
     (o) => !setOfOpenPositionMarkets.has(o.marketId) && o.marginMode === 'ISOLATED'
   );
 
-  return filteredOrders.map((o) => ({
-    ...o,
-    equity: childSubaccounts[o.subaccountNumber]?.equity ?? BIG_NUMBERS.ZERO,
-  }));
+  const filteredOrdersMap = groupBy(filteredOrders, 'marketId');
+  const marketIdToSubaccountNumber = mapValues(
+    filteredOrdersMap,
+    (filteredOrder) => filteredOrder[0]?.subaccountNumber
+  );
+
+  return map(filteredOrdersMap, (orderList, marketId) => {
+    const subaccountNumber = marketIdToSubaccountNumber[marketId];
+    if (subaccountNumber == null) return undefined;
+    const assetId = getAssetFromMarketId(marketId);
+
+    return {
+      assetId,
+      displayableAsset: getDisplayableAssetFromBaseAsset(assetId),
+      marketId,
+      displayId: getDisplayableTickerFromMarket(marketId),
+      equity: childSubaccounts[subaccountNumber]?.equity ?? BIG_NUMBERS.ZERO,
+      orders: orderList,
+    };
+  }).filter(isTruthy);
 }
