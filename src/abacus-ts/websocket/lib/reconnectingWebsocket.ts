@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logAbacusTsError } from '@/abacus-ts/logs';
+import { logAbacusTsError, logAbacusTsInfo } from '@/abacus-ts/logs';
 
 interface ReconnectingWebSocketConfig {
   url: string;
@@ -11,7 +11,7 @@ interface ReconnectingWebSocketConfig {
 }
 
 export class ReconnectingWebSocket {
-  private readonly url: string;
+  public readonly url: string;
 
   private readonly handleMessage: (data: any) => void;
 
@@ -201,6 +201,12 @@ class WebSocketConnection {
       ]);
       if (!allowedCodes.has(close.code)) {
         logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
+          code: close.code,
+          reason: close.reason,
+          clean: close.wasClean,
+        });
+      } else {
+        logAbacusTsInfo('WebSocketConnection', `socket ${this.id} closed`, {
           code: close.code,
           reason: close.reason,
           clean: close.wasClean,
