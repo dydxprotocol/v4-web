@@ -17,7 +17,7 @@ export type ModifyPerpetualPositionProps = {
 
 export type ModifyUsdcAssetPositionProps = {
   subaccountNumber: number;
-  changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
+  changes: IndexerAssetPositionResponseObject;
 };
 
 export const SubaccountOperations = unionize(
