@@ -76,7 +76,6 @@ class SubscriptionManager {
 
   getAllSubscriptions(): SubscriptionHandler[] {
     return Object.values(this.subscriptions)
-      .filter(isTruthy)
       .flatMap((channelSubs) => Object.values(channelSubs))
       .filter(isTruthy);
   }
@@ -136,7 +135,7 @@ export class IndexerWebsocket {
     lastRetryBecauseErrorMs = undefined,
     lastRetryBecauseDuplicateMs = undefined,
   }: SubscriptionHandlerInput & Partial<SubscriptionHandlerTrackingMetadata>) => {
-    const success = this.subscriptions.addSubscription({
+    const wasSuccessful = this.subscriptions.addSubscription({
       channel,
       id,
       batched,
@@ -149,7 +148,7 @@ export class IndexerWebsocket {
     });
 
     // fails if already exists
-    if (!success) {
+    if (!wasSuccessful) {
       logAbacusTsError('IndexerWebsocket', 'this subscription already exists', {
         id: `${channel}/${id}`,
         wsId: this.indexerWsId,
@@ -161,7 +160,7 @@ export class IndexerWebsocket {
       channel,
       id,
       socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
+      socketActive: Boolean(this.socket?.isActive()),
       wsId: this.indexerWsId,
     });
 
@@ -179,13 +178,13 @@ export class IndexerWebsocket {
   private _performUnsub = (
     { channel, id }: { channel: string; id: string | undefined },
     // if true, don't send the unsub message, just remove from the internal data structure
-    forceSuppressWsMessage: boolean = false
+    shouldSuppressWsMessage: boolean = false
   ) => {
     const sub = this.subscriptions.getSubscription(channel, id);
-    const success = this.subscriptions.removeSubscription(channel, id);
+    const wasSuccessful = this.subscriptions.removeSubscription(channel, id);
 
     // only if doesn't exist
-    if (!success || sub == null) {
+    if (!wasSuccessful || sub == null) {
       logAbacusTsError(
         'IndexerWebsocket',
         'unsubbing from nonexistent or already unsubbed channel',
@@ -194,7 +193,7 @@ export class IndexerWebsocket {
       return;
     }
 
-    if (forceSuppressWsMessage) {
+    if (shouldSuppressWsMessage) {
       return;
     }
 
@@ -202,7 +201,7 @@ export class IndexerWebsocket {
       channel,
       id,
       socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
+      socketActive: Boolean(this.socket?.isActive()),
       wsId: this.indexerWsId,
     });
 
@@ -243,7 +242,7 @@ export class IndexerWebsocket {
             maybeChannel,
             maybeId,
             socketNonNull: this.socket != null,
-            socketActive: this.socket?.isActive(),
+            socketActive: Boolean(this.socket?.isActive()),
             wsId: this.indexerWsId,
           });
           return true;
@@ -287,7 +286,7 @@ export class IndexerWebsocket {
             maybeChannel,
             maybeId,
             socketNonNull: this.socket != null,
-            socketActive: this.socket?.isActive(),
+            socketActive: Boolean(this.socket?.isActive()),
             wsId: this.indexerWsId,
           });
           return true;
@@ -413,7 +412,7 @@ export class IndexerWebsocket {
       socketUrl: this.socket?.url,
       wsId: this.indexerWsId,
       socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
+      socketActive: Boolean(this.socket?.isActive()),
       subs: this.subscriptions.getAllSubscriptions().map((o) => `${o.channel}///${o.id}`),
     });
     if (this.socket != null && this.socket.isActive()) {
