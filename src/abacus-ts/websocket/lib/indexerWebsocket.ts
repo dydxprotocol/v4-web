@@ -23,6 +23,8 @@ interface SubscriptionHandlerInput {
 type SubscriptionHandlerTrackingMetadata = {
   receivedBaseData: boolean;
   sentSubMessage: boolean;
+  // using subs for this data means we lose it when the user fully unsubscribes and thus might actually retry more often than expected
+  // but this is fine since every consumer has subs wrapped in resource managers that prevent lots of churn
   lastRetryBecauseErrorMs: number | undefined;
   lastRetryBecauseDuplicateMs: number | undefined;
 };
