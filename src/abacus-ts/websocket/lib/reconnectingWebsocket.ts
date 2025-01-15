@@ -86,7 +86,7 @@ export class ReconnectingWebSocket {
     // can happen if we rapidly switch websockets maybe ??
     if (id !== this.currentId || this.isDead) return;
 
-    // after x seconds, reset our failure counter
+    // after x seconds, reset our failure counter if we're still alive
     setTimeout(() => {
       if (id !== this.currentId || this.isDead || !this.isActive()) return;
       this.numberOfFailedAttempts = 0;
