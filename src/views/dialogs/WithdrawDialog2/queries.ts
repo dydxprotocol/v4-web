@@ -68,7 +68,7 @@ export function useWithdrawalDeltas({ withdrawAmount }: { withdrawAmount: string
   );
 
   const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.forms.withdraw.parentSubaccountSummary,
+    BonsaiHelpers.forms.withdraw.createSelectParentSubaccountSummary,
     withdrawInput
   );
 

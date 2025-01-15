@@ -104,10 +104,10 @@ export const BonsaiHelpers = {
   },
   forms: {
     deposit: {
-      parentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
     },
     withdraw: {
-      parentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
     },
   },
   unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
