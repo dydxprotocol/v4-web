@@ -120,7 +120,8 @@ function accountWebsocketValueCreator(
         if (value.data == null) {
           logAbacusTsError(
             'ParentSubaccountTracker',
-            'found unexpectedly null base data in update'
+            'found unexpectedly null base data in update',
+            { address, subaccountNumber }
           );
           return value;
         }
