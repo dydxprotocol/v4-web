@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { logAbacusTsError, logAbacusTsInfo } from '@/abacus-ts/logs';
 import typia from 'typia';
 
@@ -9,8 +10,80 @@ import { isTruthy } from '@/lib/isTruthy';
 import { ReconnectingWebSocket } from './reconnectingWebsocket';
 
 const NO_ID_SPECIAL_STRING_ID = '______EMPTY_ID______';
-const CHANNEL_ID_SAFE_DIVIDER = '//////////';
 const CHANNEL_RETRY_COOLDOWN_MS = timeUnits.minute;
+
+interface SubscriptionHandlerInput {
+  channel: string;
+  id: string | undefined;
+  batched: boolean;
+  handleBaseData: (data: any, fullMessage: any) => void;
+  handleUpdates: (updates: any[], fullMessage: any) => void;
+}
+
+type SubscriptionHandlerTrackingMetadata = {
+  receivedBaseData: boolean;
+  sentSubMessage: boolean;
+  // using subs for this data means we lose it when the user fully unsubscribes and thus might actually retry more often than expected
+  // but this is fine since every consumer has subs wrapped in resource managers that prevent lots of churn
+  lastRetryBecauseErrorMs: number | undefined;
+  lastRetryBecauseDuplicateMs: number | undefined;
+};
+type SubscriptionHandler = SubscriptionHandlerInput & SubscriptionHandlerTrackingMetadata;
+
+type SubscriptionMap = {
+  [channel: string]: {
+    [idOrSpecialString: string]: SubscriptionHandler;
+  };
+};
+
+class SubscriptionManager {
+  private subscriptions: SubscriptionMap = {};
+
+  hasSubscription(channel: string, id?: string): boolean {
+    const normalizedId = id ?? NO_ID_SPECIAL_STRING_ID;
+    return Boolean(this.subscriptions[channel]?.[normalizedId]);
+  }
+
+  getSubscription(channel: string, id?: string): SubscriptionHandler | undefined {
+    const normalizedId = id ?? NO_ID_SPECIAL_STRING_ID;
+    if (!this.hasSubscription(channel, normalizedId)) {
+      return undefined;
+    }
+    return this.subscriptions[channel]?.[normalizedId];
+  }
+
+  addSubscription(handler: SubscriptionHandler): boolean {
+    const normalizedId = handler.id ?? NO_ID_SPECIAL_STRING_ID;
+    const channel = handler.channel;
+
+    if (this.hasSubscription(channel, normalizedId)) {
+      return false;
+    }
+
+    this.subscriptions[channel] ??= {};
+    this.subscriptions[channel][normalizedId] = handler;
+    return true;
+  }
+
+  removeSubscription(channel: string, id: string | undefined): boolean {
+    const normalizedId = id ?? NO_ID_SPECIAL_STRING_ID;
+    if (!this.hasSubscription(channel, normalizedId)) {
+      return false;
+    }
+    delete this.subscriptions[channel]![normalizedId];
+    return true;
+  }
+
+  getAllSubscriptions(): SubscriptionHandler[] {
+    return Object.values(this.subscriptions)
+      .flatMap((channelSubs) => Object.values(channelSubs))
+      .filter(isTruthy);
+  }
+
+  getChannelSubscriptions(channel: string): SubscriptionHandler[] {
+    return Object.values(this.subscriptions[channel] ?? {});
+  }
+}
 
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
@@ -18,20 +91,7 @@ export class IndexerWebsocket {
   // for logging purposes, to differentiate when user has many tabs open
   private indexerWsId = crypto.randomUUID();
 
-  private subscriptions: {
-    [channel: string]: {
-      [id: string]: {
-        channel: string;
-        id: string | undefined;
-        batched: boolean;
-        handleBaseData: (data: any, fullMessage: any) => void;
-        handleUpdates: (updates: any[], fullMessage: any) => void;
-        sentSubMessage: boolean;
-      };
-    };
-  } = {};
-
-  private lastRetryTimeMsByChannelAndId: { [channelAndId: string]: number } = {};
+  private subscriptions = new SubscriptionManager();
 
   constructor(url: string) {
     this.socket = new ReconnectingWebSocket({
@@ -57,13 +117,7 @@ export class IndexerWebsocket {
     batched = true,
     handleUpdates,
     handleBaseData,
-  }: {
-    channel: string;
-    id: string | undefined;
-    batched?: boolean;
-    handleBaseData: (data: any, fullMessage: any) => void;
-    handleUpdates: (data: any[], fullMessage: any) => void;
-  }): () => void {
+  }: SubscriptionHandlerInput): () => void {
     this._addSub({ channel, id, batched, handleUpdates, handleBaseData });
     return () => {
       this._performUnsub({ channel, id });
@@ -76,38 +130,42 @@ export class IndexerWebsocket {
     batched = true,
     handleUpdates,
     handleBaseData,
-  }: {
-    channel: string;
-    id: string | undefined;
-    batched?: boolean;
-    handleBaseData: (data: any, fullMessage: any) => void;
-    handleUpdates: (data: any[], fullMessage: any) => void;
-  }) => {
-    this.subscriptions[channel] ??= {};
-    if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] != null) {
-      logAbacusTsError('IndexerWebsocket', 'this subscription already exists', {
-        id: `${channel}/${id}`,
-        wsId: this.indexerWsId,
-      });
-      throw new Error(`IndexerWebsocket error: this subscription already exists. ${channel}/${id}`);
-    }
-    logAbacusTsInfo('IndexerWebsocket', 'adding subscription', {
-      channel,
-      id,
-      socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
-      wsId: this.indexerWsId,
-    });
-    this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] = {
+
+    // below here is any metadata we want to allow maintaining between resubscribes
+    lastRetryBecauseErrorMs = undefined,
+    lastRetryBecauseDuplicateMs = undefined,
+  }: SubscriptionHandlerInput & Partial<SubscriptionHandlerTrackingMetadata>) => {
+    const wasSuccessful = this.subscriptions.addSubscription({
       channel,
       id,
       batched,
       handleBaseData,
       handleUpdates,
       sentSubMessage: false,
-    };
+      receivedBaseData: false,
+      lastRetryBecauseErrorMs,
+      lastRetryBecauseDuplicateMs,
+    });
+
+    // fails if already exists
+    if (!wasSuccessful) {
+      logAbacusTsError('IndexerWebsocket', 'this subscription already exists', {
+        id: `${channel}/${id}`,
+        wsId: this.indexerWsId,
+      });
+      return;
+    }
+
+    logAbacusTsInfo('IndexerWebsocket', 'adding subscription', {
+      channel,
+      id,
+      socketNonNull: this.socket != null,
+      socketActive: Boolean(this.socket?.isActive()),
+      wsId: this.indexerWsId,
+    });
+
     if (this.socket != null && this.socket.isActive()) {
-      this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage = true;
+      this.subscriptions.getSubscription(channel, id)!.sentSubMessage = true;
       this.socket.send({
         batched,
         channel,
@@ -117,16 +175,16 @@ export class IndexerWebsocket {
     }
   };
 
-  private _performUnsub = ({ channel, id }: { channel: string; id: string | undefined }) => {
-    if (this.subscriptions[channel] == null) {
-      logAbacusTsError(
-        'IndexerWebsocket',
-        'unsubbing from nonexistent or already unsubbed channel',
-        { channel, wsId: this.indexerWsId }
-      );
-      return;
-    }
-    if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
+  private _performUnsub = (
+    { channel, id }: { channel: string; id: string | undefined },
+    // if true, don't send the unsub message, just remove from the internal data structure
+    shouldSuppressWsMessage: boolean = false
+  ) => {
+    const sub = this.subscriptions.getSubscription(channel, id);
+    const wasSuccessful = this.subscriptions.removeSubscription(channel, id);
+
+    // only if doesn't exist
+    if (!wasSuccessful || sub == null) {
       logAbacusTsError(
         'IndexerWebsocket',
         'unsubbing from nonexistent or already unsubbed channel',
@@ -134,29 +192,30 @@ export class IndexerWebsocket {
       );
       return;
     }
+
+    if (shouldSuppressWsMessage) {
+      return;
+    }
+
     logAbacusTsInfo('IndexerWebsocket', 'removing subscription', {
       channel,
       id,
       socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
+      socketActive: Boolean(this.socket?.isActive()),
       wsId: this.indexerWsId,
     });
-    if (
-      this.socket != null &&
-      this.socket.isActive() &&
-      this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage
-    ) {
+
+    if (this.socket != null && this.socket.isActive() && sub.sentSubMessage) {
       this.socket.send({
         channel,
         id,
         type: 'unsubscribe',
       });
     }
-    delete this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID];
   };
 
   private _refreshSub = (channel: string, id: string | undefined) => {
-    const sub = this.subscriptions[channel]?.[id ?? NO_ID_SPECIAL_STRING_ID];
+    const sub = this.subscriptions.getSubscription(channel, id);
     if (sub == null) {
       return;
     }
@@ -164,32 +223,95 @@ export class IndexerWebsocket {
     this._addSub(sub);
   };
 
-  // if we get a "could not fetch data" error, we retry once as long as this channel+id is not on cooldown
-  // TODO: remove this entirely when backend is more reliable
-  private _handleErrorReceived = (message: IndexerWebsocketErrorMessage) => {
+  private _maybeRetryTimeoutError = (message: IndexerWebsocketErrorMessage): boolean => {
     if (message.message.startsWith('Internal error, could not fetch data for subscription: ')) {
       const maybeChannel = message.channel;
       const maybeId = message.id;
-      if (maybeChannel != null && maybeChannel.startsWith('v4_')) {
-        const channelAndId = `${maybeChannel}${CHANNEL_ID_SAFE_DIVIDER}${maybeId ?? NO_ID_SPECIAL_STRING_ID}`;
-        const lastRefresh = this.lastRetryTimeMsByChannelAndId[channelAndId] ?? 0;
-        if (Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
-          this.lastRetryTimeMsByChannelAndId[channelAndId] = Date.now();
+      if (
+        maybeChannel != null &&
+        maybeChannel.startsWith('v4_') &&
+        this.subscriptions.hasSubscription(maybeChannel, maybeId)
+      ) {
+        const sub = this.subscriptions.getSubscription(maybeChannel, maybeId)!;
+        const lastRefresh = sub.lastRetryBecauseErrorMs ?? 0;
+        const hasBaseData = sub.receivedBaseData;
+        if (!hasBaseData && Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
+          sub.lastRetryBecauseErrorMs = Date.now();
           this._refreshSub(maybeChannel, maybeId);
-          logAbacusTsInfo('IndexerWebsocket', 'error fetching data for channel, refetching', {
+          logAbacusTsInfo('IndexerWebsocket', 'error fetching subscription, refetching', {
             maybeChannel,
             maybeId,
+            socketNonNull: this.socket != null,
+            socketActive: Boolean(this.socket?.isActive()),
             wsId: this.indexerWsId,
           });
-          return;
+          return true;
         }
-        logAbacusTsError('IndexerWebsocket', 'hit max retries for channel:', {
+        logAbacusTsError('IndexerWebsocket', 'error fetching subscription, not retrying:', {
           maybeChannel,
           maybeId,
+          hasBaseData,
+          elapsedSinceLast: Date.now() - lastRefresh,
           wsId: this.indexerWsId,
         });
-        return;
+        return true;
       }
+    }
+    return false;
+  };
+
+  private _maybeFixDuplicateSubError = (message: IndexerWebsocketErrorMessage): boolean => {
+    if (message.message.startsWith('Invalid subscribe message: already subscribed (')) {
+      // temp until backend adds metadata
+      const parsedMatches = message.message.match(/\(([\w_]+)-(.+?)\)/);
+      const maybeChannel = parsedMatches?.[1];
+
+      let maybeId = parsedMatches?.[2];
+      if (maybeId === maybeChannel) {
+        maybeId = undefined;
+      }
+
+      if (
+        maybeChannel != null &&
+        maybeChannel.startsWith('v4_') &&
+        this.subscriptions.hasSubscription(maybeChannel, maybeId)
+      ) {
+        const sub = this.subscriptions.getSubscription(maybeChannel, maybeId)!;
+        const lastRefresh = sub.lastRetryBecauseDuplicateMs ?? 0;
+        const hasBaseData = sub.receivedBaseData;
+        if (!hasBaseData && Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
+          sub.lastRetryBecauseDuplicateMs = Date.now();
+          this._refreshSub(maybeChannel, maybeId);
+          logAbacusTsInfo('IndexerWebsocket', 'error: subscription already exists, refetching', {
+            maybeChannel,
+            maybeId,
+            socketNonNull: this.socket != null,
+            socketActive: Boolean(this.socket?.isActive()),
+            wsId: this.indexerWsId,
+          });
+          return true;
+        }
+        logAbacusTsError('IndexerWebsocket', 'error: subscription already exists, not retrying', {
+          maybeChannel,
+          maybeId,
+          hasBaseData,
+          elapsedSinceLast: Date.now() - lastRefresh,
+          wsId: this.indexerWsId,
+        });
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // if we get a "could not fetch data" error, we retry once as long as this channel+id is not on cooldown
+  // TODO: remove this entirely when backend is more reliable
+  private _handleErrorReceived = (message: IndexerWebsocketErrorMessage) => {
+    let handled = this._maybeRetryTimeoutError(message);
+    // this ensures this isn't called if we already retried and tracks if we have handled it yet
+    handled = handled || this._maybeFixDuplicateSubError(message);
+    if (handled) {
+      return;
     }
     logAbacusTsError('IndexerWebsocket', 'encountered server side error:', {
       message,
@@ -219,23 +341,14 @@ export class IndexerWebsocket {
         const channel = message.channel;
         const id = message.id;
 
-        if (this.subscriptions[channel] == null) {
+        const sub = this.subscriptions.getSubscription(channel, id);
+        if (!this.subscriptions.hasSubscription(channel, id) || sub == null) {
           // hide error for channel we expect to see it on
           if (channel !== 'v4_orderbook') {
-            logAbacusTsError('IndexerWebsocket', 'encountered message with unknown target', {
+            logAbacusTsInfo('IndexerWebsocket', 'encountered message with unknown target', {
               channel,
               id,
-              wsId: this.indexerWsId,
-            });
-          }
-          return;
-        }
-        if (this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID] == null) {
-          // hide error for channel we expect to see it on
-          if (channel !== 'v4_orderbook') {
-            logAbacusTsError('IndexerWebsocket', 'encountered message with unknown target', {
-              channel,
-              id,
+              type: message.type,
               wsId: this.indexerWsId,
             });
           }
@@ -247,21 +360,37 @@ export class IndexerWebsocket {
             id,
             wsId: this.indexerWsId,
           });
-          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleBaseData(
-            message.contents,
-            message
-          );
+          sub.receivedBaseData = true;
+          sub.handleBaseData(message.contents, message);
         } else if (message.type === 'channel_data') {
-          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
-            [message.contents],
-            message
-          );
+          if (!sub.receivedBaseData) {
+            logAbacusTsError(
+              'IndexerWebsocket',
+              'message received before subscription confirmed, hiding',
+              {
+                channel,
+                id,
+                wsId: this.indexerWsId,
+              }
+            );
+            return;
+          }
+          sub.handleUpdates([message.contents], message);
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (message.type === 'channel_batch_data') {
-          this.subscriptions[channel][id ?? NO_ID_SPECIAL_STRING_ID]!.handleUpdates(
-            message.contents,
-            message
-          );
+          if (!sub.receivedBaseData) {
+            logAbacusTsError(
+              'IndexerWebsocket',
+              'message received before subscription confirmed, hiding',
+              {
+                channel,
+                id,
+                wsId: this.indexerWsId,
+              }
+            );
+            return;
+          }
+          sub.handleUpdates(message.contents, message);
         } else {
           assertNever(message);
         }
@@ -283,26 +412,15 @@ export class IndexerWebsocket {
       socketUrl: this.socket?.url,
       wsId: this.indexerWsId,
       socketNonNull: this.socket != null,
-      socketActive: this.socket?.isActive(),
-      subs: Object.values(this.subscriptions)
-        .flatMap((o) => Object.values(o))
-        .filter(isTruthy)
-        .map((o) => `${o.channel}///${o.id}`),
+      socketActive: Boolean(this.socket?.isActive()),
+      subs: this.subscriptions.getAllSubscriptions().map((o) => `${o.channel}///${o.id}`),
     });
     if (this.socket != null && this.socket.isActive()) {
-      Object.values(this.subscriptions)
-        .filter(isTruthy)
-        .flatMap((o) => Object.values(o))
-        .filter(isTruthy)
-        .forEach(({ batched, channel, id }) => {
-          this.subscriptions[channel]![id ?? NO_ID_SPECIAL_STRING_ID]!.sentSubMessage = true;
-          this.socket!.send({
-            batched,
-            channel,
-            id,
-            type: 'subscribe',
-          });
-        });
+      this.subscriptions.getAllSubscriptions().forEach(({ channel, id }) => {
+        const sub = this.subscriptions.getSubscription(channel, id)!;
+        this._performUnsub(sub, true);
+        this._addSub(sub);
+      });
     } else {
       logAbacusTsError(
         'IndexerWebsocket',

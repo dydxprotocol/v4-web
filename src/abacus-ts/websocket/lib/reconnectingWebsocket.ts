@@ -154,7 +154,7 @@ class WebSocketConnection {
       this.ws = new WebSocket(url);
       this.setupEventHandlers();
     } catch (error) {
-      logAbacusTsError('WebSocketConnection', 'error connecting', error);
+      logAbacusTsError('WebSocketConnection', 'error connecting', { error });
       this.close();
       // we don't rethrow because we instead call the handleClose method
     }
@@ -169,7 +169,7 @@ class WebSocketConnection {
         const data = JSON.parse(event.data);
         this.handleMessage(this.id, data);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handler', e);
+        logAbacusTsError('WebSocketConnection', 'error in handler', { data: event.data, error: e });
       }
     };
 
@@ -180,7 +180,7 @@ class WebSocketConnection {
       try {
         this.handleConnected(this.id);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handleConnected', e);
+        logAbacusTsError('WebSocketConnection', 'error in handleConnected', { error: e });
       }
     };
 
@@ -224,7 +224,7 @@ class WebSocketConnection {
       this.ws?.close();
       this.ws = null;
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error closing socket', e);
+      logAbacusTsError('WebSocketConnection', 'error closing socket', { error: e });
     }
   }
 
@@ -245,7 +245,7 @@ class WebSocketConnection {
       const message = typeof data === 'string' ? data : JSON.stringify(data);
       this.ws!.send(message);
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error sending data', e, data);
+      logAbacusTsError('WebSocketConnection', 'error sending data', { error: e, data });
     }
   }
 }
