@@ -27,7 +27,7 @@ export const createSelectParentSubaccountSummaryDeposit = () =>
         return undefined;
       }
 
-      const operations = createUsdcDepositOperations(depositInputs);
+      const operations = createUsdcDepositOperations(parentSubaccount, depositInputs);
       const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
       const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
       return result;
@@ -52,7 +52,7 @@ export const createSelectParentSubaccountSummaryWithdrawal = () =>
         return undefined;
       }
 
-      const operations = createUsdcWithdrawalOperations(withdrawalInputs);
+      const operations = createUsdcWithdrawalOperations(parentSubaccount, withdrawalInputs);
       const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
       const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
       return result;
