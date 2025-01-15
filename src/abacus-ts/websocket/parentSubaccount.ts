@@ -5,7 +5,6 @@ import {
   IndexerAssetPositionResponseObject,
   IndexerOrderResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   isWsParentSubaccountSubscribed,
@@ -23,48 +22,17 @@ import { MustBigNumber } from '@/lib/numbers';
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
+import {
+  convertToStoredChildSubaccount,
+  freshChildSubaccount,
+  isValidSubaccount,
+} from '../lib/subaccountUtils';
 import { logAbacusTsError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
-import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
+import { ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
-
-function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
-  return (
-    Object.keys(childSubaccount.assetPositions).length > 0 ||
-    Object.keys(childSubaccount.openPerpetualPositions).length > 0
-  );
-}
-
-function convertToStoredChildSubaccount({
-  address,
-  subaccountNumber,
-  assetPositions,
-  openPerpetualPositions,
-}: IndexerSubaccountResponseObject): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions,
-    openPerpetualPositions,
-  };
-}
-
-function freshChildSubaccount({
-  address,
-  subaccountNumber,
-}: {
-  address: string;
-  subaccountNumber: number;
-}): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions: {},
-    openPerpetualPositions: {},
-  };
-}
 
 interface AccountValueArgsBase {
   address: string;

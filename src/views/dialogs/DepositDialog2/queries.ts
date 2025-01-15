@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import { BalanceRequest, RouteRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';
@@ -14,6 +15,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
 
@@ -146,4 +148,21 @@ export function useDepositRoutes(token: TokenForTransfer, amount: string) {
     refetchOnMount: 'always',
     placeholderData: (prev) => prev,
   });
+}
+
+export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {
+  const depositInput = useMemo(
+    () => ({
+      subaccountNumber: 0,
+      depositAmount,
+    }),
+    [depositAmount]
+  );
+
+  const modifiedParentSubaccount = useParameterizedSelector(
+    BonsaiHelpers.forms.deposit.createSelectParentSubaccountSummary,
+    depositInput
+  );
+
+  return modifiedParentSubaccount;
 }

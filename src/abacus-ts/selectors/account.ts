@@ -54,7 +54,7 @@ const selectRelevantMarketsList = createAppSelector(
   }
 );
 
-const selectRelevantMarketsData = createAppSelector(
+export const selectRelevantMarketsData = createAppSelector(
   [selectRelevantMarketsList, selectRawMarketsData],
   (marketIds, markets) => {
     if (markets == null || marketIds == null) {
