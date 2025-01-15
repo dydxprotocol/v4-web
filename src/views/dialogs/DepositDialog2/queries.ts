@@ -160,7 +160,7 @@ export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {
   );
 
   const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.forms.deposit.parentSubaccountSummary,
+    BonsaiHelpers.forms.deposit.createSelectParentSubaccountSummary,
     depositInput
   );
 

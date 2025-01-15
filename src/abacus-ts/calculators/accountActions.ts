@@ -7,42 +7,131 @@ import {
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { SubaccountBatchedOperations, SubaccountOperations } from '../types/operationTypes';
-import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
+import { freshChildSubaccount, newUsdcAssetPosition } from '../lib/subaccountUtils';
+import {
+  ModifyUsdcAssetPositionProps,
+  SubaccountBatchedOperations,
+  SubaccountOperations,
+} from '../types/operationTypes';
+import { ParentSubaccountData } from '../types/rawTypes';
 
-export function createUsdcDepositOperations({
-  subaccountNumber,
-  depositAmount,
-}: {
-  subaccountNumber: number;
-  depositAmount: string;
-}): SubaccountBatchedOperations {
+function addUsdcAssetPosition(
+  parentSubaccount: ParentSubaccountData,
+  payload: Pick<IndexerAssetPositionResponseObject, 'side' | 'size' | 'subaccountNumber'>
+): ParentSubaccountData {
+  const { side, size, subaccountNumber } = payload;
+  return produce(parentSubaccount, (draftParentSubaccountData) => {
+    let childSubaccount = draftParentSubaccountData.childSubaccounts[subaccountNumber];
+
+    if (childSubaccount == null) {
+      // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
+      const updatedChildSubaccount = freshChildSubaccount({
+        address: draftParentSubaccountData.address,
+        subaccountNumber,
+      });
+
+      childSubaccount = {
+        ...updatedChildSubaccount,
+        assetPositions: {
+          ...updatedChildSubaccount.assetPositions,
+          USDC: newUsdcAssetPosition({
+            side,
+            size,
+            subaccountNumber,
+          }),
+        },
+      };
+    } else {
+      if (childSubaccount.assetPositions.USDC == null) {
+        // Upsert USDC Asset Position
+        childSubaccount.assetPositions.USDC = newUsdcAssetPosition({
+          side,
+          size,
+          subaccountNumber,
+        });
+      } else {
+        if (childSubaccount.assetPositions.USDC.side !== side) {
+          const signedSizeBN = MustBigNumber(childSubaccount.assetPositions.USDC.size).minus(size);
+
+          if (signedSizeBN.lte(0)) {
+            // New size flips the Asset Position Side
+            childSubaccount.assetPositions.USDC.side =
+              side === IndexerPositionSide.LONG
+                ? IndexerPositionSide.SHORT
+                : IndexerPositionSide.LONG;
+            childSubaccount.assetPositions.USDC.size = signedSizeBN.abs().toString();
+          } else {
+            // Set the new size of the Asset Position
+            childSubaccount.assetPositions.USDC.size = signedSizeBN.toString();
+          }
+        } else {
+          // Side is maintained, add the size to the existing position
+          childSubaccount.assetPositions.USDC.size = MustBigNumber(
+            childSubaccount.assetPositions.USDC.size
+          )
+            .plus(size)
+            .toString();
+        }
+      }
+    }
+  });
+}
+
+export function createUsdcDepositOperations(
+  parentSubaccount: ParentSubaccountData,
+  {
+    subaccountNumber,
+    depositAmount,
+  }: {
+    subaccountNumber: number;
+    depositAmount: string;
+  }
+): SubaccountBatchedOperations {
+  const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
+    side: IndexerPositionSide.LONG,
+    size: depositAmount,
+    subaccountNumber,
+  });
+
+  if (updatedParentSubaccountData.childSubaccounts[subaccountNumber]?.assetPositions.USDC == null) {
+    throw new Error('USDC Asset Position was improperly modified');
+  }
+
   return {
     operations: [
       SubaccountOperations.ModifyUsdcAssetPosition({
         subaccountNumber,
-        changes: {
-          size: depositAmount,
-        },
+        changes: updatedParentSubaccountData.childSubaccounts[subaccountNumber].assetPositions.USDC,
       }),
     ],
   };
 }
 
-export function createUsdcWithdrawalOperations({
-  subaccountNumber,
-  withdrawAmount,
-}: {
-  subaccountNumber: number;
-  withdrawAmount: string;
-}): SubaccountBatchedOperations {
+export function createUsdcWithdrawalOperations(
+  parentSubaccount: ParentSubaccountData,
+  {
+    subaccountNumber,
+    withdrawAmount,
+  }: {
+    subaccountNumber: number;
+    withdrawAmount: string;
+  }
+): SubaccountBatchedOperations {
+  const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
+    side: IndexerPositionSide.SHORT,
+    size: withdrawAmount,
+    subaccountNumber,
+  });
+
+  if (updatedParentSubaccountData.childSubaccounts[subaccountNumber]?.assetPositions.USDC == null) {
+    throw new Error('USDC Asset Position was improperly modified');
+  }
+
   return {
     operations: [
       SubaccountOperations.ModifyUsdcAssetPosition({
         subaccountNumber,
-        changes: {
-          size: MustBigNumber(withdrawAmount).negated().toString(),
-        },
+        changes: updatedParentSubaccountData.childSubaccounts[subaccountNumber].assetPositions.USDC,
       }),
     ],
   };
@@ -50,57 +139,14 @@ export function createUsdcWithdrawalOperations({
 
 function modifyUsdcAssetPosition(
   parentSubaccountData: ParentSubaccountData,
-  payload: {
-    subaccountNumber: number;
-    changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
-  }
+  payload: ModifyUsdcAssetPositionProps
 ): ParentSubaccountData {
   const { subaccountNumber, changes } = payload;
-  if (!changes.size) return parentSubaccountData;
 
   return produce(parentSubaccountData, (draftParentSubaccountData) => {
-    const sizeBN = MustBigNumber(changes.size);
-
-    let childSubaccount: ChildSubaccountData | undefined =
-      draftParentSubaccountData.childSubaccounts[subaccountNumber];
-
-    if (childSubaccount != null) {
-      // Modify childSubaccount
-      if (childSubaccount.assetPositions.USDC != null) {
-        const size = MustBigNumber(childSubaccount.assetPositions.USDC.size)
-          .plus(sizeBN)
-          .toString();
-
-        childSubaccount.assetPositions.USDC.size = size;
-      } else if (sizeBN.gt(0)) {
-        // Upsert USDC Asset Position
-        childSubaccount.assetPositions.USDC = {
-          assetId: '0',
-          symbol: 'USDC',
-          size: sizeBN.toString(),
-          side: IndexerPositionSide.LONG,
-          subaccountNumber,
-        } satisfies IndexerAssetPositionResponseObject;
-      }
-    } else {
-      // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
-      childSubaccount = {
-        address: parentSubaccountData.address,
-        subaccountNumber,
-        openPerpetualPositions: {},
-        assetPositions: {
-          USDC: {
-            assetId: '0',
-            symbol: 'USDC',
-            size: sizeBN.toString(),
-            side: IndexerPositionSide.LONG,
-            subaccountNumber,
-          },
-        },
-      } satisfies ChildSubaccountData;
+    if (draftParentSubaccountData.childSubaccounts[subaccountNumber]?.assetPositions.USDC != null) {
+      draftParentSubaccountData.childSubaccounts[subaccountNumber].assetPositions.USDC = changes;
     }
-
-    draftParentSubaccountData.childSubaccounts[subaccountNumber] = childSubaccount;
   });
 }
 

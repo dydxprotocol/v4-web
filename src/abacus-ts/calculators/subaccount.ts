@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { mapValues, orderBy } from 'lodash';
+import { groupBy, map, mapValues, orderBy, pickBy } from 'lodash';
+import { weakMapMemoize } from 'reselect';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
@@ -9,14 +10,21 @@ import {
 } from '@/types/indexer/indexerApiGen';
 import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
-import { getAssetFromMarketId } from '@/lib/assetUtils';
+import {
+  getAssetFromMarketId,
+  getDisplayableAssetFromBaseAsset,
+  getDisplayableTickerFromMarket,
+} from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
+import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
+  PendingIsolatedPosition,
+  SubaccountOrder,
   SubaccountPosition,
   SubaccountPositionBase,
   SubaccountPositionDerivedCore,
@@ -74,16 +82,15 @@ export function calculateMarketsNeededForSubaccount(parent: Omit<ParentSubaccoun
   );
 }
 
-function calculateSubaccountSummary(
-  subaccountData: ChildSubaccountData,
-  markets: MarketsData
-): SubaccountSummary {
-  const core = calculateSubaccountSummaryCore(subaccountData, markets);
-  return {
-    ...core,
-    ...calculateSubaccountSummaryDerived(core),
-  };
-}
+const calculateSubaccountSummary = weakMapMemoize(
+  (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
+    const core = calculateSubaccountSummaryCore(subaccountData, markets);
+    return {
+      ...core,
+      ...calculateSubaccountSummaryDerived(core),
+    };
+  }
+);
 
 function calculateSubaccountSummaryCore(
   subaccountData: ChildSubaccountData,
@@ -287,4 +294,57 @@ function calculatePositionDerivedExtra(
     updatedUnrealizedPnl,
     updatedUnrealizedPnlPercent,
   };
+}
+
+export function calculateChildSubaccountSummaries(
+  parent: Omit<ParentSubaccountData, 'live'>,
+  markets: MarketsData
+): Record<string, SubaccountSummary> {
+  return pickBy(
+    mapValues(
+      parent.childSubaccounts,
+      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+    ),
+    isTruthy
+  );
+}
+
+/**
+ * @returns a list of pending isolated positions
+ * PendingIsolatedPosition is exists if there are any orders that meet the following criteria:
+ * - marginMode is ISOLATED
+ * - no existing position exists
+ * - childSubaccount has equity
+ */
+export function calculateUnopenedIsolatedPositions(
+  childSubaccounts: Record<string, SubaccountSummary>,
+  orders: SubaccountOrder[],
+  positions: SubaccountPosition[]
+): PendingIsolatedPosition[] {
+  const setOfOpenPositionMarkets = new Set(positions.map(({ market }) => market));
+
+  const filteredOrders = orders.filter(
+    (o) => !setOfOpenPositionMarkets.has(o.marketId) && o.marginMode === 'ISOLATED'
+  );
+
+  const filteredOrdersMap = groupBy(filteredOrders, 'marketId');
+  const marketIdToSubaccountNumber = mapValues(
+    filteredOrdersMap,
+    (filteredOrder) => filteredOrder[0]?.subaccountNumber
+  );
+
+  return map(filteredOrdersMap, (orderList, marketId) => {
+    const subaccountNumber = marketIdToSubaccountNumber[marketId];
+    if (subaccountNumber == null) return undefined;
+    const assetId = getAssetFromMarketId(marketId);
+
+    return {
+      assetId,
+      displayableAsset: getDisplayableAssetFromBaseAsset(assetId),
+      marketId,
+      displayId: getDisplayableTickerFromMarket(marketId),
+      equity: childSubaccounts[subaccountNumber]?.equity ?? BIG_NUMBERS.ZERO,
+      orders: orderList,
+    };
+  }).filter(isTruthy);
 }

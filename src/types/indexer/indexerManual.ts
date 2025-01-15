@@ -4,6 +4,7 @@ import {
   IndexerAPIOrderStatus,
   IndexerAPITimeInForce,
   IndexerAssetPositionResponseObject,
+  IndexerCandleResponseObject,
   IndexerFillType,
   IndexerHistoricalBlockTradingReward,
   IndexerIsoString,
@@ -141,7 +142,7 @@ export interface IndexerWsParentSubaccountSubscribedResponse {
 
 export type IndexerWsAssetUpdate = Partial<IndexerAssetPositionResponseObject> & {
   subaccountNumber: number;
-  assetId: string;
+  symbol: string;
 };
 export type IndexerWsPositionUpdate = Partial<IndexerPerpetualPositionResponseObject> & {
   subaccountNumber: number;
@@ -164,6 +165,13 @@ export interface IndexerWsParentSubaccountUpdateObject {
   transfers?: IndexerTransferCommonResponseObject;
 }
 
+// hacking around backend types not quite matching what the websocket sends
+export type IndexerWsTradeResponseObject = PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>;
 export interface IndexerWsTradesUpdateObject {
-  trades: PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>[];
+  trades: IndexerWsTradeResponseObject[];
+}
+
+export type IndexerWsCandleResponseObject = Omit<IndexerCandleResponseObject, 'id'>;
+export interface IndexerWsCandleResponse {
+  candles: Array<IndexerWsCandleResponseObject>;
 }
