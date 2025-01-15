@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import { RouteRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
@@ -7,6 +10,7 @@ import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
 async function getSkipWithdrawalRoutes(
   skipClient: SkipClient,
@@ -52,4 +56,21 @@ export function useWithdrawalRoutes({
     placeholderData: (prev) => prev,
     retry: false,
   });
+}
+
+export function useWithdrawalDeltas({ withdrawAmount }: { withdrawAmount: string }) {
+  const withdrawInput = useMemo(
+    () => ({
+      subaccountNumber: 0,
+      withdrawAmount,
+    }),
+    [withdrawAmount]
+  );
+
+  const modifiedParentSubaccount = useParameterizedSelector(
+    BonsaiHelpers.forms.withdraw.createSelectParentSubaccountSummary,
+    withdrawInput
+  );
+
+  return modifiedParentSubaccount;
 }

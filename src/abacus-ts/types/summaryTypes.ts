@@ -149,3 +149,12 @@ export type SubaccountOrder = {
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
+
+export type PendingIsolatedPosition = {
+  marketId: string;
+  displayId: string;
+  assetId: string;
+  displayableAsset: string;
+  equity: BigNumber;
+  orders: SubaccountOrder[];
+};

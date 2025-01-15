@@ -38,7 +38,9 @@ function tradesWebsocketValueCreator(
         const updates = isWsTradesUpdateResponses(baseUpdates);
         const startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('TradesTracker', 'found unexpectedly null base data in update');
+          logAbacusTsError('TradesTracker', 'found unexpectedly null base data in update', {
+            marketId,
+          });
           return value;
         }
         const allNewTrades = updates.flatMap((u) => u.trades).toReversed();
