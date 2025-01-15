@@ -82,16 +82,15 @@ export function calculateMarketsNeededForSubaccount(parent: Omit<ParentSubaccoun
   );
 }
 
-function calculateSubaccountSummary(
-  subaccountData: ChildSubaccountData,
-  markets: MarketsData
-): SubaccountSummary {
-  const core = calculateSubaccountSummaryCore(subaccountData, markets);
-  return {
-    ...core,
-    ...calculateSubaccountSummaryDerived(core),
-  };
-}
+const calculateSubaccountSummary = weakMapMemoize(
+  (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
+    const core = calculateSubaccountSummaryCore(subaccountData, markets);
+    return {
+      ...core,
+      ...calculateSubaccountSummaryDerived(core),
+    };
+  }
+);
 
 function calculateSubaccountSummaryCore(
   subaccountData: ChildSubaccountData,
@@ -297,20 +296,18 @@ function calculatePositionDerivedExtra(
   };
 }
 
-export const calculateChildSubaccountSummaries = weakMapMemoize(
-  (
-    parent: Omit<ParentSubaccountData, 'live'>,
-    markets: MarketsData
-  ): Record<string, SubaccountSummary> => {
-    return pickBy(
-      mapValues(
-        parent.childSubaccounts,
-        (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
-      ),
-      isTruthy
-    );
-  }
-);
+export function calculateChildSubaccountSummaries(
+  parent: Omit<ParentSubaccountData, 'live'>,
+  markets: MarketsData
+): Record<string, SubaccountSummary> {
+  return pickBy(
+    mapValues(
+      parent.childSubaccounts,
+      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+    ),
+    isTruthy
+  );
+}
 
 /**
  * @returns a list of pending isolated positions
