@@ -310,11 +310,11 @@ export function calculateChildSubaccountSummaries(
 }
 
 /**
- *
- * UnopenedIsolatedPosition is a modified SubaccountOrder that meets the following criterias:
+ * @returns a list of pending isolated positions
+ * PendingIsolatedPosition is exists if there are any orders that meet the following criteria:
  * - marginMode is ISOLATED
  * - no existing position exists
- * - equity of the childSubaccount is returned with the order
+ * - childSubaccount has equity
  */
 export function calculateUnopenedIsolatedPositions(
   childSubaccounts: Record<string, SubaccountSummary>,
