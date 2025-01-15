@@ -141,7 +141,7 @@ export interface IndexerWsParentSubaccountSubscribedResponse {
 
 export type IndexerWsAssetUpdate = Partial<IndexerAssetPositionResponseObject> & {
   subaccountNumber: number;
-  assetId: string;
+  symbol: string;
 };
 export type IndexerWsPositionUpdate = Partial<IndexerPerpetualPositionResponseObject> & {
   subaccountNumber: number;
