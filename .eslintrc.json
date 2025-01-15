@@ -55,7 +55,7 @@
         "patterns": [
           "@/abacus-ts/*/*",
           "!@/abacus-ts/ontology",
-          "!@/abacus-ts/lib",
+          "!@/abacus-ts/lib/*",
           "!@/abacus-ts/types/summaryTypes"
         ]
       }
