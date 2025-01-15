@@ -6,6 +6,7 @@ interface ReconnectingWebSocketConfig {
   handleMessage: (data: any) => void;
   handleFreshConnect: () => void;
   initialReconnectInterval?: number;
+  connectionTimeToConsiderLive?: number;
   maxReconnectInterval?: number;
   backoffMultiplier?: number;
 }
@@ -22,6 +23,8 @@ export class ReconnectingWebSocket {
   private readonly maxReconnectInterval: number;
 
   private readonly backoffMultiplier: number;
+
+  private readonly connectionTimeToConsiderLive: number;
 
   private ws: WebSocketConnection | null = null;
 
@@ -41,6 +44,7 @@ export class ReconnectingWebSocket {
     this.initialReconnectInterval = config.initialReconnectInterval ?? 1000;
     this.maxReconnectInterval = config.maxReconnectInterval ?? 120_000;
     this.backoffMultiplier = config.backoffMultiplier ?? 1.5;
+    this.connectionTimeToConsiderLive = config.connectionTimeToConsiderLive ?? 5000;
 
     this.connect();
   }
@@ -81,7 +85,13 @@ export class ReconnectingWebSocket {
   private handleWsConnected = (id: number) => {
     // can happen if we rapidly switch websockets maybe ??
     if (id !== this.currentId || this.isDead) return;
-    this.numberOfFailedAttempts = 0;
+
+    // after x seconds, reset our failure counter
+    setTimeout(() => {
+      if (id !== this.currentId || this.isDead || !this.isActive()) return;
+      this.numberOfFailedAttempts = 0;
+    }, this.connectionTimeToConsiderLive);
+
     this.handleFreshConnect();
   };
 
