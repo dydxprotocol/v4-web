@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { groupBy, map, mapValues, orderBy, pickBy } from 'lodash';
+import { weakMapMemoize } from 'reselect';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
@@ -296,18 +297,20 @@ function calculatePositionDerivedExtra(
   };
 }
 
-export function calculateChildSubaccountSummaries(
-  parent: Omit<ParentSubaccountData, 'live'>,
-  markets: MarketsData
-): Record<string, SubaccountSummary> {
-  return pickBy(
-    mapValues(
-      parent.childSubaccounts,
-      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
-    ),
-    isTruthy
-  );
-}
+export const calculateChildSubaccountSummaries = weakMapMemoize(
+  (
+    parent: Omit<ParentSubaccountData, 'live'>,
+    markets: MarketsData
+  ): Record<string, SubaccountSummary> => {
+    return pickBy(
+      mapValues(
+        parent.childSubaccounts,
+        (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+      ),
+      isTruthy
+    );
+  }
+);
 
 /**
  * @returns a list of pending isolated positions
