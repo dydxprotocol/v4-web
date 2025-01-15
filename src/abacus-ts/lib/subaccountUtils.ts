@@ -1,4 +1,7 @@
-import { IndexerSubaccountResponseObject } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerPositionSide,
+  IndexerSubaccountResponseObject,
+} from '@/types/indexer/indexerApiGen';
 
 import { ChildSubaccountData } from '../types/rawTypes';
 
@@ -35,5 +38,23 @@ export function freshChildSubaccount({
     subaccountNumber,
     assetPositions: {},
     openPerpetualPositions: {},
+  };
+}
+
+export function newUsdcAssetPosition({
+  side,
+  size,
+  subaccountNumber,
+}: {
+  side: IndexerPositionSide;
+  size: string;
+  subaccountNumber: number;
+}) {
+  return {
+    assetId: '0',
+    size,
+    subaccountNumber,
+    side,
+    symbol: 'USDC',
   };
 }
