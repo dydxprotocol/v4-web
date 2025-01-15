@@ -5,22 +5,26 @@ import {
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
 
+export type AddPerpetualPositionProps = {
+  subaccountNumber: number;
+  market: string;
+  changes: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
+};
+
+export type ModifyPerpetualPositionProps = {
+  changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
+};
+
+export type ModifyUsdcAssetPositionProps = {
+  subaccountNumber: number;
+  changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
+};
+
 export const SubaccountOperations = unionize(
   {
-    AddPerpetualPosition: ofType<{
-      subaccountNumber: number;
-      market: string;
-      position: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
-    }>(),
-    ModifyPerpetualPosition: ofType<{
-      subaccountNumber: number;
-      market: string;
-      changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
-    }>(),
-    ModifyUsdcAssetPosition: ofType<{
-      subaccountNumber: number;
-      changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
-    }>(),
+    AddPerpetualPosition: ofType<AddPerpetualPositionProps>(),
+    ModifyPerpetualPosition: ofType<ModifyPerpetualPositionProps>(),
+    ModifyUsdcAssetPosition: ofType<ModifyUsdcAssetPositionProps>(),
   },
   { tag: 'operation' as const, value: 'payload' as const }
 );

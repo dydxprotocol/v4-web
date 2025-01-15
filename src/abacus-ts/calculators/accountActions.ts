@@ -1,14 +1,15 @@
 import { produce } from 'immer';
 
-import {
-  IndexerAssetPositionResponseObject,
-  IndexerPositionSide,
-} from '@/types/indexer/indexerApiGen';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 import { freshChildSubaccount } from '../lib/subaccountUtils';
-import { SubaccountBatchedOperations, SubaccountOperations } from '../types/operationTypes';
+import {
+  ModifyUsdcAssetPositionProps,
+  SubaccountBatchedOperations,
+  SubaccountOperations,
+} from '../types/operationTypes';
 import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
 
 export function createUsdcDepositOperations({
@@ -51,10 +52,7 @@ export function createUsdcWithdrawalOperations({
 
 function modifyUsdcAssetPosition(
   parentSubaccountData: ParentSubaccountData,
-  payload: {
-    subaccountNumber: number;
-    changes: Partial<Pick<IndexerAssetPositionResponseObject, 'size'>>;
-  }
+  payload: ModifyUsdcAssetPositionProps
 ): ParentSubaccountData {
   const { subaccountNumber, changes } = payload;
   if (!changes.size) return parentSubaccountData;
