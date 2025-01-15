@@ -7,6 +7,7 @@ import {
 
 import { MustBigNumber } from '@/lib/numbers';
 
+import { freshChildSubaccount } from '../lib/subaccountUtils';
 import { SubaccountBatchedOperations, SubaccountOperations } from '../types/operationTypes';
 import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
 
@@ -80,24 +81,22 @@ function modifyUsdcAssetPosition(
           size: sizeBN.toString(),
           side: IndexerPositionSide.LONG,
           subaccountNumber,
-        } satisfies IndexerAssetPositionResponseObject;
+        };
       }
     } else {
       // Upsert ChildSubaccountData into parentSubaccountData.childSubaccounts
-      childSubaccount = {
+      childSubaccount = freshChildSubaccount({
         address: parentSubaccountData.address,
         subaccountNumber,
-        openPerpetualPositions: {},
-        assetPositions: {
-          USDC: {
-            assetId: '0',
-            symbol: 'USDC',
-            size: sizeBN.toString(),
-            side: IndexerPositionSide.LONG,
-            subaccountNumber,
-          },
-        },
-      } satisfies ChildSubaccountData;
+      });
+
+      childSubaccount.assetPositions.USDC = {
+        assetId: '0',
+        symbol: 'USDC',
+        size: sizeBN.toString(),
+        side: IndexerPositionSide.LONG,
+        subaccountNumber,
+      };
     }
 
     draftParentSubaccountData.childSubaccounts[subaccountNumber] = childSubaccount;
