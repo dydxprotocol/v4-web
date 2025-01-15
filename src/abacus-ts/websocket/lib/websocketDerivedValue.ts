@@ -25,6 +25,7 @@ export class WebsocketDerivedValue<T> {
     this.unsubFromWs = websocket.addChannelSubscription({
       channel: sub.channel,
       id: sub.id,
+      batched: true,
       handleBaseData: (data, fullMessage) =>
         this._setValue(sub.handleBaseData(data, this.value, fullMessage)),
       handleUpdates: (updates, fullMessage) =>
