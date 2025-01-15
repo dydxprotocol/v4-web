@@ -120,7 +120,8 @@ function accountWebsocketValueCreator(
         if (value.data == null) {
           logAbacusTsError(
             'ParentSubaccountTracker',
-            'found unexpectedly null base data in update'
+            'found unexpectedly null base data in update',
+            { address, subaccountNumber }
           );
           return value;
         }
@@ -140,13 +141,13 @@ function accountWebsocketValueCreator(
                 const assetPositions =
                   returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions;
 
-                if (assetPositions[positionUpdate.assetId] == null) {
-                  assetPositions[positionUpdate.assetId] =
+                if (assetPositions[positionUpdate.symbol] == null) {
+                  assetPositions[positionUpdate.symbol] =
                     positionUpdate as IndexerAssetPositionResponseObject;
                 } else {
-                  assetPositions[positionUpdate.assetId] = {
+                  assetPositions[positionUpdate.symbol] = {
                     ...(assetPositions[
-                      positionUpdate.assetId
+                      positionUpdate.symbol
                     ] as IndexerAssetPositionResponseObject),
                     ...positionUpdate,
                   };

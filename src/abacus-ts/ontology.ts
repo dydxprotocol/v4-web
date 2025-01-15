@@ -15,6 +15,7 @@ import {
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
+  selectUnopenedIsolatedPositions,
 } from './selectors/account';
 import {
   createSelectParentSubaccountSummaryDeposit,
@@ -109,6 +110,7 @@ export const BonsaiHelpers = {
       parentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
     },
   },
+  unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
 } as const satisfies NestedSelectors;
 
 export const BonsaiHooks = {

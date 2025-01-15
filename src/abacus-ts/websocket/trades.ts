@@ -38,7 +38,7 @@ function tradesWebsocketValueCreator(
         const startingValue = value.data;
         if (startingValue == null) {
           // eslint-disable-next-line no-console
-          console.log('MarketsTracker found unexpectedly null base data in update');
+          console.log('MarketsTracker found unexpectedly null base data in update', { marketId });
           return value;
         }
         const allNewTrades = updates.flatMap((u) => u.trades).toReversed();
