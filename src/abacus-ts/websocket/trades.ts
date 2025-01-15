@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { orderBy } from 'lodash';
 
 import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
+import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
@@ -10,8 +11,8 @@ import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
 import { mergeById } from '@/lib/mergeById';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
+import { logAbacusTsError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
-import { TradesData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
@@ -22,7 +23,7 @@ function tradesWebsocketValueCreator(
   websocket: IndexerWebsocket,
   { marketId }: { marketId: string }
 ) {
-  return new WebsocketDerivedValue<Loadable<TradesData>>(
+  return new WebsocketDerivedValue<Loadable<IndexerWsTradesUpdateObject>>(
     websocket,
     {
       channel: 'v4_trades',
@@ -37,8 +38,9 @@ function tradesWebsocketValueCreator(
         const updates = isWsTradesUpdateResponses(baseUpdates);
         const startingValue = value.data;
         if (startingValue == null) {
-          // eslint-disable-next-line no-console
-          console.log('MarketsTracker found unexpectedly null base data in update', { marketId });
+          logAbacusTsError('TradesTracker', 'found unexpectedly null base data in update', {
+            marketId,
+          });
           return value;
         }
         const allNewTrades = updates.flatMap((u) => u.trades).toReversed();
@@ -58,7 +60,7 @@ export function useCurrentMarketTradesValue() {
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
 
   // useSyncExternalStore is better but the API doesn't fit this use case very well
-  const [trades, setTrades] = useState<Loadable<TradesData>>(loadableIdle());
+  const [trades, setTrades] = useState<Loadable<IndexerWsTradesUpdateObject>>(loadableIdle());
 
   useEffect(() => {
     if (currentMarketId == null) {

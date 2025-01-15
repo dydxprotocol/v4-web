@@ -200,6 +200,8 @@ export const getDydxDatafeed = (
     onResetCacheNeededCallback: Function
   ) => {
     subscribeOnStream({
+      store,
+      orderbookCandlesToggleOn,
       symbolInfo,
       resolution,
       onRealtimeCallback: onTick,
