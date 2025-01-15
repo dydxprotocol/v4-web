@@ -6,7 +6,7 @@ import { IndexerWebsocketManager } from './indexerWebsocketManager';
 import { WebsocketDerivedValue } from './websocketDerivedValue';
 
 // this is set to just above the websocket subscribe timeout because of race conditions in the indexer backend
-const DESTROY_DELAY_MS = 21000;
+const DESTROY_DELAY_MS = 22000;
 
 type WebsocketValueCreator<Args, ReturnType> = (
   websocket: IndexerWebsocket,
