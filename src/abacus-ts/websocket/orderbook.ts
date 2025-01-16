@@ -45,7 +45,9 @@ function orderbookWebsocketValueCreator(
         const updates = isWsOrderbookUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('OrderbookTracker', 'found unexpectedly null base data in update');
+          logAbacusTsError('OrderbookTracker', 'found unexpectedly null base data in update', {
+            marketId,
+          });
           return value;
         }
         startingValue = { asks: { ...startingValue.asks }, bids: { ...startingValue.bids } };

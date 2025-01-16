@@ -5,8 +5,9 @@ import { formatUnits, parseUnits } from 'viem';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { USDC_DECIMALS } from '@/constants/tokens';
+import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
 
+import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -20,8 +21,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { AmountInput } from './AmountInput';
 import { RouteOptions } from './RouteOptions';
-import { useBalance, useRoutes } from './queries';
-import { DepositSpeed, DepositToken } from './types';
+import { useBalance, useDepositRoutes } from './queries';
 import { getTokenSymbol } from './utils';
 
 export const DepositForm = ({
@@ -34,16 +34,21 @@ export const DepositForm = ({
   onTokenSelect: () => void;
   amount: string;
   setAmount: Dispatch<SetStateAction<string>>;
-  token: DepositToken;
+  token: TokenForTransfer;
   onClose: () => void;
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const [selectedSpeed, setSelectedSpeed] = useState<DepositSpeed>('fast');
   const tokenBalance = useBalance(token.chainId, token.denom);
 
+  const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
-  const { data: routes, isFetching, error, isPlaceholderData } = useRoutes(token, debouncedAmount);
+  const {
+    data: routes,
+    isFetching,
+    isPlaceholderData,
+    error,
+  } = useDepositRoutes(token, debouncedAmount);
 
   useEffect(() => {
     if (debouncedAmount && !isFetching && routes && !routes.fast) setSelectedSpeed('slow');

@@ -15,7 +15,12 @@ import {
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
+  selectUnopenedIsolatedPositions,
 } from './selectors/account';
+import {
+  createSelectParentSubaccountSummaryDeposit,
+  createSelectParentSubaccountSummaryWithdrawal,
+} from './selectors/accountActions';
 import {
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
@@ -97,6 +102,15 @@ export const BonsaiHelpers = {
       fills: getCurrentMarketAccountFills,
     },
   },
+  forms: {
+    deposit: {
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
+    },
+    withdraw: {
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
+    },
+  },
+  unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
 } as const satisfies NestedSelectors;
 
 export const BonsaiHooks = {

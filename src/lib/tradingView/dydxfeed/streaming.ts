@@ -6,6 +6,8 @@ import type {
 
 import { RESOLUTION_MAP } from '@/constants/candles';
 
+import { type RootStore } from '@/state/_store';
+
 import abacusStateManager from '@/lib/abacus';
 
 import { subscriptionsByChannelId } from './cache';
@@ -16,6 +18,8 @@ export const subscribeOnStream = ({
   onRealtimeCallback,
   listenerGuid,
 }: {
+  store: RootStore;
+  orderbookCandlesToggleOn: boolean;
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
   onRealtimeCallback: SubscribeBarsCallback;

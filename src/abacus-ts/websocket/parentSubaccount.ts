@@ -5,7 +5,6 @@ import {
   IndexerAssetPositionResponseObject,
   IndexerOrderResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   isWsParentSubaccountSubscribed,
@@ -23,47 +22,17 @@ import { MustBigNumber } from '@/lib/numbers';
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
+import {
+  convertToStoredChildSubaccount,
+  freshChildSubaccount,
+  isValidSubaccount,
+} from '../lib/subaccountUtils';
+import { logAbacusTsError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
-import { ChildSubaccountData, ParentSubaccountData } from '../types/rawTypes';
+import { ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
-
-function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
-  return (
-    Object.keys(childSubaccount.assetPositions).length > 0 ||
-    Object.keys(childSubaccount.openPerpetualPositions).length > 0
-  );
-}
-
-function convertToStoredChildSubaccount({
-  address,
-  subaccountNumber,
-  assetPositions,
-  openPerpetualPositions,
-}: IndexerSubaccountResponseObject): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions,
-    openPerpetualPositions,
-  };
-}
-
-function freshChildSubaccount({
-  address,
-  subaccountNumber,
-}: {
-  address: string;
-  subaccountNumber: number;
-}): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions: {},
-    openPerpetualPositions: {},
-  };
-}
 
 interface AccountValueArgsBase {
   address: string;
@@ -116,7 +85,15 @@ function accountWebsocketValueCreator(
       handleUpdates: (baseUpdates, value, fullMessage) => {
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
-        if (value.data == null || updates.length === 0 || subaccountNumber == null) {
+        if (value.data == null) {
+          logAbacusTsError(
+            'ParentSubaccountTracker',
+            'found unexpectedly null base data in update',
+            { address, subaccountNumber }
+          );
+          return value;
+        }
+        if (updates.length === 0 || subaccountNumber == null) {
           return value;
         }
         const resultData = produce(value.data, (returnValue) => {
@@ -132,13 +109,13 @@ function accountWebsocketValueCreator(
                 const assetPositions =
                   returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions;
 
-                if (assetPositions[positionUpdate.assetId] == null) {
-                  assetPositions[positionUpdate.assetId] =
+                if (assetPositions[positionUpdate.symbol] == null) {
+                  assetPositions[positionUpdate.symbol] =
                     positionUpdate as IndexerAssetPositionResponseObject;
                 } else {
-                  assetPositions[positionUpdate.assetId] = {
+                  assetPositions[positionUpdate.symbol] = {
                     ...(assetPositions[
-                      positionUpdate.assetId
+                      positionUpdate.symbol
                     ] as IndexerAssetPositionResponseObject),
                     ...positionUpdate,
                   };

@@ -53,10 +53,10 @@
       "error",
       {
         "patterns": [
-          "@/abacus-ts/*",
+          "@/abacus-ts/*/*",
           "!@/abacus-ts/ontology",
-          "!@/abacus-ts/lib",
-          "!@/abacus-ts/summaryTypes"
+          "!@/abacus-ts/lib/*",
+          "!@/abacus-ts/types/summaryTypes"
         ]
       }
     ],

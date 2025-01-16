@@ -3,7 +3,7 @@ import { mapValues } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { IndexerPerpetualMarketResponseObject } from '@/types/indexer/indexerApiGen';
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
 import {
   getAssetFromMarketId,
@@ -22,9 +22,7 @@ export function calculateAllMarkets(markets: MarketsData | undefined): MarketsIn
   return mapValues(markets, calculateMarket);
 }
 
-export function getMarketEffectiveInitialMarginForMarket(
-  market: IndexerPerpetualMarketResponseObject
-) {
+export function getMarketEffectiveInitialMarginForMarket(market: IndexerWsBaseMarketObject) {
   const initialMarginFraction = MaybeBigNumber(market.initialMarginFraction);
   const openInterest = MaybeBigNumber(market.openInterest);
   const openInterestLowerCap = MaybeBigNumber(market.openInterestLowerCap);
@@ -59,7 +57,7 @@ export function getMarketEffectiveInitialMarginForMarket(
   return effectiveIMF;
 }
 
-function calculateDerivedMarketDisplayItems(market: IndexerPerpetualMarketResponseObject) {
+function calculateDerivedMarketDisplayItems(market: IndexerWsBaseMarketObject) {
   return {
     assetId: getAssetFromMarketId(market.ticker),
     displayableAsset: getDisplayableAssetFromTicker(market.ticker),
@@ -67,20 +65,24 @@ function calculateDerivedMarketDisplayItems(market: IndexerPerpetualMarketRespon
   };
 }
 
-function calculateDerivedMarketCore(market: IndexerPerpetualMarketResponseObject) {
+function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
   return {
     effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
-    openInterestUSDC: MustBigNumber(market.openInterest).times(market.oraclePrice).toNumber(),
+    openInterestUSDC: MustBigNumber(market.openInterest)
+      .times(market.oraclePrice ?? 0)
+      .toNumber(),
     percentChange24h: MustBigNumber(market.oraclePrice).isZero()
       ? null
-      : MustBigNumber(market.priceChange24H).div(market.oraclePrice).toNumber(),
+      : MustBigNumber(market.priceChange24H)
+          .div(market.oraclePrice ?? 0)
+          .toNumber(),
     stepSizeDecimals: MaybeBigNumber(market.stepSize)?.decimalPlaces() ?? TOKEN_DECIMALS,
     tickSizeDecimals: MaybeBigNumber(market.tickSize)?.decimalPlaces() ?? USD_DECIMALS,
   };
 }
 
 const calculateMarket = weakMapMemoize(
-  (market: IndexerPerpetualMarketResponseObject): MarketInfo => ({
+  (market: IndexerWsBaseMarketObject): MarketInfo => ({
     ...market,
     ...calculateDerivedMarketDisplayItems(market),
     ...calculateDerivedMarketCore(market),

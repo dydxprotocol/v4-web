@@ -14,9 +14,11 @@ import {
   calculateOrderHistory,
 } from '../calculators/orders';
 import {
+  calculateChildSubaccountSummaries,
   calculateMarketsNeededForSubaccount,
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
+  calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -52,7 +54,7 @@ const selectRelevantMarketsList = createAppSelector(
   }
 );
 
-const selectRelevantMarketsData = createAppSelector(
+export const selectRelevantMarketsData = createAppSelector(
   [selectRelevantMarketsList, selectRawMarketsData],
   (marketIds, markets) => {
     if (markets == null || marketIds == null) {
@@ -98,6 +100,7 @@ export const selectParentSubaccountOpenPositions = createAppSelector(
     return positions?.filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN);
   }
 );
+
 export const selectParentSubaccountOpenPositionsLoading = selectParentSubaccountSummaryLoading;
 
 export const selectAccountOrders = createAppSelector(
@@ -140,6 +143,28 @@ export const selectAccountOrdersLoading = createAppSelector(
     selectRawIndexerHeight,
   ],
   mergeLoadableStatus
+);
+
+export const selectChildSubaccountSummaries = createAppSelector(
+  [selectRawParentSubaccountData, selectRelevantMarketsData],
+  (parentSubaccount, marketsData) => {
+    if (parentSubaccount == null || marketsData == null) {
+      return undefined;
+    }
+
+    return calculateChildSubaccountSummaries(parentSubaccount, marketsData);
+  }
+);
+
+export const selectUnopenedIsolatedPositions = createAppSelector(
+  [selectChildSubaccountSummaries, selectOpenOrders, selectParentSubaccountPositions],
+  (childSubaccounts, orders, positions) => {
+    if (childSubaccounts == null || positions == null) {
+      return undefined;
+    }
+
+    return calculateUnopenedIsolatedPositions(childSubaccounts, orders, positions);
+  }
 );
 
 export const selectAccountFills = createAppSelector(

@@ -4,11 +4,12 @@ import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
   IndexerOrderType,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
-
-import { BaseTrade } from './rawTypes';
+import {
+  IndexerWsBaseMarketObject,
+  IndexerWsTradeResponseObject,
+} from '@/types/indexer/indexerManual';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
@@ -23,7 +24,7 @@ type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
   [P in keyof T]: P extends K ? ReplaceBigNumberInUnion<T[P]> : T[P];
 };
 
-export type MarketInfo = IndexerPerpetualMarketResponseObject & {
+export type MarketInfo = IndexerWsBaseMarketObject & {
   assetId: string;
   displayableAsset: string;
   displayableTicker: string;
@@ -147,4 +148,13 @@ export type SubaccountOrder = {
   marginMode: MarginMode | undefined;
 };
 
-export type LiveTrade = BaseTrade;
+export type LiveTrade = IndexerWsTradeResponseObject;
+
+export type PendingIsolatedPosition = {
+  marketId: string;
+  displayId: string;
+  assetId: string;
+  displayableAsset: string;
+  equity: BigNumber;
+  orders: SubaccountOrder[];
+};
