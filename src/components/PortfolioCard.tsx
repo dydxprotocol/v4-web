@@ -10,7 +10,6 @@ import { AssetIcon } from './AssetIcon';
 
 type PortfolioCardProps = {
   assetName: string;
-  assetId?: string;
   assetIcon?: React.ReactNode;
   assetImgUrl?: Nullable<string>;
   actionSlot: React.ReactNode;
@@ -20,7 +19,6 @@ type PortfolioCardProps = {
 };
 
 export const PortfolioCard = ({
-  assetId,
   assetIcon,
   assetImgUrl,
   assetName,
@@ -31,7 +29,7 @@ export const PortfolioCard = ({
   return (
     <$PortfolioCard>
       <$MarketRow>
-        {assetIcon ?? <AssetIcon logoUrl={assetImgUrl} symbol={assetId} />}
+        {assetIcon ?? <AssetIcon logoUrl={assetImgUrl} />}
         {assetName}
       </$MarketRow>
       <div tw="spacedRow mt-0.5 px-0.625 py-0">

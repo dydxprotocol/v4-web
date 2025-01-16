@@ -1,10 +1,11 @@
 import { ReactNode, useEffect, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import type { PendingIsolatedPosition } from '@/abacus-ts/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
-import { SubaccountPendingPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -15,9 +16,7 @@ import { DropdownIcon } from '@/components/DropdownIcon';
 import { IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
 
-import { getExistingOpenPositions, getNonZeroPendingPositions } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssets } from '@/state/assetsSelectors';
 
 type UnopenedIsolatedPositionsProps = {
   className?: string;
@@ -28,19 +27,26 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
   className,
   onViewOrders,
 }: UnopenedIsolatedPositionsProps) => {
-  const numNormalPositions = useAppSelector(getExistingOpenPositions, shallowEqual)?.length;
+  const parentSubaccountPositionsLoading =
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.loading) === 'pending';
+
+  const numNormalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
+
+  const pendingIsolatedPositions =
+    useAppSelector(BonsaiHelpers.unopenedIsolatedPositions) ?? EMPTY_ARR;
+
   const [isOpen, setIsOpen] = useState(numNormalPositions === 0);
   useEffect(() => {
-    if (numNormalPositions === 0) {
+    if (!parentSubaccountPositionsLoading && numNormalPositions === 0) {
       setIsOpen(true);
     }
-  }, [numNormalPositions]);
-
-  const pendingPositions = useAppSelector(getNonZeroPendingPositions, shallowEqual);
+  }, [parentSubaccountPositionsLoading, numNormalPositions]);
 
   const stringGetter = useStringGetter();
 
-  if (!pendingPositions?.length) return null;
+  if (!pendingIsolatedPositions.length) return null;
 
   return (
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
@@ -53,7 +59,7 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
         <div tw="px-1 pb-1 pt-0">
           <UnopenedIsolatedPositionsCards
             onViewOrders={onViewOrders}
-            pendingPositions={pendingPositions}
+            pendingPositions={pendingIsolatedPositions}
           />
         </div>
       )}
@@ -66,20 +72,23 @@ type UnopenedIsolatedPositionsPanelProps = {
   className?: string;
   header: ReactNode;
 };
+
 export const MaybeUnopenedIsolatedPositionsPanel = ({
   onViewOrders,
   header,
   className,
 }: UnopenedIsolatedPositionsPanelProps) => {
-  const pendingPositions = useAppSelector(getNonZeroPendingPositions, shallowEqual);
-  if (!pendingPositions?.length) return null;
+  const pendingIsolatedPositions =
+    useAppSelector(BonsaiHelpers.unopenedIsolatedPositions) ?? EMPTY_ARR;
+
+  if (!pendingIsolatedPositions.length) return null;
 
   return (
     <div className={className}>
       {header}
       <UnopenedIsolatedPositionsCards
         onViewOrders={onViewOrders}
-        pendingPositions={pendingPositions}
+        pendingPositions={pendingIsolatedPositions}
       />
     </div>
   );
@@ -87,27 +96,23 @@ export const MaybeUnopenedIsolatedPositionsPanel = ({
 
 type UnopenedIsolatedPositionsCardsProps = {
   onViewOrders: (marketId: string) => void;
-  pendingPositions: SubaccountPendingPosition[];
+  pendingPositions: PendingIsolatedPosition[];
 };
 
 const UnopenedIsolatedPositionsCards = ({
   onViewOrders,
   pendingPositions,
-}: UnopenedIsolatedPositionsCardsProps) => {
-  const assetsData = useAppSelector(getAssets, shallowEqual);
-  return (
-    <$Cards>
-      {pendingPositions.map((pendingPosition) => (
-        <PotentialPositionCard
-          key={pendingPosition.assetId}
-          marketName={assetsData?.[pendingPosition.assetId]?.name ?? pendingPosition.assetId ?? ''}
-          pendingPosition={pendingPosition}
-          onViewOrders={onViewOrders}
-        />
-      ))}
-    </$Cards>
-  );
-};
+}: UnopenedIsolatedPositionsCardsProps) => (
+  <$Cards>
+    {pendingPositions.map((pendingPosition) => (
+      <PotentialPositionCard
+        key={pendingPosition.marketId}
+        pendingPosition={pendingPosition}
+        onViewOrders={onViewOrders}
+      />
+    ))}
+  </$Cards>
+);
 
 const $UnopenedIsolatedPositionsDrawerContainer = styled.div<{ isOpen?: boolean }>`
   overflow: auto;

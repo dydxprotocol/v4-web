@@ -1,14 +1,17 @@
 import { useCallback } from 'react';
 
-import { SubaccountPendingPosition } from '@/constants/abacus';
+import { BonsaiCore } from '@/abacus-ts/ontology';
+import { PendingIsolatedPosition } from '@/abacus-ts/types/summaryTypes';
+
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { Icon, IconName } from './Icon';
 import { Link } from './Link';
@@ -16,13 +19,11 @@ import { Output, OutputType } from './Output';
 import { PortfolioCard } from './PortfolioCard';
 
 type PotentialPositionCardProps = {
-  marketName: string;
   onViewOrders: (marketId: string) => void;
-  pendingPosition: SubaccountPendingPosition;
+  pendingPosition: PendingIsolatedPosition;
 };
 
 export const PotentialPositionCard = ({
-  marketName,
   onViewOrders,
   pendingPosition,
 }: PotentialPositionCardProps) => {
@@ -35,16 +36,17 @@ export const PotentialPositionCard = ({
   );
 
   const stringGetter = useStringGetter();
-  const { assetId, freeCollateral, marketId, orderCount } = pendingPosition;
-  const assetImgUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const { assetId, displayableAsset, equity, marketId, orders } = pendingPosition;
+  const orderCount = orders.length;
+  const assets = orEmptyObj(useAppSelector(BonsaiCore.markets.assets.data));
+  const { name, logo } = orEmptyObj(assets[assetId]);
 
   return (
     <PortfolioCard
-      assetName={marketName}
-      assetId={assetId}
-      assetImgUrl={assetImgUrl}
+      assetName={name ?? displayableAsset}
+      assetImgUrl={logo}
       detailLabel={stringGetter({ key: STRING_KEYS.MARGIN })}
-      detailValue={<Output type={OutputType.Fiat} value={freeCollateral?.current} />}
+      detailValue={<Output type={OutputType.Fiat} value={equity} />}
       actionSlot={
         <>
           <Link onClick={() => onViewOrders(marketId)} isAccent tw="font-small-book">
