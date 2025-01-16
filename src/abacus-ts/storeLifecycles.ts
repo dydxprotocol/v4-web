@@ -1,4 +1,5 @@
 import { setUpAssetsQuery } from './rest/assets';
+import { setUpAccountBalancesQuery, setUpAccountStatsQuery } from './rest/balances';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
 import { setUpFillsQuery } from './rest/fills';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
@@ -21,4 +22,6 @@ export const storeLifecycles = [
   setUpOrderbook,
   setUpIndexerHeightQuery,
   setUpValidatorHeightQuery,
+  setUpAccountStatsQuery,
+  setUpAccountBalancesQuery,
 ] as const;
