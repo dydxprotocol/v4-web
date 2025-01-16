@@ -71,9 +71,9 @@ export const useInitializePage = () => {
       IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
       logAbacusTsInfo('useInitializePage', 'restarting because network status change');
     };
-    document.addEventListener('online', handleOnline);
+    window.addEventListener('online', handleOnline);
     return () => {
-      document.removeEventListener('online', handleOnline);
+      window.removeEventListener('online', handleOnline);
     };
   }, [localStorageNetwork]);
 };
