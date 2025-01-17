@@ -104,6 +104,8 @@ export interface IndexerWsOrderbookUpdateResponse {
 
 export type IndexerWsOrderbookUpdateItem = [string, string];
 
+export type IndexerSparklineResponseObject = { [marketId: string]: string[] };
+
 export interface IndexerWsMarketUpdateResponse {
   trading?: { [key: string]: IndexerCompositeMarketObject };
   oraclePrices?: { [key: string]: IndexerWsMarketOraclePriceObject };
