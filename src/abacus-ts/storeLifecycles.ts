@@ -6,6 +6,7 @@ import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager
 import { setUpOrdersQuery } from './rest/orders';
 import { setUpSparklinesQuery } from './rest/sparklines';
 import { setUpTransfersQuery } from './rest/transfers';
+import { setUpAccountBalancesQuery, setUpAccountStatsQuery } from './rest/validatorAccountMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
 import { setUpParentSubaccount } from './websocket/parentSubaccount';
@@ -23,4 +24,6 @@ export const storeLifecycles = [
   setUpSparklinesQuery,
   setUpIndexerHeightQuery,
   setUpValidatorHeightQuery,
+  setUpAccountStatsQuery,
+  setUpAccountBalancesQuery,
 ] as const;

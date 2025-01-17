@@ -7,6 +7,8 @@ import {
   OrdersData,
   ParentSubaccountData,
 } from '@/abacus-ts/types/rawTypes';
+import { AccountStats } from '@/abacus-ts/types/summaryTypes';
+import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -35,6 +37,8 @@ export interface RawDataState {
     }>;
   };
   account: {
+    balances: Loadable<Coin[]>;
+    stats: Loadable<AccountStats | undefined>;
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<OrdersData>;
@@ -59,6 +63,8 @@ const initialState: RawDataState = {
   },
   account: {
     parentSubaccount: loadableIdle(),
+    balances: loadableIdle(),
+    stats: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
     transfers: loadableIdle(),
@@ -99,6 +105,12 @@ export const rawSlice = createSlice({
     },
     setParentSubaccountRaw: (state, action: PayloadAction<Loadable<ParentSubaccountData>>) => {
       state.account.parentSubaccount = action.payload;
+    },
+    setAccountBalancesRaw: (state, action: PayloadAction<Loadable<Coin[]>>) => {
+      state.account.balances = action.payload;
+    },
+    setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
+      state.account.stats = action.payload;
     },
     setAccountFillsRaw: (state, action: PayloadAction<Loadable<IndexerCompositeFillResponse>>) => {
       state.account.fills = action.payload;
@@ -143,6 +155,8 @@ export const {
   setAllAssetsRaw,
   setSparklines,
   setParentSubaccountRaw,
+  setAccountBalancesRaw,
+  setAccountStatsRaw,
   setAccountFillsRaw,
   setAccountOrdersRaw,
   setAccountTransfersRaw,

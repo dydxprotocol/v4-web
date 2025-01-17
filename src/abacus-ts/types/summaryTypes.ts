@@ -158,3 +158,8 @@ export type PendingIsolatedPosition = {
   equity: BigNumber;
   orders: SubaccountOrder[];
 };
+
+export type AccountStats = {
+  takerNotional: string;
+  makerNotional: string;
+};
