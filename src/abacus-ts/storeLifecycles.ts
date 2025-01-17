@@ -1,11 +1,11 @@
 import { setUpAssetsQuery } from './rest/assets';
-import { setUpAccountBalancesQuery, setUpAccountStatsQuery } from './rest/balances';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
 import { setUpFillsQuery } from './rest/fills';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpOrdersQuery } from './rest/orders';
 import { setUpTransfersQuery } from './rest/transfers';
+import { setUpAccountBalancesQuery, setUpAccountStatsQuery } from './rest/validatorAccountMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
 import { setUpParentSubaccount } from './websocket/parentSubaccount';
