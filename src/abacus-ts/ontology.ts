@@ -33,10 +33,10 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import {
-  createSelectSparkLinesData,
   selectAllMarketsInfo,
   selectAllMarketsInfoLoading,
   selectCurrentMarketInfo,
+  selectSparkLinesData,
   selectSparklinesLoading,
 } from './selectors/markets';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -81,7 +81,7 @@ export const BonsaiCore = {
       loading: selectAllMarketsInfoLoading,
     },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
-    sparklines: { data: createSelectSparkLinesData, loading: selectSparklinesLoading },
+    sparklines: { data: selectSparkLinesData, loading: selectSparklinesLoading },
   },
   network: {
     indexerHeight: {

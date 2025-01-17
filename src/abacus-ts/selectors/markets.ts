@@ -24,7 +24,7 @@ export const selectSparklinesLoading = createAppSelector(
   mergeLoadableStatus
 );
 
-export const createSelectSparkLinesData = createAppSelector(
+export const selectSparkLinesData = createAppSelector(
   [selectRawSparklines],
   (sparklines) => sparklines.data
 );
