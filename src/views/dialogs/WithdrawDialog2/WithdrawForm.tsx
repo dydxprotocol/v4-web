@@ -20,13 +20,12 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { RouteOptions } from '../DepositDialog2/RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
-import { useWithdrawalRoutes } from './queries';
+import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
 
 export const WithdrawForm = ({
   amount,
@@ -47,7 +46,7 @@ export const WithdrawForm = ({
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
   const selectedToken = WITHDRAWABLE_ASSETS.find((token) => token.chainId === destinationChain);
-  const { freeCollateral } = orEmptyObj(
+  const { freeCollateral, marginUsage, equity } = orEmptyObj(
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
   );
 
@@ -59,6 +58,12 @@ export const WithdrawForm = ({
     token: selectedToken,
     amount: debouncedAmount,
   });
+
+  const {
+    freeCollateral: updatedFreeCollateral,
+    marginUsage: updatedMarginUsage,
+    equity: updatedEquity,
+  } = orEmptyObj(useWithdrawalDeltas({ withdrawAmount: debouncedAmount }));
 
   useEffect(() => {
     if (debouncedAmount && !isFetching && !routes?.fast) setSelectedSpeed('slow');
@@ -86,12 +91,34 @@ export const WithdrawForm = ({
           label: stringGetter({ key: STRING_KEYS.FREE_COLLATERAL }),
           value: (
             <DiffOutput
-              withDiff
+              withDiff={!freeCollateral?.eq(updatedFreeCollateral ?? 0)}
               type={OutputType.Fiat}
               value={freeCollateral}
-              newValue={MustBigNumber(freeCollateral).minus(
-                formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)
-              )}
+              newValue={updatedFreeCollateral}
+            />
+          ),
+        },
+        {
+          key: 'marginUsage',
+          label: stringGetter({ key: STRING_KEYS.MARGIN_USAGE }),
+          value: (
+            <DiffOutput
+              withDiff={!marginUsage?.eq(updatedMarginUsage ?? 0)}
+              type={OutputType.Percent}
+              value={marginUsage}
+              newValue={updatedMarginUsage}
+            />
+          ),
+        },
+        {
+          key: 'equity',
+          label: stringGetter({ key: STRING_KEYS.EQUITY }),
+          value: (
+            <DiffOutput
+              withDiff={!equity?.eq(updatedEquity ?? 0)}
+              type={OutputType.Fiat}
+              value={equity}
+              newValue={updatedEquity}
             />
           ),
         },

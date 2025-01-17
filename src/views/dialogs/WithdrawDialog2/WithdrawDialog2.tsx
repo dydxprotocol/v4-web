@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
+import { CHAIN_INFO } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
@@ -46,6 +47,12 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     setFormState('form');
     chainSelectRef.current?.scroll({ top: 0 });
   };
+
+  useEffect(() => {
+    if (CHAIN_INFO[destinationChain]?.walletNetworkType !== sourceAccount.chain) {
+      setDestinationAddress('');
+    }
+  }, [sourceAccount, destinationChain]);
 
   return (
     <$Dialog
