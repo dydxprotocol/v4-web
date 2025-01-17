@@ -4,6 +4,7 @@ import { setUpFillsQuery } from './rest/fills';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpOrdersQuery } from './rest/orders';
+import { setUpSparklinesQuery } from './rest/sparklines';
 import { setUpTransfersQuery } from './rest/transfers';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
@@ -19,6 +20,7 @@ export const storeLifecycles = [
   setUpTransfersQuery,
   setUpBlockTradingRewardsQuery,
   setUpOrderbook,
+  setUpSparklinesQuery,
   setUpIndexerHeightQuery,
   setUpValidatorHeightQuery,
 ] as const;

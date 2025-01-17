@@ -36,6 +36,8 @@ import {
   selectAllMarketsInfo,
   selectAllMarketsInfoLoading,
   selectCurrentMarketInfo,
+  selectSparkLinesData,
+  selectSparklinesLoading,
 } from './selectors/markets';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
@@ -79,6 +81,7 @@ export const BonsaiCore = {
       loading: selectAllMarketsInfoLoading,
     },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
+    sparklines: { data: selectSparkLinesData, loading: selectSparklinesLoading },
   },
   network: {
     indexerHeight: {

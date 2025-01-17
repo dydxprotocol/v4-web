@@ -15,7 +15,10 @@ import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
 } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeFillResponse } from '@/types/indexer/indexerManual';
+import {
+  IndexerCompositeFillResponse,
+  IndexerSparklineResponseObject,
+} from '@/types/indexer/indexerManual';
 
 interface NetworkState {
   indexerClientReady: boolean;
@@ -27,6 +30,9 @@ export interface RawDataState {
     allMarkets: Loadable<MarketsData>;
     assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
+    sparklines: Loadable<{
+      [period: string]: IndexerSparklineResponseObject | undefined;
+    }>;
   };
   account: {
     parentSubaccount: Loadable<ParentSubaccountData>;
@@ -45,7 +51,12 @@ export interface RawDataState {
 }
 
 const initialState: RawDataState = {
-  markets: { allMarkets: loadableIdle(), assets: loadableIdle(), orderbooks: {} },
+  markets: {
+    allMarkets: loadableIdle(),
+    assets: loadableIdle(),
+    orderbooks: {},
+    sparklines: loadableIdle(),
+  },
   account: {
     parentSubaccount: loadableIdle(),
     fills: loadableIdle(),
@@ -75,6 +86,16 @@ export const rawSlice = createSlice({
       action: PayloadAction<{ marketId: string; data: Loadable<OrderbookData> }>
     ) => {
       state.markets.orderbooks[action.payload.marketId] = action.payload.data;
+    },
+    setSparklines: (
+      state,
+      action: PayloadAction<
+        Loadable<{
+          [period: string]: IndexerSparklineResponseObject | undefined;
+        }>
+      >
+    ) => {
+      state.markets.sparklines = action.payload;
     },
     setParentSubaccountRaw: (state, action: PayloadAction<Loadable<ParentSubaccountData>>) => {
       state.account.parentSubaccount = action.payload;
@@ -120,6 +141,7 @@ export const {
   setOrderbookRaw,
   setAllMarketsRaw,
   setAllAssetsRaw,
+  setSparklines,
   setParentSubaccountRaw,
   setAccountFillsRaw,
   setAccountOrdersRaw,

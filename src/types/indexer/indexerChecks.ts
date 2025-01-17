@@ -9,6 +9,7 @@ import {
 import {
   IndexerCompositeFillResponse,
   IndexerCompositeOrderObject,
+  IndexerSparklineResponseObject,
   IndexerWsCandleResponse,
   IndexerWsCandleResponseObject,
   IndexerWsMarketUpdateResponse,
@@ -38,3 +39,5 @@ export const isParentSubaccountTransferResponse =
   typia.createAssert<IndexerParentSubaccountTransferResponse>();
 export const isParentSubaccountBlockRewardResponse =
   typia.createAssert<IndexerHistoricalBlockTradingRewardsResponse>();
+export const isPerpetualMarketSparklineResponse =
+  typia.createAssert<IndexerSparklineResponseObject>();

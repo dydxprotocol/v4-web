@@ -8,6 +8,8 @@ export const selectRawMarkets = (state: RootState) => state.raw.markets.allMarke
 export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
 export const selectRawAssetsData = (state: RootState) => state.raw.markets.assets.data;
 export const selectRawAssets = (state: RootState) => state.raw.markets.assets;
+export const selectRawSparklines = (state: RootState) => state.raw.markets.sparklines;
+export const selectRawSparklinesData = (state: RootState) => state.raw.markets.sparklines.data;
 
 export const selectRawParentSubaccount = (state: RootState) => state.raw.account.parentSubaccount;
 export const selectRawParentSubaccountData = (state: RootState) =>
