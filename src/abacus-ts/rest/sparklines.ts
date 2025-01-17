@@ -6,8 +6,10 @@ import { type RootStore } from '@/state/_store';
 import { setSparklines } from '@/state/raw';
 
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpSparklinesQuery(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
@@ -20,28 +22,21 @@ export function setUpSparklinesQuery(store: RootStore) {
           indexerClient.markets.getPerpetualMarketSparklines(IndexerSparklineTimePeriod.SEVENDAYS),
         ]);
     },
-    refetchInterval: timeUnits.hour,
-    staleTime: timeUnits.hour,
+    refetchInterval: timeUnits.minute * 10,
+    staleTime: timeUnits.minute * 10,
     onResult: (sparklines) => {
       store.dispatch(
-        setSparklines({
-          status: sparklines.status,
-          data:
-            sparklines.data != null
-              ? {
-                  [IndexerSparklineTimePeriod.ONEDAY]: isPerpetualMarketSparklineResponse(
-                    sparklines.data[0]
-                  ),
-                  [IndexerSparklineTimePeriod.SEVENDAYS]: isPerpetualMarketSparklineResponse(
-                    sparklines.data[1]
-                  ),
-                }
-              : {
-                  [IndexerSparklineTimePeriod.ONEDAY]: undefined,
-                  [IndexerSparklineTimePeriod.SEVENDAYS]: undefined,
-                },
-          error: sparklines.error,
-        })
+        setSparklines(
+          mapLoadableData(queryResultToLoadable(sparklines), (map) => {
+            const [oneDay, sevenDays] = map;
+            return {
+              [IndexerSparklineTimePeriod.ONEDAY]:
+                oneDay != null ? isPerpetualMarketSparklineResponse(oneDay) : oneDay,
+              [IndexerSparklineTimePeriod.SEVENDAYS]:
+                sevenDays != null ? isPerpetualMarketSparklineResponse(sevenDays) : sevenDays,
+            };
+          })
+        )
       );
     },
     onNoQuery: () => store.dispatch(setSparklines(loadableIdle())),

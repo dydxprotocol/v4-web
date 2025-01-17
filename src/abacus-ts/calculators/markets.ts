@@ -3,7 +3,10 @@ import { mapValues } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
+import {
+  IndexerSparklineResponseObject,
+  IndexerWsBaseMarketObject,
+} from '@/types/indexer/indexerManual';
 
 import {
   getAssetFromMarketId,
@@ -88,3 +91,14 @@ const calculateMarket = weakMapMemoize(
     ...calculateDerivedMarketCore(market),
   })
 );
+
+export function formatSparklineData(sparklines?: {
+  [period: string]: IndexerSparklineResponseObject | undefined;
+}) {
+  if (sparklines == null) return sparklines;
+  return mapValues(sparklines, (map) => {
+    return mapValues(map, (sparkline) => {
+      return sparkline.map((point) => MustBigNumber(point).toNumber());
+    });
+  });
+}
