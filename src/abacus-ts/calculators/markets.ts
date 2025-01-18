@@ -24,8 +24,8 @@ import {
   AllAssetData,
   MarketInfo,
   MarketsInfo,
+  PerpetualMarketSparklines,
   PerpetualMarketSummaries,
-  Sparklines,
 } from '../types/summaryTypes';
 import { formatAssetDataForPerpetualMarketSummary } from './assets';
 
@@ -116,7 +116,7 @@ export function formatSparklineData(sparklines?: {
 
 export function createMarketSummary(
   markets: MarketsInfo | undefined,
-  sparklines: Sparklines | undefined,
+  sparklines: PerpetualMarketSparklines | undefined,
   assetInfo: AllAssetData | undefined
 ): PerpetualMarketSummaries | null {
   if (markets == null || assetInfo == null) {

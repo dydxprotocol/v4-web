@@ -186,7 +186,7 @@ export type AllAssetData = {
   [assetId: string]: AssetData;
 };
 
-export type Sparklines = {
+export type PerpetualMarketSparklines = {
   [period: string]: {
     [marketId: string]: number[];
   };
