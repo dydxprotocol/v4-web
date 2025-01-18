@@ -1,8 +1,11 @@
 import BigNumber from 'bignumber.js';
-import { mapValues } from 'lodash';
+import { mapValues, pickBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
+import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/constants/markets';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerSparklineTimePeriod } from '@/types/indexer/indexerApiGen';
 import {
   IndexerSparklineResponseObject,
   IndexerWsBaseMarketObject,
@@ -13,10 +16,18 @@ import {
   getDisplayableAssetFromTicker,
   getDisplayableTickerFromMarket,
 } from '@/lib/assetUtils';
+import { isTruthy } from '@/lib/isTruthy';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { MarketsData } from '../types/rawTypes';
-import { MarketInfo, MarketsInfo } from '../types/summaryTypes';
+import {
+  AllAssetData,
+  MarketInfo,
+  MarketsInfo,
+  PerpetualMarketSummaries,
+  Sparklines,
+} from '../types/summaryTypes';
+import { formatAssetDataForPerpetualMarketSummary } from './assets';
 
 export function calculateAllMarkets(markets: MarketsData | undefined): MarketsInfo | undefined {
   if (markets == null) {
@@ -101,4 +112,38 @@ export function formatSparklineData(sparklines?: {
       return sparkline.map((point) => MustBigNumber(point).toNumber());
     });
   });
+}
+
+export function createMarketSummary(
+  markets: MarketsInfo | undefined,
+  sparklines: Sparklines | undefined,
+  assetInfo: AllAssetData | undefined
+): PerpetualMarketSummaries | null {
+  if (markets == null || assetInfo == null) {
+    return null;
+  }
+
+  return pickBy(
+    mapValues(markets, (market) => {
+      const isNew = Boolean(
+        (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
+          SEVEN_DAY_SPARKLINE_ENTRIES
+      );
+
+      const assetData = assetInfo[market.assetId];
+      if (assetData == null) return undefined;
+
+      const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData);
+
+      return {
+        ...market,
+        ...formattedAssetData,
+        sparkline24h: sparklines?.[IndexerSparklineTimePeriod.ONEDAY]?.[market.ticker] ?? EMPTY_ARR,
+        isNew,
+        isFavorite: false,
+        isUnlaunched: false,
+      };
+    }),
+    isTruthy
+  );
 }

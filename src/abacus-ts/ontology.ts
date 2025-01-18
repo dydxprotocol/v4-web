@@ -33,12 +33,11 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import {
-  selectAllMarketsInfo,
-  selectAllMarketsInfoLoading,
   selectCurrentMarketInfo,
   selectSparkLinesData,
   selectSparklinesLoading,
 } from './selectors/markets';
+import { selectAllMarketSummaries, selectAllMarketSummariesLoading } from './selectors/summary';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
 // every leaf is a selector or a paramaterized selector
@@ -77,8 +76,8 @@ export const BonsaiCore = {
   markets: {
     currentMarketId: getCurrentMarketId,
     markets: {
-      data: selectAllMarketsInfo,
-      loading: selectAllMarketsInfoLoading,
+      data: selectAllMarketSummaries,
+      loading: selectAllMarketSummariesLoading,
     },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
     sparklines: { data: selectSparkLinesData, loading: selectSparklinesLoading },

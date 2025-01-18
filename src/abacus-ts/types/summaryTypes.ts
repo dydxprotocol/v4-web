@@ -163,3 +163,47 @@ export type AccountStats = {
   takerNotional: string;
   makerNotional: string;
 };
+
+export type AssetData = {
+  assetId: string;
+  name: string;
+  logo: string;
+  price: number | null;
+  marketCap: number | null;
+  volume24h: number | null;
+  percentChange24h: number | null;
+  reportedMarketCap: number | null;
+  sectorTags: string[] | null;
+  tickSizeDecimals: number;
+  urls: {
+    website: string | null;
+    technicalDoc: string | null;
+    cmc: string | null;
+  };
+};
+
+export type AllAssetData = {
+  [assetId: string]: AssetData;
+};
+
+export type Sparklines = {
+  [period: string]: {
+    [marketId: string]: number[];
+  };
+};
+
+export type PerpetualMarketSummary = MarketInfo &
+  Omit<
+    AssetData,
+    'assetId' | 'price' | 'percentChange24h' | 'tickSizeDecimals' | 'volume24h' | 'tickSizeDecimals'
+  > & {
+    sparkline24h: number[];
+    isNew: boolean;
+    spotVolume24h: number | null;
+    isFavorite: boolean;
+    isUnlaunched: boolean;
+  };
+
+export type PerpetualMarketSummaries = {
+  [marketId: string]: PerpetualMarketSummary;
+};
