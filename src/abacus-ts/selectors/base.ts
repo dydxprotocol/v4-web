@@ -36,6 +36,10 @@ export const selectRawIndexerHeightDataLoading = (state: RootState) =>
   state.raw.heights.indexerHeight.latest.status;
 export const selectRawValidatorHeightDataLoading = (state: RootState) =>
   state.raw.heights.validatorHeight.latest.status;
+export const selectRawIndexerHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.indexerHeight.latest;
+export const selectRawValidatorHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.validatorHeight.latest;
 
 export const selectRawFillsRest = (state: RootState) => state.raw.account.fills;
 export const selectRawOrdersRest = (state: RootState) => state.raw.account.orders;
