@@ -2,7 +2,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 
 import { createAppSelector } from '@/state/appTypes';
 
-import { computeApiState, getLatestSuccessfulHeight } from '../calculators/apiState';
+import { computeApiState, getLatestHeight } from '../calculators/apiState';
 import { selectRawIndexerHeightData, selectRawValidatorHeightData } from './base';
 
 export const selectApiState = createAppSelector(
@@ -13,10 +13,10 @@ export const selectApiState = createAppSelector(
 );
 export const selectLatestIndexerHeight = createAppSelector(
   [selectRawIndexerHeightData],
-  (height): HeightResponse | undefined => getLatestSuccessfulHeight(height)
+  (height): HeightResponse | undefined => getLatestHeight(height)
 );
 
 export const selectLatestValidatorHeight = createAppSelector(
   [selectRawValidatorHeightData],
-  (height): HeightResponse | undefined => getLatestSuccessfulHeight(height)
+  (height): HeightResponse | undefined => getLatestHeight(height)
 );

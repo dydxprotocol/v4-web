@@ -126,8 +126,8 @@ function getApiState({
   assertNever(validatorState);
 }
 
-export function getLatestSuccessfulHeight(heightState: HeightState): HeightResponse | undefined {
-  return heightState.lastFewResults.find(isLoadableSuccess)?.data;
+export function getLatestHeight(heightState: HeightState): HeightResponse | undefined {
+  return heightState.lastFewResults.find((s) => s.data != null)?.data;
 }
 
 export function computeApiState(heights: {
@@ -137,8 +137,8 @@ export function computeApiState(heights: {
   const indexerState = computeNetworkState(heights.indexerHeight);
   const validatorState = computeNetworkState(heights.validatorHeight);
 
-  const indexerHeight = getLatestSuccessfulHeight(heights.indexerHeight);
-  const validatorHeight = getLatestSuccessfulHeight(heights.validatorHeight);
+  const indexerHeight = getLatestHeight(heights.indexerHeight);
+  const validatorHeight = getLatestHeight(heights.validatorHeight);
 
   const { status, haltedBlock, trailingBlocks } = getApiState({
     indexerHeight,
