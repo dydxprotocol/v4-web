@@ -7,7 +7,7 @@ import {
   OrdersData,
   ParentSubaccountData,
 } from '@/abacus-ts/types/rawTypes';
-import { AccountStats } from '@/abacus-ts/types/summaryTypes';
+import { AccountStats, ConfigTiers, UserFeeTier } from '@/abacus-ts/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -46,6 +46,7 @@ export interface RawDataState {
   account: {
     balances: Loadable<Coin[]>;
     stats: Loadable<AccountStats | undefined>;
+    feeTier: Loadable<UserFeeTier | undefined>;
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<OrdersData>;
@@ -59,6 +60,7 @@ export interface RawDataState {
     indexerHeight: HeightState;
     validatorHeight: HeightState;
   };
+  configs: Loadable<ConfigTiers>;
 }
 
 const initialState: RawDataState = {
@@ -72,6 +74,7 @@ const initialState: RawDataState = {
     parentSubaccount: loadableIdle(),
     balances: loadableIdle(),
     stats: loadableIdle(),
+    feeTier: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
     transfers: loadableIdle(),
@@ -82,6 +85,7 @@ const initialState: RawDataState = {
     indexerHeight: { lastFewResults: [], latest: loadableIdle() },
     validatorHeight: { lastFewResults: [], latest: loadableIdle() },
   },
+  configs: loadableIdle(),
 };
 
 export const rawSlice = createSlice({
@@ -118,6 +122,12 @@ export const rawSlice = createSlice({
     },
     setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
       state.account.stats = action.payload;
+    },
+    setAccountFeeTierRaw: (state, action: PayloadAction<Loadable<UserFeeTier | undefined>>) => {
+      state.account.feeTier = action.payload;
+    },
+    setConfigTiers: (state, action: PayloadAction<Loadable<ConfigTiers>>) => {
+      state.configs = action.payload;
     },
     setAccountFillsRaw: (state, action: PayloadAction<Loadable<IndexerCompositeFillResponse>>) => {
       state.account.fills = action.payload;
@@ -183,4 +193,6 @@ export const {
   setNetworkStateRaw,
   setIndexerHeightRaw,
   setValidatorHeightRaw,
+  setAccountFeeTierRaw,
+  setConfigTiers,
 } = rawSlice.actions;

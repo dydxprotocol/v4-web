@@ -2,7 +2,18 @@ import Long from 'long';
 
 import { bytesToBigInt } from '../numbers';
 
-type ToPrimitives<T> = T extends Long | Uint8Array | Date | bigint
+// a type that looks like Long but isn't literally Long since our version is different from v4-clients
+type LongCatcher = {
+  high: number;
+  low: number;
+  unsigned: boolean;
+  getHighBits(): number;
+  getHighBitsUnsigned(): number;
+  getLowBits(): number;
+  getLowBitsUnsigned(): number;
+};
+
+export type ToPrimitives<T> = T extends Long | Uint8Array | Date | bigint | LongCatcher
   ? string
   : T extends Array<infer U>
     ? Array<ToPrimitives<U>>

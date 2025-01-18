@@ -1,3 +1,4 @@
+import { ClobModule, FeeTierModule } from '@dydxprotocol/v4-client-js';
 import { type BigNumber } from 'bignumber.js';
 
 import {
@@ -10,6 +11,8 @@ import {
   IndexerWsBaseMarketObject,
   IndexerWsTradeResponseObject,
 } from '@/types/indexer/indexerManual';
+
+import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
@@ -181,3 +184,14 @@ export enum ApiStatus {
   INDEXER_TRAILING = 'INDEXER_TRAILING',
   NORMAL = 'NORMAL',
 }
+export type UserFeeTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserFeeTierResponse['tier']>>;
+export type EquityTiers = NonNullable<
+  ToPrimitives<ClobModule.QueryEquityTierLimitConfigurationResponse['equityTierLimitConfig']>
+>;
+export type FeeTiers = NonNullable<
+  ToPrimitives<FeeTierModule.QueryPerpetualFeeParamsResponse['params']>
+>;
+export type ConfigTiers = {
+  feeTiers: FeeTiers | undefined;
+  equityTiers: EquityTiers | undefined;
+};
