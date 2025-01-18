@@ -11,10 +11,19 @@ import {
 } from './lib/indexerQueryStoreEffect';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
+// fetch every ten seconds no matter what...could probably just set up a setInterval instead
+const heightPollingOptions = {
+  refetchInterval: timeUnits.second * 10,
+  refetchIntervalInBackground: true,
+  retry: 0,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+};
+
 export function setUpIndexerHeightQuery(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: () => true,
-    getQueryKey: () => ['height'],
+    getQueryKey: () => ['indexerHeight'],
     getQueryFn: (indexerClient) => {
       return () => indexerClient.utility.getHeight();
     },
@@ -22,8 +31,7 @@ export function setUpIndexerHeightQuery(store: RootStore) {
       store.dispatch(setIndexerHeightRaw(queryResultToLoadable(height)));
     },
     onNoQuery: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
-    refetchInterval: timeUnits.second * 10,
-    staleTime: timeUnits.second * 10,
+    ...heightPollingOptions,
   });
   return () => {
     cleanupEffect();
@@ -34,7 +42,7 @@ export function setUpIndexerHeightQuery(store: RootStore) {
 export function setUpValidatorHeightQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
     selector: () => true,
-    getQueryKey: () => ['height'],
+    getQueryKey: () => ['validatorHeight'],
     getQueryFn: (compositeClient) => {
       return () => compositeClient.validatorClient.get.latestBlock();
     },
@@ -49,8 +57,7 @@ export function setUpValidatorHeightQuery(store: RootStore) {
       );
     },
     onNoQuery: () => store.dispatch(setValidatorHeightRaw(loadableIdle())),
-    refetchInterval: timeUnits.second * 10,
-    staleTime: timeUnits.second * 10,
+    ...heightPollingOptions,
   });
   return () => {
     cleanupEffect();

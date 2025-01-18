@@ -22,6 +22,9 @@ type PassedQueryOptions<R> = Pick<
   | 'refetchIntervalInBackground'
   | 'refetchOnReconnect'
   | 'refetchOnMount'
+  | 'retry'
+  | 'retryDelay'
+  | 'retryOnMount'
 >;
 
 type QuerySetupConfig<ClientType, T, R> = {
