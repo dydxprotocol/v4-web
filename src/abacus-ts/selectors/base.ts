@@ -30,14 +30,16 @@ export const selectRawTransfersLiveData = (state: RootState) =>
 export const selectRawBlockTradingRewardsLiveData = (state: RootState) =>
   state.raw.account.parentSubaccount.data?.live.tradingRewards;
 
-export const selectRawIndexerHeightData = (state: RootState) =>
-  state.raw.heights.indexerHeight.data;
-export const selectRawValidatorHeightData = (state: RootState) =>
-  state.raw.heights.validatorHeight.data;
+export const selectRawIndexerHeightData = (state: RootState) => state.raw.heights.indexerHeight;
+export const selectRawValidatorHeightData = (state: RootState) => state.raw.heights.validatorHeight;
 export const selectRawIndexerHeightDataLoading = (state: RootState) =>
-  state.raw.heights.indexerHeight.status;
+  state.raw.heights.indexerHeight.latest.status;
 export const selectRawValidatorHeightDataLoading = (state: RootState) =>
-  state.raw.heights.validatorHeight.status;
+  state.raw.heights.validatorHeight.latest.status;
+export const selectRawIndexerHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.indexerHeight.latest;
+export const selectRawValidatorHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.validatorHeight.latest;
 
 export const selectRawFillsRest = (state: RootState) => state.raw.account.fills;
 export const selectRawOrdersRest = (state: RootState) => state.raw.account.orders;

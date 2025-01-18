@@ -22,12 +22,12 @@ import {
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
+import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawFillsLiveData,
   selectRawFillsRest,
   selectRawFillsRestData,
-  selectRawIndexerHeight,
-  selectRawIndexerHeightData,
+  selectRawIndexerHeightDataLoadable,
   selectRawMarkets,
   selectRawMarketsData,
   selectRawOrdersLiveData,
@@ -38,8 +38,7 @@ import {
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
-  selectRawValidatorHeight,
-  selectRawValidatorHeightData,
+  selectRawValidatorHeightDataLoadable,
 } from './base';
 
 const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };
@@ -107,8 +106,8 @@ export const selectAccountOrders = createAppSelector(
   [
     selectRawOrdersRestData,
     selectRawOrdersLiveData,
-    selectRawValidatorHeightData,
-    selectRawIndexerHeightData,
+    selectLatestValidatorHeight,
+    selectLatestIndexerHeight,
   ],
   (rest, live, indexerHeight, validatorHeight) => {
     return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? BACKUP_BLOCK_HEIGHT);
@@ -139,8 +138,8 @@ export const selectAccountOrdersLoading = createAppSelector(
   [
     selectRawOrdersRest,
     selectRawParentSubaccount,
-    selectRawValidatorHeight,
-    selectRawIndexerHeight,
+    selectRawIndexerHeightDataLoadable,
+    selectRawValidatorHeightDataLoadable,
   ],
   mergeLoadableStatus
 );
