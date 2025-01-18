@@ -25,6 +25,7 @@ type PassedQueryOptions<R> = Pick<
   | 'retry'
   | 'retryDelay'
   | 'retryOnMount'
+  | 'networkMode'
 >;
 
 type QuerySetupConfig<ClientType, T, R> = {

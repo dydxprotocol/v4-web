@@ -3,6 +3,8 @@ import { timeUnits } from '@/constants/time';
 import { type RootStore } from '@/state/_store';
 import { setIndexerHeightRaw, setValidatorHeightRaw } from '@/state/raw';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import {
@@ -15,6 +17,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 const heightPollingOptions = {
   refetchInterval: timeUnits.second * 10,
   refetchIntervalInBackground: true,
+  networkMode: 'always' as const,
   retry: 0,
   refetchOnWindowFocus: false,
   refetchOnMount: false,
@@ -28,7 +31,15 @@ export function setUpIndexerHeightQuery(store: RootStore) {
       return () => indexerClient.utility.getHeight();
     },
     onResult: (height) => {
-      store.dispatch(setIndexerHeightRaw(queryResultToLoadable(height)));
+      store.dispatch(
+        setIndexerHeightRaw(
+          mapLoadableData(queryResultToLoadable(height), (data) => ({
+            time: data.time,
+            // TODO: the client types are just wrong :(
+            height: MustBigNumber(data.height).toNumber(),
+          }))
+        )
+      );
     },
     onNoQuery: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
     ...heightPollingOptions,
