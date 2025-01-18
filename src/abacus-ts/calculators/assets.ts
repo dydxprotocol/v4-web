@@ -4,7 +4,7 @@ import { weakMapMemoize } from 'reselect';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
 import { AssetInfo, AssetInfos } from '../types/rawTypes';
-import { AssetData } from '../types/summaryTypes';
+import { AssetData, AssetDataForPerpetualMarketSummary } from '../types/summaryTypes';
 
 export const parseAssetInfo = weakMapMemoize(
   (assetInfo: AssetInfo, assetId: string): AssetData => ({
@@ -26,10 +26,9 @@ export const parseAssetInfo = weakMapMemoize(
   })
 );
 
-export function formatAssetDataForPerpetualMarketSummary(assetData: AssetData): Omit<
-  AssetData,
-  'assetId' | 'price' | 'percentChange24h' | 'tickSizeDecimals' | 'volume24h'
-> & {
+export function formatAssetDataForPerpetualMarketSummary(
+  assetData: AssetData
+): AssetDataForPerpetualMarketSummary & {
   spotVolume24h: number | null;
 } {
   return {
