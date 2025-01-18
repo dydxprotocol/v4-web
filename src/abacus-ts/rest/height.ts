@@ -18,6 +18,7 @@ const heightPollingOptions = {
   refetchInterval: timeUnits.second * 10,
   refetchIntervalInBackground: true,
   networkMode: 'always' as const,
+  staleTime: 0,
   retry: 0,
   refetchOnWindowFocus: false,
   refetchOnMount: false,
