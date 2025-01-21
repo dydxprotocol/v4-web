@@ -195,7 +195,8 @@ const $VaultHeaderMobile = styled(VaultHeader)`
 const $MobileFooter = styled.div`
   ${layoutMixins.stickyFooter}
   ${layoutMixins.flexEqualRow}
-  gap: .75rem;
+  background-color: var(--color-layer-2);
+  gap: 0.75rem;
   padding: 0.875rem 1.25rem;
 `;
 

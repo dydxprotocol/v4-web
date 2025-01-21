@@ -31,6 +31,15 @@ export const log = (location: string, error?: Error, metadata?: object, forceLog
   globalThis.dispatchEvent(customEvent);
 };
 
+export const logInfo = (location: string, metadata?: object) => {
+  if (isDev) {
+    // eslint-disable-next-line no-console
+    console.log('telemetry/logInfo:', { location, metadata });
+  }
+
+  dd.info(`[Info] ${location}`, metadata);
+};
+
 // Log rejected Promises without a .catch() handler
 globalThis.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();

@@ -14,3 +14,39 @@ export const USDC_ADDRESSES = {
   [CosmosChainId.Osmosis]: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
   [CosmosChainId.Neutron]: 'ibc/B559A80D62249C8AA07A380E2A2BEA6E5CA9A6F079C912C3A9E9B494105E4F81',
 };
+
+export const DYDX_CHAIN_USDC_DENOM =
+  'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5';
+
+export const USDC_DECIMALS = 6;
+export const ETH_DECIMALS = 18;
+
+export type TokenForTransfer = {
+  chainId: string;
+  decimals: number;
+  denom: string;
+};
+
+export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
+  { chainId: mainnet.id.toString(), denom: USDC_ADDRESSES[mainnet.id], decimals: USDC_DECIMALS },
+  { chainId: arbitrum.id.toString(), denom: USDC_ADDRESSES[arbitrum.id], decimals: USDC_DECIMALS },
+  { chainId: base.id.toString(), denom: USDC_ADDRESSES[base.id], decimals: USDC_DECIMALS },
+  { chainId: optimism.id.toString(), denom: USDC_ADDRESSES[optimism.id], decimals: USDC_DECIMALS },
+  { chainId: polygon.id.toString(), denom: USDC_ADDRESSES[polygon.id], decimals: USDC_DECIMALS },
+  { chainId: SOLANA_MAINNET_ID, denom: USDC_ADDRESSES[SOLANA_MAINNET_ID], decimals: USDC_DECIMALS },
+  {
+    chainId: CosmosChainId.Neutron,
+    denom: USDC_ADDRESSES[CosmosChainId.Neutron],
+    decimals: USDC_DECIMALS,
+  },
+  {
+    chainId: CosmosChainId.Noble,
+    denom: USDC_ADDRESSES[CosmosChainId.Noble],
+    decimals: USDC_DECIMALS,
+  },
+  {
+    chainId: CosmosChainId.Osmosis,
+    denom: USDC_ADDRESSES[CosmosChainId.Osmosis],
+    decimals: USDC_DECIMALS,
+  },
+];

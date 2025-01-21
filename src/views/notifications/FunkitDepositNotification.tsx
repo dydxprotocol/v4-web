@@ -5,6 +5,7 @@ import { SelectedHomeTab, useAccountModal, useCheckoutListenerByCheckoutId } fro
 import { FunkitDeposit } from '@/constants/funkit';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useFlushFunkitTheme } from '@/hooks/useFlushFunkitTheme';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -29,10 +30,11 @@ export const FunkitDepositNotification = ({
   const dispatch = useAppDispatch();
   const funkitCheckoutItem = useCheckoutListenerByCheckoutId(checkoutId);
   const { openAccountModal } = useAccountModal();
+  const flushTheme = useFlushFunkitTheme();
 
   useEffect(() => {
     if (funkitCheckoutItem?.state) {
-      dispatch(updateFunkitDeposit({ ...deposit, status: funkitCheckoutItem?.state }));
+      dispatch(updateFunkitDeposit({ ...deposit, status: funkitCheckoutItem.state }));
     }
   }, [funkitCheckoutItem?.state, dispatch, deposit]);
 
@@ -44,7 +46,13 @@ export const FunkitDepositNotification = ({
       slotTitle={stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT_IN_PROGRESS })}
       slotCustomContent={<span>{stringGetter({ key: STRING_KEYS.DEPOSIT_SHORTLY })}</span>}
       slotAction={
-        <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
+        <Link
+          onClick={() => {
+            flushTheme();
+            openAccountModal?.(SelectedHomeTab.CHECKOUTS);
+          }}
+          isAccent
+        >
           {stringGetter({ key: STRING_KEYS.VIEW_DEPOSIT_STATUS })} →
         </Link>
       }

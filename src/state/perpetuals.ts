@@ -8,7 +8,6 @@ import type {
   Nullable,
   PerpetualMarket,
 } from '@/constants/abacus';
-import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
@@ -16,14 +15,10 @@ import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 import { getLocalStorage } from '@/lib/localStorage';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
-interface CandleDataByMarket {
-  data: Record<string, Candle[]>;
-  selectedResolution: string;
-}
-
 export interface PerpetualsState {
   currentMarketId?: string;
-  candles: Record<string, CandleDataByMarket>;
+  // if user is viewing is a live, tradeable market: its id; otherwise: undefined
+  currentMarketIdIfTradeable?: string;
   liveTrades?: Record<string, MarketTrade[]>;
   markets?: Record<string, PerpetualMarket>;
   orderbooks?: Record<string, MarketOrderbook>;
@@ -41,7 +36,7 @@ export interface PerpetualsState {
 
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
-  candles: {},
+  currentMarketIdIfTradeable: undefined,
   liveTrades: {},
   markets: undefined,
   orderbooks: undefined,
@@ -63,38 +58,11 @@ export const perpetualsSlice = createSlice({
     setCurrentMarketId: (state: PerpetualsState, action: PayloadAction<string>) => {
       state.currentMarketId = action.payload;
     },
-    setCandles: (
+    setCurrentMarketIdIfTradeable: (
       state: PerpetualsState,
-      action: PayloadAction<{ candles: Candle[]; marketId: string; resolution: string }>
+      action: PayloadAction<string | undefined>
     ) => {
-      const { candles, marketId, resolution } = action.payload;
-
-      const candleState: CandleDataByMarket =
-        state.candles[marketId] != null
-          ? { ...state.candles[marketId]!, selectedResolution: resolution }
-          : {
-              data: Object.fromEntries(
-                Object.keys(RESOLUTION_MAP).map((resolutionString: string) => [
-                  resolutionString,
-                  [],
-                ])
-              ),
-              selectedResolution: resolution,
-            };
-
-      const existingCandles = (candleState.data[resolution] ??= []);
-
-      candleState.data[resolution] = [
-        ...existingCandles,
-        ...(existingCandles.length
-          ? candles.filter(
-              ({ startedAt }) =>
-                startedAt < (existingCandles[existingCandles.length - 1]?.startedAt ?? 0)
-            )
-          : candles),
-      ];
-
-      state.candles[marketId] = candleState;
+      state.currentMarketIdIfTradeable = action.payload;
     },
     setLiveTrades: (
       state: PerpetualsState,
@@ -163,7 +131,7 @@ export const perpetualsSlice = createSlice({
 
 export const {
   setCurrentMarketId,
-  setCandles,
+  setCurrentMarketIdIfTradeable,
   setLiveTrades,
   setMarkets,
   setOrderbook,

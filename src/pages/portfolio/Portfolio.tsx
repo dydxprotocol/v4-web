@@ -35,6 +35,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -248,7 +249,15 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+                    onClick={() =>
+                      dispatch(
+                        openDialog(
+                          testFlags.showNewDepositFlow
+                            ? DialogTypes.Deposit2({})
+                            : DialogTypes.Deposit({})
+                        )
+                      )
+                    }
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>
@@ -256,7 +265,15 @@ const PortfolioPage = () => {
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
+                    onClick={() =>
+                      dispatch(
+                        openDialog(
+                          testFlags.showNewWithdrawFlow
+                            ? DialogTypes.Withdraw2({})
+                            : DialogTypes.Withdraw()
+                        )
+                      )
+                    }
                   >
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>
