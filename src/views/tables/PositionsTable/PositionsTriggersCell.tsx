@@ -1,4 +1,3 @@
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { Separator } from '@radix-ui/react-separator';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
@@ -8,6 +7,7 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';

@@ -1,4 +1,3 @@
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -8,6 +7,7 @@ import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 

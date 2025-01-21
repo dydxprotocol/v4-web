@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -9,6 +8,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
