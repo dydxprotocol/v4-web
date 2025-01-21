@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
+
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { BigNumberish } from '@/lib/numbers';
 
