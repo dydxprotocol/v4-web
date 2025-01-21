@@ -179,7 +179,7 @@ class WebSocketConnection {
         const data = JSON.parse(event.data);
         this.handleMessage(this.id, data);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handler', { data: event.data, error: e });
+        logAbacusTsError('WebSocketConnection', 'error in handler', { error: e, data: event.data });
         this.close();
       }
     };
