@@ -1,16 +1,16 @@
 import { forwardRef, Key, useEffect, useMemo } from 'react';
 
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
 import { Nullable } from '@dydxprotocol/v4-abacus';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
-import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -22,23 +22,26 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
 import { viewedFills } from '@/state/account';
-import { getCurrentMarketFills, getSubaccountFills } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
-import { getHydratedTradingData } from '@/lib/orders';
+import { getHydratedFill } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
+
+import {
+  getIndexerFillTypeStringKey,
+  getIndexerLiquidityStringKey,
+  getIndexerOrderSideStringKey,
+} from './enumToStringKeyHelpers';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -47,7 +50,6 @@ export enum FillsTableColumnKey {
   Market = 'Market',
   Action = 'Action',
   Side = 'Side',
-  SideLongShort = 'Side-LongShort',
   Type = 'Type',
   Price = 'Price',
   Liquidity = 'Liquidity',
@@ -55,10 +57,6 @@ export enum FillsTableColumnKey {
   AmountTag = 'Amount-Tag',
   Total = 'Total',
   Fee = 'Fee',
-  TypeLiquidity = 'Type-Liquidity',
-
-  // TODO: CT-1292 remove deprecated fields
-  TotalFee = 'Total-Fee',
 
   // Tablet Only
   TypeAmount = 'Type-Amount',
@@ -66,11 +64,10 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  asset: Nullable<Asset>;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
-  orderSide?: Nullable<OrderSide>;
-} & SubaccountFill;
+  marketSummary: Nullable<PerpetualMarketSummary>;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
+} & IndexerCompositeFillObject;
 
 const getFillsTableColumnDef = ({
   key,
@@ -95,19 +92,19 @@ const getFillsTableColumnDef = ({
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
           </TableColumnHeader>
         ),
-        renderCell: ({ resources, size, stepSizeDecimals, asset }) => (
+        renderCell: ({ size, type, stepSizeDecimals, marketSummary }) => (
           <TableCell
             stacked
             slotLeft={
               <AssetIcon
-                logoUrl={asset?.resources?.imageUrl}
-                symbol={asset?.id}
+                logoUrl={marketSummary?.logo}
+                symbol={marketSummary?.assetId}
                 tw="text-[2.25rem]"
               />
             }
           >
             <span>
-              {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
+              {type != null ? stringGetter({ key: getIndexerFillTypeStringKey(type) }) : null}
             </span>
             <Output
               type={OutputType.Asset}
@@ -127,11 +124,11 @@ const getFillsTableColumnDef = ({
             <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
           </TableColumnHeader>
         ),
-        renderCell: ({ fee, orderSide, price, resources, tickSizeDecimals }) => (
+        renderCell: ({ fee, side, price, tickSizeDecimals, liquidity }) => (
           <TableCell stacked>
             <$InlineRow>
-              <$Side side={orderSide}>
-                {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
+              <$Side side={side}>
+                {side != null ? stringGetter({ key: getIndexerOrderSideStringKey(side) }) : null}
               </$Side>
               <span tw="text-color-text-0">@</span>
               <Output
@@ -143,8 +140,8 @@ const getFillsTableColumnDef = ({
             </$InlineRow>
             <$InlineRow>
               <span tw="text-color-text-1">
-                {resources.liquidityStringKey
-                  ? stringGetter({ key: resources.liquidityStringKey })
+                {liquidity != null
+                  ? stringGetter({ key: getIndexerLiquidityStringKey(liquidity) })
                   : null}
               </span>
               <Output type={OutputType.Fiat} value={fee} />
@@ -154,73 +151,59 @@ const getFillsTableColumnDef = ({
       },
       [FillsTableColumnKey.Time]: {
         columnKey: 'time',
-        getCellValue: (row) => row.createdAtMilliseconds,
+        getCellValue: (row) => row.createdAt,
         label: stringGetter({ key: STRING_KEYS.TIME }),
-        renderCell: ({ createdAtMilliseconds }) => (
+        renderCell: ({ createdAt }) => (
           <Output
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAtMilliseconds}
+            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
             tw="text-color-text-0"
           />
         ),
       },
       [FillsTableColumnKey.Market]: {
         columnKey: 'market',
-        getCellValue: (row) => row.marketId,
+        getCellValue: (row) => row.market,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset }) => <MarketTableCell asset={asset ?? undefined} />,
+        renderCell: ({ marketSummary }) => (
+          <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
+        ),
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',
-        getCellValue: (row) => row.marketId,
+        getCellValue: (row) => row.market,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
-        renderCell: ({ asset, orderSide }) => (
+        renderCell: ({ marketSummary, side }) => (
           <TableCell tw="gap-0.25">
-            {orderSide && (
-              <$Side side={orderSide}>
+            {side != null && (
+              <$Side side={side}>
                 {stringGetter({
-                  key: {
-                    [OrderSide.BUY]: STRING_KEYS.BUY,
-                    [OrderSide.SELL]: STRING_KEYS.SELL,
-                  }[orderSide],
+                  key: getIndexerOrderSideStringKey(side),
                 })}
               </$Side>
             )}
-            <Output type={OutputType.Text} value={asset?.id} />
+            <Output type={OutputType.Text} value={marketSummary?.displayableAsset} />
           </TableCell>
         ),
       },
       [FillsTableColumnKey.Liquidity]: {
         columnKey: 'liquidity',
-        getCellValue: (row) => row.liquidity.rawValue,
+        getCellValue: (row) => row.liquidity,
         label: stringGetter({ key: STRING_KEYS.LIQUIDITY }),
-        renderCell: ({ resources }) =>
-          resources.liquidityStringKey ? stringGetter({ key: resources.liquidityStringKey }) : null,
-      },
-      [FillsTableColumnKey.TotalFee]: {
-        columnKey: 'totalFee',
-        getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
-        label: (
-          <TableColumnHeader>
-            <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
-            <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
-          </TableColumnHeader>
-        ),
-        renderCell: ({ size, fee, price }) => (
-          <TableCell stacked>
-            <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />
-            <Output type={OutputType.Fiat} value={fee} />
-          </TableCell>
-        ),
+        renderCell: ({ liquidity }) =>
+          liquidity != null ? stringGetter({ key: getIndexerLiquidityStringKey(liquidity) }) : null,
       },
       [FillsTableColumnKey.Total]: {
         columnKey: 'total',
-        getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
+        getCellValue: (row) =>
+          MustBigNumber(row.price)
+            .times(row.size ?? 0)
+            .toNumber(),
         label: stringGetter({ key: STRING_KEYS.TOTAL }),
         renderCell: ({ size, price }) => (
           <TableCell>
-            <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />
+            <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size ?? 0)} />
           </TableCell>
         ),
       },
@@ -236,10 +219,10 @@ const getFillsTableColumnDef = ({
       },
       [FillsTableColumnKey.Type]: {
         columnKey: 'type',
-        getCellValue: (row) => row.type.rawValue,
+        getCellValue: (row) => row.type,
         label: stringGetter({ key: STRING_KEYS.TYPE }),
-        renderCell: ({ resources }) =>
-          resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null,
+        renderCell: ({ type }) =>
+          type != null ? stringGetter({ key: getIndexerFillTypeStringKey(type) }) : null,
       },
       [FillsTableColumnKey.Price]: {
         columnKey: 'price',
@@ -265,27 +248,11 @@ const getFillsTableColumnDef = ({
       },
       [FillsTableColumnKey.Side]: {
         columnKey: 'side',
-        getCellValue: (row) => row.orderSide,
+        getCellValue: (row) => row.side,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) =>
-          orderSide && <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ side }) => side && <OrderSideTag orderSide={side} size={TagSize.Medium} />,
       },
-      [FillsTableColumnKey.SideLongShort]: {
-        columnKey: 'side',
-        getCellValue: (row) => row.orderSide,
-        label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => (
-          <Output
-            type={OutputType.Text}
-            value={stringGetter({
-              key: {
-                [OrderSide.BUY]: STRING_KEYS.LONG_POSITION_SHORT,
-                [OrderSide.SELL]: STRING_KEYS.SHORT_POSITION_SHORT,
-              }[orderSide ?? OrderSide.BUY],
-            })}
-          />
-        ),
-      },
+
       [FillsTableColumnKey.AmountPrice]: {
         columnKey: 'sizePrice',
         getCellValue: (row) => row.size,
@@ -304,28 +271,6 @@ const getFillsTableColumnDef = ({
               value={price}
               fractionDigits={tickSizeDecimals}
             />
-          </TableCell>
-        ),
-      },
-      [FillsTableColumnKey.TypeLiquidity]: {
-        columnKey: 'typeLiquidity',
-        getCellValue: (row) => row.type.rawValue,
-        label: (
-          <TableColumnHeader>
-            <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
-            <span>{stringGetter({ key: STRING_KEYS.LIQUIDITY })}</span>
-          </TableColumnHeader>
-        ),
-        renderCell: ({ resources }) => (
-          <TableCell stacked>
-            <span>
-              {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
-            </span>
-            <span>
-              {resources.liquidityStringKey
-                ? stringGetter({ key: resources.liquidityStringKey })
-                : null}
-            </span>
           </TableCell>
         ),
       },
@@ -363,12 +308,11 @@ export const FillsTable = forwardRef(
     const dispatch = useAppDispatch();
     const { isMobile } = useBreakpoints();
 
-    const marketFills = useAppSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
-    const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
+    const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
+    const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
 
-    const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-    const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
     useEffect(() => {
       // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
@@ -378,21 +322,21 @@ export const FillsTable = forwardRef(
       };
     }, [currentMarket, dispatch]);
 
-    const symbol = mapIfPresent(currentMarket, (market) =>
-      mapIfPresent(allPerpetualMarkets[market]?.assetId, (assetId) => allAssets[assetId]?.id)
+    const symbol = mapIfPresent(
+      currentMarket,
+      (market) => marketSummaries[market]?.displayableAsset
     );
 
     const fillsData = useMemo(
       () =>
         fills.map(
-          (fill: SubaccountFill): FillTableRow =>
-            getHydratedTradingData({
+          (fill: IndexerCompositeFillObject): FillTableRow =>
+            getHydratedFill({
               data: fill,
-              assets: allAssets,
-              perpetualMarkets: allPerpetualMarkets,
+              marketSummaries,
             })
         ),
-      [fills, allPerpetualMarkets, allAssets]
+      [fills, marketSummaries]
     );
 
     return (
@@ -402,7 +346,7 @@ export const FillsTable = forwardRef(
         data={
           isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
         }
-        getRowKey={(row: FillTableRow) => row.id}
+        getRowKey={(row: FillTableRow) => row.id ?? ''}
         onRowAction={(key: Key) =>
           dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
         }
@@ -434,14 +378,14 @@ const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;
 const $InlineRow = tw.div`inlineRow`;
-const $Side = styled.span<{ side: Nullable<OrderSide> }>`
+const $Side = styled.span<{ side: Nullable<IndexerOrderSide> }>`
   ${({ side }) =>
     side &&
     {
-      [OrderSide.BUY]: css`
+      [IndexerOrderSide.BUY]: css`
         color: var(--color-positive);
       `,
-      [OrderSide.SELL]: css`
+      [IndexerOrderSide.SELL]: css`
         color: var(--color-negative);
       `,
     }[side]};

@@ -78,6 +78,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   const { numOpenOrders, numUnseenFills } =
     useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
+  const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -226,10 +227,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       value: InfoSection.Fills,
       label: stringGetter({ key: STRING_KEYS.FILLS }),
 
-      slotRight: fillsTagNumber && (
-        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-          {fillsTagNumber}
-        </Tag>
+      slotRight: areFillsLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        fillsTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+            {fillsTagNumber}
+          </Tag>
+        )
       ),
 
       content: (
@@ -263,11 +268,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     }),
     [
       stringGetter,
-      currentMarketId,
-      showCurrentMarket,
-      isTablet,
+      areFillsLoading,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      isTablet,
     ]
   );
 

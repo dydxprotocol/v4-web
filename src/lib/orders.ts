@@ -1,3 +1,4 @@
+import { PerpetualMarketSummaries, PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -8,15 +9,17 @@ import {
   AbacusOrderTypes,
   KotlinIrEnumValues,
   Nullable,
+  SubaccountFill,
   SubaccountFills,
   TRADE_TYPES,
   type Asset,
   type OrderStatus,
   type PerpetualMarket,
-  type SubaccountFill,
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { IconName } from '@/components/Icon';
 
@@ -144,6 +147,27 @@ export const getHydratedTradingData = <
   tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });
+
+type NewAddedProps = {
+  marketSummary: PerpetualMarketSummary | undefined;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
+};
+
+export const getHydratedFill = ({
+  data,
+  marketSummaries,
+}: {
+  data: IndexerCompositeFillObject;
+  marketSummaries: PerpetualMarketSummaries;
+}): IndexerCompositeFillObject & NewAddedProps => {
+  return {
+    ...data,
+    marketSummary: marketSummaries[data.market ?? ''],
+    stepSizeDecimals: marketSummaries[data.market ?? '']?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.market ?? '']?.tickSizeDecimals ?? USD_DECIMALS,
+  };
+};
 
 export const getTradeType = (orderType: string) =>
   TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];
