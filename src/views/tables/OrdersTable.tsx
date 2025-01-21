@@ -18,6 +18,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -407,6 +408,8 @@ export const OrdersTable = forwardRef(
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
     const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
+
+    useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
 
     useEffect(() => {
       if (hasUnseenOrderUpdates) dispatch(viewedOrders());
