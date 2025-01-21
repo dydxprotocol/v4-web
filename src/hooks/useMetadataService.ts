@@ -85,8 +85,8 @@ export const useMetadataService = () => {
 export const useMetadataServiceAssetFromId = (marketId?: string) => {
   const metadataServiceData = useMetadataService();
 
-  const launchableAsset = useMemo(() => {
-    if (!metadataServiceData.data || !marketId) {
+  const asset = useMemo(() => {
+    if (!Object.keys(metadataServiceData.data).length || !marketId) {
       return null;
     }
 
@@ -94,7 +94,7 @@ export const useMetadataServiceAssetFromId = (marketId?: string) => {
     return metadataServiceData.data[assetId];
   }, [metadataServiceData.data, marketId]);
 
-  return launchableAsset;
+  return asset;
 };
 
 export const useMetadataServiceCandles = (

@@ -1,15 +1,11 @@
-import { forwardRef, Key, ReactNode, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
 
-import { AssetInfo } from '@/abacus-ts/rawTypes';
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import {
-  selectCurrentMarketOpenOrders,
-  selectCurrentMarketOrderHistory,
-  selectOpenOrders,
-  selectOrderHistory,
-} from '@/abacus-ts/selectors/account';
-import { selectRawAssetsData, selectRawMarketsData } from '@/abacus-ts/selectors/base';
-import { OrderStatus, SubaccountOrder } from '@/abacus-ts/summaryTypes';
-import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+  OrderStatus,
+  PerpetualMarketSummary,
+  SubaccountOrder,
+} from '@/abacus-ts/types/summaryTypes';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import styled, { css } from 'styled-components';
@@ -19,9 +15,9 @@ import { Nullable } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -33,7 +29,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { MarketTableCellNew } from '@/components/Table/MarketTableCell';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -41,12 +37,12 @@ import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
+import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { getHasUnseenOrderUpdates } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { assertNever } from '@/lib/assertNever';
-import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedOrder, getOrderStatusInfoNew, isMarketOrderTypeNew } from '@/lib/orders';
@@ -56,6 +52,11 @@ import { orEmptyRecord } from '@/lib/typeUtils';
 import { OrderStatusIconNew } from '../OrderStatusIcon';
 import { CancelOrClearAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
+import {
+  getIndexerOrderSideStringKey,
+  getIndexerOrderTypeStringKey,
+  getOrderStatusStringKey,
+} from './enumToStringKeyHelpers';
 
 export enum OrdersTableColumnKey {
   Market = 'Market',
@@ -77,7 +78,7 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  asset: Nullable<AssetInfo>;
+  marketSummary: Nullable<PerpetualMarketSummary>;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 } & SubaccountOrder;
@@ -106,7 +107,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset }) => <MarketTableCellNew asset={asset ?? undefined} />,
+        renderCell: ({ marketSummary }) => (
+          <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
+        ),
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',
@@ -234,7 +237,7 @@ const getOrdersTableColumnDef = ({
         },
       },
       [OrdersTableColumnKey.Updated]: {
-        columnKey: 'udpatedAt',
+        columnKey: 'updatedAt',
         getCellValue: (row) => row.updatedAtMilliseconds ?? Infinity,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ updatedAtMilliseconds }) => {
@@ -276,7 +279,7 @@ const getOrdersTableColumnDef = ({
             </span>
           </TableColumnHeader>
         ),
-        renderCell: ({ asset, size, status, totalFilled }) => {
+        renderCell: ({ marketSummary, size, status, totalFilled }) => {
           const { statusIconColor } = getOrderStatusInfoNew({ status: status ?? OrderStatus.Open });
 
           return (
@@ -284,7 +287,7 @@ const getOrdersTableColumnDef = ({
               stacked
               slotLeft={
                 <$AssetIconWithStatus>
-                  <$AssetIcon logoUrl={asset?.logo} symbol={asset?.id} />
+                  <$AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} />
                   <$StatusDot color={statusIconColor} />
                 </$AssetIconWithStatus>
               }
@@ -303,7 +306,7 @@ const getOrdersTableColumnDef = ({
                   type={OutputType.Asset}
                   value={size}
                   fractionDigits={TOKEN_DECIMALS}
-                  tag={asset?.id}
+                  tag={marketSummary?.displayableAsset}
                 />
               </$InlineRow>
             </TableCell>
@@ -351,61 +354,6 @@ const getOrdersTableColumnDef = ({
   )[key],
 });
 
-function getOrderStatusStringKey(status: OrderStatus | undefined): string {
-  if (!status) return STRING_KEYS.PENDING;
-
-  switch (status) {
-    case OrderStatus.Open:
-      return STRING_KEYS.OPEN_STATUS;
-    case OrderStatus.Canceled:
-      return STRING_KEYS.CANCELED;
-    case OrderStatus.Canceling:
-      return STRING_KEYS.CANCELING;
-    case OrderStatus.Filled:
-      return STRING_KEYS.ORDER_FILLED;
-    case OrderStatus.Pending:
-      return STRING_KEYS.PENDING;
-    case OrderStatus.Untriggered:
-      return STRING_KEYS.UNTRIGGERED;
-    case OrderStatus.PartiallyFilled:
-      return STRING_KEYS.PARTIALLY_FILLED;
-    case OrderStatus.PartiallyCanceled:
-      return STRING_KEYS.PARTIALLY_FILLED;
-    default:
-      assertNever(status);
-      return STRING_KEYS.PENDING;
-  }
-}
-
-function getIndexerOrderTypeStringKey(type: IndexerOrderType): string {
-  switch (type) {
-    case IndexerOrderType.MARKET:
-      return STRING_KEYS.MARKET_ORDER_SHORT;
-    case IndexerOrderType.STOPLIMIT:
-      return STRING_KEYS.STOP_LIMIT;
-    case IndexerOrderType.STOPMARKET:
-      return STRING_KEYS.STOP_MARKET;
-    case IndexerOrderType.LIMIT:
-      return STRING_KEYS.LIMIT_ORDER_SHORT;
-    case IndexerOrderType.TRAILINGSTOP:
-      return STRING_KEYS.TRAILING_STOP;
-    case IndexerOrderType.TAKEPROFIT:
-      return STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT;
-    case IndexerOrderType.TAKEPROFITMARKET:
-      return STRING_KEYS.TAKE_PROFIT_MARKET_SHORT;
-    default:
-      assertNever(type);
-      return STRING_KEYS.LIMIT_ORDER_SHORT;
-  }
-}
-
-function getIndexerOrderSideStringKey(side: IndexerOrderSide): string {
-  if (side === IndexerOrderSide.BUY) {
-    return STRING_KEYS.BUY;
-  }
-  return STRING_KEYS.SELL;
-}
-
 type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
@@ -438,9 +386,15 @@ export const OrdersTable = forwardRef(
 
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketOrders = useAppSelector(
-      tableType === 'OPEN' ? selectCurrentMarketOpenOrders : selectCurrentMarketOrderHistory
+      tableType === 'OPEN'
+        ? BonsaiHelpers.currentMarket.account.openOrders
+        : BonsaiHelpers.currentMarket.account.orderHistory
     );
-    const allOrders = useAppSelector(tableType === 'OPEN' ? selectOpenOrders : selectOrderHistory);
+    const allOrders = useAppSelector(
+      tableType === 'OPEN'
+        ? BonsaiCore.account.openOrders.data
+        : BonsaiCore.account.orderHistory.data
+    );
 
     const orders = useMemo(
       () =>
@@ -451,16 +405,16 @@ export const OrdersTable = forwardRef(
       [allOrders, currentMarket, marketOrders, marketTypeFilter]
     );
 
-    const allPerpetualMarkets = orEmptyRecord(useAppSelector(selectRawMarketsData));
-    const allAssets = orEmptyRecord(useAppSelector(selectRawAssetsData));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+    const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
-    useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
+    useEffect(() => {
+      if (hasUnseenOrderUpdates) dispatch(viewedOrders());
+    }, [hasUnseenOrderUpdates]);
 
-    const symbol = mapIfPresent(currentMarket, (market) =>
-      mapIfPresent(
-        allPerpetualMarkets[market]?.ticker,
-        (ticker) => allAssets[getAssetFromMarketId(ticker)]?.id
-      )
+    const symbol = mapIfPresent(
+      currentMarket,
+      (market) => marketSummaries[market]?.displayableAsset
     );
 
     const ordersData = useMemo(
@@ -469,11 +423,10 @@ export const OrdersTable = forwardRef(
           (order: SubaccountOrder): OrderTableRow =>
             getHydratedOrder({
               data: order,
-              assets: allAssets,
-              perpetualMarkets: allPerpetualMarkets,
+              marketSummaries,
             })
         ),
-      [orders, allPerpetualMarkets, allAssets]
+      [orders, marketSummaries]
     );
 
     return (

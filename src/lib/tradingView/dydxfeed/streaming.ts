@@ -1,11 +1,12 @@
 import type {
-  Bar,
   LibrarySymbolInfo,
   ResolutionString,
   SubscribeBarsCallback,
 } from 'public/tradingview/charting_library';
 
 import { RESOLUTION_MAP } from '@/constants/candles';
+
+import { type RootStore } from '@/state/_store';
 
 import abacusStateManager from '@/lib/abacus';
 
@@ -16,14 +17,14 @@ export const subscribeOnStream = ({
   resolution,
   onRealtimeCallback,
   listenerGuid,
-  lastBar,
 }: {
+  store: RootStore;
+  orderbookCandlesToggleOn: boolean;
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
   onRealtimeCallback: SubscribeBarsCallback;
   listenerGuid: string;
   onResetCacheNeededCallback: Function;
-  lastBar: Bar;
 }) => {
   if (!symbolInfo.ticker) return;
 
@@ -45,7 +46,6 @@ export const subscribeOnStream = ({
   subscriptionItem = {
     subscribeUID: listenerGuid,
     resolution,
-    lastBar,
     handlers: {
       [listenerGuid]: handler,
     },

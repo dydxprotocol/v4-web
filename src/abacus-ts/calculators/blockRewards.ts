@@ -1,5 +1,6 @@
-import { IndexerHistoricalBlockTradingReward } from '@/types/indexer/indexerApiGen';
 import { keyBy, maxBy } from 'lodash';
+
+import { IndexerHistoricalBlockTradingReward } from '@/types/indexer/indexerApiGen';
 
 import { MustBigNumber } from '@/lib/numbers';
 

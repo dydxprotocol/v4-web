@@ -37,6 +37,7 @@ export interface AppUIConfigsState {
   displayUnit: DisplayUnit;
   shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
+  horizontalPanelHeightPx: number;
 }
 
 export const initialState: AppUIConfigsState = {
@@ -47,6 +48,7 @@ export const initialState: AppUIConfigsState = {
   displayUnit: DisplayUnit.Asset,
   shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
+  horizontalPanelHeightPx: 288,
 };
 
 export const appUiConfigsSlice = createSlice({
@@ -67,6 +69,9 @@ export const appUiConfigsSlice = createSlice({
     },
     markLaunchIncentivesSeen: (state: AppUIConfigsState) => {
       state.hasSeenLaunchIncentives = true;
+    },
+    setHorizontalPanelHeightPx: (state: AppUIConfigsState, { payload }: PayloadAction<number>) => {
+      state.horizontalPanelHeightPx = payload;
     },
     setShouldHideLaunchableMarkets: (
       state: AppUIConfigsState,
@@ -116,4 +121,5 @@ export const {
   setDisplayUnit,
   favoriteMarket,
   unfavoriteMarket,
+  setHorizontalPanelHeightPx,
 } = appUiConfigsSlice.actions;

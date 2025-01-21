@@ -1,6 +1,7 @@
 import { QueryObserver } from '@tanstack/react-query';
 import { mapValues } from 'lodash';
 
+import { MetadataServicePrice } from '@/constants/assetMetadata';
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
@@ -17,7 +18,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 export function setUpAssetsQuery(store: RootStore) {
   const observer = new QueryObserver(appQueryClient, {
     queryKey: ['metadata', 'assets'],
-    queryFn: () => metadataClient.getAssetInfo(),
+    queryFn: () => Promise.all([metadataClient.getAssetInfo(), metadataClient.getAssetPrices()]),
     refetchInterval: timeUnits.minute * 5,
     staleTime: timeUnits.minute * 5,
   });
@@ -26,9 +27,22 @@ export function setUpAssetsQuery(store: RootStore) {
     try {
       store.dispatch(
         setAllAssetsRaw(
-          mapLoadableData(queryResultToLoadable(result), (map) =>
-            mapValues(map, (v, id) => ({ ...v, id }))
-          )
+          mapLoadableData(queryResultToLoadable(result), (map) => {
+            const [info, prices] = map;
+            return mapValues(info, (assetInfo, id) => {
+              const priceData =
+                prices[id] ??
+                ({
+                  price: null,
+                  percent_change_24h: null,
+                  volume_24h: null,
+                  market_cap: null,
+                  self_reported_market_cap: null,
+                } satisfies MetadataServicePrice);
+
+              return { ...assetInfo, ...priceData, id };
+            });
+          })
         )
       );
     } catch (e) {

@@ -1,18 +1,17 @@
+import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
 import {
   IndexerAssetPositionResponseObject,
   IndexerHistoricalBlockTradingReward,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
   IndexerCompositeOrderObject,
+  IndexerTransferCommonResponseObject,
+  IndexerWsBaseMarketObject,
 } from '@/types/indexer/indexerManual';
 
-import { MetadataServiceAssetInfo } from '@/constants/assetMetadata';
-
-export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
+export type MarketsData = { [marketId: string]: IndexerWsBaseMarketObject };
 export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {
@@ -32,7 +31,7 @@ export interface ParentSubaccountData {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
     orders?: OrdersData;
-    transfers?: IndexerTransferResponseObject[];
+    transfers?: IndexerTransferCommonResponseObject[];
   };
 }
 
@@ -46,5 +45,5 @@ export interface ChildSubaccountData {
   assetPositions: { [symbol: string]: IndexerAssetPositionResponseObject };
 }
 
-export type AssetInfo = MetadataServiceAssetInfo & { id: string };
+export type AssetInfo = MetadataServiceAssetInfo & MetadataServicePrice & { id: string };
 export type AssetInfos = Record<string, AssetInfo>;
