@@ -1,6 +1,4 @@
-import { useMemo } from 'react';
-
-import { SubaccountPosition } from '@/abacus-ts/summaryTypes';
+import { SubaccountPosition } from '@/abacus-ts/types/summaryTypes';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -26,23 +24,10 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const { marginMode, margin } = useMemo(() => {
-    const { marginMode: marginModeInner, marginValueInitial } = position;
-
-    return {
-      marginMode: marginModeInner,
-      marginModeLabel:
-        marginModeInner === 'CROSS'
-          ? stringGetter({ key: STRING_KEYS.CROSS })
-          : stringGetter({ key: STRING_KEYS.ISOLATED }),
-      margin: marginValueInitial,
-    };
-  }, [position, stringGetter]);
-
   return (
     <TableCell
       slotRight={
-        marginMode === 'ISOLATED' && (
+        position.marginMode === 'ISOLATED' && (
           <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
             <$EditButton
               key="edit-margin"
@@ -60,7 +45,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
         )
       }
     >
-      <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />
+      <Output type={OutputType.Fiat} value={position.marginValueInitial} showSign={ShowSign.None} />
     </TableCell>
   );
 };

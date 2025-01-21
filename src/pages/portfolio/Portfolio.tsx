@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import { selectParentSubaccountOpenPositions } from '@/abacus-ts/selectors/account';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
@@ -65,8 +65,9 @@ const PortfolioPage = () => {
   const { nativeTokenBalance } = useAccountBalance();
 
   const { numTotalOpenOrders } = useAppSelector(getTradeInfoNumbers, shallowEqual);
-  const numTotalPositions = (useAppSelector(selectParentSubaccountOpenPositions) ?? EMPTY_ARR)
-    .length;
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
 
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);

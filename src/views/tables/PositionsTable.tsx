@@ -1,22 +1,19 @@
 import { forwardRef, useMemo } from 'react';
 
-import { AssetInfo } from '@/abacus-ts/rawTypes';
-import { selectParentSubaccountOpenPositions } from '@/abacus-ts/selectors/account';
-import { selectRawAssetsData, selectRawMarketsData } from '@/abacus-ts/selectors/base';
-import { SubaccountPosition } from '@/abacus-ts/summaryTypes';
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { BonsaiCore } from '@/abacus-ts/ontology';
+import { PerpetualMarketSummary, SubaccountPosition } from '@/abacus-ts/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
-import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Asset, type Nullable, type SubaccountOrder } from '@/constants/abacus';
+import { type SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
@@ -28,7 +25,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
@@ -40,7 +37,7 @@ import { getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
-import { getNumberSign, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { getNumberSign, MaybeBigNumber, MaybeNumber, MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -69,13 +66,12 @@ export enum PositionsTableColumnKey {
 }
 
 type PositionTableRow = {
-  asset: AssetInfo | undefined;
-  oraclePrice: Nullable<BigNumber>;
-  tickSizeDecimals: number;
-  fundingRate: Nullable<BigNumber>;
+  marketSummary: PerpetualMarketSummary | undefined;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   stepSizeDecimals: number;
+  tickSizeDecimals: number;
+  oraclePrice: number | undefined;
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -104,13 +100,13 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ asset, leverage, signedSize, side }) => (
+        renderCell: ({ marketSummary, leverage, signedSize, side }) => (
           <TableCell
             stacked
             slotLeft={
               <AssetIcon
-                logoUrl={asset?.logo}
-                symbol={asset?.id}
+                logoUrl={marketSummary?.logo}
+                symbol={marketSummary?.assetId}
                 tw="inlineRow min-w-[unset] text-[2.25rem]"
               />
             }
@@ -120,7 +116,7 @@ const getPositionsTableColumnDef = ({
               value={signedSize}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
-              tag={asset?.id}
+              tag={marketSummary?.assetId}
             />
             <div tw="inlineRow">
               <$PositionSide>
@@ -212,22 +208,8 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => getDisplayableTickerFromMarket(row.market),
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ asset }) => {
-          return (
-            <MarketTableCell
-              asset={
-                // todo fix this
-                asset != null
-                  ? ({
-                      id: asset.id,
-                      name: asset.name,
-                      tags: [],
-                      resources: { imageUrl: asset.logo },
-                    } as unknown as Asset)
-                  : undefined
-              }
-            />
-          );
+        renderCell: ({ marketSummary }) => {
+          return <MarketSummaryTableCell marketSummary={marketSummary} />;
         },
       },
       [PositionsTableColumnKey.Leverage]: {
@@ -317,7 +299,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Oracle]: {
         columnKey: 'oracle',
-        getCellValue: (row) => row.oraclePrice?.toNumber(),
+        getCellValue: (row) => row.oraclePrice,
         label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED }),
         renderCell: ({ oraclePrice, tickSizeDecimals }) => (
           <TableCell>
@@ -409,10 +391,10 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({
           market,
+          marketSummary,
           assetId,
           leverage,
           side,
-          oraclePrice,
           entryPrice,
           unrealizedPnl,
         }) => (
@@ -421,7 +403,7 @@ const getPositionsTableColumnDef = ({
             assetId={assetId}
             side={side}
             leverage={leverage}
-            oraclePrice={oraclePrice}
+            oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)}
             entryPrice={entryPrice}
             unrealizedPnl={unrealizedPnl}
             sideLabel={stringGetter({ key: getIndexerPositionSideStringKey(side) })}
@@ -482,11 +464,10 @@ export const PositionsTable = forwardRef(
 
     // todo this uses the old subaccount id for now
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    const perpetualMarkets = orEmptyRecord(useAppSelector(selectRawMarketsData));
-    const assets = orEmptyRecord(useAppSelector(selectRawAssetsData));
-
-    const openPositions = useAppSelector(selectParentSubaccountOpenPositions) ?? EMPTY_ARR;
+    const openPositions =
+      useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR;
 
     const positions = useMemo(() => {
       return openPositions.filter((position) => {
@@ -512,15 +493,11 @@ export const PositionsTable = forwardRef(
     const positionsData = useMemo(
       () =>
         positions.map((position: SubaccountPosition): PositionTableRow => {
+          const marketSummary = marketSummaries[position.market];
           return safeAssign(
             {},
             {
-              tickSizeDecimals:
-                MaybeBigNumber(perpetualMarkets[position.market]?.tickSize)?.decimalPlaces() ??
-                USD_DECIMALS,
-              asset: assets[position.assetId],
-              oraclePrice: MaybeBigNumber(perpetualMarkets[position.market]?.oraclePrice),
-              fundingRate: MaybeBigNumber(perpetualMarkets[position.market]?.nextFundingRate),
+              marketSummary,
               stopLossOrders: allStopLossOrders.filter(
                 (order: SubaccountOrder) =>
                   order.marketId === position.market &&
@@ -531,14 +508,14 @@ export const PositionsTable = forwardRef(
                   order.marketId === position.market &&
                   order.subaccountNumber === position.subaccountNumber
               ),
-              stepSizeDecimals:
-                MaybeBigNumber(perpetualMarkets[position.market]?.stepSize)?.decimalPlaces() ??
-                TOKEN_DECIMALS,
+              stepSizeDecimals: marketSummary?.stepSizeDecimals ?? TOKEN_DECIMALS,
+              tickSizeDecimals: marketSummary?.tickSizeDecimals ?? USD_DECIMALS,
+              oraclePrice: MaybeNumber(marketSummary?.oraclePrice) ?? undefined,
             },
             position
           );
         }),
-      [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+      [positions, allStopLossOrders, allTakeProfitOrders, marketSummaries]
     );
 
     return (
