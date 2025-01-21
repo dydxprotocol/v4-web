@@ -167,6 +167,24 @@ export type AccountStats = {
   makerNotional: string;
 };
 
+export interface ApiState {
+  status: ApiStatus;
+  validatorHeight: number | undefined;
+  indexerHeight: number | undefined;
+  haltedBlock?: number | undefined;
+  trailingBlocks?: number | undefined;
+}
+
+export enum ApiStatus {
+  UNKNOWN = 'UNKNOWN',
+  VALIDATOR_DOWN = 'VALIDATOR_DOWN',
+  VALIDATOR_HALTED = 'VALIDATOR_HALTED',
+  INDEXER_DOWN = 'INDEXER_DOWN',
+  INDEXER_HALTED = 'INDEXER_HALTED',
+  INDEXER_TRAILING = 'INDEXER_TRAILING',
+  NORMAL = 'NORMAL',
+}
+
 export type AssetData = {
   assetId: string;
   name: string;

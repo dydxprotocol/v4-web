@@ -22,14 +22,17 @@ import {
   createSelectParentSubaccountSummaryWithdrawal,
 } from './selectors/accountActions';
 import {
+  selectApiState,
+  selectLatestIndexerHeight,
+  selectLatestValidatorHeight,
+} from './selectors/apiStatus';
+import {
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
   selectCurrentMarketAssetInfo,
 } from './selectors/assets';
 import {
-  selectRawIndexerHeightData,
   selectRawIndexerHeightDataLoading,
-  selectRawValidatorHeightData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCurrentMarketInfo } from './selectors/markets';
@@ -79,13 +82,14 @@ export const BonsaiCore = {
   },
   network: {
     indexerHeight: {
-      data: selectRawIndexerHeightData,
+      data: selectLatestIndexerHeight,
       loading: selectRawIndexerHeightDataLoading,
     },
     validatorHeight: {
-      data: selectRawValidatorHeightData,
+      data: selectLatestValidatorHeight,
       loading: selectRawValidatorHeightDataLoading,
     },
+    apiState: selectApiState,
   },
 } as const satisfies NestedSelectors;
 

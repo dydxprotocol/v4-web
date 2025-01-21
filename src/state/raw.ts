@@ -1,4 +1,4 @@
-import { Loadable, loadableIdle } from '@/abacus-ts/lib/loadable';
+import { Loadable, LoadableError, loadableIdle, LoadableSuccess } from '@/abacus-ts/lib/loadable';
 // eslint-disable-next-line no-restricted-imports
 import {
   AssetInfos,
@@ -11,6 +11,7 @@ import { AccountStats, ConfigTiers, UserFeeTier } from '@/abacus-ts/types/summar
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { WritableDraft } from 'immer';
 
 import { DydxNetwork } from '@/constants/networks';
 import {
@@ -26,6 +27,12 @@ interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
 }
+
+export type HeightState = {
+  latest: Loadable<HeightResponse>;
+  // latest in front, will contain latest IFF latest is successful or error
+  lastFewResults: Array<LoadableSuccess<HeightResponse> | LoadableError<HeightResponse>>;
+};
 
 export interface RawDataState {
   markets: {
@@ -50,8 +57,8 @@ export interface RawDataState {
     [networkId: string]: NetworkState;
   };
   heights: {
-    indexerHeight: Loadable<HeightResponse>;
-    validatorHeight: Loadable<HeightResponse>;
+    indexerHeight: HeightState;
+    validatorHeight: HeightState;
   };
   configs: Loadable<ConfigTiers>;
 }
@@ -75,8 +82,8 @@ const initialState: RawDataState = {
   },
   network: {},
   heights: {
-    indexerHeight: loadableIdle(),
-    validatorHeight: loadableIdle(),
+    indexerHeight: { lastFewResults: [], latest: loadableIdle() },
+    validatorHeight: { lastFewResults: [], latest: loadableIdle() },
   },
   configs: loadableIdle(),
 };
@@ -151,13 +158,25 @@ export const rawSlice = createSlice({
       };
     },
     setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
-      state.heights.indexerHeight = action.payload;
+      appendToHeight(state.heights.indexerHeight, action.payload);
     },
     setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
-      state.heights.validatorHeight = action.payload;
+      appendToHeight(state.heights.validatorHeight, action.payload);
     },
   },
 });
+
+const HEIGHTS_BUFFER_LENGTH = 12;
+
+function appendToHeight(height: WritableDraft<HeightState>, response: Loadable<HeightResponse>) {
+  height.latest = response;
+  if (response.status === 'error' || response.status === 'success') {
+    height.lastFewResults.unshift(response);
+  }
+  if (height.lastFewResults.length > HEIGHTS_BUFFER_LENGTH) {
+    height.lastFewResults.pop();
+  }
+}
 
 export const {
   setOrderbookRaw,
