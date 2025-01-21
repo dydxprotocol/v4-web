@@ -40,6 +40,7 @@ export interface LinksConfigs {
   stakingAndClaimingRewardsLearnMore?: string;
   vaultTos?: string;
   vaultLearnMore?: string;
+  vaultMetrics?: string;
   vaultOperatorLearnMore?: string;
   predictionMarketLearnMore?: string;
   discoveryProgram?: string;
@@ -93,6 +94,7 @@ export const useURLConfigs = (): LinksConfigs => {
     stakingAndClaimingRewardsLearnMore:
       linksConfigs.stakingAndClaimingRewardsLearnMore ?? FALLBACK_URL,
     vaultTos: linksConfigs.vaultTos ?? FALLBACK_URL,
+    vaultMetrics: linksConfigs.vaultMetrics,
     vaultOperatorLearnMore: linksConfigs.vaultOperatorLearnMore ?? FALLBACK_URL,
     predictionMarketLearnMore: linksConfigs.predictionMarketLearnMore,
     discoveryProgram: linksConfigs.discoveryProgram,
