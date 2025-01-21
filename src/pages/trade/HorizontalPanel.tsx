@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -71,7 +72,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
+  const { numTotalOpenOrders, numTotalUnseenFills } =
     useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
 
   const { numOpenOrders, numUnseenFills } =
@@ -87,6 +88,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
+
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
 
   const fillsTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numUnseenFills : numTotalUnseenFills

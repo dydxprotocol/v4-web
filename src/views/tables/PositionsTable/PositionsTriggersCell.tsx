@@ -1,16 +1,13 @@
 import { Separator } from '@radix-ui/react-separator';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import {
-  AbacusPositionSide,
-  Nullable,
-  type AbacusPositionSides,
-  type SubaccountOrder,
-} from '@/constants/abacus';
+import { Nullable, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
@@ -35,12 +32,12 @@ type ElementProps = {
   marketId: string;
   assetId: string;
   tickSizeDecimals: number;
-  liquidationPrice: Nullable<number>;
+  liquidationPrice: Nullable<BigNumber>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   onViewOrdersClick: (marketId: string) => void;
-  positionSide: Nullable<AbacusPositionSides>;
-  positionSize: Nullable<number>;
+  positionSide: Nullable<IndexerPositionSide>;
+  positionSize: Nullable<BigNumber>;
   isDisabled?: boolean;
 };
 
@@ -69,10 +66,10 @@ export const PositionsTriggersCell = ({
       return false;
     }
     return (
-      (positionSide === AbacusPositionSide.SHORT &&
-        (order.triggerPrice ?? order.price) > liquidationPrice) ||
-      (positionSide === AbacusPositionSide.LONG &&
-        (order.triggerPrice ?? order.price) < liquidationPrice)
+      (positionSide === IndexerPositionSide.SHORT &&
+        (order.triggerPrice ?? order.price) > liquidationPrice.toNumber()) ||
+      (positionSide === IndexerPositionSide.LONG &&
+        (order.triggerPrice ?? order.price) < liquidationPrice.toNumber())
     );
   };
 
@@ -141,7 +138,7 @@ export const PositionsTriggersCell = ({
       const order = orders[0]!;
       const { size, triggerPrice } = order;
 
-      const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
+      const isPartialPosition = !!(positionSize && Math.abs(size) < positionSize.abs().toNumber());
       const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
 
       const output = (
@@ -161,7 +158,7 @@ export const PositionsTriggersCell = ({
               align="start"
               side="left"
               hovercard={
-                liquidationWarningSide === AbacusPositionSide.LONG
+                liquidationWarningSide === IndexerPositionSide.LONG
                   ? 'liquidation-warning-long'
                   : 'liquidation-warning-short'
               }
