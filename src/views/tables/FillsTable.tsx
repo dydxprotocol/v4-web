@@ -157,7 +157,7 @@ const getFillsTableColumnDef = ({
           <Output
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={createdAt != null ? new Date(createdAt).valueOf() : undefined}
+            value={createdAt != null ? new Date(createdAt).getTime() : undefined}
             tw="text-color-text-0"
           />
         ),
