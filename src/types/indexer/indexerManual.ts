@@ -90,8 +90,10 @@ export interface IndexerCompositeMarketObject {
 }
 
 // just make oraclePrice optional
-export type IndexerWsBaseMarketObject = Omit<IndexerPerpetualMarketResponseObject, 'oraclePrice'> &
-  Partial<Pick<IndexerPerpetualMarketResponseObject, 'oraclePrice'>>;
+export type IndexerWsBaseMarketObject = Omit<
+  IndexerPerpetualMarketResponseObject,
+  'oraclePrice'
+> & { oraclePrice?: string | null };
 
 export interface IndexerWsPerpetualMarketResponse {
   markets: { [key: string]: IndexerWsBaseMarketObject };
