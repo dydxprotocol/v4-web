@@ -483,20 +483,18 @@ export const PositionsTable = forwardRef(
       () =>
         positions.map((position: SubaccountPosition): PositionTableRow => {
           const marketSummary = marketSummaries[position.market];
+          const orderIsInThisMarket = (order: SubaccountOrder) => {
+            return (
+              order.marketId === position.market &&
+              order.subaccountNumber === position.subaccountNumber
+            );
+          };
           return safeAssign(
             {},
             {
               marketSummary,
-              stopLossOrders: allStopLossOrders.filter(
-                (order: SubaccountOrder) =>
-                  order.marketId === position.market &&
-                  order.subaccountNumber === position.subaccountNumber
-              ),
-              takeProfitOrders: allTakeProfitOrders.filter(
-                (order: SubaccountOrder) =>
-                  order.marketId === position.market &&
-                  order.subaccountNumber === position.subaccountNumber
-              ),
+              stopLossOrders: allStopLossOrders.filter(orderIsInThisMarket),
+              takeProfitOrders: allTakeProfitOrders.filter(orderIsInThisMarket),
               stepSizeDecimals: marketSummary?.stepSizeDecimals ?? TOKEN_DECIMALS,
               tickSizeDecimals: marketSummary?.tickSizeDecimals ?? USD_DECIMALS,
               oraclePrice: MaybeNumber(marketSummary?.oraclePrice) ?? undefined,
