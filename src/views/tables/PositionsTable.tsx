@@ -45,6 +45,7 @@ import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButto
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
+import { getIndexerPositionSideStringKey } from './enumToStringKeyHelpers';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -415,13 +416,6 @@ const getPositionsTableColumnDef = ({
     } satisfies Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
-
-function getIndexerPositionSideStringKey(side: IndexerPositionSide) {
-  if (side === IndexerPositionSide.LONG) {
-    return STRING_KEYS.LONG_POSITION_SHORT;
-  }
-  return STRING_KEYS.SHORT_POSITION_SHORT;
-}
 
 type ElementProps = {
   columnKeys: PositionsTableColumnKey[];
