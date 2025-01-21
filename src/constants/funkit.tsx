@@ -49,6 +49,7 @@ const defaultCustomColors = {
   primaryText: 'var(--color-text-2)',
   secondaryText: 'var(--color-text-1)',
   tertiaryText: 'var(--color-text-0)',
+  modalBorder: 'var(--color-border)',
   modalBackground: 'var(--color-layer-3)',
   buttonBackground: ACCENT_COLOR,
   buttonTextPrimary: 'var(--color-text-button)',
