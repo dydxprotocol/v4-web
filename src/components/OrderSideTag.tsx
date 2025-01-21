@@ -1,7 +1,7 @@
-import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
