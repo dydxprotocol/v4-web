@@ -48,5 +48,8 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
 };
 
 export const EVM_DEPOSIT_CHAINS = [mainnet, base, optimism, arbitrum, polygon];
+export function isEvmDepositChainId(chainId: string) {
+  return EVM_DEPOSIT_CHAINS.map((chain) => String(chain.id)).includes(chainId);
+}
 
 export const DYDX_DEPOSIT_CHAIN = 'dydx-mainnet-1';

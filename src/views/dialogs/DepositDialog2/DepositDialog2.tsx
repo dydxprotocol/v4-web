@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
@@ -10,6 +10,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
+import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -53,6 +54,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState<TokenForTransfer>(getDefaultToken(sourceAccount));
+  const [broadcastedTx, setBroadcastedTx] = useState<{ txHash: string; chainId: string }>();
+  const [txConfirmed, setTxConfirmed] = useState(false);
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -69,6 +72,21 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     tokenSelectRef.current?.scroll({ top: 0 });
   };
 
+  const { skipClient } = useSkipClient();
+
+  useEffect(() => {
+    if (!broadcastedTx) return;
+
+    skipClient.waitForTransaction({
+      chainID: broadcastedTx.chainId,
+      txHash: broadcastedTx.txHash,
+      onTransactionTracked: async (txInfo) => {
+        console.log('explorer link', txInfo.explorerLink);
+        setTxConfirmed(true);
+      },
+    });
+  }, [broadcastedTx, skipClient]);
+
   return (
     <$Dialog
       isOpen
@@ -80,32 +98,37 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      <div tw="w-[100%] overflow-hidden">
-        <div tw="flex w-[200%]">
-          <div
-            tw="w-[50%]"
-            style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
-          >
-            <DepositForm
-              onClose={() => setIsOpen(false)}
-              amount={amount}
-              setAmount={setAmount}
-              token={token}
-              onTokenSelect={() => setFormState('token-select')}
-            />
-          </div>
-          <div
-            ref={tokenSelectRef}
-            tw="w-[50%] overflow-scroll"
-            style={{
-              height: formState === 'form' ? 0 : '100%',
-              maxHeight: isMobile ? '50vh' : '25rem',
-            }}
-          >
-            <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+      {broadcastedTx && !txConfirmed && <div>Your transaction is pending...</div>}
+      {broadcastedTx && txConfirmed && <div>DONE!</div>}
+      {!broadcastedTx && (
+        <div tw="w-[100%] overflow-hidden">
+          <div tw="flex w-[200%]">
+            <div
+              tw="w-[50%]"
+              style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+            >
+              <DepositForm
+                onDeposit={setBroadcastedTx}
+                onClose={() => setIsOpen(false)}
+                amount={amount}
+                setAmount={setAmount}
+                token={token}
+                onTokenSelect={() => setFormState('token-select')}
+              />
+            </div>
+            <div
+              ref={tokenSelectRef}
+              tw="w-[50%] overflow-scroll"
+              style={{
+                height: formState === 'form' ? 0 : '100%',
+                maxHeight: isMobile ? '50vh' : '25rem',
+              }}
+            >
+              <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </$Dialog>
   );
 };
