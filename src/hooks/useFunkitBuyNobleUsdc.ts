@@ -1,21 +1,20 @@
 import { useCallback, useMemo } from 'react';
 
-import { useActiveTheme, useFunkitCheckout } from '@funkit/connect';
+import { useFunkitCheckout } from '@funkit/connect';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { EvmAddress } from '@/constants/wallets';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { AppTheme, AppThemeSetting } from '@/state/appUiConfigs';
-import { getAppTheme } from '@/state/appUiConfigsSelectors';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { updateFunkitDeposit } from '@/state/funkitDeposits';
 
 import { track } from '@/lib/analytics/analytics';
 
 import { useAccounts } from './useAccounts';
+import { useFlushFunkitTheme } from './useFlushFunkitTheme';
 import { useStringGetter } from './useStringGetter';
 
 const TOKEN_SYMBOL = 'USDC';
@@ -27,8 +26,7 @@ const DEFAULT_USDC_AMT = 0;
 
 export function useFunkitBuyNobleUsdc() {
   const stringGetter = useStringGetter();
-  const appThemeSetting: AppThemeSetting = useAppSelector(getAppTheme);
-  const { lightTheme, darkTheme, setTheme } = useActiveTheme();
+  const flushTheme = useFlushFunkitTheme();
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
 
@@ -47,7 +45,7 @@ export function useFunkitBuyNobleUsdc() {
   );
   const { beginCheckout } = useFunkitCheckout(config);
   const startCheckout = useCallback(async () => {
-    setTheme(appThemeSetting === AppTheme.Light ? (lightTheme as any) : (darkTheme as any));
+    flushTheme();
     await beginCheckout({
       modalTitle: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       iconSrc: TOKEN_ICON_SRC,
@@ -59,6 +57,6 @@ export function useFunkitBuyNobleUsdc() {
       customRecipient: dydxAddress,
       expirationTimestampMs: CHECKOUT_EXPIRATION_MS,
     });
-  }, [appThemeSetting, beginCheckout, darkTheme, dydxAddress, lightTheme, setTheme, stringGetter]);
+  }, [beginCheckout, dydxAddress, flushTheme, stringGetter]);
   return startCheckout;
 }
