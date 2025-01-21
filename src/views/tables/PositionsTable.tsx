@@ -45,7 +45,7 @@ import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButto
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
-import { getIndexerPositionSideStringKey } from './enumToStringKeyHelpers';
+import { getIndexerPositionSideStringKey, getMarginModeStringKey } from './enumToStringKeyHelpers';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -231,11 +231,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ marginMode }) => (
           <TableCell>
-            <Tag>
-              {marginMode === 'CROSS'
-                ? stringGetter({ key: STRING_KEYS.CROSS })
-                : stringGetter({ key: STRING_KEYS.ISOLATED })}
-            </Tag>
+            <Tag>{stringGetter({ key: getMarginModeStringKey(marginMode) })}</Tag>
           </TableCell>
         ),
       },
