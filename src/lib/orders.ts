@@ -1,10 +1,11 @@
+// eslint-disable-next-line no-restricted-imports
 import { getSimpleOrderStatus } from '@/abacus-ts/calculators/orders';
-import { AssetInfo, AssetInfos, MarketsData } from '@/abacus-ts/rawTypes';
 import {
   SubaccountOrder as NewSubaccountOrder,
   OrderStatus as OrderStatusNew,
-} from '@/abacus-ts/summaryTypes';
-import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
+  PerpetualMarketSummaries,
+  PerpetualMarketSummary,
+} from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -24,13 +25,11 @@ import {
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
-
-import { getAssetFromMarketId } from './assetUtils';
-import { MaybeBigNumber } from './numbers';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
@@ -218,25 +217,23 @@ export const getHydratedTradingData = <
 });
 
 type NewAddedProps = {
-  asset: AssetInfo | undefined;
+  marketSummary: PerpetualMarketSummary | undefined;
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 };
 
 export const getHydratedOrder = ({
   data,
-  assets,
-  perpetualMarkets,
+  marketSummaries,
 }: {
   data: NewSubaccountOrder;
-  assets: AssetInfos;
-  perpetualMarkets: MarketsData;
+  marketSummaries: PerpetualMarketSummaries;
 }): NewSubaccountOrder & NewAddedProps => {
   return {
     ...data,
-    asset: assets[getAssetFromMarketId(data.marketId)],
-    stepSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.stepSize)?.decimalPlaces(),
-    tickSizeDecimals: MaybeBigNumber(perpetualMarkets[data.marketId]?.tickSize)?.decimalPlaces(),
+    marketSummary: marketSummaries[data.marketId],
+    stepSizeDecimals: marketSummaries[data.marketId]?.stepSizeDecimals,
+    tickSizeDecimals: marketSummaries[data.marketId]?.tickSizeDecimals,
   };
 };
 

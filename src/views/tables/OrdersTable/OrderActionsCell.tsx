@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { OrderStatus } from '@/abacus-ts/summaryTypes';
+import { OrderStatus } from '@/abacus-ts/types/summaryTypes';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
