@@ -1,5 +1,6 @@
-import { isParentSubaccountOrders } from '@/types/indexer/indexerChecks';
 import { keyBy } from 'lodash';
+
+import { isParentSubaccountOrders } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
 import { setAccountOrdersRaw } from '@/state/raw';

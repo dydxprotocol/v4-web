@@ -1,21 +1,18 @@
-import { forwardRef, Key, useMemo } from 'react';
+import { forwardRef, Key, useEffect, useMemo } from 'react';
 
-import { AssetInfo } from '@/abacus-ts/rawTypes';
-import { getCurrentMarketAccountFills, selectAccountFills } from '@/abacus-ts/selectors/account';
-import { selectRawAssetsData, selectRawMarketsData } from '@/abacus-ts/selectors/base';
-import { IndexerFillType, IndexerLiquidity, IndexerOrderSide } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { Asset } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -25,21 +22,26 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
+import { viewedFills } from '@/state/account';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { assertNever } from '@/lib/assertNever';
-import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedFill } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
+
+import {
+  getIndexerFillTypeStringKey,
+  getIndexerLiquidityStringKey,
+  getIndexerOrderSideStringKey,
+} from './enumToStringKeyHelpers';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -62,9 +64,9 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  asset: Nullable<AssetInfo>;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
+  marketSummary: Nullable<PerpetualMarketSummary>;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
 } & IndexerCompositeFillObject;
 
 const getFillsTableColumnDef = ({
@@ -90,10 +92,16 @@ const getFillsTableColumnDef = ({
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
           </TableColumnHeader>
         ),
-        renderCell: ({ size, type, stepSizeDecimals, asset }) => (
+        renderCell: ({ size, type, stepSizeDecimals, marketSummary }) => (
           <TableCell
             stacked
-            slotLeft={<AssetIcon logoUrl={asset?.logo} symbol={asset?.id} tw="text-[2.25rem]" />}
+            slotLeft={
+              <AssetIcon
+                logoUrl={marketSummary?.logo}
+                symbol={marketSummary?.assetId}
+                tw="text-[2.25rem]"
+              />
+            }
           >
             <span>
               {type != null ? stringGetter({ key: getIndexerFillTypeStringKey(type) }) : null}
@@ -158,27 +166,15 @@ const getFillsTableColumnDef = ({
         columnKey: 'market',
         getCellValue: (row) => row.market,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset }) => (
-          <MarketTableCell
-            asset={
-              // todo fix this
-              asset != null
-                ? ({
-                    id: asset.id,
-                    name: asset.name,
-                    tags: [],
-                    resources: { imageUrl: asset.logo },
-                  } as unknown as Asset)
-                : undefined
-            }
-          />
+        renderCell: ({ marketSummary }) => (
+          <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
         ),
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',
         getCellValue: (row) => row.market,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
-        renderCell: ({ asset, side }) => (
+        renderCell: ({ marketSummary, side }) => (
           <TableCell tw="gap-0.25">
             {side != null && (
               <$Side side={side}>
@@ -187,7 +183,7 @@ const getFillsTableColumnDef = ({
                 })}
               </$Side>
             )}
-            <Output type={OutputType.Text} value={asset?.id} />
+            <Output type={OutputType.Text} value={marketSummary?.displayableAsset} />
           </TableCell>
         ),
       },
@@ -282,43 +278,6 @@ const getFillsTableColumnDef = ({
   )[key],
 });
 
-function getIndexerFillTypeStringKey(fillType: IndexerFillType): string {
-  switch (fillType) {
-    case IndexerFillType.LIMIT:
-      return STRING_KEYS.LIMIT_ORDER_SHORT;
-    case IndexerFillType.LIQUIDATED:
-      return STRING_KEYS.LIQUIDATED;
-    case IndexerFillType.LIQUIDATION:
-      return STRING_KEYS.LIQUIDATION;
-    case IndexerFillType.DELEVERAGED:
-      return STRING_KEYS.DELEVERAGED;
-    case IndexerFillType.OFFSETTING:
-      return STRING_KEYS.OFFSETTING;
-    default:
-      assertNever(fillType);
-      return STRING_KEYS.LIMIT_ORDER_SHORT;
-  }
-}
-
-function getIndexerLiquidityStringKey(liquidity: IndexerLiquidity): string {
-  switch (liquidity) {
-    case IndexerLiquidity.MAKER:
-      return STRING_KEYS.MAKER;
-    case IndexerLiquidity.TAKER:
-      return STRING_KEYS.TAKER;
-    default:
-      assertNever(liquidity);
-      return STRING_KEYS.MAKER;
-  }
-}
-
-function getIndexerOrderSideStringKey(side: IndexerOrderSide) {
-  if (side === IndexerOrderSide.BUY) {
-    return STRING_KEYS.BUY;
-  }
-  return STRING_KEYS.SELL;
-}
-
 type ElementProps = {
   columnKeys: FillsTableColumnKey[];
   columnWidths?: Partial<Record<FillsTableColumnKey, ColumnSize>>;
@@ -349,20 +308,23 @@ export const FillsTable = forwardRef(
     const dispatch = useAppDispatch();
     const { isMobile } = useBreakpoints();
 
-    const marketFills = useAppSelector(getCurrentMarketAccountFills);
-    const allFills = useAppSelector(selectAccountFills);
+    const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
+    const allFills = useAppSelector(BonsaiCore.account.fills.data);
     const fills = currentMarket ? marketFills : allFills;
 
-    const allPerpetualMarkets = orEmptyRecord(useAppSelector(selectRawMarketsData));
-    const allAssets = orEmptyRecord(useAppSelector(selectRawAssetsData));
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    useViewPanel(currentMarket, 'fills');
+    useEffect(() => {
+      // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
+      dispatch(viewedFills(currentMarket));
+      return () => {
+        dispatch(viewedFills(currentMarket));
+      };
+    }, [currentMarket, dispatch]);
 
-    const symbol = mapIfPresent(currentMarket, (market) =>
-      mapIfPresent(
-        allPerpetualMarkets[market]?.ticker,
-        (ticker) => allAssets[getAssetFromMarketId(ticker)]?.id
-      )
+    const symbol = mapIfPresent(
+      currentMarket,
+      (market) => marketSummaries[market]?.displayableAsset
     );
 
     const fillsData = useMemo(
@@ -371,11 +333,10 @@ export const FillsTable = forwardRef(
           (fill: IndexerCompositeFillObject): FillTableRow =>
             getHydratedFill({
               data: fill,
-              assets: allAssets,
-              perpetualMarkets: allPerpetualMarkets,
+              marketSummaries,
             })
         ),
-      [fills, allPerpetualMarkets, allAssets]
+      [fills, marketSummaries]
     );
 
     return (

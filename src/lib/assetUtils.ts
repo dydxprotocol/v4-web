@@ -102,3 +102,8 @@ export const getDefaultChainIDFromNetworkType = (networkType: NetworkType): stri
   if (networkType === 'cosmos') return 'noble-1';
   return undefined;
 };
+
+export const getAssetDescriptionStringKeys = (assetId: string) => ({
+  primary: `APP.__ASSETS.${assetId}.PRIMARY`,
+  secondary: `APP.__ASSETS.${assetId}.SECONDARY`,
+});

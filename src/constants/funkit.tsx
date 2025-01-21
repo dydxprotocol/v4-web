@@ -49,12 +49,22 @@ const defaultCustomColors = {
   primaryText: 'var(--color-text-2)',
   secondaryText: 'var(--color-text-1)',
   tertiaryText: 'var(--color-text-0)',
+  modalBorder: 'var(--color-border)',
   modalBackground: 'var(--color-layer-3)',
+  selectedOptionBorder: 'var(--color-border)',
+  mediumStroke: 'var(--color-border)',
   buttonBackground: ACCENT_COLOR,
   buttonTextPrimary: 'var(--color-text-button)',
   buttonBackgroundHover: ACCENT_COLOR_WASH,
   dydxSwitchActiveBackground: 'var(--color-layer-2)',
   buttonTextDisabled: 'var(--color-text-0)',
+};
+
+// Increase certain font sizes slightly to match dydx design
+const defaultCustomFontSizings = {
+  '10': { fontSize: '12px', lineHeight: '15px' },
+  '13': { fontSize: '14px', lineHeight: '18px' },
+  '16': { fontSize: '18px', lineHeight: '20px' },
 };
 
 export const funkitTheme = {
@@ -67,7 +77,9 @@ export const funkitTheme = {
       inputBackground: OFF_BACKGROUND_DARK,
       offBackground: OFF_BACKGROUND_DARK,
       buttonIconBackgroundHover: OFF_BACKGROUND_DARK,
+      hoverState: OFF_BACKGROUND_DARK,
     },
+    customFontSizings: defaultCustomFontSizings,
   }),
   lightTheme: lightTheme({
     customFontFamily: 'inherit',
@@ -78,6 +90,8 @@ export const funkitTheme = {
       offBackground: OFF_BACKGROUND_LIGHT,
       inputBackground: OFF_BACKGROUND_LIGHT,
       buttonIconBackgroundHover: OFF_BACKGROUND_LIGHT,
+      hoverState: OFF_BACKGROUND_LIGHT,
     },
+    customFontSizings: defaultCustomFontSizings,
   }),
 };

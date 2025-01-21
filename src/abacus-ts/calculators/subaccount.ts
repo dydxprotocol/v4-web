@@ -1,22 +1,30 @@
+import BigNumber from 'bignumber.js';
+import { groupBy, map, mapValues, orderBy, pickBy } from 'lodash';
+import { weakMapMemoize } from 'reselect';
+
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
-import BigNumber from 'bignumber.js';
-import { mapValues, orderBy } from 'lodash';
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
-
-import { getAssetFromMarketId } from '@/lib/assetUtils';
+import {
+  getAssetFromMarketId,
+  getDisplayableAssetFromBaseAsset,
+  getDisplayableTickerFromMarket,
+} from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
+import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../rawTypes';
+import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
+  PendingIsolatedPosition,
+  SubaccountOrder,
   SubaccountPosition,
   SubaccountPositionBase,
   SubaccountPositionDerivedCore,
@@ -24,7 +32,8 @@ import {
   SubaccountSummary,
   SubaccountSummaryCore,
   SubaccountSummaryDerived,
-} from '../summaryTypes';
+} from '../types/summaryTypes';
+import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
   parent: Omit<ParentSubaccountData, 'live'>,
@@ -73,16 +82,15 @@ export function calculateMarketsNeededForSubaccount(parent: Omit<ParentSubaccoun
   );
 }
 
-function calculateSubaccountSummary(
-  subaccountData: ChildSubaccountData,
-  markets: MarketsData
-): SubaccountSummary {
-  const core = calculateSubaccountSummaryCore(subaccountData, markets);
-  return {
-    ...core,
-    ...calculateSubaccountSummaryDerived(core),
-  };
-}
+const calculateSubaccountSummary = weakMapMemoize(
+  (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
+    const core = calculateSubaccountSummaryCore(subaccountData, markets);
+    return {
+      ...core,
+      ...calculateSubaccountSummaryDerived(core),
+    };
+  }
+);
 
 function calculateSubaccountSummaryCore(
   subaccountData: ChildSubaccountData,
@@ -160,7 +168,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 function calculateSubaccountPosition(
   subaccountSummary: SubaccountSummary,
   position: IndexerPerpetualPositionResponseObject,
-  market: IndexerPerpetualMarketResponseObject | undefined
+  market: IndexerWsBaseMarketObject | undefined
 ): SubaccountPosition {
   const bnPosition = getBnPosition(position);
   const core = calculateDerivedPositionCore(bnPosition, market);
@@ -189,7 +197,7 @@ function getBnPosition(position: IndexerPerpetualPositionResponseObject): Subacc
 
 function calculateDerivedPositionCore(
   position: SubaccountPositionBase,
-  market: IndexerPerpetualMarketResponseObject | undefined
+  market: IndexerWsBaseMarketObject | undefined
 ): SubaccountPositionDerivedCore {
   const marginMode = position.subaccountNumber < NUM_PARENT_SUBACCOUNTS ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
@@ -288,37 +296,55 @@ function calculatePositionDerivedExtra(
   };
 }
 
-function getMarketEffectiveInitialMarginForMarket(config: IndexerPerpetualMarketResponseObject) {
-  const initialMarginFraction = MaybeBigNumber(config.initialMarginFraction);
-  const openInterest = MaybeBigNumber(config.openInterest);
-  const openInterestLowerCap = MaybeBigNumber(config.openInterestLowerCap);
-  const openInterestUpperCap = MaybeBigNumber(config.openInterestUpperCap);
-  const oraclePrice = MaybeBigNumber(config.oraclePrice);
-
-  if (initialMarginFraction == null) return null;
-  if (
-    oraclePrice == null ||
-    openInterest == null ||
-    openInterestLowerCap == null ||
-    openInterestUpperCap == null
-  ) {
-    return initialMarginFraction;
-  }
-
-  // if these are equal we can throw an error from dividing by zero
-  if (openInterestUpperCap.eq(openInterestLowerCap)) {
-    return initialMarginFraction;
-  }
-
-  const openNotional = openInterest.times(oraclePrice);
-  const scalingFactor = openNotional
-    .minus(openInterestLowerCap)
-    .div(openInterestUpperCap.minus(openInterestLowerCap));
-  const imfIncrease = scalingFactor.times(MustBigNumber(1).minus(initialMarginFraction));
-
-  const effectiveIMF = BigNumber.minimum(
-    initialMarginFraction.plus(BigNumber.maximum(imfIncrease, 0.0)),
-    1.0
+export function calculateChildSubaccountSummaries(
+  parent: Omit<ParentSubaccountData, 'live'>,
+  markets: MarketsData
+): Record<string, SubaccountSummary> {
+  return pickBy(
+    mapValues(
+      parent.childSubaccounts,
+      (subaccount) => subaccount && calculateSubaccountSummary(subaccount, markets)
+    ),
+    isTruthy
   );
-  return effectiveIMF;
+}
+
+/**
+ * @returns a list of pending isolated positions
+ * PendingIsolatedPosition is exists if there are any orders that meet the following criteria:
+ * - marginMode is ISOLATED
+ * - no existing position exists
+ * - childSubaccount has equity
+ */
+export function calculateUnopenedIsolatedPositions(
+  childSubaccounts: Record<string, SubaccountSummary>,
+  orders: SubaccountOrder[],
+  positions: SubaccountPosition[]
+): PendingIsolatedPosition[] {
+  const setOfOpenPositionMarkets = new Set(positions.map(({ market }) => market));
+
+  const filteredOrders = orders.filter(
+    (o) => !setOfOpenPositionMarkets.has(o.marketId) && o.marginMode === 'ISOLATED'
+  );
+
+  const filteredOrdersMap = groupBy(filteredOrders, 'marketId');
+  const marketIdToSubaccountNumber = mapValues(
+    filteredOrdersMap,
+    (filteredOrder) => filteredOrder[0]?.subaccountNumber
+  );
+
+  return map(filteredOrdersMap, (orderList, marketId) => {
+    const subaccountNumber = marketIdToSubaccountNumber[marketId];
+    if (subaccountNumber == null) return undefined;
+    const assetId = getAssetFromMarketId(marketId);
+
+    return {
+      assetId,
+      displayableAsset: getDisplayableAssetFromBaseAsset(assetId),
+      marketId,
+      displayId: getDisplayableTickerFromMarket(marketId),
+      equity: childSubaccounts[subaccountNumber]?.equity ?? BIG_NUMBERS.ZERO,
+      orders: orderList,
+    };
+  }).filter(isTruthy);
 }

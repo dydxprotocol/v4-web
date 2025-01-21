@@ -1,5 +1,4 @@
-import { selectAccountFills } from '@/abacus-ts/selectors/account';
-import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
@@ -703,7 +702,7 @@ export const createGetUnseenOrdersCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
+      BonsaiCore.network.indexerHeight.data,
       getSubaccountOrders,
       (state, market: string | undefined) => market,
     ],
@@ -735,8 +734,8 @@ export const createGetUnseenFillsCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
-      selectAccountFills,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.fills.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, fills, market) => {

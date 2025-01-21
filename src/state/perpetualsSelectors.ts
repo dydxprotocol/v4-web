@@ -1,11 +1,9 @@
 import { mapValues } from 'lodash';
 
 import { Nullable } from '@/constants/abacus';
-import { Candle, TradingViewChartBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { mapCandle } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
@@ -20,6 +18,12 @@ export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilt
  * @returns marketId of the market the user is currently viewing (Internal)
  */
 export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
+
+/**
+ * @returns marketId of the market the user is currently viewing if it is tradeable (Internal)
+ */
+export const getCurrentMarketIdIfTradeable = (state: RootState) =>
+  state.perpetuals.currentMarketIdIfTradeable;
 
 /**
  * @returns displayId of the currentMarket the user is viewing (Render)
@@ -167,33 +171,6 @@ export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSe
   [getCurrentMarketMidMarketPrice, getCurrentMarketOraclePrice],
   (midMarketPrice, oraclePrice) => midMarketPrice ?? oraclePrice
 );
-
-/**
- *
- * @param marketId
- * @param resolution
- * @returns candle data for specified marketId and resolution
- */
-export const getPerpetualCandlesForMarket = (
-  state: RootState,
-  marketId: string,
-  resolution: string
-): Candle[] => state.perpetuals.candles[marketId]?.data[resolution] ?? EMPTY_ARR;
-
-/**
- *
- * @param marketId
- * @param resolution
- * @returns TradingViewChartBar data for specified marketId and resolution
- */
-export const getPerpetualBarsForPriceChart = (orderbookCandlesToggleOn: boolean) =>
-  createAppSelector(
-    [
-      (state: RootState, marketId: string, resolution: string) =>
-        getPerpetualCandlesForMarket(state, marketId, resolution),
-    ],
-    (candles): TradingViewChartBar[] => candles.map(mapCandle(orderbookCandlesToggleOn))
-  );
 
 /**
  * @returns Current market's next funding rate

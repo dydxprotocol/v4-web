@@ -1,83 +1,73 @@
+import { produce } from 'immer';
+import { isEmpty, keyBy } from 'lodash';
+
 import {
   IndexerAssetPositionResponseObject,
   IndexerOrderResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   isWsParentSubaccountSubscribed,
   isWsParentSubaccountUpdates,
 } from '@/types/indexer/indexerChecks';
 import { IndexerWsOrderUpdate } from '@/types/indexer/indexerManual';
-import { produce } from 'immer';
-import { keyBy } from 'lodash';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 import { setParentSubaccountRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { MustBigNumber } from '@/lib/numbers';
 
 import { accountRefreshSignal } from '../accountRefreshSignal';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { ChildSubaccountData, ParentSubaccountData } from '../rawTypes';
+import {
+  convertToStoredChildSubaccount,
+  freshChildSubaccount,
+  isValidSubaccount,
+} from '../lib/subaccountUtils';
+import { logAbacusTsError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
+import { ParentSubaccountData } from '../types/rawTypes';
+import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
-function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
-  return (
-    Object.keys(childSubaccount.assetPositions).length > 0 ||
-    Object.keys(childSubaccount.openPerpetualPositions).length > 0
-  );
-}
-
-function convertToStoredChildSubaccount({
-  address,
-  subaccountNumber,
-  assetPositions,
-  openPerpetualPositions,
-}: IndexerSubaccountResponseObject): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions,
-    openPerpetualPositions,
-  };
-}
-
-function freshChildSubaccount({
-  address,
-  subaccountNumber,
-}: {
+interface AccountValueArgsBase {
   address: string;
-  subaccountNumber: number;
-}): ChildSubaccountData {
-  return {
-    address,
-    subaccountNumber,
-    assetPositions: {},
-    openPerpetualPositions: {},
-  };
+  parentSubaccountNumber: string;
 }
 
-function accountWebsocketValue(
+function accountWebsocketValueCreator(
   websocket: IndexerWebsocket,
-  address: string,
-  parentSubaccountNumber: string,
-  onChange: (val: Loadable<ParentSubaccountData>) => void
+  { address, parentSubaccountNumber }: AccountValueArgsBase
 ) {
   return new WebsocketDerivedValue<Loadable<ParentSubaccountData>>(
     websocket,
     {
       channel: 'v4_parent_subaccounts',
       id: `${address}/${parentSubaccountNumber}`,
-      handleBaseData: (baseMessage) => {
-        const message = isWsParentSubaccountSubscribed(baseMessage);
+      handleBaseData: (baseMessage): Loadable<ParentSubaccountData> => {
         accountRefreshSignal.notify();
 
+        // empty message means account has had no transfers yet, but it's still valid
+        if (baseMessage == null || isEmpty(baseMessage)) {
+          const parentSubaccountNumberParsed = MustBigNumber(parentSubaccountNumber).toNumber();
+          return loadableLoaded({
+            address,
+            parentSubaccount: parentSubaccountNumberParsed,
+            live: {},
+            childSubaccounts: {
+              [parentSubaccountNumberParsed]: freshChildSubaccount({
+                address,
+                subaccountNumber: parentSubaccountNumberParsed,
+              }),
+            },
+          });
+        }
+
+        const message = isWsParentSubaccountSubscribed(baseMessage);
         return loadableLoaded({
           address: message.subaccount.address,
           parentSubaccount: message.subaccount.parentSubaccountNumber,
@@ -95,7 +85,15 @@ function accountWebsocketValue(
       handleUpdates: (baseUpdates, value, fullMessage) => {
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
-        if (value.data == null || updates.length === 0 || subaccountNumber == null) {
+        if (value.data == null) {
+          logAbacusTsError(
+            'ParentSubaccountTracker',
+            'found unexpectedly null base data in update',
+            { address, subaccountNumber }
+          );
+          return value;
+        }
+        if (updates.length === 0 || subaccountNumber == null) {
           return value;
         }
         const resultData = produce(value.data, (returnValue) => {
@@ -111,13 +109,13 @@ function accountWebsocketValue(
                 const assetPositions =
                   returnValue.childSubaccounts[positionUpdate.subaccountNumber]!.assetPositions;
 
-                if (assetPositions[positionUpdate.assetId] == null) {
-                  assetPositions[positionUpdate.assetId] =
+                if (assetPositions[positionUpdate.symbol] == null) {
+                  assetPositions[positionUpdate.symbol] =
                     positionUpdate as IndexerAssetPositionResponseObject;
                 } else {
-                  assetPositions[positionUpdate.assetId] = {
+                  assetPositions[positionUpdate.symbol] = {
                     ...(assetPositions[
-                      positionUpdate.assetId
+                      positionUpdate.symbol
                     ] as IndexerAssetPositionResponseObject),
                     ...positionUpdate,
                   };
@@ -197,10 +195,11 @@ function accountWebsocketValue(
         return { ...value, data: resultData };
       },
     },
-    loadablePending(),
-    onChange
+    loadablePending()
   );
 }
+
+const AccountValueManager = makeWsValueManager(accountWebsocketValueCreator);
 
 const selectParentSubaccount = createAppSelector(
   [selectWebsocketUrl, selectParentSubaccountInfo],
@@ -212,16 +211,15 @@ export function setUpParentSubaccount(store: RootStore) {
     if (!isTruthy(wallet) || subaccount == null) {
       return undefined;
     }
-    const thisTracker = accountWebsocketValue(
-      IndexerWebsocketManager.use(wsUrl),
-      wallet,
-      subaccount.toString(),
+
+    const unsub = subscribeToWsValue(
+      AccountValueManager,
+      { wsUrl, address: wallet, parentSubaccountNumber: subaccount.toString() },
       (val) => store.dispatch(setParentSubaccountRaw(val))
     );
 
     return () => {
-      thisTracker.teardown();
-      IndexerWebsocketManager.markDone(wsUrl);
+      unsub();
       store.dispatch(setParentSubaccountRaw(loadableIdle()));
     };
   });

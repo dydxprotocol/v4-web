@@ -16,13 +16,17 @@ export function createStoreEffect<T>(
       lastValue = thisValue;
       // NOTE: some cleanups dispatch actions which cause this to happen recursively.
       // we must ensure that those actions don't change the state they subscribe to or this will go infinitely
-      lastCleanup?.();
+      const lastCleanupCached = lastCleanup;
+      lastCleanup = undefined;
+      lastCleanupCached?.();
       lastCleanup = handleChange(thisValue);
     }
   });
 
   return () => {
-    lastCleanup?.();
+    const lastCleanupCached = lastCleanup;
+    lastCleanup = undefined;
+    lastCleanupCached?.();
     removeStoreListener();
   };
 }

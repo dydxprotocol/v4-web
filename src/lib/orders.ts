@@ -1,5 +1,4 @@
-import { AssetInfo, AssetInfos, MarketsData } from '@/abacus-ts/rawTypes';
-import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
+import { PerpetualMarketSummaries, PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -19,13 +18,12 @@ import {
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
-
-import { getAssetFromMarketId } from './assetUtils';
-import { MaybeBigNumber } from './numbers';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
@@ -151,29 +149,23 @@ export const getHydratedTradingData = <
 });
 
 type NewAddedProps = {
-  asset: AssetInfo | undefined;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
+  marketSummary: PerpetualMarketSummary | undefined;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
 };
 
 export const getHydratedFill = ({
   data,
-  assets,
-  perpetualMarkets,
+  marketSummaries,
 }: {
   data: IndexerCompositeFillObject;
-  assets: AssetInfos;
-  perpetualMarkets: MarketsData;
+  marketSummaries: PerpetualMarketSummaries;
 }): IndexerCompositeFillObject & NewAddedProps => {
   return {
     ...data,
-    asset: assets[getAssetFromMarketId(data.market ?? '')],
-    stepSizeDecimals: MaybeBigNumber(
-      perpetualMarkets[data.market ?? '']?.stepSize
-    )?.decimalPlaces(),
-    tickSizeDecimals: MaybeBigNumber(
-      perpetualMarkets[data.market ?? '']?.tickSize
-    )?.decimalPlaces(),
+    marketSummary: marketSummaries[data.market ?? ''],
+    stepSizeDecimals: marketSummaries[data.market ?? '']?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.market ?? '']?.tickSizeDecimals ?? USD_DECIMALS,
   };
 };
 

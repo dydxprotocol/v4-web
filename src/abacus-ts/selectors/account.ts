@@ -1,8 +1,8 @@
-import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 import { pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
@@ -14,18 +14,20 @@ import {
   calculateOrderHistory,
 } from '../calculators/orders';
 import {
+  calculateChildSubaccountSummaries,
   calculateMarketsNeededForSubaccount,
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
+  calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
+import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawFillsLiveData,
   selectRawFillsRest,
   selectRawFillsRestData,
-  selectRawIndexerHeight,
-  selectRawIndexerHeightData,
+  selectRawIndexerHeightDataLoadable,
   selectRawMarkets,
   selectRawMarketsData,
   selectRawOrdersLiveData,
@@ -36,8 +38,7 @@ import {
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
-  selectRawValidatorHeight,
-  selectRawValidatorHeightData,
+  selectRawValidatorHeightDataLoadable,
 } from './base';
 
 const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };
@@ -52,7 +53,7 @@ const selectRelevantMarketsList = createAppSelector(
   }
 );
 
-const selectRelevantMarketsData = createAppSelector(
+export const selectRelevantMarketsData = createAppSelector(
   [selectRelevantMarketsList, selectRawMarketsData],
   (marketIds, markets) => {
     if (markets == null || marketIds == null) {
@@ -98,14 +99,15 @@ export const selectParentSubaccountOpenPositions = createAppSelector(
     return positions?.filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN);
   }
 );
+
 export const selectParentSubaccountOpenPositionsLoading = selectParentSubaccountSummaryLoading;
 
 export const selectAccountOrders = createAppSelector(
   [
     selectRawOrdersRestData,
     selectRawOrdersLiveData,
-    selectRawValidatorHeightData,
-    selectRawIndexerHeightData,
+    selectLatestValidatorHeight,
+    selectLatestIndexerHeight,
   ],
   (rest, live, indexerHeight, validatorHeight) => {
     return calculateAllOrders(rest, live, validatorHeight ?? indexerHeight ?? BACKUP_BLOCK_HEIGHT);
@@ -136,10 +138,32 @@ export const selectAccountOrdersLoading = createAppSelector(
   [
     selectRawOrdersRest,
     selectRawParentSubaccount,
-    selectRawValidatorHeight,
-    selectRawIndexerHeight,
+    selectRawIndexerHeightDataLoadable,
+    selectRawValidatorHeightDataLoadable,
   ],
   mergeLoadableStatus
+);
+
+export const selectChildSubaccountSummaries = createAppSelector(
+  [selectRawParentSubaccountData, selectRelevantMarketsData],
+  (parentSubaccount, marketsData) => {
+    if (parentSubaccount == null || marketsData == null) {
+      return undefined;
+    }
+
+    return calculateChildSubaccountSummaries(parentSubaccount, marketsData);
+  }
+);
+
+export const selectUnopenedIsolatedPositions = createAppSelector(
+  [selectChildSubaccountSummaries, selectOpenOrders, selectParentSubaccountPositions],
+  (childSubaccounts, orders, positions) => {
+    if (childSubaccounts == null || positions == null) {
+      return undefined;
+    }
+
+    return calculateUnopenedIsolatedPositions(childSubaccounts, orders, positions);
+  }
 );
 
 export const selectAccountFills = createAppSelector(
