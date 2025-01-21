@@ -399,10 +399,9 @@ export const OrdersTable = forwardRef(
 
     const orders = useMemo(
       () =>
-        (currentMarket ? marketOrders : allOrders).filter((order) => {
-          const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
-          return marketTypeMatchesFilter(orderType, marketTypeFilter);
-        }),
+        (currentMarket ? marketOrders : allOrders).filter((order) =>
+          marketTypeMatchesFilter(order.marginMode, marketTypeFilter)
+        ),
       [allOrders, currentMarket, marketOrders, marketTypeFilter]
     );
 
