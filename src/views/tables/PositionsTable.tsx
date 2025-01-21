@@ -564,7 +564,10 @@ export const PositionsTable = forwardRef(
         const matchesMarket = currentMarket == null || position.id === currentMarket;
         const subaccountNumber = position.childSubaccountNumber;
         const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
-        const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+        const matchesType = marketTypeMatchesFilter(
+          marginType === 'Cross' ? 'CROSS' : 'ISOLATED',
+          marketTypeFilter
+        );
         return matchesMarket && matchesType;
       });
     }, [currentMarket, marketTypeFilter, openPositions]);
