@@ -36,7 +36,6 @@ import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { getNumberSign, MaybeBigNumber, MaybeNumber, MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
@@ -206,7 +205,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Market]: {
         columnKey: 'market',
-        getCellValue: (row) => getDisplayableTickerFromMarket(row.market),
+        getCellValue: (row) => row.marketSummary?.displayableTicker,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ marketSummary }) => {
