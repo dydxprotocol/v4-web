@@ -75,16 +75,17 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const { skipClient } = useSkipClient();
 
   useEffect(() => {
-    if (!broadcastedTx) return;
+    async function waitForConfirmation() {
+      if (!broadcastedTx) return;
 
-    skipClient.waitForTransaction({
-      chainID: broadcastedTx.chainId,
-      txHash: broadcastedTx.txHash,
-      onTransactionTracked: async (txInfo) => {
-        console.log('explorer link', txInfo.explorerLink);
-        setTxConfirmed(true);
-      },
-    });
+      await skipClient.waitForTransaction({
+        chainID: broadcastedTx.chainId,
+        txHash: broadcastedTx.txHash,
+      });
+      setTxConfirmed(true);
+    }
+
+    waitForConfirmation();
   }, [broadcastedTx, skipClient]);
 
   return (
@@ -98,8 +99,9 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      {broadcastedTx && !txConfirmed && <div>Your transaction is pending...</div>}
-      {broadcastedTx && txConfirmed && <div>DONE!</div>}
+      {/* TODO(deposit2.0): Implement real progress UI here */}
+      {broadcastedTx && !txConfirmed && <div tw="flex h-10">Your deposit is pending...</div>}
+      {broadcastedTx && txConfirmed && <div tw="flex h-10">DONE!!</div>}
       {!broadcastedTx && (
         <div tw="w-[100%] overflow-hidden">
           <div tw="flex w-[200%]">

@@ -94,7 +94,7 @@ const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   kava,
 ];
 
-enum ChainId {
+export enum ChainId {
   ETH_MAINNET = '1',
   ETH_SEPOLIA = '11155111',
   POLYGON_MAINNET = '137',
@@ -107,7 +107,7 @@ enum ChainId {
   BASE_SEPOLIA = '84532',
 }
 
-const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
+export const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
   const alchemyKey = import.meta.env.VITE_ALCHEMY_API_KEY;
   if (!alchemyKey) return undefined;
   switch (chainId) {

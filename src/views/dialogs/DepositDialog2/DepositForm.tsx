@@ -1,13 +1,12 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
-import { useChainId, useSwitchChain } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import { SkipRouteSpeed, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -25,7 +24,7 @@ import { openDialog } from '@/state/dialogs';
 import { AmountInput } from './AmountInput';
 import { RouteOptions } from './RouteOptions';
 import { useBalance, useDepositRoutes } from './queries';
-import { getTokenSymbol, getUserAddressesForRoute } from './utils';
+import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
 
 export const DepositForm = ({
   onTokenSelect,
@@ -46,7 +45,8 @@ export const DepositForm = ({
   const stringGetter = useStringGetter();
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
-  const walletChainId = useChainId();
+
+  const { data: walletClient } = useWalletClient();
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
@@ -63,23 +63,8 @@ export const DepositForm = ({
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
-  console.log('depositRoute', depositRoute);
 
-  const { sourceAccount, dydxAddress, nobleAddress } = useAccounts();
-  const onCorrectChain = useMemo(() => {
-    // Solana and Keplr wallets don't need to switch chains
-    if (sourceAccount.chain !== WalletNetworkType.Evm) return true;
-
-    return String(walletChainId) === token.chainId;
-  }, [sourceAccount.chain, token.chainId, walletChainId]);
-
-  const [awaitingWalletAction, setAwaitingWalletAction] = useState(false);
-  const { switchChainAsync } = useSwitchChain();
-  const onSwitchChain = async () => {
-    setAwaitingWalletAction(true);
-    await switchChainAsync({ chainId: Number(token.chainId) });
-    setAwaitingWalletAction(false);
-  };
+  const { sourceAccount } = useAccounts();
 
   const hasSufficientBalance = depositRoute
     ? tokenBalance.raw && BigInt(depositRoute.amountIn) <= BigInt(tokenBalance.raw)
@@ -99,56 +84,34 @@ export const DepositForm = ({
           <div>Min deposit is $10</div>
         </div>
       );
-    if (awaitingWalletAction) return `Continue in wallet...`;
-    if (!depositDisabled && !onCorrectChain) return `Switch network`;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [
-    awaitingWalletAction,
-    depositDisabled,
-    error,
-    hasSufficientBalance,
-    onCorrectChain,
-    stringGetter,
-    token.denom,
-  ]);
+  }, [error, hasSufficientBalance, stringGetter, token.denom]);
+
+  const { data: steps } = useDepositSteps({
+    sourceAccount,
+    depositToken: token,
+    depositRoute,
+    onDeposit,
+  });
+
+  const [depositSteps, setDepositSteps] = useState<DepositStep[]>();
+  const [awaitingWalletAction, setAwaitingWalletAction] = useState(false);
+
+  useEffect(() => {
+    // reset current deposit steps if the input has changed
+    setDepositSteps(undefined);
+  }, [token, debouncedAmount]);
 
   const onDepositClick = async () => {
-    if (depositDisabled) return;
+    if (depositDisabled || !steps || !walletClient) return;
 
     setAwaitingWalletAction(true);
-    const userAddresses = getUserAddressesForRoute(
-      depositRoute,
-      sourceAccount,
-      nobleAddress,
-      dydxAddress
-    );
-
-    try {
-      await skipClient.executeRoute({
-        // TODO(deposit2.0): add custom slippageTolerancePercentage here too;
-        route: depositRoute,
-        userAddresses,
-        onApproveAllowance: async ({ status }) => {
-          console.log('allowance approved', status);
-        },
-        onValidateGasBalance: async ({ txIndex, status }) => {
-          console.log('onValidateGasBalance', txIndex, status);
-        },
-        onTransactionTracked: async ({ txHash, explorerLink }) => {
-          console.log('onTransactionTracked', txHash, explorerLink);
-        },
-        onTransactionSigned: async ({ chainID }) => {
-          console.log('onTransactionSigned', chainID);
-        },
-        // TODO(deposit2.0): also handle onApproveAllowance here
-        onTransactionBroadcast: async ({ txHash, chainID }) => {
-          console.log('onTransactionBroadcast', txHash);
-          onDeposit({ txHash, chainId: chainID });
-        },
-      });
-    } catch (e) {
-      setAwaitingWalletAction(false);
+    if (steps.length === 1) {
+      const success = await steps[0]?.executeStep(walletClient, skipClient);
+      if (!success) setAwaitingWalletAction(false);
+    } else {
+      setDepositSteps(steps);
     }
   };
 
@@ -196,16 +159,38 @@ export const DepositForm = ({
         </div>
       </div>
       <div tw="flex flex-col gap-0.5">
-        <Button
-          tw="w-full"
-          onClick={onCorrectChain ? onDepositClick : onSwitchChain}
-          state={{ isDisabled: depositDisabled, isLoading: isFetching }}
-          disabled={depositDisabled}
-          action={ButtonAction.Primary}
-          type={ButtonType.Submit}
-        >
-          {depositButtonInner}
-        </Button>
+        {!depositSteps && (
+          <Button
+            tw="w-full"
+            onClick={onDepositClick}
+            state={{
+              isDisabled: depositDisabled,
+              isLoading: isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
+            }}
+            disabled={depositDisabled}
+            action={ButtonAction.Primary}
+            type={ButtonType.Submit}
+          >
+            {depositButtonInner}
+          </Button>
+        )}
+        {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
+        {/* TODO(deposit2.0): implement real UI for iterating through steps! */}
+        {depositSteps?.length && walletClient && (
+          <div>
+            <div>[Placeholder UI] Steps to deposit:</div>
+            {depositSteps.map((step, i) => (
+              <div key={step.type}>
+                <div>
+                  {i + 1}. {step.type}
+                </div>
+                <button type="button" onClick={() => step.executeStep(walletClient, skipClient)}>
+                  Do step
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         {/* TODO(deposit2.0): Show difference between current and new balance here */}
         <div tw="flex justify-between text-small">
           {/* TODO(deposit2.0): localization */}
