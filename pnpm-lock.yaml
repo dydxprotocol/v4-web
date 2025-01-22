@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.3.0
     version: 1.3.0
   '@funkit/connect':
-    specifier: ^4.1.4
-    version: 4.1.4(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9)
+    specifier: ^4.1.6
+    version: 4.1.6(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9)
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
@@ -4386,28 +4386,25 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@funkit/api-base@1.5.2:
-    resolution: {integrity: sha512-cxOBIvopNA/b+ODQhRfw35I4IfTrrTDUhH/tEjq81hPIDjVcuqUVT3BmSFVmwZ8mpXljZzZDYrH7O1V/rs1SSA==}
+  /@funkit/api-base@1.5.3:
+    resolution: {integrity: sha512-GtbCYAnhmq3VC78/tJlZ5AeIWBJZfU3P97lz8JhjoVsH5ePxdslec9Fh7Pyu4ZC7ouX5Sc2YuBzprx7SSFZIMQ==}
     dependencies:
       '@funkit/utils': 1.0.5
       '@lifeomic/attempt': 3.1.0
       big.js: 6.2.2
     dev: false
 
-  /@funkit/chains@0.1.1(typescript@5.7.2):
-    resolution: {integrity: sha512-q+11CtWovuH9ez9KRPS7C/YtnrObMoz9t9O1mq2n0FpokoQneXcbvNK9Pt5IMet5oO22H1vrkeX8C71X1LWtgw==}
+  /@funkit/chains@0.1.2(viem@2.17.0):
+    resolution: {integrity: sha512-9yNWYbOMEyJdFNfV+tURDanQjHntnb4jm3LYFe1oeIeiyldYoA1/aZHjkfpfpBfYumi6lqTLz0AGf6CPL38sFQ==}
     engines: {node: '>=18'}
+    peerDependencies:
+      viem: 2.x
     dependencies:
       viem: 2.17.0(typescript@5.7.2)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
     dev: false
 
-  /@funkit/connect@4.1.4(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9):
-    resolution: {integrity: sha512-8tV1/45hLz+/77PnQjvSwsRlvgjbdm3oVq0Pae7G4TPezb/CEe3x+E9iR6Gzf5TDcMPMwJJqg4M+/40F5j4mfA==}
+  /@funkit/connect@4.1.6(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(babel-plugin-macros@3.1.0)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)(wagmi@2.10.9):
+    resolution: {integrity: sha512-Cn3HM+or9yQRIEAaGTvTyYNAb7joIcWpynDmgrkjdIqgZedHOEIr1iQd9d6HN8+pSw4j0V8YW/3ApuBADvAHiQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -4417,11 +4414,11 @@ packages:
       wagmi: 2.x
     dependencies:
       '@datadog/browser-logs': 5.22.0
-      '@funkit/api-base': 1.5.2
-      '@funkit/chains': 0.1.1(typescript@5.7.2)
-      '@funkit/core': 2.3.3(typescript@5.7.2)
+      '@funkit/api-base': 1.5.3
+      '@funkit/chains': 0.1.2(viem@2.17.0)
+      '@funkit/core': 2.3.4(typescript@5.7.2)(viem@2.17.0)
       '@funkit/utils': 1.0.5
-      '@funkit/wagmi-tools': 3.0.24(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)
+      '@funkit/wagmi-tools': 3.0.26(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)
       '@meshconnect/web-link-sdk': 2.1.1
       '@moonpay/moonpay-react': 1.8.2(react@18.2.0)
       '@privy-io/js-sdk-core': 0.21.1
@@ -4456,14 +4453,16 @@ packages:
       - zod
     dev: false
 
-  /@funkit/core@2.3.3(typescript@5.7.2):
-    resolution: {integrity: sha512-bW00nf3sHYHe5auiSkz2UXqzkotfliWxswGvUsY7p7gh+7HOxlOSycgUTP1VciDx5vFezZzg93uHs21eRpgpSg==}
+  /@funkit/core@2.3.4(typescript@5.7.2)(viem@2.17.0):
+    resolution: {integrity: sha512-r/r2cvUHnktVw1FOgjhnYlP0kWsGWwpy/oJ8a3lth3VxambnIVmVWICFdzFPda0bxNe0cxVxLtJLdmdZG5ZqEg==}
+    peerDependencies:
+      viem: 2.x
     dependencies:
       '@aws-sdk/client-secrets-manager': 3.674.0
       '@ethersproject/abi': 5.7.0
       '@ethersproject/providers': 5.7.2
-      '@funkit/api-base': 1.5.2
-      '@funkit/chains': 0.1.1(typescript@5.7.2)
+      '@funkit/api-base': 1.5.3
+      '@funkit/chains': 0.1.2(viem@2.17.0)
       '@funkit/utils': 1.0.5
       '@lifeomic/attempt': 3.1.0
       abitype: 0.10.3(typescript@5.7.2)
@@ -4484,15 +4483,16 @@ packages:
     engines: {node: '>=18'}
     dev: false
 
-  /@funkit/wagmi-tools@3.0.24(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2):
-    resolution: {integrity: sha512-wLpSH/RaP4uFCtqlEhfvzB2XYMnKt4ltsaFCKuvDJ1GlxHKrZ/8zpRkzbGTMnjaqCXPjFGqD8wQiXwjbqUWycw==}
+  /@funkit/wagmi-tools@3.0.26(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0):
+    resolution: {integrity: sha512-vVJzl22KFM583+MGg/FV50v11HM6ivzXyKxx8wWj5svVdSapPlgjUDx2V7yPygrl86TuAgNkV7m/vIgo2CoNow==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18.3.0
       react-dom: ^18.3.0
+      viem: 2.x
     dependencies:
-      '@funkit/chains': 0.1.1(typescript@5.7.2)
-      '@funkit/core': 2.3.3(typescript@5.7.2)
+      '@funkit/chains': 0.1.2(viem@2.17.0)
+      '@funkit/core': 2.3.4(typescript@5.7.2)(viem@2.17.0)
       '@wagmi/core': 2.13.8(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.17.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -25095,7 +25095,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.4
       mime: 3.0.0
-      node-fetch-native: 1.6.4
+      node-fetch-native: 1.6.6
       pathe: 1.1.2
     dev: false
 
@@ -25288,7 +25288,7 @@ packages:
       listhen: 1.5.5
       lru-cache: 10.2.2
       mri: 1.2.0
-      node-fetch-native: 1.6.4
+      node-fetch-native: 1.6.6
       ofetch: 1.3.4
       ufo: 1.5.4
     transitivePeerDependencies:
