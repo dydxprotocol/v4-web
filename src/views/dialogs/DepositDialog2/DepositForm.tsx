@@ -184,6 +184,7 @@ export const DepositForm = ({
                 <div>
                   {i + 1}. {step.type}
                 </div>
+                {/* TODO(deposit2.0): handle solana and cosmos signer here too */}
                 <button type="button" onClick={() => step.executeStep(walletClient, skipClient)}>
                   Do step
                 </button>
