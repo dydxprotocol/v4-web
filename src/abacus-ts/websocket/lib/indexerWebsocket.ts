@@ -7,6 +7,7 @@ import { timeUnits } from '@/constants/time';
 import { assertNever } from '@/lib/assertNever';
 import { isTruthy } from '@/lib/isTruthy';
 
+import { MissingMessageDetector } from './missingMessageDetector';
 import { ReconnectingWebSocket } from './reconnectingWebsocket';
 
 const NO_ID_SPECIAL_STRING_ID = '______EMPTY_ID______';
@@ -87,6 +88,8 @@ class SubscriptionManager {
 
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
+
+  private missingMessageDetector: MissingMessageDetector | null = null;
 
   // for logging purposes, to differentiate when user has many tabs open
   private indexerWsId = crypto.randomUUID();
@@ -322,6 +325,14 @@ export class IndexerWebsocket {
   private _handleMessage = (messagePre: any) => {
     try {
       const message = isWsMessage(messagePre);
+      if (this.missingMessageDetector != null) {
+        this.missingMessageDetector.insert(message.message_id);
+      } else {
+        logAbacusTsError(
+          'IndexerWebsocket',
+          'message received before missing message detector initialized'
+        );
+      }
       if (message.type === 'error') {
         this._handleErrorReceived(message);
       } else if (message.type === 'connected') {
@@ -406,8 +417,18 @@ export class IndexerWebsocket {
     }
   };
 
+  private _handleMissingMessageDetected = () => {
+    logAbacusTsError('IndexerWebsocket', 'missed message detected, restarting');
+    this.missingMessageDetector?.cleanup();
+    this.missingMessageDetector = null;
+    this.restart();
+  };
+
   // when websocket churns, reconnect all known subscribers
   private _handleFreshConnect = () => {
+    this.missingMessageDetector?.cleanup();
+    this.missingMessageDetector = new MissingMessageDetector(this._handleMissingMessageDetected);
+
     logAbacusTsInfo('IndexerWebsocket', 'freshly connected', {
       socketUrl: this.socket?.url,
       wsId: this.indexerWsId,
@@ -434,14 +455,16 @@ export class IndexerWebsocket {
 type IndexerWebsocketErrorMessage = {
   type: 'error';
   message: string;
+  message_id: number;
   channel?: string;
   id?: string;
 };
 type IndexerWebsocketMessageType =
   | IndexerWebsocketErrorMessage
-  | { type: 'connected' }
+  | { type: 'connected'; message_id: number }
   | {
       type: 'channel_batch_data';
+      message_id: number;
       channel: string;
       id: string | undefined;
       version: string;
@@ -450,13 +473,26 @@ type IndexerWebsocketMessageType =
     }
   | {
       type: 'channel_data';
+      message_id: number;
       channel: string;
       id: string | undefined;
       version: string;
       subaccountNumber?: number;
       contents: any;
     }
-  | { type: 'subscribed'; channel: string; id: string | undefined; contents: any }
-  | { type: 'unsubscribed'; channel: string; id: string | undefined; contents: any };
+  | {
+      type: 'subscribed';
+      message_id: number;
+      channel: string;
+      id: string | undefined;
+      contents: any;
+    }
+  | {
+      type: 'unsubscribed';
+      message_id: number;
+      channel: string;
+      id: string | undefined;
+      contents: any;
+    };
 
 export const isWsMessage = typia.createAssert<IndexerWebsocketMessageType>();
