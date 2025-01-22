@@ -46,6 +46,7 @@ import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 import {
   calculateCrossPositionMargin,
   getTradeStateWithDoubleValuesHasDiff,
@@ -320,7 +321,13 @@ export const PlaceOrderButtonAndReceipt = ({
   const depositButton = (
     <Button
       action={ButtonAction.Primary}
-      onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+      onClick={() =>
+        dispatch(
+          openDialog(
+            testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
+          )
+        )
+      }
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
     </Button>

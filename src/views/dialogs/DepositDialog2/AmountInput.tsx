@@ -2,9 +2,11 @@ import { EventHandler } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
+import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -14,14 +16,15 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { useBalance } from './queries';
-import { getTokenSymbol } from './utils';
+import { getTokenSymbol, isNativeTokenDenom } from './utils';
 
 export type AmountInputProps = {
   value: string;
   onChange: (newValue: string) => void;
-  token: { chainId: string; denom: string };
+  token: TokenForTransfer;
   onTokenClick: () => void;
+  tokenBalance: { raw?: string; formatted?: string };
+  error?: Error | null;
 };
 
 const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
@@ -29,7 +32,16 @@ function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
-export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInputProps) => {
+const GAS_RESERVE_AMOUNT = parseUnits('0.01', ETH_DECIMALS);
+
+export const AmountInput = ({
+  value,
+  onChange,
+  token,
+  onTokenClick,
+  tokenBalance,
+  error,
+}: AmountInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
 
@@ -41,7 +53,21 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
     onChange(e.target.value);
   };
 
-  const tokenBalance = useBalance(token.chainId, token.denom);
+  const onClickMax = () => {
+    if (!tokenBalance.raw) return;
+
+    const balanceAmount = BigInt(tokenBalance.raw!);
+    if (isNativeTokenDenom(token.denom)) {
+      const amount =
+        balanceAmount > GAS_RESERVE_AMOUNT ? balanceAmount - GAS_RESERVE_AMOUNT : balanceAmount;
+      onChange(formatUnits(amount, token.decimals));
+      return;
+    }
+
+    onChange(formatUnits(balanceAmount, token.decimals));
+  };
+
+  const onMaxDisabled = !tokenBalance.raw || BigInt(tokenBalance.raw) === BigInt(0);
 
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
@@ -61,11 +87,29 @@ export const AmountInput = ({ value, onChange, token, onTokenClick }: AmountInpu
               />
             </>
           )}
+
+          {tokenBalance.raw && (
+            <>
+              <span> • </span>
+              <button
+                disabled={onMaxDisabled}
+                onClick={onClickMax}
+                type="button"
+                tw="font-medium"
+                style={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
+              >
+                {stringGetter({ key: STRING_KEYS.MAX })}
+              </button>
+            </>
+          )}
         </div>
         <input
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
           type="number"
           placeholder="0.00"
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
+          style={{ color: error ? 'var(--color-error)' : undefined }}
           value={value}
           onChange={onValueChange}
         />

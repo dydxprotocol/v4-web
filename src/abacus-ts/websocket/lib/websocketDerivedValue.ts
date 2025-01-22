@@ -5,6 +5,10 @@ type Unsubscribe = () => void;
 export class WebsocketDerivedValue<T> {
   private unsubFromWs: Unsubscribe | undefined;
 
+  private value: T;
+
+  private subscribers: ((val: T) => void)[] = [];
+
   constructor(
     websocket: IndexerWebsocket,
     // subscriptions must be unique, we are trusing whoever is constructing us is ensuring uniqueness
@@ -14,12 +18,14 @@ export class WebsocketDerivedValue<T> {
       handleBaseData: (data: any, value: T, fullMessage: any) => T;
       handleUpdates: (updates: any[], value: T, fullMessage: any) => T;
     },
-    private value: T,
-    private changeHandler: ((val: T) => void) | undefined
+    value: T
   ) {
+    this.value = value;
+
     this.unsubFromWs = websocket.addChannelSubscription({
       channel: sub.channel,
       id: sub.id,
+      batched: true,
       handleBaseData: (data, fullMessage) =>
         this._setValue(sub.handleBaseData(data, this.value, fullMessage)),
       handleUpdates: (updates, fullMessage) =>
@@ -31,8 +37,17 @@ export class WebsocketDerivedValue<T> {
     return this.value;
   }
 
+  subscribe(handler: (val: T) => void): () => void {
+    this.subscribers.push(handler);
+    handler(this.value);
+
+    return () => {
+      this.subscribers = this.subscribers.filter((h) => h !== handler);
+    };
+  }
+
   teardown() {
-    this.changeHandler = undefined;
+    this.subscribers = [];
     this.unsubFromWs?.();
     this.unsubFromWs = undefined;
   }
@@ -40,7 +55,7 @@ export class WebsocketDerivedValue<T> {
   private _setValue = (newValue: T): void => {
     if (newValue !== this.value) {
       this.value = newValue;
-      this.changeHandler?.(this.value);
+      this.subscribers.forEach((subscriber) => subscriber(this.value));
     }
   };
 }

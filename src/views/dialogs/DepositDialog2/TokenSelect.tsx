@@ -6,13 +6,13 @@ import { parseUnits } from 'viem';
 
 import { CHAIN_INFO } from '@/constants/chains';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { TokenForTransfer } from '@/constants/tokens';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { useBalances } from './queries';
-import { DepositToken } from './types';
 import { getTokenSymbol } from './utils';
 
 export const TokenSelect = ({
@@ -21,8 +21,8 @@ export const TokenSelect = ({
   setToken,
 }: {
   onBack: () => void;
-  token: DepositToken;
-  setToken: Dispatch<SetStateAction<DepositToken>>;
+  token: TokenForTransfer;
+  setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
   const { isLoading, data } = useBalances();
 
@@ -43,15 +43,14 @@ export const TokenSelect = ({
             }))
           : [];
       })
-      .flat();
+      .flat()
+      // TODO: log when there are no decimals? this shouldnt happen
+      .filter((balance) => balance.decimals);
 
-    return partition(
-      allBalances,
-      (balance) => parseUnits(balance.amount, balance.decimals ?? 18) > 0
-    );
+    return partition(allBalances, (balance) => parseUnits(balance.amount, balance.decimals!) > 0);
   }, [data]);
 
-  const onTokenClick = (newToken: DepositToken) => () => {
+  const onTokenClick = (newToken: TokenForTransfer) => () => {
     setToken(newToken);
     onBack();
   };
@@ -72,7 +71,11 @@ export const TokenSelect = ({
         {withBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
-              onClick={onTokenClick({ chainId: balance.chainId, denom: balance.denom })}
+              onClick={onTokenClick({
+                chainId: balance.chainId,
+                denom: balance.denom,
+                decimals: balance.decimals!,
+              })}
               type="button"
               style={{
                 backgroundColor: token.denom === balance.denom ? 'var(--color-layer-4)' : undefined,
@@ -120,7 +123,11 @@ export const TokenSelect = ({
         {noBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
-              onClick={onTokenClick({ chainId: balance.chainId, denom: balance.denom })}
+              onClick={onTokenClick({
+                chainId: balance.chainId,
+                denom: balance.denom,
+                decimals: balance.decimals!,
+              })}
               type="button"
               tw="flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4"
               key={balance.denom}

@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import { kollections } from '@dydxprotocol/v4-abacus';
 import { fromPairs, throttle } from 'lodash';
 
@@ -286,3 +287,19 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 }
 
 export default AbacusStateNotifier;
+
+export class NoOpAbacusStateNotifier implements AbacusStateNotificationProtocol {
+  environmentsChanged(): void {}
+
+  notificationsChanged(): void {}
+
+  stateChanged(): void {}
+
+  lastOrderChanged() {}
+
+  errorsEmitted() {}
+
+  apiStateChanged() {}
+
+  setStore = () => {};
+}

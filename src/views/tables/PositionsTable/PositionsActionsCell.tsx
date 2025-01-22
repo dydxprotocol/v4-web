@@ -1,11 +1,13 @@
+import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { AbacusPositionSides, Nullable } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -24,11 +26,11 @@ import abacusStateManager from '@/lib/abacus';
 type ElementProps = {
   marketId: string;
   assetId: string;
-  leverage: Nullable<number>;
-  oraclePrice: Nullable<number>;
-  entryPrice: Nullable<number>;
-  unrealizedPnl: Nullable<number>;
-  side: Nullable<AbacusPositionSides>;
+  leverage: Nullable<BigNumber>;
+  oraclePrice: Nullable<BigNumber>;
+  entryPrice: Nullable<BigNumber>;
+  unrealizedPnl: Nullable<BigNumber>;
+  side: Nullable<IndexerPositionSide>;
   sideLabel: Nullable<string>;
   isDisabled?: boolean;
   showClosePositionAction: boolean;
@@ -72,10 +74,10 @@ export const PositionsActionsCell = ({
         DialogTypes.SharePNLAnalytics({
           marketId,
           assetId,
-          leverage,
-          oraclePrice,
-          entryPrice,
-          unrealizedPnl,
+          leverage: leverage?.toNumber(),
+          oraclePrice: oraclePrice?.toNumber(),
+          entryPrice: entryPrice?.toNumber(),
+          unrealizedPnl: unrealizedPnl?.toNumber(),
           side,
           sideLabel,
         })

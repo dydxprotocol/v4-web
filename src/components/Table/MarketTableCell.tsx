@@ -1,3 +1,5 @@
+import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
+
 import type { Asset } from '@/constants/abacus';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -19,6 +21,27 @@ export const MarketTableCell = ({ asset }: { asset?: Asset }) => {
       }
     >
       {getDisplayableAssetFromBaseAsset(asset?.id ?? '')}
+    </TableCell>
+  );
+};
+
+export const MarketSummaryTableCell = ({
+  marketSummary,
+}: {
+  marketSummary?: PerpetualMarketSummary;
+}) => {
+  return (
+    <TableCell
+      tw="font-bold text-color-text-2"
+      slotLeft={
+        <AssetIcon
+          logoUrl={marketSummary?.logo}
+          symbol={marketSummary?.assetId}
+          tw="text-[1.25rem] tablet:text-[2.25rem]"
+        />
+      }
+    >
+      {marketSummary?.displayableAsset ?? ''}
     </TableCell>
   );
 };
