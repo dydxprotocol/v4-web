@@ -227,7 +227,6 @@ export const getWidgetOverrides = ({
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
       'scalesProperties.fontSize': 12,
-      timezone,
     } as Partial<ChartPropertiesOverrides>,
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
@@ -272,6 +271,7 @@ export const getWidgetOptions = (
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: disabledFeatures,
+    timezone,
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',
