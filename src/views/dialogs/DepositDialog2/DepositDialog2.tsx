@@ -74,6 +74,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const { skipClient } = useSkipClient();
 
+  // TODO(deposit2.0): Move transaction status tracking to global scope so user can exit the modal
   useEffect(() => {
     async function waitForConfirmation() {
       if (!broadcastedTx) return;
