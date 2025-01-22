@@ -1,84 +1,75 @@
 import { useMemo } from 'react';
 
+import { BonsaiCore } from '@/abacus-ts/ontology';
+import { AssetData } from '@/abacus-ts/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
-import { MetadataServiceAsset } from '@/constants/assetMetadata';
 import {
   HiddenMarketFilterTags,
-  LIQUIDITY_TIERS,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
-import { StatsigFlags } from '@/constants/statsig';
-
-import {
-  SEVEN_DAY_SPARKLINE_ENTRIES,
-  usePerpetualMarketSparklines,
-} from '@/hooks/usePerpetualMarketSparklines';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
-import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets, getPerpetualMarketsClobIds } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromBaseAsset, getMarketIdFromAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { MustBigNumber } from '@/lib/numbers';
-import { objectKeys, safeAssign } from '@/lib/objectHelpers';
+import {
+  getMarketDataFromAsset,
+  getMarketDataFromPerpetualMarketSummary,
+} from '@/lib/marketsHelpers';
+import { objectKeys } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
-import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
-
-import { useMetadataService } from './useMetadataService';
-import { useAllStatsigGateValues } from './useStatsig';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | undefined> = {
-  [MarketFilters.AI]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.AI);
+  [MarketFilters.AI]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.AI);
   },
   [MarketFilters.ALL]: () => true,
-  [MarketFilters.DEFI]: (market: MarketData) => {
+  [MarketFilters.DEFI]: (market) => {
     return (
-      !!market.tags?.includes(MarketFilters.DEFI) ||
-      !!market.tags?.includes(HiddenMarketFilterTags.DEX)
+      !!market.sectorTags?.includes(MarketFilters.DEFI) ||
+      !!market.sectorTags?.includes(HiddenMarketFilterTags.DEX)
     );
   },
-  [MarketFilters.DEPIN]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.DEPIN);
+  [MarketFilters.DEPIN]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.DEPIN);
   },
-  [MarketFilters.FAVORITE]: (market: MarketData) => {
+  [MarketFilters.FAVORITE]: (market) => {
     return market.isFavorite;
   },
-  [MarketFilters.FX]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.FX);
+  [MarketFilters.FX]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.FX);
   },
-  [MarketFilters.GAMING]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.GAMING);
+  [MarketFilters.GAMING]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.GAMING);
   },
-  [MarketFilters.LAYER_1]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.LAYER_1);
+  [MarketFilters.LAYER_1]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.LAYER_1);
   },
-  [MarketFilters.LAYER_2]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.LAYER_2);
+  [MarketFilters.LAYER_2]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.LAYER_2);
   },
-  [MarketFilters.MEMES]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.MEMES);
+  [MarketFilters.MEMES]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.MEMES);
   },
-  [MarketFilters.NEW]: (market: MarketData) => {
+  [MarketFilters.NEW]: (market) => {
     return market.isNew;
   },
-  [MarketFilters.PREDICTION_MARKET]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.PREDICTION_MARKET);
+  [MarketFilters.PREDICTION_MARKET]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.PREDICTION_MARKET);
   },
-  [MarketFilters.RWA]: (market: MarketData) => {
-    return market.tags?.includes(MarketFilters.RWA);
+  [MarketFilters.RWA]: (market) => {
+    return market.sectorTags?.includes(MarketFilters.RWA);
   },
-  [MarketFilters.LAUNCHABLE]: (market: MarketData) => {
+  [MarketFilters.LAUNCHABLE]: (market) => {
     return market.isUnlaunched;
   },
 };
 
-const sortByMarketCap = (a: MetadataServiceAsset, b: MetadataServiceAsset) => {
+const sortByMarketCap = (a: AssetData, b: AssetData) => {
   return (b.marketCap ?? 0) - (a.marketCap ?? 0);
 };
 
@@ -99,169 +90,55 @@ export const useMarketsData = ({
   hasMarketIds: boolean;
   hasResults: boolean;
 } => {
-  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allPerpetualClobIds = orEmptyRecord(
-    useAppSelector(getPerpetualMarketsClobIds, shallowEqual)
-  );
-  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
-  const sevenDaysSparklineData = usePerpetualMarketSparklines();
-  const featureFlags = useAllStatsigGateValues();
-  const metadataServiceInfo = useMetadataService();
+  const perpetualMarkets = orEmptyObj(useAppSelector(BonsaiCore.markets.markets.data));
+  const assets = orEmptyObj(useAppSelector(BonsaiCore.markets.assets.data));
+
   const shouldHideLaunchableMarkets =
     useAppSelector(getShouldHideLaunchableMarkets) || forceHideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
-  const hasMarketIds = Object.keys(allPerpetualMarkets).length > 0;
+  const hasMarketIds = Object.keys(perpetualMarkets).length > 0;
 
-  const allPerpetualMarketIdsSet = useMemo(
+  // AssetIds from existing PerpetualMarkets
+  const marketsAssetIdSet = useMemo(
     () =>
       new Set(
-        Object.values(allPerpetualMarkets)
+        Object.values(perpetualMarkets)
           .filter(isTruthy)
           .map((m) => m.assetId)
       ),
-    [allPerpetualMarkets]
+    [perpetualMarkets]
   );
 
-  const markets = useMemo(() => {
-    const listOfMarkets = Object.values(allPerpetualMarkets)
+  const markets: MarketData[] = useMemo(() => {
+    const listOfMarkets = Object.values(perpetualMarkets)
       .filter(isTruthy)
       // filter out markets that cannot be traded
-      .filter((m) => Boolean(m.status?.canTrade))
+      .filter((m) => m.status !== 'FINAL_SETTLEMENT')
       // temporarily filter out markets with empty/0 oracle price
       .filter((m) => isTruthy(m.oraclePrice))
-      // temporary filterout TRUMPWIN until the backend is working
-      .filter(
-        (m) => m.assetId !== 'TRUMPWIN' || featureFlags[StatsigFlags.ffShowPredictionMarketsUi]
-      )
-      .map((marketData): MarketData => {
-        const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
-        const isNew = Boolean(
-          sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
-        );
-        const clobPairId = allPerpetualClobIds[marketData.id] ?? 0;
-        const {
-          volume24h: spotVolume24H,
-          marketCap,
-          reportedMarketCap,
-        } = orEmptyObj(metadataServiceInfo.data[marketData.assetId]);
+      .map(getMarketDataFromPerpetualMarketSummary);
 
-        const {
-          assetId,
-          displayId,
-          id,
-          configs,
-          oraclePrice,
-          priceChange24H,
-          priceChange24HPercent,
-          perpetual,
-        } = marketData;
-        const { nextFundingRate, line, openInterest, openInterestUSDC, trades24H, volume24H } =
-          orEmptyObj(perpetual);
-        const { name, tags, resources } = orEmptyObj(allAssets[assetId]);
-        const { imageUrl } = orEmptyObj(resources);
-        const { effectiveInitialMarginFraction, initialMarginFraction, tickSizeDecimals } =
-          orEmptyObj(configs);
+    const unlaunchedMarketsData =
+      !!forceShowUnlaunchedMarkets || !shouldHideLaunchableMarkets
+        ? Object.values(assets)
+            .filter(isTruthy)
+            .sort(sortByMarketCap)
+            .map((asset) => {
+              // Remove assets that are already in the list of markets from Indexer
+              if (marketsAssetIdSet.has(asset.assetId)) return null;
+              return getMarketDataFromAsset(asset, favoritedMarkets);
+            })
+            .filter(isTruthy)
+        : [];
 
-        return safeAssign(
-          {},
-          {
-            id,
-            assetId,
-            displayId,
-            clobPairId,
-            effectiveInitialMarginFraction,
-            imageUrl,
-            initialMarginFraction,
-            isNew,
-            line: line?.toArray(),
-            name,
-            nextFundingRate,
-            openInterest,
-            openInterestUSDC,
-            oraclePrice,
-            priceChange24H,
-            priceChange24HPercent,
-            tags: tags?.toArray(),
-            tickSizeDecimals,
-            trades24H,
-            volume24H,
-            spotVolume24H,
-            marketCap: marketCap ?? reportedMarketCap,
-            isFavorite: favoritedMarkets.includes(id),
-          }
-        );
-      });
-
-    if (!!forceShowUnlaunchedMarkets || !shouldHideLaunchableMarkets) {
-      const unlaunchedMarketsData = Object.values(metadataServiceInfo.data)
-        .sort(sortByMarketCap)
-        .map((market) => {
-          const {
-            id: assetId,
-            name,
-            logo,
-            sectorTags,
-            price,
-            percentChange24h,
-            tickSizeDecimals,
-            volume24h: spotVolume24H,
-            marketCap,
-            reportedMarketCap,
-          } = market;
-
-          if (allPerpetualMarketIdsSet.has(assetId)) return null;
-
-          const id = getMarketIdFromAsset(assetId);
-
-          return safeAssign(
-            {},
-            {
-              id,
-              assetId,
-              displayId: getMarketIdFromAsset(getDisplayableAssetFromBaseAsset(assetId)),
-              clobPairId: -1,
-              effectiveInitialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
-              imageUrl: logo,
-              initialMarginFraction: LIQUIDITY_TIERS[4].initialMarginFraction,
-              isNew: false,
-              isUnlaunched: true,
-              line: undefined,
-              name,
-              nextFundingRate: undefined,
-              openInterest: undefined,
-              openInterestUSDC: undefined,
-              oraclePrice: price,
-              priceChange24H:
-                price && percentChange24h
-                  ? MustBigNumber(price).times(MustBigNumber(percentChange24h).div(100)).toNumber()
-                  : undefined,
-              priceChange24HPercent: MustBigNumber(percentChange24h).div(100).toNumber(),
-              tags: sectorTags ?? [],
-              tickSizeDecimals,
-              trades24H: undefined,
-              volume24H: undefined,
-              spotVolume24H,
-              marketCap: marketCap ?? reportedMarketCap,
-              isFavorite: favoritedMarkets.includes(id),
-            }
-          );
-        });
-
-      return [...listOfMarkets, ...unlaunchedMarketsData.filter(isTruthy)];
-    }
-
-    return listOfMarkets;
+    return [...listOfMarkets, ...unlaunchedMarketsData];
   }, [
-    allPerpetualMarkets,
-    allPerpetualMarketIdsSet,
-    forceShowUnlaunchedMarkets,
-    shouldHideLaunchableMarkets,
-    featureFlags,
-    sevenDaysSparklineData,
-    allPerpetualClobIds,
-    metadataServiceInfo.data,
-    allAssets,
+    perpetualMarkets,
+    marketsAssetIdSet,
+    assets,
     favoritedMarkets,
+    shouldHideLaunchableMarkets,
+    forceShowUnlaunchedMarkets,
   ]);
 
   const filteredMarkets = useMemo(() => {

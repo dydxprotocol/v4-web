@@ -24,11 +24,7 @@ interface AssetTableCellProps {
   configs:
     | Pick<
         MarketData,
-        | 'effectiveInitialMarginFraction'
-        | 'imageUrl'
-        | 'initialMarginFraction'
-        | 'isUnlaunched'
-        | 'volume24H'
+        'effectiveInitialMarginFraction' | 'logo' | 'initialMarginFraction' | 'isUnlaunched'
       >
     | null
     | undefined;
@@ -41,7 +37,7 @@ interface AssetTableCellProps {
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
   const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
-  const { imageUrl, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
+  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
     orEmptyObj(configs);
 
   const maxLeverage =
@@ -59,7 +55,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   return (
     <TableCell
       className={className}
-      slotLeft={<$AssetIcon logoUrl={imageUrl} stacked={stacked} symbol={symbol} />}
+      slotLeft={<$AssetIcon logoUrl={logo} stacked={stacked} symbol={symbol} />}
     >
       <$TableCellContent stacked={stacked}>
         <div tw="row gap-0.5">

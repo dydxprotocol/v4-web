@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
-import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -224,7 +223,7 @@ const DetailsItem = ({
   isLoading: boolean;
   priceChange24HPercent: number | null | undefined;
   initialMarginFraction: string | null | undefined;
-  effectiveInitialMarginFraction: BigNumber | null | undefined;
+  effectiveInitialMarginFraction: number | null | undefined;
   useFiatDisplayUnit: boolean;
 }) => {
   const valueBN = MustBigNumber(value);
@@ -320,7 +319,7 @@ const DetailsItem = ({
               ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
               : null
           }
-          withDiff={initialMarginFraction !== effectiveInitialMarginFraction?.toString()}
+          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
           type={OutputType.Multiple}
         />
       );

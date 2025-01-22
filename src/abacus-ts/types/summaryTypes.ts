@@ -31,7 +31,7 @@ export type MarketInfo = IndexerWsBaseMarketObject & {
   assetId: string;
   displayableAsset: string;
   displayableTicker: string;
-  effectiveInitialMarginFraction: BigNumber | null;
+  effectiveInitialMarginFraction: number | null;
   openInterestUSDC: number;
   percentChange24h: number | null;
   stepSizeDecimals: number;

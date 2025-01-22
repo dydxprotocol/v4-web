@@ -1,4 +1,4 @@
-import { forwardRef, Key, useEffect, useMemo } from 'react';
+import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
@@ -13,6 +13,7 @@ import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -28,7 +29,6 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
-import { viewedFills } from '@/state/account';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -314,13 +314,7 @@ export const FillsTable = forwardRef(
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    useEffect(() => {
-      // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
-      dispatch(viewedFills(currentMarket));
-      return () => {
-        dispatch(viewedFills(currentMarket));
-      };
-    }, [currentMarket, dispatch]);
+    useViewPanel(currentMarket, 'fills');
 
     const symbol = mapIfPresent(
       currentMarket,
