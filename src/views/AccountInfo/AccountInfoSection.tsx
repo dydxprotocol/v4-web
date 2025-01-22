@@ -56,7 +56,7 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
-  const subAccountAbacus = useAppSelector(getSubaccount, shallowEqual);
+  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
   const isLoadingData =
@@ -68,7 +68,7 @@ export const AccountInfoSection = () => {
     freeCollateral: availableBalancePost,
     marginUsage: marginUsagePost,
     equity: portfolioValuePost,
-  } = subAccountAbacus ?? {};
+  } = subAccountAbacus;
 
   const isPostOrderBalanceNegative =
     isNumber(availableBalancePost?.postOrder) &&
