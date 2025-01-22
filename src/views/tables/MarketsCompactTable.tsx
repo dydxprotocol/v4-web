@@ -56,12 +56,12 @@ export const MarketsCompactTable = ({
             renderCell: ({
               assetId,
               effectiveInitialMarginFraction,
-              imageUrl,
+              logo,
               initialMarginFraction,
               name,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ imageUrl, effectiveInitialMarginFraction, initialMarginFraction }}
+                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -74,8 +74,8 @@ export const MarketsCompactTable = ({
             label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
             renderCell: ({
               oraclePrice,
-              priceChange24H,
-              priceChange24HPercent,
+              priceChange24h,
+              percentChange24h,
               tickSizeDecimals,
             }: MarketData) => (
               <TableCell stacked>
@@ -88,18 +88,18 @@ export const MarketsCompactTable = ({
                   tw="text-color-text-1 font-small-medium"
                 />
                 <$TabletPriceChange>
-                  {!priceChange24H ? (
+                  {!priceChange24h ? (
                     <Output type={OutputType.Fiat} value={null} />
                   ) : (
                     <>
-                      {priceChange24H > 0 && (
-                        <TriangleIndicator value={MustBigNumber(priceChange24H)} />
+                      {priceChange24h > 0 && (
+                        <TriangleIndicator value={MustBigNumber(priceChange24h)} />
                       )}
                       <$Output
                         type={OutputType.Percent}
-                        value={MustBigNumber(priceChange24HPercent).abs()}
-                        isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
-                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                        value={MustBigNumber(percentChange24h).abs()}
+                        isPositive={MustBigNumber(percentChange24h).gt(0)}
+                        isNegative={MustBigNumber(percentChange24h).isNegative()}
                       />
                     </>
                   )}
@@ -131,12 +131,12 @@ export const MarketsCompactTable = ({
             renderCell: ({
               assetId,
               effectiveInitialMarginFraction,
-              imageUrl,
+              logo,
               initialMarginFraction,
               name,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ imageUrl, effectiveInitialMarginFraction, initialMarginFraction }}
+                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -149,8 +149,8 @@ export const MarketsCompactTable = ({
             label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
             renderCell: ({
               oraclePrice,
-              priceChange24H,
-              priceChange24HPercent,
+              priceChange24h,
+              percentChange24h,
               tickSizeDecimals,
             }: MarketData) => (
               <TableCell stacked>
@@ -163,18 +163,18 @@ export const MarketsCompactTable = ({
                   tw="text-color-text-1 font-small-medium"
                 />
                 <$TabletPriceChange>
-                  {!priceChange24H ? (
+                  {!percentChange24h ? (
                     <Output type={OutputType.Fiat} value={null} />
                   ) : (
                     <>
-                      {priceChange24H > 0 && (
-                        <TriangleIndicator value={MustBigNumber(priceChange24H)} />
+                      {percentChange24h > 0 && (
+                        <TriangleIndicator value={MustBigNumber(priceChange24h)} />
                       )}
                       <$Output
                         type={OutputType.Percent}
-                        value={MustBigNumber(priceChange24HPercent).abs()}
-                        isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
-                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                        value={MustBigNumber(percentChange24h).abs()}
+                        isPositive={MustBigNumber(percentChange24h).gt(0)}
+                        isNegative={MustBigNumber(percentChange24h).isNegative()}
                       />
                     </>
                   )}
@@ -206,26 +206,28 @@ export const MarketsCompactTable = ({
 
   const sortedMarkets = useMemo(() => {
     if (sorting === MarketSorting.RECENTLY_LISTED) {
-      return filteredMarkets.sort((a, b) => (a.line?.length ?? 0) - (b.line?.length ?? 0));
+      return filteredMarkets.sort(
+        (a, b) => (a.sparkline24h?.length ?? 0) - (b.sparkline24h?.length ?? 0)
+      );
     }
 
     if (sorting === MarketSorting.GAINERS || sorting === MarketSorting.LOSERS) {
       const sortingFunction = (marketA: MarketData, marketB: MarketData) => {
-        if (marketA.priceChange24HPercent == null && marketB.priceChange24HPercent == null) {
+        if (marketA.percentChange24h == null && marketB.percentChange24h == null) {
           return 0;
         }
 
-        if (marketA.priceChange24HPercent == null) {
+        if (marketA.percentChange24h == null) {
           return 1;
         }
 
-        if (marketB.priceChange24HPercent == null) {
+        if (marketB.percentChange24h == null) {
           return -1;
         }
 
         return sorting === MarketSorting.GAINERS
-          ? marketB.priceChange24HPercent - marketA.priceChange24HPercent
-          : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
+          ? marketB.percentChange24h - marketA.percentChange24h
+          : marketA.percentChange24h - marketB.percentChange24h;
       };
 
       return filteredMarkets.sort(sortingFunction);

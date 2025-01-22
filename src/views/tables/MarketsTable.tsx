@@ -55,17 +55,17 @@ export const MarketsTable = forwardRef(
           ? ([
               {
                 columnKey: 'marketAndVolume',
-                getCellValue: (row) => row.volume24H,
+                getCellValue: (row) => row.volume24h,
                 label: stringGetter({ key: STRING_KEYS.MARKET }),
                 renderCell: ({
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  imageUrl,
+                  logo,
                   initialMarginFraction,
                   name,
                   isUnlaunched,
-                  volume24H,
+                  volume24h,
                 }) => (
                   <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
                     <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
@@ -73,7 +73,7 @@ export const MarketsTable = forwardRef(
                       tw="overflow-auto"
                       configs={{
                         effectiveInitialMarginFraction,
-                        imageUrl,
+                        logo,
                         initialMarginFraction,
                         isUnlaunched,
                       }}
@@ -82,7 +82,7 @@ export const MarketsTable = forwardRef(
                     >
                       <Output
                         type={OutputType.CompactFiat}
-                        value={volume24H ?? undefined}
+                        value={volume24h ?? undefined}
                         tw="text-color-text-0 font-mini-medium"
                       />
                     </AssetTableCell>
@@ -95,8 +95,8 @@ export const MarketsTable = forwardRef(
                 label: stringGetter({ key: STRING_KEYS.PRICE }),
                 renderCell: ({
                   oraclePrice,
-                  priceChange24H,
-                  priceChange24HPercent,
+                  priceChange24h,
+                  percentChange24h,
                   tickSizeDecimals,
                 }) => (
                   <TableCell stacked tw="max-w-8">
@@ -108,18 +108,18 @@ export const MarketsTable = forwardRef(
                       withBaseFont
                     />
                     <$InlineRow tw="font-small-book">
-                      {!priceChange24H ? (
+                      {!priceChange24h ? (
                         <Output type={OutputType.Fiat} value={null} />
                       ) : (
                         <>
-                          {priceChange24H > 0 && (
-                            <TriangleIndicator value={MustBigNumber(priceChange24H)} />
+                          {priceChange24h > 0 && (
+                            <TriangleIndicator value={MustBigNumber(priceChange24h)} />
                           )}
                           <$Output
                             type={OutputType.Percent}
-                            value={MustBigNumber(priceChange24HPercent).abs()}
-                            isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
-                            isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                            value={MustBigNumber(percentChange24h).abs()}
+                            isPositive={MustBigNumber(percentChange24h).gt(0)}
+                            isNegative={MustBigNumber(percentChange24h).isNegative()}
                           />
                         </>
                       )}
@@ -138,7 +138,7 @@ export const MarketsTable = forwardRef(
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  imageUrl,
+                  logo,
                   initialMarginFraction,
                   name,
                   isUnlaunched,
@@ -148,7 +148,7 @@ export const MarketsTable = forwardRef(
                     <AssetTableCell
                       configs={{
                         effectiveInitialMarginFraction,
-                        imageUrl,
+                        logo,
                         initialMarginFraction,
                         isUnlaunched,
                       }}
@@ -174,16 +174,16 @@ export const MarketsTable = forwardRef(
               {
                 columnKey: 'priceChange24HChart',
                 label: stringGetter({ key: STRING_KEYS.LAST_24H }),
-                renderCell: ({ line, priceChange24HPercent }) => (
+                renderCell: ({ sparkline24h, percentChange24h }) => (
                   <div tw="h-2 w-3">
                     <SparklineChart
-                      data={(line ?? []).map((datum, index) => ({
+                      data={(sparkline24h ?? []).map((datum, index) => ({
                         x: index + 1,
                         y: parseFloat(datum.toString()),
                       }))}
                       xAccessor={(datum) => datum?.x ?? 0}
                       yAccessor={(datum) => datum?.y ?? 0}
-                      positive={MustBigNumber(priceChange24HPercent).gt(0)}
+                      positive={MustBigNumber(percentChange24h).gt(0)}
                     />
                   </div>
                 ),
@@ -191,19 +191,19 @@ export const MarketsTable = forwardRef(
               },
               {
                 columnKey: 'priceChange24HPercent',
-                getCellValue: (row) => row.priceChange24HPercent,
+                getCellValue: (row) => row.percentChange24h,
                 label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
-                renderCell: ({ priceChange24HPercent }) => (
+                renderCell: ({ percentChange24h }) => (
                   <TableCell stacked>
                     <$InlineRow>
-                      {!priceChange24HPercent ? (
+                      {!percentChange24h ? (
                         <Output type={OutputType.Text} value={null} />
                       ) : (
                         <$Output
                           type={OutputType.Percent}
-                          value={MustBigNumber(priceChange24HPercent).abs()}
-                          isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
-                          isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                          value={MustBigNumber(percentChange24h).abs()}
+                          isPositive={MustBigNumber(percentChange24h).gt(0)}
+                          isNegative={MustBigNumber(percentChange24h).isNegative()}
                         />
                       )}
                     </$InlineRow>
@@ -212,18 +212,18 @@ export const MarketsTable = forwardRef(
               },
               {
                 columnKey: 'volume24H',
-                getCellValue: (row) => row.volume24H,
+                getCellValue: (row) => row.volume24h,
                 label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
                 renderCell: (row) => (
-                  <$NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.volume24h} />
                 ),
               },
               {
                 columnKey: 'spotVolume24H',
-                getCellValue: (row) => row.spotVolume24H,
+                getCellValue: (row) => row.spotVolume24h,
                 label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
                 renderCell: (row) => (
-                  <$NumberOutput type={OutputType.CompactFiat} value={row.spotVolume24H} />
+                  <$NumberOutput type={OutputType.CompactFiat} value={row.spotVolume24h} />
                 ),
               },
               {
@@ -236,10 +236,10 @@ export const MarketsTable = forwardRef(
               },
               {
                 columnKey: 'trades24H',
-                getCellValue: (row) => row.trades24H,
+                getCellValue: (row) => row.trades24h,
                 label: stringGetter({ key: STRING_KEYS.TRADES }),
                 renderCell: (row) => (
-                  <$NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
+                  <$NumberOutput type={OutputType.CompactNumber} value={row.trades24h} />
                 ),
               },
               {
