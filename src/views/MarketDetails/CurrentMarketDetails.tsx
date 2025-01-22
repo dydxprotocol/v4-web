@@ -1,10 +1,8 @@
-import { selectCurrentMarketAssetInfo } from '@/abacus-ts/selectors/assets';
-import { selectCurrentMarketInfo } from '@/abacus-ts/selectors/markets';
-import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -22,8 +20,7 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(selectCurrentMarketInfo, shallowEqual);
-  const asset = useAppSelector(selectCurrentMarketAssetInfo);
+  const currentMarketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
 
   const {
     displayableAsset,
@@ -38,7 +35,7 @@ export const CurrentMarketDetails = () => {
     stepSizeDecimals,
   } = orEmptyObj(currentMarketData);
 
-  const { assetId, logo, name, urls } = orEmptyObj(asset);
+  const { assetId, logo, name, urls } = orEmptyObj(currentMarketData);
   const { cmc, website, technicalDoc } = orEmptyObj(urls);
   const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
 

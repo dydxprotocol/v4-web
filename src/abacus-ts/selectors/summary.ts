@@ -1,4 +1,5 @@
 import { createAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -14,4 +15,25 @@ export const selectAllMarketSummariesLoading = createAppSelector(
 export const selectAllMarketSummaries = createAppSelector(
   [selectAllMarketsInfo, selectSparkLinesData, selectAllAssetsInfo],
   (markets, sparklines, assetInfo) => createMarketSummary(markets, sparklines, assetInfo)
+);
+
+export const selectCurrentMarketInfo = createAppSelector(
+  [selectAllMarketSummaries, getCurrentMarketId],
+  (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
+);
+
+export const selectAllMarketsInfoLoading = createAppSelector(
+  [selectRawMarkets],
+  mergeLoadableStatus
+);
+
+export const selectCurrentMarketAssetInfo = createAppSelector(
+  [selectCurrentMarketInfo, selectAllAssetsInfo],
+  (currentMarketInfo, assets) => {
+    if (currentMarketInfo == null || assets == null) {
+      return undefined;
+    }
+
+    return assets[currentMarketInfo.assetId];
+  }
 );
