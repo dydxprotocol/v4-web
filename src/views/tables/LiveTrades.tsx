@@ -49,7 +49,7 @@ type RowData = {
 export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const currentMarketConfig = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const currentMarketConfig = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo);
   const currentMarketLiveTrades =
     BonsaiHooks.useCurrentMarketLiveTrades().data?.trades ?? EMPTY_ARR;
 
