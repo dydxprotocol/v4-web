@@ -6,15 +6,6 @@ export enum MarketTypeFilter {
   Isolated = 'Isolated',
 }
 
-export function marketTypeMatchesFilter(type: 'Isolated' | 'Cross', filter?: MarketTypeFilter) {
-  return (
-    filter == null ||
-    filter === MarketTypeFilter.AllMarkets ||
-    (type === 'Isolated' && filter === MarketTypeFilter.Isolated) ||
-    (type === 'Cross' && filter === MarketTypeFilter.Cross)
-  );
-}
-
 export function marginModeMatchesFilter(type: MarginMode, filter?: MarketTypeFilter) {
   return (
     filter == null ||

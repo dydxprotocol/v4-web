@@ -1,3 +1,8 @@
+// eslint-disable-next-line no-restricted-imports
+import {
+  subscribeOnStream,
+  unsubscribeFromStream,
+} from '@/abacus-ts/websocket/candlesForTradingView';
 import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 import type {
@@ -33,7 +38,6 @@ import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
 import { getSymbol, mapCandle } from '../utils';
-import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 import { getMarkForOrderFills } from './utils';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;

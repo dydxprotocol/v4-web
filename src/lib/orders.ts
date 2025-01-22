@@ -1,4 +1,11 @@
-import { PerpetualMarketSummaries, PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
+// eslint-disable-next-line no-restricted-imports
+import { getSimpleOrderStatus } from '@/abacus-ts/calculators/orders';
+import {
+  SubaccountOrder as NewSubaccountOrder,
+  OrderStatus as OrderStatusNew,
+  PerpetualMarketSummaries,
+  PerpetualMarketSummary,
+} from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
@@ -9,16 +16,17 @@ import {
   AbacusOrderTypes,
   KotlinIrEnumValues,
   Nullable,
+  OrderStatus,
   SubaccountFill,
   SubaccountFills,
   TRADE_TYPES,
   type Asset,
-  type OrderStatus,
   type PerpetualMarket,
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { IconName } from '@/components/Icon';
@@ -74,6 +82,55 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
   }
 };
 
+export const getOrderStatusInfoNew = ({ status }: { status: OrderStatusNew }) => {
+  switch (status) {
+    case OrderStatusNew.Open: {
+      return {
+        statusIcon: IconName.OrderOpen,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+    case OrderStatusNew.PartiallyFilled:
+    case OrderStatusNew.PartiallyCanceled: {
+      return {
+        statusIcon: IconName.OrderPartiallyFilled,
+        statusIconColor: `var(--color-warning)`,
+      };
+    }
+    case OrderStatusNew.Filled: {
+      return {
+        statusIcon: IconName.OrderFilled,
+        statusIconColor: `var(--color-success)`,
+      };
+    }
+    case OrderStatusNew.Canceled: {
+      return {
+        statusIcon: IconName.OrderCanceled,
+        statusIconColor: `var(--color-error)`,
+      };
+    }
+    case OrderStatusNew.Canceling: {
+      return {
+        statusIcon: IconName.OrderPending,
+        statusIconColor: `var(--color-error)`,
+      };
+    }
+    case OrderStatusNew.Untriggered: {
+      return {
+        statusIcon: IconName.OrderUntriggered,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+    case OrderStatusNew.Pending:
+    default: {
+      return {
+        statusIcon: IconName.OrderPending,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
+  }
+};
+
 export const isOrderStatusOpen = (status: OrderStatus) =>
   [
     AbacusOrderStatus.Open,
@@ -84,6 +141,10 @@ export const isOrderStatusOpen = (status: OrderStatus) =>
 
 export const isOrderStatusClearable = (status: OrderStatus) =>
   status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
+
+export const isNewOrderStatusClearable = (status: OrderStatusNew) =>
+  getSimpleOrderStatus(status) === OrderStatusNew.Canceled ||
+  getSimpleOrderStatus(status) === OrderStatusNew.Filled;
 
 export const isOrderStatusCanceled = (status: OrderStatus) =>
   [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
@@ -98,6 +159,15 @@ export const isMarketOrderType = (type?: AbacusOrderTypes) =>
     AbacusOrderType.TakeProfitMarket,
     AbacusOrderType.TrailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
+
+export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
+  type &&
+  [
+    IndexerOrderType.MARKET,
+    IndexerOrderType.STOPMARKET,
+    IndexerOrderType.TAKEPROFITMARKET,
+    IndexerOrderType.TRAILINGSTOP,
+  ].some((t) => t === type);
 
 export const isLimitOrderType = (type?: AbacusOrderTypes) =>
   type &&
@@ -152,6 +222,21 @@ type NewAddedProps = {
   marketSummary: PerpetualMarketSummary | undefined;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
+};
+
+export const getHydratedOrder = ({
+  data,
+  marketSummaries,
+}: {
+  data: NewSubaccountOrder;
+  marketSummaries: PerpetualMarketSummaries;
+}): NewSubaccountOrder & NewAddedProps => {
+  return {
+    ...data,
+    marketSummary: marketSummaries[data.marketId],
+    stepSizeDecimals: marketSummaries[data.marketId]?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.marketId]?.tickSizeDecimals ?? USD_DECIMALS,
+  };
 };
 
 export const getHydratedFill = ({

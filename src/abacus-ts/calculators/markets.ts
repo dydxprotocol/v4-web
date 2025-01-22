@@ -117,7 +117,8 @@ export function formatSparklineData(sparklines?: {
 export function createMarketSummary(
   markets: MarketsInfo | undefined,
   sparklines: PerpetualMarketSparklines | undefined,
-  assetInfo: AllAssetData | undefined
+  assetInfo: AllAssetData | undefined,
+  listOfFavorites: string[]
 ): PerpetualMarketSummaries | null {
   if (markets == null || assetInfo == null) {
     return null;
@@ -140,7 +141,7 @@ export function createMarketSummary(
         ...formattedAssetData,
         sparkline24h: sparklines?.[IndexerSparklineTimePeriod.ONEDAY]?.[market.ticker] ?? EMPTY_ARR,
         isNew,
-        isFavorite: false,
+        isFavorite: listOfFavorites.includes(market.ticker),
         isUnlaunched: false,
       };
     }),
