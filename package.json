@@ -60,7 +60,7 @@
     "@dydxprotocol/v4-localization": "^1.1.257",
     "@dydxprotocol/v4-proto": "^7.0.0-dev.0",
     "@emotion/is-prop-valid": "^1.3.0",
-    "@funkit/connect": "^4.1.4",
+    "@funkit/connect": "^4.1.6",
     "@hugocxl/react-to-image": "^0.0.9",
     "@js-joda/core": "^5.5.3",
     "@keplr-wallet/types": "^0.12.121",
