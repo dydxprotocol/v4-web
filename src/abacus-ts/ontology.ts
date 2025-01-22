@@ -34,6 +34,7 @@ import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketInfo,
+  selectCurrentMarketInfoStable,
 } from './selectors/summary';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
@@ -93,6 +94,8 @@ export const BonsaiCore = {
 export const BonsaiHelpers = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
+    // marketInfo but with only the properties that rately change, for fewer rerenders
+    stableMarketInfo: selectCurrentMarketInfoStable,
     account: {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,

@@ -20,7 +20,7 @@ import { MarketDetails } from './MarketDetails';
 
 export const CurrentMarketDetails = () => {
   const stringGetter = useStringGetter();
-  const currentMarketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const currentMarketData = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo);
 
   const {
     displayableAsset,
