@@ -1,19 +1,16 @@
-import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderFlags, OrderStatus } from '@/abacus-ts/types/summaryTypes';
+import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import {
-  AbacusMarginMode,
-  AbacusOrderStatus,
-  AbacusOrderTypes,
-  type Nullable,
-} from '@/constants/abacus';
+import { type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 import { CancelOrderStatuses } from '@/constants/trade';
+import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -25,7 +22,13 @@ import { type DetailsItem } from '@/components/Details';
 import { DetailsDialog } from '@/components/DetailsDialog';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { OrderStatusIcon } from '@/views/OrderStatusIcon';
+import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
+import {
+  getIndexerOrderTypeStringKey,
+  getMarginModeStringKey,
+  getOrderStatusStringKey,
+  getOrderTimeInForceStringKey,
+} from '@/views/tables/enumToStringKeyHelpers';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -33,9 +36,7 @@ import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
-import { isMarketOrderType, isOrderStatusClearable } from '@/lib/orders';
-import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
+import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
 
 export const OrderDetailsDialog = ({
   orderId,
@@ -44,55 +45,51 @@ export const OrderDetailsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-  const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
 
   const { cancelOrder } = useSubaccount();
 
+  const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
   const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
   const isOrderCanceling =
     localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
   const {
-    asset,
-    cancelReason,
-    createdAtMilliseconds,
     displayId,
     expiresAtMilliseconds,
     marketId,
     orderFlags,
-    orderSide,
+    side: orderSide,
     postOnly,
     price,
     reduceOnly,
     totalFilled,
-    resources,
     size,
     status,
     stepSizeDecimals,
     subaccountNumber,
     tickSizeDecimals,
-    trailingPercent,
     triggerPrice,
+    timeInForce,
     type,
-  } = useParameterizedSelector(getOrderDetails, orderId)! ?? {};
+    updatedAtMilliseconds,
+    marginMode,
+    marketSummary,
 
-  const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);
+    removalReason,
+  } = useParameterizedSelector(getOrderDetails, orderId) ?? {};
 
-  const marginModeLabel =
-    marginMode === AbacusMarginMode.Cross
-      ? stringGetter({ key: STRING_KEYS.CROSS })
-      : stringGetter({ key: STRING_KEYS.ISOLATED });
+  const marginModeLabel = stringGetter({ key: getMarginModeStringKey(marginMode ?? 'CROSS') });
 
   const renderOrderPrice = ({
     type: innerType,
     price: innerPrice,
     tickSizeDecimals: innerTickSizeDecimals,
   }: {
-    type?: AbacusOrderTypes;
-    price?: Nullable<number>;
+    type?: IndexerOrderType;
+    price?: Nullable<BigNumber>;
     tickSizeDecimals: number;
   }) =>
-    isMarketOrderType(innerType) ? (
+    isMarketOrderTypeNew(innerType) ? (
       stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
     ) : (
       <Output type={OutputType.Fiat} value={innerPrice} fractionDigits={innerTickSizeDecimals} />
@@ -125,16 +122,16 @@ export const OrderDetailsDialog = ({
       {
         key: 'side',
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        value: <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} />,
+        value: <OrderSideTag orderSide={orderSide ?? IndexerOrderSide.BUY} />,
       },
       {
         key: 'status',
         label: stringGetter({ key: STRING_KEYS.STATUS }),
         value: (
           <div tw="inlineRow">
-            <OrderStatusIcon status={status.rawValue} />
+            {status != null && <OrderStatusIconNew status={status} />}
             <span tw="font-small-medium">
-              {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
+              {stringGetter({ key: getOrderStatusStringKey(status) })}
             </span>
           </div>
         ),
@@ -142,8 +139,8 @@ export const OrderDetailsDialog = ({
       {
         key: 'cancel-reason',
         label: stringGetter({ key: STRING_KEYS.CANCEL_REASON }),
-        value: cancelReason
-          ? stringGetter({ key: STRING_KEYS[cancelReason as StringKey] })
+        value: removalReason
+          ? stringGetter({ key: STRING_KEYS[removalReason as StringKey] })
           : undefined,
       },
       {
@@ -171,18 +168,12 @@ export const OrderDetailsDialog = ({
           : undefined,
       },
       {
-        key: 'trailing-percent',
-        label: stringGetter({ key: STRING_KEYS.TRAILING_PERCENT }),
-        value: trailingPercent ? (
-          <Output type={OutputType.Percent} value={MustBigNumber(trailingPercent).div(100)} />
-        ) : undefined,
-      },
-      {
         key: 'time-in-force',
         label: stringGetter({ key: STRING_KEYS.TIME_IN_FORCE }),
-        value: resources.timeInForceStringKey
-          ? stringGetter({ key: resources.timeInForceStringKey })
-          : undefined,
+        value:
+          timeInForce != null
+            ? stringGetter({ key: getOrderTimeInForceStringKey(timeInForce) })
+            : undefined,
       },
       {
         key: 'execution',
@@ -199,9 +190,9 @@ export const OrderDetailsDialog = ({
         value: renderOrderTime({ timeInMs: expiresAtMilliseconds }),
       },
       {
-        key: 'created-at',
-        label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
-        value: renderOrderTime({ timeInMs: createdAtMilliseconds }),
+        key: 'updated-at',
+        label: stringGetter({ key: STRING_KEYS.UPDATED }),
+        value: renderOrderTime({ timeInMs: updatedAtMilliseconds }),
       },
       {
         key: 'subaccount',
@@ -223,19 +214,18 @@ export const OrderDetailsDialog = ({
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
   // we update short term orders to pending status when they are best effort canceled in Abacus
   const isBestEffortCanceled =
-    (status === AbacusOrderStatus.Pending && cancelReason != null) ||
-    status === AbacusOrderStatus.Canceling;
+    (status === OrderStatus.Pending && removalReason != null) || status === OrderStatus.Canceling;
 
   const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
 
   return (
     <DetailsDialog
       slotIcon={
-        <AssetIcon logoUrl={asset?.resources?.imageUrl} symbol={asset?.id} tw="text-[1em]" />
+        <AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} tw="text-[1em]" />
       }
-      title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
+      title={type != null && stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
       slotFooter={
-        isAccountViewOnly ? null : isOrderStatusClearable(status) ? (
+        isAccountViewOnly ? null : status != null && isNewOrderStatusClearable(status) ? (
           <Button onClick={onClearClick}>{stringGetter({ key: STRING_KEYS.CLEAR })}</Button>
         ) : (
           <Button

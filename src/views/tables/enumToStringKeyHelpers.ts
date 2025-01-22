@@ -2,6 +2,7 @@ import { MarginMode, OrderStatus } from '@/abacus-ts/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import {
+  IndexerAPITimeInForce,
   IndexerFillType,
   IndexerLiquidity,
   IndexerOrderSide,
@@ -104,5 +105,19 @@ export function getIndexerLiquidityStringKey(liquidity: IndexerLiquidity): strin
     default:
       assertNever(liquidity);
       return STRING_KEYS.MAKER;
+  }
+}
+
+export function getOrderTimeInForceStringKey(time: IndexerAPITimeInForce): string {
+  switch (time) {
+    case IndexerAPITimeInForce.FOK:
+      return STRING_KEYS.FILL_OR_KILL;
+    case IndexerAPITimeInForce.GTT:
+      return STRING_KEYS.GOOD_TIL_TIME;
+    case IndexerAPITimeInForce.IOC:
+      return STRING_KEYS.IMMEDIATE_OR_CANCEL;
+    default:
+      assertNever(time);
+      return STRING_KEYS.GOOD_TIL_TIME;
   }
 }

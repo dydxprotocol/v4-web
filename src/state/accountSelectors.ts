@@ -23,7 +23,8 @@ import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   getAverageFillPrice,
-  getHydratedTradingData,
+  getHydratedFill,
+  getHydratedOrder,
   isOrderStatusClearable,
   isOrderStatusOpen,
   isStopLossOrder,
@@ -373,14 +374,18 @@ export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
  */
 export const getOrderDetails = () =>
   createAppSelector(
-    [getSubaccountOrders, getAssets, getPerpetualMarkets, (s, orderId: string) => orderId],
-    (orders, assets, perpetualMarkets, orderId) => {
-      const matchingOrder = orders?.find((order) => order.id === orderId);
+    [
+      BonsaiCore.account.orderHistory.data,
+      BonsaiCore.account.openOrders.data,
+      BonsaiCore.markets.markets.data,
+      (s, orderId: string) => orderId,
+    ],
+    (historical, current, marketSummaries, orderId) => {
+      const matchingOrder = [...historical, ...current].find((order) => order.id === orderId);
       return matchingOrder
-        ? getHydratedTradingData({
+        ? getHydratedOrder({
             data: matchingOrder,
-            assets: assets ?? {},
-            perpetualMarkets: perpetualMarkets ?? {},
+            marketSummaries: marketSummaries ?? {},
           })
         : undefined;
     }
@@ -416,14 +421,13 @@ export const getMarketFills = createAppSelector(
  */
 export const getFillDetails = () =>
   createAppSelector(
-    [getSubaccountFills, getAssets, getPerpetualMarkets, (s, fillId: string) => fillId],
-    (fills, assets, perpetualMarkets, fillId) => {
-      const matchingFill = fills?.find((fill) => fill.id === fillId);
+    [BonsaiCore.account.fills.data, BonsaiCore.markets.markets.data, (s, fillId: string) => fillId],
+    (fills, marketSummaries, fillId) => {
+      const matchingFill = fills.find((fill) => fill.id === fillId);
       return matchingFill
-        ? getHydratedTradingData({
+        ? getHydratedFill({
             data: matchingFill,
-            assets: assets ?? {},
-            perpetualMarkets: perpetualMarkets ?? {},
+            marketSummaries: marketSummaries ?? {},
           })
         : undefined;
     }
@@ -732,7 +736,7 @@ export const createGetUnseenOpenOrdersCount = () =>
           (o.updatedAtMilliseconds ?? 0) >
           (mapIfPresent(
             (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
-            (t) => new Date(t).valueOf()
+            (t) => new Date(t).getTime()
           ) ?? 0)
       );
       return unseen.length;
@@ -763,7 +767,7 @@ export const createGetUnseenOrderHistoryCount = () =>
           (o.updatedAtMilliseconds ?? 0) >
           (mapIfPresent(
             (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
-            (t) => new Date(t).valueOf()
+            (t) => new Date(t).getTime()
           ) ?? 0)
       );
       return unseen.length;
@@ -791,10 +795,10 @@ export const createGetUnseenFillsCount = () =>
       }
       const unseen = ourFills.filter(
         (o) =>
-          (mapIfPresent(o.createdAt, (c) => new Date(c).valueOf()) ?? 0) >
+          (mapIfPresent(o.createdAt, (c) => new Date(c).getTime()) ?? 0) >
           (mapIfPresent(
             (memory.seenFills[o.market ?? ''] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
-            (t) => new Date(t).valueOf()
+            (t) => new Date(t).getTime()
           ) ?? 0)
       );
       return unseen.length;
