@@ -55,7 +55,7 @@ export function getMarketDataFromPerpetualMarketSummary(
     assetId,
     displayId,
     clobPairId,
-    effectiveInitialMarginFraction: effectiveInitialMarginFraction?.toNumber(),
+    effectiveInitialMarginFraction,
     logo,
     initialMarginFraction: MustBigNumber(initialMarginFraction).toNumber(),
     isNew,

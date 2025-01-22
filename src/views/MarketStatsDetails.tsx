@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -25,13 +25,10 @@ import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketData,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MidMarketPrice } from './MidMarketPrice';
 
@@ -54,23 +51,32 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const { tickSizeDecimals, initialMarginFraction, effectiveInitialMarginFraction } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const marketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
+  const isLoading = useAppSelector(BonsaiCore.markets.markets.loading) === 'pending';
+
+  const {
+    displayableAsset,
+    effectiveInitialMarginFraction,
+    initialMarginFraction,
+    nextFundingRate,
+    openInterest,
+    openInterestUSDC,
+    oraclePrice,
+    percentChange24h,
+    priceChange24H,
+    tickSizeDecimals,
+    trades24H,
+    volume24H,
+  } = orEmptyObj(marketData);
+
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
-  const currentMarketData = useAppSelector(getCurrentMarketData, shallowEqual);
-  const isLoading = currentMarketData === undefined;
-
-  const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent, assetId } =
-    currentMarketData ?? {};
 
   useEffect(() => {
     lastMidMarketPrice.current = midMarketPrice;
   }, [midMarketPrice]);
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
-
-  const { nextFundingRate, openInterest, openInterestUSDC, trades24H, volume24H } = perpetual ?? {};
 
   const valueMap = {
     [MarketStats.OraclePrice]: oraclePrice,
@@ -117,9 +123,9 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               value={valueMap[stat]}
               stat={stat}
               tickSizeDecimals={tickSizeDecimals}
-              assetId={assetId ?? ''}
+              assetId={displayableAsset ?? ''}
               isLoading={isLoading}
-              priceChange24HPercent={priceChange24HPercent}
+              priceChange24HPercent={percentChange24h}
               initialMarginFraction={initialMarginFraction}
               effectiveInitialMarginFraction={effectiveInitialMarginFraction}
               useFiatDisplayUnit={displayUnit === DisplayUnit.Fiat}
@@ -210,13 +216,13 @@ const DetailsItem = ({
   effectiveInitialMarginFraction,
   useFiatDisplayUnit,
 }: {
-  value: number | null | undefined;
+  value: string | number | null | undefined;
   stat: MarketStats;
   tickSizeDecimals: number | null | undefined;
   assetId: string;
   isLoading: boolean;
   priceChange24HPercent: number | null | undefined;
-  initialMarginFraction: number | null | undefined;
+  initialMarginFraction: string | null | undefined;
   effectiveInitialMarginFraction: number | null | undefined;
   useFiatDisplayUnit: boolean;
 }) => {
