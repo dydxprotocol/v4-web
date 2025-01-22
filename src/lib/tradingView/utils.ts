@@ -1,6 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { DateTime } from 'luxon';
 import {
   ChartPropertiesOverrides,
+  Timezone,
   TradingTerminalFeatureset,
   TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
@@ -191,6 +193,8 @@ export const getChartLineColors = ({
   };
 };
 
+const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
+
 export const getWidgetOverrides = ({
   appTheme,
   appColorMode,
@@ -223,6 +227,7 @@ export const getWidgetOverrides = ({
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
       'scalesProperties.fontSize': 12,
+      timezone,
     } as Partial<ChartPropertiesOverrides>,
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
