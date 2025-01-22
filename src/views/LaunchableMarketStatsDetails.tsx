@@ -57,7 +57,7 @@ export const LaunchableMarketStatsDetails = ({
   const { isTablet } = useBreakpoints();
   const assetId = getAssetFromMarketId(launchableMarketId);
   const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.paramaterizedAssetInfo,
+    BonsaiHelpers.assets.createSelectAssetInfo,
     assetId
   );
 
