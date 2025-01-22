@@ -13,7 +13,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { getDirectionFromFundingRate, mapFundingChartObject } from '../calculators/funding';
-import { selectCurrentMarketInfo } from '../selectors/markets';
+import { selectCurrentMarketInfo } from '../selectors/summary';
 import { useIndexerClient } from './lib/useIndexer';
 
 export const useCurrentMarketHistoricalFunding = () => {
