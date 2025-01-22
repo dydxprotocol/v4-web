@@ -1,6 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { DateTime } from 'luxon';
 import {
   ChartPropertiesOverrides,
+  Timezone,
   TradingTerminalFeatureset,
   TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
@@ -191,6 +193,8 @@ export const getChartLineColors = ({
   };
 };
 
+const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
+
 export const getWidgetOverrides = ({
   appTheme,
   appColorMode,
@@ -267,6 +271,7 @@ export const getWidgetOptions = (
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: disabledFeatures,
+    timezone,
     enabled_features: [
       'remove_library_container_border',
       'hide_last_na_study_output',
