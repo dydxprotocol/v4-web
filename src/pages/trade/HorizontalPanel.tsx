@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -25,12 +26,7 @@ import {
   calculateIsAccountViewOnly,
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
-import {
-  createGetUnseenFillsCount,
-  createGetUnseenOrdersCount,
-  getCurrentMarketTradeInfoNumbers,
-  getTradeInfoNumbers,
-} from '@/state/accountSelectors';
+import { createGetUnseenFillsCount, createGetUnseenOrdersCount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
@@ -53,9 +49,10 @@ enum InfoSection {
 type ElementProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
+  handleStartResize?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
+export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
@@ -69,14 +66,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders } = useAppSelector(
-    getTradeInfoNumbers,
-    shallowEqual
-  );
-
-  const { numOpenOrders } = useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual);
-
+  const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
@@ -88,19 +80,22 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     createGetUnseenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
-  const hasUnseenOrderUpdates = unseenOrders > 0;
+  const ordersTagNumber = shortenNumberForDisplay(unseenOrders);
+
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
 
   const numUnseenFills = useParameterizedSelector(
     createGetUnseenFillsCount,
     showCurrentMarket ? currentMarketId : undefined
   );
-  const hasUnseenFillUpdates = numUnseenFills > 0;
   const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
-  const ordersTagNumber = shortenNumberForDisplay(
-    showCurrentMarket ? numOpenOrders : numTotalOpenOrders
-  );
 
-  const initialPageSize = 10;
+  const hasUnseenOrderUpdates = unseenOrders > 0;
+  const hasUnseenFillUpdates = numUnseenFills > 0;
+
+  const initialPageSize = 20;
 
   const onViewOrders = useCallback(
     (market: string) => {
@@ -227,10 +222,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       value: InfoSection.Fills,
       label: stringGetter({ key: STRING_KEYS.FILLS }),
 
-      slotRight: fillsTagNumber && (
-        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-          {fillsTagNumber}
-        </Tag>
+      slotRight: areFillsLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        fillsTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+            {fillsTagNumber}
+          </Tag>
+        )
       ),
 
       content: (
@@ -264,26 +263,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     }),
     [
       stringGetter,
-      currentMarketId,
-      showCurrentMarket,
-      isTablet,
+      areFillsLoading,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      isTablet,
     ]
   );
-
-  // TODO - TRCL-1693 - re-enable when funding payments are supported
-  // const paymentsTabItem = {
-  //   value: InfoSection.Payments,
-  //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
-
-  //   tag: shortenNumberForDisplay(
-  //     showCurrentMarket ? numFundingPayments : numTotalFundingPayments
-  //   ),
-  //   content: (
-  //     <FundingPaymentsTable currentMarket={showCurrentMarket ? currentMarket?.id : undefined} />
-  //   ),
-  // },
 
   const tabItems = useMemo(
     () => [positionTabItem, fillsTabItem, ordersTabItem],
@@ -303,6 +290,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} />
   ) : (
     <>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <$DragHandle onMouseDown={handleStartResize} />
+
       <$CollapsibleTabs
         defaultTab={InfoSection.Position}
         tab={tab}
@@ -325,6 +315,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     </>
   );
 };
+
+const $DragHandle = styled.div`
+  width: 100%;
+  height: 0.5rem;
+  cursor: ns-resize;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+`;
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
   header {

@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
-
+import { SubaccountPosition } from '@/abacus-ts/types/summaryTypes';
 import styled from 'styled-components';
 
-import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,8 +16,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
-
 type PositionsMarginCellProps = {
   position: SubaccountPosition;
 };
@@ -28,24 +24,10 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const { marginMode, margin } = useMemo(() => {
-    const { childSubaccountNumber } = position;
-    const derivedMarginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
-
-    return {
-      marginMode: derivedMarginMode,
-      marginModeLabel:
-        derivedMarginMode === AbacusMarginMode.Cross
-          ? stringGetter({ key: STRING_KEYS.CROSS })
-          : stringGetter({ key: STRING_KEYS.ISOLATED }),
-      margin: getPositionMargin({ position }),
-    };
-  }, [position, stringGetter]);
-
   return (
     <TableCell
       slotRight={
-        marginMode === AbacusMarginMode.Isolated && (
+        position.marginMode === 'ISOLATED' && (
           <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
             <$EditButton
               key="edit-margin"
@@ -53,14 +35,17 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
               shape={ButtonShape.Square}
               size={ButtonSize.XSmall}
               onClick={() =>
-                dispatch(openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.id })))
+                // todo this handoff should be using uniqueid
+                dispatch(
+                  openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.market }))
+                )
               }
             />
           </WithTooltip>
         )
       }
     >
-      <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />
+      <Output type={OutputType.Fiat} value={position.marginValueInitial} showSign={ShowSign.None} />
     </TableCell>
   );
 };

@@ -138,7 +138,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                     const bar: TradingViewChartBar = mapCandle(this.orderbookCandlesToggleOn)(
                       updatedCandle
                     );
-                    subscriptionItem.lastBar = bar;
 
                     // send data to every subscriber of that symbol
                     Object.values(subscriptionItem.handlers).forEach((handler: any) =>

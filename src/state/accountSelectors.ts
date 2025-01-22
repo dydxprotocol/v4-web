@@ -1,4 +1,4 @@
-import { selectRawIndexerHeightData } from '@/abacus-ts/selectors/base';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';
@@ -702,7 +702,7 @@ export const createGetUnseenOrdersCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
+      BonsaiCore.network.indexerHeight.data,
       getSubaccountOrders,
       (state, market: string | undefined) => market,
     ],
@@ -734,16 +734,15 @@ export const createGetUnseenFillsCount = () =>
   createAppSelector(
     [
       getCurrentAccountMemory,
-      selectRawIndexerHeightData,
-      getSubaccountFills,
+      BonsaiCore.network.indexerHeight.data,
+      BonsaiCore.account.fills.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, fills, market) => {
       if (height == null) {
         return 0;
       }
-      const ourFills =
-        (market == null ? fills : fills?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      const ourFills = market == null ? fills : fills.filter((o) => o.market === market);
       if (ourFills.length === 0) {
         return 0;
       }
@@ -752,9 +751,9 @@ export const createGetUnseenFillsCount = () =>
       }
       const unseen = ourFills.filter(
         (o) =>
-          o.createdAtMilliseconds >
+          (mapIfPresent(o.createdAt, (c) => new Date(c).valueOf()) ?? 0) >
           (mapIfPresent(
-            (memory.seenFills[o.marketId] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
+            (memory.seenFills[o.market ?? ''] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
             (t) => new Date(t).valueOf()
           ) ?? 0)
       );
