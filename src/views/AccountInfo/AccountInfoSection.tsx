@@ -1,7 +1,9 @@
+import { BonsaiCore } from '@/abacus-ts/ontology';
+import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import type { Nullable, TradeState } from '@/constants/abacus';
+import type { Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -29,22 +31,21 @@ import { openDialog } from '@/state/dialogs';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
 enum AccountInfoItem {
   PortfolioValue = 'portfolio-value',
   MarginUsed = 'margin-used',
-
-  // TODO: CT-1292 remove deprecated fields
   AvailableBalance = 'available-balance',
 }
 
-const getUsageValue = (value: Nullable<TradeState<number>>) => {
-  const currentValue = value?.current;
-  const postOrderValue = value?.postOrder;
-  const hasDiffPostOrder = postOrderValue !== null && currentValue !== postOrderValue;
-  return (hasDiffPostOrder ? postOrderValue : currentValue) ?? 0;
+const getUsageValue = (value: Nullable<BigNumber>, valuePost: Nullable<number>) => {
+  const currentValue = value;
+  const postOrderValue = valuePost;
+  const hasDiffPostOrder = postOrderValue != null && !currentValue?.eq(postOrderValue);
+  return (hasDiffPostOrder ? postOrderValue : currentValue?.toNumber()) ?? 0;
 };
 
 export const AccountInfoSection = () => {
@@ -55,14 +56,23 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
-  const subAccount = useAppSelector(getSubaccount, shallowEqual);
-  const isLoading = useAppSelector(calculateIsAccountLoading);
+  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
+  const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
+  const isLoadingData =
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
+  const isLoading = !!isLoadingGuards || isLoadingData;
 
-  const { freeCollateral: availableBalance, marginUsage } = subAccount ?? {};
-  const portfolioValue = subAccount?.equity;
+  const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
+  const {
+    freeCollateral: availableBalancePost,
+    marginUsage: marginUsagePost,
+    equity: portfolioValuePost,
+  } = subAccountAbacus;
 
   const isPostOrderBalanceNegative =
-    isNumber(availableBalance?.postOrder) && MustBigNumber(availableBalance.postOrder).lt(0);
+    isNumber(availableBalancePost?.postOrder) &&
+    MustBigNumber(availableBalancePost.postOrder).lt(0);
 
   const withdrawButton = (
     <$Button
@@ -123,11 +133,12 @@ export const AccountInfoSection = () => {
         <AccountInfoDiffOutput
           hasError={false}
           hideDiff
-          isPositive={MustBigNumber(portfolioValue?.postOrder).gt(
-            MustBigNumber(portfolioValue?.current)
+          isPositive={MustBigNumber(portfolioValuePost?.postOrder).gt(
+            MustBigNumber(portfolioValue)
           )}
           type={OutputType.Fiat}
           value={portfolioValue}
+          valuePost={portfolioValuePost?.postOrder}
         />
       ),
     },
@@ -142,15 +153,16 @@ export const AccountInfoSection = () => {
         <AccountInfoDiffOutput
           hasError={isPostOrderBalanceNegative}
           hideDiff={isPostOrderBalanceNegative}
-          isPositive={MustBigNumber(availableBalance?.postOrder).gt(
-            MustBigNumber(availableBalance?.current)
+          isPositive={MustBigNumber(availableBalancePost?.postOrder).gt(
+            MustBigNumber(availableBalance)
           )}
           type={OutputType.Fiat}
           value={
-            MustBigNumber(availableBalance?.current).lt(0) && availableBalance?.postOrder === null
+            MustBigNumber(availableBalance).lt(0) && availableBalancePost?.postOrder === null
               ? undefined
               : availableBalance
           }
+          valuePost={availableBalancePost?.postOrder}
         />
       ),
     },
@@ -164,15 +176,14 @@ export const AccountInfoSection = () => {
       value: (
         <>
           <WithTooltip tooltip="margin-used" side="left">
-            <MarginUsageRing value={getUsageValue(marginUsage)} />
+            <MarginUsageRing value={getUsageValue(marginUsage, marginUsagePost?.postOrder)} />
           </WithTooltip>
           <AccountInfoDiffOutput
             hasError={false}
-            isPositive={MustBigNumber(marginUsage?.postOrder).gt(
-              MustBigNumber(marginUsage?.current)
-            )}
+            isPositive={MustBigNumber(marginUsagePost?.postOrder).gt(MustBigNumber(marginUsage))}
             type={OutputType.Percent}
             value={marginUsage}
+            valuePost={marginUsagePost?.postOrder}
           />
         </>
       ),
