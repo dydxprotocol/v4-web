@@ -1,7 +1,4 @@
-import {
-  selectParentSubaccountSummary,
-  selectParentSubaccountSummaryLoading,
-} from '@/abacus-ts/selectors/account';
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -34,6 +31,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
@@ -59,16 +57,13 @@ export const AccountInfoSection = () => {
   const { dydxAccounts } = useAccounts();
 
   const subAccountAbacus = useAppSelector(getSubaccount, shallowEqual);
-  const subAccount = useAppSelector(selectParentSubaccountSummary);
+  const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
-  const isLoadingData = useAppSelector(selectParentSubaccountSummaryLoading) === 'pending';
+  const isLoadingData =
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
   const isLoading = !!isLoadingGuards || isLoadingData;
 
-  const {
-    freeCollateral: availableBalance,
-    marginUsage,
-    equity: portfolioValue,
-  } = subAccount ?? {};
+  const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const {
     freeCollateral: availableBalancePost,
     marginUsage: marginUsagePost,
