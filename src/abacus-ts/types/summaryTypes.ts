@@ -122,6 +122,12 @@ export enum OrderStatus {
   PartiallyCanceled = 'PARTIALLY_CANCELED',
 }
 
+export enum OrderFlags {
+  SHORT_TERM = '0',
+  LONG_TERM = '64',
+  CONDITIONAL = '32',
+}
+
 export type SubaccountOrder = {
   subaccountNumber: number;
   id: string;

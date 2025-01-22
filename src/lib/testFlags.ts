@@ -1,5 +1,3 @@
-import { isDev } from '@/constants/networks';
-
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -60,10 +58,6 @@ class TestFlags {
 
   get showInstantDepositToggle() {
     return !!this.queryParams.funkit_toggle;
-  }
-
-  get useAbacusTs() {
-    return isDev;
   }
 
   get disableAbacus() {
