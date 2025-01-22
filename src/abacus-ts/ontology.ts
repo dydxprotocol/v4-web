@@ -26,7 +26,11 @@ import {
   selectLatestIndexerHeight,
   selectLatestValidatorHeight,
 } from './selectors/apiStatus';
-import { createSelectAssetInfo } from './selectors/assets';
+import {
+  createSelectAssetInfo,
+  selectAllAssetsInfo,
+  selectAllAssetsInfoLoading,
+} from './selectors/assets';
 import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
@@ -78,6 +82,7 @@ export const BonsaiCore = {
       data: selectAllMarketSummaries,
       loading: selectAllMarketSummariesLoading,
     },
+    assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
   },
   network: {
     indexerHeight: {
