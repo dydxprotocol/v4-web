@@ -1,4 +1,5 @@
 import { createAppSelector } from '@/state/appTypes';
+import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -12,6 +13,7 @@ export const selectAllMarketSummariesLoading = createAppSelector(
 );
 
 export const selectAllMarketSummaries = createAppSelector(
-  [selectAllMarketsInfo, selectSparkLinesData, selectAllAssetsInfo],
-  (markets, sparklines, assetInfo) => createMarketSummary(markets, sparklines, assetInfo)
+  [selectAllMarketsInfo, selectSparkLinesData, selectAllAssetsInfo, getFavoritedMarkets],
+  (markets, sparklines, assetInfo, favorites) =>
+    createMarketSummary(markets, sparklines, assetInfo, favorites)
 );
