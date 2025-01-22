@@ -94,7 +94,7 @@ export const BonsaiCore = {
 export const BonsaiHelpers = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
-    // marketInfo but with only the properties that rately change, for fewer rerenders
+    // marketInfo but with only the properties that rarely change, for fewer rerenders
     stableMarketInfo: selectCurrentMarketInfoStable,
     account: {
       openOrders: selectCurrentMarketOpenOrders,
