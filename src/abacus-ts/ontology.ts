@@ -26,7 +26,11 @@ import {
   selectLatestIndexerHeight,
   selectLatestValidatorHeight,
 } from './selectors/apiStatus';
-import { selectAllAssetsInfo, selectAllAssetsInfoLoading } from './selectors/assets';
+import {
+  createSelectAssetInfo,
+  selectAllAssetsInfo,
+  selectAllAssetsInfoLoading,
+} from './selectors/assets';
 import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
@@ -103,6 +107,9 @@ export const BonsaiHelpers = {
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
     },
+  },
+  assets: {
+    createSelectAssetInfo,
   },
   forms: {
     deposit: {
