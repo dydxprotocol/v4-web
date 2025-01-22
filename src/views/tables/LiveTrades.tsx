@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
 import { BonsaiHelpers, BonsaiHooks } from '@/abacus-ts/ontology';
-import { LiveTrade } from '@/abacus-ts/summaryTypes';
-import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+import { LiveTrade } from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css, keyframes } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
