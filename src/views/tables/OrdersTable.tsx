@@ -36,7 +36,11 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
-import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
+import {
+  marginModeMatchesFilter,
+  MarketTypeFilter,
+  marketTypeMatchesFilter,
+} from '@/pages/trade/types';
 
 import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -400,7 +404,7 @@ export const OrdersTable = forwardRef(
     const orders = useMemo(
       () =>
         (currentMarket ? marketOrders : allOrders).filter((order) =>
-          marketTypeMatchesFilter(order.marginMode, marketTypeFilter)
+          marginModeMatchesFilter(order.marginMode, marketTypeFilter)
         ),
       [allOrders, currentMarket, marketOrders, marketTypeFilter]
     );
