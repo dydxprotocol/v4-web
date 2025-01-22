@@ -766,7 +766,8 @@ export const createGetUnseenOrderHistoryCount = () =>
         (o) =>
           (o.updatedAtMilliseconds ?? 0) >
           (mapIfPresent(
-            (memory.seenOpenOrders[o.marketId] ?? memory.seenOpenOrders[ALL_MARKETS_STRING])?.time,
+            (memory.seenOrderHistory[o.marketId] ?? memory.seenOrderHistory[ALL_MARKETS_STRING])
+              ?.time,
             (t) => new Date(t).getTime()
           ) ?? 0)
       );

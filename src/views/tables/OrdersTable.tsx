@@ -1,4 +1,4 @@
-import { forwardRef, Key, ReactNode, useEffect, useMemo } from 'react';
+import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import {
@@ -38,9 +38,7 @@ import { Tag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { marginModeMatchesFilter, MarketTypeFilter } from '@/pages/trade/types';
 
-import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getHasUnseenOrderUpdates } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -406,13 +404,7 @@ export const OrdersTable = forwardRef(
     );
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
-    const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
-
     useViewPanel(currentMarket, tableType === 'OPEN' ? 'openOrders' : 'orderHistory');
-
-    useEffect(() => {
-      if (hasUnseenOrderUpdates) dispatch(viewedOrders());
-    }, [hasUnseenOrderUpdates]);
 
     const symbol = mapIfPresent(
       currentMarket,

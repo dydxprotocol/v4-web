@@ -81,7 +81,8 @@ function calculateDerivedMarketDisplayItems(market: IndexerWsBaseMarketObject) {
 
 function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
   return {
-    effectiveInitialMarginFraction: getMarketEffectiveInitialMarginForMarket(market),
+    effectiveInitialMarginFraction:
+      getMarketEffectiveInitialMarginForMarket(market)?.toNumber() ?? null,
     openInterestUSDC: MustBigNumber(market.openInterest)
       .times(market.oraclePrice ?? 0)
       .toNumber(),

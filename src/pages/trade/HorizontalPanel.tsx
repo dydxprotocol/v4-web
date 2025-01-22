@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/abacus-ts/ontology';
-import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -28,11 +27,9 @@ import {
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
+  createGetUnseenFillsCount,
+  createGetUnseenOpenOrdersCount,
   createGetUnseenOrderHistoryCount,
-  getCurrentMarketTradeInfoNumbers,
-  getHasUnseenFillUpdates,
-  getHasUnseenOrderUpdates,
-  getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
@@ -74,16 +71,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalOpenOrders, numTotalUnseenFills } =
-    useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
-
-  const { numOpenOrders, numUnseenFills } =
-    useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
-
   const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
-  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
-  const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useParameterizedSelector(
     calculateShouldRenderActionsInPositionsTable
@@ -97,16 +87,24 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
   const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
 
+  const unseenOrders = useParameterizedSelector(
+    createGetUnseenOpenOrdersCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const ordersTagNumber = shortenNumberForDisplay(unseenOrders);
+
   const numTotalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
   ).length;
 
-  const fillsTagNumber = shortenNumberForDisplay(
-    showCurrentMarket ? numUnseenFills : numTotalUnseenFills
+  const numUnseenFills = useParameterizedSelector(
+    createGetUnseenFillsCount,
+    showCurrentMarket ? currentMarketId : undefined
   );
-  const ordersTagNumber = shortenNumberForDisplay(
-    showCurrentMarket ? numOpenOrders : numTotalOpenOrders
-  );
+  const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
+
+  const hasUnseenOrderUpdates = unseenOrders > 0;
+  const hasUnseenFillUpdates = numUnseenFills > 0;
 
   const initialPageSize = 20;
 

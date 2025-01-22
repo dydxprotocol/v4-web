@@ -27,16 +27,15 @@ import {
   selectLatestValidatorHeight,
 } from './selectors/apiStatus';
 import {
-  selectAllAssetsInfo,
-  selectAllAssetsInfoLoading,
-  selectCurrentMarketAssetInfo,
-} from './selectors/assets';
-import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
-import { selectCurrentMarketInfo } from './selectors/markets';
-import { selectAllMarketSummaries, selectAllMarketSummariesLoading } from './selectors/summary';
+import {
+  selectAllMarketSummaries,
+  selectAllMarketSummariesLoading,
+  selectCurrentMarketInfo,
+  selectCurrentMarketInfoStable,
+} from './selectors/summary';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
 // every leaf is a selector or a paramaterized selector
@@ -78,7 +77,6 @@ export const BonsaiCore = {
       data: selectAllMarketSummaries,
       loading: selectAllMarketSummariesLoading,
     },
-    assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
   },
   network: {
     indexerHeight: {
@@ -96,7 +94,8 @@ export const BonsaiCore = {
 export const BonsaiHelpers = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
-    assetInfo: selectCurrentMarketAssetInfo,
+    // marketInfo but with only the properties that rarely change, for fewer rerenders
+    stableMarketInfo: selectCurrentMarketInfoStable,
     account: {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,
