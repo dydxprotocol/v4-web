@@ -20,7 +20,7 @@ export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMark
   const stringGetter = useStringGetter();
   const assetId = getAssetFromMarketId(launchableMarketId);
   const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.paramaterizedAssetInfo,
+    BonsaiHelpers.assets.createSelectAssetInfo,
     assetId
   );
 

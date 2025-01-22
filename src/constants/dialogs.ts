@@ -2,9 +2,11 @@ import { ReactNode } from 'react';
 
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+
 import { BigNumberish } from '@/lib/numbers';
 
-import { AbacusPositionSides, Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
+import { Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 
@@ -64,7 +66,7 @@ export type SharePNLAnalyticsDialogProps = {
   oraclePrice: Nullable<number>;
   entryPrice: Nullable<number>;
   unrealizedPnl: Nullable<number>;
-  side: Nullable<AbacusPositionSides>;
+  side: Nullable<IndexerPositionSide>;
   sideLabel: Nullable<string>;
 };
 export type StakeDialogProps = {};
@@ -85,6 +87,7 @@ export type UnlimitedAnnouncementDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
+export type WithdrawDialog2Props = {};
 export type DepositDialog2Props = {};
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
@@ -106,6 +109,7 @@ export const DialogTypes = unionize(
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
+    CoinbaseDepositDialog: ofType<{}>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
@@ -145,6 +149,7 @@ export const DialogTypes = unionize(
     Unstake: ofType<UnstakeDialogProps>(),
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw: ofType<WithdrawDialogProps>(),
+    Withdraw2: ofType<WithdrawDialog2Props>(),
     WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
   },
   { tag: 'type' as const, value: 'props' as const }

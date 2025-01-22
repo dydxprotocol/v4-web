@@ -11,6 +11,7 @@ import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrde
 import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
 import { CloseAllPositionsConfirmationDialog } from '@/views/dialogs/CloseAllPositionsConfirmationDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
+import { CoinbaseDepositDialog } from '@/views/dialogs/CoinbaseDepositDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
@@ -49,6 +50,7 @@ import { UnlimitedAnnouncementDialog } from '@/views/dialogs/UnlimitedAnnounceme
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
+import { WithdrawDialog2 } from '@/views/dialogs/WithdrawDialog2/WithdrawDialog2';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -79,6 +81,7 @@ export const DialogManager = React.memo(() => {
       <CancelAllOrdersConfirmationDialog {...args} {...modalProps} />
     ),
     CancelPendingOrders: (args) => <CancelPendingOrdersDialog {...args} {...modalProps} />,
+    CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
@@ -117,6 +120,7 @@ export const DialogManager = React.memo(() => {
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
+    Withdraw2: (args) => <WithdrawDialog2 {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });

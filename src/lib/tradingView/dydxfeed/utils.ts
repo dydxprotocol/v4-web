@@ -74,7 +74,7 @@ export const getMarkForOrderFills = (
 
   const textParams = {
     ASSET_SIZE: formattedSize,
-    ASSET: fillDetails?.asset?.id,
+    ASSET: fillDetails?.marketSummary?.assetId,
     PRICE: formattedAveragePrice,
   };
 

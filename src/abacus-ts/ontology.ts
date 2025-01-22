@@ -1,6 +1,7 @@
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import {
   getCurrentMarketAccountFills,
   selectAccountFills,
@@ -14,7 +15,17 @@ import {
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
+  selectUnopenedIsolatedPositions,
 } from './selectors/account';
+import {
+  createSelectParentSubaccountSummaryDeposit,
+  createSelectParentSubaccountSummaryWithdrawal,
+} from './selectors/accountActions';
+import {
+  selectApiState,
+  selectLatestIndexerHeight,
+  selectLatestValidatorHeight,
+} from './selectors/apiStatus';
 import {
   createSelectAssetInfo,
   selectAllAssetsInfo,
@@ -22,16 +33,12 @@ import {
   selectCurrentMarketAssetInfo,
 } from './selectors/assets';
 import {
-  selectRawIndexerHeightData,
   selectRawIndexerHeightDataLoading,
-  selectRawValidatorHeightData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
-import {
-  selectAllMarketsInfo,
-  selectAllMarketsInfoLoading,
-  selectCurrentMarketInfo,
-} from './selectors/markets';
+import { selectCurrentMarketInfo } from './selectors/markets';
+import { selectAllMarketSummaries, selectAllMarketSummariesLoading } from './selectors/summary';
+import { useCurrentMarketTradesValue } from './websocket/trades';
 
 // every leaf is a selector or a paramaterized selector
 type NestedSelectors = {
@@ -69,20 +76,21 @@ export const BonsaiCore = {
   markets: {
     currentMarketId: getCurrentMarketId,
     markets: {
-      data: selectAllMarketsInfo,
-      loading: selectAllMarketsInfoLoading,
+      data: selectAllMarketSummaries,
+      loading: selectAllMarketSummariesLoading,
     },
     assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
   },
   network: {
     indexerHeight: {
-      data: selectRawIndexerHeightData,
+      data: selectLatestIndexerHeight,
       loading: selectRawIndexerHeightDataLoading,
     },
     validatorHeight: {
-      data: selectRawValidatorHeightData,
+      data: selectLatestValidatorHeight,
       loading: selectRawValidatorHeightDataLoading,
     },
+    apiState: selectApiState,
   },
 } as const satisfies NestedSelectors;
 
@@ -97,6 +105,20 @@ export const BonsaiHelpers = {
     },
   },
   assets: {
-    paramaterizedAssetInfo: createSelectAssetInfo,
+    createSelectAssetInfo,
   },
+  forms: {
+    deposit: {
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
+    },
+    withdraw: {
+      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
+    },
+  },
+  unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
 } as const satisfies NestedSelectors;
+
+export const BonsaiHooks = {
+  useCurrentMarketHistoricalFunding,
+  useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
+} as const;

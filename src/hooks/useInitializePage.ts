@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
+import { logAbacusTsInfo } from '@/abacus-ts/logs';
+// eslint-disable-next-line no-restricted-imports
 import { IndexerWebsocketManager } from '@/abacus-ts/websocket/lib/indexerWebsocketManager';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -50,6 +52,7 @@ export const useInitializePage = () => {
             // reconnect abacus (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             abacusStateManager.restart({ network: localStorageNetwork });
             IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+            logAbacusTsInfo('useInitializePage', 'restarting because visibility change');
           }
           hiddenTimeRef.current = null;
         }
@@ -66,10 +69,11 @@ export const useInitializePage = () => {
     const handleOnline = () => {
       abacusStateManager.restart({ network: localStorageNetwork });
       IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+      logAbacusTsInfo('useInitializePage', 'restarting because network status change');
     };
-    document.addEventListener('online', handleOnline);
+    window.addEventListener('online', handleOnline);
     return () => {
-      document.removeEventListener('online', handleOnline);
+      window.removeEventListener('online', handleOnline);
     };
   }, [localStorageNetwork]);
 };

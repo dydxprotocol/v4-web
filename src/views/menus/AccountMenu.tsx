@@ -55,6 +55,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 import { MobileDownloadLinks } from '../MobileDownloadLinks';
@@ -458,13 +459,17 @@ const AssetActions = memo(
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Deposit({}),
+            dialog: testFlags.showNewDepositFlow
+              ? DialogTypes.Deposit2({})
+              : DialogTypes.Deposit({}),
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
           },
         withOnboarding &&
           hasBalance && {
-            dialog: DialogTypes.Withdraw(),
+            dialog: testFlags.showNewWithdrawFlow
+              ? DialogTypes.Withdraw2({})
+              : DialogTypes.Withdraw({}),
             iconName: IconName.Withdraw,
             tooltipStringKey: STRING_KEYS.WITHDRAW,
           },

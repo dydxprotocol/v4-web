@@ -67,7 +67,7 @@ export enum CandleResolution {
  * @description ResolutionStrings used with TradingView's charting library mapped to time interval per candle in ms
  */
 export const RESOLUTION_TO_INTERVAL_MS = {
-  '1': timeUnits.second,
+  '1': timeUnits.minute,
   '5': 5 * timeUnits.minute,
   '15': 15 * timeUnits.minute,
   '30': 30 * timeUnits.minute,
