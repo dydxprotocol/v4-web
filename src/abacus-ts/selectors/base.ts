@@ -8,6 +8,8 @@ export const selectRawMarkets = (state: RootState) => state.raw.markets.allMarke
 export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
 export const selectRawAssetsData = (state: RootState) => state.raw.markets.assets.data;
 export const selectRawAssets = (state: RootState) => state.raw.markets.assets;
+export const selectRawSparklines = (state: RootState) => state.raw.markets.sparklines;
+export const selectRawSparklinesData = (state: RootState) => state.raw.markets.sparklines.data;
 
 export const selectRawParentSubaccount = (state: RootState) => state.raw.account.parentSubaccount;
 export const selectRawParentSubaccountData = (state: RootState) =>
@@ -28,14 +30,16 @@ export const selectRawTransfersLiveData = (state: RootState) =>
 export const selectRawBlockTradingRewardsLiveData = (state: RootState) =>
   state.raw.account.parentSubaccount.data?.live.tradingRewards;
 
-export const selectRawIndexerHeightData = (state: RootState) =>
-  state.raw.heights.indexerHeight.data;
-export const selectRawValidatorHeightData = (state: RootState) =>
-  state.raw.heights.validatorHeight.data;
+export const selectRawIndexerHeightData = (state: RootState) => state.raw.heights.indexerHeight;
+export const selectRawValidatorHeightData = (state: RootState) => state.raw.heights.validatorHeight;
 export const selectRawIndexerHeightDataLoading = (state: RootState) =>
-  state.raw.heights.indexerHeight.status;
+  state.raw.heights.indexerHeight.latest.status;
 export const selectRawValidatorHeightDataLoading = (state: RootState) =>
-  state.raw.heights.validatorHeight.status;
+  state.raw.heights.validatorHeight.latest.status;
+export const selectRawIndexerHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.indexerHeight.latest;
+export const selectRawValidatorHeightDataLoadable = (state: RootState) =>
+  state.raw.heights.validatorHeight.latest;
 
 export const selectRawFillsRest = (state: RootState) => state.raw.account.fills;
 export const selectRawOrdersRest = (state: RootState) => state.raw.account.orders;

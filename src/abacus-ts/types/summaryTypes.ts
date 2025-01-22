@@ -1,13 +1,18 @@
+import { ClobModule, FeeTierModule } from '@dydxprotocol/v4-client-js';
+import { type BigNumber } from 'bignumber.js';
+
 import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
   IndexerOrderType,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
-import { type BigNumber } from 'bignumber.js';
+import {
+  IndexerWsBaseMarketObject,
+  IndexerWsTradeResponseObject,
+} from '@/types/indexer/indexerManual';
 
-import { BaseTrade } from './rawTypes';
+import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
@@ -22,7 +27,7 @@ type ConvertStringToBigNumber<T, K extends SelectStringProperties<T>> = {
   [P in keyof T]: P extends K ? ReplaceBigNumberInUnion<T[P]> : T[P];
 };
 
-export type MarketInfo = IndexerPerpetualMarketResponseObject & {
+export type MarketInfo = IndexerWsBaseMarketObject & {
   assetId: string;
   displayableAsset: string;
   displayableTicker: string;
@@ -117,6 +122,12 @@ export enum OrderStatus {
   PartiallyCanceled = 'PARTIALLY_CANCELED',
 }
 
+export enum OrderFlags {
+  SHORT_TERM = '0',
+  LONG_TERM = '64',
+  CONDITIONAL = '32',
+}
+
 export type SubaccountOrder = {
   subaccountNumber: number;
   id: string;
@@ -146,4 +157,94 @@ export type SubaccountOrder = {
   marginMode: MarginMode | undefined;
 };
 
-export type LiveTrade = BaseTrade;
+export type LiveTrade = IndexerWsTradeResponseObject;
+
+export type PendingIsolatedPosition = {
+  marketId: string;
+  displayId: string;
+  assetId: string;
+  displayableAsset: string;
+  equity: BigNumber;
+  orders: SubaccountOrder[];
+};
+
+export type AccountStats = {
+  takerNotional: string;
+  makerNotional: string;
+};
+
+export interface ApiState {
+  status: ApiStatus;
+  validatorHeight: number | undefined;
+  indexerHeight: number | undefined;
+  haltedBlock?: number | undefined;
+  trailingBlocks?: number | undefined;
+}
+
+export enum ApiStatus {
+  UNKNOWN = 'UNKNOWN',
+  VALIDATOR_DOWN = 'VALIDATOR_DOWN',
+  VALIDATOR_HALTED = 'VALIDATOR_HALTED',
+  INDEXER_DOWN = 'INDEXER_DOWN',
+  INDEXER_HALTED = 'INDEXER_HALTED',
+  INDEXER_TRAILING = 'INDEXER_TRAILING',
+  NORMAL = 'NORMAL',
+}
+
+export type AssetData = {
+  assetId: string;
+  name: string;
+  logo: string;
+  price: number | null;
+  marketCap: number | null;
+  volume24h: number | null;
+  percentChange24h: number | null;
+  reportedMarketCap: number | null;
+  sectorTags: string[] | null;
+  tickSizeDecimals: number;
+  urls: {
+    website: string | null;
+    technicalDoc: string | null;
+    cmc: string | null;
+  };
+};
+
+export type AssetDataForPerpetualMarketSummary = Omit<
+  AssetData,
+  'assetId' | 'price' | 'percentChange24h' | 'tickSizeDecimals' | 'volume24h' | 'tickSizeDecimals'
+>;
+
+export type AllAssetData = {
+  [assetId: string]: AssetData;
+};
+
+export type PerpetualMarketSparklines = {
+  [period: string]: {
+    [marketId: string]: number[];
+  };
+};
+
+export type PerpetualMarketSummary = MarketInfo &
+  AssetDataForPerpetualMarketSummary & {
+    sparkline24h: number[];
+    isNew: boolean;
+    spotVolume24h: number | null;
+    isFavorite: boolean;
+    isUnlaunched: boolean;
+  };
+
+export type PerpetualMarketSummaries = {
+  [marketId: string]: PerpetualMarketSummary;
+};
+
+export type UserFeeTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserFeeTierResponse['tier']>>;
+export type EquityTiers = NonNullable<
+  ToPrimitives<ClobModule.QueryEquityTierLimitConfigurationResponse['equityTierLimitConfig']>
+>;
+export type FeeTiers = NonNullable<
+  ToPrimitives<FeeTierModule.QueryPerpetualFeeParamsResponse['params']>
+>;
+export type ConfigTiers = {
+  feeTiers: FeeTiers | undefined;
+  equityTiers: EquityTiers | undefined;
+};

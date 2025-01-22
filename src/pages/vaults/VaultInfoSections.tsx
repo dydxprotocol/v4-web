@@ -141,14 +141,22 @@ export const VaultDescription = ({ className }: { className?: string }) => {
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const numPositions = useLoadedVaultPositions()?.positions?.size;
+  const { vaultMetrics } = useURLConfigs();
 
   return (
     <div className={className}>
-      <div tw="row mb-1 gap-0.5 text-color-text-2 font-large-medium">
-        {stringGetter({ key: STRING_KEYS.HOLDINGS })}{' '}
-        <Tag size={TagSize.Medium} type={TagType.Number}>
-          {numPositions}
-        </Tag>
+      <div tw="row mb-1 justify-between">
+        <div tw="row gap-0.5 text-color-text-2 font-large-medium">
+          {stringGetter({ key: STRING_KEYS.HOLDINGS })}{' '}
+          <Tag size={TagSize.Medium} type={TagType.Number}>
+            {numPositions}
+          </Tag>
+        </div>
+        {vaultMetrics && (
+          <Link isInline withIcon href={vaultMetrics}>
+            {stringGetter({ key: STRING_KEYS.METRICS })}
+          </Link>
+        )}
       </div>
       <VaultPositionsTable />
     </div>

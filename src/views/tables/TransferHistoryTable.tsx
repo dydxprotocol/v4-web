@@ -27,6 +27,7 @@ import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 export enum TransferHistoryTableColumnKey {
@@ -163,7 +164,15 @@ export const TransferHistoryTable = ({
           {canAccountTrade ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+              onClick={() =>
+                dispatch(
+                  openDialog(
+                    testFlags.showNewDepositFlow
+                      ? DialogTypes.Deposit2({})
+                      : DialogTypes.Deposit({})
+                  )
+                )
+              }
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
             </Button>

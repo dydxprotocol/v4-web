@@ -1,22 +1,22 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 import { RouteResponse } from '@skip-go/client';
 import { formatUnits } from 'viem';
 
 import { USD_DECIMALS } from '@/constants/numbers';
 
+import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
+
 import { LightningIcon, ShieldIcon } from '@/icons';
 
 import { Output, OutputType } from '@/components/Output';
 
-import { DepositSpeed } from './types';
-
 type Props = {
-  routes: { slow?: RouteResponse; fast?: RouteResponse };
+  routes?: { slow?: RouteResponse; fast?: RouteResponse };
   isLoading: boolean;
   disabled: boolean;
-  selectedSpeed: DepositSpeed;
-  onSelectSpeed: (route: DepositSpeed) => void;
+  selectedSpeed: SkipRouteSpeed;
+  onSelectSpeed: (route: SkipRouteSpeed) => void;
 };
 
 export const RouteOptions = ({
@@ -26,24 +26,55 @@ export const RouteOptions = ({
   onSelectSpeed,
   disabled,
 }: Props) => {
-  // TODO(deposit2.0): finalize error handling here
-  if (!routes.slow && !routes.fast) {
-    return <div>There was an error loading deposit quotes.</div>;
-  }
+  const fastRouteDescription = useMemo(() => {
+    const fastOperationFee = // @ts-ignore
+      routes?.fast?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
+    const totalFastFee = fastOperationFee
+      ? formatUnits(
+          BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
+            BigInt(fastOperationFee.destinationChainFeeAmount ?? 0) +
+            BigInt(fastOperationFee.sourceChainFeeAmount ?? 0),
+          6
+        )
+      : '-';
 
-  const fastOperationFee = // @ts-ignore
-    routes.fast?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
-  const totalFastFee = fastOperationFee
-    ? formatUnits(
-        BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
-          BigInt(fastOperationFee.destinationChainFeeAmount ?? 0) +
-          BigInt(fastOperationFee.sourceChainFeeAmount ?? 0),
-        6
-      )
-    : '-';
+    // TODO(deposit2.0): localization
+    if (!routes || disabled) return '$$ fee, $10k limit';
+    if (!routes.fast) return 'Unavailable';
+
+    return (
+      <span>
+        <Output
+          tw="inline"
+          type={OutputType.Fiat}
+          fractionDigits={USD_DECIMALS}
+          value={totalFastFee}
+        />{' '}
+        fee, $10k limit
+      </span>
+    );
+  }, [routes, disabled]);
+
+  const slowRouteDescription = useMemo(() => {
+    // TODO(deposit2.0): localization
+    if (!routes || disabled) return '$ fee, no limit';
+    if (!routes.slow) return 'Unavailable';
+
+    return (
+      <span>
+        <Output
+          tw="inline"
+          type={OutputType.Fiat}
+          fractionDigits={USD_DECIMALS}
+          value={routes.slow.estimatedFees[0]?.usdAmount}
+        />{' '}
+        fee, no limit
+      </span>
+    );
+  }, [routes, disabled]);
 
   return (
-    <div tw="flex gap-1">
+    <div tw="flex gap-0.5">
       <RouteOption
         icon={
           <span
@@ -58,25 +89,11 @@ export const RouteOptions = ({
           </span>
         }
         selected={selectedSpeed === 'fast'}
-        disabled={disabled || !routes.fast || isLoading}
+        disabled={disabled || !routes?.fast || isLoading}
         onClick={() => onSelectSpeed('fast')}
         // TODO(deposit2.0): localization
         title="Instant"
-        description={
-          routes.fast ? (
-            <span>
-              <Output
-                tw="inline"
-                type={OutputType.Fiat}
-                fractionDigits={USD_DECIMALS}
-                value={totalFastFee}
-              />{' '}
-              fee, $10k limit
-            </span>
-          ) : (
-            'Unavailable'
-          )
-        }
+        description={fastRouteDescription}
       />
       <RouteOption
         icon={
@@ -92,25 +109,11 @@ export const RouteOptions = ({
           </span>
         }
         selected={selectedSpeed === 'slow'}
-        disabled={disabled || !routes.slow}
+        disabled={disabled || isLoading || !routes?.slow}
         onClick={() => onSelectSpeed('slow')}
         // TODO(deposit2.0): localization
         title="~20 mins"
-        description={
-          routes.slow ? (
-            <span>
-              <Output
-                tw="inline"
-                type={OutputType.Fiat}
-                fractionDigits={USD_DECIMALS}
-                value={routes.slow.estimatedFees[0]?.usdAmount}
-              />{' '}
-              fee, no limit
-            </span>
-          ) : (
-            'Unavailable'
-          )
-        }
+        description={slowRouteDescription}
       />
     </div>
   );

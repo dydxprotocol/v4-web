@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -26,6 +28,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
+  createGetUnseenOrderHistoryCount,
   getCurrentMarketTradeInfoNumbers,
   getHasUnseenFillUpdates,
   getHasUnseenOrderUpdates,
@@ -46,6 +49,7 @@ import { MarketTypeFilter, PanelView } from './types';
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
+  OrderHistory = 'OrderHistory',
   Fills = 'Fills',
   Payments = 'Payments',
 }
@@ -70,12 +74,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
+  const { numTotalOpenOrders, numTotalUnseenFills } =
     useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
 
   const { numOpenOrders, numUnseenFills } =
     useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
+  const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -84,7 +89,17 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     calculateShouldRenderActionsInPositionsTable
   );
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
+  const areOrdersLoading = useAppSelector(BonsaiCore.account.openOrders.loading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
+  const numUnseenOrderHistory = useParameterizedSelector(
+    createGetUnseenOrderHistoryCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
+
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
 
   const fillsTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numUnseenFills : numTotalUnseenFills
@@ -164,22 +179,24 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     () => ({
       asChild: true,
       value: InfoSection.Orders,
-      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
 
-      slotRight: isWaitingForOrderToIndex ? (
-        <LoadingSpinner tw="[--spinner-width:1rem]" />
-      ) : (
-        ordersTagNumber && (
-          <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
-            {ordersTagNumber}
-          </Tag>
-        )
-      ),
+      slotRight:
+        areOrdersLoading || isWaitingForOrderToIndex ? (
+          <LoadingSpinner tw="[--spinner-width:1rem]" />
+        ) : (
+          ordersTagNumber && (
+            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+              {ordersTagNumber}
+            </Tag>
+          )
+        ),
 
       content: (
         <OrdersTable
           currentMarket={showCurrentMarket ? currentMarketId : undefined}
           marketTypeFilter={viewIsolated}
+          tableType="OPEN"
           columnKeys={
             isTablet
               ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
@@ -203,14 +220,69 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     }),
     [
       stringGetter,
-      currentMarketId,
-      viewIsolated,
-      showCurrentMarket,
-      isTablet,
+      areOrdersLoading,
       isWaitingForOrderToIndex,
-      isAccountViewOnly,
       ordersTagNumber,
       hasUnseenOrderUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
+      isAccountViewOnly,
+    ]
+  );
+
+  const orderHistoryTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.OrderHistory,
+      label: stringGetter({ key: STRING_KEYS.ORDER_HISTORY_HEADER }),
+
+      slotRight: areOrdersLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        orderHistoryTagNumber &&
+        numUnseenOrderHistory > 0 && (
+          <Tag type={TagType.Number} isHighlighted={numUnseenOrderHistory > 0}>
+            {orderHistoryTagNumber}
+          </Tag>
+        )
+      ),
+
+      content: (
+        <OrdersTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          tableType="HISTORY"
+          columnKeys={
+            isTablet
+              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+              : [
+                  !showCurrentMarket && OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.Amount,
+                  OrdersTableColumnKey.Filled,
+                  OrdersTableColumnKey.OrderValue,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.Updated,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [
+      stringGetter,
+      areOrdersLoading,
+      orderHistoryTagNumber,
+      numUnseenOrderHistory,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
     ]
   );
 
@@ -220,10 +292,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       value: InfoSection.Fills,
       label: stringGetter({ key: STRING_KEYS.FILLS }),
 
-      slotRight: fillsTagNumber && (
-        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-          {fillsTagNumber}
-        </Tag>
+      slotRight: areFillsLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        fillsTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+            {fillsTagNumber}
+          </Tag>
+        )
       ),
 
       content: (
@@ -257,17 +333,18 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     }),
     [
       stringGetter,
-      currentMarketId,
-      showCurrentMarket,
-      isTablet,
+      areFillsLoading,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      isTablet,
     ]
   );
 
   const tabItems = useMemo(
-    () => [positionTabItem, fillsTabItem, ordersTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem]
   );
 
   const slotBottom = {
@@ -275,6 +352,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       <MaybeUnopenedIsolatedPositionsDrawer onViewOrders={onViewOrders} tw="mt-auto" />
     ),
     [InfoSection.Orders]: null,
+    [InfoSection.OrderHistory]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
   }[tab];

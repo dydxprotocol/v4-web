@@ -1,17 +1,18 @@
 /* eslint-disable max-classes-per-file */
-import { logAbacusTsError } from '@/abacus-ts/logs';
+import { logAbacusTsError, logAbacusTsInfo } from '@/abacus-ts/logs';
 
 interface ReconnectingWebSocketConfig {
   url: string;
   handleMessage: (data: any) => void;
   handleFreshConnect: () => void;
   initialReconnectInterval?: number;
+  connectionTimeToConsiderLive?: number;
   maxReconnectInterval?: number;
   backoffMultiplier?: number;
 }
 
 export class ReconnectingWebSocket {
-  private readonly url: string;
+  public readonly url: string;
 
   private readonly handleMessage: (data: any) => void;
 
@@ -22,6 +23,8 @@ export class ReconnectingWebSocket {
   private readonly maxReconnectInterval: number;
 
   private readonly backoffMultiplier: number;
+
+  private readonly connectionTimeToConsiderLive: number;
 
   private ws: WebSocketConnection | null = null;
 
@@ -41,6 +44,7 @@ export class ReconnectingWebSocket {
     this.initialReconnectInterval = config.initialReconnectInterval ?? 1000;
     this.maxReconnectInterval = config.maxReconnectInterval ?? 120_000;
     this.backoffMultiplier = config.backoffMultiplier ?? 1.5;
+    this.connectionTimeToConsiderLive = config.connectionTimeToConsiderLive ?? 5000;
 
     this.connect();
   }
@@ -81,7 +85,13 @@ export class ReconnectingWebSocket {
   private handleWsConnected = (id: number) => {
     // can happen if we rapidly switch websockets maybe ??
     if (id !== this.currentId || this.isDead) return;
-    this.numberOfFailedAttempts = 0;
+
+    // after x seconds, reset our failure counter if we're still alive
+    setTimeout(() => {
+      if (id !== this.currentId || this.isDead || !this.isActive()) return;
+      this.numberOfFailedAttempts = 0;
+    }, this.connectionTimeToConsiderLive);
+
     this.handleFreshConnect();
   };
 
@@ -154,7 +164,7 @@ class WebSocketConnection {
       this.ws = new WebSocket(url);
       this.setupEventHandlers();
     } catch (error) {
-      logAbacusTsError('WebSocketConnection', 'error connecting', error);
+      logAbacusTsError('WebSocketConnection', 'error connecting', { error });
       this.close();
       // we don't rethrow because we instead call the handleClose method
     }
@@ -169,7 +179,8 @@ class WebSocketConnection {
         const data = JSON.parse(event.data);
         this.handleMessage(this.id, data);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handler', e);
+        logAbacusTsError('WebSocketConnection', 'error in handler', { error: e, data: event.data });
+        this.close();
       }
     };
 
@@ -180,16 +191,39 @@ class WebSocketConnection {
       try {
         this.handleConnected(this.id);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handleConnected', e);
+        logAbacusTsError('WebSocketConnection', 'error in handleConnected', { error: e });
+        this.close();
       }
     };
 
-    this.ws.onerror = (error) => {
-      logAbacusTsError('WebSocketConnection', `socket ${this.id} error encountered`, error);
+    this.ws.onerror = () => {
       this.close();
     };
 
-    this.ws.onclose = () => {
+    this.ws.onclose = (close) => {
+      const allowedCodes = new Set([
+        // normal
+        1000,
+        // going away (nav or graceful server shutdown)
+        1001,
+        // normal but no code
+        1005,
+        // supposedly abnormal tcp failure but super super common
+        1006,
+      ]);
+      if (!allowedCodes.has(close.code)) {
+        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
+          code: close.code,
+          reason: close.reason,
+          clean: close.wasClean,
+        });
+      } else {
+        logAbacusTsInfo('WebSocketConnection', `socket ${this.id} closed`, {
+          code: close.code,
+          reason: close.reason,
+          clean: close.wasClean,
+        });
+      }
       this.close();
     };
   }
@@ -202,7 +236,7 @@ class WebSocketConnection {
       this.ws?.close();
       this.ws = null;
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error closing socket', e);
+      logAbacusTsError('WebSocketConnection', 'error closing socket', { error: e });
     }
   }
 
@@ -223,7 +257,7 @@ class WebSocketConnection {
       const message = typeof data === 'string' ? data : JSON.stringify(data);
       this.ws!.send(message);
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error sending data', e, data);
+      logAbacusTsError('WebSocketConnection', 'error sending data', { error: e, data });
     }
   }
 }
