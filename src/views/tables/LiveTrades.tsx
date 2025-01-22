@@ -67,7 +67,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       currentMarketLiveTrades.map(
         ({ createdAt, price, size, side, id }: LiveTrade): RowData => ({
           key: id,
-          createdAtMilliseconds: new Date(createdAt).valueOf(),
+          createdAtMilliseconds: new Date(createdAt).getTime(),
           price: MustBigNumber(price).toNumber(),
           // todo use same helper as the horizontal panel files
           side: side === IndexerOrderSide.BUY ? OrderSide.BUY : OrderSide.SELL,
