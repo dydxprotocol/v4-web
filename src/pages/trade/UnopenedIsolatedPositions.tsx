@@ -27,8 +27,10 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
   className,
   onViewOrders,
 }: UnopenedIsolatedPositionsProps) => {
-  const parentSubaccountPositionsLoading =
-    useAppSelector(BonsaiCore.account.parentSubaccountPositions.loading) === 'pending';
+  const parentSubaccountPositionsLoadingState = useAppSelector(
+    BonsaiCore.account.parentSubaccountPositions.loading
+  );
+  const parentSubaccountLoaded = parentSubaccountPositionsLoadingState === 'success';
 
   const numNormalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
@@ -37,12 +39,12 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
   const pendingIsolatedPositions =
     useAppSelector(BonsaiHelpers.unopenedIsolatedPositions) ?? EMPTY_ARR;
 
-  const [isOpen, setIsOpen] = useState(numNormalPositions === 0);
+  const [isOpen, setIsOpen] = useState(parentSubaccountLoaded && numNormalPositions === 0);
   useEffect(() => {
-    if (!parentSubaccountPositionsLoading && numNormalPositions === 0) {
+    if (parentSubaccountLoaded && numNormalPositions === 0) {
       setIsOpen(true);
     }
-  }, [parentSubaccountPositionsLoading, numNormalPositions]);
+  }, [parentSubaccountLoaded, numNormalPositions]);
 
   const stringGetter = useStringGetter();
 
