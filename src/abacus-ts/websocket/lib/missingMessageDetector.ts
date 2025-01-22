@@ -9,7 +9,7 @@ export class MissingMessageDetector {
 
   constructor(
     private onTimeout: (messageId: number) => void,
-    private timeoutMs: number = timeUnits.second * 25
+    private timeoutMs: number = timeUnits.second * 30
   ) {}
 
   insert(messageId: number): void {
