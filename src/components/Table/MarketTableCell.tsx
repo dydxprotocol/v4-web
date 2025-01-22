@@ -1,6 +1,6 @@
 import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
 
-import { Asset } from '@/constants/abacus';
+import type { Asset } from '@/constants/abacus';
 
 import { AssetIcon } from '@/components/AssetIcon';
 

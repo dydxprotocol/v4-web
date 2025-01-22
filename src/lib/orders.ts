@@ -17,15 +17,17 @@ import {
   KotlinIrEnumValues,
   Nullable,
   OrderStatus,
+  SubaccountFill,
   SubaccountFills,
   TRADE_TYPES,
   type Asset,
   type PerpetualMarket,
-  type SubaccountFill,
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
+import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { IconName } from '@/components/Icon';
 
@@ -218,8 +220,8 @@ export const getHydratedTradingData = <
 
 type NewAddedProps = {
   marketSummary: PerpetualMarketSummary | undefined;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
 };
 
 export const getHydratedOrder = ({
@@ -232,8 +234,23 @@ export const getHydratedOrder = ({
   return {
     ...data,
     marketSummary: marketSummaries[data.marketId],
-    stepSizeDecimals: marketSummaries[data.marketId]?.stepSizeDecimals,
-    tickSizeDecimals: marketSummaries[data.marketId]?.tickSizeDecimals,
+    stepSizeDecimals: marketSummaries[data.marketId]?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.marketId]?.tickSizeDecimals ?? USD_DECIMALS,
+  };
+};
+
+export const getHydratedFill = ({
+  data,
+  marketSummaries,
+}: {
+  data: IndexerCompositeFillObject;
+  marketSummaries: PerpetualMarketSummaries;
+}): IndexerCompositeFillObject & NewAddedProps => {
+  return {
+    ...data,
+    marketSummary: marketSummaries[data.market ?? ''],
+    stepSizeDecimals: marketSummaries[data.market ?? '']?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.market ?? '']?.tickSizeDecimals ?? USD_DECIMALS,
   };
 };
 

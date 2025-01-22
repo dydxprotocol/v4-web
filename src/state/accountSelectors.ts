@@ -775,15 +775,14 @@ export const createGetUnseenFillsCount = () =>
     [
       getCurrentAccountMemory,
       BonsaiCore.network.indexerHeight.data,
-      getSubaccountFills,
+      BonsaiCore.account.fills.data,
       (state, market: string | undefined) => market,
     ],
     (memory, height, fills, market) => {
       if (height == null) {
         return 0;
       }
-      const ourFills =
-        (market == null ? fills : fills?.filter((o) => o.marketId === market)) ?? EMPTY_ARR;
+      const ourFills = market == null ? fills : fills.filter((o) => o.market === market);
       if (ourFills.length === 0) {
         return 0;
       }
@@ -792,9 +791,9 @@ export const createGetUnseenFillsCount = () =>
       }
       const unseen = ourFills.filter(
         (o) =>
-          o.createdAtMilliseconds >
+          (mapIfPresent(o.createdAt, (c) => new Date(c).valueOf()) ?? 0) >
           (mapIfPresent(
-            (memory.seenFills[o.marketId] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
+            (memory.seenFills[o.market ?? ''] ?? memory.seenFills[ALL_MARKETS_STRING])?.time,
             (t) => new Date(t).valueOf()
           ) ?? 0)
       );

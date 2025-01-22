@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -73,12 +74,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
+  const { numTotalOpenOrders, numTotalUnseenFills } =
     useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
 
   const { numOpenOrders, numUnseenFills } =
     useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
+  const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -94,6 +96,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     showCurrentMarket ? currentMarketId : undefined
   );
   const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
+
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
 
   const fillsTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numUnseenFills : numTotalUnseenFills
@@ -286,10 +292,14 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       value: InfoSection.Fills,
       label: stringGetter({ key: STRING_KEYS.FILLS }),
 
-      slotRight: fillsTagNumber && (
-        <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
-          {fillsTagNumber}
-        </Tag>
+      slotRight: areFillsLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        fillsTagNumber && (
+          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+            {fillsTagNumber}
+          </Tag>
+        )
       ),
 
       content: (
@@ -323,11 +333,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     }),
     [
       stringGetter,
-      currentMarketId,
-      showCurrentMarket,
-      isTablet,
+      areFillsLoading,
       fillsTagNumber,
       hasUnseenFillUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      isTablet,
     ]
   );
 
