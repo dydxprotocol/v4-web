@@ -77,7 +77,7 @@ const MarketsDropdownContent = ({
             id,
             assetId,
             displayId,
-            imageUrl,
+            logo,
             isNew,
             isUnlaunched,
             effectiveInitialMarginFraction,
@@ -85,7 +85,7 @@ const MarketsDropdownContent = ({
           }: MarketData) => (
             <div tw="flex items-center gap-0.25">
               <FavoriteButton marketId={id} />
-              <$AssetIcon logoUrl={imageUrl} symbol={assetId} />
+              <$AssetIcon logoUrl={logo} symbol={assetId} />
               <h2>{displayId}</h2>
               <Tag>
                 {isUnlaunched ? (
@@ -120,17 +120,17 @@ const MarketsDropdownContent = ({
         },
         {
           columnKey: 'priceChange24HPercent',
-          getCellValue: (row: MarketData) => row.priceChange24HPercent,
+          getCellValue: (row: MarketData) => row.percentChange24h,
           label: stringGetter({ key: STRING_KEYS._24H }),
-          renderCell: ({ priceChange24HPercent }: MarketData) => (
+          renderCell: ({ percentChange24h }: MarketData) => (
             <div tw="inlineRow">
-              {!priceChange24HPercent ? (
+              {!percentChange24h ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
                 <$PriceChangeOutput
                   type={OutputType.Percent}
-                  value={priceChange24HPercent}
-                  isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                  value={percentChange24h}
+                  isNegative={MustBigNumber(percentChange24h).isNegative()}
                 />
               )}
             </div>
@@ -138,18 +138,18 @@ const MarketsDropdownContent = ({
         },
         {
           columnKey: 'volume24H',
-          getCellValue: (row: MarketData) => row.volume24H,
+          getCellValue: (row: MarketData) => row.volume24h,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
           renderCell: (row: MarketData) => (
-            <$Output type={OutputType.CompactFiat} value={row.volume24H} />
+            <$Output type={OutputType.CompactFiat} value={row.volume24h} />
           ),
         },
         {
           columnKey: 'spotVolume24H',
-          getCellValue: (row: MarketData) => row.spotVolume24H,
+          getCellValue: (row: MarketData) => row.spotVolume24h,
           label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
           renderCell: (row: MarketData) => (
-            <$Output type={OutputType.CompactFiat} value={row.spotVolume24H} />
+            <$Output type={OutputType.CompactFiat} value={row.spotVolume24h} />
           ),
         },
         {
