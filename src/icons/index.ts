@@ -16,6 +16,7 @@ export { default as ChevronLeftIcon } from './chevron-left.svg';
 export { default as ChevronRightIcon } from './chevron-right.svg';
 export { default as ClockIcon } from './clock.svg';
 export { default as CloseIcon } from './close.svg';
+export { default as CoinbaseBrandIcon } from './coinbase.svg';
 export { default as CoinsIcon } from './coins.svg';
 export { default as CommentIcon } from './comment.svg';
 export { default as CopyIcon } from './copy.svg';

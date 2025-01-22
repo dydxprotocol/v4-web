@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 
+import { BonsaiCore } from '@/abacus-ts/ontology';
 import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
@@ -9,6 +10,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -33,6 +35,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -61,8 +64,11 @@ const PortfolioPage = () => {
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { numTotalPositions, numTotalOpenOrders } =
-    useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
+  const { numTotalOpenOrders } = useAppSelector(getTradeInfoNumbers, shallowEqual);
+  const numTotalPositions = (
+    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
+  ).length;
+
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
@@ -244,7 +250,15 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() => dispatch(openDialog(DialogTypes.Deposit({})))}
+                    onClick={() =>
+                      dispatch(
+                        openDialog(
+                          testFlags.showNewDepositFlow
+                            ? DialogTypes.Deposit2({})
+                            : DialogTypes.Deposit({})
+                        )
+                      )
+                    }
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>
@@ -252,7 +266,15 @@ const PortfolioPage = () => {
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
+                    onClick={() =>
+                      dispatch(
+                        openDialog(
+                          testFlags.showNewWithdrawFlow
+                            ? DialogTypes.Withdraw2({})
+                            : DialogTypes.Withdraw()
+                        )
+                      )
+                    }
                   >
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>

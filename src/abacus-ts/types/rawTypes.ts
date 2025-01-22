@@ -1,31 +1,22 @@
+import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
 import {
   IndexerAssetPositionResponseObject,
   IndexerHistoricalBlockTradingReward,
-  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualPositionResponseObject,
-  IndexerTradeResponseObject,
-  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
   IndexerCompositeOrderObject,
+  IndexerTransferCommonResponseObject,
+  IndexerWsBaseMarketObject,
 } from '@/types/indexer/indexerManual';
 
-import { MetadataServiceAssetInfo, MetadataServicePrice } from '@/constants/assetMetadata';
-
-import { PartialBy } from '@/lib/typeUtils';
-
-export type MarketsData = { [marketId: string]: IndexerPerpetualMarketResponseObject };
+export type MarketsData = { [marketId: string]: IndexerWsBaseMarketObject };
 export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {
   bids: { [price: string]: string };
   asks: { [price: string]: string };
-};
-
-export type BaseTrade = PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>;
-export type TradesData = {
-  trades: Array<BaseTrade>;
 };
 
 export interface ParentSubaccountData {
@@ -40,7 +31,7 @@ export interface ParentSubaccountData {
     tradingRewards?: IndexerHistoricalBlockTradingReward[];
     fills?: IndexerCompositeFillObject[];
     orders?: OrdersData;
-    transfers?: IndexerTransferResponseObject[];
+    transfers?: IndexerTransferCommonResponseObject[];
   };
 }
 

@@ -7,7 +7,7 @@ import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
+import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -20,9 +20,8 @@ import { SourceAccount } from '@/state/wallet';
 
 import { DepositForm } from './DepositForm';
 import { TokenSelect } from './TokenSelect';
-import { DepositToken } from './types';
 
-function getDefaultToken(sourceAccount: SourceAccount): DepositToken {
+function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
   if (!sourceAccount.chain) throw new Error('No user chain detected');
 
   // TODO(deposit2.0): Use user's biggest balance as the default token
@@ -53,7 +52,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const { sourceAccount } = useAccounts();
 
   const [amount, setAmount] = useState('');
-  const [token, setToken] = useState<DepositToken>(getDefaultToken(sourceAccount));
+  const [token, setToken] = useState<TokenForTransfer>(getDefaultToken(sourceAccount));
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -81,27 +80,30 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      <div tw="flex w-[200%] overflow-hidden">
-        <div
-          tw="w-[50%]"
-          style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
-        >
-          <DepositForm
-            amount={amount}
-            setAmount={setAmount}
-            token={token}
-            onTokenSelect={() => setFormState('token-select')}
-          />
-        </div>
-        <div
-          ref={tokenSelectRef}
-          tw="w-[50%] overflow-scroll"
-          style={{
-            height: formState === 'form' ? 0 : '100%',
-            maxHeight: isMobile ? '50vh' : '25rem',
-          }}
-        >
-          <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+      <div tw="w-[100%] overflow-hidden">
+        <div tw="flex w-[200%]">
+          <div
+            tw="w-[50%]"
+            style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+          >
+            <DepositForm
+              onClose={() => setIsOpen(false)}
+              amount={amount}
+              setAmount={setAmount}
+              token={token}
+              onTokenSelect={() => setFormState('token-select')}
+            />
+          </div>
+          <div
+            ref={tokenSelectRef}
+            tw="w-[50%] overflow-scroll"
+            style={{
+              height: formState === 'form' ? 0 : '100%',
+              maxHeight: isMobile ? '50vh' : '25rem',
+            }}
+          >
+            <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+          </div>
         </div>
       </div>
     </$Dialog>

@@ -88,7 +88,6 @@ export const QrCode = ({
 };
 const $QrCode = styled.div`
   width: 100%;
-  cursor: none;
   border-radius: 0.75em;
 
   svg {

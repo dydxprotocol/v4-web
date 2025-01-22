@@ -4,6 +4,7 @@ import {
   IndexerAPIOrderStatus,
   IndexerAPITimeInForce,
   IndexerAssetPositionResponseObject,
+  IndexerCandleResponseObject,
   IndexerFillType,
   IndexerHistoricalBlockTradingReward,
   IndexerIsoString,
@@ -13,6 +14,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerParentSubaccountResponse,
+  IndexerPerpetualMarketResponseObject,
   IndexerPerpetualMarketStatus,
   IndexerPerpetualMarketType,
   IndexerPerpetualPositionResponseObject,
@@ -87,12 +89,24 @@ export interface IndexerCompositeMarketObject {
   incrementalInitialMarginFraction?: string;
 }
 
+// just make oraclePrice optional
+export type IndexerWsBaseMarketObject = Omit<
+  IndexerPerpetualMarketResponseObject,
+  'oraclePrice'
+> & { oraclePrice?: string | null };
+
+export interface IndexerWsPerpetualMarketResponse {
+  markets: { [key: string]: IndexerWsBaseMarketObject };
+}
+
 export interface IndexerWsOrderbookUpdateResponse {
   asks?: IndexerWsOrderbookUpdateItem[];
   bids?: IndexerWsOrderbookUpdateItem[];
 }
 
 export type IndexerWsOrderbookUpdateItem = [string, string];
+
+export type IndexerSparklineResponseObject = { [marketId: string]: string[] };
 
 export interface IndexerWsMarketUpdateResponse {
   trading?: { [key: string]: IndexerCompositeMarketObject };
@@ -132,7 +146,7 @@ export interface IndexerWsParentSubaccountSubscribedResponse {
 
 export type IndexerWsAssetUpdate = Partial<IndexerAssetPositionResponseObject> & {
   subaccountNumber: number;
-  assetId: string;
+  symbol: string;
 };
 export type IndexerWsPositionUpdate = Partial<IndexerPerpetualPositionResponseObject> & {
   subaccountNumber: number;
@@ -143,6 +157,8 @@ export type IndexerWsOrderUpdate = Partial<
   Omit<IndexerCompositeOrderObject, 'subaccountNumber'>
 > & { id: string };
 
+export type IndexerTransferCommonResponseObject = Omit<IndexerTransferResponseObject, 'id'>;
+
 export interface IndexerWsParentSubaccountUpdateObject {
   blockHeight: string;
   assetPositions?: Array<IndexerAssetPositionResponseObject | IndexerWsAssetUpdate>;
@@ -150,9 +166,16 @@ export interface IndexerWsParentSubaccountUpdateObject {
   tradingReward?: IndexerHistoricalBlockTradingReward;
   fills?: IndexerCompositeFillObject[];
   orders?: Array<IndexerWsOrderUpdate | IndexerCompositeOrderObject>;
-  transfers?: IndexerTransferResponseObject;
+  transfers?: IndexerTransferCommonResponseObject;
 }
 
+// hacking around backend types not quite matching what the websocket sends
+export type IndexerWsTradeResponseObject = PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>;
 export interface IndexerWsTradesUpdateObject {
-  trades: PartialBy<IndexerTradeResponseObject, 'createdAtHeight'>[];
+  trades: IndexerWsTradeResponseObject[];
+}
+
+export type IndexerWsCandleResponseObject = Omit<IndexerCandleResponseObject, 'id'>;
+export interface IndexerWsCandleResponse {
+  candles: Array<IndexerWsCandleResponseObject>;
 }

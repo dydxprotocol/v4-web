@@ -33,6 +33,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 
 import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { LanguageSelector } from '../menus/LanguageSelector';
@@ -54,7 +55,11 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     if (!currentOnboardingStep) setIsOpen(false);
     if (currentOnboardingStep === OnboardingSteps.DepositFunds) {
       setIsOpen(false);
-      dispatch(forceOpenDialog(DialogTypes.Deposit({})));
+      dispatch(
+        forceOpenDialog(
+          testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
+        )
+      );
     }
   }, [currentOnboardingStep, setIsOpen, dispatch]);
 

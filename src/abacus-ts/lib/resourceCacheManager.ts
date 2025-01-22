@@ -1,3 +1,5 @@
+import { logAbacusTsError } from '../logs';
+
 type CacheEntry<T> = {
   resource: T;
   count: number;
@@ -14,7 +16,7 @@ export class ResourceCacheManager<T, U> {
   constructor(
     private options: {
       constructor: (key: U) => T;
-      destroyer: (resource: NoInfer<T>) => void;
+      destroyer: (resource: NoInfer<T>, key: NoInfer<U>) => void;
       keySerializer: (key: NoInfer<U>) => string;
       destroyDelayMs?: number;
     }
@@ -42,7 +44,14 @@ export class ResourceCacheManager<T, U> {
   markDone(key: U): void {
     const serializedKey = this.options.keySerializer(key);
     const entry = this.cache[serializedKey];
-    if (!entry) return;
+    if (!entry) {
+      logAbacusTsError('ResourceCacheManager', 'tried to mark done unknown key', key);
+      return;
+    }
+    if (entry.count <= 0) {
+      logAbacusTsError('ResourceCacheManager', 'tried to mark done key with no subscribers', key);
+      entry.count = 1;
+    }
 
     entry.count -= 1;
 
@@ -55,9 +64,12 @@ export class ResourceCacheManager<T, U> {
       const delay = this.options.destroyDelayMs ?? 1000;
       entry.destroyTimeout = setTimeout(() => {
         const latestVal = this.cache[serializedKey];
-        if (!latestVal) return;
+        if (!latestVal) {
+          logAbacusTsError('ResourceCacheManager', 'could not find resource to destroy', key);
+          return;
+        }
 
-        this.options.destroyer(latestVal.resource);
+        this.options.destroyer(latestVal.resource, key);
         delete this.cache[serializedKey];
       }, delay);
     }

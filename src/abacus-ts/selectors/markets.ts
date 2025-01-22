@@ -1,9 +1,14 @@
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
-import { calculateAllMarkets } from '../calculators/markets';
+import { calculateAllMarkets, formatSparklineData } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
-import { selectRawMarkets, selectRawMarketsData } from './base';
+import {
+  selectRawMarkets,
+  selectRawMarketsData,
+  selectRawSparklines,
+  selectRawSparklinesData,
+} from './base';
 
 export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (markets) =>
   calculateAllMarkets(markets)
@@ -17,4 +22,13 @@ export const selectCurrentMarketInfo = createAppSelector(
 export const selectAllMarketsInfoLoading = createAppSelector(
   [selectRawMarkets],
   mergeLoadableStatus
+);
+
+export const selectSparklinesLoading = createAppSelector(
+  [selectRawSparklines],
+  mergeLoadableStatus
+);
+
+export const selectSparkLinesData = createAppSelector([selectRawSparklinesData], (sparklines) =>
+  formatSparklineData(sparklines)
 );
