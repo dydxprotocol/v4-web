@@ -274,7 +274,7 @@ function calculatePositionDerivedExtra(
     unrealizedPnlPercentInner: updatedUnrealizedPnlPercent,
   } = calc(() => {
     const entryValue = signedSize.multipliedBy(MustBigNumber(position.baseEntryPrice));
-    const unrealizedPnlInner = value.minus(entryValue).plus(MustBigNumber(position.baseNetFunding));
+    const unrealizedPnlInner = value.minus(entryValue);
 
     const scaledLeverage = leverage
       ? BigNumber.max(leverage.abs(), BIG_NUMBERS.ONE)
