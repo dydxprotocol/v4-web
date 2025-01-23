@@ -10,6 +10,7 @@ import { FundingRateResolution, type FundingChartDatum } from '@/constants/chart
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
 import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -26,7 +27,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { FundingChartTooltipContent } from './Tooltip';
 
-const FUNDING_RATE_TIME_RESOLUTION = 60 * 60 * 1000; // 1 hour
+const FUNDING_RATE_TIME_RESOLUTION = timeUnits.hour;
 
 const getAllFundingRates = (oneHourRate: number = 0) => ({
   [FundingRateResolution.OneHour]: oneHourRate,
