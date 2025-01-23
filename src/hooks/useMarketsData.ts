@@ -19,6 +19,7 @@ import {
   getMarketDataFromAsset,
   getMarketDataFromPerpetualMarketSummary,
 } from '@/lib/marketsHelpers';
+import { MustBigNumber } from '@/lib/numbers';
 import { objectKeys } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -115,7 +116,7 @@ export const useMarketsData = ({
       // filter out markets that cannot be traded
       .filter((m) => m.status !== 'FINAL_SETTLEMENT')
       // temporarily filter out markets with empty/0 oracle price
-      .filter((m) => isTruthy(m.oraclePrice))
+      .filter((m) => MustBigNumber(m.oraclePrice).gt(0))
       .map(getMarketDataFromPerpetualMarketSummary);
 
     const unlaunchedMarketsData =
@@ -124,8 +125,11 @@ export const useMarketsData = ({
             .filter(isTruthy)
             .sort(sortByMarketCap)
             .map((asset) => {
-              // Remove assets that are already in the list of markets from Indexer
-              if (marketsAssetIdSet.has(asset.assetId)) return null;
+              // Remove assets that are already in the list of markets from Indexer a long with assets that have no price or a negative price
+              if (marketsAssetIdSet.has(asset.assetId) || MustBigNumber(asset.price).lte(0)) {
+                return null;
+              }
+
               return getMarketDataFromAsset(asset, favoritedMarkets);
             })
             .filter(isTruthy)
