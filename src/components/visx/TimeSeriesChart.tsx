@@ -161,7 +161,7 @@ export const TimeSeriesChart = <Datum extends {}>({
         return getClampedZoomDomain(defaultZoomDomain);
       }
       if (latestDatum != null && earliestDatum != null) {
-        return xAccessor(latestDatum) - xAccessor(earliestDatum);
+        return getClampedZoomDomain(xAccessor(latestDatum) - xAccessor(earliestDatum));
       }
       return minZoomDomain;
     })()
