@@ -8,6 +8,7 @@ import {
   IndexerPerpetualPositionResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
+  IndexerCompositeFillObject,
   IndexerWsBaseMarketObject,
   IndexerWsTradeResponseObject,
 } from '@/types/indexer/indexerManual';
@@ -155,6 +156,18 @@ export type SubaccountOrder = {
   reduceOnly: boolean;
   removalReason: string | undefined;
   marginMode: MarginMode | undefined;
+};
+
+export enum SubaccountFillType {
+  LIMIT = 'LIMIT',
+  LIQUIDATED = 'LIQUIDATED',
+  DELEVERAGED = 'DELEVERAGED',
+  MARKET = 'MARKET',
+}
+
+export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
+  marginMode: MarginMode;
+  type: SubaccountFillType | undefined;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
