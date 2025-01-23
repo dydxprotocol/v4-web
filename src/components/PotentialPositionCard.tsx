@@ -39,7 +39,7 @@ export const PotentialPositionCard = ({
   const { assetId, displayableAsset, equity, marketId, orders } = pendingPosition;
   const orderCount = orders.length;
   const assets = orEmptyObj(useAppSelector(BonsaiCore.markets.markets.data));
-  const { name, logo } = orEmptyObj(assets[assetId]);
+  const { name, logo } = orEmptyObj(assets[marketId]);
 
   return (
     <PortfolioCard
