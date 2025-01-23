@@ -1,9 +1,8 @@
-import { MarginMode, OrderStatus } from '@/abacus-ts/types/summaryTypes';
+import { MarginMode, OrderStatus, SubaccountFillType } from '@/abacus-ts/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import {
   IndexerAPITimeInForce,
-  IndexerFillType,
   IndexerLiquidity,
   IndexerOrderSide,
   IndexerOrderType,
@@ -71,18 +70,16 @@ export function getMarginModeStringKey(mode: MarginMode) {
   return mode === 'CROSS' ? STRING_KEYS.CROSS : STRING_KEYS.ISOLATED;
 }
 
-export function getIndexerFillTypeStringKey(fillType: IndexerFillType): string {
+export function getIndexerFillTypeStringKey(fillType: SubaccountFillType): string {
   switch (fillType) {
-    case IndexerFillType.LIMIT:
+    case SubaccountFillType.LIMIT:
       return STRING_KEYS.LIMIT_ORDER_SHORT;
-    case IndexerFillType.LIQUIDATED:
+    case SubaccountFillType.MARKET:
+      return STRING_KEYS.MARKET_ORDER_SHORT;
+    case SubaccountFillType.LIQUIDATED:
       return STRING_KEYS.LIQUIDATED;
-    case IndexerFillType.LIQUIDATION:
-      return STRING_KEYS.LIQUIDATION;
-    case IndexerFillType.DELEVERAGED:
+    case SubaccountFillType.DELEVERAGED:
       return STRING_KEYS.DELEVERAGED;
-    case IndexerFillType.OFFSETTING:
-      return STRING_KEYS.OFFSETTING;
     default:
       assertNever(fillType);
       return STRING_KEYS.LIMIT_ORDER_SHORT;

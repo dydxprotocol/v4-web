@@ -1,7 +1,7 @@
 import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
-import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
+import { PerpetualMarketSummary, SubaccountFill } from '@/abacus-ts/types/summaryTypes';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
@@ -10,7 +10,6 @@ import tw from 'twin.macro';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
@@ -67,7 +66,7 @@ export type FillTableRow = {
   marketSummary: Nullable<PerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
-} & IndexerCompositeFillObject;
+} & SubaccountFill;
 
 const getFillsTableColumnDef = ({
   key,
@@ -324,7 +323,7 @@ export const FillsTable = forwardRef(
     const fillsData = useMemo(
       () =>
         fills.map(
-          (fill: IndexerCompositeFillObject): FillTableRow =>
+          (fill: SubaccountFill): FillTableRow =>
             getHydratedFill({
               data: fill,
               marketSummaries,

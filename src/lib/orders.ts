@@ -5,6 +5,7 @@ import {
   OrderStatus as OrderStatusNew,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
+  SubaccountFill as SubaccountFillNew,
 } from '@/abacus-ts/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
@@ -27,7 +28,6 @@ import {
 } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
-import { IndexerCompositeFillObject } from '@/types/indexer/indexerManual';
 
 import { IconName } from '@/components/Icon';
 
@@ -243,9 +243,9 @@ export const getHydratedFill = ({
   data,
   marketSummaries,
 }: {
-  data: IndexerCompositeFillObject;
+  data: SubaccountFillNew;
   marketSummaries: PerpetualMarketSummaries;
-}): IndexerCompositeFillObject & NewAddedProps => {
+}): SubaccountFillNew & NewAddedProps => {
   return {
     ...data,
     marketSummary: marketSummaries[data.market ?? ''],
