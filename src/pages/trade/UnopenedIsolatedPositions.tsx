@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 
-import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
 import type { PendingIsolatedPosition } from '@/abacus-ts/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
@@ -15,8 +15,11 @@ import { Button } from '@/components/Button';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
+import { Tag, TagType } from '@/components/Tag';
 
 import { useAppSelector } from '@/state/appTypes';
+
+import { shortenNumberForDisplay } from '@/lib/numbers';
 
 type UnopenedIsolatedPositionsProps = {
   className?: string;
@@ -27,24 +30,10 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
   className,
   onViewOrders,
 }: UnopenedIsolatedPositionsProps) => {
-  const parentSubaccountPositionsLoadingState = useAppSelector(
-    BonsaiCore.account.parentSubaccountPositions.loading
-  );
-  const parentSubaccountLoaded = parentSubaccountPositionsLoadingState === 'success';
-
-  const numNormalPositions = (
-    useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
-  ).length;
-
   const pendingIsolatedPositions =
     useAppSelector(BonsaiHelpers.unopenedIsolatedPositions) ?? EMPTY_ARR;
 
-  const [isOpen, setIsOpen] = useState(parentSubaccountLoaded && numNormalPositions === 0);
-  useEffect(() => {
-    if (parentSubaccountLoaded && numNormalPositions === 0) {
-      setIsOpen(true);
-    }
-  }, [parentSubaccountLoaded, numNormalPositions]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const stringGetter = useStringGetter();
 
@@ -54,6 +43,7 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
     <$UnopenedIsolatedPositionsDrawerContainer className={className} isOpen={isOpen}>
       <$Button onClick={() => setIsOpen(!isOpen)}>
         {stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
+        <Tag type={TagType.Number}>{shortenNumberForDisplay(pendingIsolatedPositions.length)}</Tag>
         <DropdownIcon iconName={IconName.Caret} isOpen={isOpen} tw="text-[0.5em]" />
       </$Button>
 
