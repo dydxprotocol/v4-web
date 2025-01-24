@@ -9,7 +9,8 @@ import { ButtonSize } from '@/constants/buttons';
 import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
-import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS } from '@/constants/numbers';
+import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -29,7 +30,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { FundingChartTooltipContent } from './Tooltip';
 
-const FUNDING_RATE_TIME_RESOLUTION = 60 * 60 * 1000; // 1 hour
+const FUNDING_RATE_TIME_RESOLUTION = timeUnits.hour;
 
 const getAllFundingRates = (oneHourRate: number = 0) => ({
   [FundingRateResolution.OneHour]: oneHourRate,
@@ -89,7 +90,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         },
       ]}
       tickFormatY={(value) =>
-        `${(getAllFundingRates(value)[fundingRateView] * 100).toFixed(SMALL_PERCENT_DECIMALS)}%`
+        `${(getAllFundingRates(value)[fundingRateView] * 100).toFixed(FUNDING_DECIMALS)}%`
       }
       renderXAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
@@ -108,6 +109,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         return (
           <$YAxisLabelOutput
             type={OutputType.SmallPercent}
+            fractionDigits={FUNDING_DECIMALS}
             value={getAllFundingRates(tooltipDatum?.fundingRate)[fundingRateView]}
             accentColor={
               {
@@ -173,7 +175,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         <$Output
           type={OutputType.SmallPercent}
           value={latestFundingRate}
-          fractionDigits={TINY_PERCENT_DECIMALS}
+          fractionDigits={FUNDING_DECIMALS}
           isNegative={(latestFundingRate ?? 0) < 0}
         />
       </$CurrentFundingRate>

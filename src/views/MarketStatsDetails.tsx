@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 import { DisplayUnit } from '@/constants/trade';
 
@@ -269,7 +269,7 @@ const DetailsItem = ({
             type={OutputType.Percent}
             value={value}
             color={color}
-            fractionDigits={TINY_PERCENT_DECIMALS}
+            fractionDigits={FUNDING_DECIMALS}
           />
         </WithTooltip>
       );
