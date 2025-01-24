@@ -269,7 +269,6 @@ export const getSubaccountConditionalOrders = () =>
               : IndexerOrderSide.BUY;
 
           const conditionalOrders = openOrdersByPositionUniqueId[position.uniqueId];
-          console.log(position.market, conditionalOrders);
 
           return {
             stopLossOrders: conditionalOrders?.filter(
