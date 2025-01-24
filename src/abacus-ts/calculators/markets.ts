@@ -79,6 +79,18 @@ function calculateDerivedMarketDisplayItems(market: IndexerWsBaseMarketObject) {
   };
 }
 
+function calculatePriceChangePercent(
+  priceChange24H: string | null | undefined,
+  oraclePrice: string | null | undefined
+): BigNumber | null {
+  if (priceChange24H == null || oraclePrice == null) {
+    return null;
+  }
+
+  const basePrice = MustBigNumber(oraclePrice).minus(priceChange24H);
+  return basePrice.gt(0) ? MustBigNumber(priceChange24H).div(basePrice) : null;
+}
+
 function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
   return {
     effectiveInitialMarginFraction:
@@ -86,11 +98,8 @@ function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
     openInterestUSDC: MustBigNumber(market.openInterest)
       .times(market.oraclePrice ?? 0)
       .toNumber(),
-    percentChange24h: MustBigNumber(market.oraclePrice).isZero()
-      ? null
-      : MustBigNumber(market.priceChange24H)
-          .div(market.oraclePrice ?? 0)
-          .toNumber(),
+    percentChange24h:
+      calculatePriceChangePercent(market.priceChange24H, market.oraclePrice)?.toNumber() ?? null,
     stepSizeDecimals: MaybeBigNumber(market.stepSize)?.decimalPlaces() ?? TOKEN_DECIMALS,
     tickSizeDecimals: MaybeBigNumber(market.tickSize)?.decimalPlaces() ?? USD_DECIMALS,
   };
