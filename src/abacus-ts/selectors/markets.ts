@@ -38,7 +38,7 @@ export const selectCurrentMarketOrderbook = createAppSelector(
 export const selectCurrentMarketOrderbookLoading = createAppSelector(
   [selectCurrentMarketOrderbook],
   (currentMarketOrderbook) =>
-    currentMarketOrderbook ? mergeLoadableStatus(currentMarketOrderbook) : 'pending'
+    currentMarketOrderbook ? mergeLoadableStatus(currentMarketOrderbook) : 'idle'
 );
 
 export const selectCurrentMarketOrderbookData = createAppSelector(
