@@ -31,7 +31,7 @@ export const calculateOrderbook = ({
   const bidsBase: Omit<OrderbookLine, 'depth' | 'depthCost'>[] = objectEntries(bids)
     .map(mapRawOrderbookLine)
     .filter(isTruthy)
-    .sort((a, b) => a.price - b.price);
+    .sort((a, b) => b.price - a.price);
 
   // calculate depth and depthCost
   const asksComposite = calculateDepthAndDepthCost(asksBase);
@@ -77,7 +77,7 @@ function uncrossOrderbook(asks: OrderbookLine[], bids: OrderbookLine[]) {
       // one of the sizes "should" be zero, but we simply check for the larger size.
       if (ask.size > bid.size) {
         // remove the bid
-        bid = bidsCopy.pop();
+        bid = bidsCopy.shift();
       } else {
         // remove the ask
         ask = asksCopy.shift();
@@ -89,7 +89,7 @@ function uncrossOrderbook(asks: OrderbookLine[], bids: OrderbookLine[]) {
         ask = asksCopy.shift();
       } else {
         // remove the bid
-        bid = bidsCopy.pop();
+        bid = bidsCopy.shift();
       }
     }
   }
