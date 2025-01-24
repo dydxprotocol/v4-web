@@ -129,9 +129,9 @@ export function createMarketSummary(
   sparklines: PerpetualMarketSparklines | undefined,
   assetInfo: AllAssetData | undefined,
   listOfFavorites: string[]
-): PerpetualMarketSummaries | null {
+): PerpetualMarketSummaries | undefined {
   if (markets == null || assetInfo == null) {
-    return null;
+    return undefined;
   }
 
   return pickBy(
