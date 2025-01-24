@@ -13,7 +13,14 @@ export const getDirectionFromFundingRate = (fundingRate: string) => {
       : FundingDirection.ToLong;
 };
 
-export const mapFundingChartObject = (funding: IndexerHistoricalFundingResponseObject) => ({
+export type HistoricalFundingObject = {
+  fundingRate: number;
+  time: number;
+  direction: FundingDirection;
+};
+export const mapFundingChartObject = (
+  funding: IndexerHistoricalFundingResponseObject
+): HistoricalFundingObject => ({
   fundingRate: MustBigNumber(funding.rate).toNumber(),
   time: new Date(funding.effectiveAt).getTime(),
   direction: getDirectionFromFundingRate(funding.rate),

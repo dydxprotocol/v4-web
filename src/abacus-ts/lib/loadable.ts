@@ -3,6 +3,7 @@ export type LoadableSuccess<T> = { status: 'success'; data: T };
 export type LoadableIdle = { status: 'idle'; data: undefined };
 export type LoadableError<T> = { status: 'error'; data?: T; error: any };
 export type Loadable<T> = LoadableIdle | LoadableSuccess<T> | LoadablePending<T> | LoadableError<T>;
+export type LoadableStatus = Loadable<any>['status'];
 
 export function loadablePending<T>() {
   return { status: 'pending' } as LoadablePending<T>;

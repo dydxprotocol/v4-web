@@ -10,6 +10,7 @@ import { FundingRateResolution, type FundingChartDatum } from '@/constants/chart
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
 import { FUNDING_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -47,9 +48,11 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const { data, isLoading, isError } = BonsaiHooks.useCurrentMarketHistoricalFunding();
+  const { data, status } = BonsaiHooks.useCurrentMarketHistoricalFunding();
+  const isLoading = status === 'pending';
+  const isError = status === 'error';
 
-  const latestDatum = data[data.length - 1];
+  const latestDatum = data?.[data.length - 1];
 
   // Chart state
   const [fundingRateView, setFundingRateView] = useState(FundingRateResolution.OneHour);
@@ -63,7 +66,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   return (
     <TimeSeriesChart
       selectedLocale={selectedLocale}
-      data={data}
+      data={data ?? EMPTY_ARR}
       yAxisScaleType="symlog"
       margin={{
         left: isMobile ? 0 : 88,

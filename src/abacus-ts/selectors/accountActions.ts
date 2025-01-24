@@ -4,6 +4,8 @@ import {
   applyOperationsToSubaccount,
   createUsdcDepositOperations,
   createUsdcWithdrawalOperations,
+  UsdcDepositArgs,
+  UsdcWithdrawArgs,
 } from '../calculators/accountActions';
 import { calculateParentSubaccountSummary } from '../calculators/subaccount';
 import { selectRelevantMarketsData } from './account';
@@ -14,13 +16,7 @@ export const createSelectParentSubaccountSummaryDeposit = () =>
     [
       selectRawParentSubaccountData,
       selectRelevantMarketsData,
-      (
-        _s,
-        input: {
-          subaccountNumber: number;
-          depositAmount: string;
-        }
-      ) => input,
+      (_s, input: UsdcDepositArgs) => input,
     ],
     (parentSubaccount, markets, depositInputs) => {
       if (parentSubaccount == null || markets == null) {
@@ -39,13 +35,7 @@ export const createSelectParentSubaccountSummaryWithdrawal = () =>
     [
       selectRawParentSubaccountData,
       selectRelevantMarketsData,
-      (
-        _s,
-        input: {
-          subaccountNumber: number;
-          withdrawAmount: string;
-        }
-      ) => input,
+      (_s, input: UsdcWithdrawArgs) => input,
     ],
     (parentSubaccount, markets, withdrawalInputs) => {
       if (parentSubaccount == null || markets == null) {
