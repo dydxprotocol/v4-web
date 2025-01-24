@@ -274,6 +274,7 @@ export type OrderbookLine = {
 export type OrderbookProcessedData = {
   asks: OrderbookLine[];
   bids: OrderbookLine[];
+  midPrice: number | undefined;
   spread: number | undefined;
   spreadPercent: number | undefined;
 };

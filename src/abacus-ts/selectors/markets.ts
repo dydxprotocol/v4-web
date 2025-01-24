@@ -24,21 +24,38 @@ export const selectSparkLinesData = createAppSelector([selectRawSparklinesData],
   formatSparklineData(sparklines)
 );
 
-export const selectCurrentMarketOrderbookLoading = createAppSelector(
-  [selectRawOrderbooks, getCurrentMarketId],
-  (rawOrderbooks, currentMarketId) =>
-    currentMarketId && rawOrderbooks[currentMarketId]
-      ? mergeLoadableStatus(rawOrderbooks[currentMarketId])
-      : 'pending'
-);
-
 export const selectCurrentMarketOrderbook = createAppSelector(
-  [selectRawOrderbooks, getCurrentMarketId, (_s, groupingMultiplier: number) => groupingMultiplier],
-  (rawOrderbooks, currentMarketId, groupingMultiplier) => {
-    if (!currentMarketId || !rawOrderbooks[currentMarketId]?.data) {
+  [selectRawOrderbooks, getCurrentMarketId],
+  (rawOrderbooks, currentMarketId) => {
+    if (!currentMarketId || !rawOrderbooks[currentMarketId]) {
       return undefined;
     }
 
-    return calculateOrderbook(rawOrderbooks[currentMarketId].data, groupingMultiplier);
+    return rawOrderbooks[currentMarketId];
+  }
+);
+
+export const selectCurrentMarketOrderbookLoading = createAppSelector(
+  [selectCurrentMarketOrderbook],
+  (currentMarketOrderbook) =>
+    currentMarketOrderbook ? mergeLoadableStatus(currentMarketOrderbook) : 'pending'
+);
+
+export const selectCurrentMarketOrderbookData = createAppSelector(
+  [selectCurrentMarketOrderbook],
+  (currentMarketOrderbook) => calculateOrderbook({ orderbook: currentMarketOrderbook?.data })
+);
+
+export const createSelectCurrentMarketOrderbook = createAppSelector(
+  [selectCurrentMarketOrderbook, (_s, groupingMultiplier?: number) => groupingMultiplier],
+  (currentMarketOrderbook, groupingMultiplier) => {
+    if (currentMarketOrderbook?.data == null) {
+      return undefined;
+    }
+
+    return calculateOrderbook({
+      orderbook: currentMarketOrderbook.data,
+      _groupingMultiplier: groupingMultiplier,
+    });
   }
 );

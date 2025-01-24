@@ -13,6 +13,8 @@ import {
   IndexerWsCandleResponse,
   IndexerWsCandleResponseObject,
   IndexerWsMarketUpdateResponse,
+  IndexerWsOrderbookChannelBatchDataMessage,
+  IndexerWsOrderbookSubscribedMessage,
   IndexerWsOrderbookUpdateResponse,
   IndexerWsParentSubaccountSubscribedResponse,
   IndexerWsParentSubaccountUpdateObject,
@@ -26,6 +28,10 @@ export const isWsParentSubaccountUpdates =
   typia.createAssert<IndexerWsParentSubaccountUpdateObject[]>();
 export const isWsPerpetualMarketResponse = typia.createAssert<IndexerWsPerpetualMarketResponse>();
 export const isWsMarketUpdateResponses = typia.createAssert<IndexerWsMarketUpdateResponse[]>();
+export const isWsOrderbookSubscribedMessage =
+  typia.createAssert<IndexerWsOrderbookSubscribedMessage>();
+export const isWsOrderbookChannelBatchDataMessage =
+  typia.createAssert<IndexerWsOrderbookChannelBatchDataMessage>();
 export const isWsOrderbookResponse = typia.createAssert<IndexerOrderbookResponseObject>();
 export const isWsOrderbookUpdateResponses =
   typia.createAssert<IndexerWsOrderbookUpdateResponse[]>();
