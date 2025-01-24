@@ -2,7 +2,11 @@ import { AssetData, PerpetualMarketSummary } from '@/abacus-ts/types/summaryType
 
 import { ISOLATED_LIQUIDITY_TIER_INFO, MarketData } from '@/constants/markets';
 
-import { getDisplayableTickerFromMarket, getMarketIdFromAsset } from './assetUtils';
+import {
+  getDisplayableAssetFromTicker,
+  getDisplayableTickerFromMarket,
+  getMarketIdFromAsset,
+} from './assetUtils';
 import { BIG_NUMBERS, MustBigNumber } from './numbers';
 import { safeAssign } from './objectHelpers';
 
@@ -28,6 +32,7 @@ export function getMarketDataFromPerpetualMarketSummary(
     ticker: id,
     assetId,
     displayableTicker: displayId,
+    displayableAsset,
     clobPairId,
     effectiveInitialMarginFraction,
     logo,
@@ -54,6 +59,7 @@ export function getMarketDataFromPerpetualMarketSummary(
     id,
     assetId,
     displayId,
+    displayableAsset,
     clobPairId,
     effectiveInitialMarginFraction,
     logo,
@@ -94,11 +100,13 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
 
   const ticker = getMarketIdFromAsset(assetId);
   const displayId = getDisplayableTickerFromMarket(ticker);
+  const displayableAsset = getDisplayableAssetFromTicker(ticker);
 
   return safeAssign({}, {
     id: ticker,
     assetId,
     displayId,
+    displayableAsset,
     clobPairId: '-1',
     effectiveInitialMarginFraction: ISOLATED_LIQUIDITY_TIER_INFO.initialMarginFraction,
     logo,

@@ -170,7 +170,7 @@ export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
     IndexerOrderType.STOPMARKET,
     IndexerOrderType.TAKEPROFITMARKET,
     IndexerOrderType.TRAILINGSTOP,
-  ].some((t) => t === type);
+  ].includes(type);
 
 export const isLimitOrderType = (type?: AbacusOrderTypes) =>
   type &&
@@ -180,9 +180,7 @@ export const isLimitOrderType = (type?: AbacusOrderTypes) =>
 
 export const isLimitOrderTypeNew = (type?: IndexerOrderType) =>
   type &&
-  [IndexerOrderType.LIMIT, IndexerOrderType.STOPLIMIT, IndexerOrderType.TAKEPROFIT].some(
-    (t) => t === type
-  );
+  [IndexerOrderType.LIMIT, IndexerOrderType.STOPLIMIT, IndexerOrderType.TAKEPROFIT].includes(type);
 
 export const isStopLossOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
   const validOrderTypes = isSlTpLimitOrdersEnabled
@@ -197,7 +195,7 @@ export const isStopLossOrderNew = (
   const validOrderTypes = isSlTpLimitOrdersEnabled
     ? [IndexerOrderType.STOPLIMIT, IndexerOrderType.STOPMARKET]
     : [IndexerOrderType.STOPMARKET];
-  return validOrderTypes.some((type) => type === order.type) && order.reduceOnly;
+  return order.reduceOnly && validOrderTypes.includes(order.type);
 };
 
 export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
@@ -214,7 +212,7 @@ export const isTakeProfitOrderNew = (
   const validOrderTypes = isSlTpLimitOrdersEnabled
     ? [IndexerOrderType.TAKEPROFIT, IndexerOrderType.TAKEPROFITMARKET]
     : [IndexerOrderType.TAKEPROFITMARKET];
-  return validOrderTypes.some((type) => type === order.type) && order.reduceOnly;
+  return order.reduceOnly && validOrderTypes.includes(order.type);
 };
 
 export const isSellOrder = (order: SubaccountOrder) => {

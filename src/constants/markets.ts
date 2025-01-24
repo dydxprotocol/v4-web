@@ -16,6 +16,9 @@ export type MarketData = {
   // Displayable Market id (e.g. 'ETH-USD' or 'BUFFI-USD')
   displayId: Nullable<string>;
 
+  // Displayable asset id so just 'ETH' or 'BUFFI
+  displayableAsset: Nullable<string>;
+
   clobPairId: string;
   effectiveInitialMarginFraction: Nullable<number>;
   logo: string;

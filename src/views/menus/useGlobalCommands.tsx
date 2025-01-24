@@ -91,11 +91,11 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
     {
       group: 'markets',
       groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
-      items: markets.map(({ name, id, logo, displayId, assetId }) => ({
+      items: markets.map(({ name, id, logo, displayableAsset, assetId }) => ({
         value: id,
         slotBefore: <AssetIcon logoUrl={logo} symbol={assetId} />,
         label: name,
-        tag: displayId,
+        tag: displayableAsset,
         onSelect: () => navigate(`${AppRoute.Trade}/${id}`),
       })),
     },
