@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';

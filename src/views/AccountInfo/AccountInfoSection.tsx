@@ -1,4 +1,4 @@
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';

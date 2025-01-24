@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';

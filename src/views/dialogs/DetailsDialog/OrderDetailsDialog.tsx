@@ -1,4 +1,4 @@
-import { OrderFlags, OrderStatus } from '@/abacus-ts/types/summaryTypes';
+import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';

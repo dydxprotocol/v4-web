@@ -1,4 +1,4 @@
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 
 import { STRING_KEYS } from '@/constants/localization';

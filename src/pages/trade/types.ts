@@ -1,4 +1,4 @@
-import { MarginMode } from '@/abacus-ts/types/summaryTypes';
+import { MarginMode } from '@/bonsai/types/summaryTypes';
 
 export enum MarketTypeFilter {
   AllMarkets = 'AllMarkets',

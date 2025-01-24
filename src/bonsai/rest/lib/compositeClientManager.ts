@@ -1,5 +1,5 @@
-import { createStoreEffect } from '@/abacus-ts/lib/createStoreEffect';
-import { ResourceCacheManager } from '@/abacus-ts/lib/resourceCacheManager';
+import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
+import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import {
   CompositeClient,
   IndexerClient,

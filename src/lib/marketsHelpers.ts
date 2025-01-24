@@ -1,4 +1,4 @@
-import { AssetData, PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
+import { AssetData, PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 
 import { ISOLATED_LIQUIDITY_TIER_INFO, MarketData } from '@/constants/markets';
 

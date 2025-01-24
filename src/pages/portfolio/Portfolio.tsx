@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';

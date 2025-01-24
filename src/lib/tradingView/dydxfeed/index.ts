@@ -1,8 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import {
-  subscribeOnStream,
-  unsubscribeFromStream,
-} from '@/abacus-ts/websocket/candlesForTradingView';
+import { subscribeOnStream, unsubscribeFromStream } from '@/bonsai/websocket/candlesForTradingView';
 import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 import type {

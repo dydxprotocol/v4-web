@@ -1,4 +1,4 @@
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, sum } from 'lodash';

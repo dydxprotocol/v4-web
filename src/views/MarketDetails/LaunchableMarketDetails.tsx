@@ -1,4 +1,4 @@
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';

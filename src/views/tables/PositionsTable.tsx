@@ -1,7 +1,7 @@
 import { forwardRef, useMemo } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
-import { PerpetualMarketSummary, SubaccountPosition } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { PerpetualMarketSummary, SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual } from 'react-redux';

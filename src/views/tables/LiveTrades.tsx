@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { BonsaiHelpers, BonsaiHooks } from '@/abacus-ts/ontology';
-import { LiveTrade } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiHelpers, BonsaiHooks } from '@/bonsai/ontology';
+import { LiveTrade } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css, keyframes } from 'styled-components';
 

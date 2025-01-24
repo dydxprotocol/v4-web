@@ -1,7 +1,7 @@
 import { forwardRef, Key, useMemo } from 'react';
 
-import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
-import { PerpetualMarketSummary, SubaccountFill } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';

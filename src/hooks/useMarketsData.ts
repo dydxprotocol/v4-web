@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
-import { AssetData } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { AssetData } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
 import {

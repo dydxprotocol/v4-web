@@ -13,7 +13,7 @@
   ],
   "overrides": [
     {
-      "files": ["**/abacus-ts/**"],
+      "files": ["**/bonsai/**"],
       "rules": {
         "no-restricted-imports": "off"
       }
@@ -53,10 +53,10 @@
       "error",
       {
         "patterns": [
-          "@/abacus-ts/*/*",
-          "!@/abacus-ts/ontology",
-          "!@/abacus-ts/lib/*",
-          "!@/abacus-ts/types/summaryTypes"
+          "@/bonsai/*/*",
+          "!@/bonsai/ontology",
+          "!@/bonsai/lib/*",
+          "!@/bonsai/types/summaryTypes"
         ]
       }
     ],

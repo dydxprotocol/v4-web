@@ -1,4 +1,4 @@
-import { Loadable } from '@/abacus-ts/lib/loadable';
+import { Loadable } from '@/bonsai/lib/loadable';
 import { QueryObserverResult } from '@tanstack/react-query';
 
 export function queryResultToLoadable<T>(arg: QueryObserverResult<T>): Loadable<T> {

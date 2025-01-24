@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
-import { logAbacusTsInfo } from '@/abacus-ts/logs';
+import { logAbacusTsInfo } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
-import { IndexerWebsocketManager } from '@/abacus-ts/websocket/lib/indexerWebsocketManager';
+import { IndexerWebsocketManager } from '@/bonsai/websocket/lib/indexerWebsocketManager';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';

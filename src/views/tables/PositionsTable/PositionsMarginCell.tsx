@@ -1,4 +1,4 @@
-import { SubaccountPosition } from '@/abacus-ts/types/summaryTypes';
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';

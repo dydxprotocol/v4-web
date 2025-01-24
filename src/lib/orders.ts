@@ -1,12 +1,12 @@
 // eslint-disable-next-line no-restricted-imports
-import { getSimpleOrderStatus } from '@/abacus-ts/calculators/orders';
+import { getSimpleOrderStatus } from '@/bonsai/calculators/orders';
 import {
   SubaccountOrder as NewSubaccountOrder,
   OrderStatus as OrderStatusNew,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
   SubaccountFill as SubaccountFillNew,
-} from '@/abacus-ts/types/summaryTypes';
+} from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 

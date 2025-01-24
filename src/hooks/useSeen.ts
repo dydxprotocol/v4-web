@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { getUserWalletAddress } from '@/state/accountSelectors';

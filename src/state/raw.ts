@@ -1,4 +1,4 @@
-import { Loadable, LoadableError, loadableIdle, LoadableSuccess } from '@/abacus-ts/lib/loadable';
+import { Loadable, LoadableError, loadableIdle, LoadableSuccess } from '@/bonsai/lib/loadable';
 // eslint-disable-next-line no-restricted-imports
 import {
   AssetInfos,
@@ -6,8 +6,8 @@ import {
   OrderbookData,
   OrdersData,
   ParentSubaccountData,
-} from '@/abacus-ts/types/rawTypes';
-import { AccountStats, ConfigTiers, UserFeeTier } from '@/abacus-ts/types/summaryTypes';
+} from '@/bonsai/types/rawTypes';
+import { AccountStats, ConfigTiers, UserFeeTier } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';

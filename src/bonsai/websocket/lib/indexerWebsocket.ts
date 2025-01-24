@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logAbacusTsError, logAbacusTsInfo } from '@/abacus-ts/logs';
+import { logAbacusTsError, logAbacusTsInfo } from '@/bonsai/logs';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';

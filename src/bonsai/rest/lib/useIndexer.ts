@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { selectCompositeClientReady, selectIndexerReady } from '@/abacus-ts/socketSelectors';
+import { selectCompositeClientReady, selectIndexerReady } from '@/bonsai/socketSelectors';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
