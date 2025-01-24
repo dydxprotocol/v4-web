@@ -66,3 +66,14 @@ export const selectCurrentMarketAssetInfo = createAppSelector(
     return assets[currentMarketInfo.assetId];
   }
 );
+
+export const createSelectMarketSummaryById = () =>
+  createAppSelector(
+    [selectAllMarketSummaries, (_s, marketId: string | undefined) => marketId],
+    (allSummaries, marketId) => {
+      if (marketId == null) {
+        return undefined;
+      }
+      return allSummaries?.[marketId];
+    }
+  );

@@ -1,26 +1,20 @@
-import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { MarketFilters } from '@/constants/markets';
 import { type MenuConfig } from '@/constants/menus';
 import { AppRoute } from '@/constants/routes';
 
+import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAssets } from '@/state/assetsSelectors';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { safeAssign } from '@/lib/objectHelpers';
-import { orEmptyRecord } from '@/lib/typeUtils';
 
 export const useGlobalCommands = (): MenuConfig<string | number, string | number> => {
   const dispatch = useAppDispatch();
@@ -28,14 +22,10 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const allPerpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyRecord(useAppSelector(getAssets, shallowEqual));
-
-  const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
-    (market): PerpetualMarket & Asset =>
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      safeAssign({}, market, allAssets[market?.assetId] ?? ({} as Asset))
-  );
+  const { markets } = useMarketsData({
+    forceShowUnlaunchedMarkets: true,
+    filter: MarketFilters.ALL,
+  });
 
   return [
     {
@@ -101,12 +91,12 @@ export const useGlobalCommands = (): MenuConfig<string | number, string | number
     {
       group: 'markets',
       groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
-      items: joinedPerpetualMarketsAndAssets.map(({ market, name, id, resources }) => ({
-        value: market ?? '',
-        slotBefore: <AssetIcon logoUrl={resources?.imageUrl} symbol={id} />,
-        label: name ?? '',
-        tag: getDisplayableAssetFromBaseAsset(id),
-        onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
+      items: markets.map(({ name, id, logo, displayId, assetId }) => ({
+        value: id,
+        slotBefore: <AssetIcon logoUrl={logo} symbol={assetId} />,
+        label: name,
+        tag: displayId,
+        onSelect: () => navigate(`${AppRoute.Trade}/${id}`),
       })),
     },
   ];

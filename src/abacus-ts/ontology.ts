@@ -36,6 +36,7 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import {
+  createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketInfo,
@@ -110,6 +111,9 @@ export const BonsaiHelpers = {
   },
   assets: {
     createSelectAssetInfo,
+  },
+  markets: {
+    createSelectMarketSummaryById,
   },
   forms: {
     deposit: {

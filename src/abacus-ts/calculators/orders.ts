@@ -13,6 +13,7 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
 import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import { getPositionUniqueId } from './helpers';
 
 export function calculateOpenOrders(orders: SubaccountOrder[]) {
   return orders.filter(
@@ -50,6 +51,7 @@ function calculateSubaccountOrder(
     marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
     subaccountNumber: base.subaccountNumber,
     id: base.id,
+    positionUniqueId: getPositionUniqueId(base.ticker, base.subaccountNumber),
     clientId: base.clientId,
     type: base.type,
     side: base.side,
