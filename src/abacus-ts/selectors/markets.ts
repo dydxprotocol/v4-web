@@ -43,19 +43,17 @@ export const selectCurrentMarketOrderbookLoading = createAppSelector(
 
 export const selectCurrentMarketOrderbookData = createAppSelector(
   [selectCurrentMarketOrderbook],
-  (currentMarketOrderbook) => calculateOrderbook({ orderbook: currentMarketOrderbook?.data })
+  (currentMarketOrderbook) => calculateOrderbook(currentMarketOrderbook?.data)
 );
 
 export const createSelectCurrentMarketOrderbook = createAppSelector(
   [selectCurrentMarketOrderbook, (_s, groupingMultiplier?: number) => groupingMultiplier],
-  (currentMarketOrderbook, groupingMultiplier) => {
+  (currentMarketOrderbook, _groupingMultiplier) => {
     if (currentMarketOrderbook?.data == null) {
       return undefined;
     }
 
-    return calculateOrderbook({
-      orderbook: currentMarketOrderbook.data,
-      _groupingMultiplier: groupingMultiplier,
-    });
+    // TODO: groupMultiplier calculations on the orderbook
+    return calculateOrderbook(currentMarketOrderbook.data);
   }
 );

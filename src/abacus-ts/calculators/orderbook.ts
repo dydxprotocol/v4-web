@@ -18,13 +18,7 @@ type OrderbookLineBN = {
 };
 
 export const calculateOrderbook = weakMapMemoize(
-  ({
-    orderbook,
-    _groupingMultiplier = undefined,
-  }: {
-    orderbook: OrderbookData | undefined;
-    _groupingMultiplier?: number;
-  }): OrderbookProcessedData | undefined => {
+  (orderbook: OrderbookData | undefined): OrderbookProcessedData | undefined => {
     if (orderbook == null) {
       return undefined;
     }
@@ -62,8 +56,6 @@ export const calculateOrderbook = weakMapMemoize(
     const midPriceBN = lowestAsk && highestBid && lowestAsk.price.plus(highestBid.price).div(2);
     const spreadBN = lowestAsk && highestBid && lowestAsk.price.minus(highestBid.price);
     const spreadPercentBN = spreadBN && midPriceBN && spreadBN.div(midPriceBN).times(100);
-
-    // TODO: multiply by groupingMultiplier
 
     return {
       bids: uncrossedBook.bids.map(mapOrderbookLineToNumber),
