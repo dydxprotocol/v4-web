@@ -27,7 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MidMarketPrice } from './MidMarketPrice';
@@ -319,7 +319,10 @@ const DetailsItem = ({
               ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
               : null
           }
-          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
+          withDiff={
+            MaybeBigNumber(initialMarginFraction)?.toNumber() !==
+            (effectiveInitialMarginFraction ?? undefined)
+          }
           type={OutputType.Multiple}
         />
       );
