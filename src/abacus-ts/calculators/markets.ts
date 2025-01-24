@@ -87,8 +87,8 @@ function calculatePriceChangePercent(
     return null;
   }
 
-  const basePrice = MustBigNumber(oraclePrice).minus(priceChange24H);
-  return basePrice.gt(0) ? MustBigNumber(priceChange24H).div(basePrice) : null;
+  const price24hAgo = MustBigNumber(oraclePrice).minus(priceChange24H);
+  return price24hAgo.gt(0) ? MustBigNumber(priceChange24H).div(price24hAgo) : null;
 }
 
 function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
