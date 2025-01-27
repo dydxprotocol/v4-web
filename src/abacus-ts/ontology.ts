@@ -1,6 +1,13 @@
+import { HeightResponse } from '@dydxprotocol/v4-client-js';
+
+import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
+
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { UsdcDepositArgs, UsdcWithdrawArgs } from './calculators/accountActions';
+import { HistoricalFundingObject } from './calculators/funding';
+import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import {
   getCurrentMarketAccountFills,
@@ -36,25 +43,88 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import {
+  selectCurrentMarketOrderbookData,
+  selectCurrentMarketOrderbookLoading,
+} from './selectors/markets';
+import {
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
+  StablePerpetualMarketSummary,
 } from './selectors/summary';
+import {
+  AllAssetData,
+  ApiState,
+  AssetData,
+  GroupedSubaccountSummary,
+  OrderbookProcessedData,
+  PendingIsolatedPosition,
+  PerpetualMarketSummaries,
+  PerpetualMarketSummary,
+  SubaccountFill,
+  SubaccountOrder,
+  SubaccountPosition,
+} from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
-// every leaf is a selector or a paramaterized selector
-type NestedSelectors = {
-  [K: string]:
-    | NestedSelectors
-    | ((state: RootState) => any)
-    | (() => (state: RootState, ...other: any[]) => any);
-};
+type BasicSelector<Result> = (state: RootState) => Result;
+type ParameterizedSelector<Result, Args extends any[]> = () => (
+  state: RootState,
+  ...args: Args
+) => Result;
 
 // all data should be accessed via selectors in this file
 // no files outside abacus-ts should access anything within abacus-ts except this file
-export const BonsaiCore = {
+interface BonsaiCoreShape {
+  account: {
+    parentSubaccountSummary: {
+      data: BasicSelector<GroupedSubaccountSummary | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    parentSubaccountPositions: {
+      data: BasicSelector<SubaccountPosition[] | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    openOrders: {
+      data: BasicSelector<SubaccountOrder[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    orderHistory: {
+      data: BasicSelector<SubaccountOrder[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    fills: {
+      data: BasicSelector<SubaccountFill[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+  };
+  markets: {
+    currentMarketId: BasicSelector<string | undefined>;
+    markets: {
+      data: BasicSelector<PerpetualMarketSummaries | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    assets: {
+      data: BasicSelector<AllAssetData | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+  };
+  network: {
+    indexerHeight: {
+      data: BasicSelector<HeightResponse | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    validatorHeight: {
+      data: BasicSelector<HeightResponse | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    apiState: BasicSelector<ApiState>;
+  };
+}
+
+export const BonsaiCore: BonsaiCoreShape = {
   account: {
     parentSubaccountSummary: {
       data: selectParentSubaccountSummary,
@@ -83,7 +153,10 @@ export const BonsaiCore = {
       data: selectAllMarketSummaries,
       loading: selectAllMarketSummariesLoading,
     },
-    assets: { data: selectAllAssetsInfo, loading: selectAllAssetsInfoLoading },
+    assets: {
+      data: selectAllAssetsInfo,
+      loading: selectAllAssetsInfoLoading,
+    },
   },
   network: {
     indexerHeight: {
@@ -96,13 +169,57 @@ export const BonsaiCore = {
     },
     apiState: selectApiState,
   },
-} as const satisfies NestedSelectors;
+};
 
-export const BonsaiHelpers = {
+interface BonsaiHelpersShape {
+  currentMarket: {
+    marketInfo: BasicSelector<PerpetualMarketSummary | undefined>;
+    // marketInfo but with only the properties that rarely change, for fewer rerenders
+    stableMarketInfo: BasicSelector<StablePerpetualMarketSummary | undefined>;
+    account: {
+      openOrders: BasicSelector<SubaccountOrder[]>;
+      orderHistory: BasicSelector<SubaccountOrder[]>;
+      fills: BasicSelector<SubaccountFill[]>;
+    };
+    orderbook: {
+      data: BasicSelector<OrderbookProcessedData | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+  };
+  assets: {
+    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string]>;
+  };
+  markets: {
+    createSelectMarketSummaryById: ParameterizedSelector<
+      PerpetualMarketSummary | undefined,
+      [string]
+    >;
+  };
+  forms: {
+    deposit: {
+      createSelectParentSubaccountSummary: ParameterizedSelector<
+        GroupedSubaccountSummary | undefined,
+        [UsdcDepositArgs]
+      >;
+    };
+    withdraw: {
+      createSelectParentSubaccountSummary: ParameterizedSelector<
+        GroupedSubaccountSummary | undefined,
+        [UsdcWithdrawArgs]
+      >;
+    };
+  };
+  unopenedIsolatedPositions: BasicSelector<PendingIsolatedPosition[] | undefined>;
+}
+
+export const BonsaiHelpers: BonsaiHelpersShape = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
-    // marketInfo but with only the properties that rarely change, for fewer rerenders
     stableMarketInfo: selectCurrentMarketInfoStable,
+    orderbook: {
+      data: selectCurrentMarketOrderbookData,
+      loading: selectCurrentMarketOrderbookLoading,
+    },
     account: {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,
@@ -124,9 +241,14 @@ export const BonsaiHelpers = {
     },
   },
   unopenedIsolatedPositions: selectUnopenedIsolatedPositions,
-} as const satisfies NestedSelectors;
+};
 
-export const BonsaiHooks = {
+interface BonsaiHooksShape {
+  useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
+  useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
+}
+
+export const BonsaiHooks: BonsaiHooksShape = {
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
-} as const;
+};

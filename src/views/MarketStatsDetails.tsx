@@ -4,7 +4,7 @@ import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 import { DisplayUnit } from '@/constants/trade';
 
@@ -27,7 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MidMarketPrice } from './MidMarketPrice';
@@ -275,7 +275,7 @@ const DetailsItem = ({
             type={OutputType.Percent}
             value={value}
             color={color}
-            fractionDigits={TINY_PERCENT_DECIMALS}
+            fractionDigits={FUNDING_DECIMALS}
           />
         </WithTooltip>
       );
@@ -319,7 +319,10 @@ const DetailsItem = ({
               ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
               : null
           }
-          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
+          withDiff={
+            MaybeBigNumber(initialMarginFraction)?.toNumber() !==
+            (effectiveInitialMarginFraction ?? undefined)
+          }
           type={OutputType.Multiple}
         />
       );

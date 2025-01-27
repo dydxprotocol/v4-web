@@ -79,6 +79,18 @@ function calculateDerivedMarketDisplayItems(market: IndexerWsBaseMarketObject) {
   };
 }
 
+function calculatePriceChangePercent(
+  priceChange24H: string | null | undefined,
+  oraclePrice: string | null | undefined
+): BigNumber | null {
+  if (priceChange24H == null || oraclePrice == null) {
+    return null;
+  }
+
+  const price24hAgo = MustBigNumber(oraclePrice).minus(priceChange24H);
+  return price24hAgo.gt(0) ? MustBigNumber(priceChange24H).div(price24hAgo) : null;
+}
+
 function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
   return {
     effectiveInitialMarginFraction:
@@ -86,11 +98,8 @@ function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
     openInterestUSDC: MustBigNumber(market.openInterest)
       .times(market.oraclePrice ?? 0)
       .toNumber(),
-    percentChange24h: MustBigNumber(market.oraclePrice).isZero()
-      ? null
-      : MustBigNumber(market.priceChange24H)
-          .div(market.oraclePrice ?? 0)
-          .toNumber(),
+    percentChange24h:
+      calculatePriceChangePercent(market.priceChange24H, market.oraclePrice)?.toNumber() ?? null,
     stepSizeDecimals: MaybeBigNumber(market.stepSize)?.decimalPlaces() ?? TOKEN_DECIMALS,
     tickSizeDecimals: MaybeBigNumber(market.tickSize)?.decimalPlaces() ?? USD_DECIMALS,
   };
@@ -110,7 +119,7 @@ export function formatSparklineData(sparklines?: {
   if (sparklines == null) return sparklines;
   return mapValues(sparklines, (map) => {
     return mapValues(map, (sparkline) => {
-      return sparkline.map((point) => MustBigNumber(point).toNumber());
+      return sparkline.map((point) => MustBigNumber(point).toNumber()).toReversed();
     });
   });
 }
@@ -120,9 +129,9 @@ export function createMarketSummary(
   sparklines: PerpetualMarketSparklines | undefined,
   assetInfo: AllAssetData | undefined,
   listOfFavorites: string[]
-): PerpetualMarketSummaries | null {
+): PerpetualMarketSummaries | undefined {
   if (markets == null || assetInfo == null) {
-    return null;
+    return undefined;
   }
 
   return pickBy(

@@ -39,10 +39,11 @@ const unstablePaths = [
   'openInterestUSDC',
 ] satisfies Array<keyof PerpetualMarketSummary>;
 type UnstablePaths = (typeof unstablePaths)[number];
+export type StablePerpetualMarketSummary = Omit<PerpetualMarketSummary, UnstablePaths>;
 
 export const selectCurrentMarketInfoStable = createAppSelector(
   [selectCurrentMarketInfo],
-  (market): undefined | Omit<PerpetualMarketSummary, UnstablePaths> =>
+  (market): undefined | StablePerpetualMarketSummary =>
     market == null ? market : omit(market, ...unstablePaths),
   {
     memoizeOptions: {

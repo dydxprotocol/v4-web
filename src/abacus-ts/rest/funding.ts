@@ -12,11 +12,16 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { getDirectionFromFundingRate, mapFundingChartObject } from '../calculators/funding';
+import {
+  getDirectionFromFundingRate,
+  HistoricalFundingObject,
+  mapFundingChartObject,
+} from '../calculators/funding';
+import { Loadable } from '../lib/loadable';
 import { selectCurrentMarketInfo } from '../selectors/summary';
 import { useIndexerClient } from './lib/useIndexer';
 
-export const useCurrentMarketHistoricalFunding = () => {
+export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingObject[]> => {
   const { indexerClient, key: indexerKey } = useIndexerClient();
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
   const { nextFundingRate } = orEmptyObj(useAppSelector(selectCurrentMarketInfo));

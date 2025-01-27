@@ -77,15 +77,14 @@ function addUsdcAssetPosition(
   });
 }
 
+export type UsdcDepositArgs = {
+  subaccountNumber: number;
+  depositAmount: string;
+};
+
 export function createUsdcDepositOperations(
   parentSubaccount: ParentSubaccountData,
-  {
-    subaccountNumber,
-    depositAmount,
-  }: {
-    subaccountNumber: number;
-    depositAmount: string;
-  }
+  { subaccountNumber, depositAmount }: UsdcDepositArgs
 ): SubaccountBatchedOperations {
   const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
     side: IndexerPositionSide.LONG,
@@ -107,15 +106,13 @@ export function createUsdcDepositOperations(
   };
 }
 
+export type UsdcWithdrawArgs = {
+  subaccountNumber: number;
+  withdrawAmount: string;
+};
 export function createUsdcWithdrawalOperations(
   parentSubaccount: ParentSubaccountData,
-  {
-    subaccountNumber,
-    withdrawAmount,
-  }: {
-    subaccountNumber: number;
-    withdrawAmount: string;
-  }
+  { subaccountNumber, withdrawAmount }: UsdcWithdrawArgs
 ): SubaccountBatchedOperations {
   const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
     side: IndexerPositionSide.SHORT,
