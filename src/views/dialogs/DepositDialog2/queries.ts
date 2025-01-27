@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { BalanceRequest, RouteRequest, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';

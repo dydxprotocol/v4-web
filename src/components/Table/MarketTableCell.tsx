@@ -1,4 +1,4 @@
-import { PerpetualMarketSummary } from '@/abacus-ts/types/summaryTypes';
+import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 
 import type { Asset } from '@/constants/abacus';
 

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
-import { PendingIsolatedPosition } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { PendingIsolatedPosition } from '@/bonsai/types/summaryTypes';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';

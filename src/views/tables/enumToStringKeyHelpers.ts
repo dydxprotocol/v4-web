@@ -1,4 +1,4 @@
-import { MarginMode, OrderStatus, SubaccountFillType } from '@/abacus-ts/types/summaryTypes';
+import { MarginMode, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import {

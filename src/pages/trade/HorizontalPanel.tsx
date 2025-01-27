@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 

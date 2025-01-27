@@ -1,11 +1,11 @@
 import { forwardRef, useMemo } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import {
   PerpetualMarketSummary,
   SubaccountOrder,
   SubaccountPosition,
-} from '@/abacus-ts/types/summaryTypes';
+} from '@/bonsai/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
 import { useNavigate } from 'react-router-dom';

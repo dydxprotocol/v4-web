@@ -1,5 +1,5 @@
-import { logAbacusTsError } from '@/abacus-ts/logs';
-import { selectCompositeClientReady, selectIndexerReady } from '@/abacus-ts/socketSelectors';
+import { logAbacusTsError } from '@/bonsai/logs';
+import { selectCompositeClientReady, selectIndexerReady } from '@/bonsai/socketSelectors';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 

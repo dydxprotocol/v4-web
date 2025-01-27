@@ -1,4 +1,4 @@
-import { PositionUniqueId, SubaccountOrder } from '@/abacus-ts/types/summaryTypes';
+import { PositionUniqueId, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';

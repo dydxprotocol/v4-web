@@ -76,7 +76,7 @@ type ParameterizedSelector<Result, Args extends any[]> = () => (
 ) => Result;
 
 // all data should be accessed via selectors in this file
-// no files outside abacus-ts should access anything within abacus-ts except this file
+// no files outside bonsai should access anything within bonsai except this file
 interface BonsaiCoreShape {
   account: {
     parentSubaccountSummary: {

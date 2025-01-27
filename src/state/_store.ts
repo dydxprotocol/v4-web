@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import { storeLifecycles } from '@/abacus-ts/storeLifecycles';
+import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';

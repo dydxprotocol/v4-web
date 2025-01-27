@@ -1,6 +1,6 @@
 import { EventHandler } from 'react';
 
-import { BonsaiCore } from '@/abacus-ts/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 
 import { STRING_KEYS } from '@/constants/localization';

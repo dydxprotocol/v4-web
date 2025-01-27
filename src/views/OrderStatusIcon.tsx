@@ -1,4 +1,4 @@
-import { OrderStatus } from '@/abacus-ts/types/summaryTypes';
+import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { Icon } from '@/components/Icon';

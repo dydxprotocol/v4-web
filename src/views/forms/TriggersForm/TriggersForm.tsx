@@ -1,7 +1,7 @@
 import { FormEvent } from 'react';
 
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
-import { PositionUniqueId } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiHelpers } from '@/bonsai/ontology';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 

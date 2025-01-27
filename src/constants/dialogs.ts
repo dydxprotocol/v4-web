@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { PositionUniqueId } from '@/abacus-ts/types/summaryTypes';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';

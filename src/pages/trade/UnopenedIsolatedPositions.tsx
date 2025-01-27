@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 
-import { BonsaiHelpers } from '@/abacus-ts/ontology';
-import type { PendingIsolatedPosition } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiHelpers } from '@/bonsai/ontology';
+import type { PendingIsolatedPosition } from '@/bonsai/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';

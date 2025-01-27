@@ -1,7 +1,7 @@
-import { createStoreEffect } from '@/abacus-ts/lib/createStoreEffect';
-import { selectWebsocketUrl } from '@/abacus-ts/socketSelectors';
-import { CandlesValuesManager } from '@/abacus-ts/websocket/candles';
-import { subscribeToWsValue } from '@/abacus-ts/websocket/lib/indexerValueManagerHelpers';
+import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
+import { selectWebsocketUrl } from '@/bonsai/socketSelectors';
+import { CandlesValuesManager } from '@/bonsai/websocket/candles';
+import { subscribeToWsValue } from '@/bonsai/websocket/lib/indexerValueManagerHelpers';
 import type {
   LibrarySymbolInfo,
   ResolutionString,

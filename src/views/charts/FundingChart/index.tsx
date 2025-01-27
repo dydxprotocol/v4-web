@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BonsaiHooks } from '@/abacus-ts/ontology';
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
 import styled, { css } from 'styled-components';

@@ -1,11 +1,7 @@
 import { forwardRef, Key, ReactNode, useMemo } from 'react';
 
-import { BonsaiCore, BonsaiHelpers } from '@/abacus-ts/ontology';
-import {
-  OrderStatus,
-  PerpetualMarketSummary,
-  SubaccountOrder,
-} from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { OrderStatus, PerpetualMarketSummary, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import styled, { css } from 'styled-components';

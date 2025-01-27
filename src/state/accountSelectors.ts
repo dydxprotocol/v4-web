@@ -1,5 +1,5 @@
-import { BonsaiCore } from '@/abacus-ts/ontology';
-import { PositionUniqueId } from '@/abacus-ts/types/summaryTypes';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { groupBy, keyBy, mapValues, sum } from 'lodash';

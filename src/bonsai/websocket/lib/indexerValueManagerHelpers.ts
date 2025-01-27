@@ -1,4 +1,4 @@
-import { ResourceCacheManager } from '@/abacus-ts/lib/resourceCacheManager';
+import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import stableStringify from 'fast-json-stable-stringify';
 
 import { IndexerWebsocket } from './indexerWebsocket';
