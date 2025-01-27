@@ -47,6 +47,7 @@ import {
   selectCurrentMarketOrderbookLoading,
 } from './selectors/markets';
 import {
+  createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketInfo,
@@ -58,6 +59,7 @@ import {
   ApiState,
   AssetData,
   GroupedSubaccountSummary,
+  OrderbookProcessedData,
   PendingIsolatedPosition,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
@@ -179,9 +181,19 @@ interface BonsaiHelpersShape {
       orderHistory: BasicSelector<SubaccountOrder[]>;
       fills: BasicSelector<SubaccountFill[]>;
     };
+    orderbook: {
+      data: BasicSelector<OrderbookProcessedData | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
   };
   assets: {
     createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string]>;
+  };
+  markets: {
+    createSelectMarketSummaryById: ParameterizedSelector<
+      PerpetualMarketSummary | undefined,
+      [string | undefined]
+    >;
   };
   forms: {
     deposit: {
@@ -216,6 +228,9 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   },
   assets: {
     createSelectAssetInfo,
+  },
+  markets: {
+    createSelectMarketSummaryById,
   },
   forms: {
     deposit: {

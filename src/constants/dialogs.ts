@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 
+import { PositionUniqueId } from '@/abacus-ts/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { BigNumberish } from '@/lib/numbers';
 
-import { Nullable, SubaccountOrder, SubaccountPosition } from './abacus';
+import { Nullable, SubaccountPosition } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 
@@ -76,10 +77,9 @@ export type TradeDialogProps = {
   slotTrigger?: React.ReactNode;
 };
 export type TriggersDialogProps = {
+  positionUniqueId: PositionUniqueId;
   marketId: string;
   assetId: string;
-  stopLossOrders: SubaccountOrder[];
-  takeProfitOrders: SubaccountOrder[];
   navigateToMarketOrders: (market: string) => void;
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };

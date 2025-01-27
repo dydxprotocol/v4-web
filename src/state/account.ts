@@ -36,7 +36,6 @@ export type AccountState = {
 
   subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
-  fundingPayments?: SubaccountFundingPayments;
   transfers?: SubaccountTransfers;
   historicalPnl?: SubAccountHistoricalPNLs;
 
@@ -73,7 +72,6 @@ const initialState: AccountState = {
   subaccount: undefined,
   childSubaccounts: {},
   fills: undefined,
-  fundingPayments: undefined,
   transfers: undefined,
   historicalPnl: undefined,
 
@@ -128,9 +126,6 @@ export const accountSlice = createSlice({
         fills: action.payload,
         unseenFillsCountPerMarket: newUnseenFillsCountPerMarket,
       };
-    },
-    setFundingPayments: (state, action: PayloadAction<any>) => {
-      state.fundingPayments = action.payload;
     },
     setTransfers: (state, action: PayloadAction<any>) => {
       state.transfers = action.payload;
@@ -257,7 +252,6 @@ export const accountSlice = createSlice({
 
 export const {
   setFills,
-  setFundingPayments,
   setTransfers,
 
   clearOrder,

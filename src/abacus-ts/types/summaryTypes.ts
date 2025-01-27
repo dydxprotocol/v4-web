@@ -75,8 +75,10 @@ export type SubaccountPositionBase = ConvertStringToBigNumber<
 
 export type MarginMode = 'ISOLATED' | 'CROSS';
 
+export type PositionUniqueId = string & { ___brand: 'POSITION_UNIQUE_ID' };
+
 export type SubaccountPositionDerivedCore = {
-  uniqueId: string;
+  uniqueId: PositionUniqueId;
   assetId: string;
   marginMode: MarginMode;
 
@@ -133,6 +135,7 @@ export type SubaccountOrder = {
   subaccountNumber: number;
   id: string;
   clientId: string | undefined;
+  positionUniqueId: PositionUniqueId; // market + subaccount, can map to a unique position if/when it exists
   type: IndexerOrderType;
   side: IndexerOrderSide;
   status: OrderStatus | undefined;

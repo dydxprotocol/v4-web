@@ -1,12 +1,15 @@
 import { FormEvent } from 'react';
 
+import { BonsaiHelpers } from '@/abacus-ts/ontology';
+import { PositionUniqueId } from '@/abacus-ts/types/summaryTypes';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
+import { ErrorType, ValidationError } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -18,36 +21,46 @@ import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getPositionDetails } from '@/state/accountSelectors';
+import {
+  getSubaccountConditionalOrders,
+  getSubaccountPositionByUniqueId,
+} from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { getTradeInputAlert } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
 import { TriggerOrdersInputs } from './TriggerOrdersInputs';
 
 type ElementProps = {
+  positionUniqueId: PositionUniqueId;
   marketId: string;
-  stopLossOrders: SubaccountOrder[];
-  takeProfitOrders: SubaccountOrder[];
   onViewOrdersClick: () => void;
 };
 
-export const TriggersForm = ({
-  marketId,
-  stopLossOrders,
-  takeProfitOrders,
-  onViewOrdersClick,
-}: ElementProps) => {
+export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
-  const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useParameterizedSelector(getPositionDetails, marketId) ?? {};
+  const { stopLossOrders, takeProfitOrders } = orEmptyObj(
+    useParameterizedSelector(getSubaccountConditionalOrders, isSlTpLimitOrdersEnabled)[
+      positionUniqueId
+    ]
+  );
+
+  const { entryPrice, signedSize, market } = orEmptyObj(
+    useParameterizedSelector(getSubaccountPositionByUniqueId, positionUniqueId)
+  );
+
+  const { oraclePrice, assetId, tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
+    useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, market)
+  );
 
   const {
     differingOrderSizes,
@@ -58,14 +71,14 @@ export const TriggersForm = ({
     existsLimitOrder,
   } = useTriggerOrdersFormInputs({
     marketId,
-    positionSize: size?.current ?? null,
-    stopLossOrder: stopLossOrders.length === 1 ? stopLossOrders[0] : undefined,
-    takeProfitOrder: takeProfitOrders.length === 1 ? takeProfitOrders[0] : undefined,
+    positionSize: signedSize?.toNumber() ?? null,
+    stopLossOrder: stopLossOrders?.length === 1 ? stopLossOrders[0] : undefined,
+    takeProfitOrder: takeProfitOrders?.length === 1 ? takeProfitOrders[0] : undefined,
   });
 
-  const symbol = asset?.id ?? '';
-  const multipleTakeProfitOrders = takeProfitOrders.length > 1;
-  const multipleStopLossOrders = stopLossOrders.length > 1;
+  const symbol = assetId ?? '';
+  const multipleTakeProfitOrders = (takeProfitOrders?.length ?? 0) > 1;
+  const multipleStopLossOrders = (stopLossOrders?.length ?? 0) > 1;
 
   const hasInputErrors = inputErrors?.some(
     (error: ValidationError) => error.type !== ErrorType.warning
@@ -85,11 +98,7 @@ export const TriggersForm = ({
     <$PriceBox>
       <$PriceRow>
         <$PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</$PriceLabel>
-        <$Price
-          type={OutputType.Fiat}
-          value={entryPrice?.current}
-          fractionDigits={tickSizeDecimals}
-        />
+        <$Price type={OutputType.Fiat} value={entryPrice} fractionDigits={tickSizeDecimals} />
       </$PriceRow>
       <$PriceRow>
         <$PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</$PriceLabel>
@@ -124,7 +133,7 @@ export const TriggersForm = ({
             symbol={symbol}
             existsLimitOrder={existsLimitOrder}
             size={inputSize}
-            positionSize={size?.current ? Math.abs(size.current) : null}
+            positionSize={signedSize ? signedSize.abs().toNumber() : null}
             differingOrderSizes={differingOrderSizes}
             multipleTakeProfitOrders={multipleTakeProfitOrders}
             multipleStopLossOrders={multipleStopLossOrders}

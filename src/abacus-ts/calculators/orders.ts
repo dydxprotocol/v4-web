@@ -2,7 +2,11 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { mapValues, maxBy, orderBy } from 'lodash';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
-import { IndexerBestEffortOpenedStatus, IndexerOrderStatus } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerBestEffortOpenedStatus,
+  IndexerOrderStatus,
+  IndexerOrderType,
+} from '@/types/indexer/indexerApiGen';
 import { IndexerCompositeOrderObject } from '@/types/indexer/indexerManual';
 
 import { assertNever } from '@/lib/assertNever';
@@ -13,6 +17,7 @@ import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { mergeObjects } from '../lib/mergeObjects';
 import { OrdersData } from '../types/rawTypes';
 import { OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import { getPositionUniqueId } from './helpers';
 
 export function calculateOpenOrders(orders: SubaccountOrder[]) {
   return orders.filter(
@@ -50,8 +55,9 @@ function calculateSubaccountOrder(
     marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
     subaccountNumber: base.subaccountNumber,
     id: base.id,
+    positionUniqueId: getPositionUniqueId(base.ticker, base.subaccountNumber),
     clientId: base.clientId,
-    type: base.type,
+    type: getOrderType(base.type, base.clientMetadata),
     side: base.side,
     timeInForce: base.timeInForce,
     clobPairId: MaybeBigNumber(base.clobPairId)?.toNumber(),
@@ -70,6 +76,25 @@ function calculateSubaccountOrder(
   };
   order = maybeUpdateOrderIfExpired(order, protocolHeight);
   return order;
+}
+
+function getOrderType(
+  type: IndexerOrderType,
+  clientMetadata: string | undefined
+): IndexerOrderType {
+  if (clientMetadata === '1') {
+    switch (type) {
+      case IndexerOrderType.LIMIT:
+        return IndexerOrderType.MARKET;
+      case IndexerOrderType.STOPLIMIT:
+        return IndexerOrderType.STOPMARKET;
+      case IndexerOrderType.TAKEPROFIT:
+        return IndexerOrderType.TAKEPROFITMARKET;
+      default:
+        return type;
+    }
+  }
+  return type;
 }
 
 export function getSimpleOrderStatus(status: OrderStatus) {

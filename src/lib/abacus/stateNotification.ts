@@ -26,7 +26,6 @@ import {
   setChildSubaccount,
   setCompliance,
   setFills,
-  setFundingPayments,
   setHistoricalPnl,
   setRestrictionType,
   setStakingBalances,
@@ -185,20 +184,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           } else {
             dispatch(setFills(fills));
             dispatch(updateFilledOrders(fills));
-          }
-        }
-
-        if (changes.has(Changes.fundingPayments)) {
-          const fundingPayments =
-            updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
-
-          if (isChildSubaccount) {
-            childSubaccountUpdate[subaccountId] = {
-              ...childSubaccountUpdate[subaccountId],
-              fundingPayments,
-            };
-          } else {
-            dispatch(setFundingPayments(fundingPayments));
           }
         }
 
